@@ -2,25 +2,7 @@
 [TestLabelsSource/78 - 1]
 expr: bottomk(10, sum(rate(foo[5m])) without(job))
 output:
-    - selector:
-        name: foo
-        originaloffset: 0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 0
-              name: __name__
-              value: foo
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 21
-            end: 24
-      labels:
+    - labels:
         __name__:
             reason: Aggregation removes metric name.
             fragment:

@@ -5,8 +5,7 @@ expr: |4
       vector(1) and month() == 2
     ) or vector(0)
 output:
-    - selector: null
-      labels:
+    - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
             fragment:
@@ -17,8 +16,7 @@ output:
       isdeadreason: ""
       returns: vector
       joins:
-        - selector: null
-          labels:
+        - labels:
             "":
                 reason: Calling `month()` with no arguments will return an empty time series with no labels.
                 fragment:
@@ -59,8 +57,7 @@ output:
       knownreturn: true
       isconditional: true
       isreturnbool: false
-    - selector: null
-      labels:
+    - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
             fragment:

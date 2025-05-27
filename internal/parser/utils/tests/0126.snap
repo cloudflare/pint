@@ -2,8 +2,7 @@
 [TestLabelsSource/126 - 1]
 expr: label_replace(vector(1), "nexthop_tag", "$1", "nexthop", "(.+)")
 output:
-    - selector: null
-      labels:
+    - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
             fragment:

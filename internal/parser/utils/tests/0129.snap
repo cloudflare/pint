@@ -3,8 +3,7 @@
 expr: |4-
     ((( group(vector(0)) ))) > 0
 output:
-    - selector: null
-      labels:
+    - labels:
         "":
             reason: Query is using aggregation that removes all labels.
             fragment:

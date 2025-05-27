@@ -2,25 +2,7 @@
 [TestLabelsSource/91 - 1]
 expr: container_file_descriptors / on (instance, app_name) group_left() container_ulimits_soft{ulimit="max_open_files"}
 output:
-    - selector:
-        name: container_file_descriptors
-        originaloffset: 0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 0
-              name: __name__
-              value: container_file_descriptors
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 0
-            end: 26
-      labels:
+    - labels:
         app_name:
             reason: Query is using many-to-one vector matching with `on(instance, app_name)`, labels included inside `on(...)` will be present on the results.
             fragment:
@@ -37,28 +19,7 @@ output:
       isdeadreason: ""
       returns: vector
       joins:
-        - selector:
-            name: container_ulimits_soft
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 0
-                  name: ulimit
-                  value: max_open_files
-                - type: 0
-                  name: __name__
-                  value: container_ulimits_soft
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 66
-                end: 113
-          labels:
+        - labels:
             ulimit:
                 reason: Query will only return series where these labels are present.
                 fragment:

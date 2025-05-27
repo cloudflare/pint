@@ -2,37 +2,7 @@
 [TestLabelsSource/88 - 1]
 expr: label_join(up{job="api-server",src1="a",src2="b",src3="c"}, "foo", ",", "src1", "src2", "src3")
 output:
-    - selector:
-        name: up
-        originaloffset: 0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 0
-              name: job
-              value: api-server
-            - type: 0
-              name: src1
-              value: a
-            - type: 0
-              name: src2
-              value: b
-            - type: 0
-              name: src3
-              value: c
-            - type: 0
-              name: __name__
-              value: up
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 11
-            end: 58
-      labels:
+    - labels:
         foo:
             reason: This label will be added to the result by label_join() call.
             fragment:

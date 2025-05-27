@@ -2,28 +2,7 @@
 [TestLabelsSource/137 - 1]
 expr: foo{a="1"} * on(instance) group_right(c,d) bar{b="2"}
 output:
-    - selector:
-        name: bar
-        originaloffset: 0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 0
-              name: b
-              value: "2"
-            - type: 0
-              name: __name__
-              value: bar
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 43
-            end: 53
-      labels:
+    - labels:
         b:
             reason: Query will only return series where these labels are present.
             fragment:
@@ -52,28 +31,7 @@ output:
       isdeadreason: ""
       returns: vector
       joins:
-        - selector:
-            name: foo
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 0
-                  name: a
-                  value: "1"
-                - type: 0
-                  name: __name__
-                  value: foo
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 0
-                end: 10
-          labels:
+        - labels:
             a:
                 reason: Query will only return series where these labels are present.
                 fragment:

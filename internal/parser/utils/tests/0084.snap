@@ -2,49 +2,13 @@
 [TestLabelsSource/84 - 1]
 expr: foo unless bar unless baz
 output:
-    - selector:
-        name: foo
-        originaloffset: 0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 0
-              name: __name__
-              value: foo
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 0
-            end: 3
-      labels: {}
+    - labels: {}
       operation: many-to-many
       isdeadreason: ""
       returns: vector
       joins: []
       unless:
-        - selector:
-            name: bar
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 0
-                  name: __name__
-                  value: bar
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 11
-                end: 14
-          labels: {}
+        - labels: {}
           operation: ""
           isdeadreason: ""
           returns: vector
@@ -64,25 +28,7 @@ output:
           knownreturn: false
           isconditional: false
           isreturnbool: false
-        - selector:
-            name: baz
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 0
-                  name: __name__
-                  value: baz
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 22
-                end: 25
-          labels: {}
+        - labels: {}
           operation: ""
           isdeadreason: ""
           returns: vector

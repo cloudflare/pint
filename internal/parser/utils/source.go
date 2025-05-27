@@ -43,7 +43,7 @@ type LabelTransform struct {
 // FIXME remove Selector/Call/Aggregation?
 // Use a single parser.Node instead?
 type Source struct {
-	Selector       *promParser.VectorSelector // Vector selector used for this source.
+	Selector       *promParser.VectorSelector `yaml:"-"` // Vector selector used for this source.
 	Call           *promParser.Call           `yaml:"-"` // Most outer call used inside this source.
 	Aggregation    *promParser.AggregateExpr  `yaml:"-"` // Most outer aggregation expression used inside this source.
 	Labels         map[string]LabelTransform

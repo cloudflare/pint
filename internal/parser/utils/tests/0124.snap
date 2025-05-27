@@ -2,25 +2,7 @@
 [TestLabelsSource/124 - 1]
 expr: foo offset 5m > 5
 output:
-    - selector:
-        name: foo
-        originaloffset: 5m0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 0
-              name: __name__
-              value: foo
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 0
-            end: 13
-      labels: {}
+    - labels: {}
       operation: ""
       isdeadreason: ""
       returns: vector

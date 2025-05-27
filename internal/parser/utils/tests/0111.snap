@@ -2,31 +2,7 @@
 [TestLabelsSource/111 - 1]
 expr: up{instance="a", job="prometheus"} * ignoring(job) up{instance="a", job="pint"}
 output:
-    - selector:
-        name: up
-        originaloffset: 0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 0
-              name: instance
-              value: a
-            - type: 0
-              name: job
-              value: prometheus
-            - type: 0
-              name: __name__
-              value: up
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 0
-            end: 34
-      labels:
+    - labels:
         instance:
             reason: Query will only return series where these labels are present.
             fragment:
@@ -43,31 +19,7 @@ output:
       isdeadreason: ""
       returns: vector
       joins:
-        - selector:
-            name: up
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 0
-                  name: instance
-                  value: a
-                - type: 0
-                  name: job
-                  value: pint
-                - type: 0
-                  name: __name__
-                  value: up
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 51
-                end: 79
-          labels:
+        - labels:
             instance:
                 reason: Query will only return series where these labels are present.
                 fragment:

@@ -2,28 +2,7 @@
 [TestLabelsSource/135 - 1]
 expr: foo{a="1"} * on() bar{b="2"}
 output:
-    - selector:
-        name: foo
-        originaloffset: 0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 0
-              name: a
-              value: "1"
-            - type: 0
-              name: __name__
-              value: foo
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 0
-            end: 10
-      labels:
+    - labels:
         "":
             reason: Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.
             fragment:
@@ -40,28 +19,7 @@ output:
       isdeadreason: ""
       returns: vector
       joins:
-        - selector:
-            name: bar
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 0
-                  name: b
-                  value: "2"
-                - type: 0
-                  name: __name__
-                  value: bar
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 18
-                end: 28
-          labels:
+        - labels:
             b:
                 reason: Query will only return series where these labels are present.
                 fragment:

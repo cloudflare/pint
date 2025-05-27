@@ -2,28 +2,7 @@
 [TestLabelsSource/45 - 1]
 expr: abs(foo{job="myjob"} or bar{cluster="dev"})
 output:
-    - selector:
-        name: foo
-        originaloffset: 0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 0
-              name: job
-              value: myjob
-            - type: 0
-              name: __name__
-              value: foo
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 4
-            end: 20
-      labels:
+    - labels:
         job:
             reason: Query will only return series where these labels are present.
             fragment:
@@ -49,28 +28,7 @@ output:
       knownreturn: false
       isconditional: false
       isreturnbool: false
-    - selector:
-        name: bar
-        originaloffset: 0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 0
-              name: cluster
-              value: dev
-            - type: 0
-              name: __name__
-              value: bar
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 24
-            end: 42
-      labels:
+    - labels:
         cluster:
             reason: Query will only return series where these labels are present.
             fragment:

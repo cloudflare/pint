@@ -2,25 +2,7 @@
 [TestLabelsSource/81 - 1]
 expr: (foo or bar) or baz
 output:
-    - selector:
-        name: foo
-        originaloffset: 0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 0
-              name: __name__
-              value: foo
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 1
-            end: 4
-      labels: {}
+    - labels: {}
       operation: many-to-many
       isdeadreason: ""
       returns: vector
@@ -40,25 +22,7 @@ output:
       knownreturn: false
       isconditional: false
       isreturnbool: false
-    - selector:
-        name: bar
-        originaloffset: 0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 0
-              name: __name__
-              value: bar
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 8
-            end: 11
-      labels: {}
+    - labels: {}
       operation: many-to-many
       isdeadreason: ""
       returns: vector
@@ -78,25 +42,7 @@ output:
       knownreturn: false
       isconditional: false
       isreturnbool: false
-    - selector:
-        name: baz
-        originaloffset: 0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 0
-              name: __name__
-              value: baz
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 16
-            end: 19
-      labels: {}
+    - labels: {}
       operation: many-to-many
       isdeadreason: ""
       returns: vector

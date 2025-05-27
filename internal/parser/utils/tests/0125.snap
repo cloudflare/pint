@@ -5,48 +5,12 @@ expr: |4
     (rate(metric1[5m]) or vector(1)) +
     (rate(metric3{log_name="samplerd"}[5m]) or vector(2)) > 0
 output:
-    - selector:
-        name: metric2
-        originaloffset: 0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 0
-              name: __name__
-              value: metric2
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 7
-            end: 14
-      labels: {}
+    - labels: {}
       operation: rate
       isdeadreason: ""
       returns: vector
       joins:
-        - selector:
-            name: metric1
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 0
-                  name: __name__
-                  value: metric1
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 42
-                end: 49
-          labels: {}
+        - labels: {}
           operation: rate
           isdeadreason: ""
           returns: vector
@@ -66,8 +30,7 @@ output:
           knownreturn: false
           isconditional: false
           isreturnbool: false
-        - selector: null
-          labels:
+        - labels:
             "":
                 reason: Calling `vector()` will return a vector value with no labels.
                 fragment:
@@ -93,28 +56,7 @@ output:
           knownreturn: true
           isconditional: false
           isreturnbool: false
-        - selector:
-            name: metric3
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 0
-                  name: log_name
-                  value: samplerd
-                - type: 0
-                  name: __name__
-                  value: metric3
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 77
-                end: 105
-          labels:
+        - labels:
             log_name:
                 reason: Query will only return series where these labels are present.
                 fragment:
@@ -140,8 +82,7 @@ output:
           knownreturn: false
           isconditional: false
           isreturnbool: false
-        - selector: null
-          labels:
+        - labels:
             "":
                 reason: Calling `vector()` will return a vector value with no labels.
                 fragment:
@@ -182,8 +123,7 @@ output:
       knownreturn: false
       isconditional: true
       isreturnbool: false
-    - selector: null
-      labels:
+    - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
             fragment:
@@ -194,25 +134,7 @@ output:
       isdeadreason: ""
       returns: vector
       joins:
-        - selector:
-            name: metric1
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 0
-                  name: __name__
-                  value: metric1
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 42
-                end: 49
-          labels: {}
+        - labels: {}
           operation: rate
           isdeadreason: ""
           returns: vector
@@ -232,8 +154,7 @@ output:
           knownreturn: false
           isconditional: false
           isreturnbool: false
-        - selector: null
-          labels:
+        - labels:
             "":
                 reason: Calling `vector()` will return a vector value with no labels.
                 fragment:
@@ -259,28 +180,7 @@ output:
           knownreturn: true
           isconditional: false
           isreturnbool: false
-        - selector:
-            name: metric3
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 0
-                  name: log_name
-                  value: samplerd
-                - type: 0
-                  name: __name__
-                  value: metric3
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 77
-                end: 105
-          labels:
+        - labels:
             log_name:
                 reason: Query will only return series where these labels are present.
                 fragment:
@@ -306,8 +206,7 @@ output:
           knownreturn: false
           isconditional: false
           isreturnbool: false
-        - selector: null
-          labels:
+        - labels:
             "":
                 reason: Calling `vector()` will return a vector value with no labels.
                 fragment:

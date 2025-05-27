@@ -2,8 +2,7 @@
 [TestLabelsSource/86 - 1]
 expr: year()
 output:
-    - selector: null
-      labels:
+    - labels:
         "":
             reason: Calling `year()` with no arguments will return an empty time series with no labels.
             fragment:

@@ -5,28 +5,7 @@ expr: |-
     or
     ((bob > 10) or sum(foo) or vector(1))
 output:
-    - selector:
-        name: sometimes
-        originaloffset: 0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 1
-              name: foo
-              value: bar
-            - type: 0
-              name: __name__
-              value: sometimes
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 5
-            end: 26
-      labels:
+    - labels:
         "":
             reason: Query is using aggregation that removes all labels.
             fragment:
@@ -58,8 +37,7 @@ output:
       knownreturn: false
       isconditional: false
       isreturnbool: false
-    - selector: null
-      labels:
+    - labels:
         "":
             reason: Query is using aggregation that removes all labels.
             fragment:
@@ -91,25 +69,7 @@ output:
       knownreturn: true
       isconditional: false
       isreturnbool: false
-    - selector:
-        name: bob
-        originaloffset: 0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 0
-              name: __name__
-              value: bob
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 47
-            end: 50
-      labels: {}
+    - labels: {}
       operation: many-to-many
       isdeadreason: ""
       returns: vector
@@ -129,25 +89,7 @@ output:
       knownreturn: false
       isconditional: true
       isreturnbool: false
-    - selector:
-        name: foo
-        originaloffset: 0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 0
-              name: __name__
-              value: foo
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 64
-            end: 67
-      labels:
+    - labels:
         "":
             reason: Query is using aggregation that removes all labels.
             fragment:
@@ -179,8 +121,7 @@ output:
       knownreturn: false
       isconditional: false
       isreturnbool: false
-    - selector: null
-      labels:
+    - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
             fragment:

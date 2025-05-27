@@ -2,8 +2,7 @@
 [TestLabelsSource/106 - 1]
 expr: days_in_month()
 output:
-    - selector: null
-      labels:
+    - labels:
         "":
             reason: Calling `days_in_month()` with no arguments will return an empty time series with no labels.
             fragment:

@@ -8,28 +8,7 @@ expr: |4
        and on(device, instance) absent(node_disk_info)
      ) * on(instance) group_left(group) label_replace(salt_highstate_runner_configured_minions, "instance", "$1", "minion", "(.+)")
 output:
-    - selector:
-        name: kernel_device_io_errors_total
-        originaloffset: 0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 3
-              name: device
-              value: loop.+
-            - type: 0
-              name: __name__
-              value: kernel_device_io_errors_total
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 46
-            end: 93
-      labels:
+    - labels:
         __name__:
             reason: Aggregation removes metric name.
             fragment:
@@ -64,25 +43,7 @@ output:
       isdeadreason: ""
       returns: vector
       joins:
-        - selector:
-            name: node_disk_info
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 0
-                  name: __name__
-                  value: node_disk_info
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 299
-                end: 313
-          labels:
+        - labels:
             "":
                 reason: |-
                     The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
@@ -118,25 +79,7 @@ output:
           knownreturn: false
           isconditional: false
           isreturnbool: false
-        - selector:
-            name: salt_highstate_runner_configured_minions
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 0
-                  name: __name__
-                  value: salt_highstate_runner_configured_minions
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 365
-                end: 405
-          labels:
+        - labels:
             instance:
                 reason: This label will be added to the result by label_replace() call.
                 fragment:
@@ -163,51 +106,12 @@ output:
           isconditional: false
           isreturnbool: false
       unless:
-        - selector:
-            name: kernel_device_io_soft_errors_total
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 3
-                  name: device
-                  value: loop.+
-                - type: 0
-                  name: __name__
-                  value: kernel_device_io_soft_errors_total
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 149
-                end: 201
-          labels: {}
+        - labels: {}
           operation: increase
           isdeadreason: ""
           returns: vector
           joins:
-            - selector:
-                name: kernel_device_io_errors_total
-                originaloffset: 0s
-                originaloffsetexpr: null
-                offset: 0s
-                timestamp: null
-                skiphistogrambuckets: false
-                startorend: 0
-                labelmatchers:
-                    - type: 0
-                      name: __name__
-                      value: kernel_device_io_errors_total
-                unexpandedseriesset: null
-                series: []
-                bypassemptymatchercheck: false
-                posrange:
-                    start: 222
-                    end: 251
-              labels: {}
+            - labels: {}
               operation: increase
               isdeadreason: ""
               returns: vector

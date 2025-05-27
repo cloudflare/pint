@@ -2,28 +2,7 @@
 [TestLabelsSource/59 - 1]
 expr: count_values("version", build_version{job="foo"}) without(job)
 output:
-    - selector:
-        name: build_version
-        originaloffset: 0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 0
-              name: job
-              value: foo
-            - type: 0
-              name: __name__
-              value: build_version
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 24
-            end: 48
-      labels:
+    - labels:
         __name__:
             reason: Aggregation removes metric name.
             fragment:

@@ -2,25 +2,7 @@
 [TestLabelsSource/51 - 1]
 expr: group(foo) by(job)
 output:
-    - selector:
-        name: foo
-        originaloffset: 0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 0
-              name: __name__
-              value: foo
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 6
-            end: 9
-      labels:
+    - labels:
         "":
             reason: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
             fragment:

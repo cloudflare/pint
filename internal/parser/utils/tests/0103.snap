@@ -2,8 +2,7 @@
 [TestLabelsSource/103 - 1]
 expr: vector(scalar(foo))
 output:
-    - selector: null
-      labels:
+    - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
             fragment:

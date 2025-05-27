@@ -9,25 +9,7 @@ expr: |4-
     and on(job)
     sum(foo:count) by(job) > 20
 output:
-    - selector:
-        name: foo:sum
-        originaloffset: 0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 0
-              name: __name__
-              value: foo:sum
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 8
-            end: 15
-      labels:
+    - labels:
         __name__:
             reason: Aggregation removes metric name.
             fragment:
@@ -50,25 +32,7 @@ output:
       isdeadreason: ""
       returns: vector
       joins:
-        - selector:
-            name: job:notify
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 0
-                  name: __name__
-                  value: job:notify
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 68
-                end: 78
-          labels: {}
+        - labels: {}
           operation: ""
           isdeadreason: ""
           returns: vector
@@ -88,25 +52,7 @@ output:
           knownreturn: false
           isconditional: false
           isreturnbool: false
-        - selector:
-            name: foo:count
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 0
-                  name: __name__
-                  value: foo:count
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 97
-                end: 106
-          labels:
+        - labels:
             "":
                 reason: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
                 fragment:

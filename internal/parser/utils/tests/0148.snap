@@ -7,25 +7,7 @@ expr: |4-
         server_errors_total
     )
 output:
-    - selector:
-        name: errors_total
-        originaloffset: 0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 0
-              name: __name__
-              value: errors_total
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 30
-            end: 42
-      labels:
+    - labels:
         "":
             reason: Query is using aggregation with `by(foo, bar)`, only labels included inside `by(...)` will be present on the results.
             fragment:
@@ -72,25 +54,7 @@ output:
       isdeadreason: ""
       returns: vector
       joins:
-        - selector:
-            name: server_errors_total
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 0
-                  name: __name__
-                  value: server_errors_total
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 94
-                end: 113
-          labels: {}
+        - labels: {}
           operation: ""
           isdeadreason: ""
           returns: vector

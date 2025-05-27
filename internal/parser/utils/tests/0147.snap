@@ -2,8 +2,7 @@
 [TestLabelsSource/147 - 1]
 expr: (day_of_week() == 6 and hour() < 1) or vector(1)
 output:
-    - selector: null
-      labels:
+    - labels:
         "":
             reason: Calling `day_of_week()` with no arguments will return an empty time series with no labels.
             fragment:
@@ -14,8 +13,7 @@ output:
       isdeadreason: ""
       returns: vector
       joins:
-        - selector: null
-          labels:
+        - labels:
             "":
                 reason: Calling `hour()` with no arguments will return an empty time series with no labels.
                 fragment:
@@ -56,8 +54,7 @@ output:
       knownreturn: false
       isconditional: true
       isreturnbool: false
-    - selector: null
-      labels:
+    - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
             fragment:

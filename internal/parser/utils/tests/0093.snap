@@ -2,37 +2,7 @@
 [TestLabelsSource/93 - 1]
 expr: absent(foo{job="bar", cluster!="dev", instance=~".+", env="prod"})
 output:
-    - selector:
-        name: foo
-        originaloffset: 0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 0
-              name: job
-              value: bar
-            - type: 1
-              name: cluster
-              value: dev
-            - type: 2
-              name: instance
-              value: .+
-            - type: 0
-              name: env
-              value: prod
-            - type: 0
-              name: __name__
-              value: foo
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 7
-            end: 65
-      labels:
+    - labels:
         "":
             reason: |-
                 The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.

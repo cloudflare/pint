@@ -2,28 +2,7 @@
 [TestLabelsSource/49 - 1]
 expr: max(foo{job="myjob"}) / min(foo{job="myjob"})
 output:
-    - selector:
-        name: foo
-        originaloffset: 0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 0
-              name: job
-              value: myjob
-            - type: 0
-              name: __name__
-              value: foo
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 4
-            end: 20
-      labels:
+    - labels:
         "":
             reason: Query is using aggregation that removes all labels.
             fragment:
@@ -46,28 +25,7 @@ output:
       isdeadreason: ""
       returns: vector
       joins:
-        - selector:
-            name: foo
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 0
-                  name: job
-                  value: myjob
-                - type: 0
-                  name: __name__
-                  value: foo
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 28
-                end: 44
-          labels:
+        - labels:
             "":
                 reason: Query is using aggregation that removes all labels.
                 fragment:

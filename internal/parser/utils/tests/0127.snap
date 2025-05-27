@@ -2,28 +2,7 @@
 [TestLabelsSource/127 - 1]
 expr: (sum(foo{job="myjob"}))
 output:
-    - selector:
-        name: foo
-        originaloffset: 0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 0
-              name: job
-              value: myjob
-            - type: 0
-              name: __name__
-              value: foo
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 5
-            end: 21
-      labels:
+    - labels:
         "":
             reason: Query is using aggregation that removes all labels.
             fragment:

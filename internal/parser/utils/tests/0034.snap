@@ -2,25 +2,7 @@
 [TestLabelsSource/34 - 1]
 expr: deriv(rate(distance_covered_meters_total[1m])[5m:1m])
 output:
-    - selector:
-        name: distance_covered_meters_total
-        originaloffset: 0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 0
-              name: __name__
-              value: distance_covered_meters_total
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 11
-            end: 40
-      labels: {}
+    - labels: {}
       operation: deriv
       isdeadreason: ""
       returns: vector

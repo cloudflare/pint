@@ -2,28 +2,7 @@
 [TestLabelsSource/69 - 1]
 expr: foo{job="foo", ignored="true"} * on(instance) group_right(job) bar{cluster="bar"}
 output:
-    - selector:
-        name: bar
-        originaloffset: 0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 0
-              name: cluster
-              value: bar
-            - type: 0
-              name: __name__
-              value: bar
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 63
-            end: 81
-      labels:
+    - labels:
         cluster:
             reason: Query will only return series where these labels are present.
             fragment:
@@ -46,31 +25,7 @@ output:
       isdeadreason: ""
       returns: vector
       joins:
-        - selector:
-            name: foo
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 0
-                  name: job
-                  value: foo
-                - type: 0
-                  name: ignored
-                  value: "true"
-                - type: 0
-                  name: __name__
-                  value: foo
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 0
-                end: 30
-          labels:
+        - labels:
             ignored:
                 reason: Query will only return series where these labels are present.
                 fragment:

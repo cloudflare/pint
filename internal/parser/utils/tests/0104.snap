@@ -2,8 +2,7 @@
 [TestLabelsSource/104 - 1]
 expr: vector(0.0  >= bool 0.5) == 1
 output:
-    - selector: null
-      labels:
+    - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
             fragment:

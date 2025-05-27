@@ -11,28 +11,7 @@ expr: |4-
      notfound > 0
     )
 output:
-    - selector:
-        name: sometimes
-        originaloffset: 0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 1
-              name: foo
-              value: bar
-            - type: 0
-              name: __name__
-              value: sometimes
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 8
-            end: 29
-      labels:
+    - labels:
         "":
             reason: Query is using aggregation that removes all labels.
             fragment:
@@ -49,25 +28,7 @@ output:
       isdeadreason: ""
       returns: vector
       joins:
-        - selector:
-            name: bob
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 0
-                  name: __name__
-                  value: bob
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 57
-                end: 60
-          labels: {}
+        - labels: {}
           operation: many-to-many
           isdeadreason: ""
           returns: vector
@@ -87,25 +48,7 @@ output:
           knownreturn: false
           isconditional: true
           isreturnbool: false
-        - selector:
-            name: bar
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 0
-                  name: __name__
-                  value: bar
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 74
-                end: 77
-          labels:
+        - labels:
             "":
                 reason: Query is using aggregation that removes all labels.
                 fragment:
@@ -137,25 +80,7 @@ output:
           knownreturn: false
           isconditional: false
           isreturnbool: false
-        - selector:
-            name: notfound
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 0
-                  name: __name__
-                  value: notfound
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 85
-                end: 93
-          labels: {}
+        - labels: {}
           operation: many-to-many
           isdeadreason: ""
           returns: vector
@@ -190,8 +115,7 @@ output:
       knownreturn: false
       isconditional: true
       isreturnbool: false
-    - selector: null
-      labels:
+    - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
             fragment:
@@ -202,25 +126,7 @@ output:
       isdeadreason: ""
       returns: vector
       joins:
-        - selector:
-            name: bob
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 0
-                  name: __name__
-                  value: bob
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 57
-                end: 60
-          labels: {}
+        - labels: {}
           operation: many-to-many
           isdeadreason: ""
           returns: vector
@@ -240,25 +146,7 @@ output:
           knownreturn: false
           isconditional: true
           isreturnbool: false
-        - selector:
-            name: bar
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 0
-                  name: __name__
-                  value: bar
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 74
-                end: 77
-          labels:
+        - labels:
             "":
                 reason: Query is using aggregation that removes all labels.
                 fragment:
@@ -290,25 +178,7 @@ output:
           knownreturn: false
           isconditional: false
           isreturnbool: false
-        - selector:
-            name: notfound
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 0
-                  name: __name__
-                  value: notfound
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 85
-                end: 93
-          labels: {}
+        - labels: {}
           operation: many-to-many
           isdeadreason: ""
           returns: vector

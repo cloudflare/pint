@@ -2,25 +2,7 @@
 [TestLabelsSource/62 - 1]
 expr: topk(10, foo or bar)
 output:
-    - selector:
-        name: foo
-        originaloffset: 0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 0
-              name: __name__
-              value: foo
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 9
-            end: 12
-      labels: {}
+    - labels: {}
       operation: topk
       isdeadreason: ""
       returns: vector
@@ -40,25 +22,7 @@ output:
       knownreturn: false
       isconditional: false
       isreturnbool: false
-    - selector:
-        name: bar
-        originaloffset: 0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 0
-              name: __name__
-              value: bar
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 16
-            end: 19
-      labels: {}
+    - labels: {}
       operation: topk
       isdeadreason: ""
       returns: vector

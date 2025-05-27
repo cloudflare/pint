@@ -2,8 +2,7 @@
 [TestLabelsSource/15 - 1]
 expr: '"test"'
 output:
-    - selector: null
-      labels:
+    - labels:
         "":
             reason: This query returns a string value with no labels.
             fragment:

@@ -7,31 +7,7 @@ expr: |4
        * on (instance) group_left (cluster)
         cf_node_role{kubernetes_role="master",role="kubernetes"}
 output:
-    - selector:
-        name: cf_node_role
-        originaloffset: 0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 0
-              name: kubernetes_role
-              value: master
-            - type: 0
-              name: role
-              value: kubernetes
-            - type: 0
-              name: __name__
-              value: cf_node_role
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 29
-            end: 85
-      labels:
+    - labels:
         "":
             reason: Query is using aggregation with `by(instance, cluster)`, only labels included inside `by(...)` will be present on the results.
             fragment:
@@ -73,28 +49,7 @@ output:
       returns: vector
       joins: []
       unless:
-        - selector:
-            name: node_systemd_timer_last_trigger_seconds
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 2
-                  name: name
-                  value: etcd-defrag-.*.timer
-                - type: 0
-                  name: __name__
-                  value: node_systemd_timer_last_trigger_seconds
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 132
-                end: 201
-          labels:
+        - labels:
             "":
                 reason: Query is using aggregation with `by(instance, cluster)`, only labels included inside `by(...)` will be present on the results.
                 fragment:
@@ -129,31 +84,7 @@ output:
           isdeadreason: ""
           returns: vector
           joins:
-            - selector:
-                name: cf_node_role
-                originaloffset: 0s
-                originaloffsetexpr: null
-                offset: 0s
-                timestamp: null
-                skiphistogrambuckets: false
-                startorend: 0
-                labelmatchers:
-                    - type: 0
-                      name: kubernetes_role
-                      value: master
-                    - type: 0
-                      name: role
-                      value: kubernetes
-                    - type: 0
-                      name: __name__
-                      value: cf_node_role
-                unexpandedseriesset: null
-                series: []
-                bypassemptymatchercheck: false
-                posrange:
-                    start: 247
-                    end: 303
-              labels:
+            - labels:
                 kubernetes_role:
                     reason: Query will only return series where these labels are present.
                     fragment:

@@ -2,25 +2,7 @@
 [TestLabelsSource/24 - 1]
 expr: foo > bool on(instance) group_left(version) bar
 output:
-    - selector:
-        name: foo
-        originaloffset: 0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 0
-              name: __name__
-              value: foo
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 0
-            end: 3
-      labels:
+    - labels:
         instance:
             reason: Query is using many-to-one vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
             fragment:
@@ -37,25 +19,7 @@ output:
       isdeadreason: ""
       returns: vector
       joins:
-        - selector:
-            name: bar
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 0
-                  name: __name__
-                  value: bar
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 44
-                end: 47
-          labels: {}
+        - labels: {}
           operation: ""
           isdeadreason: ""
           returns: vector

@@ -2,25 +2,7 @@
 [TestLabelsSource/149 - 1]
 expr: 1 - (foo or vector(0)) < 0.999
 output:
-    - selector:
-        name: foo
-        originaloffset: 0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 0
-              name: __name__
-              value: foo
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 5
-            end: 8
-      labels: {}
+    - labels: {}
       operation: many-to-many
       isdeadreason: ""
       returns: vector
@@ -40,8 +22,7 @@ output:
       knownreturn: false
       isconditional: true
       isreturnbool: false
-    - selector: null
-      labels:
+    - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
             fragment:

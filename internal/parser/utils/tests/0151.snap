@@ -2,25 +2,7 @@
 [TestLabelsSource/151 - 1]
 expr: count by (region) (stddev by (colo_name, region) (error_total))
 output:
-    - selector:
-        name: error_total
-        originaloffset: 0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 0
-              name: __name__
-              value: error_total
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 50
-            end: 61
-      labels:
+    - labels:
         "":
             reason: Query is using aggregation with `by(region)`, only labels included inside `by(...)` will be present on the results.
             fragment:

@@ -2,8 +2,7 @@
 [TestLabelsSource/117 - 1]
 expr: vector(0) > vector(1)
 output:
-    - selector: null
-      labels:
+    - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
             fragment:
@@ -14,8 +13,7 @@ output:
       isdeadreason: '`vector(0) > vector(1)` always evaluates to `0 > 1` which is not possible, so it will never return anything'
       returns: vector
       joins:
-        - selector: null
-          labels:
+        - labels:
             "":
                 reason: Calling `vector()` will return a vector value with no labels.
                 fragment:

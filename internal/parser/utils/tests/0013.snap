@@ -2,8 +2,7 @@
 [TestLabelsSource/13 - 1]
 expr: 1 > bool 0
 output:
-    - selector: null
-      labels:
+    - labels:
         "":
             reason: This query returns a number value with no labels.
             fragment:

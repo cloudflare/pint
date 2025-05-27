@@ -7,28 +7,7 @@ expr: |4-
      vector(1)
     ) == 0
 output:
-    - selector:
-        name: probe_success
-        originaloffset: 0s
-        originaloffsetexpr: null
-        offset: 0s
-        timestamp: null
-        skiphistogrambuckets: false
-        startorend: 0
-        labelmatchers:
-            - type: 0
-              name: job
-              value: abc
-            - type: 0
-              name: __name__
-              value: probe_success
-        unexpandedseriesset: null
-        series: []
-        bypassemptymatchercheck: false
-        posrange:
-            start: 56
-            end: 80
-      labels:
+    - labels:
         "":
             reason: Query is using aggregation with `by(region, target, colo_name)`, only labels included inside `by(...)` will be present on the results.
             fragment:
@@ -84,8 +63,7 @@ output:
       knownreturn: false
       isconditional: true
       isreturnbool: false
-    - selector: null
-      labels:
+    - labels:
         "":
             reason: Query is using aggregation with `by(region, target, colo_name)`, only labels included inside `by(...)` will be present on the results.
             fragment:
