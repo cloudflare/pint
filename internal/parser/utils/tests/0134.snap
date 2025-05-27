@@ -1,0 +1,276 @@
+
+[TestLabelsSource/134 - 1]
+expr: |4
+    max by (instance, cluster) (cf_node_role{kubernetes_role="master",role="kubernetes"})
+    unless
+       sum by (instance, cluster) (time() - node_systemd_timer_last_trigger_seconds{name=~"etcd-defrag-.*.timer"})
+       * on (instance) group_left (cluster)
+        cf_node_role{kubernetes_role="master",role="kubernetes"}
+output:
+    - selector:
+        name: cf_node_role
+        originaloffset: 0s
+        originaloffsetexpr: null
+        offset: 0s
+        timestamp: null
+        skiphistogrambuckets: false
+        startorend: 0
+        labelmatchers:
+            - type: 0
+              name: kubernetes_role
+              value: master
+            - type: 0
+              name: role
+              value: kubernetes
+            - type: 0
+              name: __name__
+              value: cf_node_role
+        unexpandedseriesset: null
+        series: []
+        bypassemptymatchercheck: false
+        posrange:
+            start: 29
+            end: 85
+      call: null
+      aggregation:
+        op: 57409
+        expr:
+            name: cf_node_role
+            originaloffset: 0s
+            originaloffsetexpr: null
+            offset: 0s
+            timestamp: null
+            skiphistogrambuckets: false
+            startorend: 0
+            labelmatchers:
+                - type: 0
+                  name: kubernetes_role
+                  value: master
+                - type: 0
+                  name: role
+                  value: kubernetes
+                - type: 0
+                  name: __name__
+                  value: cf_node_role
+            unexpandedseriesset: null
+            series: []
+            bypassemptymatchercheck: false
+            posrange:
+                start: 29
+                end: 85
+        param: null
+        grouping:
+            - instance
+            - cluster
+        without: false
+        posrange:
+            start: 1
+            end: 86
+      excludereason:
+        "":
+            reason: Query is using aggregation with `by(instance, cluster)`, only labels included inside `by(...)` will be present on the results.
+            fragment:
+                start: 5
+                end: 8
+        __name__:
+            reason: Aggregation removes metric name.
+            fragment:
+                start: 1
+                end: 86
+        kubernetes_role:
+            reason: Query is using aggregation with `by(instance, cluster)`, only labels included inside `by(...)` will be present on the results.
+            fragment:
+                start: 5
+                end: 8
+        role:
+            reason: Query is using aggregation with `by(instance, cluster)`, only labels included inside `by(...)` will be present on the results.
+            fragment:
+                start: 5
+                end: 8
+      operation: max
+      isdeadreason: ""
+      returns: vector
+      joins: []
+      unless:
+        - selector:
+            name: node_systemd_timer_last_trigger_seconds
+            originaloffset: 0s
+            originaloffsetexpr: null
+            offset: 0s
+            timestamp: null
+            skiphistogrambuckets: false
+            startorend: 0
+            labelmatchers:
+                - type: 2
+                  name: name
+                  value: etcd-defrag-.*.timer
+                - type: 0
+                  name: __name__
+                  value: node_systemd_timer_last_trigger_seconds
+            unexpandedseriesset: null
+            series: []
+            bypassemptymatchercheck: false
+            posrange:
+                start: 132
+                end: 201
+          call: null
+          aggregation:
+            op: 57414
+            expr:
+                op: 57399
+                lhs:
+                    func:
+                        name: time
+                        argtypes: []
+                        variadic: 0
+                        returntype: scalar
+                        experimental: false
+                    args: []
+                    posrange:
+                        start: 123
+                        end: 129
+                rhs:
+                    name: node_systemd_timer_last_trigger_seconds
+                    originaloffset: 0s
+                    originaloffsetexpr: null
+                    offset: 0s
+                    timestamp: null
+                    skiphistogrambuckets: false
+                    startorend: 0
+                    labelmatchers:
+                        - type: 2
+                          name: name
+                          value: etcd-defrag-.*.timer
+                        - type: 0
+                          name: __name__
+                          value: node_systemd_timer_last_trigger_seconds
+                    unexpandedseriesset: null
+                    series: []
+                    bypassemptymatchercheck: false
+                    posrange:
+                        start: 132
+                        end: 201
+                vectormatching: null
+                returnbool: false
+            param: null
+            grouping:
+                - instance
+                - cluster
+            without: false
+            posrange:
+                start: 95
+                end: 202
+          excludereason:
+            "":
+                reason: Query is using aggregation with `by(instance, cluster)`, only labels included inside `by(...)` will be present on the results.
+                fragment:
+                    start: 99
+                    end: 102
+            __name__:
+                reason: Aggregation removes metric name.
+                fragment:
+                    start: 95
+                    end: 202
+            name:
+                reason: Query is using aggregation with `by(instance, cluster)`, only labels included inside `by(...)` will be present on the results.
+                fragment:
+                    start: 99
+                    end: 102
+          operation: sum
+          isdeadreason: ""
+          returns: vector
+          joins:
+            - selector:
+                name: cf_node_role
+                originaloffset: 0s
+                originaloffsetexpr: null
+                offset: 0s
+                timestamp: null
+                skiphistogrambuckets: false
+                startorend: 0
+                labelmatchers:
+                    - type: 0
+                      name: kubernetes_role
+                      value: master
+                    - type: 0
+                      name: role
+                      value: kubernetes
+                    - type: 0
+                      name: __name__
+                      value: cf_node_role
+                unexpandedseriesset: null
+                series: []
+                bypassemptymatchercheck: false
+                posrange:
+                    start: 247
+                    end: 303
+              call: null
+              aggregation: null
+              excludereason: {}
+              operation: ""
+              isdeadreason: ""
+              returns: vector
+              joins: []
+              unless: []
+              includedlabels: []
+              excludedlabels: []
+              guaranteedlabels:
+                - kubernetes_role
+                - role
+              position:
+                start: 247
+                end: 303
+              isdeadposition:
+                start: 0
+                end: 0
+              returnednumber: 0
+              type: 3
+              fixedlabels: false
+              isdead: false
+              alwaysreturns: false
+              knownreturn: false
+              isconditional: false
+              isreturnbool: false
+          unless: []
+          includedlabels:
+            - instance
+            - cluster
+          excludedlabels:
+            - __name__
+          guaranteedlabels: []
+          position:
+            start: 132
+            end: 201
+          isdeadposition:
+            start: 0
+            end: 0
+          returnednumber: 0
+          type: 5
+          fixedlabels: true
+          isdead: false
+          alwaysreturns: false
+          knownreturn: false
+          isconditional: false
+          isreturnbool: false
+      includedlabels:
+        - instance
+        - cluster
+      excludedlabels:
+        - __name__
+      guaranteedlabels: []
+      position:
+        start: 29
+        end: 85
+      isdeadposition:
+        start: 0
+        end: 0
+      returnednumber: 0
+      type: 5
+      fixedlabels: true
+      isdead: false
+      alwaysreturns: false
+      knownreturn: false
+      isconditional: false
+      isreturnbool: false
+
+---

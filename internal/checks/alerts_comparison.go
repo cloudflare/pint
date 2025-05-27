@@ -64,7 +64,7 @@ func (c ComparisonCheck) Check(_ context.Context, entry discovery.Entry, _ []dis
 			continue
 		}
 		for _, s := range src.Joins {
-			if !s.Src.IsDead && s.Src.IsConditional {
+			if !s.IsDead && s.IsConditional {
 				goto NEXT
 			}
 		}

@@ -1,0 +1,37 @@
+
+[TestLabelsSource/3 - 1]
+expr: (2 ^ 5) == bool 5
+output:
+    - selector: null
+      call: null
+      aggregation: null
+      excludereason:
+        "":
+            reason: This query returns a number value with no labels.
+            fragment:
+                start: 1
+                end: 2
+      operation: ""
+      isdeadreason: this query always evaluates to `32 == 5` which is not possible, so it will never return anything
+      returns: scalar
+      joins: []
+      unless: []
+      includedlabels: []
+      excludedlabels: []
+      guaranteedlabels: []
+      position:
+        start: 1
+        end: 2
+      isdeadposition:
+        start: 1
+        end: 2
+      returnednumber: 32
+      type: 1
+      fixedlabels: true
+      isdead: true
+      alwaysreturns: true
+      knownreturn: true
+      isconditional: true
+      isreturnbool: true
+
+---

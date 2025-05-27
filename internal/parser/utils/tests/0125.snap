@@ -1,0 +1,633 @@
+
+[TestLabelsSource/125 - 1]
+expr: |4
+    (rate(metric2[5m]) or vector(0)) +
+    (rate(metric1[5m]) or vector(1)) +
+    (rate(metric3{log_name="samplerd"}[5m]) or vector(2)) > 0
+output:
+    - selector:
+        name: metric2
+        originaloffset: 0s
+        originaloffsetexpr: null
+        offset: 0s
+        timestamp: null
+        skiphistogrambuckets: false
+        startorend: 0
+        labelmatchers:
+            - type: 0
+              name: __name__
+              value: metric2
+        unexpandedseriesset: null
+        series: []
+        bypassemptymatchercheck: false
+        posrange:
+            start: 7
+            end: 14
+      call:
+        func:
+            name: rate
+            argtypes:
+                - matrix
+            variadic: 0
+            returntype: vector
+            experimental: false
+        args:
+            - vectorselector:
+                name: metric2
+                originaloffset: 0s
+                originaloffsetexpr: null
+                offset: 0s
+                timestamp: null
+                skiphistogrambuckets: false
+                startorend: 0
+                labelmatchers:
+                    - type: 0
+                      name: __name__
+                      value: metric2
+                unexpandedseriesset: null
+                series: []
+                bypassemptymatchercheck: false
+                posrange:
+                    start: 7
+                    end: 14
+              range: 5m0s
+              rangeexpr: null
+              endpos: 18
+        posrange:
+            start: 2
+            end: 19
+      aggregation: null
+      excludereason: {}
+      operation: rate
+      isdeadreason: ""
+      returns: vector
+      joins:
+        - selector:
+            name: metric1
+            originaloffset: 0s
+            originaloffsetexpr: null
+            offset: 0s
+            timestamp: null
+            skiphistogrambuckets: false
+            startorend: 0
+            labelmatchers:
+                - type: 0
+                  name: __name__
+                  value: metric1
+            unexpandedseriesset: null
+            series: []
+            bypassemptymatchercheck: false
+            posrange:
+                start: 42
+                end: 49
+          call:
+            func:
+                name: rate
+                argtypes:
+                    - matrix
+                variadic: 0
+                returntype: vector
+                experimental: false
+            args:
+                - vectorselector:
+                    name: metric1
+                    originaloffset: 0s
+                    originaloffsetexpr: null
+                    offset: 0s
+                    timestamp: null
+                    skiphistogrambuckets: false
+                    startorend: 0
+                    labelmatchers:
+                        - type: 0
+                          name: __name__
+                          value: metric1
+                    unexpandedseriesset: null
+                    series: []
+                    bypassemptymatchercheck: false
+                    posrange:
+                        start: 42
+                        end: 49
+                  range: 5m0s
+                  rangeexpr: null
+                  endpos: 53
+            posrange:
+                start: 37
+                end: 54
+          aggregation: null
+          excludereason: {}
+          operation: rate
+          isdeadreason: ""
+          returns: vector
+          joins: []
+          unless: []
+          includedlabels: []
+          excludedlabels: []
+          guaranteedlabels: []
+          position:
+            start: 42
+            end: 53
+          isdeadposition:
+            start: 0
+            end: 0
+          returnednumber: 0
+          type: 4
+          fixedlabels: false
+          isdead: false
+          alwaysreturns: false
+          knownreturn: false
+          isconditional: false
+          isreturnbool: false
+        - selector: null
+          call:
+            func:
+                name: vector
+                argtypes:
+                    - scalar
+                variadic: 0
+                returntype: vector
+                experimental: false
+            args:
+                - val: 1
+                  duration: false
+                  posrange:
+                    start: 65
+                    end: 66
+            posrange:
+                start: 58
+                end: 67
+          aggregation: null
+          excludereason:
+            "":
+                reason: Calling `vector()` will return a vector value with no labels.
+                fragment:
+                    start: 58
+                    end: 64
+          operation: vector
+          isdeadreason: ""
+          returns: vector
+          joins: []
+          unless: []
+          includedlabels: []
+          excludedlabels: []
+          guaranteedlabels: []
+          position:
+            start: 58
+            end: 67
+          isdeadposition:
+            start: 0
+            end: 0
+          returnednumber: 1
+          type: 4
+          fixedlabels: true
+          isdead: false
+          alwaysreturns: true
+          knownreturn: true
+          isconditional: false
+          isreturnbool: false
+        - selector:
+            name: metric3
+            originaloffset: 0s
+            originaloffsetexpr: null
+            offset: 0s
+            timestamp: null
+            skiphistogrambuckets: false
+            startorend: 0
+            labelmatchers:
+                - type: 0
+                  name: log_name
+                  value: samplerd
+                - type: 0
+                  name: __name__
+                  value: metric3
+            unexpandedseriesset: null
+            series: []
+            bypassemptymatchercheck: false
+            posrange:
+                start: 77
+                end: 105
+          call:
+            func:
+                name: rate
+                argtypes:
+                    - matrix
+                variadic: 0
+                returntype: vector
+                experimental: false
+            args:
+                - vectorselector:
+                    name: metric3
+                    originaloffset: 0s
+                    originaloffsetexpr: null
+                    offset: 0s
+                    timestamp: null
+                    skiphistogrambuckets: false
+                    startorend: 0
+                    labelmatchers:
+                        - type: 0
+                          name: log_name
+                          value: samplerd
+                        - type: 0
+                          name: __name__
+                          value: metric3
+                    unexpandedseriesset: null
+                    series: []
+                    bypassemptymatchercheck: false
+                    posrange:
+                        start: 77
+                        end: 105
+                  range: 5m0s
+                  rangeexpr: null
+                  endpos: 109
+            posrange:
+                start: 72
+                end: 110
+          aggregation: null
+          excludereason: {}
+          operation: rate
+          isdeadreason: ""
+          returns: vector
+          joins: []
+          unless: []
+          includedlabels: []
+          excludedlabels: []
+          guaranteedlabels:
+            - log_name
+          position:
+            start: 77
+            end: 109
+          isdeadposition:
+            start: 0
+            end: 0
+          returnednumber: 0
+          type: 4
+          fixedlabels: false
+          isdead: false
+          alwaysreturns: false
+          knownreturn: false
+          isconditional: false
+          isreturnbool: false
+        - selector: null
+          call:
+            func:
+                name: vector
+                argtypes:
+                    - scalar
+                variadic: 0
+                returntype: vector
+                experimental: false
+            args:
+                - val: 2
+                  duration: false
+                  posrange:
+                    start: 121
+                    end: 122
+            posrange:
+                start: 114
+                end: 123
+          aggregation: null
+          excludereason:
+            "":
+                reason: Calling `vector()` will return a vector value with no labels.
+                fragment:
+                    start: 114
+                    end: 120
+          operation: vector
+          isdeadreason: ""
+          returns: vector
+          joins: []
+          unless: []
+          includedlabels: []
+          excludedlabels: []
+          guaranteedlabels: []
+          position:
+            start: 114
+            end: 123
+          isdeadposition:
+            start: 0
+            end: 0
+          returnednumber: 2
+          type: 4
+          fixedlabels: true
+          isdead: false
+          alwaysreturns: true
+          knownreturn: true
+          isconditional: false
+          isreturnbool: false
+      unless: []
+      includedlabels: []
+      excludedlabels: []
+      guaranteedlabels: []
+      position:
+        start: 7
+        end: 18
+      isdeadposition:
+        start: 0
+        end: 0
+      returnednumber: 0
+      type: 4
+      fixedlabels: false
+      isdead: false
+      alwaysreturns: false
+      knownreturn: false
+      isconditional: true
+      isreturnbool: false
+    - selector: null
+      call:
+        func:
+            name: vector
+            argtypes:
+                - scalar
+            variadic: 0
+            returntype: vector
+            experimental: false
+        args:
+            - val: 0
+              duration: false
+              posrange:
+                start: 30
+                end: 31
+        posrange:
+            start: 23
+            end: 32
+      aggregation: null
+      excludereason:
+        "":
+            reason: Calling `vector()` will return a vector value with no labels.
+            fragment:
+                start: 23
+                end: 29
+      operation: vector
+      isdeadreason: ""
+      returns: vector
+      joins:
+        - selector:
+            name: metric1
+            originaloffset: 0s
+            originaloffsetexpr: null
+            offset: 0s
+            timestamp: null
+            skiphistogrambuckets: false
+            startorend: 0
+            labelmatchers:
+                - type: 0
+                  name: __name__
+                  value: metric1
+            unexpandedseriesset: null
+            series: []
+            bypassemptymatchercheck: false
+            posrange:
+                start: 42
+                end: 49
+          call:
+            func:
+                name: rate
+                argtypes:
+                    - matrix
+                variadic: 0
+                returntype: vector
+                experimental: false
+            args:
+                - vectorselector:
+                    name: metric1
+                    originaloffset: 0s
+                    originaloffsetexpr: null
+                    offset: 0s
+                    timestamp: null
+                    skiphistogrambuckets: false
+                    startorend: 0
+                    labelmatchers:
+                        - type: 0
+                          name: __name__
+                          value: metric1
+                    unexpandedseriesset: null
+                    series: []
+                    bypassemptymatchercheck: false
+                    posrange:
+                        start: 42
+                        end: 49
+                  range: 5m0s
+                  rangeexpr: null
+                  endpos: 53
+            posrange:
+                start: 37
+                end: 54
+          aggregation: null
+          excludereason: {}
+          operation: rate
+          isdeadreason: ""
+          returns: vector
+          joins: []
+          unless: []
+          includedlabels: []
+          excludedlabels: []
+          guaranteedlabels: []
+          position:
+            start: 42
+            end: 53
+          isdeadposition:
+            start: 0
+            end: 0
+          returnednumber: 0
+          type: 4
+          fixedlabels: false
+          isdead: false
+          alwaysreturns: false
+          knownreturn: false
+          isconditional: false
+          isreturnbool: false
+        - selector: null
+          call:
+            func:
+                name: vector
+                argtypes:
+                    - scalar
+                variadic: 0
+                returntype: vector
+                experimental: false
+            args:
+                - val: 1
+                  duration: false
+                  posrange:
+                    start: 65
+                    end: 66
+            posrange:
+                start: 58
+                end: 67
+          aggregation: null
+          excludereason:
+            "":
+                reason: Calling `vector()` will return a vector value with no labels.
+                fragment:
+                    start: 58
+                    end: 64
+          operation: vector
+          isdeadreason: ""
+          returns: vector
+          joins: []
+          unless: []
+          includedlabels: []
+          excludedlabels: []
+          guaranteedlabels: []
+          position:
+            start: 58
+            end: 67
+          isdeadposition:
+            start: 0
+            end: 0
+          returnednumber: 1
+          type: 4
+          fixedlabels: true
+          isdead: false
+          alwaysreturns: true
+          knownreturn: true
+          isconditional: false
+          isreturnbool: false
+        - selector:
+            name: metric3
+            originaloffset: 0s
+            originaloffsetexpr: null
+            offset: 0s
+            timestamp: null
+            skiphistogrambuckets: false
+            startorend: 0
+            labelmatchers:
+                - type: 0
+                  name: log_name
+                  value: samplerd
+                - type: 0
+                  name: __name__
+                  value: metric3
+            unexpandedseriesset: null
+            series: []
+            bypassemptymatchercheck: false
+            posrange:
+                start: 77
+                end: 105
+          call:
+            func:
+                name: rate
+                argtypes:
+                    - matrix
+                variadic: 0
+                returntype: vector
+                experimental: false
+            args:
+                - vectorselector:
+                    name: metric3
+                    originaloffset: 0s
+                    originaloffsetexpr: null
+                    offset: 0s
+                    timestamp: null
+                    skiphistogrambuckets: false
+                    startorend: 0
+                    labelmatchers:
+                        - type: 0
+                          name: log_name
+                          value: samplerd
+                        - type: 0
+                          name: __name__
+                          value: metric3
+                    unexpandedseriesset: null
+                    series: []
+                    bypassemptymatchercheck: false
+                    posrange:
+                        start: 77
+                        end: 105
+                  range: 5m0s
+                  rangeexpr: null
+                  endpos: 109
+            posrange:
+                start: 72
+                end: 110
+          aggregation: null
+          excludereason: {}
+          operation: rate
+          isdeadreason: ""
+          returns: vector
+          joins: []
+          unless: []
+          includedlabels: []
+          excludedlabels: []
+          guaranteedlabels:
+            - log_name
+          position:
+            start: 77
+            end: 109
+          isdeadposition:
+            start: 0
+            end: 0
+          returnednumber: 0
+          type: 4
+          fixedlabels: false
+          isdead: false
+          alwaysreturns: false
+          knownreturn: false
+          isconditional: false
+          isreturnbool: false
+        - selector: null
+          call:
+            func:
+                name: vector
+                argtypes:
+                    - scalar
+                variadic: 0
+                returntype: vector
+                experimental: false
+            args:
+                - val: 2
+                  duration: false
+                  posrange:
+                    start: 121
+                    end: 122
+            posrange:
+                start: 114
+                end: 123
+          aggregation: null
+          excludereason:
+            "":
+                reason: Calling `vector()` will return a vector value with no labels.
+                fragment:
+                    start: 114
+                    end: 120
+          operation: vector
+          isdeadreason: ""
+          returns: vector
+          joins: []
+          unless: []
+          includedlabels: []
+          excludedlabels: []
+          guaranteedlabels: []
+          position:
+            start: 114
+            end: 123
+          isdeadposition:
+            start: 0
+            end: 0
+          returnednumber: 2
+          type: 4
+          fixedlabels: true
+          isdead: false
+          alwaysreturns: true
+          knownreturn: true
+          isconditional: false
+          isreturnbool: false
+      unless: []
+      includedlabels: []
+      excludedlabels: []
+      guaranteedlabels: []
+      position:
+        start: 23
+        end: 32
+      isdeadposition:
+        start: 0
+        end: 0
+      returnednumber: 3
+      type: 4
+      fixedlabels: true
+      isdead: false
+      alwaysreturns: true
+      knownreturn: true
+      isconditional: true
+      isreturnbool: false
+
+---

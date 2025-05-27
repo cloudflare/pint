@@ -1,0 +1,146 @@
+
+[TestLabelsSource/95 - 1]
+expr: absent(foo{job="prometheus", xxx="1"}) AND on(job) prometheus_build_info
+output:
+    - selector:
+        name: foo
+        originaloffset: 0s
+        originaloffsetexpr: null
+        offset: 0s
+        timestamp: null
+        skiphistogrambuckets: false
+        startorend: 0
+        labelmatchers:
+            - type: 0
+              name: job
+              value: prometheus
+            - type: 0
+              name: xxx
+              value: "1"
+            - type: 0
+              name: __name__
+              value: foo
+        unexpandedseriesset: null
+        series: []
+        bypassemptymatchercheck: false
+        posrange:
+            start: 7
+            end: 37
+      call:
+        func:
+            name: absent
+            argtypes:
+                - vector
+            variadic: 0
+            returntype: vector
+            experimental: false
+        args:
+            - name: foo
+              originaloffset: 0s
+              originaloffsetexpr: null
+              offset: 0s
+              timestamp: null
+              skiphistogrambuckets: false
+              startorend: 0
+              labelmatchers:
+                - type: 0
+                  name: job
+                  value: prometheus
+                - type: 0
+                  name: xxx
+                  value: "1"
+                - type: 0
+                  name: __name__
+                  value: foo
+              unexpandedseriesset: null
+              series: []
+              bypassemptymatchercheck: false
+              posrange:
+                start: 7
+                end: 37
+        posrange:
+            start: 0
+            end: 38
+      aggregation: null
+      excludereason:
+        "":
+            reason: |-
+                The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+                You will only get any results back if the metric selector you pass doesn't match anything.
+                Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+                This means that the only labels you can get back from absent call are the ones you pass to it.
+                If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+            fragment:
+                start: 0
+                end: 6
+      operation: absent
+      isdeadreason: ""
+      returns: vector
+      joins:
+        - selector:
+            name: prometheus_build_info
+            originaloffset: 0s
+            originaloffsetexpr: null
+            offset: 0s
+            timestamp: null
+            skiphistogrambuckets: false
+            startorend: 0
+            labelmatchers:
+                - type: 0
+                  name: __name__
+                  value: prometheus_build_info
+            unexpandedseriesset: null
+            series: []
+            bypassemptymatchercheck: false
+            posrange:
+                start: 51
+                end: 72
+          call: null
+          aggregation: null
+          excludereason: {}
+          operation: ""
+          isdeadreason: ""
+          returns: vector
+          joins: []
+          unless: []
+          includedlabels: []
+          excludedlabels: []
+          guaranteedlabels: []
+          position:
+            start: 51
+            end: 72
+          isdeadposition:
+            start: 0
+            end: 0
+          returnednumber: 0
+          type: 3
+          fixedlabels: false
+          isdead: false
+          alwaysreturns: false
+          knownreturn: false
+          isconditional: false
+          isreturnbool: false
+      unless: []
+      includedlabels:
+        - job
+        - xxx
+      excludedlabels: []
+      guaranteedlabels:
+        - job
+        - xxx
+      position:
+        start: 7
+        end: 37
+      isdeadposition:
+        start: 0
+        end: 0
+      returnednumber: 0
+      type: 4
+      fixedlabels: true
+      isdead: false
+      alwaysreturns: false
+      knownreturn: false
+      isconditional: false
+      isreturnbool: false
+
+---

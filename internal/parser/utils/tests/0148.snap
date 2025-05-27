@@ -1,0 +1,228 @@
+
+[TestLabelsSource/148 - 1]
+expr: |4-
+    sum by (foo, bar) (
+        rate(errors_total[5m])
+      * on (instance) group_left (bob, alice)
+        server_errors_total
+    )
+output:
+    - selector:
+        name: errors_total
+        originaloffset: 0s
+        originaloffsetexpr: null
+        offset: 0s
+        timestamp: null
+        skiphistogrambuckets: false
+        startorend: 0
+        labelmatchers:
+            - type: 0
+              name: __name__
+              value: errors_total
+        unexpandedseriesset: null
+        series: []
+        bypassemptymatchercheck: false
+        posrange:
+            start: 30
+            end: 42
+      call:
+        func:
+            name: rate
+            argtypes:
+                - matrix
+            variadic: 0
+            returntype: vector
+            experimental: false
+        args:
+            - vectorselector:
+                name: errors_total
+                originaloffset: 0s
+                originaloffsetexpr: null
+                offset: 0s
+                timestamp: null
+                skiphistogrambuckets: false
+                startorend: 0
+                labelmatchers:
+                    - type: 0
+                      name: __name__
+                      value: errors_total
+                unexpandedseriesset: null
+                series: []
+                bypassemptymatchercheck: false
+                posrange:
+                    start: 30
+                    end: 42
+              range: 5m0s
+              rangeexpr: null
+              endpos: 46
+        posrange:
+            start: 25
+            end: 47
+      aggregation:
+        op: 57414
+        expr:
+            op: 57395
+            lhs:
+                func:
+                    name: rate
+                    argtypes:
+                        - matrix
+                    variadic: 0
+                    returntype: vector
+                    experimental: false
+                args:
+                    - vectorselector:
+                        name: errors_total
+                        originaloffset: 0s
+                        originaloffsetexpr: null
+                        offset: 0s
+                        timestamp: null
+                        skiphistogrambuckets: false
+                        startorend: 0
+                        labelmatchers:
+                            - type: 0
+                              name: __name__
+                              value: errors_total
+                        unexpandedseriesset: null
+                        series: []
+                        bypassemptymatchercheck: false
+                        posrange:
+                            start: 30
+                            end: 42
+                      range: 5m0s
+                      rangeexpr: null
+                      endpos: 46
+                posrange:
+                    start: 25
+                    end: 47
+            rhs:
+                name: server_errors_total
+                originaloffset: 0s
+                originaloffsetexpr: null
+                offset: 0s
+                timestamp: null
+                skiphistogrambuckets: false
+                startorend: 0
+                labelmatchers:
+                    - type: 0
+                      name: __name__
+                      value: server_errors_total
+                unexpandedseriesset: null
+                series: []
+                bypassemptymatchercheck: false
+                posrange:
+                    start: 94
+                    end: 113
+            vectormatching:
+                card: 1
+                matchinglabels:
+                    - instance
+                "on": true
+                include:
+                    - bob
+                    - alice
+            returnbool: false
+        param: null
+        grouping:
+            - foo
+            - bar
+        without: false
+        posrange:
+            start: 1
+            end: 115
+      excludereason:
+        "":
+            reason: Query is using aggregation with `by(foo, bar)`, only labels included inside `by(...)` will be present on the results.
+            fragment:
+                start: 5
+                end: 8
+        __name__:
+            reason: Aggregation removes metric name.
+            fragment:
+                start: 1
+                end: 115
+        alice:
+            reason: Query is using aggregation with `by(foo, bar)`, only labels included inside `by(...)` will be present on the results.
+            fragment:
+                start: 5
+                end: 8
+        bob:
+            reason: Query is using aggregation with `by(foo, bar)`, only labels included inside `by(...)` will be present on the results.
+            fragment:
+                start: 5
+                end: 8
+        instance:
+            reason: Query is using aggregation with `by(foo, bar)`, only labels included inside `by(...)` will be present on the results.
+            fragment:
+                start: 5
+                end: 8
+      operation: sum
+      isdeadreason: ""
+      returns: vector
+      joins:
+        - selector:
+            name: server_errors_total
+            originaloffset: 0s
+            originaloffsetexpr: null
+            offset: 0s
+            timestamp: null
+            skiphistogrambuckets: false
+            startorend: 0
+            labelmatchers:
+                - type: 0
+                  name: __name__
+                  value: server_errors_total
+            unexpandedseriesset: null
+            series: []
+            bypassemptymatchercheck: false
+            posrange:
+                start: 94
+                end: 113
+          call: null
+          aggregation: null
+          excludereason: {}
+          operation: ""
+          isdeadreason: ""
+          returns: vector
+          joins: []
+          unless: []
+          includedlabels: []
+          excludedlabels: []
+          guaranteedlabels: []
+          position:
+            start: 94
+            end: 113
+          isdeadposition:
+            start: 0
+            end: 0
+          returnednumber: 0
+          type: 3
+          fixedlabels: false
+          isdead: false
+          alwaysreturns: false
+          knownreturn: false
+          isconditional: false
+          isreturnbool: false
+      unless: []
+      includedlabels:
+        - foo
+        - bar
+      excludedlabels:
+        - __name__
+      guaranteedlabels: []
+      position:
+        start: 30
+        end: 46
+      isdeadposition:
+        start: 0
+        end: 0
+      returnednumber: 0
+      type: 5
+      fixedlabels: true
+      isdead: false
+      alwaysreturns: false
+      knownreturn: false
+      isconditional: false
+      isreturnbool: false
+
+---

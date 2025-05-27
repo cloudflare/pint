@@ -1,0 +1,103 @@
+
+[TestLabelsSource/34 - 1]
+expr: deriv(rate(distance_covered_meters_total[1m])[5m:1m])
+output:
+    - selector:
+        name: distance_covered_meters_total
+        originaloffset: 0s
+        originaloffsetexpr: null
+        offset: 0s
+        timestamp: null
+        skiphistogrambuckets: false
+        startorend: 0
+        labelmatchers:
+            - type: 0
+              name: __name__
+              value: distance_covered_meters_total
+        unexpandedseriesset: null
+        series: []
+        bypassemptymatchercheck: false
+        posrange:
+            start: 11
+            end: 40
+      call:
+        func:
+            name: deriv
+            argtypes:
+                - matrix
+            variadic: 0
+            returntype: vector
+            experimental: false
+        args:
+            - expr:
+                func:
+                    name: rate
+                    argtypes:
+                        - matrix
+                    variadic: 0
+                    returntype: vector
+                    experimental: false
+                args:
+                    - vectorselector:
+                        name: distance_covered_meters_total
+                        originaloffset: 0s
+                        originaloffsetexpr: null
+                        offset: 0s
+                        timestamp: null
+                        skiphistogrambuckets: false
+                        startorend: 0
+                        labelmatchers:
+                            - type: 0
+                              name: __name__
+                              value: distance_covered_meters_total
+                        unexpandedseriesset: null
+                        series: []
+                        bypassemptymatchercheck: false
+                        posrange:
+                            start: 11
+                            end: 40
+                      range: 1m0s
+                      rangeexpr: null
+                      endpos: 44
+                posrange:
+                    start: 6
+                    end: 45
+              range: 5m0s
+              rangeexpr: null
+              originaloffset: 0s
+              originaloffsetexpr: null
+              offset: 0s
+              timestamp: null
+              startorend: 0
+              step: 1m0s
+              stepexpr: null
+              endpos: 52
+        posrange:
+            start: 0
+            end: 53
+      aggregation: null
+      excludereason: {}
+      operation: deriv
+      isdeadreason: ""
+      returns: vector
+      joins: []
+      unless: []
+      includedlabels: []
+      excludedlabels: []
+      guaranteedlabels: []
+      position:
+        start: 6
+        end: 52
+      isdeadposition:
+        start: 0
+        end: 0
+      returnednumber: 0
+      type: 4
+      fixedlabels: false
+      isdead: false
+      alwaysreturns: false
+      knownreturn: false
+      isconditional: false
+      isreturnbool: false
+
+---

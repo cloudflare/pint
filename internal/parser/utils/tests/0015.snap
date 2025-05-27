@@ -1,0 +1,37 @@
+
+[TestLabelsSource/15 - 1]
+expr: '"test"'
+output:
+    - selector: null
+      call: null
+      aggregation: null
+      excludereason:
+        "":
+            reason: This query returns a string value with no labels.
+            fragment:
+                start: 0
+                end: 6
+      operation: ""
+      isdeadreason: ""
+      returns: string
+      joins: []
+      unless: []
+      includedlabels: []
+      excludedlabels: []
+      guaranteedlabels: []
+      position:
+        start: 0
+        end: 6
+      isdeadposition:
+        start: 0
+        end: 0
+      returnednumber: 0
+      type: 2
+      fixedlabels: true
+      isdead: false
+      alwaysreturns: true
+      knownreturn: false
+      isconditional: false
+      isreturnbool: false
+
+---

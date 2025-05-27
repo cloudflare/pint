@@ -1,0 +1,48 @@
+
+[TestLabelsSource/86 - 1]
+expr: year()
+output:
+    - selector: null
+      call:
+        func:
+            name: year
+            argtypes:
+                - vector
+            variadic: 1
+            returntype: vector
+            experimental: false
+        args: []
+        posrange:
+            start: 0
+            end: 6
+      aggregation: null
+      excludereason:
+        "":
+            reason: Calling `year()` with no arguments will return an empty time series with no labels.
+            fragment:
+                start: 0
+                end: 6
+      operation: year
+      isdeadreason: ""
+      returns: vector
+      joins: []
+      unless: []
+      includedlabels: []
+      excludedlabels: []
+      guaranteedlabels: []
+      position:
+        start: 0
+        end: 6
+      isdeadposition:
+        start: 0
+        end: 0
+      returnednumber: 0
+      type: 4
+      fixedlabels: true
+      isdead: false
+      alwaysreturns: true
+      knownreturn: false
+      isconditional: false
+      isreturnbool: false
+
+---

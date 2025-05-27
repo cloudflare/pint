@@ -15,7 +15,7 @@ import (
 
 var guaranteedLabelsMatches = []labels.MatchType{labels.MatchEqual, labels.MatchRegexp}
 
-type SourceType int
+type SourceType uint8
 
 const (
 	UnknownSource SourceType = iota
@@ -31,10 +31,6 @@ type ExcludedLabel struct {
 	Fragment posrange.PositionRange
 }
 
-type Join struct {
-	Src Source
-}
-
 // FIXME remove Selector/Call/Aggregation?
 // Use a single parser.Node instead?
 type Source struct {
@@ -45,8 +41,8 @@ type Source struct {
 	Operation        string
 	IsDeadReason     string
 	Returns          promParser.ValueType
-	Joins            []Join   // Any other sources this source joins with.
-	Unless           []Join   // Any other sources this source is suppressed by.
+	Joins            []Source // Any other sources this source joins with.
+	Unless           []Source // Any other sources this source is suppressed by.
 	IncludedLabels   []string // Labels that are included by filters, they will be present if exist on source series (by).
 	ExcludedLabels   []string // Labels guaranteed to be excluded from the results (without).
 	GuaranteedLabels []string // Labels guaranteed to be present on the results (matchers).
@@ -199,10 +195,10 @@ type Visitor func(s Source)
 func (s Source) WalkSources(fn Visitor) {
 	fn(s)
 	for _, j := range s.Joins {
-		j.Src.WalkSources(fn)
+		j.WalkSources(fn)
 	}
 	for _, u := range s.Unless {
-		u.Src.WalkSources(fn)
+		u.WalkSources(fn)
 	}
 }
 
@@ -774,9 +770,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					rs.IsDeadReason = s
 					rs.IsDeadPosition = pos
 				}
-				s.Joins = append(s.Joins, Join{
-					Src: rs,
-				})
+				s.Joins = append(s.Joins, rs)
 			}
 			s.IsConditional, s.IsReturnBool = checkConditions(s, n.Op, n.ReturnBool)
 			src = append(src, s)
@@ -803,9 +797,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					ls.IsDeadReason = s
 					ls.IsDeadPosition = pos
 				}
-				s.Joins = append(s.Joins, Join{
-					Src: ls,
-				})
+				s.Joins = append(s.Joins, ls)
 			}
 			s.IsConditional, s.IsReturnBool = checkConditions(s, n.Op, n.ReturnBool)
 			src = append(src, s)
@@ -829,9 +821,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					rs.IsDeadReason = s
 					rs.IsDeadPosition = pos
 				}
-				s.Joins = append(s.Joins, Join{
-					Src: rs,
-				})
+				s.Joins = append(s.Joins, rs)
 			}
 			s.IsConditional, s.IsReturnBool = checkConditions(s, n.Op, n.ReturnBool)
 			src = append(src, s)
@@ -871,13 +861,9 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 						s.IsDeadReason = "this query will never return anything because the `unless` query always returns something"
 						s.IsDeadPosition = rs.Position
 					}
-					s.Unless = append(s.Unless, Join{
-						Src: rs,
-					})
+					s.Unless = append(s.Unless, rs)
 				case n.Op != promParser.LOR:
-					s.Joins = append(s.Joins, Join{
-						Src: rs,
-					})
+					s.Joins = append(s.Joins, rs)
 				}
 			}
 			if n.Op == promParser.LAND && rhsConditional {

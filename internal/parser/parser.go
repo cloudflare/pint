@@ -29,7 +29,7 @@ const (
 
 var ErrRuleCommentOnFile = errors.New("this comment is only valid when attached to a rule")
 
-type Schema int
+type Schema uint8
 
 const (
 	PrometheusSchema Schema = iota

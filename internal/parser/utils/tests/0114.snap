@@ -1,0 +1,324 @@
+
+[TestLabelsSource/114 - 1]
+expr: |4-
+    sum by (region, target, colo_name) (
+        sum_over_time(probe_success{job="abc"}[5m])
+     or
+     vector(1)
+    ) == 0
+output:
+    - selector:
+        name: probe_success
+        originaloffset: 0s
+        originaloffsetexpr: null
+        offset: 0s
+        timestamp: null
+        skiphistogrambuckets: false
+        startorend: 0
+        labelmatchers:
+            - type: 0
+              name: job
+              value: abc
+            - type: 0
+              name: __name__
+              value: probe_success
+        unexpandedseriesset: null
+        series: []
+        bypassemptymatchercheck: false
+        posrange:
+            start: 56
+            end: 80
+      call:
+        func:
+            name: sum_over_time
+            argtypes:
+                - matrix
+            variadic: 0
+            returntype: vector
+            experimental: false
+        args:
+            - vectorselector:
+                name: probe_success
+                originaloffset: 0s
+                originaloffsetexpr: null
+                offset: 0s
+                timestamp: null
+                skiphistogrambuckets: false
+                startorend: 0
+                labelmatchers:
+                    - type: 0
+                      name: job
+                      value: abc
+                    - type: 0
+                      name: __name__
+                      value: probe_success
+                unexpandedseriesset: null
+                series: []
+                bypassemptymatchercheck: false
+                posrange:
+                    start: 56
+                    end: 80
+              range: 5m0s
+              rangeexpr: null
+              endpos: 84
+        posrange:
+            start: 42
+            end: 85
+      aggregation:
+        op: 57414
+        expr:
+            op: 57390
+            lhs:
+                func:
+                    name: sum_over_time
+                    argtypes:
+                        - matrix
+                    variadic: 0
+                    returntype: vector
+                    experimental: false
+                args:
+                    - vectorselector:
+                        name: probe_success
+                        originaloffset: 0s
+                        originaloffsetexpr: null
+                        offset: 0s
+                        timestamp: null
+                        skiphistogrambuckets: false
+                        startorend: 0
+                        labelmatchers:
+                            - type: 0
+                              name: job
+                              value: abc
+                            - type: 0
+                              name: __name__
+                              value: probe_success
+                        unexpandedseriesset: null
+                        series: []
+                        bypassemptymatchercheck: false
+                        posrange:
+                            start: 56
+                            end: 80
+                      range: 5m0s
+                      rangeexpr: null
+                      endpos: 84
+                posrange:
+                    start: 42
+                    end: 85
+            rhs:
+                func:
+                    name: vector
+                    argtypes:
+                        - scalar
+                    variadic: 0
+                    returntype: vector
+                    experimental: false
+                args:
+                    - val: 1
+                      duration: false
+                      posrange:
+                        start: 98
+                        end: 99
+                posrange:
+                    start: 91
+                    end: 100
+            vectormatching:
+                card: 3
+                matchinglabels: []
+                "on": false
+                include: []
+            returnbool: false
+        param: null
+        grouping:
+            - region
+            - target
+            - colo_name
+        without: false
+        posrange:
+            start: 1
+            end: 102
+      excludereason:
+        "":
+            reason: Query is using aggregation with `by(region, target, colo_name)`, only labels included inside `by(...)` will be present on the results.
+            fragment:
+                start: 5
+                end: 8
+        __name__:
+            reason: Aggregation removes metric name.
+            fragment:
+                start: 1
+                end: 102
+        job:
+            reason: Query is using aggregation with `by(region, target, colo_name)`, only labels included inside `by(...)` will be present on the results.
+            fragment:
+                start: 5
+                end: 8
+      operation: sum
+      isdeadreason: ""
+      returns: vector
+      joins: []
+      unless: []
+      includedlabels:
+        - region
+        - target
+        - colo_name
+      excludedlabels:
+        - __name__
+      guaranteedlabels: []
+      position:
+        start: 56
+        end: 84
+      isdeadposition:
+        start: 0
+        end: 0
+      returnednumber: 0
+      type: 5
+      fixedlabels: true
+      isdead: false
+      alwaysreturns: false
+      knownreturn: false
+      isconditional: true
+      isreturnbool: false
+    - selector: null
+      call:
+        func:
+            name: vector
+            argtypes:
+                - scalar
+            variadic: 0
+            returntype: vector
+            experimental: false
+        args:
+            - val: 1
+              duration: false
+              posrange:
+                start: 98
+                end: 99
+        posrange:
+            start: 91
+            end: 100
+      aggregation:
+        op: 57414
+        expr:
+            op: 57390
+            lhs:
+                func:
+                    name: sum_over_time
+                    argtypes:
+                        - matrix
+                    variadic: 0
+                    returntype: vector
+                    experimental: false
+                args:
+                    - vectorselector:
+                        name: probe_success
+                        originaloffset: 0s
+                        originaloffsetexpr: null
+                        offset: 0s
+                        timestamp: null
+                        skiphistogrambuckets: false
+                        startorend: 0
+                        labelmatchers:
+                            - type: 0
+                              name: job
+                              value: abc
+                            - type: 0
+                              name: __name__
+                              value: probe_success
+                        unexpandedseriesset: null
+                        series: []
+                        bypassemptymatchercheck: false
+                        posrange:
+                            start: 56
+                            end: 80
+                      range: 5m0s
+                      rangeexpr: null
+                      endpos: 84
+                posrange:
+                    start: 42
+                    end: 85
+            rhs:
+                func:
+                    name: vector
+                    argtypes:
+                        - scalar
+                    variadic: 0
+                    returntype: vector
+                    experimental: false
+                args:
+                    - val: 1
+                      duration: false
+                      posrange:
+                        start: 98
+                        end: 99
+                posrange:
+                    start: 91
+                    end: 100
+            vectormatching:
+                card: 3
+                matchinglabels: []
+                "on": false
+                include: []
+            returnbool: false
+        param: null
+        grouping:
+            - region
+            - target
+            - colo_name
+        without: false
+        posrange:
+            start: 1
+            end: 102
+      excludereason:
+        "":
+            reason: Query is using aggregation with `by(region, target, colo_name)`, only labels included inside `by(...)` will be present on the results.
+            fragment:
+                start: 5
+                end: 8
+        __name__:
+            reason: Aggregation removes metric name.
+            fragment:
+                start: 1
+                end: 102
+        colo_name:
+            reason: Calling `vector()` will return a vector value with no labels.
+            fragment:
+                start: 91
+                end: 97
+        region:
+            reason: Calling `vector()` will return a vector value with no labels.
+            fragment:
+                start: 91
+                end: 97
+        target:
+            reason: Calling `vector()` will return a vector value with no labels.
+            fragment:
+                start: 91
+                end: 97
+      operation: sum
+      isdeadreason: this query always evaluates to `1 == 0` which is not possible, so it will never return anything
+      returns: vector
+      joins: []
+      unless: []
+      includedlabels: []
+      excludedlabels:
+        - region
+        - target
+        - colo_name
+        - __name__
+      guaranteedlabels: []
+      position:
+        start: 91
+        end: 100
+      isdeadposition:
+        start: 91
+        end: 100
+      returnednumber: 1
+      type: 5
+      fixedlabels: true
+      isdead: true
+      alwaysreturns: true
+      knownreturn: true
+      isconditional: true
+      isreturnbool: false
+
+---

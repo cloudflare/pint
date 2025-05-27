@@ -1,0 +1,93 @@
+
+[TestLabelsSource/60 - 1]
+expr: count_values("version", build_version) by(job)
+output:
+    - selector:
+        name: build_version
+        originaloffset: 0s
+        originaloffsetexpr: null
+        offset: 0s
+        timestamp: null
+        skiphistogrambuckets: false
+        startorend: 0
+        labelmatchers:
+            - type: 0
+              name: __name__
+              value: build_version
+        unexpandedseriesset: null
+        series: []
+        bypassemptymatchercheck: false
+        posrange:
+            start: 24
+            end: 37
+      call: null
+      aggregation:
+        op: 57407
+        expr:
+            name: build_version
+            originaloffset: 0s
+            originaloffsetexpr: null
+            offset: 0s
+            timestamp: null
+            skiphistogrambuckets: false
+            startorend: 0
+            labelmatchers:
+                - type: 0
+                  name: __name__
+                  value: build_version
+            unexpandedseriesset: null
+            series: []
+            bypassemptymatchercheck: false
+            posrange:
+                start: 24
+                end: 37
+        param:
+            val: version
+            posrange:
+                start: 13
+                end: 22
+        grouping:
+            - job
+        without: false
+        posrange:
+            start: 0
+            end: 46
+      excludereason:
+        "":
+            reason: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
+            fragment:
+                start: 39
+                end: 41
+        __name__:
+            reason: Aggregation removes metric name.
+            fragment:
+                start: 0
+                end: 46
+      operation: count_values
+      isdeadreason: ""
+      returns: vector
+      joins: []
+      unless: []
+      includedlabels:
+        - job
+        - version
+      excludedlabels:
+        - __name__
+      guaranteedlabels:
+        - version
+      position:
+        start: 24
+        end: 37
+      isdeadposition:
+        start: 0
+        end: 0
+      returnednumber: 0
+      type: 5
+      fixedlabels: true
+      isdead: false
+      alwaysreturns: false
+      knownreturn: false
+      isconditional: false
+      isreturnbool: false
+
+---

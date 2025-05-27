@@ -1,0 +1,144 @@
+
+[TestLabelsSource/141 - 1]
+expr: foo{a="1"} * on(instance) group_left(c,d) sum(bar{b="2"}) without(instance)
+output:
+    - selector:
+        name: foo
+        originaloffset: 0s
+        originaloffsetexpr: null
+        offset: 0s
+        timestamp: null
+        skiphistogrambuckets: false
+        startorend: 0
+        labelmatchers:
+            - type: 0
+              name: a
+              value: "1"
+            - type: 0
+              name: __name__
+              value: foo
+        unexpandedseriesset: null
+        series: []
+        bypassemptymatchercheck: false
+        posrange:
+            start: 0
+            end: 10
+      call: null
+      aggregation: null
+      excludereason: {}
+      operation: many-to-one
+      isdeadreason: ""
+      returns: vector
+      joins:
+        - selector:
+            name: bar
+            originaloffset: 0s
+            originaloffsetexpr: null
+            offset: 0s
+            timestamp: null
+            skiphistogrambuckets: false
+            startorend: 0
+            labelmatchers:
+                - type: 0
+                  name: b
+                  value: "2"
+                - type: 0
+                  name: __name__
+                  value: bar
+            unexpandedseriesset: null
+            series: []
+            bypassemptymatchercheck: false
+            posrange:
+                start: 46
+                end: 56
+          call: null
+          aggregation:
+            op: 57414
+            expr:
+                name: bar
+                originaloffset: 0s
+                originaloffsetexpr: null
+                offset: 0s
+                timestamp: null
+                skiphistogrambuckets: false
+                startorend: 0
+                labelmatchers:
+                    - type: 0
+                      name: b
+                      value: "2"
+                    - type: 0
+                      name: __name__
+                      value: bar
+                unexpandedseriesset: null
+                series: []
+                bypassemptymatchercheck: false
+                posrange:
+                    start: 46
+                    end: 56
+            param: null
+            grouping:
+                - instance
+            without: true
+            posrange:
+                start: 42
+                end: 75
+          excludereason:
+            __name__:
+                reason: Aggregation removes metric name.
+                fragment:
+                    start: 42
+                    end: 75
+            instance:
+                reason: Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
+                fragment:
+                    start: 58
+                    end: 65
+          operation: sum
+          isdeadreason: The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
+          returns: vector
+          joins: []
+          unless: []
+          includedlabels: []
+          excludedlabels:
+            - instance
+            - __name__
+          guaranteedlabels:
+            - b
+          position:
+            start: 46
+            end: 56
+          isdeadposition:
+            start: 58
+            end: 65
+          returnednumber: 0
+          type: 5
+          fixedlabels: false
+          isdead: true
+          alwaysreturns: false
+          knownreturn: false
+          isconditional: false
+          isreturnbool: false
+      unless: []
+      includedlabels:
+        - c
+        - d
+        - instance
+      excludedlabels: []
+      guaranteedlabels:
+        - a
+      position:
+        start: 0
+        end: 10
+      isdeadposition:
+        start: 0
+        end: 0
+      returnednumber: 0
+      type: 3
+      fixedlabels: false
+      isdead: false
+      alwaysreturns: false
+      knownreturn: false
+      isconditional: false
+      isreturnbool: false
+
+---

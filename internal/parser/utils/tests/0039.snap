@@ -1,0 +1,110 @@
+
+[TestLabelsSource/39 - 1]
+expr: sum(count(foo{job="myjob"}) by(instance))
+output:
+    - selector:
+        name: foo
+        originaloffset: 0s
+        originaloffsetexpr: null
+        offset: 0s
+        timestamp: null
+        skiphistogrambuckets: false
+        startorend: 0
+        labelmatchers:
+            - type: 0
+              name: job
+              value: myjob
+            - type: 0
+              name: __name__
+              value: foo
+        unexpandedseriesset: null
+        series: []
+        bypassemptymatchercheck: false
+        posrange:
+            start: 10
+            end: 26
+      call: null
+      aggregation:
+        op: 57414
+        expr:
+            op: 57406
+            expr:
+                name: foo
+                originaloffset: 0s
+                originaloffsetexpr: null
+                offset: 0s
+                timestamp: null
+                skiphistogrambuckets: false
+                startorend: 0
+                labelmatchers:
+                    - type: 0
+                      name: job
+                      value: myjob
+                    - type: 0
+                      name: __name__
+                      value: foo
+                unexpandedseriesset: null
+                series: []
+                bypassemptymatchercheck: false
+                posrange:
+                    start: 10
+                    end: 26
+            param: null
+            grouping:
+                - instance
+            without: false
+            posrange:
+                start: 4
+                end: 40
+        param: null
+        grouping: []
+        without: false
+        posrange:
+            start: 0
+            end: 41
+      excludereason:
+        "":
+            reason: Query is using aggregation that removes all labels.
+            fragment:
+                start: 0
+                end: 3
+        __name__:
+            reason: Aggregation removes metric name.
+            fragment:
+                start: 0
+                end: 41
+        instance:
+            reason: Query is using aggregation that removes all labels.
+            fragment:
+                start: 0
+                end: 3
+        job:
+            reason: Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
+            fragment:
+                start: 28
+                end: 30
+      operation: sum
+      isdeadreason: ""
+      returns: vector
+      joins: []
+      unless: []
+      includedlabels: []
+      excludedlabels:
+        - __name__
+      guaranteedlabels: []
+      position:
+        start: 10
+        end: 26
+      isdeadposition:
+        start: 0
+        end: 0
+      returnednumber: 0
+      type: 5
+      fixedlabels: true
+      isdead: false
+      alwaysreturns: false
+      knownreturn: false
+      isconditional: false
+      isreturnbool: false
+
+---

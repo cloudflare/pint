@@ -2,7 +2,7 @@ package output
 
 import "fmt"
 
-type Color int
+type Color uint8
 
 const (
 	None    Color = 0
