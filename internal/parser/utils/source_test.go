@@ -1,8 +1,9 @@
 package utils_test
 
 import (
-	"fmt"
 	"os"
+	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 	"testing"
@@ -249,6 +250,10 @@ sum by (foo, bar) (
 		Output []utils.Source
 	}
 
+	_, file, _, ok := runtime.Caller(0)
+	require.True(t, ok, "can't get caller function")
+	file = strings.TrimSuffix(filepath.Base(file), ".go")
+
 	done := map[string]struct{}{}
 	for i, expr := range testCases {
 		t.Run(strconv.Itoa(i+1), func(t *testing.T) {
@@ -267,8 +272,8 @@ sum by (foo, bar) (
 			for _, src := range output {
 				src.WalkSources(func(s utils.Source) {
 					require.Positive(t, s.Position.End, "empty position %+v", s)
-					if s.IsDead {
-						require.Positive(t, s.IsDeadPosition.End, "empty dead position %+v", s)
+					if s.DeadInfo != nil {
+						require.Positive(t, s.DeadInfo.Fragment.End, "empty dead position %+v", s)
 					}
 				})
 			}
@@ -279,7 +284,7 @@ sum by (foo, bar) (
 			}
 			d, err := yaml.Marshal(snap)
 			require.NoError(t, err, "failed to YAML encode snapshots")
-			snaps.WithConfig(snaps.Dir("tests"), snaps.Filename(fmt.Sprintf("%04d", i+1))).MatchSnapshot(t, string(d))
+			snaps.WithConfig(snaps.Dir("."), snaps.Filename(file)).MatchSnapshot(t, string(d))
 		})
 	}
 }
@@ -319,7 +324,10 @@ func TestLabelsSourceCallCoverage(t *testing.T) {
 			}
 			output := utils.LabelsSource(b.String(), n.Expr)
 			require.Len(t, output, 1)
-			require.NotNil(t, output[0].Call, "no call detected in: %q ~> %+v", b.String(), output)
+			require.NotEmpty(t, output[0].Operations)
+			call, ok := utils.MostOuterOperation[*promParser.Call](output[0])
+			require.True(t, ok, "no call found in operations for: %q ~> %+v", b.String(), output)
+			require.NotNil(t, call, "no call detected in: %q ~> %+v", b.String(), output)
 			require.Equal(t, name, output[0].Operation)
 			require.Equal(t, def.ReturnType, output[0].Returns, "incorrect return type on Source{}")
 		})
@@ -336,7 +344,9 @@ func TestLabelsSourceCallCoverageFail(t *testing.T) {
 	}
 	output := utils.LabelsSource("fake_call()", n.Expr)
 	require.Len(t, output, 1)
-	require.Nil(t, output[0].Call, "no call should have been detected in fake function")
+	call, ok := utils.MostOuterOperation[*promParser.Call](output[0])
+	require.False(t, ok, "no call should have been detected in fake function, got: %v", ok)
+	require.Nil(t, call, "no call should have been detected in fake function, got: %+v", call)
 }
 
 func TestSourceFragment(t *testing.T) {

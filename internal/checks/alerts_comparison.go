@@ -57,14 +57,14 @@ func (c ComparisonCheck) Check(_ context.Context, entry discovery.Entry, _ []dis
 	srcs := utils.LabelsSource(expr.Value.Value, expr.Query.Expr)
 	var msg string
 	for _, src := range srcs {
-		if src.IsDead {
+		if src.DeadInfo != nil {
 			continue
 		}
 		if len(src.Unless) > 0 {
 			continue
 		}
 		for _, s := range src.Joins {
-			if !s.IsDead && s.IsConditional {
+			if s.DeadInfo == nil && s.IsConditional {
 				goto NEXT
 			}
 		}

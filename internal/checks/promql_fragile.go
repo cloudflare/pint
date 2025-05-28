@@ -57,7 +57,7 @@ func (c FragileCheck) Check(_ context.Context, entry discovery.Entry, _ []discov
 			if src.Type != utils.AggregateSource {
 				continue
 			}
-			if src.FixedLabels && len(src.IncludedLabels) == 0 {
+			if src.FixedLabels && len(src.TransformedLabels(utils.PossibleLabel)) == 0 {
 				continue
 			}
 			if !slices.Contains([]string{"topk", "bottomk", "limit", "limit_ratio"}, src.Operation) {

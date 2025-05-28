@@ -161,8 +161,8 @@ func (c RateCheck) checkNode(ctx context.Context, rule parser.Rule, expr parser.
 							if src.Type != utils.AggregateSource {
 								continue
 							}
-							if src.Selector != nil {
-								metadata, err := c.prom.Metadata(ctx, src.Selector.Name)
+							if vs, ok := utils.MostOuterOperation[*promParser.VectorSelector](src); ok {
+								metadata, err := c.prom.Metadata(ctx, vs.Name)
 								if err != nil {
 									if errors.Is(err, promapi.ErrUnsupported) {
 										continue
@@ -198,7 +198,7 @@ func (c RateCheck) checkNode(ctx context.Context, rule parser.Rule, expr parser.
 									Diagnostics: []diags.Diagnostic{
 										{
 											Message: fmt.Sprintf("`rate(%s(counter))` chain detected, `%s` is called here on results of `%s(%s)`.",
-												src.Operation, node.Expr, src.Operation, src.Selector),
+												src.Operation, node.Expr, src.Operation, vs),
 											Pos:         expr.Value.Pos,
 											FirstColumn: int(src.Position.Start) + 1,
 											LastColumn:  int(src.Position.End),
