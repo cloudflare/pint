@@ -65,6 +65,12 @@ func MostOuterOperation[T promParser.Node](s Source) (T, bool) {
 	return *new(T), false
 }
 
+func newSource() Source {
+	return Source{ // nolint: exhaustruct
+		Labels: map[string]LabelTransform{},
+	}
+}
+
 type Source struct {
 	Labels         map[string]LabelTransform
 	DeadInfo       *DeadInfo
@@ -133,9 +139,6 @@ func (s Source) LabelExcludeReason(name string) (string, posrange.PositionRange)
 }
 
 func (s *Source) excludeAllLabels(reason string, fragment posrange.PositionRange, except []string) {
-	if s.Labels == nil {
-		s.Labels = map[string]LabelTransform{}
-	}
 	// Everything that was included until now but will be removed needs an explicit stamp to mark it as gone.
 	for name, l := range s.Labels {
 		if slices.Contains(except, name) {
@@ -181,9 +184,6 @@ func (s *Source) excludeAllLabels(reason string, fragment posrange.PositionRange
 }
 
 func (s *Source) excludeLabel(reason string, fragment posrange.PositionRange, names ...string) {
-	if s.Labels == nil {
-		s.Labels = map[string]LabelTransform{}
-	}
 	for _, name := range names {
 		s.Labels[name] = LabelTransform{
 			Kind:     ImpossibleLabel,
@@ -194,9 +194,6 @@ func (s *Source) excludeLabel(reason string, fragment posrange.PositionRange, na
 }
 
 func (s *Source) includeLabel(reason string, fragment posrange.PositionRange, names ...string) {
-	if s.Labels == nil {
-		s.Labels = map[string]LabelTransform{}
-	}
 	for _, name := range names {
 		if l, ok := s.Labels[name]; ok && l.Kind == GuaranteedLabel {
 			continue
@@ -210,9 +207,6 @@ func (s *Source) includeLabel(reason string, fragment posrange.PositionRange, na
 }
 
 func (s *Source) guaranteeLabel(reason string, fragment posrange.PositionRange, names ...string) {
-	if s.Labels == nil {
-		s.Labels = map[string]LabelTransform{}
-	}
 	for _, name := range names {
 		s.Labels[name] = LabelTransform{
 			Kind:     GuaranteedLabel,
@@ -239,7 +233,7 @@ func LabelsSource(expr string, node promParser.Node) (src []Source) {
 }
 
 func walkNode(expr string, node promParser.Node) (src []Source) {
-	var s Source
+	s := newSource()
 	switch n := node.(type) {
 	case *promParser.AggregateExpr:
 		src = append(src, walkAggregation(expr, n)...)
@@ -354,7 +348,7 @@ func GetQueryFragment(expr string, pos posrange.PositionRange) string {
 }
 
 func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
-	var s Source
+	s := newSource()
 	switch n.Op {
 	case promParser.SUM:
 		for _, s = range parseAggregation(expr, n) {
@@ -482,7 +476,7 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 }
 
 func parseAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
-	var s Source
+	s := newSource()
 	for _, s = range walkNode(expr, n.Expr) {
 		if n.Without {
 			s.excludeLabel(
@@ -740,11 +734,13 @@ func parseCall(expr string, n *promParser.Call) (src []Source) {
 	}
 
 	if len(src) == 0 {
-		var s Source
-		s.Type = FuncSource
-		s.Operation = n.Func.Name
-		s.Operations = append(s.Operations, n)
-		s.Position = n.PosRange
+		s := Source{ // nolint: exhaustruct
+			Labels:     map[string]LabelTransform{},
+			Type:       FuncSource,
+			Operation:  n.Func.Name,
+			Operations: SourceOperations{n},
+			Position:   n.PosRange,
+		}
 		src = append(src, parsePromQLFunc(s, expr, n))
 	}
 
@@ -752,9 +748,8 @@ func parseCall(expr string, n *promParser.Call) (src []Source) {
 }
 
 func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
-	var s Source
+	s := newSource()
 	switch {
-
 	// foo{} + 1
 	// 1 + foo{}
 	// foo{} > 1
@@ -766,7 +761,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 			ls.IsConditional, ls.IsReturnBool = checkConditions(ls, n.Op, n.ReturnBool)
 			for _, rs := range rhs {
 				rs.IsConditional, rs.IsReturnBool = checkConditions(rs, n.Op, n.ReturnBool)
-				var side Source
+				side := newSource()
 				switch {
 				case ls.Returns == promParser.ValueTypeVector, ls.Returns == promParser.ValueTypeMatrix:
 					// Use labels from LHS
