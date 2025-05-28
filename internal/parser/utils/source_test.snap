@@ -19,7 +19,7 @@ output:
         start: 0
         end: 1
       returnednumber: 1
-      type: 1
+      type: number
       fixedlabels: true
       alwaysreturns: true
       knownreturn: true
@@ -48,7 +48,7 @@ output:
         start: 0
         end: 1
       returnednumber: 0.2
-      type: 1
+      type: number
       fixedlabels: true
       alwaysreturns: true
       knownreturn: true
@@ -81,7 +81,7 @@ output:
         start: 1
         end: 2
       returnednumber: 32
-      type: 1
+      type: number
       fixedlabels: true
       alwaysreturns: true
       knownreturn: true
@@ -114,7 +114,7 @@ output:
         start: 1
         end: 2
       returnednumber: 3
-      type: 1
+      type: number
       fixedlabels: true
       alwaysreturns: true
       knownreturn: true
@@ -147,7 +147,7 @@ output:
         start: 1
         end: 2
       returnednumber: 3
-      type: 1
+      type: number
       fixedlabels: true
       alwaysreturns: true
       knownreturn: true
@@ -176,7 +176,7 @@ output:
         start: 1
         end: 2
       returnednumber: 3
-      type: 1
+      type: number
       fixedlabels: true
       alwaysreturns: true
       knownreturn: true
@@ -209,7 +209,7 @@ output:
         start: 1
         end: 2
       returnednumber: 3
-      type: 1
+      type: number
       fixedlabels: true
       alwaysreturns: true
       knownreturn: true
@@ -242,7 +242,7 @@ output:
         start: 0
         end: 2
       returnednumber: 5
-      type: 1
+      type: number
       fixedlabels: true
       alwaysreturns: true
       knownreturn: true
@@ -271,7 +271,7 @@ output:
         start: 0
         end: 1
       returnednumber: 10
-      type: 1
+      type: number
       fixedlabels: true
       alwaysreturns: true
       knownreturn: true
@@ -295,7 +295,7 @@ output:
         start: 1
         end: 4
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -313,7 +313,7 @@ output:
         start: 8
         end: 11
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -337,7 +337,7 @@ output:
         start: 1
         end: 4
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -361,7 +361,7 @@ output:
         start: 8
         end: 17
       returnednumber: 10
-      type: 4
+      type: function
       fixedlabels: true
       alwaysreturns: true
       knownreturn: true
@@ -398,7 +398,7 @@ output:
             start: 22
             end: 31
           returnednumber: 2
-          type: 4
+          type: function
           fixedlabels: true
           alwaysreturns: true
           knownreturn: true
@@ -420,7 +420,7 @@ output:
             start: 35
             end: 38
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -431,7 +431,7 @@ output:
         start: 1
         end: 4
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -468,7 +468,7 @@ output:
             start: 22
             end: 31
           returnednumber: 2
-          type: 4
+          type: function
           fixedlabels: true
           alwaysreturns: true
           knownreturn: true
@@ -490,7 +490,7 @@ output:
             start: 35
             end: 38
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -501,7 +501,7 @@ output:
         start: 8
         end: 17
       returnednumber: 10
-      type: 4
+      type: function
       fixedlabels: true
       alwaysreturns: true
       knownreturn: true
@@ -530,7 +530,7 @@ output:
         start: 0
         end: 1
       returnednumber: 1
-      type: 1
+      type: number
       fixedlabels: true
       alwaysreturns: true
       knownreturn: true
@@ -559,7 +559,7 @@ output:
         start: 0
         end: 2
       returnednumber: 20
-      type: 1
+      type: number
       fixedlabels: true
       alwaysreturns: true
       knownreturn: true
@@ -588,7 +588,7 @@ output:
         start: 0
         end: 6
       returnednumber: 0
-      type: 2
+      type: string
       fixedlabels: true
       alwaysreturns: true
       knownreturn: false
@@ -612,7 +612,7 @@ output:
         start: 0
         end: 3
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -636,7 +636,7 @@ output:
         start: 1
         end: 4
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -660,7 +660,7 @@ output:
         start: 0
         end: 3
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -684,7 +684,7 @@ output:
         start: 0
         end: 3
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -715,7 +715,7 @@ output:
             start: 11
             end: 14
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -726,7 +726,7 @@ output:
         start: 0
         end: 3
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -757,7 +757,7 @@ output:
             start: 12
             end: 15
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -768,7 +768,7 @@ output:
         start: 1
         end: 4
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -811,7 +811,7 @@ output:
             start: 24
             end: 27
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -822,7 +822,7 @@ output:
         start: 0
         end: 3
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -865,7 +865,7 @@ output:
             start: 25
             end: 28
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -876,7 +876,7 @@ output:
         start: 1
         end: 4
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -919,7 +919,7 @@ output:
             start: 44
             end: 47
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -930,7 +930,7 @@ output:
         start: 0
         end: 3
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -973,7 +973,7 @@ output:
             start: 0
             end: 3
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -984,7 +984,7 @@ output:
         start: 45
         end: 48
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -1015,7 +1015,7 @@ output:
             start: 8
             end: 11
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -1026,7 +1026,7 @@ output:
         start: 0
         end: 3
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -1050,7 +1050,7 @@ output:
         start: 0
         end: 13
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -1080,7 +1080,7 @@ output:
         start: 0
         end: 14
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -1110,7 +1110,7 @@ output:
         start: 0
         end: 11
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -1140,7 +1140,7 @@ output:
         start: 0
         end: 14
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -1164,7 +1164,7 @@ output:
         start: 18
         end: 32
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -1194,7 +1194,7 @@ output:
         start: 0
         end: 12
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -1218,7 +1218,7 @@ output:
         start: 16
         end: 28
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -1242,7 +1242,7 @@ output:
         start: 0
         end: 3
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -1266,7 +1266,7 @@ output:
         start: 0
         end: 21
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -1292,7 +1292,7 @@ output:
         start: 6
         end: 52
       returnednumber: 0
-      type: 4
+      type: function
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -1316,7 +1316,7 @@ output:
         start: 0
         end: 3
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -1340,7 +1340,7 @@ output:
         start: 0
         end: 3
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -1364,7 +1364,7 @@ output:
         start: 1
         end: 4
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -1407,7 +1407,7 @@ output:
         start: 4
         end: 20
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -1457,7 +1457,7 @@ output:
         start: 10
         end: 26
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -1500,7 +1500,7 @@ output:
         start: 4
         end: 20
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -1537,7 +1537,7 @@ output:
         start: 4
         end: 20
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -1580,7 +1580,7 @@ output:
         start: 4
         end: 7
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -1623,7 +1623,7 @@ output:
         start: 4
         end: 20
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -1654,7 +1654,7 @@ output:
         start: 4
         end: 30
       returnednumber: 0
-      type: 4
+      type: function
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -1685,7 +1685,7 @@ output:
         start: 4
         end: 42
       returnednumber: 0
-      type: 4
+      type: function
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -1710,7 +1710,7 @@ output:
         start: 4
         end: 42
       returnednumber: 0
-      type: 4
+      type: function
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -1753,7 +1753,7 @@ output:
         start: 4
         end: 20
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -1790,7 +1790,7 @@ output:
         start: 24
         end: 42
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -1833,7 +1833,7 @@ output:
         start: 4
         end: 20
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -1902,7 +1902,7 @@ output:
             start: 28
             end: 44
           returnednumber: 0
-          type: 5
+          type: aggregation
           fixedlabels: true
           alwaysreturns: false
           knownreturn: false
@@ -1913,7 +1913,7 @@ output:
         start: 4
         end: 20
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -1982,7 +1982,7 @@ output:
             start: 28
             end: 44
           returnednumber: 0
-          type: 5
+          type: aggregation
           fixedlabels: true
           alwaysreturns: false
           knownreturn: false
@@ -1993,7 +1993,7 @@ output:
         start: 4
         end: 20
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -2036,7 +2036,7 @@ output:
         start: 4
         end: 20
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -2079,7 +2079,7 @@ output:
         start: 6
         end: 9
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -2117,7 +2117,7 @@ output:
         start: 12
         end: 19
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -2155,7 +2155,7 @@ output:
         start: 12
         end: 19
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -2180,7 +2180,7 @@ output:
         start: 17
         end: 24
       returnednumber: 0
-      type: 4
+      type: function
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -2205,7 +2205,7 @@ output:
         start: 17
         end: 24
       returnednumber: 0
-      type: 4
+      type: function
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -2243,7 +2243,7 @@ output:
         start: 19
         end: 26
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -2286,7 +2286,7 @@ output:
         start: 24
         end: 37
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -2329,7 +2329,7 @@ output:
         start: 24
         end: 37
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -2372,7 +2372,7 @@ output:
         start: 24
         end: 48
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -2421,7 +2421,7 @@ output:
         start: 24
         end: 37
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -2452,7 +2452,7 @@ output:
         start: 9
         end: 25
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -2477,7 +2477,7 @@ output:
         start: 9
         end: 12
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -2496,7 +2496,7 @@ output:
         start: 16
         end: 19
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -2521,7 +2521,7 @@ output:
         start: 5
         end: 13
       returnednumber: 0
-      type: 4
+      type: function
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -2559,7 +2559,7 @@ output:
         start: 9
         end: 17
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -2596,7 +2596,7 @@ output:
             start: 17
             end: 20
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -2607,7 +2607,7 @@ output:
         start: 0
         end: 14
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -2656,7 +2656,7 @@ output:
             start: 30
             end: 33
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -2667,7 +2667,7 @@ output:
         start: 0
         end: 14
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -2716,7 +2716,7 @@ output:
             start: 46
             end: 49
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -2727,7 +2727,7 @@ output:
         start: 0
         end: 14
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -2788,7 +2788,7 @@ output:
             start: 50
             end: 84
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -2799,7 +2799,7 @@ output:
         start: 0
         end: 14
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -2860,7 +2860,7 @@ output:
             start: 0
             end: 30
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -2871,7 +2871,7 @@ output:
         start: 63
         end: 81
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -2915,7 +2915,7 @@ output:
             start: 12
             end: 15
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -2926,7 +2926,7 @@ output:
         start: 6
         end: 9
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -2982,7 +2982,7 @@ output:
             start: 26
             end: 37
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -2993,7 +2993,7 @@ output:
         start: 6
         end: 17
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -3055,7 +3055,7 @@ output:
             start: 29
             end: 40
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -3066,7 +3066,7 @@ output:
         start: 6
         end: 17
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -3109,7 +3109,7 @@ output:
             start: 33
             end: 36
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -3120,7 +3120,7 @@ output:
         start: 0
         end: 28
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -3169,7 +3169,7 @@ output:
             start: 45
             end: 48
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -3180,7 +3180,7 @@ output:
         start: 0
         end: 28
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -3205,7 +3205,7 @@ output:
         start: 9
         end: 12
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -3230,7 +3230,7 @@ output:
         start: 9
         end: 12
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -3255,7 +3255,7 @@ output:
         start: 9
         end: 12
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -3294,7 +3294,7 @@ output:
         start: 21
         end: 28
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -3318,7 +3318,7 @@ output:
         start: 0
         end: 3
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -3336,7 +3336,7 @@ output:
         start: 7
         end: 10
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -3360,7 +3360,7 @@ output:
         start: 0
         end: 3
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -3378,7 +3378,7 @@ output:
         start: 7
         end: 10
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -3396,7 +3396,7 @@ output:
         start: 14
         end: 17
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -3420,7 +3420,7 @@ output:
         start: 1
         end: 4
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -3438,7 +3438,7 @@ output:
         start: 8
         end: 11
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -3456,7 +3456,7 @@ output:
         start: 16
         end: 19
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -3488,7 +3488,7 @@ output:
             start: 11
             end: 14
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -3498,7 +3498,7 @@ output:
         start: 0
         end: 3
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -3530,7 +3530,7 @@ output:
             start: 11
             end: 14
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -3540,7 +3540,7 @@ output:
         start: 0
         end: 3
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -3572,7 +3572,7 @@ output:
             start: 11
             end: 14
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -3590,7 +3590,7 @@ output:
             start: 22
             end: 25
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -3600,7 +3600,7 @@ output:
         start: 0
         end: 3
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -3650,7 +3650,7 @@ output:
         start: 10
         end: 38
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -3680,7 +3680,7 @@ output:
         start: 0
         end: 6
       returnednumber: 0
-      type: 4
+      type: function
       fixedlabels: true
       alwaysreturns: true
       knownreturn: false
@@ -3705,7 +3705,7 @@ output:
         start: 5
         end: 8
       returnednumber: 0
-      type: 4
+      type: function
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -3760,7 +3760,7 @@ output:
         start: 11
         end: 58
       returnednumber: 0
-      type: 4
+      type: function
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -3817,7 +3817,7 @@ output:
             start: 68
             end: 78
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -3854,7 +3854,7 @@ output:
             start: 97
             end: 106
           returnednumber: 0
-          type: 5
+          type: aggregation
           fixedlabels: true
           alwaysreturns: false
           knownreturn: false
@@ -3865,7 +3865,7 @@ output:
         start: 8
         end: 15
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -3920,7 +3920,7 @@ output:
             start: 53
             end: 100
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -3931,7 +3931,7 @@ output:
         start: 0
         end: 26
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -3980,7 +3980,7 @@ output:
             start: 66
             end: 113
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -3991,7 +3991,7 @@ output:
         start: 0
         end: 26
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -4033,7 +4033,7 @@ output:
         start: 7
         end: 21
       returnednumber: 0
-      type: 4
+      type: function
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -4092,7 +4092,7 @@ output:
         start: 7
         end: 65
       returnednumber: 0
-      type: 4
+      type: function
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -4157,7 +4157,7 @@ output:
         start: 7
         end: 33
       returnednumber: 0
-      type: 4
+      type: function
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -4212,7 +4212,7 @@ output:
             start: 51
             end: 72
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -4223,7 +4223,7 @@ output:
         start: 7
         end: 37
       returnednumber: 0
-      type: 4
+      type: function
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -4266,7 +4266,7 @@ output:
         start: 8
         end: 11
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -4359,7 +4359,7 @@ output:
             start: 106
             end: 125
           returnednumber: 0
-          type: 5
+          type: aggregation
           fixedlabels: true
           alwaysreturns: false
           knownreturn: false
@@ -4370,7 +4370,7 @@ output:
         start: 6
         end: 30
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -4406,7 +4406,7 @@ output:
         start: 7
         end: 10
       returnednumber: 0
-      type: 4
+      type: function
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -4436,7 +4436,7 @@ output:
         start: 22
         end: 25
       returnednumber: 0
-      type: 4
+      type: function
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -4472,7 +4472,7 @@ output:
         start: 17
         end: 24
       returnednumber: 0
-      type: 4
+      type: function
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -4502,7 +4502,7 @@ output:
         start: 36
         end: 39
       returnednumber: 0
-      type: 4
+      type: function
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -4563,7 +4563,7 @@ output:
             start: 0
             end: 3
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -4574,7 +4574,7 @@ output:
         start: 44
         end: 58
       returnednumber: 0
-      type: 4
+      type: function
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -4623,7 +4623,7 @@ output:
             start: 0
             end: 3
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -4634,7 +4634,7 @@ output:
         start: 32
         end: 46
       returnednumber: 0
-      type: 4
+      type: function
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -4664,7 +4664,7 @@ output:
         start: 0
         end: 9
       returnednumber: 1
-      type: 4
+      type: function
       fixedlabels: true
       alwaysreturns: true
       knownreturn: true
@@ -4694,7 +4694,7 @@ output:
         start: 0
         end: 19
       returnednumber: 0
-      type: 4
+      type: function
       fixedlabels: true
       alwaysreturns: true
       knownreturn: false
@@ -4728,7 +4728,7 @@ output:
         start: 0
         end: 24
       returnednumber: 0
-      type: 4
+      type: function
       fixedlabels: true
       alwaysreturns: true
       knownreturn: true
@@ -4759,7 +4759,7 @@ output:
         start: 14
         end: 34
       returnednumber: 0
-      type: 4
+      type: function
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -4789,7 +4789,7 @@ output:
         start: 0
         end: 15
       returnednumber: 0
-      type: 4
+      type: function
       fixedlabels: true
       alwaysreturns: true
       knownreturn: false
@@ -4820,7 +4820,7 @@ output:
         start: 14
         end: 28
       returnednumber: 0
-      type: 4
+      type: function
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -4863,7 +4863,7 @@ output:
         start: 14
         end: 48
       returnednumber: 0
-      type: 4
+      type: function
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -4913,7 +4913,7 @@ output:
         start: 14
         end: 43
       returnednumber: 0
-      type: 4
+      type: function
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -4937,7 +4937,7 @@ output:
         start: 10
         end: 19
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -4992,7 +4992,7 @@ output:
             start: 51
             end: 79
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -5003,7 +5003,7 @@ output:
         start: 0
         end: 34
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -5058,7 +5058,7 @@ output:
         start: 41
         end: 100
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -5145,7 +5145,7 @@ output:
             start: 227
             end: 288
           returnednumber: 0
-          type: 5
+          type: aggregation
           fixedlabels: true
           alwaysreturns: false
           knownreturn: false
@@ -5156,7 +5156,7 @@ output:
         start: 155
         end: 212
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -5205,7 +5205,7 @@ output:
         start: 343
         end: 403
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -5243,7 +5243,7 @@ output:
         start: 14
         end: 40
       returnednumber: 0
-      type: 4
+      type: function
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -5310,7 +5310,7 @@ output:
         start: 56
         end: 84
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -5363,7 +5363,7 @@ output:
         start: 91
         end: 100
       returnednumber: 1
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: true
       knownreturn: true
@@ -5393,7 +5393,7 @@ output:
         start: 0
         end: 9
       returnednumber: 1
-      type: 4
+      type: function
       fixedlabels: true
       alwaysreturns: true
       knownreturn: true
@@ -5415,7 +5415,7 @@ output:
         start: 13
         end: 16
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -5449,7 +5449,7 @@ output:
         start: 0
         end: 9
       returnednumber: 0
-      type: 4
+      type: function
       fixedlabels: true
       alwaysreturns: true
       knownreturn: true
@@ -5496,7 +5496,7 @@ output:
             start: 12
             end: 21
           returnednumber: 1
-          type: 4
+          type: function
           fixedlabels: true
           alwaysreturns: true
           knownreturn: true
@@ -5507,7 +5507,7 @@ output:
         start: 0
         end: 9
       returnednumber: 0
-      type: 4
+      type: function
       fixedlabels: true
       alwaysreturns: true
       knownreturn: true
@@ -5544,7 +5544,7 @@ output:
         start: 4
         end: 7
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -5579,7 +5579,7 @@ output:
         start: 11
         end: 20
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: true
       knownreturn: true
@@ -5616,7 +5616,7 @@ output:
         start: 5
         end: 8
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -5651,7 +5651,7 @@ output:
         start: 12
         end: 21
       returnednumber: 1
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: true
       knownreturn: true
@@ -5688,7 +5688,7 @@ output:
         start: 5
         end: 8
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -5719,7 +5719,7 @@ output:
         start: 12
         end: 21
       returnednumber: 1
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: true
       knownreturn: true
@@ -5756,7 +5756,7 @@ output:
         start: 5
         end: 8
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -5791,7 +5791,7 @@ output:
         start: 12
         end: 21
       returnednumber: 2
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: true
       knownreturn: true
@@ -5831,7 +5831,7 @@ output:
         start: 5
         end: 26
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -5862,7 +5862,7 @@ output:
         start: 30
         end: 39
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: true
       knownreturn: true
@@ -5880,7 +5880,7 @@ output:
         start: 47
         end: 50
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -5911,7 +5911,7 @@ output:
         start: 64
         end: 67
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -5935,7 +5935,7 @@ output:
         start: 72
         end: 81
       returnednumber: 1
-      type: 4
+      type: function
       fixedlabels: true
       alwaysreturns: true
       knownreturn: true
@@ -5988,7 +5988,7 @@ output:
             start: 57
             end: 60
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -6019,7 +6019,7 @@ output:
             start: 74
             end: 77
           returnednumber: 0
-          type: 5
+          type: aggregation
           fixedlabels: true
           alwaysreturns: false
           knownreturn: false
@@ -6037,7 +6037,7 @@ output:
             start: 85
             end: 93
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -6048,7 +6048,7 @@ output:
         start: 8
         end: 29
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -6079,7 +6079,7 @@ output:
             start: 57
             end: 60
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -6110,7 +6110,7 @@ output:
             start: 74
             end: 77
           returnednumber: 0
-          type: 5
+          type: aggregation
           fixedlabels: true
           alwaysreturns: false
           knownreturn: false
@@ -6128,7 +6128,7 @@ output:
             start: 85
             end: 93
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -6139,7 +6139,7 @@ output:
         start: 36
         end: 45
       returnednumber: 1
-      type: 4
+      type: function
       fixedlabels: true
       alwaysreturns: true
       knownreturn: true
@@ -6163,7 +6163,7 @@ output:
         start: 0
         end: 13
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -6199,7 +6199,7 @@ output:
             start: 42
             end: 53
           returnednumber: 0
-          type: 4
+          type: function
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -6223,7 +6223,7 @@ output:
             start: 58
             end: 67
           returnednumber: 1
-          type: 4
+          type: function
           fixedlabels: true
           alwaysreturns: true
           knownreturn: true
@@ -6248,7 +6248,7 @@ output:
             start: 77
             end: 109
           returnednumber: 0
-          type: 4
+          type: function
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -6272,7 +6272,7 @@ output:
             start: 114
             end: 123
           returnednumber: 2
-          type: 4
+          type: function
           fixedlabels: true
           alwaysreturns: true
           knownreturn: true
@@ -6283,7 +6283,7 @@ output:
         start: 7
         end: 18
       returnednumber: 0
-      type: 4
+      type: function
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -6315,7 +6315,7 @@ output:
             start: 42
             end: 53
           returnednumber: 0
-          type: 4
+          type: function
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -6339,7 +6339,7 @@ output:
             start: 58
             end: 67
           returnednumber: 1
-          type: 4
+          type: function
           fixedlabels: true
           alwaysreturns: true
           knownreturn: true
@@ -6364,7 +6364,7 @@ output:
             start: 77
             end: 109
           returnednumber: 0
-          type: 4
+          type: function
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -6388,7 +6388,7 @@ output:
             start: 114
             end: 123
           returnednumber: 2
-          type: 4
+          type: function
           fixedlabels: true
           alwaysreturns: true
           knownreturn: true
@@ -6399,7 +6399,7 @@ output:
         start: 23
         end: 32
       returnednumber: 3
-      type: 4
+      type: function
       fixedlabels: true
       alwaysreturns: true
       knownreturn: true
@@ -6436,7 +6436,7 @@ output:
         start: 14
         end: 23
       returnednumber: 1
-      type: 4
+      type: function
       fixedlabels: true
       alwaysreturns: true
       knownreturn: true
@@ -6479,7 +6479,7 @@ output:
         start: 5
         end: 21
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -6509,7 +6509,7 @@ output:
         start: 2
         end: 18
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -6551,7 +6551,7 @@ output:
         start: 11
         end: 20
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: true
       knownreturn: true
@@ -6584,7 +6584,7 @@ output:
         start: 0
         end: 1
       returnednumber: 1
-      type: 1
+      type: number
       fixedlabels: true
       alwaysreturns: true
       knownreturn: true
@@ -6632,7 +6632,7 @@ output:
             start: 42
             end: 51
           returnednumber: 0
-          type: 4
+          type: function
           fixedlabels: true
           alwaysreturns: true
           knownreturn: true
@@ -6642,7 +6642,7 @@ output:
         start: 0
         end: 34
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -6690,7 +6690,7 @@ output:
             start: 47
             end: 56
           returnednumber: 0
-          type: 4
+          type: function
           fixedlabels: true
           alwaysreturns: true
           knownreturn: true
@@ -6700,7 +6700,7 @@ output:
         start: 0
         end: 34
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -6748,7 +6748,7 @@ output:
             start: 50
             end: 59
           returnednumber: 0
-          type: 4
+          type: function
           fixedlabels: true
           alwaysreturns: true
           knownreturn: true
@@ -6758,7 +6758,7 @@ output:
         start: 0
         end: 34
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -6882,7 +6882,7 @@ output:
                 start: 247
                 end: 303
               returnednumber: 0
-              type: 3
+              type: selector
               fixedlabels: false
               alwaysreturns: false
               knownreturn: false
@@ -6893,7 +6893,7 @@ output:
             start: 132
             end: 201
           returnednumber: 0
-          type: 5
+          type: aggregation
           fixedlabels: true
           alwaysreturns: false
           knownreturn: false
@@ -6903,7 +6903,7 @@ output:
         start: 29
         end: 85
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -6952,7 +6952,7 @@ output:
             start: 18
             end: 28
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -6963,7 +6963,7 @@ output:
         start: 0
         end: 10
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -7024,7 +7024,7 @@ output:
             start: 42
             end: 52
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -7035,7 +7035,7 @@ output:
         start: 0
         end: 10
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -7096,7 +7096,7 @@ output:
             start: 0
             end: 10
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -7107,7 +7107,7 @@ output:
         start: 43
         end: 53
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -7179,7 +7179,7 @@ output:
             start: 30
             end: 40
           returnednumber: 0
-          type: 5
+          type: aggregation
           fixedlabels: true
           alwaysreturns: false
           knownreturn: false
@@ -7190,7 +7190,7 @@ output:
         start: 0
         end: 10
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -7268,7 +7268,7 @@ output:
             start: 46
             end: 56
           returnednumber: 0
-          type: 5
+          type: aggregation
           fixedlabels: true
           alwaysreturns: false
           knownreturn: false
@@ -7279,7 +7279,7 @@ output:
         start: 0
         end: 10
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -7357,7 +7357,7 @@ output:
             start: 4
             end: 14
           returnednumber: 0
-          type: 5
+          type: aggregation
           fixedlabels: true
           alwaysreturns: false
           knownreturn: false
@@ -7368,7 +7368,7 @@ output:
         start: 48
         end: 58
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -7446,7 +7446,7 @@ output:
             start: 46
             end: 56
           returnednumber: 0
-          type: 5
+          type: aggregation
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -7457,7 +7457,7 @@ output:
         start: 0
         end: 10
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -7535,7 +7535,7 @@ output:
             start: 4
             end: 14
           returnednumber: 0
-          type: 5
+          type: aggregation
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -7546,7 +7546,7 @@ output:
         start: 66
         end: 76
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -7636,7 +7636,7 @@ output:
             start: 299
             end: 313
           returnednumber: 0
-          type: 4
+          type: function
           fixedlabels: true
           alwaysreturns: false
           knownreturn: false
@@ -7661,7 +7661,7 @@ output:
             start: 365
             end: 405
           returnednumber: 0
-          type: 4
+          type: function
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -7689,7 +7689,7 @@ output:
                 start: 222
                 end: 257
               returnednumber: 0
-              type: 4
+              type: function
               fixedlabels: false
               alwaysreturns: false
               knownreturn: false
@@ -7700,7 +7700,7 @@ output:
             start: 149
             end: 207
           returnednumber: 0
-          type: 4
+          type: function
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -7710,7 +7710,7 @@ output:
         start: 46
         end: 99
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -7772,7 +7772,7 @@ output:
             start: 31
             end: 41
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -7783,7 +7783,7 @@ output:
         start: 4
         end: 14
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -7827,7 +7827,7 @@ output:
         start: 8
         end: 11
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -7933,7 +7933,7 @@ output:
                 start: 195
                 end: 226
               returnednumber: 0
-              type: 5
+              type: aggregation
               fixedlabels: true
               alwaysreturns: false
               knownreturn: false
@@ -7944,7 +7944,7 @@ output:
             start: 92
             end: 241
           returnednumber: 0
-          type: 4
+          type: function
           fixedlabels: true
           alwaysreturns: false
           knownreturn: false
@@ -7955,7 +7955,7 @@ output:
         start: 1
         end: 44
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -7998,7 +7998,7 @@ output:
             start: 24
             end: 30
           returnednumber: 0
-          type: 4
+          type: function
           fixedlabels: true
           alwaysreturns: true
           knownreturn: false
@@ -8009,7 +8009,7 @@ output:
         start: 1
         end: 14
       returnednumber: 0
-      type: 4
+      type: function
       fixedlabels: true
       alwaysreturns: true
       knownreturn: false
@@ -8033,7 +8033,7 @@ output:
         start: 39
         end: 48
       returnednumber: 1
-      type: 4
+      type: function
       fixedlabels: true
       alwaysreturns: true
       knownreturn: true
@@ -8113,7 +8113,7 @@ output:
             start: 94
             end: 113
           returnednumber: 0
-          type: 3
+          type: selector
           fixedlabels: false
           alwaysreturns: false
           knownreturn: false
@@ -8124,7 +8124,7 @@ output:
         start: 30
         end: 46
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false
@@ -8148,7 +8148,7 @@ output:
         start: 5
         end: 8
       returnednumber: 0
-      type: 3
+      type: selector
       fixedlabels: false
       alwaysreturns: false
       knownreturn: false
@@ -8176,7 +8176,7 @@ output:
         start: 12
         end: 21
       returnednumber: 1
-      type: 4
+      type: function
       fixedlabels: true
       alwaysreturns: true
       knownreturn: true
@@ -8222,7 +8222,7 @@ output:
             start: 19
             end: 26
           returnednumber: 0
-          type: 4
+          type: function
           fixedlabels: true
           alwaysreturns: true
           knownreturn: false
@@ -8233,7 +8233,7 @@ output:
         start: 5
         end: 14
       returnednumber: 1
-      type: 4
+      type: function
       fixedlabels: true
       alwaysreturns: true
       knownreturn: true
@@ -8257,7 +8257,7 @@ output:
         start: 37
         end: 46
       returnednumber: 0
-      type: 4
+      type: function
       fixedlabels: true
       alwaysreturns: true
       knownreturn: true
@@ -8307,7 +8307,7 @@ output:
         start: 50
         end: 61
       returnednumber: 0
-      type: 5
+      type: aggregation
       fixedlabels: true
       alwaysreturns: false
       knownreturn: false

@@ -26,13 +26,45 @@ const (
 	AggregateSource
 )
 
-type LabelPromiseType string
+// Used for test snapshots.
+func (st SourceType) MarshalYAML() (any, error) {
+	var name string
+	switch st { // nolint: exhaustive
+	case NumberSource:
+		name = "number"
+	case StringSource:
+		name = "string"
+	case SelectorSource:
+		name = "selector"
+	case FuncSource:
+		name = "function"
+	case AggregateSource:
+		name = "aggregation"
+	}
+	return name, nil
+}
+
+type LabelPromiseType uint8
 
 const (
-	ImpossibleLabel LabelPromiseType = "excluded"
-	PossibleLabel   LabelPromiseType = "included"
-	GuaranteedLabel LabelPromiseType = "guaranteed"
+	ImpossibleLabel LabelPromiseType = iota
+	PossibleLabel
+	GuaranteedLabel
 )
+
+// Used for test snapshots.
+func (lpt LabelPromiseType) MarshalYAML() (any, error) {
+	var name string
+	switch lpt {
+	case ImpossibleLabel:
+		name = "excluded"
+	case PossibleLabel:
+		name = "included"
+	case GuaranteedLabel:
+		name = "guaranteed"
+	}
+	return name, nil
+}
 
 type LabelTransform struct {
 	Reason   string
@@ -47,6 +79,7 @@ type DeadInfo struct {
 
 type SourceOperations []promParser.Node
 
+// Used for test snapshots.
 func (so SourceOperations) MarshalYAML() (any, error) {
 	ops := make([]string, 0, len(so))
 	for _, o := range so {
