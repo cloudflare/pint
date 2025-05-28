@@ -30,8 +30,8 @@ type LabelPromiseType string
 
 const (
 	ImpossibleLabel LabelPromiseType = "excluded"
-	PossibleLabel                    = "included"
-	GuaranteedLabel                  = "guaranteed"
+	PossibleLabel   LabelPromiseType = "included"
+	GuaranteedLabel LabelPromiseType = "guaranteed"
 )
 
 type LabelTransform struct {
@@ -149,7 +149,7 @@ func (s *Source) excludeAllLabels(reason string, fragment posrange.PositionRange
 			}
 		}
 	}
-	// Mark except labels as possible, unless they are already guranteed.
+	// Mark except labels as possible, unless they are already guaranteed.
 	for _, name := range except {
 		if l, ok := s.Labels[name]; ok && l.Kind == GuaranteedLabel {
 			continue
@@ -712,7 +712,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 
 	default:
 		// Unsupported function
-		return Source{}
+		return Source{} // nolint: exhaustruct
 	}
 	return s
 }
