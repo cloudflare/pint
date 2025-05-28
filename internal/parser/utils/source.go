@@ -60,8 +60,6 @@ func MostOuterOperation[T promParser.Node](s Source) (T, bool) {
 	return *new(T), false
 }
 
-// FIXME remove Selector/Call/Aggregation?
-// Use a single parser.Node instead?
 type Source struct {
 	Labels         map[string]LabelTransform
 	Operation      string
