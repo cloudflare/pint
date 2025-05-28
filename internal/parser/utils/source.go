@@ -67,12 +67,12 @@ func MostOuterOperation[T promParser.Node](s Source) (T, bool) {
 
 type Source struct {
 	Labels         map[string]LabelTransform
+	DeadInfo       *DeadInfo
 	Operation      string
 	Returns        promParser.ValueType
 	Operations     SourceOperations
 	Joins          []Source // Any other sources this source joins with.
 	Unless         []Source // Any other sources this source is suppressed by.
-	DeadInfo       *DeadInfo
 	Position       posrange.PositionRange
 	ReturnedNumber float64 // If AlwaysReturns=true this is the number that's returned
 	Type           SourceType

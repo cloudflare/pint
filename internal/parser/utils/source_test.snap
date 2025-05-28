@@ -9,12 +9,12 @@ output:
             fragment:
                 start: 0
                 end: 1
+      deadinfo: null
       operation: ""
       returns: scalar
       operations: []
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 1
@@ -38,12 +38,12 @@ output:
             fragment:
                 start: 0
                 end: 1
+      deadinfo: null
       operation: ""
       returns: scalar
       operations: []
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 1
@@ -67,16 +67,16 @@ output:
             fragment:
                 start: 1
                 end: 2
-      operation: ""
-      returns: scalar
-      operations: []
-      joins: []
-      unless: []
       deadinfo:
         reason: this query always evaluates to `32 == 5` which is not possible, so it will never return anything
         fragment:
             start: 1
             end: 2
+      operation: ""
+      returns: scalar
+      operations: []
+      joins: []
+      unless: []
       position:
         start: 1
         end: 2
@@ -100,16 +100,16 @@ output:
             fragment:
                 start: 1
                 end: 2
-      operation: ""
-      returns: scalar
-      operations: []
-      joins: []
-      unless: []
       deadinfo:
         reason: this query always evaluates to `3 <= 2` which is not possible, so it will never return anything
         fragment:
             start: 1
             end: 2
+      operation: ""
+      returns: scalar
+      operations: []
+      joins: []
+      unless: []
       position:
         start: 1
         end: 2
@@ -133,16 +133,16 @@ output:
             fragment:
                 start: 1
                 end: 2
-      operation: ""
-      returns: scalar
-      operations: []
-      joins: []
-      unless: []
       deadinfo:
         reason: this query always evaluates to `3 >= 20` which is not possible, so it will never return anything
         fragment:
             start: 1
             end: 2
+      operation: ""
+      returns: scalar
+      operations: []
+      joins: []
+      unless: []
       position:
         start: 1
         end: 2
@@ -166,12 +166,12 @@ output:
             fragment:
                 start: 1
                 end: 2
+      deadinfo: null
       operation: ""
       returns: scalar
       operations: []
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 1
         end: 2
@@ -195,16 +195,16 @@ output:
             fragment:
                 start: 1
                 end: 2
-      operation: ""
-      returns: scalar
-      operations: []
-      joins: []
-      unless: []
       deadinfo:
         reason: this query always evaluates to `3 < 1` which is not possible, so it will never return anything
         fragment:
             start: 1
             end: 2
+      operation: ""
+      returns: scalar
+      operations: []
+      joins: []
+      unless: []
       position:
         start: 1
         end: 2
@@ -228,16 +228,16 @@ output:
             fragment:
                 start: 0
                 end: 2
-      operation: ""
-      returns: scalar
-      operations: []
-      joins: []
-      unless: []
       deadinfo:
         reason: this query always evaluates to `5 < 1` which is not possible, so it will never return anything
         fragment:
             start: 0
             end: 2
+      operation: ""
+      returns: scalar
+      operations: []
+      joins: []
+      unless: []
       position:
         start: 0
         end: 2
@@ -261,12 +261,12 @@ output:
             fragment:
                 start: 0
                 end: 1
+      deadinfo: null
       operation: ""
       returns: scalar
       operations: []
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 1
@@ -284,13 +284,13 @@ output:
 expr: (foo or bar) * 5
 output:
     - labels: {}
+      deadinfo: null
       operation: many-to-many
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 1
         end: 4
@@ -302,13 +302,13 @@ output:
       isconditional: false
       isreturnbool: false
     - labels: {}
+      deadinfo: null
       operation: many-to-many
       returns: vector
       operations:
         - '[*parser.VectorSelector] bar'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 8
         end: 11
@@ -326,13 +326,13 @@ output:
 expr: (foo or vector(2)) * 5
 output:
     - labels: {}
+      deadinfo: null
       operation: many-to-many
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 1
         end: 4
@@ -350,13 +350,13 @@ output:
             fragment:
                 start: 8
                 end: 14
+      deadinfo: null
       operation: vector
       returns: vector
       operations:
         - '[*parser.Call] vector(2)'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 8
         end: 17
@@ -374,6 +374,7 @@ output:
 expr: (foo or vector(5)) * (vector(2) or bar)
 output:
     - labels: {}
+      deadinfo: null
       operation: many-to-many
       returns: vector
       operations:
@@ -386,13 +387,13 @@ output:
                 fragment:
                     start: 22
                     end: 28
+          deadinfo: null
           operation: vector
           returns: vector
           operations:
             - '[*parser.Call] vector(2)'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 22
             end: 31
@@ -404,17 +405,17 @@ output:
           isconditional: false
           isreturnbool: false
         - labels: {}
+          deadinfo:
+            reason: the left hand side always returs something and so the right hand side is never used
+            fragment:
+                start: 35
+                end: 38
           operation: many-to-many
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
-          deadinfo:
-            reason: the left hand side always returs something and so the right hand side is never used
-            fragment:
-                start: 35
-                end: 38
           position:
             start: 35
             end: 38
@@ -426,7 +427,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 1
         end: 4
@@ -444,6 +444,7 @@ output:
             fragment:
                 start: 8
                 end: 14
+      deadinfo: null
       operation: vector
       returns: vector
       operations:
@@ -456,13 +457,13 @@ output:
                 fragment:
                     start: 22
                     end: 28
+          deadinfo: null
           operation: vector
           returns: vector
           operations:
             - '[*parser.Call] vector(2)'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 22
             end: 31
@@ -474,17 +475,17 @@ output:
           isconditional: false
           isreturnbool: false
         - labels: {}
+          deadinfo:
+            reason: the left hand side always returs something and so the right hand side is never used
+            fragment:
+                start: 35
+                end: 38
           operation: many-to-many
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
-          deadinfo:
-            reason: the left hand side always returs something and so the right hand side is never used
-            fragment:
-                start: 35
-                end: 38
           position:
             start: 35
             end: 38
@@ -496,7 +497,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 8
         end: 17
@@ -520,12 +520,12 @@ output:
             fragment:
                 start: 0
                 end: 1
+      deadinfo: null
       operation: ""
       returns: scalar
       operations: []
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 1
@@ -549,12 +549,12 @@ output:
             fragment:
                 start: 0
                 end: 2
+      deadinfo: null
       operation: ""
       returns: scalar
       operations: []
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 2
@@ -578,12 +578,12 @@ output:
             fragment:
                 start: 0
                 end: 6
+      deadinfo: null
       operation: ""
       returns: string
       operations: []
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 6
@@ -601,13 +601,13 @@ output:
 expr: foo
 output:
     - labels: {}
+      deadinfo: null
       operation: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 3
@@ -625,13 +625,13 @@ output:
 expr: (foo > 1) > bool 1
 output:
     - labels: {}
+      deadinfo: null
       operation: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 1
         end: 4
@@ -649,13 +649,13 @@ output:
 expr: foo > bool 5
 output:
     - labels: {}
+      deadinfo: null
       operation: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 3
@@ -673,13 +673,13 @@ output:
 expr: foo > bool 5 == 1
 output:
     - labels: {}
+      deadinfo: null
       operation: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 3
@@ -697,19 +697,20 @@ output:
 expr: foo > bool bar
 output:
     - labels: {}
+      deadinfo: null
       operation: one-to-one
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins:
         - labels: {}
+          deadinfo: null
           operation: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 11
             end: 14
@@ -721,7 +722,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 3
@@ -739,19 +739,20 @@ output:
 expr: (foo > bool bar) == 0
 output:
     - labels: {}
+      deadinfo: null
       operation: one-to-one
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins:
         - labels: {}
+          deadinfo: null
           operation: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 12
             end: 15
@@ -763,7 +764,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 1
         end: 4
@@ -793,19 +793,20 @@ output:
             fragment:
                 start: 11
                 end: 13
+      deadinfo: null
       operation: one-to-one
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins:
         - labels: {}
+          deadinfo: null
           operation: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 24
             end: 27
@@ -817,7 +818,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 3
@@ -847,19 +847,20 @@ output:
             fragment:
                 start: 12
                 end: 14
+      deadinfo: null
       operation: one-to-one
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins:
         - labels: {}
+          deadinfo: null
           operation: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 25
             end: 28
@@ -871,7 +872,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 1
         end: 4
@@ -901,19 +901,20 @@ output:
             fragment:
                 start: 24
                 end: 34
+      deadinfo: null
       operation: many-to-one
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins:
         - labels: {}
+          deadinfo: null
           operation: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 44
             end: 47
@@ -925,7 +926,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 3
@@ -955,19 +955,20 @@ output:
             fragment:
                 start: 24
                 end: 35
+      deadinfo: null
       operation: one-to-many
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins:
         - labels: {}
+          deadinfo: null
           operation: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 0
             end: 3
@@ -979,7 +980,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 45
         end: 48
@@ -997,19 +997,20 @@ output:
 expr: foo and bar > bool 0
 output:
     - labels: {}
+      deadinfo: null
       operation: many-to-many
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins:
         - labels: {}
+          deadinfo: null
           operation: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 8
             end: 11
@@ -1021,7 +1022,6 @@ output:
           isconditional: true
           isreturnbool: true
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 3
@@ -1039,13 +1039,13 @@ output:
 expr: foo offset 5m
 output:
     - labels: {}
+      deadinfo: null
       operation: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo offset 5m'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 13
@@ -1069,13 +1069,13 @@ output:
             fragment:
                 start: 0
                 end: 14
+      deadinfo: null
       operation: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job="bar"}'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 14
@@ -1099,13 +1099,13 @@ output:
             fragment:
                 start: 0
                 end: 11
+      deadinfo: null
       operation: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job=""}'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 11
@@ -1129,13 +1129,13 @@ output:
             fragment:
                 start: 0
                 end: 14
+      deadinfo: null
       operation: many-to-many
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job="bar"}'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 14
@@ -1153,13 +1153,13 @@ output:
             fragment:
                 start: 18
                 end: 32
+      deadinfo: null
       operation: many-to-many
       returns: vector
       operations:
         - '[*parser.VectorSelector] bar{job="foo"}'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 18
         end: 32
@@ -1183,13 +1183,13 @@ output:
             fragment:
                 start: 0
                 end: 12
+      deadinfo: null
       operation: many-to-many
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{a="bar"}'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 12
@@ -1207,13 +1207,13 @@ output:
             fragment:
                 start: 16
                 end: 28
+      deadinfo: null
       operation: many-to-many
       returns: vector
       operations:
         - '[*parser.VectorSelector] bar{b="foo"}'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 16
         end: 28
@@ -1231,13 +1231,13 @@ output:
 expr: foo[5m]
 output:
     - labels: {}
+      deadinfo: null
       operation: ""
       returns: matrix
       operations:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 3
@@ -1255,13 +1255,13 @@ output:
 expr: prometheus_build_info[2m:1m]
 output:
     - labels: {}
+      deadinfo: null
       operation: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] prometheus_build_info'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 21
@@ -1279,6 +1279,7 @@ output:
 expr: deriv(rate(distance_covered_meters_total[1m])[5m:1m])
 output:
     - labels: {}
+      deadinfo: null
       operation: deriv
       returns: vector
       operations:
@@ -1287,7 +1288,6 @@ output:
         - '[*parser.Call] deriv(rate(distance_covered_meters_total[1m])[5m:1m])'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 6
         end: 52
@@ -1305,13 +1305,13 @@ output:
 expr: foo - 1
 output:
     - labels: {}
+      deadinfo: null
       operation: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 3
@@ -1329,13 +1329,13 @@ output:
 expr: foo / 5
 output:
     - labels: {}
+      deadinfo: null
       operation: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 3
@@ -1353,13 +1353,13 @@ output:
 expr: -foo
 output:
     - labels: {}
+      deadinfo: null
       operation: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 1
         end: 4
@@ -1395,6 +1395,7 @@ output:
             fragment:
                 start: 0
                 end: 3
+      deadinfo: null
       operation: sum
       returns: vector
       operations:
@@ -1402,7 +1403,6 @@ output:
         - '[*parser.AggregateExpr] sum(foo{job="myjob"})'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 4
         end: 20
@@ -1444,6 +1444,7 @@ output:
             fragment:
                 start: 28
                 end: 30
+      deadinfo: null
       operation: sum
       returns: vector
       operations:
@@ -1452,7 +1453,6 @@ output:
         - '[*parser.AggregateExpr] sum(count by (instance) (foo{job="myjob"}))'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 10
         end: 26
@@ -1488,6 +1488,7 @@ output:
             fragment:
                 start: 0
                 end: 3
+      deadinfo: null
       operation: sum
       returns: vector
       operations:
@@ -1495,7 +1496,6 @@ output:
         - '[*parser.AggregateExpr] sum(foo{job="myjob"})'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 4
         end: 20
@@ -1525,6 +1525,7 @@ output:
             fragment:
                 start: 22
                 end: 29
+      deadinfo: null
       operation: sum
       returns: vector
       operations:
@@ -1532,7 +1533,6 @@ output:
         - '[*parser.AggregateExpr] sum without (job) (foo{job="myjob"})'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 4
         end: 20
@@ -1568,6 +1568,7 @@ output:
             fragment:
                 start: 9
                 end: 11
+      deadinfo: null
       operation: sum
       returns: vector
       operations:
@@ -1575,7 +1576,6 @@ output:
         - '[*parser.AggregateExpr] sum by (job) (foo)'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 4
         end: 7
@@ -1611,6 +1611,7 @@ output:
             fragment:
                 start: 4
                 end: 20
+      deadinfo: null
       operation: sum
       returns: vector
       operations:
@@ -1618,7 +1619,6 @@ output:
         - '[*parser.AggregateExpr] sum by (job) (foo{job="myjob"})'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 4
         end: 20
@@ -1642,6 +1642,7 @@ output:
             fragment:
                 start: 0
                 end: 31
+      deadinfo: null
       operation: abs
       returns: vector
       operations:
@@ -1649,7 +1650,6 @@ output:
         - '[*parser.Call] abs(foo{job="myjob"} offset 5m)'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 4
         end: 30
@@ -1673,6 +1673,7 @@ output:
             fragment:
                 start: 0
                 end: 43
+      deadinfo: null
       operation: abs
       returns: vector
       operations:
@@ -1680,7 +1681,6 @@ output:
         - '[*parser.Call] abs(foo{job="myjob"} or bar{cluster="dev"})'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 4
         end: 42
@@ -1698,6 +1698,7 @@ output:
             fragment:
                 start: 0
                 end: 43
+      deadinfo: null
       operation: abs
       returns: vector
       operations:
@@ -1705,7 +1706,6 @@ output:
         - '[*parser.Call] abs(foo{job="myjob"} or bar{cluster="dev"})'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 4
         end: 42
@@ -1741,6 +1741,7 @@ output:
             fragment:
                 start: 4
                 end: 20
+      deadinfo: null
       operation: sum
       returns: vector
       operations:
@@ -1748,7 +1749,6 @@ output:
         - '[*parser.AggregateExpr] sum without (instance) (foo{job="myjob"} or bar{cluster="dev"})'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 4
         end: 20
@@ -1778,6 +1778,7 @@ output:
             fragment:
                 start: 44
                 end: 51
+      deadinfo: null
       operation: sum
       returns: vector
       operations:
@@ -1785,7 +1786,6 @@ output:
         - '[*parser.AggregateExpr] sum without (instance) (foo{job="myjob"} or bar{cluster="dev"})'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 24
         end: 42
@@ -1821,6 +1821,7 @@ output:
             fragment:
                 start: 4
                 end: 20
+      deadinfo: null
       operation: sum
       returns: vector
       operations:
@@ -1828,7 +1829,6 @@ output:
         - '[*parser.AggregateExpr] sum without (instance) (foo{job="myjob"})'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 4
         end: 20
@@ -1864,6 +1864,7 @@ output:
             fragment:
                 start: 0
                 end: 21
+      deadinfo: null
       operation: min
       returns: vector
       operations:
@@ -1889,6 +1890,7 @@ output:
                 fragment:
                     start: 24
                     end: 45
+          deadinfo: null
           operation: max
           returns: vector
           operations:
@@ -1896,7 +1898,6 @@ output:
             - '[*parser.AggregateExpr] max(foo{job="myjob"})'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 28
             end: 44
@@ -1908,7 +1909,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 4
         end: 20
@@ -1944,6 +1944,7 @@ output:
             fragment:
                 start: 0
                 end: 21
+      deadinfo: null
       operation: max
       returns: vector
       operations:
@@ -1969,6 +1970,7 @@ output:
                 fragment:
                     start: 24
                     end: 45
+          deadinfo: null
           operation: min
           returns: vector
           operations:
@@ -1976,7 +1978,6 @@ output:
             - '[*parser.AggregateExpr] min(foo{job="myjob"})'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 28
             end: 44
@@ -1988,7 +1989,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 4
         end: 20
@@ -2024,6 +2024,7 @@ output:
             fragment:
                 start: 4
                 end: 20
+      deadinfo: null
       operation: avg
       returns: vector
       operations:
@@ -2031,7 +2032,6 @@ output:
         - '[*parser.AggregateExpr] avg by (job) (foo{job="myjob"})'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 4
         end: 20
@@ -2067,6 +2067,7 @@ output:
             fragment:
                 start: 11
                 end: 13
+      deadinfo: null
       operation: group
       returns: vector
       operations:
@@ -2074,7 +2075,6 @@ output:
         - '[*parser.AggregateExpr] group by (job) (foo)'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 6
         end: 9
@@ -2104,6 +2104,7 @@ output:
             fragment:
                 start: 0
                 end: 21
+      deadinfo: null
       operation: stddev
       returns: vector
       operations:
@@ -2112,7 +2113,6 @@ output:
         - '[*parser.AggregateExpr] stddev(rate(foo[5m]))'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 12
         end: 19
@@ -2142,6 +2142,7 @@ output:
             fragment:
                 start: 0
                 end: 21
+      deadinfo: null
       operation: stdvar
       returns: vector
       operations:
@@ -2150,7 +2151,6 @@ output:
         - '[*parser.AggregateExpr] stdvar(rate(foo[5m]))'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 12
         end: 19
@@ -2168,6 +2168,7 @@ output:
 expr: stddev_over_time(foo[5m])
 output:
     - labels: {}
+      deadinfo: null
       operation: stddev_over_time
       returns: vector
       operations:
@@ -2175,7 +2176,6 @@ output:
         - '[*parser.Call] stddev_over_time(foo[5m])'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 17
         end: 24
@@ -2193,6 +2193,7 @@ output:
 expr: stdvar_over_time(foo[5m])
 output:
     - labels: {}
+      deadinfo: null
       operation: stdvar_over_time
       returns: vector
       operations:
@@ -2200,7 +2201,6 @@ output:
         - '[*parser.Call] stdvar_over_time(foo[5m])'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 17
         end: 24
@@ -2230,6 +2230,7 @@ output:
             fragment:
                 start: 0
                 end: 28
+      deadinfo: null
       operation: quantile
       returns: vector
       operations:
@@ -2238,7 +2239,6 @@ output:
         - '[*parser.AggregateExpr] quantile(0.9, rate(foo[5m]))'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 19
         end: 26
@@ -2274,6 +2274,7 @@ output:
             fragment:
                 start: 0
                 end: 38
+      deadinfo: null
       operation: count_values
       returns: vector
       operations:
@@ -2281,7 +2282,6 @@ output:
         - '[*parser.AggregateExpr] count_values("version", build_version)'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 24
         end: 37
@@ -2317,6 +2317,7 @@ output:
             fragment:
                 start: 0
                 end: 51
+      deadinfo: null
       operation: count_values
       returns: vector
       operations:
@@ -2324,7 +2325,6 @@ output:
         - '[*parser.AggregateExpr] count_values without (job) ("version", build_version)'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 24
         end: 37
@@ -2360,6 +2360,7 @@ output:
             fragment:
                 start: 0
                 end: 62
+      deadinfo: null
       operation: count_values
       returns: vector
       operations:
@@ -2367,7 +2368,6 @@ output:
         - '[*parser.AggregateExpr] count_values without (job) ("version", build_version{job="foo"})'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 24
         end: 48
@@ -2409,6 +2409,7 @@ output:
             fragment:
                 start: 0
                 end: 46
+      deadinfo: null
       operation: count_values
       returns: vector
       operations:
@@ -2416,7 +2417,6 @@ output:
         - '[*parser.AggregateExpr] count_values by (job) ("version", build_version)'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 24
         end: 37
@@ -2440,6 +2440,7 @@ output:
             fragment:
                 start: 9
                 end: 25
+      deadinfo: null
       operation: topk
       returns: vector
       operations:
@@ -2447,7 +2448,6 @@ output:
         - '[*parser.AggregateExpr] topk(10, foo{job="myjob"})'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 9
         end: 25
@@ -2465,6 +2465,7 @@ output:
 expr: topk(10, foo or bar)
 output:
     - labels: {}
+      deadinfo: null
       operation: topk
       returns: vector
       operations:
@@ -2472,7 +2473,6 @@ output:
         - '[*parser.AggregateExpr] topk(10, foo or bar)'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 9
         end: 12
@@ -2484,6 +2484,7 @@ output:
       isconditional: false
       isreturnbool: false
     - labels: {}
+      deadinfo: null
       operation: topk
       returns: vector
       operations:
@@ -2491,7 +2492,6 @@ output:
         - '[*parser.AggregateExpr] topk(10, foo or bar)'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 16
         end: 19
@@ -2509,6 +2509,7 @@ output:
 expr: rate(foo[10m])
 output:
     - labels: {}
+      deadinfo: null
       operation: rate
       returns: vector
       operations:
@@ -2516,7 +2517,6 @@ output:
         - '[*parser.Call] rate(foo[10m])'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 5
         end: 13
@@ -2546,6 +2546,7 @@ output:
             fragment:
                 start: 20
                 end: 27
+      deadinfo: null
       operation: sum
       returns: vector
       operations:
@@ -2554,7 +2555,6 @@ output:
         - '[*parser.AggregateExpr] sum without (instance) (rate(foo[10m]))'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 9
         end: 17
@@ -2578,19 +2578,20 @@ output:
             fragment:
                 start: 0
                 end: 14
+      deadinfo: null
       operation: one-to-one
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job="foo"}'
       joins:
         - labels: {}
+          deadinfo: null
           operation: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 17
             end: 20
@@ -2602,7 +2603,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 14
@@ -2638,19 +2638,20 @@ output:
             fragment:
                 start: 17
                 end: 19
+      deadinfo: null
       operation: one-to-one
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job="foo"}'
       joins:
         - labels: {}
+          deadinfo: null
           operation: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 30
             end: 33
@@ -2662,7 +2663,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 14
@@ -2698,19 +2698,20 @@ output:
             fragment:
                 start: 0
                 end: 14
+      deadinfo: null
       operation: many-to-one
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job="foo"}'
       joins:
         - labels: {}
+          deadinfo: null
           operation: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 46
             end: 49
@@ -2722,7 +2723,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 14
@@ -2758,6 +2758,7 @@ output:
             fragment:
                 start: 0
                 end: 14
+      deadinfo: null
       operation: many-to-one
       returns: vector
       operations:
@@ -2776,13 +2777,13 @@ output:
                 fragment:
                     start: 50
                     end: 84
+          deadinfo: null
           operation: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar{cluster="bar",ignored="true"}'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 50
             end: 84
@@ -2794,7 +2795,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 14
@@ -2830,6 +2830,7 @@ output:
             fragment:
                 start: 46
                 end: 57
+      deadinfo: null
       operation: one-to-many
       returns: vector
       operations:
@@ -2848,13 +2849,13 @@ output:
                 fragment:
                     start: 0
                     end: 30
+          deadinfo: null
           operation: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] foo{ignored="true",job="foo"}'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 0
             end: 30
@@ -2866,7 +2867,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 63
         end: 81
@@ -2896,6 +2896,7 @@ output:
             fragment:
                 start: 0
                 end: 16
+      deadinfo: null
       operation: count
       returns: vector
       operations:
@@ -2903,13 +2904,13 @@ output:
         - '[*parser.AggregateExpr] count(foo / bar)'
       joins:
         - labels: {}
+          deadinfo: null
           operation: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 12
             end: 15
@@ -2921,7 +2922,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 6
         end: 9
@@ -2957,6 +2957,7 @@ output:
             fragment:
                 start: 20
                 end: 23
+      deadinfo: null
       operation: count
       returns: vector
       operations:
@@ -2970,13 +2971,13 @@ output:
                 fragment:
                     start: 26
                     end: 37
+          deadinfo: null
           operation: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] up{job="b"}'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 26
             end: 37
@@ -2988,7 +2989,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 6
         end: 17
@@ -3030,6 +3030,7 @@ output:
             fragment:
                 start: 20
                 end: 23
+      deadinfo: null
       operation: count
       returns: vector
       operations:
@@ -3043,13 +3044,13 @@ output:
                 fragment:
                     start: 29
                     end: 40
+          deadinfo: null
           operation: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] up{job="b"}'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 29
             end: 40
@@ -3061,7 +3062,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 6
         end: 17
@@ -3091,19 +3091,20 @@ output:
             fragment:
                 start: 0
                 end: 28
+      deadinfo: null
       operation: many-to-many
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{instance="1",job="foo"}'
       joins:
         - labels: {}
+          deadinfo: null
           operation: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 33
             end: 36
@@ -3115,7 +3116,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 28
@@ -3151,19 +3151,20 @@ output:
             fragment:
                 start: 0
                 end: 28
+      deadinfo: null
       operation: many-to-many
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{instance="1",job="foo"}'
       joins:
         - labels: {}
+          deadinfo: null
           operation: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 45
             end: 48
@@ -3175,7 +3176,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 28
@@ -3193,6 +3193,7 @@ output:
 expr: topk(10, foo)
 output:
     - labels: {}
+      deadinfo: null
       operation: topk
       returns: vector
       operations:
@@ -3200,7 +3201,6 @@ output:
         - '[*parser.AggregateExpr] topk(10, foo)'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 9
         end: 12
@@ -3218,6 +3218,7 @@ output:
 expr: topk(10, foo) without(cluster)
 output:
     - labels: {}
+      deadinfo: null
       operation: topk
       returns: vector
       operations:
@@ -3225,7 +3226,6 @@ output:
         - '[*parser.AggregateExpr] topk without (cluster) (10, foo)'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 9
         end: 12
@@ -3243,6 +3243,7 @@ output:
 expr: topk(10, foo) by(cluster)
 output:
     - labels: {}
+      deadinfo: null
       operation: topk
       returns: vector
       operations:
@@ -3250,7 +3251,6 @@ output:
         - '[*parser.AggregateExpr] topk by (cluster) (10, foo)'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 9
         end: 12
@@ -3280,6 +3280,7 @@ output:
             fragment:
                 start: 31
                 end: 38
+      deadinfo: null
       operation: bottomk
       returns: vector
       operations:
@@ -3289,7 +3290,6 @@ output:
         - '[*parser.AggregateExpr] bottomk(10, sum without (job) (rate(foo[5m])))'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 21
         end: 28
@@ -3307,13 +3307,13 @@ output:
 expr: foo or bar
 output:
     - labels: {}
+      deadinfo: null
       operation: many-to-many
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 3
@@ -3325,13 +3325,13 @@ output:
       isconditional: false
       isreturnbool: false
     - labels: {}
+      deadinfo: null
       operation: many-to-many
       returns: vector
       operations:
         - '[*parser.VectorSelector] bar'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 7
         end: 10
@@ -3349,13 +3349,13 @@ output:
 expr: foo or bar or baz
 output:
     - labels: {}
+      deadinfo: null
       operation: many-to-many
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 3
@@ -3367,13 +3367,13 @@ output:
       isconditional: false
       isreturnbool: false
     - labels: {}
+      deadinfo: null
       operation: many-to-many
       returns: vector
       operations:
         - '[*parser.VectorSelector] bar'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 7
         end: 10
@@ -3385,13 +3385,13 @@ output:
       isconditional: false
       isreturnbool: false
     - labels: {}
+      deadinfo: null
       operation: many-to-many
       returns: vector
       operations:
         - '[*parser.VectorSelector] baz'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 14
         end: 17
@@ -3409,13 +3409,13 @@ output:
 expr: (foo or bar) or baz
 output:
     - labels: {}
+      deadinfo: null
       operation: many-to-many
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 1
         end: 4
@@ -3427,13 +3427,13 @@ output:
       isconditional: false
       isreturnbool: false
     - labels: {}
+      deadinfo: null
       operation: many-to-many
       returns: vector
       operations:
         - '[*parser.VectorSelector] bar'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 8
         end: 11
@@ -3445,13 +3445,13 @@ output:
       isconditional: false
       isreturnbool: false
     - labels: {}
+      deadinfo: null
       operation: many-to-many
       returns: vector
       operations:
         - '[*parser.VectorSelector] baz'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 16
         end: 19
@@ -3469,6 +3469,7 @@ output:
 expr: foo unless bar
 output:
     - labels: {}
+      deadinfo: null
       operation: many-to-many
       returns: vector
       operations:
@@ -3476,13 +3477,13 @@ output:
       joins: []
       unless:
         - labels: {}
+          deadinfo: null
           operation: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 11
             end: 14
@@ -3493,7 +3494,6 @@ output:
           knownreturn: false
           isconditional: false
           isreturnbool: false
-      deadinfo: null
       position:
         start: 0
         end: 3
@@ -3511,6 +3511,7 @@ output:
 expr: foo unless bar > 5
 output:
     - labels: {}
+      deadinfo: null
       operation: many-to-many
       returns: vector
       operations:
@@ -3518,13 +3519,13 @@ output:
       joins: []
       unless:
         - labels: {}
+          deadinfo: null
           operation: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 11
             end: 14
@@ -3535,7 +3536,6 @@ output:
           knownreturn: false
           isconditional: true
           isreturnbool: false
-      deadinfo: null
       position:
         start: 0
         end: 3
@@ -3553,6 +3553,7 @@ output:
 expr: foo unless bar unless baz
 output:
     - labels: {}
+      deadinfo: null
       operation: many-to-many
       returns: vector
       operations:
@@ -3560,13 +3561,13 @@ output:
       joins: []
       unless:
         - labels: {}
+          deadinfo: null
           operation: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 11
             end: 14
@@ -3578,13 +3579,13 @@ output:
           isconditional: false
           isreturnbool: false
         - labels: {}
+          deadinfo: null
           operation: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] baz'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 22
             end: 25
@@ -3595,7 +3596,6 @@ output:
           knownreturn: false
           isconditional: false
           isreturnbool: false
-      deadinfo: null
       position:
         start: 0
         end: 3
@@ -3637,6 +3637,7 @@ output:
             fragment:
                 start: 63
                 end: 70
+      deadinfo: null
       operation: count
       returns: vector
       operations:
@@ -3645,7 +3646,6 @@ output:
         - '[*parser.AggregateExpr] count without (job, cluster) (sum by (job, cluster) (up{cluster="dev",job="foo"}) == 0)'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 10
         end: 38
@@ -3669,13 +3669,13 @@ output:
             fragment:
                 start: 0
                 end: 6
+      deadinfo: null
       operation: year
       returns: vector
       operations:
         - '[*parser.Call] year()'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 6
@@ -3693,6 +3693,7 @@ output:
 expr: year(foo)
 output:
     - labels: {}
+      deadinfo: null
       operation: year
       returns: vector
       operations:
@@ -3700,7 +3701,6 @@ output:
         - '[*parser.Call] year(foo)'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 5
         end: 8
@@ -3748,6 +3748,7 @@ output:
             fragment:
                 start: 11
                 end: 58
+      deadinfo: null
       operation: label_join
       returns: vector
       operations:
@@ -3755,7 +3756,6 @@ output:
         - '[*parser.Call] label_join(up{job="api-server",src1="a",src2="b",src3="c"}, "foo", ",", "src1", "src2", "src3")'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 11
         end: 58
@@ -3798,6 +3798,7 @@ output:
             fragment:
                 start: 48
                 end: 58
+      deadinfo: null
       operation: sum
       returns: vector
       operations:
@@ -3805,13 +3806,13 @@ output:
         - '[*parser.AggregateExpr] sum without (notify) (foo:sum > 0)'
       joins:
         - labels: {}
+          deadinfo: null
           operation: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] job:notify'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 68
             end: 78
@@ -3841,6 +3842,7 @@ output:
                 fragment:
                     start: 108
                     end: 110
+          deadinfo: null
           operation: sum
           returns: vector
           operations:
@@ -3848,7 +3850,6 @@ output:
             - '[*parser.AggregateExpr] sum by (job) (foo:count)'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 97
             end: 106
@@ -3860,7 +3861,6 @@ output:
           isconditional: true
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 8
         end: 15
@@ -3896,6 +3896,7 @@ output:
             fragment:
                 start: 29
                 end: 32
+      deadinfo: null
       operation: one-to-one
       returns: vector
       operations:
@@ -3908,13 +3909,13 @@ output:
                 fragment:
                     start: 53
                     end: 100
+          deadinfo: null
           operation: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] container_ulimits_soft{ulimit="max_open_files"}'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 53
             end: 100
@@ -3926,7 +3927,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 26
@@ -3956,6 +3956,7 @@ output:
             fragment:
                 start: 29
                 end: 32
+      deadinfo: null
       operation: many-to-one
       returns: vector
       operations:
@@ -3968,13 +3969,13 @@ output:
                 fragment:
                     start: 66
                     end: 113
+          deadinfo: null
           operation: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] container_ulimits_soft{ulimit="max_open_files"}'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 66
             end: 113
@@ -3986,7 +3987,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 26
@@ -4021,6 +4021,7 @@ output:
             fragment:
                 start: 0
                 end: 22
+      deadinfo: null
       operation: absent
       returns: vector
       operations:
@@ -4028,7 +4029,6 @@ output:
         - '[*parser.Call] absent(foo{job="bar"})'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 7
         end: 21
@@ -4080,6 +4080,7 @@ output:
             fragment:
                 start: 0
                 end: 66
+      deadinfo: null
       operation: absent
       returns: vector
       operations:
@@ -4087,7 +4088,6 @@ output:
         - '[*parser.Call] absent(foo{cluster!="dev",env="prod",instance=~".+",job="bar"})'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 7
         end: 65
@@ -4144,6 +4144,7 @@ output:
             fragment:
                 start: 0
                 end: 6
+      deadinfo: null
       operation: absent
       returns: vector
       operations:
@@ -4152,7 +4153,6 @@ output:
         - '[*parser.Call] absent(sum by (job, instance) (foo))'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 7
         end: 33
@@ -4193,6 +4193,7 @@ output:
             fragment:
                 start: 0
                 end: 38
+      deadinfo: null
       operation: absent
       returns: vector
       operations:
@@ -4200,13 +4201,13 @@ output:
         - '[*parser.Call] absent(foo{job="prometheus",xxx="1"})'
       joins:
         - labels: {}
+          deadinfo: null
           operation: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] prometheus_build_info'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 51
             end: 72
@@ -4218,7 +4219,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 7
         end: 37
@@ -4254,6 +4254,7 @@ output:
             fragment:
                 start: 13
                 end: 15
+      deadinfo: null
       operation: sum
       returns: vector
       operations:
@@ -4261,7 +4262,6 @@ output:
         - '[*parser.AggregateExpr] sum by (notjob) (foo)'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 8
         end: 11
@@ -4309,6 +4309,7 @@ output:
             fragment:
                 start: 32
                 end: 35
+      deadinfo: null
       operation: count
       returns: vector
       operations:
@@ -4346,6 +4347,7 @@ output:
                 fragment:
                     start: 127
                     end: 130
+          deadinfo: null
           operation: count
           returns: vector
           operations:
@@ -4353,7 +4355,6 @@ output:
             - '[*parser.AggregateExpr] count by (instance, version, package) (deb_package_version)'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 106
             end: 125
@@ -4365,7 +4366,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 6
         end: 30
@@ -4394,6 +4394,7 @@ output:
             fragment:
                 start: 0
                 end: 6
+      deadinfo: null
       operation: absent
       returns: vector
       operations:
@@ -4401,7 +4402,6 @@ output:
         - '[*parser.Call] absent(foo)'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 7
         end: 10
@@ -4424,6 +4424,7 @@ output:
             fragment:
                 start: 15
                 end: 21
+      deadinfo: null
       operation: absent
       returns: vector
       operations:
@@ -4431,7 +4432,6 @@ output:
         - '[*parser.Call] absent(bar)'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 22
         end: 25
@@ -4460,6 +4460,7 @@ output:
             fragment:
                 start: 0
                 end: 16
+      deadinfo: null
       operation: absent_over_time
       returns: vector
       operations:
@@ -4467,7 +4468,6 @@ output:
         - '[*parser.Call] absent_over_time(foo[5m])'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 17
         end: 24
@@ -4490,6 +4490,7 @@ output:
             fragment:
                 start: 29
                 end: 35
+      deadinfo: null
       operation: absent
       returns: vector
       operations:
@@ -4497,7 +4498,6 @@ output:
         - '[*parser.Call] absent(bar)'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 36
         end: 39
@@ -4544,6 +4544,7 @@ output:
             fragment:
                 start: 37
                 end: 59
+      deadinfo: null
       operation: absent
       returns: vector
       operations:
@@ -4551,13 +4552,13 @@ output:
         - '[*parser.Call] absent(foo{job="xxx"})'
       joins:
         - labels: {}
+          deadinfo: null
           operation: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 0
             end: 3
@@ -4569,7 +4570,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 44
         end: 58
@@ -4604,6 +4604,7 @@ output:
             fragment:
                 start: 25
                 end: 47
+      deadinfo: null
       operation: absent
       returns: vector
       operations:
@@ -4611,13 +4612,13 @@ output:
         - '[*parser.Call] absent(foo{job="xxx"})'
       joins:
         - labels: {}
+          deadinfo: null
           operation: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 0
             end: 3
@@ -4629,7 +4630,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 32
         end: 46
@@ -4653,13 +4653,13 @@ output:
             fragment:
                 start: 0
                 end: 6
+      deadinfo: null
       operation: vector
       returns: vector
       operations:
         - '[*parser.Call] vector(1)'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 9
@@ -4683,13 +4683,13 @@ output:
             fragment:
                 start: 0
                 end: 6
+      deadinfo: null
       operation: vector
       returns: vector
       operations:
         - '[*parser.Call] vector(scalar(foo))'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 19
@@ -4713,17 +4713,17 @@ output:
             fragment:
                 start: 0
                 end: 6
+      deadinfo:
+        reason: this query always evaluates to `0 == 1` which is not possible, so it will never return anything
+        fragment:
+            start: 0
+            end: 24
       operation: vector
       returns: vector
       operations:
         - '[*parser.Call] vector(0 >= bool 0.5)'
       joins: []
       unless: []
-      deadinfo:
-        reason: this query always evaluates to `0 == 1` which is not possible, so it will never return anything
-        fragment:
-            start: 0
-            end: 24
       position:
         start: 0
         end: 24
@@ -4747,6 +4747,7 @@ output:
             fragment:
                 start: 0
                 end: 35
+      deadinfo: null
       operation: sum_over_time
       returns: vector
       operations:
@@ -4754,7 +4755,6 @@ output:
         - '[*parser.Call] sum_over_time(foo{job="myjob"}[5m])'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 14
         end: 34
@@ -4778,13 +4778,13 @@ output:
             fragment:
                 start: 0
                 end: 15
+      deadinfo: null
       operation: days_in_month
       returns: vector
       operations:
         - '[*parser.Call] days_in_month()'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 15
@@ -4808,6 +4808,7 @@ output:
             fragment:
                 start: 0
                 end: 29
+      deadinfo: null
       operation: days_in_month
       returns: vector
       operations:
@@ -4815,7 +4816,6 @@ output:
         - '[*parser.Call] days_in_month(foo{job="foo"})'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 14
         end: 28
@@ -4851,6 +4851,7 @@ output:
             fragment:
                 start: 14
                 end: 48
+      deadinfo: null
       operation: label_replace
       returns: vector
       operations:
@@ -4858,7 +4859,6 @@ output:
         - '[*parser.Call] label_replace(up{job="api-server",service="a:c"}, "foo", "$1", "service", "(.*):.*")'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 14
         end: 48
@@ -4900,6 +4900,7 @@ output:
             fragment:
                 start: 18
                 end: 21
+      deadinfo: null
       operation: label_replace
       returns: vector
       operations:
@@ -4908,7 +4909,6 @@ output:
         - '[*parser.Call] label_replace(sum by (pod) (pod_status) > 0, "cluster", "$1", "pod", "(.*)")'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 14
         end: 43
@@ -4926,13 +4926,13 @@ output:
 expr: (time() - my_metric) > 5*3600
 output:
     - labels: {}
+      deadinfo: null
       operation: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] my_metric'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 10
         end: 19
@@ -4962,6 +4962,7 @@ output:
             fragment:
                 start: 37
                 end: 45
+      deadinfo: null
       operation: one-to-one
       returns: vector
       operations:
@@ -4980,13 +4981,13 @@ output:
                 fragment:
                     start: 51
                     end: 79
+          deadinfo: null
           operation: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] up{instance="a",job="pint"}'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 51
             end: 79
@@ -4998,7 +4999,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 34
@@ -5046,6 +5046,7 @@ output:
             fragment:
                 start: 5
                 end: 12
+      deadinfo: null
       operation: avg
       returns: vector
       operations:
@@ -5053,7 +5054,6 @@ output:
         - '[*parser.AggregateExpr] avg without (router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"})'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 41
         end: 100
@@ -5101,6 +5101,7 @@ output:
             fragment:
                 start: 119
                 end: 126
+      deadinfo: null
       operation: sum
       returns: vector
       operations:
@@ -5132,6 +5133,7 @@ output:
                 fragment:
                     start: 221
                     end: 289
+          deadinfo: null
           operation: count
           returns: vector
           operations:
@@ -5139,7 +5141,6 @@ output:
             - '[*parser.AggregateExpr] count(colo_router_tier:disabled_pops:max{router=~"edge.*",tier="1"})'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 227
             end: 288
@@ -5151,7 +5152,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 155
         end: 212
@@ -5193,6 +5193,7 @@ output:
             fragment:
                 start: 307
                 end: 314
+      deadinfo: null
       operation: avg
       returns: vector
       operations:
@@ -5200,7 +5201,6 @@ output:
         - '[*parser.AggregateExpr] avg without (router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*regional.*"})'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 343
         end: 403
@@ -5230,6 +5230,7 @@ output:
             fragment:
                 start: 0
                 end: 69
+      deadinfo: null
       operation: label_replace
       returns: vector
       operations:
@@ -5238,7 +5239,6 @@ output:
         - '[*parser.Call] label_replace(sum without (instance) (foo), "instance", "none", "", "")'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 14
         end: 40
@@ -5297,6 +5297,7 @@ output:
             fragment:
                 start: 5
                 end: 8
+      deadinfo: null
       operation: sum
       returns: vector
       operations:
@@ -5305,7 +5306,6 @@ output:
         - '[*parser.AggregateExpr] sum by (region, target, colo_name) (sum_over_time(probe_success{job="abc"}[5m]) or vector(1))'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 56
         end: 84
@@ -5347,6 +5347,11 @@ output:
             fragment:
                 start: 91
                 end: 97
+      deadinfo:
+        reason: this query always evaluates to `1 == 0` which is not possible, so it will never return anything
+        fragment:
+            start: 91
+            end: 100
       operation: sum
       returns: vector
       operations:
@@ -5354,11 +5359,6 @@ output:
         - '[*parser.AggregateExpr] sum by (region, target, colo_name) (sum_over_time(probe_success{job="abc"}[5m]) or vector(1))'
       joins: []
       unless: []
-      deadinfo:
-        reason: this query always evaluates to `1 == 0` which is not possible, so it will never return anything
-        fragment:
-            start: 91
-            end: 100
       position:
         start: 91
         end: 100
@@ -5382,13 +5382,13 @@ output:
             fragment:
                 start: 0
                 end: 6
+      deadinfo: null
       operation: vector
       returns: vector
       operations:
         - '[*parser.Call] vector(1)'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 9
@@ -5400,17 +5400,17 @@ output:
       isconditional: false
       isreturnbool: false
     - labels: {}
+      deadinfo:
+        reason: the left hand side always returs something and so the right hand side is never used
+        fragment:
+            start: 13
+            end: 16
       operation: many-to-many
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
-      deadinfo:
-        reason: the left hand side always returs something and so the right hand side is never used
-        fragment:
-            start: 13
-            end: 16
       position:
         start: 13
         end: 16
@@ -5434,17 +5434,17 @@ output:
             fragment:
                 start: 0
                 end: 6
+      deadinfo:
+        reason: this query always evaluates to `0 > 0` which is not possible, so it will never return anything
+        fragment:
+            start: 0
+            end: 9
       operation: vector
       returns: vector
       operations:
         - '[*parser.Call] vector(0)'
       joins: []
       unless: []
-      deadinfo:
-        reason: this query always evaluates to `0 > 0` which is not possible, so it will never return anything
-        fragment:
-            start: 0
-            end: 9
       position:
         start: 0
         end: 9
@@ -5468,6 +5468,11 @@ output:
             fragment:
                 start: 0
                 end: 6
+      deadinfo:
+        reason: '`vector(0) > vector(1)` always evaluates to `0 > 1` which is not possible, so it will never return anything'
+        fragment:
+            start: 0
+            end: 9
       operation: vector
       returns: vector
       operations:
@@ -5480,13 +5485,13 @@ output:
                 fragment:
                     start: 12
                     end: 18
+          deadinfo: null
           operation: vector
           returns: vector
           operations:
             - '[*parser.Call] vector(1)'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 12
             end: 21
@@ -5498,11 +5503,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo:
-        reason: '`vector(0) > vector(1)` always evaluates to `0 > 1` which is not possible, so it will never return anything'
-        fragment:
-            start: 0
-            end: 9
       position:
         start: 0
         end: 9
@@ -5532,6 +5532,7 @@ output:
             fragment:
                 start: 0
                 end: 21
+      deadinfo: null
       operation: sum
       returns: vector
       operations:
@@ -5539,7 +5540,6 @@ output:
         - '[*parser.AggregateExpr] sum(foo or vector(0))'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 4
         end: 7
@@ -5563,6 +5563,11 @@ output:
             fragment:
                 start: 0
                 end: 21
+      deadinfo:
+        reason: this query always evaluates to `0 > 0` which is not possible, so it will never return anything
+        fragment:
+            start: 11
+            end: 20
       operation: sum
       returns: vector
       operations:
@@ -5570,11 +5575,6 @@ output:
         - '[*parser.AggregateExpr] sum(foo or vector(0))'
       joins: []
       unless: []
-      deadinfo:
-        reason: this query always evaluates to `0 > 0` which is not possible, so it will never return anything
-        fragment:
-            start: 11
-            end: 20
       position:
         start: 11
         end: 20
@@ -5604,6 +5604,7 @@ output:
             fragment:
                 start: 1
                 end: 22
+      deadinfo: null
       operation: sum
       returns: vector
       operations:
@@ -5611,7 +5612,6 @@ output:
         - '[*parser.AggregateExpr] sum(foo or vector(1))'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 5
         end: 8
@@ -5635,6 +5635,11 @@ output:
             fragment:
                 start: 1
                 end: 22
+      deadinfo:
+        reason: this query always evaluates to `1 == 2` which is not possible, so it will never return anything
+        fragment:
+            start: 12
+            end: 21
       operation: sum
       returns: vector
       operations:
@@ -5642,11 +5647,6 @@ output:
         - '[*parser.AggregateExpr] sum(foo or vector(1))'
       joins: []
       unless: []
-      deadinfo:
-        reason: this query always evaluates to `1 == 2` which is not possible, so it will never return anything
-        fragment:
-            start: 12
-            end: 21
       position:
         start: 12
         end: 21
@@ -5676,6 +5676,7 @@ output:
             fragment:
                 start: 1
                 end: 22
+      deadinfo: null
       operation: sum
       returns: vector
       operations:
@@ -5683,7 +5684,6 @@ output:
         - '[*parser.AggregateExpr] sum(foo or vector(1))'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 5
         end: 8
@@ -5707,6 +5707,7 @@ output:
             fragment:
                 start: 1
                 end: 22
+      deadinfo: null
       operation: sum
       returns: vector
       operations:
@@ -5714,7 +5715,6 @@ output:
         - '[*parser.AggregateExpr] sum(foo or vector(1))'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 12
         end: 21
@@ -5744,6 +5744,7 @@ output:
             fragment:
                 start: 1
                 end: 22
+      deadinfo: null
       operation: sum
       returns: vector
       operations:
@@ -5751,7 +5752,6 @@ output:
         - '[*parser.AggregateExpr] sum(foo or vector(2))'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 5
         end: 8
@@ -5775,6 +5775,11 @@ output:
             fragment:
                 start: 1
                 end: 22
+      deadinfo:
+        reason: this query always evaluates to `2 != 2` which is not possible, so it will never return anything
+        fragment:
+            start: 12
+            end: 21
       operation: sum
       returns: vector
       operations:
@@ -5782,11 +5787,6 @@ output:
         - '[*parser.AggregateExpr] sum(foo or vector(2))'
       joins: []
       unless: []
-      deadinfo:
-        reason: this query always evaluates to `2 != 2` which is not possible, so it will never return anything
-        fragment:
-            start: 12
-            end: 21
       position:
         start: 12
         end: 21
@@ -5819,6 +5819,7 @@ output:
             fragment:
                 start: 1
                 end: 41
+      deadinfo: null
       operation: sum
       returns: vector
       operations:
@@ -5826,7 +5827,6 @@ output:
         - '[*parser.AggregateExpr] sum(sometimes{foo!="bar"} or vector(0))'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 5
         end: 26
@@ -5850,6 +5850,7 @@ output:
             fragment:
                 start: 1
                 end: 41
+      deadinfo: null
       operation: sum
       returns: vector
       operations:
@@ -5857,7 +5858,6 @@ output:
         - '[*parser.AggregateExpr] sum(sometimes{foo!="bar"} or vector(0))'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 30
         end: 39
@@ -5869,13 +5869,13 @@ output:
       isconditional: false
       isreturnbool: false
     - labels: {}
+      deadinfo: null
       operation: many-to-many
       returns: vector
       operations:
         - '[*parser.VectorSelector] bob'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 47
         end: 50
@@ -5899,6 +5899,7 @@ output:
             fragment:
                 start: 60
                 end: 68
+      deadinfo: null
       operation: sum
       returns: vector
       operations:
@@ -5906,7 +5907,6 @@ output:
         - '[*parser.AggregateExpr] sum(foo)'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 64
         end: 67
@@ -5924,13 +5924,13 @@ output:
             fragment:
                 start: 72
                 end: 78
+      deadinfo: null
       operation: vector
       returns: vector
       operations:
         - '[*parser.Call] vector(1)'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 72
         end: 81
@@ -5969,6 +5969,7 @@ output:
             fragment:
                 start: 4
                 end: 30
+      deadinfo: null
       operation: sum
       returns: vector
       operations:
@@ -5976,13 +5977,13 @@ output:
         - '[*parser.AggregateExpr] sum(sometimes{foo!="bar"})'
       joins:
         - labels: {}
+          deadinfo: null
           operation: many-to-many
           returns: vector
           operations:
             - '[*parser.VectorSelector] bob'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 57
             end: 60
@@ -6006,6 +6007,7 @@ output:
                 fragment:
                     start: 70
                     end: 79
+          deadinfo: null
           operation: sum
           returns: vector
           operations:
@@ -6013,7 +6015,6 @@ output:
             - '[*parser.AggregateExpr] sum(bar)'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 74
             end: 77
@@ -6025,13 +6026,13 @@ output:
           isconditional: false
           isreturnbool: false
         - labels: {}
+          deadinfo: null
           operation: many-to-many
           returns: vector
           operations:
             - '[*parser.VectorSelector] notfound'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 85
             end: 93
@@ -6043,7 +6044,6 @@ output:
           isconditional: true
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 8
         end: 29
@@ -6061,19 +6061,20 @@ output:
             fragment:
                 start: 36
                 end: 42
+      deadinfo: null
       operation: vector
       returns: vector
       operations:
         - '[*parser.Call] vector(1)'
       joins:
         - labels: {}
+          deadinfo: null
           operation: many-to-many
           returns: vector
           operations:
             - '[*parser.VectorSelector] bob'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 57
             end: 60
@@ -6097,6 +6098,7 @@ output:
                 fragment:
                     start: 70
                     end: 79
+          deadinfo: null
           operation: sum
           returns: vector
           operations:
@@ -6104,7 +6106,6 @@ output:
             - '[*parser.AggregateExpr] sum(bar)'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 74
             end: 77
@@ -6116,13 +6117,13 @@ output:
           isconditional: false
           isreturnbool: false
         - labels: {}
+          deadinfo: null
           operation: many-to-many
           returns: vector
           operations:
             - '[*parser.VectorSelector] notfound'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 85
             end: 93
@@ -6134,7 +6135,6 @@ output:
           isconditional: true
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 36
         end: 45
@@ -6152,13 +6152,13 @@ output:
 expr: foo offset 5m > 5
 output:
     - labels: {}
+      deadinfo: null
       operation: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo offset 5m'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 13
@@ -6179,6 +6179,7 @@ expr: |4
     (rate(metric3{log_name="samplerd"}[5m]) or vector(2)) > 0
 output:
     - labels: {}
+      deadinfo: null
       operation: rate
       returns: vector
       operations:
@@ -6186,6 +6187,7 @@ output:
         - '[*parser.Call] rate(metric2[5m])'
       joins:
         - labels: {}
+          deadinfo: null
           operation: rate
           returns: vector
           operations:
@@ -6193,7 +6195,6 @@ output:
             - '[*parser.Call] rate(metric1[5m])'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 42
             end: 53
@@ -6211,13 +6212,13 @@ output:
                 fragment:
                     start: 58
                     end: 64
+          deadinfo: null
           operation: vector
           returns: vector
           operations:
             - '[*parser.Call] vector(1)'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 58
             end: 67
@@ -6235,6 +6236,7 @@ output:
                 fragment:
                     start: 72
                     end: 110
+          deadinfo: null
           operation: rate
           returns: vector
           operations:
@@ -6242,7 +6244,6 @@ output:
             - '[*parser.Call] rate(metric3{log_name="samplerd"}[5m])'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 77
             end: 109
@@ -6260,13 +6261,13 @@ output:
                 fragment:
                     start: 114
                     end: 120
+          deadinfo: null
           operation: vector
           returns: vector
           operations:
             - '[*parser.Call] vector(2)'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 114
             end: 123
@@ -6278,7 +6279,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 7
         end: 18
@@ -6296,12 +6296,14 @@ output:
             fragment:
                 start: 23
                 end: 29
+      deadinfo: null
       operation: vector
       returns: vector
       operations:
         - '[*parser.Call] vector(0)'
       joins:
         - labels: {}
+          deadinfo: null
           operation: rate
           returns: vector
           operations:
@@ -6309,7 +6311,6 @@ output:
             - '[*parser.Call] rate(metric1[5m])'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 42
             end: 53
@@ -6327,13 +6328,13 @@ output:
                 fragment:
                     start: 58
                     end: 64
+          deadinfo: null
           operation: vector
           returns: vector
           operations:
             - '[*parser.Call] vector(1)'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 58
             end: 67
@@ -6351,6 +6352,7 @@ output:
                 fragment:
                     start: 72
                     end: 110
+          deadinfo: null
           operation: rate
           returns: vector
           operations:
@@ -6358,7 +6360,6 @@ output:
             - '[*parser.Call] rate(metric3{log_name="samplerd"}[5m])'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 77
             end: 109
@@ -6376,13 +6377,13 @@ output:
                 fragment:
                     start: 114
                     end: 120
+          deadinfo: null
           operation: vector
           returns: vector
           operations:
             - '[*parser.Call] vector(2)'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 114
             end: 123
@@ -6394,7 +6395,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 23
         end: 32
@@ -6424,6 +6424,7 @@ output:
             fragment:
                 start: 0
                 end: 64
+      deadinfo: null
       operation: label_replace
       returns: vector
       operations:
@@ -6431,7 +6432,6 @@ output:
         - '[*parser.Call] label_replace(vector(1), "nexthop_tag", "$1", "nexthop", "(.+)")'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 14
         end: 23
@@ -6467,6 +6467,7 @@ output:
             fragment:
                 start: 1
                 end: 4
+      deadinfo: null
       operation: sum
       returns: vector
       operations:
@@ -6474,7 +6475,6 @@ output:
         - '[*parser.AggregateExpr] sum(foo{job="myjob"})'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 5
         end: 21
@@ -6498,13 +6498,13 @@ output:
             fragment:
                 start: 2
                 end: 18
+      deadinfo: null
       operation: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job="myjob"}'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 2
         end: 18
@@ -6535,6 +6535,11 @@ output:
             fragment:
                 start: 5
                 end: 23
+      deadinfo:
+        reason: this query always evaluates to `0 > 0` which is not possible, so it will never return anything
+        fragment:
+            start: 11
+            end: 20
       operation: group
       returns: vector
       operations:
@@ -6542,11 +6547,6 @@ output:
         - '[*parser.AggregateExpr] group(vector(0))'
       joins: []
       unless: []
-      deadinfo:
-        reason: this query always evaluates to `0 > 0` which is not possible, so it will never return anything
-        fragment:
-            start: 11
-            end: 20
       position:
         start: 11
         end: 20
@@ -6570,16 +6570,16 @@ output:
             fragment:
                 start: 0
                 end: 1
-      operation: ""
-      returns: scalar
-      operations: []
-      joins: []
-      unless: []
       deadinfo:
         reason: this query always evaluates to `1 > 5` which is not possible, so it will never return anything
         fragment:
             start: 0
             end: 1
+      operation: ""
+      returns: scalar
+      operations: []
+      joins: []
+      unless: []
       position:
         start: 0
         end: 1
@@ -6603,6 +6603,7 @@ output:
             fragment:
                 start: 0
                 end: 34
+      deadinfo: null
       operation: many-to-many
       returns: vector
       operations:
@@ -6616,17 +6617,17 @@ output:
                 fragment:
                     start: 42
                     end: 48
+          deadinfo:
+            reason: The right hand side will never be matched because it doesn't have the `job` label while the left hand side will. Calling `vector()` will return a vector value with no labels.
+            fragment:
+                start: 42
+                end: 48
           operation: vector
           returns: vector
           operations:
             - '[*parser.Call] vector(0)'
           joins: []
           unless: []
-          deadinfo:
-            reason: The right hand side will never be matched because it doesn't have the `job` label while the left hand side will. Calling `vector()` will return a vector value with no labels.
-            fragment:
-                start: 42
-                end: 48
           position:
             start: 42
             end: 51
@@ -6637,7 +6638,6 @@ output:
           knownreturn: true
           isconditional: false
           isreturnbool: false
-      deadinfo: null
       position:
         start: 0
         end: 34
@@ -6661,6 +6661,11 @@ output:
             fragment:
                 start: 0
                 end: 34
+      deadinfo:
+        reason: this query will never return anything because the `unless` query always returns something
+        fragment:
+            start: 47
+            end: 56
       operation: many-to-many
       returns: vector
       operations:
@@ -6674,13 +6679,13 @@ output:
                 fragment:
                     start: 47
                     end: 53
+          deadinfo: null
           operation: vector
           returns: vector
           operations:
             - '[*parser.Call] vector(0)'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 47
             end: 56
@@ -6691,11 +6696,6 @@ output:
           knownreturn: true
           isconditional: false
           isreturnbool: false
-      deadinfo:
-        reason: this query will never return anything because the `unless` query always returns something
-        fragment:
-            start: 47
-            end: 56
       position:
         start: 0
         end: 34
@@ -6719,6 +6719,7 @@ output:
             fragment:
                 start: 0
                 end: 34
+      deadinfo: null
       operation: many-to-many
       returns: vector
       operations:
@@ -6732,17 +6733,17 @@ output:
                 fragment:
                     start: 50
                     end: 56
+          deadinfo:
+            reason: The right hand side will never be matched because it doesn't have the `job` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
+            fragment:
+                start: 50
+                end: 56
           operation: vector
           returns: vector
           operations:
             - '[*parser.Call] vector(0)'
           joins: []
           unless: []
-          deadinfo:
-            reason: The right hand side will never be matched because it doesn't have the `job` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
-            fragment:
-                start: 50
-                end: 56
           position:
             start: 50
             end: 59
@@ -6753,7 +6754,6 @@ output:
           knownreturn: true
           isconditional: false
           isreturnbool: false
-      deadinfo: null
       position:
         start: 0
         end: 34
@@ -6812,6 +6812,7 @@ output:
             fragment:
                 start: 5
                 end: 8
+      deadinfo: null
       operation: max
       returns: vector
       operations:
@@ -6850,6 +6851,7 @@ output:
                 fragment:
                     start: 99
                     end: 102
+          deadinfo: null
           operation: sum
           returns: vector
           operations:
@@ -6869,13 +6871,13 @@ output:
                     fragment:
                         start: 247
                         end: 303
+              deadinfo: null
               operation: ""
               returns: vector
               operations:
                 - '[*parser.VectorSelector] cf_node_role{kubernetes_role="master",role="kubernetes"}'
               joins: []
               unless: []
-              deadinfo: null
               position:
                 start: 247
                 end: 303
@@ -6887,7 +6889,6 @@ output:
               isconditional: false
               isreturnbool: false
           unless: []
-          deadinfo: null
           position:
             start: 132
             end: 201
@@ -6898,7 +6899,6 @@ output:
           knownreturn: false
           isconditional: false
           isreturnbool: false
-      deadinfo: null
       position:
         start: 29
         end: 85
@@ -6928,6 +6928,7 @@ output:
             fragment:
                 start: 13
                 end: 15
+      deadinfo: null
       operation: one-to-one
       returns: vector
       operations:
@@ -6940,13 +6941,13 @@ output:
                 fragment:
                     start: 18
                     end: 28
+          deadinfo: null
           operation: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar{b="2"}'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 18
             end: 28
@@ -6958,7 +6959,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 10
@@ -7000,6 +7000,7 @@ output:
             fragment:
                 start: 13
                 end: 15
+      deadinfo: null
       operation: many-to-one
       returns: vector
       operations:
@@ -7012,13 +7013,13 @@ output:
                 fragment:
                     start: 42
                     end: 52
+          deadinfo: null
           operation: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar{b="2"}'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 42
             end: 52
@@ -7030,7 +7031,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 10
@@ -7072,6 +7072,7 @@ output:
             fragment:
                 start: 13
                 end: 15
+      deadinfo: null
       operation: one-to-many
       returns: vector
       operations:
@@ -7084,13 +7085,13 @@ output:
                 fragment:
                     start: 0
                     end: 10
+          deadinfo: null
           operation: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] foo{a="1"}'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 0
             end: 10
@@ -7102,7 +7103,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 43
         end: 53
@@ -7138,6 +7138,7 @@ output:
             fragment:
                 start: 13
                 end: 15
+      deadinfo: null
       operation: one-to-one
       returns: vector
       operations:
@@ -7162,6 +7163,11 @@ output:
                 fragment:
                     start: 26
                     end: 29
+          deadinfo:
+            reason: The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
+            fragment:
+                start: 26
+                end: 29
           operation: sum
           returns: vector
           operations:
@@ -7169,11 +7175,6 @@ output:
             - '[*parser.AggregateExpr] sum(bar{b="2"})'
           joins: []
           unless: []
-          deadinfo:
-            reason: The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
-            fragment:
-                start: 26
-                end: 29
           position:
             start: 30
             end: 40
@@ -7185,7 +7186,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 10
@@ -7227,6 +7227,7 @@ output:
             fragment:
                 start: 13
                 end: 15
+      deadinfo: null
       operation: many-to-one
       returns: vector
       operations:
@@ -7251,6 +7252,11 @@ output:
                 fragment:
                     start: 42
                     end: 45
+          deadinfo:
+            reason: The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
+            fragment:
+                start: 42
+                end: 45
           operation: sum
           returns: vector
           operations:
@@ -7258,11 +7264,6 @@ output:
             - '[*parser.AggregateExpr] sum(bar{b="2"})'
           joins: []
           unless: []
-          deadinfo:
-            reason: The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
-            fragment:
-                start: 42
-                end: 45
           position:
             start: 46
             end: 56
@@ -7274,7 +7275,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 10
@@ -7316,6 +7316,7 @@ output:
             fragment:
                 start: 18
                 end: 20
+      deadinfo: null
       operation: one-to-many
       returns: vector
       operations:
@@ -7340,6 +7341,11 @@ output:
                 fragment:
                     start: 0
                     end: 3
+          deadinfo:
+            reason: The left hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
+            fragment:
+                start: 0
+                end: 3
           operation: sum
           returns: vector
           operations:
@@ -7347,11 +7353,6 @@ output:
             - '[*parser.AggregateExpr] sum(foo{a="1"})'
           joins: []
           unless: []
-          deadinfo:
-            reason: The left hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
-            fragment:
-                start: 0
-                end: 3
           position:
             start: 4
             end: 14
@@ -7363,7 +7364,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 48
         end: 58
@@ -7405,6 +7405,7 @@ output:
             fragment:
                 start: 13
                 end: 15
+      deadinfo: null
       operation: many-to-one
       returns: vector
       operations:
@@ -7429,6 +7430,11 @@ output:
                 fragment:
                     start: 58
                     end: 65
+          deadinfo:
+            reason: The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
+            fragment:
+                start: 58
+                end: 65
           operation: sum
           returns: vector
           operations:
@@ -7436,11 +7442,6 @@ output:
             - '[*parser.AggregateExpr] sum without (instance) (bar{b="2"})'
           joins: []
           unless: []
-          deadinfo:
-            reason: The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
-            fragment:
-                start: 58
-                end: 65
           position:
             start: 46
             end: 56
@@ -7452,7 +7453,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 0
         end: 10
@@ -7494,6 +7494,7 @@ output:
             fragment:
                 start: 36
                 end: 38
+      deadinfo: null
       operation: one-to-many
       returns: vector
       operations:
@@ -7518,6 +7519,11 @@ output:
                 fragment:
                     start: 16
                     end: 23
+          deadinfo:
+            reason: The left hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
+            fragment:
+                start: 16
+                end: 23
           operation: sum
           returns: vector
           operations:
@@ -7525,11 +7531,6 @@ output:
             - '[*parser.AggregateExpr] sum without (instance) (foo{a="1"})'
           joins: []
           unless: []
-          deadinfo:
-            reason: The left hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
-            fragment:
-                start: 16
-                end: 23
           position:
             start: 4
             end: 14
@@ -7541,7 +7542,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 66
         end: 76
@@ -7595,6 +7595,7 @@ output:
             fragment:
                 start: 6
                 end: 14
+      deadinfo: null
       operation: max
       returns: vector
       operations:
@@ -7614,13 +7615,6 @@ output:
                 fragment:
                     start: 292
                     end: 298
-          operation: absent
-          returns: vector
-          operations:
-            - '[*parser.VectorSelector] node_disk_info'
-            - '[*parser.Call] absent(node_disk_info)'
-          joins: []
-          unless: []
           deadinfo:
             reason: |-
                 The right hand side will never be matched because it doesn't have the `device` label from `on(...)`. The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
@@ -7631,6 +7625,13 @@ output:
             fragment:
                 start: 292
                 end: 298
+          operation: absent
+          returns: vector
+          operations:
+            - '[*parser.VectorSelector] node_disk_info'
+            - '[*parser.Call] absent(node_disk_info)'
+          joins: []
+          unless: []
           position:
             start: 299
             end: 313
@@ -7648,6 +7649,7 @@ output:
                 fragment:
                     start: 351
                     end: 442
+          deadinfo: null
           operation: label_replace
           returns: vector
           operations:
@@ -7655,7 +7657,6 @@ output:
             - '[*parser.Call] label_replace(salt_highstate_runner_configured_minions, "instance", "$1", "minion", "(.+)")'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 365
             end: 405
@@ -7668,6 +7669,7 @@ output:
           isreturnbool: false
       unless:
         - labels: {}
+          deadinfo: null
           operation: increase
           returns: vector
           operations:
@@ -7675,6 +7677,7 @@ output:
             - '[*parser.Call] increase(kernel_device_io_soft_errors_total{device!~"loop.+"}[2h5m])'
           joins:
             - labels: {}
+              deadinfo: null
               operation: increase
               returns: vector
               operations:
@@ -7682,7 +7685,6 @@ output:
                 - '[*parser.Call] increase(kernel_device_io_errors_total[2h])'
               joins: []
               unless: []
-              deadinfo: null
               position:
                 start: 222
                 end: 257
@@ -7694,7 +7696,6 @@ output:
               isconditional: false
               isreturnbool: false
           unless: []
-          deadinfo: null
           position:
             start: 149
             end: 207
@@ -7705,7 +7706,6 @@ output:
           knownreturn: false
           isconditional: true
           isreturnbool: false
-      deadinfo: null
       position:
         start: 46
         end: 99
@@ -7747,6 +7747,7 @@ output:
             fragment:
                 start: 26
                 end: 28
+      deadinfo: null
       operation: sum
       returns: vector
       operations:
@@ -7760,13 +7761,13 @@ output:
                 fragment:
                     start: 31
                     end: 41
+          deadinfo: null
           operation: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar{b="2"}'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 31
             end: 41
@@ -7778,7 +7779,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 4
         end: 14
@@ -7814,6 +7814,7 @@ output:
             fragment:
                 start: 13
                 end: 20
+      deadinfo: null
       operation: sum
       returns: vector
       operations:
@@ -7822,7 +7823,6 @@ output:
         - '[*parser.AggregateExpr] sum by (job) (sum without (job) (foo))'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 8
         end: 11
@@ -7855,6 +7855,7 @@ output:
             fragment:
                 start: 47
                 end: 49
+      deadinfo: null
       operation: many-to-one
       returns: vector
       operations:
@@ -7891,6 +7892,7 @@ output:
                 fragment:
                     start: 75
                     end: 287
+          deadinfo: null
           operation: label_replace
           returns: vector
           operations:
@@ -7918,6 +7920,7 @@ output:
                     fragment:
                         start: 229
                         end: 231
+              deadinfo: null
               operation: max
               returns: vector
               operations:
@@ -7926,7 +7929,6 @@ output:
                 - '[*parser.AggregateExpr] max by (instance) (max_over_time(prometheus_tsdb_head_series[2h]))'
               joins: []
               unless: []
-              deadinfo: null
               position:
                 start: 195
                 end: 226
@@ -7938,7 +7940,6 @@ output:
               isconditional: false
               isreturnbool: false
           unless: []
-          deadinfo: null
           position:
             start: 92
             end: 241
@@ -7950,7 +7951,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 1
         end: 44
@@ -7974,6 +7974,7 @@ output:
             fragment:
                 start: 1
                 end: 14
+      deadinfo: null
       operation: day_of_week
       returns: vector
       operations:
@@ -7986,13 +7987,13 @@ output:
                 fragment:
                     start: 24
                     end: 30
+          deadinfo: null
           operation: hour
           returns: vector
           operations:
             - '[*parser.Call] hour()'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 24
             end: 30
@@ -8004,7 +8005,6 @@ output:
           isconditional: true
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 1
         end: 14
@@ -8022,13 +8022,13 @@ output:
             fragment:
                 start: 39
                 end: 45
+      deadinfo: null
       operation: vector
       returns: vector
       operations:
         - '[*parser.Call] vector(1)'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 39
         end: 48
@@ -8093,6 +8093,7 @@ output:
             fragment:
                 start: 5
                 end: 8
+      deadinfo: null
       operation: sum
       returns: vector
       operations:
@@ -8101,13 +8102,13 @@ output:
         - '[*parser.AggregateExpr] sum by (foo, bar) (rate(errors_total[5m]) * on (instance) group_left (bob, alice) server_errors_total)'
       joins:
         - labels: {}
+          deadinfo: null
           operation: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] server_errors_total'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 94
             end: 113
@@ -8119,7 +8120,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 30
         end: 46
@@ -8137,13 +8137,13 @@ output:
 expr: 1 - (foo or vector(0)) < 0.999
 output:
     - labels: {}
+      deadinfo: null
       operation: many-to-many
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 5
         end: 8
@@ -8161,17 +8161,17 @@ output:
             fragment:
                 start: 12
                 end: 18
+      deadinfo:
+        reason: this query always evaluates to `1 < 0.999` which is not possible, so it will never return anything
+        fragment:
+            start: 12
+            end: 21
       operation: vector
       returns: vector
       operations:
         - '[*parser.Call] vector(0)'
       joins: []
       unless: []
-      deadinfo:
-        reason: this query always evaluates to `1 < 0.999` which is not possible, so it will never return anything
-        fragment:
-            start: 12
-            end: 21
       position:
         start: 12
         end: 21
@@ -8198,6 +8198,7 @@ output:
             fragment:
                 start: 5
                 end: 11
+      deadinfo: null
       operation: vector
       returns: vector
       operations:
@@ -8210,13 +8211,13 @@ output:
                 fragment:
                     start: 19
                     end: 26
+          deadinfo: null
           operation: month
           returns: vector
           operations:
             - '[*parser.Call] month()'
           joins: []
           unless: []
-          deadinfo: null
           position:
             start: 19
             end: 26
@@ -8228,7 +8229,6 @@ output:
           isconditional: true
           isreturnbool: false
       unless: []
-      deadinfo: null
       position:
         start: 5
         end: 14
@@ -8246,13 +8246,13 @@ output:
             fragment:
                 start: 37
                 end: 43
+      deadinfo: null
       operation: vector
       returns: vector
       operations:
         - '[*parser.Call] vector(0)'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 37
         end: 46
@@ -8294,6 +8294,7 @@ output:
             fragment:
                 start: 6
                 end: 9
+      deadinfo: null
       operation: count
       returns: vector
       operations:
@@ -8302,7 +8303,6 @@ output:
         - '[*parser.AggregateExpr] count by (region) (stddev by (colo_name, region) (error_total))'
       joins: []
       unless: []
-      deadinfo: null
       position:
         start: 50
         end: 61
