@@ -36,8 +36,8 @@ const (
 
 type LabelTransform struct {
 	Reason   string
-	Fragment posrange.PositionRange
 	Kind     LabelPromiseType
+	Fragment posrange.PositionRange
 }
 
 type SourceOperations []promParser.Node

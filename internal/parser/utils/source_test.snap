@@ -5,10 +5,10 @@ output:
     - labels:
         "":
             reason: This query returns a number value with no labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 1
-            kind: excluded
       operation: ""
       isdeadreason: ""
       returns: scalar
@@ -38,10 +38,10 @@ output:
     - labels:
         "":
             reason: This query returns a number value with no labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 1
-            kind: excluded
       operation: ""
       isdeadreason: ""
       returns: scalar
@@ -71,10 +71,10 @@ output:
     - labels:
         "":
             reason: This query returns a number value with no labels.
+            kind: excluded
             fragment:
                 start: 1
                 end: 2
-            kind: excluded
       operation: ""
       isdeadreason: this query always evaluates to `32 == 5` which is not possible, so it will never return anything
       returns: scalar
@@ -104,10 +104,10 @@ output:
     - labels:
         "":
             reason: This query returns a number value with no labels.
+            kind: excluded
             fragment:
                 start: 1
                 end: 2
-            kind: excluded
       operation: ""
       isdeadreason: this query always evaluates to `3 <= 2` which is not possible, so it will never return anything
       returns: scalar
@@ -137,10 +137,10 @@ output:
     - labels:
         "":
             reason: This query returns a number value with no labels.
+            kind: excluded
             fragment:
                 start: 1
                 end: 2
-            kind: excluded
       operation: ""
       isdeadreason: this query always evaluates to `3 >= 20` which is not possible, so it will never return anything
       returns: scalar
@@ -170,10 +170,10 @@ output:
     - labels:
         "":
             reason: This query returns a number value with no labels.
+            kind: excluded
             fragment:
                 start: 1
                 end: 2
-            kind: excluded
       operation: ""
       isdeadreason: ""
       returns: scalar
@@ -203,10 +203,10 @@ output:
     - labels:
         "":
             reason: This query returns a number value with no labels.
+            kind: excluded
             fragment:
                 start: 1
                 end: 2
-            kind: excluded
       operation: ""
       isdeadreason: this query always evaluates to `3 < 1` which is not possible, so it will never return anything
       returns: scalar
@@ -236,10 +236,10 @@ output:
     - labels:
         "":
             reason: This query returns a number value with no labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 2
-            kind: excluded
       operation: ""
       isdeadreason: this query always evaluates to `5 < 1` which is not possible, so it will never return anything
       returns: scalar
@@ -269,10 +269,10 @@ output:
     - labels:
         "":
             reason: This query returns a number value with no labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 1
-            kind: excluded
       operation: ""
       isdeadreason: ""
       returns: scalar
@@ -374,10 +374,10 @@ output:
     - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
+            kind: excluded
             fragment:
                 start: 8
                 end: 14
-            kind: excluded
       operation: vector
       isdeadreason: ""
       returns: vector
@@ -415,10 +415,10 @@ output:
         - labels:
             "":
                 reason: Calling `vector()` will return a vector value with no labels.
+                kind: excluded
                 fragment:
                     start: 22
                     end: 28
-                kind: excluded
           operation: vector
           isdeadreason: ""
           returns: vector
@@ -480,10 +480,10 @@ output:
     - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
+            kind: excluded
             fragment:
                 start: 8
                 end: 14
-            kind: excluded
       operation: vector
       isdeadreason: ""
       returns: vector
@@ -493,10 +493,10 @@ output:
         - labels:
             "":
                 reason: Calling `vector()` will return a vector value with no labels.
+                kind: excluded
                 fragment:
                     start: 22
                     end: 28
-                kind: excluded
           operation: vector
           isdeadreason: ""
           returns: vector
@@ -564,10 +564,10 @@ output:
     - labels:
         "":
             reason: This query returns a number value with no labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 1
-            kind: excluded
       operation: ""
       isdeadreason: ""
       returns: scalar
@@ -597,10 +597,10 @@ output:
     - labels:
         "":
             reason: This query returns a number value with no labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 2
-            kind: excluded
       operation: ""
       isdeadreason: ""
       returns: scalar
@@ -630,10 +630,10 @@ output:
     - labels:
         "":
             reason: This query returns a string value with no labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 6
-            kind: excluded
       operation: ""
       isdeadreason: ""
       returns: string
@@ -875,16 +875,16 @@ output:
     - labels:
         "":
             reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 11
                 end: 13
-            kind: excluded
         instance:
             reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 11
                 end: 13
-            kind: included
       operation: one-to-one
       isdeadreason: ""
       returns: vector
@@ -937,16 +937,16 @@ output:
     - labels:
         "":
             reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 12
                 end: 14
-            kind: excluded
         instance:
             reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 12
                 end: 14
-            kind: included
       operation: one-to-one
       isdeadreason: ""
       returns: vector
@@ -999,16 +999,16 @@ output:
     - labels:
         instance:
             reason: Query is using many-to-one vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 11
                 end: 13
-            kind: included
         version:
             reason: Query is using many-to-one vector matching with `group_left(version)`, all labels included inside `group_left(...)` will be include on the results.
+            kind: included
             fragment:
                 start: 24
                 end: 34
-            kind: included
       operation: many-to-one
       isdeadreason: ""
       returns: vector
@@ -1061,16 +1061,16 @@ output:
     - labels:
         instance:
             reason: Query is using one-to-many vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 11
                 end: 13
-            kind: included
         version:
             reason: Query is using one-to-many vector matching with `group_right(version)`, all labels included inside `group_right(...)` will be include on the results.
+            kind: included
             fragment:
                 start: 24
                 end: 35
-            kind: included
       operation: one-to-many
       isdeadreason: ""
       returns: vector
@@ -1201,10 +1201,10 @@ output:
     - labels:
         job:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 14
-            kind: guaranteed
       operation: ""
       isdeadreason: ""
       returns: vector
@@ -1235,10 +1235,10 @@ output:
     - labels:
         job:
             reason: Query uses `{job=""}` selector which will filter out any time series with the `job` label set.
+            kind: excluded
             fragment:
                 start: 0
                 end: 11
-            kind: excluded
       operation: ""
       isdeadreason: ""
       returns: vector
@@ -1269,10 +1269,10 @@ output:
     - labels:
         job:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 14
-            kind: guaranteed
       operation: many-to-many
       isdeadreason: ""
       returns: vector
@@ -1297,10 +1297,10 @@ output:
     - labels:
         job:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 18
                 end: 32
-            kind: guaranteed
       operation: many-to-many
       isdeadreason: ""
       returns: vector
@@ -1331,10 +1331,10 @@ output:
     - labels:
         a:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 12
-            kind: guaranteed
       operation: many-to-many
       isdeadreason: ""
       returns: vector
@@ -1359,10 +1359,10 @@ output:
     - labels:
         b:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 16
                 end: 28
-            kind: guaranteed
       operation: many-to-many
       isdeadreason: ""
       returns: vector
@@ -1563,22 +1563,22 @@ output:
     - labels:
         "":
             reason: Query is using aggregation that removes all labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 3
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 0
                 end: 21
-            kind: excluded
         job:
             reason: Query is using aggregation that removes all labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 3
-            kind: excluded
       operation: sum
       isdeadreason: ""
       returns: vector
@@ -1610,28 +1610,28 @@ output:
     - labels:
         "":
             reason: Query is using aggregation that removes all labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 3
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 0
                 end: 41
-            kind: excluded
         instance:
             reason: Query is using aggregation that removes all labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 3
-            kind: excluded
         job:
             reason: Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 28
                 end: 30
-            kind: excluded
       operation: sum
       isdeadreason: ""
       returns: vector
@@ -1664,22 +1664,22 @@ output:
     - labels:
         "":
             reason: Query is using aggregation that removes all labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 3
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 0
                 end: 21
-            kind: excluded
         job:
             reason: Query is using aggregation that removes all labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 3
-            kind: excluded
       operation: sum
       isdeadreason: ""
       returns: vector
@@ -1711,16 +1711,16 @@ output:
     - labels:
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 0
                 end: 34
-            kind: excluded
         job:
             reason: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
+            kind: excluded
             fragment:
                 start: 22
                 end: 29
-            kind: excluded
       operation: sum
       isdeadreason: ""
       returns: vector
@@ -1752,22 +1752,22 @@ output:
     - labels:
         "":
             reason: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 9
                 end: 11
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 0
                 end: 16
-            kind: excluded
         job:
             reason: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 9
                 end: 11
-            kind: included
       operation: sum
       isdeadreason: ""
       returns: vector
@@ -1799,22 +1799,22 @@ output:
     - labels:
         "":
             reason: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 22
                 end: 24
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 0
                 end: 29
-            kind: excluded
         job:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 4
                 end: 20
-            kind: guaranteed
       operation: sum
       isdeadreason: ""
       returns: vector
@@ -1846,10 +1846,10 @@ output:
     - labels:
         job:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 31
-            kind: guaranteed
       operation: abs
       isdeadreason: ""
       returns: vector
@@ -1881,10 +1881,10 @@ output:
     - labels:
         job:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 43
-            kind: guaranteed
       operation: abs
       isdeadreason: ""
       returns: vector
@@ -1910,10 +1910,10 @@ output:
     - labels:
         cluster:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 43
-            kind: guaranteed
       operation: abs
       isdeadreason: ""
       returns: vector
@@ -1945,22 +1945,22 @@ output:
     - labels:
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 0
                 end: 61
-            kind: excluded
         instance:
             reason: Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
+            kind: excluded
             fragment:
                 start: 44
                 end: 51
-            kind: excluded
         job:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 4
                 end: 20
-            kind: guaranteed
       operation: sum
       isdeadreason: ""
       returns: vector
@@ -1986,22 +1986,22 @@ output:
     - labels:
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 0
                 end: 61
-            kind: excluded
         cluster:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 24
                 end: 42
-            kind: guaranteed
         instance:
             reason: Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
+            kind: excluded
             fragment:
                 start: 44
                 end: 51
-            kind: excluded
       operation: sum
       isdeadreason: ""
       returns: vector
@@ -2033,22 +2033,22 @@ output:
     - labels:
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 0
                 end: 39
-            kind: excluded
         instance:
             reason: Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
+            kind: excluded
             fragment:
                 start: 22
                 end: 29
-            kind: excluded
         job:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 4
                 end: 20
-            kind: guaranteed
       operation: sum
       isdeadreason: ""
       returns: vector
@@ -2080,22 +2080,22 @@ output:
     - labels:
         "":
             reason: Query is using aggregation that removes all labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 21
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 0
                 end: 21
-            kind: excluded
         job:
             reason: Query is using aggregation that removes all labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 21
-            kind: excluded
       operation: min
       isdeadreason: ""
       returns: vector
@@ -2106,22 +2106,22 @@ output:
         - labels:
             "":
                 reason: Query is using aggregation that removes all labels.
+                kind: excluded
                 fragment:
                     start: 24
                     end: 45
-                kind: excluded
             __name__:
                 reason: Aggregation removes metric name.
+                kind: excluded
                 fragment:
                     start: 24
                     end: 45
-                kind: excluded
             job:
                 reason: Query is using aggregation that removes all labels.
+                kind: excluded
                 fragment:
                     start: 24
                     end: 45
-                kind: excluded
           operation: max
           isdeadreason: ""
           returns: vector
@@ -2168,22 +2168,22 @@ output:
     - labels:
         "":
             reason: Query is using aggregation that removes all labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 21
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 0
                 end: 21
-            kind: excluded
         job:
             reason: Query is using aggregation that removes all labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 21
-            kind: excluded
       operation: max
       isdeadreason: ""
       returns: vector
@@ -2194,22 +2194,22 @@ output:
         - labels:
             "":
                 reason: Query is using aggregation that removes all labels.
+                kind: excluded
                 fragment:
                     start: 24
                     end: 45
-                kind: excluded
             __name__:
                 reason: Aggregation removes metric name.
+                kind: excluded
                 fragment:
                     start: 24
                     end: 45
-                kind: excluded
             job:
                 reason: Query is using aggregation that removes all labels.
+                kind: excluded
                 fragment:
                     start: 24
                     end: 45
-                kind: excluded
           operation: min
           isdeadreason: ""
           returns: vector
@@ -2256,22 +2256,22 @@ output:
     - labels:
         "":
             reason: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 22
                 end: 24
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 0
                 end: 29
-            kind: excluded
         job:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 4
                 end: 20
-            kind: guaranteed
       operation: avg
       isdeadreason: ""
       returns: vector
@@ -2303,22 +2303,22 @@ output:
     - labels:
         "":
             reason: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 11
                 end: 13
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 0
                 end: 18
-            kind: excluded
         job:
             reason: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 11
                 end: 13
-            kind: included
       operation: group
       isdeadreason: ""
       returns: vector
@@ -2350,16 +2350,16 @@ output:
     - labels:
         "":
             reason: Query is using aggregation that removes all labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 21
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 0
                 end: 21
-            kind: excluded
       operation: stddev
       isdeadreason: ""
       returns: vector
@@ -2392,16 +2392,16 @@ output:
     - labels:
         "":
             reason: Query is using aggregation that removes all labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 21
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 0
                 end: 21
-            kind: excluded
       operation: stdvar
       isdeadreason: ""
       returns: vector
@@ -2492,16 +2492,16 @@ output:
     - labels:
         "":
             reason: Query is using aggregation that removes all labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 28
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 0
                 end: 28
-            kind: excluded
       operation: quantile
       isdeadreason: ""
       returns: vector
@@ -2534,22 +2534,22 @@ output:
     - labels:
         "":
             reason: Query is using aggregation that removes all labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 38
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 0
                 end: 38
-            kind: excluded
         version:
             reason: This label will be added to the results by the count_values() call.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 38
-            kind: guaranteed
       operation: count_values
       isdeadreason: ""
       returns: vector
@@ -2581,22 +2581,22 @@ output:
     - labels:
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 0
                 end: 51
-            kind: excluded
         job:
             reason: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
+            kind: excluded
             fragment:
                 start: 39
                 end: 46
-            kind: excluded
         version:
             reason: This label will be added to the results by the count_values() call.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 51
-            kind: guaranteed
       operation: count_values
       isdeadreason: ""
       returns: vector
@@ -2628,22 +2628,22 @@ output:
     - labels:
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 0
                 end: 62
-            kind: excluded
         job:
             reason: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
+            kind: excluded
             fragment:
                 start: 50
                 end: 57
-            kind: excluded
         version:
             reason: This label will be added to the results by the count_values() call.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 62
-            kind: guaranteed
       operation: count_values
       isdeadreason: ""
       returns: vector
@@ -2675,28 +2675,28 @@ output:
     - labels:
         "":
             reason: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 39
                 end: 41
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 0
                 end: 46
-            kind: excluded
         job:
             reason: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 39
                 end: 41
-            kind: included
         version:
             reason: This label will be added to the results by the count_values() call.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 46
-            kind: guaranteed
       operation: count_values
       isdeadreason: ""
       returns: vector
@@ -2728,10 +2728,10 @@ output:
     - labels:
         job:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 9
                 end: 25
-            kind: guaranteed
       operation: topk
       isdeadreason: ""
       returns: vector
@@ -2844,16 +2844,16 @@ output:
     - labels:
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 0
                 end: 37
-            kind: excluded
         instance:
             reason: Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
+            kind: excluded
             fragment:
                 start: 20
                 end: 27
-            kind: excluded
       operation: sum
       isdeadreason: ""
       returns: vector
@@ -2886,10 +2886,10 @@ output:
     - labels:
         job:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 14
-            kind: guaranteed
       operation: one-to-one
       isdeadreason: ""
       returns: vector
@@ -2942,22 +2942,22 @@ output:
     - labels:
         "":
             reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 17
                 end: 19
-            kind: excluded
         instance:
             reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 17
                 end: 19
-            kind: included
         job:
             reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 17
                 end: 19
-            kind: excluded
       operation: one-to-one
       isdeadreason: ""
       returns: vector
@@ -3010,22 +3010,22 @@ output:
     - labels:
         bar:
             reason: Query is using many-to-one vector matching with `group_left(bar)`, all labels included inside `group_left(...)` will be include on the results.
+            kind: included
             fragment:
                 start: 30
                 end: 40
-            kind: included
         instance:
             reason: Query is using many-to-one vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 17
                 end: 19
-            kind: included
         job:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 14
-            kind: guaranteed
       operation: many-to-one
       isdeadreason: ""
       returns: vector
@@ -3078,22 +3078,22 @@ output:
     - labels:
         cluster:
             reason: Query is using many-to-one vector matching with `group_left(cluster)`, all labels included inside `group_left(...)` will be include on the results.
+            kind: included
             fragment:
                 start: 30
                 end: 40
-            kind: included
         instance:
             reason: Query is using many-to-one vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 17
                 end: 19
-            kind: included
         job:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 14
-            kind: guaranteed
       operation: many-to-one
       isdeadreason: ""
       returns: vector
@@ -3103,16 +3103,16 @@ output:
         - labels:
             cluster:
                 reason: Query will only return series where these labels are present.
+                kind: guaranteed
                 fragment:
                     start: 50
                     end: 84
-                kind: guaranteed
             ignored:
                 reason: Query will only return series where these labels are present.
+                kind: guaranteed
                 fragment:
                     start: 50
                     end: 84
-                kind: guaranteed
           operation: ""
           isdeadreason: ""
           returns: vector
@@ -3158,22 +3158,22 @@ output:
     - labels:
         cluster:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 63
                 end: 81
-            kind: guaranteed
         instance:
             reason: Query is using one-to-many vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 33
                 end: 35
-            kind: included
         job:
             reason: Query is using one-to-many vector matching with `group_right(job)`, all labels included inside `group_right(...)` will be include on the results.
+            kind: included
             fragment:
                 start: 46
                 end: 57
-            kind: included
       operation: one-to-many
       isdeadreason: ""
       returns: vector
@@ -3183,16 +3183,16 @@ output:
         - labels:
             ignored:
                 reason: Query will only return series where these labels are present.
+                kind: guaranteed
                 fragment:
                     start: 0
                     end: 30
-                kind: guaranteed
             job:
                 reason: Query will only return series where these labels are present.
+                kind: guaranteed
                 fragment:
                     start: 0
                     end: 30
-                kind: guaranteed
           operation: ""
           isdeadreason: ""
           returns: vector
@@ -3238,16 +3238,16 @@ output:
     - labels:
         "":
             reason: Query is using aggregation that removes all labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 16
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 0
                 end: 16
-            kind: excluded
       operation: count
       isdeadreason: ""
       returns: vector
@@ -3301,22 +3301,22 @@ output:
     - labels:
         "":
             reason: Query is using aggregation that removes all labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 38
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 0
                 end: 38
-            kind: excluded
         job:
             reason: Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 20
                 end: 23
-            kind: excluded
       operation: count
       isdeadreason: ""
       returns: vector
@@ -3327,10 +3327,10 @@ output:
         - labels:
             job:
                 reason: Query will only return series where these labels are present.
+                kind: guaranteed
                 fragment:
                     start: 26
                     end: 37
-                kind: guaranteed
           operation: ""
           isdeadreason: ""
           returns: vector
@@ -3376,28 +3376,28 @@ output:
     - labels:
         "":
             reason: Query is using aggregation that removes all labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 41
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 0
                 end: 41
-            kind: excluded
         env:
             reason: Query is using aggregation that removes all labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 41
-            kind: excluded
         job:
             reason: Query is using one-to-one vector matching with `on(env)`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 20
                 end: 23
-            kind: excluded
       operation: count
       isdeadreason: ""
       returns: vector
@@ -3408,10 +3408,10 @@ output:
         - labels:
             job:
                 reason: Query will only return series where these labels are present.
+                kind: guaranteed
                 fragment:
                     start: 29
                     end: 40
-                kind: guaranteed
           operation: ""
           isdeadreason: ""
           returns: vector
@@ -3457,16 +3457,16 @@ output:
     - labels:
         instance:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 28
-            kind: guaranteed
         job:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 28
-            kind: guaranteed
       operation: many-to-many
       isdeadreason: ""
       returns: vector
@@ -3519,22 +3519,22 @@ output:
     - labels:
         cluster:
             reason: Query is using many-to-many vector matching with `on(cluster)`, labels included inside `on(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 33
                 end: 35
-            kind: included
         instance:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 28
-            kind: guaranteed
         job:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 28
-            kind: guaranteed
       operation: many-to-many
       isdeadreason: ""
       returns: vector
@@ -3674,16 +3674,16 @@ output:
     - labels:
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 12
                 end: 43
-            kind: excluded
         job:
             reason: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
+            kind: excluded
             fragment:
                 start: 31
                 end: 38
-            kind: excluded
       operation: bottomk
       isdeadreason: ""
       returns: vector
@@ -4083,28 +4083,28 @@ output:
     - labels:
         "":
             reason: Query is using aggregation with `by(job, cluster)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 40
                 end: 42
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 0
                 end: 84
-            kind: excluded
         cluster:
             reason: Query is using aggregation with `without(job, cluster)`, all labels included inside `without(...)` will be removed from the results.
+            kind: excluded
             fragment:
                 start: 63
                 end: 70
-            kind: excluded
         job:
             reason: Query is using aggregation with `without(job, cluster)`, all labels included inside `without(...)` will be removed from the results.
+            kind: excluded
             fragment:
                 start: 63
                 end: 70
-            kind: excluded
       operation: count
       isdeadreason: ""
       returns: vector
@@ -4137,10 +4137,10 @@ output:
     - labels:
         "":
             reason: Calling `year()` with no arguments will return an empty time series with no labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 6
-            kind: excluded
       operation: year
       isdeadreason: ""
       returns: vector
@@ -4200,34 +4200,34 @@ output:
     - labels:
         foo:
             reason: This label will be added to the result by label_join() call.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 95
-            kind: guaranteed
         job:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 11
                 end: 58
-            kind: guaranteed
         src1:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 11
                 end: 58
-            kind: guaranteed
         src2:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 11
                 end: 58
-            kind: guaranteed
         src3:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 11
                 end: 58
-            kind: guaranteed
       operation: label_join
       isdeadreason: ""
       returns: vector
@@ -4266,22 +4266,22 @@ output:
     - labels:
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 4
                 end: 36
-            kind: excluded
         job:
             reason: Query is using many-to-many vector matching with `on(job)`, labels included inside `on(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 40
                 end: 42
-            kind: included
         notify:
             reason: Query is using many-to-one vector matching with `group_left(notify)`, all labels included inside `group_left(...)` will be include on the results.
+            kind: included
             fragment:
                 start: 48
                 end: 58
-            kind: included
       operation: sum
       isdeadreason: ""
       returns: vector
@@ -4314,22 +4314,22 @@ output:
         - labels:
             "":
                 reason: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
+                kind: excluded
                 fragment:
                     start: 108
                     end: 110
-                kind: excluded
             __name__:
                 reason: Aggregation removes metric name.
+                kind: excluded
                 fragment:
                     start: 93
                     end: 115
-                kind: excluded
             job:
                 reason: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
+                kind: included
                 fragment:
                     start: 108
                     end: 110
-                kind: included
           operation: sum
           isdeadreason: ""
           returns: vector
@@ -4376,22 +4376,22 @@ output:
     - labels:
         "":
             reason: Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 29
                 end: 32
-            kind: excluded
         app_name:
             reason: Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 29
                 end: 32
-            kind: included
         instance:
             reason: Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 29
                 end: 32
-            kind: included
       operation: one-to-one
       isdeadreason: ""
       returns: vector
@@ -4401,10 +4401,10 @@ output:
         - labels:
             ulimit:
                 reason: Query will only return series where these labels are present.
+                kind: guaranteed
                 fragment:
                     start: 53
                     end: 100
-                kind: guaranteed
           operation: ""
           isdeadreason: ""
           returns: vector
@@ -4450,16 +4450,16 @@ output:
     - labels:
         app_name:
             reason: Query is using many-to-one vector matching with `on(instance, app_name)`, labels included inside `on(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 29
                 end: 32
-            kind: included
         instance:
             reason: Query is using many-to-one vector matching with `on(instance, app_name)`, labels included inside `on(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 29
                 end: 32
-            kind: included
       operation: many-to-one
       isdeadreason: ""
       returns: vector
@@ -4469,10 +4469,10 @@ output:
         - labels:
             ulimit:
                 reason: Query will only return series where these labels are present.
+                kind: guaranteed
                 fragment:
                     start: 66
                     end: 113
-                kind: guaranteed
           operation: ""
           isdeadreason: ""
           returns: vector
@@ -4523,16 +4523,16 @@ output:
                 Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
                 This means that the only labels you can get back from absent call are the ones you pass to it.
                 If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+            kind: excluded
             fragment:
                 start: 0
                 end: 6
-            kind: excluded
         job:
             reason: All labels passed to absent() call will be present on the results if the query doesn't match anything.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 22
-            kind: guaranteed
       operation: absent
       isdeadreason: ""
       returns: vector
@@ -4569,16 +4569,16 @@ output:
                 Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
                 This means that the only labels you can get back from absent call are the ones you pass to it.
                 If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+            kind: excluded
             fragment:
                 start: 0
                 end: 6
-            kind: excluded
         env:
             reason: All labels passed to absent() call will be present on the results if the query doesn't match anything.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 66
-            kind: guaranteed
         instance:
             reason: |-
                 The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
@@ -4586,16 +4586,16 @@ output:
                 Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
                 This means that the only labels you can get back from absent call are the ones you pass to it.
                 If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+            kind: excluded
             fragment:
                 start: 0
                 end: 6
-            kind: excluded
         job:
             reason: All labels passed to absent() call will be present on the results if the query doesn't match anything.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 66
-            kind: guaranteed
       operation: absent
       isdeadreason: ""
       returns: vector
@@ -4632,16 +4632,16 @@ output:
                 Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
                 This means that the only labels you can get back from absent call are the ones you pass to it.
                 If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+            kind: excluded
             fragment:
                 start: 0
                 end: 6
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 7
                 end: 33
-            kind: excluded
         instance:
             reason: |-
                 The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
@@ -4649,10 +4649,10 @@ output:
                 Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
                 This means that the only labels you can get back from absent call are the ones you pass to it.
                 If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+            kind: excluded
             fragment:
                 start: 0
                 end: 6
-            kind: excluded
         job:
             reason: |-
                 The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
@@ -4660,10 +4660,10 @@ output:
                 Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
                 This means that the only labels you can get back from absent call are the ones you pass to it.
                 If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+            kind: excluded
             fragment:
                 start: 0
                 end: 6
-            kind: excluded
       operation: absent
       isdeadreason: ""
       returns: vector
@@ -4701,22 +4701,22 @@ output:
                 Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
                 This means that the only labels you can get back from absent call are the ones you pass to it.
                 If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+            kind: excluded
             fragment:
                 start: 0
                 end: 6
-            kind: excluded
         job:
             reason: All labels passed to absent() call will be present on the results if the query doesn't match anything.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 38
-            kind: guaranteed
         xxx:
             reason: All labels passed to absent() call will be present on the results if the query doesn't match anything.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 38
-            kind: guaranteed
       operation: absent
       isdeadreason: ""
       returns: vector
@@ -4770,22 +4770,22 @@ output:
     - labels:
         "":
             reason: Query is using aggregation with `by(notjob)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 13
                 end: 15
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 4
                 end: 23
-            kind: excluded
         notjob:
             reason: Query is using aggregation with `by(notjob)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 13
                 end: 15
-            kind: included
       operation: sum
       isdeadreason: ""
       returns: vector
@@ -4817,34 +4817,34 @@ output:
     - labels:
         "":
             reason: Query is using aggregation with `by(instance, version)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 32
                 end: 35
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 0
                 end: 54
-            kind: excluded
         foo:
             reason: Query is using many-to-one vector matching with `group_left(foo)`, all labels included inside `group_left(...)` will be include on the results.
+            kind: included
             fragment:
                 start: 84
                 end: 94
-            kind: included
         instance:
             reason: Query is using aggregation with `by(instance, version)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 32
                 end: 35
-            kind: included
         version:
             reason: Query is using aggregation with `by(instance, version)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 32
                 end: 35
-            kind: included
       operation: count
       isdeadreason: ""
       returns: vector
@@ -4855,34 +4855,34 @@ output:
         - labels:
             "":
                 reason: Query is using aggregation with `by(instance, version, package)`, only labels included inside `by(...)` will be present on the results.
+                kind: excluded
                 fragment:
                     start: 127
                     end: 130
-                kind: excluded
             __name__:
                 reason: Aggregation removes metric name.
+                kind: excluded
                 fragment:
                     start: 100
                     end: 158
-                kind: excluded
             instance:
                 reason: Query is using aggregation with `by(instance, version, package)`, only labels included inside `by(...)` will be present on the results.
+                kind: included
                 fragment:
                     start: 127
                     end: 130
-                kind: included
             package:
                 reason: Query is using aggregation with `by(instance, version, package)`, only labels included inside `by(...)` will be present on the results.
+                kind: included
                 fragment:
                     start: 127
                     end: 130
-                kind: included
             version:
                 reason: Query is using aggregation with `by(instance, version, package)`, only labels included inside `by(...)` will be present on the results.
+                kind: included
                 fragment:
                     start: 127
                     end: 130
-                kind: included
           operation: count
           isdeadreason: ""
           returns: vector
@@ -4934,10 +4934,10 @@ output:
                 Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
                 This means that the only labels you can get back from absent call are the ones you pass to it.
                 If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+            kind: excluded
             fragment:
                 start: 0
                 end: 6
-            kind: excluded
       operation: absent
       isdeadreason: ""
       returns: vector
@@ -4968,10 +4968,10 @@ output:
                 Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
                 This means that the only labels you can get back from absent call are the ones you pass to it.
                 If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+            kind: excluded
             fragment:
                 start: 15
                 end: 21
-            kind: excluded
       operation: absent
       isdeadreason: ""
       returns: vector
@@ -5008,10 +5008,10 @@ output:
                 Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
                 This means that the only labels you can get back from absent call are the ones you pass to it.
                 If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+            kind: excluded
             fragment:
                 start: 0
                 end: 16
-            kind: excluded
       operation: absent_over_time
       isdeadreason: ""
       returns: vector
@@ -5042,10 +5042,10 @@ output:
                 Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
                 This means that the only labels you can get back from absent call are the ones you pass to it.
                 If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+            kind: excluded
             fragment:
                 start: 29
                 end: 35
-            kind: excluded
       operation: absent
       isdeadreason: ""
       returns: vector
@@ -5082,28 +5082,28 @@ output:
                 Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
                 This means that the only labels you can get back from absent call are the ones you pass to it.
                 If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+            kind: excluded
             fragment:
                 start: 37
                 end: 43
-            kind: excluded
         cluster:
             reason: Query is using one-to-many vector matching with `group_right(cluster, env)`, all labels included inside `group_right(...)` will be include on the results.
+            kind: included
             fragment:
                 start: 11
                 end: 22
-            kind: included
         env:
             reason: Query is using one-to-many vector matching with `group_right(cluster, env)`, all labels included inside `group_right(...)` will be include on the results.
+            kind: included
             fragment:
                 start: 11
                 end: 22
-            kind: included
         job:
             reason: All labels passed to absent() call will be present on the results if the query doesn't match anything.
+            kind: guaranteed
             fragment:
                 start: 37
                 end: 59
-            kind: guaranteed
       operation: absent
       isdeadreason: ""
       returns: vector
@@ -5162,16 +5162,16 @@ output:
                 Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
                 This means that the only labels you can get back from absent call are the ones you pass to it.
                 If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+            kind: excluded
             fragment:
                 start: 25
                 end: 31
-            kind: excluded
         job:
             reason: All labels passed to absent() call will be present on the results if the query doesn't match anything.
+            kind: guaranteed
             fragment:
                 start: 25
                 end: 47
-            kind: guaranteed
       operation: absent
       isdeadreason: ""
       returns: vector
@@ -5225,10 +5225,10 @@ output:
     - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 6
-            kind: excluded
       operation: vector
       isdeadreason: ""
       returns: vector
@@ -5259,10 +5259,10 @@ output:
     - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 6
-            kind: excluded
       operation: vector
       isdeadreason: ""
       returns: vector
@@ -5293,10 +5293,10 @@ output:
     - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 6
-            kind: excluded
       operation: vector
       isdeadreason: this query always evaluates to `0 == 1` which is not possible, so it will never return anything
       returns: vector
@@ -5327,10 +5327,10 @@ output:
     - labels:
         job:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 35
-            kind: guaranteed
       operation: sum_over_time
       isdeadreason: ""
       returns: vector
@@ -5362,10 +5362,10 @@ output:
     - labels:
         "":
             reason: Calling `days_in_month()` with no arguments will return an empty time series with no labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 15
-            kind: excluded
       operation: days_in_month
       isdeadreason: ""
       returns: vector
@@ -5396,10 +5396,10 @@ output:
     - labels:
         job:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 29
-            kind: guaranteed
       operation: days_in_month
       isdeadreason: ""
       returns: vector
@@ -5431,22 +5431,22 @@ output:
     - labels:
         foo:
             reason: This label will be added to the result by label_replace() call.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 84
-            kind: guaranteed
         job:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 14
                 end: 48
-            kind: guaranteed
         service:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 14
                 end: 48
-            kind: guaranteed
       operation: label_replace
       isdeadreason: ""
       returns: vector
@@ -5478,28 +5478,28 @@ output:
     - labels:
         "":
             reason: Query is using aggregation with `by(pod)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 18
                 end: 21
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 14
                 end: 39
-            kind: excluded
         cluster:
             reason: This label will be added to the result by label_replace() call.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 76
-            kind: guaranteed
         pod:
             reason: Query is using aggregation with `by(pod)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 18
                 end: 21
-            kind: included
       operation: label_replace
       isdeadreason: ""
       returns: vector
@@ -5560,16 +5560,16 @@ output:
     - labels:
         instance:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 34
-            kind: guaranteed
         job:
             reason: Query is using one-to-one vector matching with `ignoring(job)`, all labels included inside `ignoring(...)` will be removed on the results.
+            kind: excluded
             fragment:
                 start: 37
                 end: 45
-            kind: excluded
       operation: one-to-one
       isdeadreason: ""
       returns: vector
@@ -5579,16 +5579,16 @@ output:
         - labels:
             instance:
                 reason: Query will only return series where these labels are present.
+                kind: guaranteed
                 fragment:
                     start: 51
                     end: 79
-                kind: guaranteed
             job:
                 reason: Query will only return series where these labels are present.
+                kind: guaranteed
                 fragment:
                     start: 51
                     end: 79
-                kind: guaranteed
           operation: ""
           isdeadreason: ""
           returns: vector
@@ -5640,28 +5640,28 @@ output:
     - labels:
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 1
                 end: 101
-            kind: excluded
         colo_id:
             reason: Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.
+            kind: excluded
             fragment:
                 start: 5
                 end: 12
-            kind: excluded
         instance:
             reason: Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.
+            kind: excluded
             fragment:
                 start: 5
                 end: 12
-            kind: excluded
         router:
             reason: Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.
+            kind: excluded
             fragment:
                 start: 5
                 end: 12
-            kind: excluded
       operation: avg
       isdeadreason: ""
       returns: vector
@@ -5687,40 +5687,40 @@ output:
     - labels:
         "":
             reason: Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 216
                 end: 218
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 115
                 end: 213
-            kind: excluded
         cidr_use_case:
             reason: Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 216
                 end: 218
-            kind: excluded
         colo_id:
             reason: Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.
+            kind: excluded
             fragment:
                 start: 119
                 end: 126
-            kind: excluded
         instance:
             reason: Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.
+            kind: excluded
             fragment:
                 start: 119
                 end: 126
-            kind: excluded
         router:
             reason: Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.
+            kind: excluded
             fragment:
                 start: 119
                 end: 126
-            kind: excluded
       operation: sum
       isdeadreason: ""
       returns: vector
@@ -5731,28 +5731,28 @@ output:
         - labels:
             "":
                 reason: Query is using aggregation that removes all labels.
+                kind: excluded
                 fragment:
                     start: 221
                     end: 289
-                kind: excluded
             __name__:
                 reason: Aggregation removes metric name.
+                kind: excluded
                 fragment:
                     start: 221
                     end: 289
-                kind: excluded
             router:
                 reason: Query is using aggregation that removes all labels.
+                kind: excluded
                 fragment:
                     start: 221
                     end: 289
-                kind: excluded
             tier:
                 reason: Query is using aggregation that removes all labels.
+                kind: excluded
                 fragment:
                     start: 221
                     end: 289
-                kind: excluded
           operation: count
           isdeadreason: ""
           returns: vector
@@ -5793,34 +5793,34 @@ output:
     - labels:
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 303
                 end: 404
-            kind: excluded
         cidr_use_case:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 343
                 end: 403
-            kind: guaranteed
         colo_id:
             reason: Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.
+            kind: excluded
             fragment:
                 start: 307
                 end: 314
-            kind: excluded
         instance:
             reason: Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.
+            kind: excluded
             fragment:
                 start: 307
                 end: 314
-            kind: excluded
         router:
             reason: Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.
+            kind: excluded
             fragment:
                 start: 307
                 end: 314
-            kind: excluded
       operation: avg
       isdeadreason: ""
       returns: vector
@@ -5852,16 +5852,16 @@ output:
     - labels:
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 14
                 end: 40
-            kind: excluded
         instance:
             reason: This label will be added to the result by label_replace() call.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 69
-            kind: guaranteed
       operation: label_replace
       isdeadreason: ""
       returns: vector
@@ -5899,40 +5899,40 @@ output:
     - labels:
         "":
             reason: Query is using aggregation with `by(region, target, colo_name)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 5
                 end: 8
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 1
                 end: 102
-            kind: excluded
         colo_name:
             reason: Query is using aggregation with `by(region, target, colo_name)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 5
                 end: 8
-            kind: included
         job:
             reason: Query is using aggregation with `by(region, target, colo_name)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 5
                 end: 8
-            kind: excluded
         region:
             reason: Query is using aggregation with `by(region, target, colo_name)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 5
                 end: 8
-            kind: included
         target:
             reason: Query is using aggregation with `by(region, target, colo_name)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 5
                 end: 8
-            kind: included
       operation: sum
       isdeadreason: ""
       returns: vector
@@ -5959,34 +5959,34 @@ output:
     - labels:
         "":
             reason: Query is using aggregation with `by(region, target, colo_name)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 5
                 end: 8
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 1
                 end: 102
-            kind: excluded
         colo_name:
             reason: Calling `vector()` will return a vector value with no labels.
+            kind: excluded
             fragment:
                 start: 91
                 end: 97
-            kind: excluded
         region:
             reason: Calling `vector()` will return a vector value with no labels.
+            kind: excluded
             fragment:
                 start: 91
                 end: 97
-            kind: excluded
         target:
             reason: Calling `vector()` will return a vector value with no labels.
+            kind: excluded
             fragment:
                 start: 91
                 end: 97
-            kind: excluded
       operation: sum
       isdeadreason: this query always evaluates to `1 == 0` which is not possible, so it will never return anything
       returns: vector
@@ -6018,10 +6018,10 @@ output:
     - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 6
-            kind: excluded
       operation: vector
       isdeadreason: ""
       returns: vector
@@ -6074,10 +6074,10 @@ output:
     - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 6
-            kind: excluded
       operation: vector
       isdeadreason: this query always evaluates to `0 > 0` which is not possible, so it will never return anything
       returns: vector
@@ -6108,10 +6108,10 @@ output:
     - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 6
-            kind: excluded
       operation: vector
       isdeadreason: '`vector(0) > vector(1)` always evaluates to `0 > 1` which is not possible, so it will never return anything'
       returns: vector
@@ -6121,10 +6121,10 @@ output:
         - labels:
             "":
                 reason: Calling `vector()` will return a vector value with no labels.
+                kind: excluded
                 fragment:
                     start: 12
                     end: 18
-                kind: excluded
           operation: vector
           isdeadreason: ""
           returns: vector
@@ -6170,16 +6170,16 @@ output:
     - labels:
         "":
             reason: Query is using aggregation that removes all labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 3
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 0
                 end: 21
-            kind: excluded
       operation: sum
       isdeadreason: ""
       returns: vector
@@ -6205,16 +6205,16 @@ output:
     - labels:
         "":
             reason: Query is using aggregation that removes all labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 3
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 0
                 end: 21
-            kind: excluded
       operation: sum
       isdeadreason: this query always evaluates to `0 > 0` which is not possible, so it will never return anything
       returns: vector
@@ -6246,16 +6246,16 @@ output:
     - labels:
         "":
             reason: Query is using aggregation that removes all labels.
+            kind: excluded
             fragment:
                 start: 1
                 end: 4
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 1
                 end: 22
-            kind: excluded
       operation: sum
       isdeadreason: ""
       returns: vector
@@ -6281,16 +6281,16 @@ output:
     - labels:
         "":
             reason: Query is using aggregation that removes all labels.
+            kind: excluded
             fragment:
                 start: 1
                 end: 4
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 1
                 end: 22
-            kind: excluded
       operation: sum
       isdeadreason: this query always evaluates to `1 == 2` which is not possible, so it will never return anything
       returns: vector
@@ -6322,16 +6322,16 @@ output:
     - labels:
         "":
             reason: Query is using aggregation that removes all labels.
+            kind: excluded
             fragment:
                 start: 1
                 end: 4
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 1
                 end: 22
-            kind: excluded
       operation: sum
       isdeadreason: ""
       returns: vector
@@ -6357,16 +6357,16 @@ output:
     - labels:
         "":
             reason: Query is using aggregation that removes all labels.
+            kind: excluded
             fragment:
                 start: 1
                 end: 4
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 1
                 end: 22
-            kind: excluded
       operation: sum
       isdeadreason: ""
       returns: vector
@@ -6398,16 +6398,16 @@ output:
     - labels:
         "":
             reason: Query is using aggregation that removes all labels.
+            kind: excluded
             fragment:
                 start: 1
                 end: 4
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 1
                 end: 22
-            kind: excluded
       operation: sum
       isdeadreason: ""
       returns: vector
@@ -6433,16 +6433,16 @@ output:
     - labels:
         "":
             reason: Query is using aggregation that removes all labels.
+            kind: excluded
             fragment:
                 start: 1
                 end: 4
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 1
                 end: 22
-            kind: excluded
       operation: sum
       isdeadreason: this query always evaluates to `2 != 2` which is not possible, so it will never return anything
       returns: vector
@@ -6477,16 +6477,16 @@ output:
     - labels:
         "":
             reason: Query is using aggregation that removes all labels.
+            kind: excluded
             fragment:
                 start: 1
                 end: 4
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 1
                 end: 41
-            kind: excluded
       operation: sum
       isdeadreason: ""
       returns: vector
@@ -6512,16 +6512,16 @@ output:
     - labels:
         "":
             reason: Query is using aggregation that removes all labels.
+            kind: excluded
             fragment:
                 start: 1
                 end: 4
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 1
                 end: 41
-            kind: excluded
       operation: sum
       isdeadreason: ""
       returns: vector
@@ -6569,16 +6569,16 @@ output:
     - labels:
         "":
             reason: Query is using aggregation that removes all labels.
+            kind: excluded
             fragment:
                 start: 60
                 end: 63
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 60
                 end: 68
-            kind: excluded
       operation: sum
       isdeadreason: ""
       returns: vector
@@ -6604,10 +6604,10 @@ output:
     - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
+            kind: excluded
             fragment:
                 start: 72
                 end: 78
-            kind: excluded
       operation: vector
       isdeadreason: ""
       returns: vector
@@ -6647,16 +6647,16 @@ output:
     - labels:
         "":
             reason: Query is using aggregation that removes all labels.
+            kind: excluded
             fragment:
                 start: 4
                 end: 7
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 4
                 end: 30
-            kind: excluded
       operation: sum
       isdeadreason: ""
       returns: vector
@@ -6689,16 +6689,16 @@ output:
         - labels:
             "":
                 reason: Query is using aggregation that removes all labels.
+                kind: excluded
                 fragment:
                     start: 70
                     end: 73
-                kind: excluded
             __name__:
                 reason: Aggregation removes metric name.
+                kind: excluded
                 fragment:
                     start: 70
                     end: 79
-                kind: excluded
           operation: sum
           isdeadreason: ""
           returns: vector
@@ -6761,10 +6761,10 @@ output:
     - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
+            kind: excluded
             fragment:
                 start: 36
                 end: 42
-            kind: excluded
       operation: vector
       isdeadreason: ""
       returns: vector
@@ -6796,16 +6796,16 @@ output:
         - labels:
             "":
                 reason: Query is using aggregation that removes all labels.
+                kind: excluded
                 fragment:
                     start: 70
                     end: 73
-                kind: excluded
             __name__:
                 reason: Aggregation removes metric name.
+                kind: excluded
                 fragment:
                     start: 70
                     end: 79
-                kind: excluded
           operation: sum
           isdeadreason: ""
           returns: vector
@@ -6936,10 +6936,10 @@ output:
         - labels:
             "":
                 reason: Calling `vector()` will return a vector value with no labels.
+                kind: excluded
                 fragment:
                     start: 58
                     end: 64
-                kind: excluded
           operation: vector
           isdeadreason: ""
           returns: vector
@@ -6964,10 +6964,10 @@ output:
         - labels:
             log_name:
                 reason: Query will only return series where these labels are present.
+                kind: guaranteed
                 fragment:
                     start: 72
                     end: 110
-                kind: guaranteed
           operation: rate
           isdeadreason: ""
           returns: vector
@@ -6993,10 +6993,10 @@ output:
         - labels:
             "":
                 reason: Calling `vector()` will return a vector value with no labels.
+                kind: excluded
                 fragment:
                     start: 114
                     end: 120
-                kind: excluded
           operation: vector
           isdeadreason: ""
           returns: vector
@@ -7036,10 +7036,10 @@ output:
     - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
+            kind: excluded
             fragment:
                 start: 23
                 end: 29
-            kind: excluded
       operation: vector
       isdeadreason: ""
       returns: vector
@@ -7072,10 +7072,10 @@ output:
         - labels:
             "":
                 reason: Calling `vector()` will return a vector value with no labels.
+                kind: excluded
                 fragment:
                     start: 58
                     end: 64
-                kind: excluded
           operation: vector
           isdeadreason: ""
           returns: vector
@@ -7100,10 +7100,10 @@ output:
         - labels:
             log_name:
                 reason: Query will only return series where these labels are present.
+                kind: guaranteed
                 fragment:
                     start: 72
                     end: 110
-                kind: guaranteed
           operation: rate
           isdeadreason: ""
           returns: vector
@@ -7129,10 +7129,10 @@ output:
         - labels:
             "":
                 reason: Calling `vector()` will return a vector value with no labels.
+                kind: excluded
                 fragment:
                     start: 114
                     end: 120
-                kind: excluded
           operation: vector
           isdeadreason: ""
           returns: vector
@@ -7178,16 +7178,16 @@ output:
     - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
+            kind: excluded
             fragment:
                 start: 14
                 end: 20
-            kind: excluded
         nexthop_tag:
             reason: This label will be added to the result by label_replace() call.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 64
-            kind: guaranteed
       operation: label_replace
       isdeadreason: ""
       returns: vector
@@ -7219,22 +7219,22 @@ output:
     - labels:
         "":
             reason: Query is using aggregation that removes all labels.
+            kind: excluded
             fragment:
                 start: 1
                 end: 4
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 1
                 end: 23
-            kind: excluded
         job:
             reason: Query is using aggregation that removes all labels.
+            kind: excluded
             fragment:
                 start: 1
                 end: 4
-            kind: excluded
       operation: sum
       isdeadreason: ""
       returns: vector
@@ -7266,10 +7266,10 @@ output:
     - labels:
         job:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 2
                 end: 18
-            kind: guaranteed
       operation: ""
       isdeadreason: ""
       returns: vector
@@ -7301,16 +7301,16 @@ output:
     - labels:
         "":
             reason: Query is using aggregation that removes all labels.
+            kind: excluded
             fragment:
                 start: 5
                 end: 23
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 5
                 end: 23
-            kind: excluded
       operation: group
       isdeadreason: this query always evaluates to `0 > 0` which is not possible, so it will never return anything
       returns: vector
@@ -7342,10 +7342,10 @@ output:
     - labels:
         "":
             reason: This query returns a number value with no labels.
+            kind: excluded
             fragment:
                 start: 0
                 end: 1
-            kind: excluded
       operation: ""
       isdeadreason: this query always evaluates to `1 > 5` which is not possible, so it will never return anything
       returns: scalar
@@ -7375,10 +7375,10 @@ output:
     - labels:
         job:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 34
-            kind: guaranteed
       operation: many-to-many
       isdeadreason: ""
       returns: vector
@@ -7389,10 +7389,10 @@ output:
         - labels:
             "":
                 reason: Calling `vector()` will return a vector value with no labels.
+                kind: excluded
                 fragment:
                     start: 42
                     end: 48
-                kind: excluded
           operation: vector
           isdeadreason: The right hand side will never be matched because it doesn't have the `job` label while the left hand side will. Calling `vector()` will return a vector value with no labels.
           returns: vector
@@ -7437,10 +7437,10 @@ output:
     - labels:
         job:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 34
-            kind: guaranteed
       operation: many-to-many
       isdeadreason: this query will never return anything because the `unless` query always returns something
       returns: vector
@@ -7451,10 +7451,10 @@ output:
         - labels:
             "":
                 reason: Calling `vector()` will return a vector value with no labels.
+                kind: excluded
                 fragment:
                     start: 47
                     end: 53
-                kind: excluded
           operation: vector
           isdeadreason: ""
           returns: vector
@@ -7499,10 +7499,10 @@ output:
     - labels:
         job:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 34
-            kind: guaranteed
       operation: many-to-many
       isdeadreason: ""
       returns: vector
@@ -7513,10 +7513,10 @@ output:
         - labels:
             "":
                 reason: Calling `vector()` will return a vector value with no labels.
+                kind: excluded
                 fragment:
                     start: 50
                     end: 56
-                kind: excluded
           operation: vector
           isdeadreason: The right hand side will never be matched because it doesn't have the `job` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
           returns: vector
@@ -7566,40 +7566,40 @@ output:
     - labels:
         "":
             reason: Query is using aggregation with `by(instance, cluster)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 5
                 end: 8
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 1
                 end: 86
-            kind: excluded
         cluster:
             reason: Query is using aggregation with `by(instance, cluster)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 5
                 end: 8
-            kind: included
         instance:
             reason: Query is using aggregation with `by(instance, cluster)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 5
                 end: 8
-            kind: included
         kubernetes_role:
             reason: Query is using aggregation with `by(instance, cluster)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 5
                 end: 8
-            kind: excluded
         role:
             reason: Query is using aggregation with `by(instance, cluster)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 5
                 end: 8
-            kind: excluded
       operation: max
       isdeadreason: ""
       returns: vector
@@ -7611,34 +7611,34 @@ output:
         - labels:
             "":
                 reason: Query is using aggregation with `by(instance, cluster)`, only labels included inside `by(...)` will be present on the results.
+                kind: excluded
                 fragment:
                     start: 99
                     end: 102
-                kind: excluded
             __name__:
                 reason: Aggregation removes metric name.
+                kind: excluded
                 fragment:
                     start: 95
                     end: 202
-                kind: excluded
             cluster:
                 reason: Query is using many-to-one vector matching with `group_left(cluster)`, all labels included inside `group_left(...)` will be include on the results.
+                kind: included
                 fragment:
                     start: 222
                     end: 233
-                kind: included
             instance:
                 reason: Query is using many-to-one vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
+                kind: included
                 fragment:
                     start: 208
                     end: 211
-                kind: included
             name:
                 reason: Query is using aggregation with `by(instance, cluster)`, only labels included inside `by(...)` will be present on the results.
+                kind: excluded
                 fragment:
                     start: 99
                     end: 102
-                kind: excluded
           operation: sum
           isdeadreason: ""
           returns: vector
@@ -7649,16 +7649,16 @@ output:
             - labels:
                 kubernetes_role:
                     reason: Query will only return series where these labels are present.
+                    kind: guaranteed
                     fragment:
                         start: 247
                         end: 303
-                    kind: guaranteed
                 role:
                     reason: Query will only return series where these labels are present.
+                    kind: guaranteed
                     fragment:
                         start: 247
                         end: 303
-                    kind: guaranteed
               operation: ""
               isdeadreason: ""
               returns: vector
@@ -7718,16 +7718,16 @@ output:
     - labels:
         "":
             reason: Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 13
                 end: 15
-            kind: excluded
         a:
             reason: Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 13
                 end: 15
-            kind: excluded
       operation: one-to-one
       isdeadreason: ""
       returns: vector
@@ -7737,10 +7737,10 @@ output:
         - labels:
             b:
                 reason: Query will only return series where these labels are present.
+                kind: guaranteed
                 fragment:
                     start: 18
                     end: 28
-                kind: guaranteed
           operation: ""
           isdeadreason: ""
           returns: vector
@@ -7786,28 +7786,28 @@ output:
     - labels:
         a:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 10
-            kind: guaranteed
         c:
             reason: Query is using many-to-one vector matching with `group_left(c, d)`, all labels included inside `group_left(...)` will be include on the results.
+            kind: included
             fragment:
                 start: 26
                 end: 36
-            kind: included
         d:
             reason: Query is using many-to-one vector matching with `group_left(c, d)`, all labels included inside `group_left(...)` will be include on the results.
+            kind: included
             fragment:
                 start: 26
                 end: 36
-            kind: included
         instance:
             reason: Query is using many-to-one vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 13
                 end: 15
-            kind: included
       operation: many-to-one
       isdeadreason: ""
       returns: vector
@@ -7817,10 +7817,10 @@ output:
         - labels:
             b:
                 reason: Query will only return series where these labels are present.
+                kind: guaranteed
                 fragment:
                     start: 42
                     end: 52
-                kind: guaranteed
           operation: ""
           isdeadreason: ""
           returns: vector
@@ -7866,28 +7866,28 @@ output:
     - labels:
         b:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 43
                 end: 53
-            kind: guaranteed
         c:
             reason: Query is using one-to-many vector matching with `group_right(c, d)`, all labels included inside `group_right(...)` will be include on the results.
+            kind: included
             fragment:
                 start: 26
                 end: 37
-            kind: included
         d:
             reason: Query is using one-to-many vector matching with `group_right(c, d)`, all labels included inside `group_right(...)` will be include on the results.
+            kind: included
             fragment:
                 start: 26
                 end: 37
-            kind: included
         instance:
             reason: Query is using one-to-many vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 13
                 end: 15
-            kind: included
       operation: one-to-many
       isdeadreason: ""
       returns: vector
@@ -7897,10 +7897,10 @@ output:
         - labels:
             a:
                 reason: Query will only return series where these labels are present.
+                kind: guaranteed
                 fragment:
                     start: 0
                     end: 10
-                kind: guaranteed
           operation: ""
           isdeadreason: ""
           returns: vector
@@ -7946,22 +7946,22 @@ output:
     - labels:
         "":
             reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 13
                 end: 15
-            kind: excluded
         a:
             reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 13
                 end: 15
-            kind: excluded
         instance:
             reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 13
                 end: 15
-            kind: included
       operation: one-to-one
       isdeadreason: ""
       returns: vector
@@ -7971,22 +7971,22 @@ output:
         - labels:
             "":
                 reason: Query is using aggregation that removes all labels.
+                kind: excluded
                 fragment:
                     start: 26
                     end: 29
-                kind: excluded
             __name__:
                 reason: Aggregation removes metric name.
+                kind: excluded
                 fragment:
                     start: 26
                     end: 41
-                kind: excluded
             b:
                 reason: Query is using aggregation that removes all labels.
+                kind: excluded
                 fragment:
                     start: 26
                     end: 29
-                kind: excluded
           operation: sum
           isdeadreason: The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
           returns: vector
@@ -8033,28 +8033,28 @@ output:
     - labels:
         a:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 10
-            kind: guaranteed
         c:
             reason: Query is using many-to-one vector matching with `group_left(c, d)`, all labels included inside `group_left(...)` will be include on the results.
+            kind: included
             fragment:
                 start: 26
                 end: 36
-            kind: included
         d:
             reason: Query is using many-to-one vector matching with `group_left(c, d)`, all labels included inside `group_left(...)` will be include on the results.
+            kind: included
             fragment:
                 start: 26
                 end: 36
-            kind: included
         instance:
             reason: Query is using many-to-one vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 13
                 end: 15
-            kind: included
       operation: many-to-one
       isdeadreason: ""
       returns: vector
@@ -8064,22 +8064,22 @@ output:
         - labels:
             "":
                 reason: Query is using aggregation that removes all labels.
+                kind: excluded
                 fragment:
                     start: 42
                     end: 45
-                kind: excluded
             __name__:
                 reason: Aggregation removes metric name.
+                kind: excluded
                 fragment:
                     start: 42
                     end: 57
-                kind: excluded
             b:
                 reason: Query is using aggregation that removes all labels.
+                kind: excluded
                 fragment:
                     start: 42
                     end: 45
-                kind: excluded
           operation: sum
           isdeadreason: The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
           returns: vector
@@ -8126,28 +8126,28 @@ output:
     - labels:
         b:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 48
                 end: 58
-            kind: guaranteed
         c:
             reason: Query is using one-to-many vector matching with `group_right(c, d)`, all labels included inside `group_right(...)` will be include on the results.
+            kind: included
             fragment:
                 start: 31
                 end: 42
-            kind: included
         d:
             reason: Query is using one-to-many vector matching with `group_right(c, d)`, all labels included inside `group_right(...)` will be include on the results.
+            kind: included
             fragment:
                 start: 31
                 end: 42
-            kind: included
         instance:
             reason: Query is using one-to-many vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 18
                 end: 20
-            kind: included
       operation: one-to-many
       isdeadreason: ""
       returns: vector
@@ -8157,22 +8157,22 @@ output:
         - labels:
             "":
                 reason: Query is using aggregation that removes all labels.
+                kind: excluded
                 fragment:
                     start: 0
                     end: 3
-                kind: excluded
             __name__:
                 reason: Aggregation removes metric name.
+                kind: excluded
                 fragment:
                     start: 0
                     end: 15
-                kind: excluded
             a:
                 reason: Query is using aggregation that removes all labels.
+                kind: excluded
                 fragment:
                     start: 0
                     end: 3
-                kind: excluded
           operation: sum
           isdeadreason: The left hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
           returns: vector
@@ -8219,28 +8219,28 @@ output:
     - labels:
         a:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 0
                 end: 10
-            kind: guaranteed
         c:
             reason: Query is using many-to-one vector matching with `group_left(c, d)`, all labels included inside `group_left(...)` will be include on the results.
+            kind: included
             fragment:
                 start: 26
                 end: 36
-            kind: included
         d:
             reason: Query is using many-to-one vector matching with `group_left(c, d)`, all labels included inside `group_left(...)` will be include on the results.
+            kind: included
             fragment:
                 start: 26
                 end: 36
-            kind: included
         instance:
             reason: Query is using many-to-one vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 13
                 end: 15
-            kind: included
       operation: many-to-one
       isdeadreason: ""
       returns: vector
@@ -8250,22 +8250,22 @@ output:
         - labels:
             __name__:
                 reason: Aggregation removes metric name.
+                kind: excluded
                 fragment:
                     start: 42
                     end: 75
-                kind: excluded
             b:
                 reason: Query will only return series where these labels are present.
+                kind: guaranteed
                 fragment:
                     start: 46
                     end: 56
-                kind: guaranteed
             instance:
                 reason: Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
+                kind: excluded
                 fragment:
                     start: 58
                     end: 65
-                kind: excluded
           operation: sum
           isdeadreason: The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
           returns: vector
@@ -8312,28 +8312,28 @@ output:
     - labels:
         b:
             reason: Query will only return series where these labels are present.
+            kind: guaranteed
             fragment:
                 start: 66
                 end: 76
-            kind: guaranteed
         c:
             reason: Query is using one-to-many vector matching with `group_right(c, d)`, all labels included inside `group_right(...)` will be include on the results.
+            kind: included
             fragment:
                 start: 49
                 end: 60
-            kind: included
         d:
             reason: Query is using one-to-many vector matching with `group_right(c, d)`, all labels included inside `group_right(...)` will be include on the results.
+            kind: included
             fragment:
                 start: 49
                 end: 60
-            kind: included
         instance:
             reason: Query is using one-to-many vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 36
                 end: 38
-            kind: included
       operation: one-to-many
       isdeadreason: ""
       returns: vector
@@ -8343,22 +8343,22 @@ output:
         - labels:
             __name__:
                 reason: Aggregation removes metric name.
+                kind: excluded
                 fragment:
                     start: 0
                     end: 33
-                kind: excluded
             a:
                 reason: Query will only return series where these labels are present.
+                kind: guaranteed
                 fragment:
                     start: 4
                     end: 14
-                kind: guaranteed
             instance:
                 reason: Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
+                kind: excluded
                 fragment:
                     start: 16
                     end: 23
-                kind: excluded
           operation: sum
           isdeadreason: The left hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
           returns: vector
@@ -8411,34 +8411,34 @@ output:
     - labels:
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 2
                 end: 317
-            kind: excluded
         device:
             reason: Query is using many-to-many vector matching with `on(device, instance)`, labels included inside `on(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 112
                 end: 114
-            kind: included
         group:
             reason: Query is using many-to-one vector matching with `group_left(group)`, all labels included inside `group_left(...)` will be include on the results.
+            kind: included
             fragment:
                 start: 333
                 end: 343
-            kind: included
         instance:
             reason: Query is using many-to-one vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 112
                 end: 114
-            kind: included
         source_instance:
             reason: Query is using aggregation with `without(source_instance)`, all labels included inside `without(...)` will be removed from the results.
+            kind: excluded
             fragment:
                 start: 6
                 end: 14
-            kind: excluded
       operation: max
       isdeadreason: ""
       returns: vector
@@ -8455,10 +8455,10 @@ output:
                     Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
                     This means that the only labels you can get back from absent call are the ones you pass to it.
                     If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+                kind: excluded
                 fragment:
                     start: 292
                     end: 298
-                kind: excluded
           operation: absent
           isdeadreason: |-
             The right hand side will never be matched because it doesn't have the `device` label from `on(...)`. The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
@@ -8489,10 +8489,10 @@ output:
         - labels:
             instance:
                 reason: This label will be added to the result by label_replace() call.
+                kind: guaranteed
                 fragment:
                     start: 351
                     end: 442
-                kind: guaranteed
           operation: label_replace
           isdeadreason: ""
           returns: vector
@@ -8585,28 +8585,28 @@ output:
     - labels:
         "":
             reason: Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 26
                 end: 28
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 0
                 end: 23
-            kind: excluded
         a:
             reason: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 16
                 end: 18
-            kind: excluded
         job:
             reason: Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 26
                 end: 28
-            kind: excluded
       operation: sum
       isdeadreason: ""
       returns: vector
@@ -8617,10 +8617,10 @@ output:
         - labels:
             b:
                 reason: Query will only return series where these labels are present.
+                kind: guaranteed
                 fragment:
                     start: 31
                     end: 41
-                kind: guaranteed
           operation: ""
           isdeadreason: ""
           returns: vector
@@ -8666,22 +8666,22 @@ output:
     - labels:
         "":
             reason: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 27
                 end: 29
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 0
                 end: 34
-            kind: excluded
         job:
             reason: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
+            kind: excluded
             fragment:
                 start: 13
                 end: 20
-            kind: excluded
       operation: sum
       isdeadreason: ""
       returns: vector
@@ -8723,10 +8723,10 @@ output:
     - labels:
         prometheus:
             reason: Query is using many-to-one vector matching with `on(prometheus)`, labels included inside `on(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 47
                 end: 49
-            kind: included
       operation: many-to-one
       isdeadreason: ""
       returns: vector
@@ -8736,34 +8736,34 @@ output:
         - labels:
             "":
                 reason: Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
+                kind: excluded
                 fragment:
                     start: 158
                     end: 160
-                kind: excluded
             __name__:
                 reason: Aggregation removes metric name.
+                kind: excluded
                 fragment:
                     start: 92
                     end: 170
-                kind: excluded
             instance:
                 reason: Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
+                kind: included
                 fragment:
                     start: 158
                     end: 160
-                kind: included
             job:
                 reason: Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
+                kind: excluded
                 fragment:
                     start: 158
                     end: 160
-                kind: excluded
             prometheus:
                 reason: This label will be added to the result by label_replace() call.
+                kind: guaranteed
                 fragment:
                     start: 75
                     end: 287
-                kind: guaranteed
           operation: label_replace
           isdeadreason: ""
           returns: vector
@@ -8776,22 +8776,22 @@ output:
             - labels:
                 "":
                     reason: Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
+                    kind: excluded
                     fragment:
                         start: 229
                         end: 231
-                    kind: excluded
                 __name__:
                     reason: Aggregation removes metric name.
+                    kind: excluded
                     fragment:
                         start: 177
                         end: 241
-                    kind: excluded
                 instance:
                     reason: Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
+                    kind: included
                     fragment:
                         start: 229
                         end: 231
-                    kind: included
               operation: max
               isdeadreason: ""
               returns: vector
@@ -8854,10 +8854,10 @@ output:
     - labels:
         "":
             reason: Calling `day_of_week()` with no arguments will return an empty time series with no labels.
+            kind: excluded
             fragment:
                 start: 1
                 end: 14
-            kind: excluded
       operation: day_of_week
       isdeadreason: ""
       returns: vector
@@ -8867,10 +8867,10 @@ output:
         - labels:
             "":
                 reason: Calling `hour()` with no arguments will return an empty time series with no labels.
+                kind: excluded
                 fragment:
                     start: 24
                     end: 30
-                kind: excluded
           operation: hour
           isdeadreason: ""
           returns: vector
@@ -8910,10 +8910,10 @@ output:
     - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
+            kind: excluded
             fragment:
                 start: 39
                 end: 45
-            kind: excluded
       operation: vector
       isdeadreason: ""
       returns: vector
@@ -8949,46 +8949,46 @@ output:
     - labels:
         "":
             reason: Query is using aggregation with `by(foo, bar)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 5
                 end: 8
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 1
                 end: 115
-            kind: excluded
         alice:
             reason: Query is using aggregation with `by(foo, bar)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 5
                 end: 8
-            kind: excluded
         bar:
             reason: Query is using aggregation with `by(foo, bar)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 5
                 end: 8
-            kind: included
         bob:
             reason: Query is using aggregation with `by(foo, bar)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 5
                 end: 8
-            kind: excluded
         foo:
             reason: Query is using aggregation with `by(foo, bar)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 5
                 end: 8
-            kind: included
         instance:
             reason: Query is using aggregation with `by(foo, bar)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 5
                 end: 8
-            kind: excluded
       operation: sum
       isdeadreason: ""
       returns: vector
@@ -9065,10 +9065,10 @@ output:
     - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
+            kind: excluded
             fragment:
                 start: 12
                 end: 18
-            kind: excluded
       operation: vector
       isdeadreason: this query always evaluates to `1 < 0.999` which is not possible, so it will never return anything
       returns: vector
@@ -9102,10 +9102,10 @@ output:
     - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
+            kind: excluded
             fragment:
                 start: 5
                 end: 11
-            kind: excluded
       operation: vector
       isdeadreason: ""
       returns: vector
@@ -9115,10 +9115,10 @@ output:
         - labels:
             "":
                 reason: Calling `month()` with no arguments will return an empty time series with no labels.
+                kind: excluded
                 fragment:
                     start: 19
                     end: 26
-                kind: excluded
           operation: month
           isdeadreason: ""
           returns: vector
@@ -9158,10 +9158,10 @@ output:
     - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
+            kind: excluded
             fragment:
                 start: 37
                 end: 43
-            kind: excluded
       operation: vector
       isdeadreason: ""
       returns: vector
@@ -9192,28 +9192,28 @@ output:
     - labels:
         "":
             reason: Query is using aggregation with `by(region)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 6
                 end: 9
-            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
+            kind: excluded
             fragment:
                 start: 0
                 end: 63
-            kind: excluded
         colo_name:
             reason: Query is using aggregation with `by(region)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
             fragment:
                 start: 6
                 end: 9
-            kind: excluded
         region:
             reason: Query is using aggregation with `by(region)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
             fragment:
                 start: 6
                 end: 9
-            kind: included
       operation: count
       isdeadreason: ""
       returns: vector
