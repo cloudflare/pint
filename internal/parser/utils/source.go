@@ -40,6 +40,11 @@ type LabelTransform struct {
 	Fragment posrange.PositionRange
 }
 
+type DeadInfo struct {
+	Reason   string
+	Fragment posrange.PositionRange
+}
+
 type SourceOperations []promParser.Node
 
 func (so SourceOperations) MarshalYAML() (any, error) {
@@ -63,17 +68,15 @@ func MostOuterOperation[T promParser.Node](s Source) (T, bool) {
 type Source struct {
 	Labels         map[string]LabelTransform
 	Operation      string
-	IsDeadReason   string
 	Returns        promParser.ValueType
 	Operations     SourceOperations
 	Joins          []Source // Any other sources this source joins with.
 	Unless         []Source // Any other sources this source is suppressed by.
+	DeadInfo       *DeadInfo
 	Position       posrange.PositionRange
-	IsDeadPosition posrange.PositionRange
 	ReturnedNumber float64 // If AlwaysReturns=true this is the number that's returned
 	Type           SourceType
 	FixedLabels    bool // Labels are fixed and only allowed labels can be present.
-	IsDead         bool // True if this source cannot be reached and is dead code.
 	AlwaysReturns  bool // True if this source always returns results.
 	KnownReturn    bool // True if we always know the return value.
 	IsConditional  bool // True if this source is guarded by 'foo > 5' or other condition.
@@ -777,11 +780,11 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 				}
 				if ls.AlwaysReturns && rs.AlwaysReturns && ls.KnownReturn && rs.KnownReturn {
 					// Both sides always return something
-					side.ReturnedNumber, side.IsDead, side.IsDeadReason, side.IsDeadPosition = calculateStaticReturn(
+					side.ReturnedNumber, side.DeadInfo = calculateStaticReturn(
 						expr,
 						ls, rs,
 						n.Op,
-						ls.IsDead,
+						ls.DeadInfo,
 					)
 				}
 				src = append(src, side)
@@ -817,11 +820,11 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					rs.IsConditional, rs.IsReturnBool = checkConditions(rs, n.Op, n.ReturnBool)
 					if s.AlwaysReturns && rs.AlwaysReturns && s.KnownReturn && rs.KnownReturn {
 						// Both sides always return something
-						s.ReturnedNumber, s.IsDead, s.IsDeadReason, s.IsDeadPosition = calculateStaticReturn(
+						s.ReturnedNumber, s.DeadInfo = calculateStaticReturn(
 							expr,
 							s, rs,
 							n.Op,
-							s.IsDead,
+							s.DeadInfo,
 						)
 					}
 				}
@@ -831,9 +834,10 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 			}
 			for _, rs := range rhs {
 				if ok, s, pos := canJoin(s, rs, n.VectorMatching); !ok {
-					rs.IsDead = true
-					rs.IsDeadReason = s
-					rs.IsDeadPosition = pos
+					rs.DeadInfo = &DeadInfo{
+						Reason:   s,
+						Fragment: pos,
+					}
 				}
 				s.Joins = append(s.Joins, rs)
 			}
@@ -872,9 +876,10 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 			}
 			for _, ls := range lhs {
 				if ok, s, pos := canJoin(s, ls, n.VectorMatching); !ok {
-					ls.IsDead = true
-					ls.IsDeadReason = s
-					ls.IsDeadPosition = pos
+					ls.DeadInfo = &DeadInfo{
+						Reason:   s,
+						Fragment: pos,
+					}
 				}
 				s.Joins = append(s.Joins, ls)
 			}
@@ -910,9 +915,10 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 			}
 			for _, rs := range rhs {
 				if ok, s, pos := canJoin(s, rs, n.VectorMatching); !ok {
-					rs.IsDead = true
-					rs.IsDeadReason = s
-					rs.IsDeadPosition = pos
+					rs.DeadInfo = &DeadInfo{
+						Reason:   s,
+						Fragment: pos,
+					}
 				}
 				s.Joins = append(s.Joins, rs)
 			}
@@ -950,16 +956,18 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					rhsConditional = true
 				}
 				if ok, s, pos := canJoin(s, rs, n.VectorMatching); !ok {
-					rs.IsDead = true
-					rs.IsDeadReason = s
-					rs.IsDeadPosition = pos
+					rs.DeadInfo = &DeadInfo{
+						Reason:   s,
+						Fragment: pos,
+					}
 				}
 				switch {
 				case n.Op == promParser.LUNLESS:
 					if n.VectorMatching.On && len(n.VectorMatching.MatchingLabels) == 0 && rs.AlwaysReturns && !rs.IsConditional {
-						s.IsDead = true
-						s.IsDeadReason = "this query will never return anything because the `unless` query always returns something"
-						s.IsDeadPosition = rs.Position
+						s.DeadInfo = &DeadInfo{
+							Reason:   "this query will never return anything because the `unless` query always returns something",
+							Fragment: rs.Position,
+						}
 					}
 					s.Unless = append(s.Unless, rs)
 				case n.Op != promParser.LOR:
@@ -978,9 +986,10 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 				}
 				// If LHS can NOT be empty then RHS is dead code.
 				if !lhsCanBeEmpty {
-					s.IsDead = true
-					s.IsDeadReason = "the left hand side always returs something and so the right hand side is never used"
-					s.IsDeadPosition = s.Position
+					s.DeadInfo = &DeadInfo{
+						Reason:   "the left hand side always returs something and so the right hand side is never used",
+						Fragment: s.Position,
+					}
 				}
 				src = append(src, s)
 			}
@@ -1039,7 +1048,7 @@ func ftos(v float64) string {
 	return strconv.FormatFloat(v, 'f', -1, 64)
 }
 
-func calculateStaticReturn(expr string, ls, rs Source, op promParser.ItemType, isDead bool) (float64, bool, string, posrange.PositionRange) {
+func calculateStaticReturn(expr string, ls, rs Source, op promParser.ItemType, fallbackDeadInfo *DeadInfo) (float64, *DeadInfo) {
 	lf := ls.Fragment(expr)
 	rf := rs.Fragment(expr)
 	var cmpPrefix string
@@ -1053,59 +1062,65 @@ func calculateStaticReturn(expr string, ls, rs Source, op promParser.ItemType, i
 	case promParser.EQLC:
 		if ls.ReturnedNumber != rs.ReturnedNumber {
 			return ls.ReturnedNumber,
-				true,
-				fmt.Sprintf("%s `%s == %s` %s", cmpPrefix, ftos(ls.ReturnedNumber), ftos(rs.ReturnedNumber), cmpSuffix),
-				ls.Position
+				&DeadInfo{
+					Reason:   fmt.Sprintf("%s `%s == %s` %s", cmpPrefix, ftos(ls.ReturnedNumber), ftos(rs.ReturnedNumber), cmpSuffix),
+					Fragment: ls.Position,
+				}
 		}
 	case promParser.NEQ:
 		if ls.ReturnedNumber == rs.ReturnedNumber {
 			return ls.ReturnedNumber,
-				true,
-				fmt.Sprintf("%s `%s != %s` %s", cmpPrefix, ftos(ls.ReturnedNumber), ftos(rs.ReturnedNumber), cmpSuffix),
-				ls.Position
+				&DeadInfo{
+					Reason:   fmt.Sprintf("%s `%s != %s` %s", cmpPrefix, ftos(ls.ReturnedNumber), ftos(rs.ReturnedNumber), cmpSuffix),
+					Fragment: ls.Position,
+				}
 		}
 	case promParser.LTE:
 		if ls.ReturnedNumber > rs.ReturnedNumber {
 			return ls.ReturnedNumber,
-				true,
-				fmt.Sprintf("%s `%s <= %s` %s", cmpPrefix, ftos(ls.ReturnedNumber), ftos(rs.ReturnedNumber), cmpSuffix),
-				ls.Position
+				&DeadInfo{
+					Reason:   fmt.Sprintf("%s `%s <= %s` %s", cmpPrefix, ftos(ls.ReturnedNumber), ftos(rs.ReturnedNumber), cmpSuffix),
+					Fragment: ls.Position,
+				}
 		}
 	case promParser.LSS:
 		if ls.ReturnedNumber >= rs.ReturnedNumber {
 			return ls.ReturnedNumber,
-				true,
-				fmt.Sprintf("%s `%s < %s` %s", cmpPrefix, ftos(ls.ReturnedNumber), ftos(rs.ReturnedNumber), cmpSuffix),
-				ls.Position
+				&DeadInfo{
+					Reason:   fmt.Sprintf("%s `%s < %s` %s", cmpPrefix, ftos(ls.ReturnedNumber), ftos(rs.ReturnedNumber), cmpSuffix),
+					Fragment: ls.Position,
+				}
 		}
 	case promParser.GTE:
 		if ls.ReturnedNumber < rs.ReturnedNumber {
 			return ls.ReturnedNumber,
-				true,
-				fmt.Sprintf("%s `%s >= %s` %s", cmpPrefix, ftos(ls.ReturnedNumber), ftos(rs.ReturnedNumber), cmpSuffix),
-				ls.Position
+				&DeadInfo{
+					Reason:   fmt.Sprintf("%s `%s >= %s` %s", cmpPrefix, ftos(ls.ReturnedNumber), ftos(rs.ReturnedNumber), cmpSuffix),
+					Fragment: ls.Position,
+				}
 		}
 	case promParser.GTR:
 		if ls.ReturnedNumber <= rs.ReturnedNumber {
 			return ls.ReturnedNumber,
-				true,
-				fmt.Sprintf("%s `%s > %s` %s", cmpPrefix, ftos(ls.ReturnedNumber), ftos(rs.ReturnedNumber), cmpSuffix),
-				ls.Position
+				&DeadInfo{
+					Reason:   fmt.Sprintf("%s `%s > %s` %s", cmpPrefix, ftos(ls.ReturnedNumber), ftos(rs.ReturnedNumber), cmpSuffix),
+					Fragment: ls.Position,
+				}
 		}
 	case promParser.ADD:
-		return ls.ReturnedNumber + rs.ReturnedNumber, isDead, "", ls.IsDeadPosition
+		return ls.ReturnedNumber + rs.ReturnedNumber, fallbackDeadInfo
 	case promParser.SUB:
-		return ls.ReturnedNumber - rs.ReturnedNumber, isDead, "", ls.IsDeadPosition
+		return ls.ReturnedNumber - rs.ReturnedNumber, fallbackDeadInfo
 	case promParser.MUL:
-		return ls.ReturnedNumber * rs.ReturnedNumber, isDead, "", ls.IsDeadPosition
+		return ls.ReturnedNumber * rs.ReturnedNumber, fallbackDeadInfo
 	case promParser.DIV:
-		return ls.ReturnedNumber / rs.ReturnedNumber, isDead, "", ls.IsDeadPosition
+		return ls.ReturnedNumber / rs.ReturnedNumber, fallbackDeadInfo
 	case promParser.MOD:
-		return math.Mod(ls.ReturnedNumber, rs.ReturnedNumber), isDead, "", ls.IsDeadPosition
+		return math.Mod(ls.ReturnedNumber, rs.ReturnedNumber), fallbackDeadInfo
 	case promParser.POW:
-		return math.Pow(ls.ReturnedNumber, rs.ReturnedNumber), isDead, "", ls.IsDeadPosition
+		return math.Pow(ls.ReturnedNumber, rs.ReturnedNumber), fallbackDeadInfo
 	}
-	return ls.ReturnedNumber, isDead, "", ls.IsDeadPosition
+	return ls.ReturnedNumber, fallbackDeadInfo
 }
 
 // FIXME sum() on ().

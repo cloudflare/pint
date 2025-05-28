@@ -272,8 +272,8 @@ sum by (foo, bar) (
 			for _, src := range output {
 				src.WalkSources(func(s utils.Source) {
 					require.Positive(t, s.Position.End, "empty position %+v", s)
-					if s.IsDead {
-						require.Positive(t, s.IsDeadPosition.End, "empty dead position %+v", s)
+					if s.DeadInfo != nil {
+						require.Positive(t, s.DeadInfo.Fragment.End, "empty dead position %+v", s)
 					}
 				})
 			}

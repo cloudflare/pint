@@ -10,21 +10,17 @@ output:
                 start: 0
                 end: 1
       operation: ""
-      isdeadreason: ""
       returns: scalar
       operations: []
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 1
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 1
       type: 1
       fixedlabels: true
-      isdead: false
       alwaysreturns: true
       knownreturn: true
       isconditional: false
@@ -43,21 +39,17 @@ output:
                 start: 0
                 end: 1
       operation: ""
-      isdeadreason: ""
       returns: scalar
       operations: []
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 1
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0.2
       type: 1
       fixedlabels: true
-      isdead: false
       alwaysreturns: true
       knownreturn: true
       isconditional: false
@@ -76,21 +68,21 @@ output:
                 start: 1
                 end: 2
       operation: ""
-      isdeadreason: this query always evaluates to `32 == 5` which is not possible, so it will never return anything
       returns: scalar
       operations: []
       joins: []
       unless: []
+      deadinfo:
+        reason: this query always evaluates to `32 == 5` which is not possible, so it will never return anything
+        fragment:
+            start: 1
+            end: 2
       position:
-        start: 1
-        end: 2
-      isdeadposition:
         start: 1
         end: 2
       returnednumber: 32
       type: 1
       fixedlabels: true
-      isdead: true
       alwaysreturns: true
       knownreturn: true
       isconditional: true
@@ -109,21 +101,21 @@ output:
                 start: 1
                 end: 2
       operation: ""
-      isdeadreason: this query always evaluates to `3 <= 2` which is not possible, so it will never return anything
       returns: scalar
       operations: []
       joins: []
       unless: []
+      deadinfo:
+        reason: this query always evaluates to `3 <= 2` which is not possible, so it will never return anything
+        fragment:
+            start: 1
+            end: 2
       position:
-        start: 1
-        end: 2
-      isdeadposition:
         start: 1
         end: 2
       returnednumber: 3
       type: 1
       fixedlabels: true
-      isdead: true
       alwaysreturns: true
       knownreturn: true
       isconditional: true
@@ -142,21 +134,21 @@ output:
                 start: 1
                 end: 2
       operation: ""
-      isdeadreason: this query always evaluates to `3 >= 20` which is not possible, so it will never return anything
       returns: scalar
       operations: []
       joins: []
       unless: []
+      deadinfo:
+        reason: this query always evaluates to `3 >= 20` which is not possible, so it will never return anything
+        fragment:
+            start: 1
+            end: 2
       position:
-        start: 1
-        end: 2
-      isdeadposition:
         start: 1
         end: 2
       returnednumber: 3
       type: 1
       fixedlabels: true
-      isdead: true
       alwaysreturns: true
       knownreturn: true
       isconditional: true
@@ -175,21 +167,17 @@ output:
                 start: 1
                 end: 2
       operation: ""
-      isdeadreason: ""
       returns: scalar
       operations: []
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 1
         end: 2
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 3
       type: 1
       fixedlabels: true
-      isdead: false
       alwaysreturns: true
       knownreturn: true
       isconditional: true
@@ -208,21 +196,21 @@ output:
                 start: 1
                 end: 2
       operation: ""
-      isdeadreason: this query always evaluates to `3 < 1` which is not possible, so it will never return anything
       returns: scalar
       operations: []
       joins: []
       unless: []
+      deadinfo:
+        reason: this query always evaluates to `3 < 1` which is not possible, so it will never return anything
+        fragment:
+            start: 1
+            end: 2
       position:
-        start: 1
-        end: 2
-      isdeadposition:
         start: 1
         end: 2
       returnednumber: 3
       type: 1
       fixedlabels: true
-      isdead: true
       alwaysreturns: true
       knownreturn: true
       isconditional: true
@@ -241,21 +229,21 @@ output:
                 start: 0
                 end: 2
       operation: ""
-      isdeadreason: this query always evaluates to `5 < 1` which is not possible, so it will never return anything
       returns: scalar
       operations: []
       joins: []
       unless: []
+      deadinfo:
+        reason: this query always evaluates to `5 < 1` which is not possible, so it will never return anything
+        fragment:
+            start: 0
+            end: 2
       position:
-        start: 0
-        end: 2
-      isdeadposition:
         start: 0
         end: 2
       returnednumber: 5
       type: 1
       fixedlabels: true
-      isdead: true
       alwaysreturns: true
       knownreturn: true
       isconditional: true
@@ -274,21 +262,17 @@ output:
                 start: 0
                 end: 1
       operation: ""
-      isdeadreason: ""
       returns: scalar
       operations: []
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 1
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 10
       type: 1
       fixedlabels: true
-      isdead: false
       alwaysreturns: true
       knownreturn: true
       isconditional: false
@@ -301,44 +285,36 @@ expr: (foo or bar) * 5
 output:
     - labels: {}
       operation: many-to-many
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 1
         end: 4
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
       isreturnbool: false
     - labels: {}
       operation: many-to-many
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] bar'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 8
         end: 11
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -351,22 +327,18 @@ expr: (foo or vector(2)) * 5
 output:
     - labels: {}
       operation: many-to-many
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 1
         end: 4
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -379,22 +351,18 @@ output:
                 start: 8
                 end: 14
       operation: vector
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.Call] vector(2)'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 8
         end: 17
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 10
       type: 4
       fixedlabels: true
-      isdead: false
       alwaysreturns: true
       knownreturn: true
       isconditional: false
@@ -407,7 +375,6 @@ expr: (foo or vector(5)) * (vector(2) or bar)
 output:
     - labels: {}
       operation: many-to-many
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
@@ -420,59 +387,52 @@ output:
                     start: 22
                     end: 28
           operation: vector
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.Call] vector(2)'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 22
             end: 31
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 2
           type: 4
           fixedlabels: true
-          isdead: false
           alwaysreturns: true
           knownreturn: true
           isconditional: false
           isreturnbool: false
         - labels: {}
           operation: many-to-many
-          isdeadreason: the left hand side always returs something and so the right hand side is never used
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          deadinfo:
+            reason: the left hand side always returs something and so the right hand side is never used
+            fragment:
+                start: 35
+                end: 38
           position:
-            start: 35
-            end: 38
-          isdeadposition:
             start: 35
             end: 38
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: true
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 1
         end: 4
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -485,7 +445,6 @@ output:
                 start: 8
                 end: 14
       operation: vector
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.Call] vector(5)'
@@ -498,59 +457,52 @@ output:
                     start: 22
                     end: 28
           operation: vector
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.Call] vector(2)'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 22
             end: 31
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 2
           type: 4
           fixedlabels: true
-          isdead: false
           alwaysreturns: true
           knownreturn: true
           isconditional: false
           isreturnbool: false
         - labels: {}
           operation: many-to-many
-          isdeadreason: the left hand side always returs something and so the right hand side is never used
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          deadinfo:
+            reason: the left hand side always returs something and so the right hand side is never used
+            fragment:
+                start: 35
+                end: 38
           position:
-            start: 35
-            end: 38
-          isdeadposition:
             start: 35
             end: 38
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: true
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 8
         end: 17
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 10
       type: 4
       fixedlabels: true
-      isdead: false
       alwaysreturns: true
       knownreturn: true
       isconditional: false
@@ -569,21 +521,17 @@ output:
                 start: 0
                 end: 1
       operation: ""
-      isdeadreason: ""
       returns: scalar
       operations: []
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 1
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 1
       type: 1
       fixedlabels: true
-      isdead: false
       alwaysreturns: true
       knownreturn: true
       isconditional: true
@@ -602,21 +550,17 @@ output:
                 start: 0
                 end: 2
       operation: ""
-      isdeadreason: ""
       returns: scalar
       operations: []
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 2
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 20
       type: 1
       fixedlabels: true
-      isdead: false
       alwaysreturns: true
       knownreturn: true
       isconditional: true
@@ -635,21 +579,17 @@ output:
                 start: 0
                 end: 6
       operation: ""
-      isdeadreason: ""
       returns: string
       operations: []
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 6
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 2
       fixedlabels: true
-      isdead: false
       alwaysreturns: true
       knownreturn: false
       isconditional: false
@@ -662,22 +602,18 @@ expr: foo
 output:
     - labels: {}
       operation: ""
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 3
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -690,22 +626,18 @@ expr: (foo > 1) > bool 1
 output:
     - labels: {}
       operation: ""
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 1
         end: 4
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: true
@@ -718,22 +650,18 @@ expr: foo > bool 5
 output:
     - labels: {}
       operation: ""
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 3
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: true
@@ -746,22 +674,18 @@ expr: foo > bool 5 == 1
 output:
     - labels: {}
       operation: ""
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 3
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: true
@@ -774,44 +698,36 @@ expr: foo > bool bar
 output:
     - labels: {}
       operation: one-to-one
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins:
         - labels: {}
           operation: ""
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 11
             end: 14
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 3
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: true
@@ -824,44 +740,36 @@ expr: (foo > bool bar) == 0
 output:
     - labels: {}
       operation: one-to-one
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins:
         - labels: {}
           operation: ""
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 12
             end: 15
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 1
         end: 4
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: true
@@ -886,44 +794,36 @@ output:
                 start: 11
                 end: 13
       operation: one-to-one
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins:
         - labels: {}
           operation: ""
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 24
             end: 27
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 3
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: true
@@ -948,44 +848,36 @@ output:
                 start: 12
                 end: 14
       operation: one-to-one
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins:
         - labels: {}
           operation: ""
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 25
             end: 28
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 1
         end: 4
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: true
@@ -1010,44 +902,36 @@ output:
                 start: 24
                 end: 34
       operation: many-to-one
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins:
         - labels: {}
           operation: ""
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 44
             end: 47
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 3
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: true
@@ -1072,44 +956,36 @@ output:
                 start: 24
                 end: 35
       operation: one-to-many
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins:
         - labels: {}
           operation: ""
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 0
             end: 3
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 45
         end: 48
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: true
@@ -1122,44 +998,36 @@ expr: foo and bar > bool 0
 output:
     - labels: {}
       operation: many-to-many
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins:
         - labels: {}
           operation: ""
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 8
             end: 11
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: true
           isreturnbool: true
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 3
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: true
@@ -1172,22 +1040,18 @@ expr: foo offset 5m
 output:
     - labels: {}
       operation: ""
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo offset 5m'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 13
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -1206,22 +1070,18 @@ output:
                 start: 0
                 end: 14
       operation: ""
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job="bar"}'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 14
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -1240,22 +1100,18 @@ output:
                 start: 0
                 end: 11
       operation: ""
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job=""}'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 11
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -1274,22 +1130,18 @@ output:
                 start: 0
                 end: 14
       operation: many-to-many
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job="bar"}'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 14
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -1302,22 +1154,18 @@ output:
                 start: 18
                 end: 32
       operation: many-to-many
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] bar{job="foo"}'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 18
         end: 32
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -1336,22 +1184,18 @@ output:
                 start: 0
                 end: 12
       operation: many-to-many
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{a="bar"}'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 12
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -1364,22 +1208,18 @@ output:
                 start: 16
                 end: 28
       operation: many-to-many
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] bar{b="foo"}'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 16
         end: 28
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -1392,22 +1232,18 @@ expr: foo[5m]
 output:
     - labels: {}
       operation: ""
-      isdeadreason: ""
       returns: matrix
       operations:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 3
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -1420,22 +1256,18 @@ expr: prometheus_build_info[2m:1m]
 output:
     - labels: {}
       operation: ""
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] prometheus_build_info'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 21
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -1448,7 +1280,6 @@ expr: deriv(rate(distance_covered_meters_total[1m])[5m:1m])
 output:
     - labels: {}
       operation: deriv
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] distance_covered_meters_total'
@@ -1456,16 +1287,13 @@ output:
         - '[*parser.Call] deriv(rate(distance_covered_meters_total[1m])[5m:1m])'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 6
         end: 52
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 4
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -1478,22 +1306,18 @@ expr: foo - 1
 output:
     - labels: {}
       operation: ""
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 3
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -1506,22 +1330,18 @@ expr: foo / 5
 output:
     - labels: {}
       operation: ""
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 3
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -1534,22 +1354,18 @@ expr: -foo
 output:
     - labels: {}
       operation: ""
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 1
         end: 4
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -1580,23 +1396,19 @@ output:
                 start: 0
                 end: 3
       operation: sum
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job="myjob"}'
         - '[*parser.AggregateExpr] sum(foo{job="myjob"})'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 4
         end: 20
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -1633,7 +1445,6 @@ output:
                 start: 28
                 end: 30
       operation: sum
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job="myjob"}'
@@ -1641,16 +1452,13 @@ output:
         - '[*parser.AggregateExpr] sum(count by (instance) (foo{job="myjob"}))'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 10
         end: 26
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -1681,23 +1489,19 @@ output:
                 start: 0
                 end: 3
       operation: sum
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job="myjob"}'
         - '[*parser.AggregateExpr] sum(foo{job="myjob"})'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 4
         end: 20
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: true
@@ -1722,23 +1526,19 @@ output:
                 start: 22
                 end: 29
       operation: sum
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job="myjob"}'
         - '[*parser.AggregateExpr] sum without (job) (foo{job="myjob"})'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 4
         end: 20
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -1769,23 +1569,19 @@ output:
                 start: 9
                 end: 11
       operation: sum
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
         - '[*parser.AggregateExpr] sum by (job) (foo)'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 4
         end: 7
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -1816,23 +1612,19 @@ output:
                 start: 4
                 end: 20
       operation: sum
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job="myjob"}'
         - '[*parser.AggregateExpr] sum by (job) (foo{job="myjob"})'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 4
         end: 20
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -1851,23 +1643,19 @@ output:
                 start: 0
                 end: 31
       operation: abs
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job="myjob"} offset 5m'
         - '[*parser.Call] abs(foo{job="myjob"} offset 5m)'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 4
         end: 30
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 4
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -1886,23 +1674,19 @@ output:
                 start: 0
                 end: 43
       operation: abs
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job="myjob"}'
         - '[*parser.Call] abs(foo{job="myjob"} or bar{cluster="dev"})'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 4
         end: 42
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 4
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -1915,23 +1699,19 @@ output:
                 start: 0
                 end: 43
       operation: abs
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] bar{cluster="dev"}'
         - '[*parser.Call] abs(foo{job="myjob"} or bar{cluster="dev"})'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 4
         end: 42
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 4
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -1962,23 +1742,19 @@ output:
                 start: 4
                 end: 20
       operation: sum
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job="myjob"}'
         - '[*parser.AggregateExpr] sum without (instance) (foo{job="myjob"} or bar{cluster="dev"})'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 4
         end: 20
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -2003,23 +1779,19 @@ output:
                 start: 44
                 end: 51
       operation: sum
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] bar{cluster="dev"}'
         - '[*parser.AggregateExpr] sum without (instance) (foo{job="myjob"} or bar{cluster="dev"})'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 24
         end: 42
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -2050,23 +1822,19 @@ output:
                 start: 4
                 end: 20
       operation: sum
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job="myjob"}'
         - '[*parser.AggregateExpr] sum without (instance) (foo{job="myjob"})'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 4
         end: 20
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -2097,7 +1865,6 @@ output:
                 start: 0
                 end: 21
       operation: min
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job="myjob"}'
@@ -2123,38 +1890,31 @@ output:
                     start: 24
                     end: 45
           operation: max
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] foo{job="myjob"}'
             - '[*parser.AggregateExpr] max(foo{job="myjob"})'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 28
             end: 44
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 5
           fixedlabels: true
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 4
         end: 20
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -2185,7 +1945,6 @@ output:
                 start: 0
                 end: 21
       operation: max
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job="myjob"}'
@@ -2211,38 +1970,31 @@ output:
                     start: 24
                     end: 45
           operation: min
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] foo{job="myjob"}'
             - '[*parser.AggregateExpr] min(foo{job="myjob"})'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 28
             end: 44
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 5
           fixedlabels: true
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 4
         end: 20
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -2273,23 +2025,19 @@ output:
                 start: 4
                 end: 20
       operation: avg
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job="myjob"}'
         - '[*parser.AggregateExpr] avg by (job) (foo{job="myjob"})'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 4
         end: 20
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -2320,23 +2068,19 @@ output:
                 start: 11
                 end: 13
       operation: group
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
         - '[*parser.AggregateExpr] group by (job) (foo)'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 6
         end: 9
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -2361,7 +2105,6 @@ output:
                 start: 0
                 end: 21
       operation: stddev
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
@@ -2369,16 +2112,13 @@ output:
         - '[*parser.AggregateExpr] stddev(rate(foo[5m]))'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 12
         end: 19
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -2403,7 +2143,6 @@ output:
                 start: 0
                 end: 21
       operation: stdvar
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
@@ -2411,16 +2150,13 @@ output:
         - '[*parser.AggregateExpr] stdvar(rate(foo[5m]))'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 12
         end: 19
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -2433,23 +2169,19 @@ expr: stddev_over_time(foo[5m])
 output:
     - labels: {}
       operation: stddev_over_time
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
         - '[*parser.Call] stddev_over_time(foo[5m])'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 17
         end: 24
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 4
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -2462,23 +2194,19 @@ expr: stdvar_over_time(foo[5m])
 output:
     - labels: {}
       operation: stdvar_over_time
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
         - '[*parser.Call] stdvar_over_time(foo[5m])'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 17
         end: 24
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 4
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -2503,7 +2231,6 @@ output:
                 start: 0
                 end: 28
       operation: quantile
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
@@ -2511,16 +2238,13 @@ output:
         - '[*parser.AggregateExpr] quantile(0.9, rate(foo[5m]))'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 19
         end: 26
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -2551,23 +2275,19 @@ output:
                 start: 0
                 end: 38
       operation: count_values
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] build_version'
         - '[*parser.AggregateExpr] count_values("version", build_version)'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 24
         end: 37
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -2598,23 +2318,19 @@ output:
                 start: 0
                 end: 51
       operation: count_values
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] build_version'
         - '[*parser.AggregateExpr] count_values without (job) ("version", build_version)'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 24
         end: 37
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -2645,23 +2361,19 @@ output:
                 start: 0
                 end: 62
       operation: count_values
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] build_version{job="foo"}'
         - '[*parser.AggregateExpr] count_values without (job) ("version", build_version{job="foo"})'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 24
         end: 48
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -2698,23 +2410,19 @@ output:
                 start: 0
                 end: 46
       operation: count_values
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] build_version'
         - '[*parser.AggregateExpr] count_values by (job) ("version", build_version)'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 24
         end: 37
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -2733,23 +2441,19 @@ output:
                 start: 9
                 end: 25
       operation: topk
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job="myjob"}'
         - '[*parser.AggregateExpr] topk(10, foo{job="myjob"})'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 9
         end: 25
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: true
@@ -2762,46 +2466,38 @@ expr: topk(10, foo or bar)
 output:
     - labels: {}
       operation: topk
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
         - '[*parser.AggregateExpr] topk(10, foo or bar)'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 9
         end: 12
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
       isreturnbool: false
     - labels: {}
       operation: topk
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] bar'
         - '[*parser.AggregateExpr] topk(10, foo or bar)'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 16
         end: 19
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -2814,23 +2510,19 @@ expr: rate(foo[10m])
 output:
     - labels: {}
       operation: rate
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
         - '[*parser.Call] rate(foo[10m])'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 5
         end: 13
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 4
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -2855,7 +2547,6 @@ output:
                 start: 20
                 end: 27
       operation: sum
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
@@ -2863,16 +2554,13 @@ output:
         - '[*parser.AggregateExpr] sum without (instance) (rate(foo[10m]))'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 9
         end: 17
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -2891,44 +2579,36 @@ output:
                 start: 0
                 end: 14
       operation: one-to-one
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job="foo"}'
       joins:
         - labels: {}
           operation: ""
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 17
             end: 20
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 14
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -2959,44 +2639,36 @@ output:
                 start: 17
                 end: 19
       operation: one-to-one
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job="foo"}'
       joins:
         - labels: {}
           operation: ""
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 30
             end: 33
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 14
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -3027,44 +2699,36 @@ output:
                 start: 0
                 end: 14
       operation: many-to-one
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job="foo"}'
       joins:
         - labels: {}
           operation: ""
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 46
             end: 49
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 14
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -3095,7 +2759,6 @@ output:
                 start: 0
                 end: 14
       operation: many-to-one
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job="foo"}'
@@ -3114,37 +2777,30 @@ output:
                     start: 50
                     end: 84
           operation: ""
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar{cluster="bar",ignored="true"}'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 50
             end: 84
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 14
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -3175,7 +2831,6 @@ output:
                 start: 46
                 end: 57
       operation: one-to-many
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] bar{cluster="bar"}'
@@ -3194,37 +2849,30 @@ output:
                     start: 0
                     end: 30
           operation: ""
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] foo{ignored="true",job="foo"}'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 0
             end: 30
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 63
         end: 81
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -3249,7 +2897,6 @@ output:
                 start: 0
                 end: 16
       operation: count
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
@@ -3257,37 +2904,30 @@ output:
       joins:
         - labels: {}
           operation: ""
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 12
             end: 15
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 6
         end: 9
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -3318,7 +2958,6 @@ output:
                 start: 20
                 end: 23
       operation: count
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] up{job="a"}'
@@ -3332,37 +2971,30 @@ output:
                     start: 26
                     end: 37
           operation: ""
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] up{job="b"}'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 26
             end: 37
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 6
         end: 17
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -3399,7 +3031,6 @@ output:
                 start: 20
                 end: 23
       operation: count
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] up{job="a"}'
@@ -3413,37 +3044,30 @@ output:
                     start: 29
                     end: 40
           operation: ""
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] up{job="b"}'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 29
             end: 40
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 6
         end: 17
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -3468,44 +3092,36 @@ output:
                 start: 0
                 end: 28
       operation: many-to-many
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{instance="1",job="foo"}'
       joins:
         - labels: {}
           operation: ""
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 33
             end: 36
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 28
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -3536,44 +3152,36 @@ output:
                 start: 0
                 end: 28
       operation: many-to-many
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{instance="1",job="foo"}'
       joins:
         - labels: {}
           operation: ""
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 45
             end: 48
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 28
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -3586,23 +3194,19 @@ expr: topk(10, foo)
 output:
     - labels: {}
       operation: topk
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
         - '[*parser.AggregateExpr] topk(10, foo)'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 9
         end: 12
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -3615,23 +3219,19 @@ expr: topk(10, foo) without(cluster)
 output:
     - labels: {}
       operation: topk
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
         - '[*parser.AggregateExpr] topk without (cluster) (10, foo)'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 9
         end: 12
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -3644,23 +3244,19 @@ expr: topk(10, foo) by(cluster)
 output:
     - labels: {}
       operation: topk
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
         - '[*parser.AggregateExpr] topk by (cluster) (10, foo)'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 9
         end: 12
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -3685,7 +3281,6 @@ output:
                 start: 31
                 end: 38
       operation: bottomk
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
@@ -3694,16 +3289,13 @@ output:
         - '[*parser.AggregateExpr] bottomk(10, sum without (job) (rate(foo[5m])))'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 21
         end: 28
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -3716,44 +3308,36 @@ expr: foo or bar
 output:
     - labels: {}
       operation: many-to-many
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 3
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
       isreturnbool: false
     - labels: {}
       operation: many-to-many
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] bar'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 7
         end: 10
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -3766,66 +3350,54 @@ expr: foo or bar or baz
 output:
     - labels: {}
       operation: many-to-many
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 3
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
       isreturnbool: false
     - labels: {}
       operation: many-to-many
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] bar'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 7
         end: 10
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
       isreturnbool: false
     - labels: {}
       operation: many-to-many
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] baz'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 14
         end: 17
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -3838,66 +3410,54 @@ expr: (foo or bar) or baz
 output:
     - labels: {}
       operation: many-to-many
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 1
         end: 4
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
       isreturnbool: false
     - labels: {}
       operation: many-to-many
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] bar'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 8
         end: 11
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
       isreturnbool: false
     - labels: {}
       operation: many-to-many
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] baz'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 16
         end: 19
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -3910,7 +3470,6 @@ expr: foo unless bar
 output:
     - labels: {}
       operation: many-to-many
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
@@ -3918,36 +3477,29 @@ output:
       unless:
         - labels: {}
           operation: ""
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 11
             end: 14
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
+      deadinfo: null
       position:
         start: 0
         end: 3
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -3960,7 +3512,6 @@ expr: foo unless bar > 5
 output:
     - labels: {}
       operation: many-to-many
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
@@ -3968,36 +3519,29 @@ output:
       unless:
         - labels: {}
           operation: ""
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 11
             end: 14
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: true
           isreturnbool: false
+      deadinfo: null
       position:
         start: 0
         end: 3
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -4010,7 +3554,6 @@ expr: foo unless bar unless baz
 output:
     - labels: {}
       operation: many-to-many
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
@@ -4018,58 +3561,47 @@ output:
       unless:
         - labels: {}
           operation: ""
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 11
             end: 14
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
         - labels: {}
           operation: ""
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] baz'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 22
             end: 25
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
+      deadinfo: null
       position:
         start: 0
         end: 3
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -4106,7 +3638,6 @@ output:
                 start: 63
                 end: 70
       operation: count
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] up{cluster="dev",job="foo"}'
@@ -4114,16 +3645,13 @@ output:
         - '[*parser.AggregateExpr] count without (job, cluster) (sum by (job, cluster) (up{cluster="dev",job="foo"}) == 0)'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 10
         end: 38
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: true
@@ -4142,22 +3670,18 @@ output:
                 start: 0
                 end: 6
       operation: year
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.Call] year()'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 6
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 4
       fixedlabels: true
-      isdead: false
       alwaysreturns: true
       knownreturn: false
       isconditional: false
@@ -4170,23 +3694,19 @@ expr: year(foo)
 output:
     - labels: {}
       operation: year
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
         - '[*parser.Call] year(foo)'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 5
         end: 8
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 4
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -4229,23 +3749,19 @@ output:
                 start: 11
                 end: 58
       operation: label_join
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] up{job="api-server",src1="a",src2="b",src3="c"}'
         - '[*parser.Call] label_join(up{job="api-server",src1="a",src2="b",src3="c"}, "foo", ",", "src1", "src2", "src3")'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 11
         end: 58
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 4
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -4283,7 +3799,6 @@ output:
                 start: 48
                 end: 58
       operation: sum
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo:sum'
@@ -4291,22 +3806,18 @@ output:
       joins:
         - labels: {}
           operation: ""
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] job:notify'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 68
             end: 78
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
@@ -4331,38 +3842,31 @@ output:
                     start: 108
                     end: 110
           operation: sum
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] foo:count'
             - '[*parser.AggregateExpr] sum by (job) (foo:count)'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 97
             end: 106
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 5
           fixedlabels: true
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: true
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 8
         end: 15
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: true
@@ -4393,7 +3897,6 @@ output:
                 start: 29
                 end: 32
       operation: one-to-one
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] container_file_descriptors'
@@ -4406,37 +3909,30 @@ output:
                     start: 53
                     end: 100
           operation: ""
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] container_ulimits_soft{ulimit="max_open_files"}'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 53
             end: 100
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 26
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -4461,7 +3957,6 @@ output:
                 start: 29
                 end: 32
       operation: many-to-one
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] container_file_descriptors'
@@ -4474,37 +3969,30 @@ output:
                     start: 66
                     end: 113
           operation: ""
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] container_ulimits_soft{ulimit="max_open_files"}'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 66
             end: 113
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 26
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -4534,23 +4022,19 @@ output:
                 start: 0
                 end: 22
       operation: absent
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job="bar"}'
         - '[*parser.Call] absent(foo{job="bar"})'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 7
         end: 21
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 4
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -4597,23 +4081,19 @@ output:
                 start: 0
                 end: 66
       operation: absent
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{cluster!="dev",env="prod",instance=~".+",job="bar"}'
         - '[*parser.Call] absent(foo{cluster!="dev",env="prod",instance=~".+",job="bar"})'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 7
         end: 65
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 4
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -4665,7 +4145,6 @@ output:
                 start: 0
                 end: 6
       operation: absent
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
@@ -4673,16 +4152,13 @@ output:
         - '[*parser.Call] absent(sum by (job, instance) (foo))'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 7
         end: 33
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 4
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -4718,7 +4194,6 @@ output:
                 start: 0
                 end: 38
       operation: absent
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job="prometheus",xxx="1"}'
@@ -4726,37 +4201,30 @@ output:
       joins:
         - labels: {}
           operation: ""
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] prometheus_build_info'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 51
             end: 72
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 7
         end: 37
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 4
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -4787,23 +4255,19 @@ output:
                 start: 13
                 end: 15
       operation: sum
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
         - '[*parser.AggregateExpr] sum by (notjob) (foo)'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 8
         end: 11
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -4846,7 +4310,6 @@ output:
                 start: 32
                 end: 35
       operation: count
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] node_exporter_build_info'
@@ -4884,38 +4347,31 @@ output:
                     start: 127
                     end: 130
           operation: count
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] deb_package_version'
             - '[*parser.AggregateExpr] count by (instance, version, package) (deb_package_version)'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 106
             end: 125
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 5
           fixedlabels: true
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 6
         end: 30
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: true
@@ -4939,23 +4395,19 @@ output:
                 start: 0
                 end: 6
       operation: absent
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
         - '[*parser.Call] absent(foo)'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 7
         end: 10
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 4
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -4973,23 +4425,19 @@ output:
                 start: 15
                 end: 21
       operation: absent
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] bar'
         - '[*parser.Call] absent(bar)'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 22
         end: 25
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 4
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -5013,23 +4461,19 @@ output:
                 start: 0
                 end: 16
       operation: absent_over_time
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
         - '[*parser.Call] absent_over_time(foo[5m])'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 17
         end: 24
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 4
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -5047,23 +4491,19 @@ output:
                 start: 29
                 end: 35
       operation: absent
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] bar'
         - '[*parser.Call] absent(bar)'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 36
         end: 39
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 4
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -5105,7 +4545,6 @@ output:
                 start: 37
                 end: 59
       operation: absent
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job="xxx"}'
@@ -5113,37 +4552,30 @@ output:
       joins:
         - labels: {}
           operation: ""
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 0
             end: 3
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 44
         end: 58
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 4
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -5173,7 +4605,6 @@ output:
                 start: 25
                 end: 47
       operation: absent
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job="xxx"}'
@@ -5181,37 +4612,30 @@ output:
       joins:
         - labels: {}
           operation: ""
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 0
             end: 3
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 32
         end: 46
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 4
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -5230,22 +4654,18 @@ output:
                 start: 0
                 end: 6
       operation: vector
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.Call] vector(1)'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 9
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 1
       type: 4
       fixedlabels: true
-      isdead: false
       alwaysreturns: true
       knownreturn: true
       isconditional: false
@@ -5264,22 +4684,18 @@ output:
                 start: 0
                 end: 6
       operation: vector
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.Call] vector(scalar(foo))'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 19
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 4
       fixedlabels: true
-      isdead: false
       alwaysreturns: true
       knownreturn: false
       isconditional: false
@@ -5298,22 +4714,22 @@ output:
                 start: 0
                 end: 6
       operation: vector
-      isdeadreason: this query always evaluates to `0 == 1` which is not possible, so it will never return anything
       returns: vector
       operations:
         - '[*parser.Call] vector(0 >= bool 0.5)'
       joins: []
       unless: []
+      deadinfo:
+        reason: this query always evaluates to `0 == 1` which is not possible, so it will never return anything
+        fragment:
+            start: 0
+            end: 24
       position:
-        start: 0
-        end: 24
-      isdeadposition:
         start: 0
         end: 24
       returnednumber: 0
       type: 4
       fixedlabels: true
-      isdead: true
       alwaysreturns: true
       knownreturn: true
       isconditional: true
@@ -5332,23 +4748,19 @@ output:
                 start: 0
                 end: 35
       operation: sum_over_time
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job="myjob"}'
         - '[*parser.Call] sum_over_time(foo{job="myjob"}[5m])'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 14
         end: 34
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 4
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -5367,22 +4779,18 @@ output:
                 start: 0
                 end: 15
       operation: days_in_month
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.Call] days_in_month()'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 15
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 4
       fixedlabels: true
-      isdead: false
       alwaysreturns: true
       knownreturn: false
       isconditional: false
@@ -5401,23 +4809,19 @@ output:
                 start: 0
                 end: 29
       operation: days_in_month
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job="foo"}'
         - '[*parser.Call] days_in_month(foo{job="foo"})'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 14
         end: 28
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 4
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -5448,23 +4852,19 @@ output:
                 start: 14
                 end: 48
       operation: label_replace
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] up{job="api-server",service="a:c"}'
         - '[*parser.Call] label_replace(up{job="api-server",service="a:c"}, "foo", "$1", "service", "(.*):.*")'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 14
         end: 48
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 4
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -5501,7 +4901,6 @@ output:
                 start: 18
                 end: 21
       operation: label_replace
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] pod_status'
@@ -5509,16 +4908,13 @@ output:
         - '[*parser.Call] label_replace(sum by (pod) (pod_status) > 0, "cluster", "$1", "pod", "(.*)")'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 14
         end: 43
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 4
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: true
@@ -5531,22 +4927,18 @@ expr: (time() - my_metric) > 5*3600
 output:
     - labels: {}
       operation: ""
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] my_metric'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 10
         end: 19
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: true
@@ -5571,7 +4963,6 @@ output:
                 start: 37
                 end: 45
       operation: one-to-one
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] up{instance="a",job="prometheus"}'
@@ -5590,37 +4981,30 @@ output:
                     start: 51
                     end: 79
           operation: ""
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] up{instance="a",job="pint"}'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 51
             end: 79
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 34
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -5663,23 +5047,19 @@ output:
                 start: 5
                 end: 12
       operation: avg
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"}'
         - '[*parser.AggregateExpr] avg without (router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"})'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 41
         end: 100
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: true
@@ -5722,7 +5102,6 @@ output:
                 start: 119
                 end: 126
       operation: sum
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"}'
@@ -5754,38 +5133,31 @@ output:
                     start: 221
                     end: 289
           operation: count
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] colo_router_tier:disabled_pops:max{router=~"edge.*",tier="1"}'
             - '[*parser.AggregateExpr] count(colo_router_tier:disabled_pops:max{router=~"edge.*",tier="1"})'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 227
             end: 288
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 5
           fixedlabels: true
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 155
         end: 212
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: true
@@ -5822,23 +5194,19 @@ output:
                 start: 307
                 end: 314
       operation: avg
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] router_anycast_prefix_enabled{cidr_use_case=~".*regional.*"}'
         - '[*parser.AggregateExpr] avg without (router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*regional.*"})'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 343
         end: 403
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: true
@@ -5863,7 +5231,6 @@ output:
                 start: 0
                 end: 69
       operation: label_replace
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
@@ -5871,16 +5238,13 @@ output:
         - '[*parser.Call] label_replace(sum without (instance) (foo), "instance", "none", "", "")'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 14
         end: 40
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 4
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -5934,7 +5298,6 @@ output:
                 start: 5
                 end: 8
       operation: sum
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] probe_success{job="abc"}'
@@ -5942,16 +5305,13 @@ output:
         - '[*parser.AggregateExpr] sum by (region, target, colo_name) (sum_over_time(probe_success{job="abc"}[5m]) or vector(1))'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 56
         end: 84
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: true
@@ -5988,23 +5348,23 @@ output:
                 start: 91
                 end: 97
       operation: sum
-      isdeadreason: this query always evaluates to `1 == 0` which is not possible, so it will never return anything
       returns: vector
       operations:
         - '[*parser.Call] vector(1)'
         - '[*parser.AggregateExpr] sum by (region, target, colo_name) (sum_over_time(probe_success{job="abc"}[5m]) or vector(1))'
       joins: []
       unless: []
+      deadinfo:
+        reason: this query always evaluates to `1 == 0` which is not possible, so it will never return anything
+        fragment:
+            start: 91
+            end: 100
       position:
-        start: 91
-        end: 100
-      isdeadposition:
         start: 91
         end: 100
       returnednumber: 1
       type: 5
       fixedlabels: true
-      isdead: true
       alwaysreturns: true
       knownreturn: true
       isconditional: true
@@ -6023,44 +5383,40 @@ output:
                 start: 0
                 end: 6
       operation: vector
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.Call] vector(1)'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 9
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 1
       type: 4
       fixedlabels: true
-      isdead: false
       alwaysreturns: true
       knownreturn: true
       isconditional: false
       isreturnbool: false
     - labels: {}
       operation: many-to-many
-      isdeadreason: the left hand side always returs something and so the right hand side is never used
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
+      deadinfo:
+        reason: the left hand side always returs something and so the right hand side is never used
+        fragment:
+            start: 13
+            end: 16
       position:
-        start: 13
-        end: 16
-      isdeadposition:
         start: 13
         end: 16
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: true
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -6079,22 +5435,22 @@ output:
                 start: 0
                 end: 6
       operation: vector
-      isdeadreason: this query always evaluates to `0 > 0` which is not possible, so it will never return anything
       returns: vector
       operations:
         - '[*parser.Call] vector(0)'
       joins: []
       unless: []
+      deadinfo:
+        reason: this query always evaluates to `0 > 0` which is not possible, so it will never return anything
+        fragment:
+            start: 0
+            end: 9
       position:
-        start: 0
-        end: 9
-      isdeadposition:
         start: 0
         end: 9
       returnednumber: 0
       type: 4
       fixedlabels: true
-      isdead: true
       alwaysreturns: true
       knownreturn: true
       isconditional: true
@@ -6113,7 +5469,6 @@ output:
                 start: 0
                 end: 6
       operation: vector
-      isdeadreason: '`vector(0) > vector(1)` always evaluates to `0 > 1` which is not possible, so it will never return anything'
       returns: vector
       operations:
         - '[*parser.Call] vector(0)'
@@ -6126,37 +5481,34 @@ output:
                     start: 12
                     end: 18
           operation: vector
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.Call] vector(1)'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 12
             end: 21
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 1
           type: 4
           fixedlabels: true
-          isdead: false
           alwaysreturns: true
           knownreturn: true
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo:
+        reason: '`vector(0) > vector(1)` always evaluates to `0 > 1` which is not possible, so it will never return anything'
+        fragment:
+            start: 0
+            end: 9
       position:
-        start: 0
-        end: 9
-      isdeadposition:
         start: 0
         end: 9
       returnednumber: 0
       type: 4
       fixedlabels: true
-      isdead: true
       alwaysreturns: true
       knownreturn: true
       isconditional: true
@@ -6181,23 +5533,19 @@ output:
                 start: 0
                 end: 21
       operation: sum
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
         - '[*parser.AggregateExpr] sum(foo or vector(0))'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 4
         end: 7
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: true
@@ -6216,23 +5564,23 @@ output:
                 start: 0
                 end: 21
       operation: sum
-      isdeadreason: this query always evaluates to `0 > 0` which is not possible, so it will never return anything
       returns: vector
       operations:
         - '[*parser.Call] vector(0)'
         - '[*parser.AggregateExpr] sum(foo or vector(0))'
       joins: []
       unless: []
+      deadinfo:
+        reason: this query always evaluates to `0 > 0` which is not possible, so it will never return anything
+        fragment:
+            start: 11
+            end: 20
       position:
-        start: 11
-        end: 20
-      isdeadposition:
         start: 11
         end: 20
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: true
       alwaysreturns: true
       knownreturn: true
       isconditional: true
@@ -6257,23 +5605,19 @@ output:
                 start: 1
                 end: 22
       operation: sum
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
         - '[*parser.AggregateExpr] sum(foo or vector(1))'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 5
         end: 8
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: true
@@ -6292,23 +5636,23 @@ output:
                 start: 1
                 end: 22
       operation: sum
-      isdeadreason: this query always evaluates to `1 == 2` which is not possible, so it will never return anything
       returns: vector
       operations:
         - '[*parser.Call] vector(1)'
         - '[*parser.AggregateExpr] sum(foo or vector(1))'
       joins: []
       unless: []
+      deadinfo:
+        reason: this query always evaluates to `1 == 2` which is not possible, so it will never return anything
+        fragment:
+            start: 12
+            end: 21
       position:
-        start: 12
-        end: 21
-      isdeadposition:
         start: 12
         end: 21
       returnednumber: 1
       type: 5
       fixedlabels: true
-      isdead: true
       alwaysreturns: true
       knownreturn: true
       isconditional: true
@@ -6333,23 +5677,19 @@ output:
                 start: 1
                 end: 22
       operation: sum
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
         - '[*parser.AggregateExpr] sum(foo or vector(1))'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 5
         end: 8
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: true
@@ -6368,23 +5708,19 @@ output:
                 start: 1
                 end: 22
       operation: sum
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.Call] vector(1)'
         - '[*parser.AggregateExpr] sum(foo or vector(1))'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 12
         end: 21
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 1
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: true
       knownreturn: true
       isconditional: true
@@ -6409,23 +5745,19 @@ output:
                 start: 1
                 end: 22
       operation: sum
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
         - '[*parser.AggregateExpr] sum(foo or vector(2))'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 5
         end: 8
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: true
@@ -6444,23 +5776,23 @@ output:
                 start: 1
                 end: 22
       operation: sum
-      isdeadreason: this query always evaluates to `2 != 2` which is not possible, so it will never return anything
       returns: vector
       operations:
         - '[*parser.Call] vector(2)'
         - '[*parser.AggregateExpr] sum(foo or vector(2))'
       joins: []
       unless: []
+      deadinfo:
+        reason: this query always evaluates to `2 != 2` which is not possible, so it will never return anything
+        fragment:
+            start: 12
+            end: 21
       position:
-        start: 12
-        end: 21
-      isdeadposition:
         start: 12
         end: 21
       returnednumber: 2
       type: 5
       fixedlabels: true
-      isdead: true
       alwaysreturns: true
       knownreturn: true
       isconditional: true
@@ -6488,23 +5820,19 @@ output:
                 start: 1
                 end: 41
       operation: sum
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] sometimes{foo!="bar"}'
         - '[*parser.AggregateExpr] sum(sometimes{foo!="bar"} or vector(0))'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 5
         end: 26
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -6523,45 +5851,37 @@ output:
                 start: 1
                 end: 41
       operation: sum
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.Call] vector(0)'
         - '[*parser.AggregateExpr] sum(sometimes{foo!="bar"} or vector(0))'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 30
         end: 39
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: true
       knownreturn: true
       isconditional: false
       isreturnbool: false
     - labels: {}
       operation: many-to-many
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] bob'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 47
         end: 50
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: true
@@ -6580,23 +5900,19 @@ output:
                 start: 60
                 end: 68
       operation: sum
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
         - '[*parser.AggregateExpr] sum(foo)'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 64
         end: 67
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -6609,22 +5925,18 @@ output:
                 start: 72
                 end: 78
       operation: vector
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.Call] vector(1)'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 72
         end: 81
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 1
       type: 4
       fixedlabels: true
-      isdead: false
       alwaysreturns: true
       knownreturn: true
       isconditional: false
@@ -6658,7 +5970,6 @@ output:
                 start: 4
                 end: 30
       operation: sum
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] sometimes{foo!="bar"}'
@@ -6666,22 +5977,18 @@ output:
       joins:
         - labels: {}
           operation: many-to-many
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bob'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 57
             end: 60
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: true
@@ -6700,60 +6007,49 @@ output:
                     start: 70
                     end: 79
           operation: sum
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
             - '[*parser.AggregateExpr] sum(bar)'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 74
             end: 77
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 5
           fixedlabels: true
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
         - labels: {}
           operation: many-to-many
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] notfound'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 85
             end: 93
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: true
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 8
         end: 29
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: true
@@ -6766,29 +6062,24 @@ output:
                 start: 36
                 end: 42
       operation: vector
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.Call] vector(1)'
       joins:
         - labels: {}
           operation: many-to-many
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bob'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 57
             end: 60
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: true
@@ -6807,60 +6098,49 @@ output:
                     start: 70
                     end: 79
           operation: sum
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar'
             - '[*parser.AggregateExpr] sum(bar)'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 74
             end: 77
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 5
           fixedlabels: true
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
         - labels: {}
           operation: many-to-many
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] notfound'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 85
             end: 93
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: true
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 36
         end: 45
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 1
       type: 4
       fixedlabels: true
-      isdead: false
       alwaysreturns: true
       knownreturn: true
       isconditional: true
@@ -6873,22 +6153,18 @@ expr: foo offset 5m > 5
 output:
     - labels: {}
       operation: ""
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo offset 5m'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 13
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: true
@@ -6904,7 +6180,6 @@ expr: |4
 output:
     - labels: {}
       operation: rate
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] metric2'
@@ -6912,23 +6187,19 @@ output:
       joins:
         - labels: {}
           operation: rate
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] metric1'
             - '[*parser.Call] rate(metric1[5m])'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 42
             end: 53
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 4
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
@@ -6941,22 +6212,18 @@ output:
                     start: 58
                     end: 64
           operation: vector
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.Call] vector(1)'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 58
             end: 67
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 1
           type: 4
           fixedlabels: true
-          isdead: false
           alwaysreturns: true
           knownreturn: true
           isconditional: false
@@ -6969,23 +6236,19 @@ output:
                     start: 72
                     end: 110
           operation: rate
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] metric3{log_name="samplerd"}'
             - '[*parser.Call] rate(metric3{log_name="samplerd"}[5m])'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 77
             end: 109
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 4
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
@@ -6998,37 +6261,30 @@ output:
                     start: 114
                     end: 120
           operation: vector
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.Call] vector(2)'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 114
             end: 123
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 2
           type: 4
           fixedlabels: true
-          isdead: false
           alwaysreturns: true
           knownreturn: true
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 7
         end: 18
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 4
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: true
@@ -7041,30 +6297,25 @@ output:
                 start: 23
                 end: 29
       operation: vector
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.Call] vector(0)'
       joins:
         - labels: {}
           operation: rate
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] metric1'
             - '[*parser.Call] rate(metric1[5m])'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 42
             end: 53
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 4
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
@@ -7077,22 +6328,18 @@ output:
                     start: 58
                     end: 64
           operation: vector
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.Call] vector(1)'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 58
             end: 67
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 1
           type: 4
           fixedlabels: true
-          isdead: false
           alwaysreturns: true
           knownreturn: true
           isconditional: false
@@ -7105,23 +6352,19 @@ output:
                     start: 72
                     end: 110
           operation: rate
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] metric3{log_name="samplerd"}'
             - '[*parser.Call] rate(metric3{log_name="samplerd"}[5m])'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 77
             end: 109
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 4
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
@@ -7134,37 +6377,30 @@ output:
                     start: 114
                     end: 120
           operation: vector
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.Call] vector(2)'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 114
             end: 123
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 2
           type: 4
           fixedlabels: true
-          isdead: false
           alwaysreturns: true
           knownreturn: true
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 23
         end: 32
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 3
       type: 4
       fixedlabels: true
-      isdead: false
       alwaysreturns: true
       knownreturn: true
       isconditional: true
@@ -7189,23 +6425,19 @@ output:
                 start: 0
                 end: 64
       operation: label_replace
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.Call] vector(1)'
         - '[*parser.Call] label_replace(vector(1), "nexthop_tag", "$1", "nexthop", "(.+)")'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 14
         end: 23
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 1
       type: 4
       fixedlabels: true
-      isdead: false
       alwaysreturns: true
       knownreturn: true
       isconditional: false
@@ -7236,23 +6468,19 @@ output:
                 start: 1
                 end: 4
       operation: sum
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job="myjob"}'
         - '[*parser.AggregateExpr] sum(foo{job="myjob"})'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 5
         end: 21
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -7271,22 +6499,18 @@ output:
                 start: 2
                 end: 18
       operation: ""
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{job="myjob"}'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 2
         end: 18
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -7312,23 +6536,23 @@ output:
                 start: 5
                 end: 23
       operation: group
-      isdeadreason: this query always evaluates to `0 > 0` which is not possible, so it will never return anything
       returns: vector
       operations:
         - '[*parser.Call] vector(0)'
         - '[*parser.AggregateExpr] group(vector(0))'
       joins: []
       unless: []
+      deadinfo:
+        reason: this query always evaluates to `0 > 0` which is not possible, so it will never return anything
+        fragment:
+            start: 11
+            end: 20
       position:
-        start: 11
-        end: 20
-      isdeadposition:
         start: 11
         end: 20
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: true
       alwaysreturns: true
       knownreturn: true
       isconditional: true
@@ -7347,21 +6571,21 @@ output:
                 start: 0
                 end: 1
       operation: ""
-      isdeadreason: this query always evaluates to `1 > 5` which is not possible, so it will never return anything
       returns: scalar
       operations: []
       joins: []
       unless: []
+      deadinfo:
+        reason: this query always evaluates to `1 > 5` which is not possible, so it will never return anything
+        fragment:
+            start: 0
+            end: 1
       position:
-        start: 0
-        end: 1
-      isdeadposition:
         start: 0
         end: 1
       returnednumber: 1
       type: 1
       fixedlabels: true
-      isdead: true
       alwaysreturns: true
       knownreturn: true
       isconditional: true
@@ -7380,7 +6604,6 @@ output:
                 start: 0
                 end: 34
       operation: many-to-many
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] prometheus_ready{job="prometheus"}'
@@ -7394,36 +6617,33 @@ output:
                     start: 42
                     end: 48
           operation: vector
-          isdeadreason: The right hand side will never be matched because it doesn't have the `job` label while the left hand side will. Calling `vector()` will return a vector value with no labels.
           returns: vector
           operations:
             - '[*parser.Call] vector(0)'
           joins: []
           unless: []
+          deadinfo:
+            reason: The right hand side will never be matched because it doesn't have the `job` label while the left hand side will. Calling `vector()` will return a vector value with no labels.
+            fragment:
+                start: 42
+                end: 48
           position:
             start: 42
             end: 51
-          isdeadposition:
-            start: 42
-            end: 48
           returnednumber: 0
           type: 4
           fixedlabels: true
-          isdead: true
           alwaysreturns: true
           knownreturn: true
           isconditional: false
           isreturnbool: false
+      deadinfo: null
       position:
         start: 0
         end: 34
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -7442,7 +6662,6 @@ output:
                 start: 0
                 end: 34
       operation: many-to-many
-      isdeadreason: this query will never return anything because the `unless` query always returns something
       returns: vector
       operations:
         - '[*parser.VectorSelector] prometheus_ready{job="prometheus"}'
@@ -7456,36 +6675,33 @@ output:
                     start: 47
                     end: 53
           operation: vector
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.Call] vector(0)'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 47
             end: 56
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 4
           fixedlabels: true
-          isdead: false
           alwaysreturns: true
           knownreturn: true
           isconditional: false
           isreturnbool: false
+      deadinfo:
+        reason: this query will never return anything because the `unless` query always returns something
+        fragment:
+            start: 47
+            end: 56
       position:
         start: 0
         end: 34
-      isdeadposition:
-        start: 47
-        end: 56
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: true
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -7504,7 +6720,6 @@ output:
                 start: 0
                 end: 34
       operation: many-to-many
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] prometheus_ready{job="prometheus"}'
@@ -7518,36 +6733,33 @@ output:
                     start: 50
                     end: 56
           operation: vector
-          isdeadreason: The right hand side will never be matched because it doesn't have the `job` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
           returns: vector
           operations:
             - '[*parser.Call] vector(0)'
           joins: []
           unless: []
+          deadinfo:
+            reason: The right hand side will never be matched because it doesn't have the `job` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
+            fragment:
+                start: 50
+                end: 56
           position:
             start: 50
             end: 59
-          isdeadposition:
-            start: 50
-            end: 56
           returnednumber: 0
           type: 4
           fixedlabels: true
-          isdead: true
           alwaysreturns: true
           knownreturn: true
           isconditional: false
           isreturnbool: false
+      deadinfo: null
       position:
         start: 0
         end: 34
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -7601,7 +6813,6 @@ output:
                 start: 5
                 end: 8
       operation: max
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] cf_node_role{kubernetes_role="master",role="kubernetes"}'
@@ -7640,7 +6851,6 @@ output:
                     start: 99
                     end: 102
           operation: sum
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] node_systemd_timer_last_trigger_seconds{name=~"etcd-defrag-.*.timer"}'
@@ -7660,51 +6870,41 @@ output:
                         start: 247
                         end: 303
               operation: ""
-              isdeadreason: ""
               returns: vector
               operations:
                 - '[*parser.VectorSelector] cf_node_role{kubernetes_role="master",role="kubernetes"}'
               joins: []
               unless: []
+              deadinfo: null
               position:
                 start: 247
                 end: 303
-              isdeadposition:
-                start: 0
-                end: 0
               returnednumber: 0
               type: 3
               fixedlabels: false
-              isdead: false
               alwaysreturns: false
               knownreturn: false
               isconditional: false
               isreturnbool: false
           unless: []
+          deadinfo: null
           position:
             start: 132
             end: 201
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 5
           fixedlabels: true
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
+      deadinfo: null
       position:
         start: 29
         end: 85
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -7729,7 +6929,6 @@ output:
                 start: 13
                 end: 15
       operation: one-to-one
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{a="1"}'
@@ -7742,37 +6941,30 @@ output:
                     start: 18
                     end: 28
           operation: ""
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar{b="2"}'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 18
             end: 28
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 10
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -7809,7 +7001,6 @@ output:
                 start: 13
                 end: 15
       operation: many-to-one
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{a="1"}'
@@ -7822,37 +7013,30 @@ output:
                     start: 42
                     end: 52
           operation: ""
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar{b="2"}'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 42
             end: 52
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 10
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -7889,7 +7073,6 @@ output:
                 start: 13
                 end: 15
       operation: one-to-many
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] bar{b="2"}'
@@ -7902,37 +7085,30 @@ output:
                     start: 0
                     end: 10
           operation: ""
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] foo{a="1"}'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 0
             end: 10
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 43
         end: 53
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -7963,7 +7139,6 @@ output:
                 start: 13
                 end: 15
       operation: one-to-one
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{a="1"}'
@@ -7988,38 +7163,35 @@ output:
                     start: 26
                     end: 29
           operation: sum
-          isdeadreason: The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar{b="2"}'
             - '[*parser.AggregateExpr] sum(bar{b="2"})'
           joins: []
           unless: []
+          deadinfo:
+            reason: The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
+            fragment:
+                start: 26
+                end: 29
           position:
             start: 30
             end: 40
-          isdeadposition:
-            start: 26
-            end: 29
           returnednumber: 0
           type: 5
           fixedlabels: true
-          isdead: true
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 10
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -8056,7 +7228,6 @@ output:
                 start: 13
                 end: 15
       operation: many-to-one
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{a="1"}'
@@ -8081,38 +7252,35 @@ output:
                     start: 42
                     end: 45
           operation: sum
-          isdeadreason: The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar{b="2"}'
             - '[*parser.AggregateExpr] sum(bar{b="2"})'
           joins: []
           unless: []
+          deadinfo:
+            reason: The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
+            fragment:
+                start: 42
+                end: 45
           position:
             start: 46
             end: 56
-          isdeadposition:
-            start: 42
-            end: 45
           returnednumber: 0
           type: 5
           fixedlabels: true
-          isdead: true
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 10
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -8149,7 +7317,6 @@ output:
                 start: 18
                 end: 20
       operation: one-to-many
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] bar{b="2"}'
@@ -8174,38 +7341,35 @@ output:
                     start: 0
                     end: 3
           operation: sum
-          isdeadreason: The left hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
           returns: vector
           operations:
             - '[*parser.VectorSelector] foo{a="1"}'
             - '[*parser.AggregateExpr] sum(foo{a="1"})'
           joins: []
           unless: []
+          deadinfo:
+            reason: The left hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
+            fragment:
+                start: 0
+                end: 3
           position:
             start: 4
             end: 14
-          isdeadposition:
-            start: 0
-            end: 3
           returnednumber: 0
           type: 5
           fixedlabels: true
-          isdead: true
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 48
         end: 58
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -8242,7 +7406,6 @@ output:
                 start: 13
                 end: 15
       operation: many-to-one
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{a="1"}'
@@ -8267,38 +7430,35 @@ output:
                     start: 58
                     end: 65
           operation: sum
-          isdeadreason: The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar{b="2"}'
             - '[*parser.AggregateExpr] sum without (instance) (bar{b="2"})'
           joins: []
           unless: []
+          deadinfo:
+            reason: The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
+            fragment:
+                start: 58
+                end: 65
           position:
             start: 46
             end: 56
-          isdeadposition:
-            start: 58
-            end: 65
           returnednumber: 0
           type: 5
           fixedlabels: false
-          isdead: true
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 0
         end: 10
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -8335,7 +7495,6 @@ output:
                 start: 36
                 end: 38
       operation: one-to-many
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] bar{b="2"}'
@@ -8360,38 +7519,35 @@ output:
                     start: 16
                     end: 23
           operation: sum
-          isdeadreason: The left hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
           returns: vector
           operations:
             - '[*parser.VectorSelector] foo{a="1"}'
             - '[*parser.AggregateExpr] sum without (instance) (foo{a="1"})'
           joins: []
           unless: []
+          deadinfo:
+            reason: The left hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
+            fragment:
+                start: 16
+                end: 23
           position:
             start: 4
             end: 14
-          isdeadposition:
-            start: 16
-            end: 23
           returnednumber: 0
           type: 5
           fixedlabels: false
-          isdead: true
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 66
         end: 76
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -8440,7 +7596,6 @@ output:
                 start: 6
                 end: 14
       operation: max
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] kernel_device_io_errors_total{device!~"loop.+"}'
@@ -8460,28 +7615,28 @@ output:
                     start: 292
                     end: 298
           operation: absent
-          isdeadreason: |-
-            The right hand side will never be matched because it doesn't have the `device` label from `on(...)`. The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
-            You will only get any results back if the metric selector you pass doesn't match anything.
-            Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
-            This means that the only labels you can get back from absent call are the ones you pass to it.
-            If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
           returns: vector
           operations:
             - '[*parser.VectorSelector] node_disk_info'
             - '[*parser.Call] absent(node_disk_info)'
           joins: []
           unless: []
+          deadinfo:
+            reason: |-
+                The right hand side will never be matched because it doesn't have the `device` label from `on(...)`. The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+                You will only get any results back if the metric selector you pass doesn't match anything.
+                Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+                This means that the only labels you can get back from absent call are the ones you pass to it.
+                If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+            fragment:
+                start: 292
+                end: 298
           position:
             start: 299
             end: 313
-          isdeadposition:
-            start: 292
-            end: 298
           returnednumber: 0
           type: 4
           fixedlabels: true
-          isdead: true
           alwaysreturns: false
           knownreturn: false
           isconditional: false
@@ -8494,23 +7649,19 @@ output:
                     start: 351
                     end: 442
           operation: label_replace
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] salt_highstate_runner_configured_minions'
             - '[*parser.Call] label_replace(salt_highstate_runner_configured_minions, "instance", "$1", "minion", "(.+)")'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 365
             end: 405
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 4
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
@@ -8518,7 +7669,6 @@ output:
       unless:
         - labels: {}
           operation: increase
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] kernel_device_io_soft_errors_total{device!~"loop.+"}'
@@ -8526,52 +7676,42 @@ output:
           joins:
             - labels: {}
               operation: increase
-              isdeadreason: ""
               returns: vector
               operations:
                 - '[*parser.VectorSelector] kernel_device_io_errors_total'
                 - '[*parser.Call] increase(kernel_device_io_errors_total[2h])'
               joins: []
               unless: []
+              deadinfo: null
               position:
                 start: 222
                 end: 257
-              isdeadposition:
-                start: 0
-                end: 0
               returnednumber: 0
               type: 4
               fixedlabels: false
-              isdead: false
               alwaysreturns: false
               knownreturn: false
               isconditional: false
               isreturnbool: false
           unless: []
+          deadinfo: null
           position:
             start: 149
             end: 207
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 4
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: true
           isreturnbool: false
+      deadinfo: null
       position:
         start: 46
         end: 99
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: true
@@ -8608,7 +7748,6 @@ output:
                 start: 26
                 end: 28
       operation: sum
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo{a="1"}'
@@ -8622,37 +7761,30 @@ output:
                     start: 31
                     end: 41
           operation: ""
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] bar{b="2"}'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 31
             end: 41
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 4
         end: 14
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -8683,7 +7815,6 @@ output:
                 start: 13
                 end: 20
       operation: sum
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
@@ -8691,16 +7822,13 @@ output:
         - '[*parser.AggregateExpr] sum by (job) (sum without (job) (foo))'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 8
         end: 11
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -8728,7 +7856,6 @@ output:
                 start: 47
                 end: 49
       operation: many-to-one
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] prometheus:scrape_series_added:since_gc:sum'
@@ -8765,7 +7892,6 @@ output:
                     start: 75
                     end: 287
           operation: label_replace
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] go_memstats_alloc_bytes{job="prometheus"}'
@@ -8793,7 +7919,6 @@ output:
                         start: 229
                         end: 231
               operation: max
-              isdeadreason: ""
               returns: vector
               operations:
                 - '[*parser.VectorSelector] prometheus_tsdb_head_series'
@@ -8801,46 +7926,37 @@ output:
                 - '[*parser.AggregateExpr] max by (instance) (max_over_time(prometheus_tsdb_head_series[2h]))'
               joins: []
               unless: []
+              deadinfo: null
               position:
                 start: 195
                 end: 226
-              isdeadposition:
-                start: 0
-                end: 0
               returnednumber: 0
               type: 5
               fixedlabels: true
-              isdead: false
               alwaysreturns: false
               knownreturn: false
               isconditional: false
               isreturnbool: false
           unless: []
+          deadinfo: null
           position:
             start: 92
             end: 241
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 4
           fixedlabels: true
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 1
         end: 44
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -8859,7 +7975,6 @@ output:
                 start: 1
                 end: 14
       operation: day_of_week
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.Call] day_of_week()'
@@ -8872,37 +7987,30 @@ output:
                     start: 24
                     end: 30
           operation: hour
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.Call] hour()'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 24
             end: 30
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 4
           fixedlabels: true
-          isdead: false
           alwaysreturns: true
           knownreturn: false
           isconditional: true
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 1
         end: 14
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 4
       fixedlabels: true
-      isdead: false
       alwaysreturns: true
       knownreturn: false
       isconditional: true
@@ -8915,22 +8023,18 @@ output:
                 start: 39
                 end: 45
       operation: vector
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.Call] vector(1)'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 39
         end: 48
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 1
       type: 4
       fixedlabels: true
-      isdead: false
       alwaysreturns: true
       knownreturn: true
       isconditional: false
@@ -8990,7 +8094,6 @@ output:
                 start: 5
                 end: 8
       operation: sum
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] errors_total'
@@ -8999,37 +8102,30 @@ output:
       joins:
         - labels: {}
           operation: ""
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.VectorSelector] server_errors_total'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 94
             end: 113
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 3
           fixedlabels: false
-          isdead: false
           alwaysreturns: false
           knownreturn: false
           isconditional: false
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 30
         end: 46
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false
@@ -9042,22 +8138,18 @@ expr: 1 - (foo or vector(0)) < 0.999
 output:
     - labels: {}
       operation: many-to-many
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 5
         end: 8
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 3
       fixedlabels: false
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: true
@@ -9070,22 +8162,22 @@ output:
                 start: 12
                 end: 18
       operation: vector
-      isdeadreason: this query always evaluates to `1 < 0.999` which is not possible, so it will never return anything
       returns: vector
       operations:
         - '[*parser.Call] vector(0)'
       joins: []
       unless: []
+      deadinfo:
+        reason: this query always evaluates to `1 < 0.999` which is not possible, so it will never return anything
+        fragment:
+            start: 12
+            end: 21
       position:
-        start: 12
-        end: 21
-      isdeadposition:
         start: 12
         end: 21
       returnednumber: 1
       type: 4
       fixedlabels: true
-      isdead: true
       alwaysreturns: true
       knownreturn: true
       isconditional: true
@@ -9107,7 +8199,6 @@ output:
                 start: 5
                 end: 11
       operation: vector
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.Call] vector(1)'
@@ -9120,37 +8211,30 @@ output:
                     start: 19
                     end: 26
           operation: month
-          isdeadreason: ""
           returns: vector
           operations:
             - '[*parser.Call] month()'
           joins: []
           unless: []
+          deadinfo: null
           position:
             start: 19
             end: 26
-          isdeadposition:
-            start: 0
-            end: 0
           returnednumber: 0
           type: 4
           fixedlabels: true
-          isdead: false
           alwaysreturns: true
           knownreturn: false
           isconditional: true
           isreturnbool: false
       unless: []
+      deadinfo: null
       position:
         start: 5
         end: 14
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 1
       type: 4
       fixedlabels: true
-      isdead: false
       alwaysreturns: true
       knownreturn: true
       isconditional: true
@@ -9163,22 +8247,18 @@ output:
                 start: 37
                 end: 43
       operation: vector
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.Call] vector(0)'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 37
         end: 46
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 4
       fixedlabels: true
-      isdead: false
       alwaysreturns: true
       knownreturn: true
       isconditional: false
@@ -9215,7 +8295,6 @@ output:
                 start: 6
                 end: 9
       operation: count
-      isdeadreason: ""
       returns: vector
       operations:
         - '[*parser.VectorSelector] error_total'
@@ -9223,16 +8302,13 @@ output:
         - '[*parser.AggregateExpr] count by (region) (stddev by (colo_name, region) (error_total))'
       joins: []
       unless: []
+      deadinfo: null
       position:
         start: 50
         end: 61
-      isdeadposition:
-        start: 0
-        end: 0
       returnednumber: 0
       type: 5
       fixedlabels: true
-      isdead: false
       alwaysreturns: false
       knownreturn: false
       isconditional: false

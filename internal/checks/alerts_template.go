@@ -513,7 +513,7 @@ func (c TemplateCheck) checkQueryLabels(group *parser.Group, rule parser.Rule, l
 					goto NEXT
 				}
 				for _, s := range src {
-					if s.IsDead {
+					if s.DeadInfo != nil {
 						continue
 					}
 					if !s.CanHaveLabel(v.value[1]) {
