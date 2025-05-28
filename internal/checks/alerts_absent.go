@@ -13,6 +13,7 @@ import (
 	"github.com/cloudflare/pint/internal/promapi"
 
 	"github.com/prometheus/common/model"
+	promParser "github.com/prometheus/prometheus/promql/parser"
 )
 
 const (
@@ -97,12 +98,14 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, entry discovery.Entry, _ [
 
 	for _, s := range absentSources {
 		var summary string
+
+		call, _ := utils.MostOuterOperation[*promParser.Call](s)
 		dgs := []diags.Diagnostic{
 			{
 				Message:     "Using `absent()` might cause false positive alerts when Prometheus restarts.",
 				Pos:         entry.Rule.AlertingRule.Expr.Value.Pos,
-				FirstColumn: int(s.Call.PosRange.Start) + 1,
-				LastColumn:  int(s.Call.PosRange.End),
+				FirstColumn: int(call.PosRange.Start) + 1,
+				LastColumn:  int(call.PosRange.End),
 				Kind:        diags.Issue,
 			},
 		}

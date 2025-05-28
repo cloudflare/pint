@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	promParser "github.com/prometheus/prometheus/promql/parser"
+
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser/utils"
@@ -118,13 +120,13 @@ func (c AggregationCheck) Check(_ context.Context, entry discovery.Entry, _ []di
 		}
 		if !c.keep && src.CanHaveLabel(c.label) {
 			posrange := src.Position
-			if src.Aggregation != nil {
-				posrange = src.Aggregation.PosRange
-				if len(src.Aggregation.Grouping) != 0 {
-					if src.Aggregation.Without {
-						posrange = utils.FindPosition(expr.Value.Value, src.Aggregation.PosRange, "without")
+			if aggr, ok := utils.MostOuterOperation[*promParser.AggregateExpr](src); ok {
+				posrange = aggr.PosRange
+				if len(aggr.Grouping) != 0 {
+					if aggr.Without {
+						posrange = utils.FindPosition(expr.Value.Value, aggr.PosRange, "without")
 					} else {
-						posrange = utils.FindPosition(expr.Value.Value, src.Aggregation.PosRange, "by")
+						posrange = utils.FindPosition(expr.Value.Value, aggr.PosRange, "by")
 					}
 				}
 			}

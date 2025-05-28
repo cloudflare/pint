@@ -40,16 +40,34 @@ type LabelTransform struct {
 	Kind     LabelPromiseType
 }
 
+type SourceOperations []promParser.Node
+
+func (so SourceOperations) MarshalYAML() (any, error) {
+	ops := make([]string, 0, len(so))
+	for _, o := range so {
+		ops = append(ops, fmt.Sprintf("[%T] %s", o, o.String()))
+	}
+	return ops, nil
+}
+
+func MostOuterOperation[T promParser.Node](s Source) (T, bool) {
+	for i := len(s.Operations) - 1; i >= 0; i-- {
+		op := s.Operations[i]
+		if o, ok := op.(T); ok {
+			return o, true
+		}
+	}
+	return *new(T), false
+}
+
 // FIXME remove Selector/Call/Aggregation?
 // Use a single parser.Node instead?
 type Source struct {
-	Selector       *promParser.VectorSelector `yaml:"-"` // Vector selector used for this source.
-	Call           *promParser.Call           `yaml:"-"` // Most outer call used inside this source.
-	Aggregation    *promParser.AggregateExpr  `yaml:"-"` // Most outer aggregation expression used inside this source.
 	Labels         map[string]LabelTransform
 	Operation      string
 	IsDeadReason   string
 	Returns        promParser.ValueType
+	Operations     SourceOperations
 	Joins          []Source // Any other sources this source joins with.
 	Unless         []Source // Any other sources this source is suppressed by.
 	Position       posrange.PositionRange
@@ -64,19 +82,25 @@ type Source struct {
 	IsReturnBool   bool // True if this source uses the 'bool' modifier.
 }
 
+// FIXME remove this
 func (s Source) Fragment(expr string) string {
-	switch {
-	case s.Type == FuncSource && s.Call != nil:
-		return GetQueryFragment(expr, s.Call.PosRange)
-	case s.Call != nil:
-		return GetQueryFragment(expr, s.Call.PosRange)
-	case s.Type == AggregateSource && s.Aggregation != nil:
-		return GetQueryFragment(expr, s.Aggregation.PosRange)
-	case s.Selector != nil:
-		return GetQueryFragment(expr, s.Selector.PosRange)
-	default:
-		return ""
+	for i := len(s.Operations) - 1; i >= 0; i-- {
+		op := s.Operations[i]
+		switch n := op.(type) {
+		case *promParser.Call:
+			if s.Type == FuncSource {
+				return GetQueryFragment(expr, n.PosRange)
+			}
+		case *promParser.AggregateExpr:
+			if s.Type == AggregateSource {
+				return GetQueryFragment(expr, n.PosRange)
+			}
+		}
 	}
+	if vs, ok := MostOuterOperation[*promParser.VectorSelector](s); ok {
+		return GetQueryFragment(expr, vs.PosRange)
+	}
+	return ""
 }
 
 func (s Source) CanHaveLabel(name string) bool {
@@ -96,7 +120,6 @@ func (s Source) TransformedLabels(kinds ...LabelPromiseType) []string {
 	for name, l := range s.Labels {
 		if slices.Contains(kinds, l.Kind) {
 			names = append(names, name)
-
 		}
 	}
 	return names
@@ -266,7 +289,7 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 	case *promParser.VectorSelector:
 		s.Type = SelectorSource
 		s.Returns = promParser.ValueTypeVector
-		s.Selector = n
+		s.Operations = append(s.Operations, n)
 		s.guaranteeLabel(
 			"Query will only return series where these labels are present.",
 			n.PosRange,
@@ -335,7 +358,7 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 	switch n.Op {
 	case promParser.SUM:
 		for _, s = range parseAggregation(expr, n) {
-			s.Aggregation = n
+			s.Operations = append(s.Operations, n)
 			s.Operation = "sum"
 			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
 				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
@@ -344,7 +367,7 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 		}
 	case promParser.MIN:
 		for _, s = range parseAggregation(expr, n) {
-			s.Aggregation = n
+			s.Operations = append(s.Operations, n)
 			s.Operation = "min"
 			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
 				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
@@ -353,7 +376,7 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 		}
 	case promParser.MAX:
 		for _, s = range parseAggregation(expr, n) {
-			s.Aggregation = n
+			s.Operations = append(s.Operations, n)
 			s.Operation = "max"
 			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
 				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
@@ -362,7 +385,7 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 		}
 	case promParser.AVG:
 		for _, s = range parseAggregation(expr, n) {
-			s.Aggregation = n
+			s.Operations = append(s.Operations, n)
 			s.Operation = "avg"
 			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
 				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
@@ -371,7 +394,7 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 		}
 	case promParser.GROUP:
 		for _, s = range parseAggregation(expr, n) {
-			s.Aggregation = n
+			s.Operations = append(s.Operations, n)
 			s.Operation = "group"
 			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
 				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
@@ -380,7 +403,7 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 		}
 	case promParser.STDDEV:
 		for _, s = range parseAggregation(expr, n) {
-			s.Aggregation = n
+			s.Operations = append(s.Operations, n)
 			s.Operation = "stddev"
 			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
 				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
@@ -389,7 +412,7 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 		}
 	case promParser.STDVAR:
 		for _, s = range parseAggregation(expr, n) {
-			s.Aggregation = n
+			s.Operations = append(s.Operations, n)
 			s.Operation = "stdvar"
 			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
 				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
@@ -398,7 +421,7 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 		}
 	case promParser.COUNT:
 		for _, s = range parseAggregation(expr, n) {
-			s.Aggregation = n
+			s.Operations = append(s.Operations, n)
 			s.Operation = "count"
 			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
 				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
@@ -407,7 +430,7 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 		}
 	case promParser.COUNT_VALUES:
 		for _, s = range parseAggregation(expr, n) {
-			s.Aggregation = n
+			s.Operations = append(s.Operations, n)
 			s.Operation = "count_values"
 			// Param is the label to store the count value in.
 			s.guaranteeLabel(
@@ -422,7 +445,7 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 		}
 	case promParser.QUANTILE:
 		for _, s = range parseAggregation(expr, n) {
-			s.Aggregation = n
+			s.Operations = append(s.Operations, n)
 			s.Operation = "quantile"
 			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
 				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
@@ -432,14 +455,14 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 	case promParser.TOPK:
 		for _, s = range walkNode(expr, n.Expr) {
 			s.Type = AggregateSource
-			s.Aggregation = n
+			s.Operations = append(s.Operations, n)
 			s.Operation = "topk"
 			src = append(src, s)
 		}
 	case promParser.BOTTOMK:
 		for _, s = range walkNode(expr, n.Expr) {
 			s.Type = AggregateSource
-			s.Aggregation = n
+			s.Operations = append(s.Operations, n)
 			s.Operation = "bottomk"
 			src = append(src, s)
 		}
@@ -496,42 +519,47 @@ func parsePromQLFunc(s Source, expr string, n *promParser.Call) Source {
 	case "abs", "sgn", "acos", "acosh", "asin", "asinh", "atan", "atanh", "cos", "cosh", "sin", "sinh", "tan", "tanh":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
+		vs, _ := MostOuterOperation[*promParser.VectorSelector](s)
 		s.guaranteeLabel(
 			"Query will only return series where these labels are present.",
 			n.PosRange,
-			labelsFromSelectors(guaranteedLabelsMatches, s.Selector)...,
+			labelsFromSelectors(guaranteedLabelsMatches, vs)...,
 		)
 
 	case "ceil", "floor", "round":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
+		vs, _ := MostOuterOperation[*promParser.VectorSelector](s)
 		s.guaranteeLabel(
 			"Query will only return series where these labels are present.",
 			n.PosRange,
-			labelsFromSelectors(guaranteedLabelsMatches, s.Selector)...,
+			labelsFromSelectors(guaranteedLabelsMatches, vs)...,
 		)
 
 	case "changes", "resets":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
+		vs, _ := MostOuterOperation[*promParser.VectorSelector](s)
 		s.guaranteeLabel(
 			"Query will only return series where these labels are present.",
 			n.PosRange,
-			labelsFromSelectors(guaranteedLabelsMatches, s.Selector)...,
+			labelsFromSelectors(guaranteedLabelsMatches, vs)...,
 		)
 
 	case "clamp", "clamp_max", "clamp_min":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
+		vs, _ := MostOuterOperation[*promParser.VectorSelector](s)
 		s.guaranteeLabel(
 			"Query will only return series where these labels are present.",
 			n.PosRange,
-			labelsFromSelectors(guaranteedLabelsMatches, s.Selector)...,
+			labelsFromSelectors(guaranteedLabelsMatches, vs)...,
 		)
 
 	case "absent", "absent_over_time":
 		s.Returns = promParser.ValueTypeVector
-		names := labelsFromSelectors([]labels.MatchType{labels.MatchEqual}, s.Selector)
+		vs, _ := MostOuterOperation[*promParser.VectorSelector](s)
+		names := labelsFromSelectors([]labels.MatchType{labels.MatchEqual}, vs)
 		s.excludeAllLabels(
 			fmt.Sprintf(`The [%s()](https://prometheus.io/docs/prometheus/latest/querying/functions/#%s) function is used to check if provided query doesn't match any time series.
 You will only get any results back if the metric selector you pass doesn't match anything.
@@ -551,17 +579,18 @@ If you're hoping to get instance specific labels this way and alert when some ta
 	case "avg_over_time", "count_over_time", "last_over_time", "max_over_time", "min_over_time", "present_over_time", "quantile_over_time", "stddev_over_time", "stdvar_over_time", "sum_over_time":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
+		vs, _ := MostOuterOperation[*promParser.VectorSelector](s)
 		s.guaranteeLabel(
 			"Query will only return series where these labels are present.",
 			n.PosRange,
-			labelsFromSelectors(guaranteedLabelsMatches, s.Selector)...,
+			labelsFromSelectors(guaranteedLabelsMatches, vs)...,
 		)
 
 	case "days_in_month", "day_of_month", "day_of_week", "day_of_year", "hour", "minute", "month", "year":
 		s.Returns = promParser.ValueTypeVector
 		// No labels if we don't pass any arguments.
 		// Otherwise no change to labels.
-		if len(s.Call.Args) == 0 {
+		if len(n.Args) == 0 {
 			s.AlwaysReturns = true
 			s.excludeAllLabels(
 				fmt.Sprintf("Calling `%s()` with no arguments will return an empty time series with no labels.",
@@ -570,46 +599,51 @@ If you're hoping to get instance specific labels this way and alert when some ta
 				nil,
 			)
 		} else {
+			vs, _ := MostOuterOperation[*promParser.VectorSelector](s)
 			s.guaranteeLabel(
 				"Query will only return series where these labels are present.",
 				n.PosRange,
-				labelsFromSelectors(guaranteedLabelsMatches, s.Selector)...,
+				labelsFromSelectors(guaranteedLabelsMatches, vs)...,
 			)
 		}
 
 	case "deg", "rad", "ln", "log10", "log2", "sqrt", "exp":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
+		vs, _ := MostOuterOperation[*promParser.VectorSelector](s)
 		s.guaranteeLabel(
 			"Query will only return series where these labels are present.",
 			n.PosRange,
-			labelsFromSelectors(guaranteedLabelsMatches, s.Selector)...,
+			labelsFromSelectors(guaranteedLabelsMatches, vs)...,
 		)
 	case "delta", "idelta", "increase", "deriv", "irate", "rate":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
+		vs, _ := MostOuterOperation[*promParser.VectorSelector](s)
 		s.guaranteeLabel(
 			"Query will only return series where these labels are present.",
 			n.PosRange,
-			labelsFromSelectors(guaranteedLabelsMatches, s.Selector)...,
+			labelsFromSelectors(guaranteedLabelsMatches, vs)...,
 		)
 
 	case "histogram_avg", "histogram_count", "histogram_sum", "histogram_stddev", "histogram_stdvar", "histogram_fraction", "histogram_quantile":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
+		vs, _ := MostOuterOperation[*promParser.VectorSelector](s)
 		s.guaranteeLabel(
 			"Query will only return series where these labels are present.",
 			n.PosRange,
-			labelsFromSelectors(guaranteedLabelsMatches, s.Selector)...,
+			labelsFromSelectors(guaranteedLabelsMatches, vs)...,
 		)
 
 	case "holt_winters", "predict_linear":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
+		vs, _ := MostOuterOperation[*promParser.VectorSelector](s)
 		s.guaranteeLabel(
 			"Query will only return series where these labels are present.",
 			n.PosRange,
-			labelsFromSelectors(guaranteedLabelsMatches, s.Selector)...,
+			labelsFromSelectors(guaranteedLabelsMatches, vs)...,
 		)
 	case "label_replace", "label_join":
 		// One label added to the results.
@@ -654,10 +688,11 @@ If you're hoping to get instance specific labels this way and alert when some ta
 	case "timestamp":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
+		vs, _ := MostOuterOperation[*promParser.VectorSelector](s)
 		s.guaranteeLabel(
 			"Query will only return series where these labels are present.",
 			n.PosRange,
-			labelsFromSelectors(guaranteedLabelsMatches, s.Selector)...,
+			labelsFromSelectors(guaranteedLabelsMatches, vs)...,
 		)
 
 	case "vector":
@@ -677,8 +712,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 
 	default:
 		// Unsupported function
-		s.Returns = promParser.ValueTypeNone
-		s.Call = nil
+		return Source{}
 	}
 	return s
 }
@@ -697,7 +731,7 @@ func parseCall(expr string, n *promParser.Call) (src []Source) {
 			for _, es := range walkNode(expr, e) {
 				es.Type = FuncSource
 				es.Operation = n.Func.Name
-				es.Call = n
+				es.Operations = append(es.Operations, n)
 				es.Position = e.PositionRange()
 				src = append(src, parsePromQLFunc(es, expr, n))
 			}
@@ -709,7 +743,7 @@ func parseCall(expr string, n *promParser.Call) (src []Source) {
 		var s Source
 		s.Type = FuncSource
 		s.Operation = n.Func.Name
-		s.Call = n
+		s.Operations = append(s.Operations, n)
 		s.Position = n.PosRange
 		src = append(src, parsePromQLFunc(s, expr, n))
 	}

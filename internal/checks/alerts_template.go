@@ -202,13 +202,14 @@ func (c TemplateCheck) checkHumanizeIsNeeded(expr parser.PromQLExpr, ann *parser
 		return problems
 	}
 	for _, src := range utils.LabelsSource(expr.Value.Value, expr.Query.Expr) {
-		if src.Call != nil && isRateResult(src) {
+		call := isRateResult(src)
+		if call != nil {
 			dgs := []diags.Diagnostic{
 				{
-					Message:     fmt.Sprintf("`%s()` will produce results that are hard to read for humans.", src.Call.Func.Name),
+					Message:     fmt.Sprintf("`%s()` will produce results that are hard to read for humans.", call.Func.Name),
 					Pos:         expr.Value.Pos,
-					FirstColumn: int(src.Call.PosRange.Start) + 1,
-					LastColumn:  int(src.Call.PosRange.End),
+					FirstColumn: int(call.PosRange.Start) + 1,
+					LastColumn:  int(call.PosRange.End),
 					Kind:        diags.Context,
 				},
 			}
@@ -244,18 +245,24 @@ func (c TemplateCheck) checkHumanizeIsNeeded(expr parser.PromQLExpr, ann *parser
 	return problems
 }
 
-func isRateResult(src utils.Source) bool {
+func isRateResult(src utils.Source) *promParser.Call {
 	if src.Type == utils.AggregateSource {
 		switch src.Operation {
 		case "count", "count_values", "group":
-			return false
+			return nil
 		}
 	}
-	switch src.Call.Func.Name {
+
+	call, ok := utils.MostOuterOperation[*promParser.Call](src)
+	if !ok {
+		return nil
+	}
+
+	switch call.Func.Name {
 	case "rate", "irate", "deriv":
-		return true
+		return call
 	default:
-		return false
+		return nil
 	}
 }
 

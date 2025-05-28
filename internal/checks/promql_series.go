@@ -954,14 +954,14 @@ func getNonFallbackSelectors(n parser.PromQLExpr) (selectors []*promParser.Vecto
 	hasVectorFallback := sourceHasFallback(sources)
 	for _, ls := range sources {
 		if !hasVectorFallback {
-			if ls.Selector != nil {
-				selectors = append(selectors, selectorWithoutOffset(ls.Selector))
+			if vs, ok := utils.MostOuterOperation[*promParser.VectorSelector](ls); ok {
+				selectors = append(selectors, selectorWithoutOffset(vs))
 			}
 		}
 		if !joinHasFallback(ls.Joins) {
 			for _, js := range ls.Joins {
-				if js.Selector != nil {
-					selectors = append(selectors, selectorWithoutOffset(js.Selector))
+				if vs, ok := utils.MostOuterOperation[*promParser.VectorSelector](js); ok {
+					selectors = append(selectors, selectorWithoutOffset(vs))
 				}
 			}
 		}
@@ -969,8 +969,8 @@ func getNonFallbackSelectors(n parser.PromQLExpr) (selectors []*promParser.Vecto
 			if !us.IsConditional {
 				continue
 			}
-			if us.Selector != nil {
-				selectors = append(selectors, selectorWithoutOffset(us.Selector))
+			if vs, ok := utils.MostOuterOperation[*promParser.VectorSelector](us); ok {
+				selectors = append(selectors, selectorWithoutOffset(vs))
 			}
 		}
 	}

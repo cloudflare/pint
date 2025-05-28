@@ -324,7 +324,10 @@ func TestLabelsSourceCallCoverage(t *testing.T) {
 			}
 			output := utils.LabelsSource(b.String(), n.Expr)
 			require.Len(t, output, 1)
-			require.NotNil(t, output[0].Call, "no call detected in: %q ~> %+v", b.String(), output)
+			require.NotEmpty(t, output[0].Operations)
+			call, ok := utils.MostOuterOperation[*promParser.Call](output[0])
+			require.True(t, ok, "no call found in operations for: %q ~> %+v", b.String(), output)
+			require.NotNil(t, call, "no call detected in: %q ~> %+v", b.String(), output)
 			require.Equal(t, name, output[0].Operation)
 			require.Equal(t, def.ReturnType, output[0].Returns, "incorrect return type on Source{}")
 		})
@@ -341,7 +344,9 @@ func TestLabelsSourceCallCoverageFail(t *testing.T) {
 	}
 	output := utils.LabelsSource("fake_call()", n.Expr)
 	require.Len(t, output, 1)
-	require.Nil(t, output[0].Call, "no call should have been detected in fake function")
+	call, ok := utils.MostOuterOperation[*promParser.Call](output[0])
+	require.False(t, ok, "no call should have been detected in fake function, got: %v", ok)
+	require.Nil(t, call, "no call should have been detected in fake function, got: %+v", call)
 }
 
 func TestSourceFragment(t *testing.T) {
