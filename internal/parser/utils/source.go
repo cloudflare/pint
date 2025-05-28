@@ -83,7 +83,6 @@ type Source struct {
 	IsReturnBool   bool // True if this source uses the 'bool' modifier.
 }
 
-// FIXME remove this
 func (s Source) Fragment(expr string) string {
 	for i := len(s.Operations) - 1; i >= 0; i-- {
 		op := s.Operations[i]
