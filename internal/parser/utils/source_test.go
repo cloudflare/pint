@@ -1,8 +1,9 @@
 package utils_test
 
 import (
-	"fmt"
 	"os"
+	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 	"testing"
@@ -249,6 +250,10 @@ sum by (foo, bar) (
 		Output []utils.Source
 	}
 
+	_, file, _, ok := runtime.Caller(0)
+	require.True(t, ok, "can't get caller function")
+	file = strings.TrimSuffix(filepath.Base(file), ".go")
+
 	done := map[string]struct{}{}
 	for i, expr := range testCases {
 		t.Run(strconv.Itoa(i+1), func(t *testing.T) {
@@ -279,7 +284,7 @@ sum by (foo, bar) (
 			}
 			d, err := yaml.Marshal(snap)
 			require.NoError(t, err, "failed to YAML encode snapshots")
-			snaps.WithConfig(snaps.Dir("tests"), snaps.Filename(fmt.Sprintf("%04d", i+1))).MatchSnapshot(t, string(d))
+			snaps.WithConfig(snaps.Dir("."), snaps.Filename(file)).MatchSnapshot(t, string(d))
 		})
 	}
 }
