@@ -73,13 +73,13 @@
       expr: 0 > bool 0
   output: |
     3 |   expr: 0 > bool 0
-                ^ this query always evaluates to `0 > 0` which is not possible, so it will never return anything
+                ^ `0 > 0` always evaluates to `0 > 0` and uses the `bool` modifier which means it will always return 0
   problem:
     reporter: promql/impossible
     summary: dead code in query
     details: ""
     diagnostics:
-        - message: this query always evaluates to `0 > 0` which is not possible, so it will never return anything
+        - message: '`0 > 0` always evaluates to `0 > 0` and uses the `bool` modifier which means it will always return 0'
           pos:
             - line: 3
               firstcolumn: 9
@@ -120,6 +120,375 @@
     lines:
         first: 4
         last: 4
+    severity: 1
+    anchor: 0
+
+---
+
+[TestImpossibleCheck/complex_query_with_or_vector() - 1]
+- description: complex query with or vector()
+  content: |4
+      - alert: Foo
+        expr: |
+          (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
+            (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
+          > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
+            avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
+          # Multi-line comment
+          # inside the query
+          and on (colo_name)
+            (colo_job:foo_total:rate2m or vector(0)) > 80
+          and on (colo_name)
+            (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
+        annotations:
+          summary: High rejectsion rate in {{ $labels.colo_name }}
+  output: |4
+     4 |       (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
+     5 |         (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
+     6 |       > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
+     7 |         avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
+     8 |       # Multi-line comment
+     9 |       # inside the query
+    10 |       and on (colo_name)
+    11 |         (colo_job:foo_total:rate2m or vector(0)) > 80
+                                               ^^^^^^ The right hand side will never be matched because it doesn't have the `colo_name` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
+    12 |       and on (colo_name)
+    13 |         (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
+  problem:
+    reporter: promql/impossible
+    summary: dead code in query
+    details: ""
+    diagnostics:
+        - message: The right hand side will never be matched because it doesn't have the `colo_name` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
+          pos:
+            - line: 4
+              firstcolumn: 7
+              lastcolumn: 67
+            - line: 5
+              firstcolumn: 7
+              lastcolumn: 64
+            - line: 6
+              firstcolumn: 7
+              lastcolumn: 83
+            - line: 7
+              firstcolumn: 7
+              lastcolumn: 72
+            - line: 8
+              firstcolumn: 7
+              lastcolumn: 27
+            - line: 9
+              firstcolumn: 7
+              lastcolumn: 25
+            - line: 10
+              firstcolumn: 7
+              lastcolumn: 25
+            - line: 11
+              firstcolumn: 7
+              lastcolumn: 54
+            - line: 12
+              firstcolumn: 7
+              lastcolumn: 25
+            - line: 13
+              firstcolumn: 7
+              lastcolumn: 63
+          firstcolumn: 354
+          lastcolumn: 359
+          kind: 0
+    lines:
+        first: 4
+        last: 13
+    severity: 1
+    anchor: 0
+- description: complex query with or vector()
+  content: |4
+      - alert: Foo
+        expr: |
+          (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
+            (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
+          > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
+            avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
+          # Multi-line comment
+          # inside the query
+          and on (colo_name)
+            (colo_job:foo_total:rate2m or vector(0)) > 80
+          and on (colo_name)
+            (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
+        annotations:
+          summary: High rejectsion rate in {{ $labels.colo_name }}
+  output: |4
+     4 |       (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
+     5 |         (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
+     6 |       > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
+     7 |         avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
+     8 |       # Multi-line comment
+     9 |       # inside the query
+    10 |       and on (colo_name)
+    11 |         (colo_job:foo_total:rate2m or vector(0)) > 80
+    12 |       and on (colo_name)
+    13 |         (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
+                                                         ^^^^^^ The right hand side will never be matched because it doesn't have the `colo_name` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
+  problem:
+    reporter: promql/impossible
+    summary: dead code in query
+    details: ""
+    diagnostics:
+        - message: The right hand side will never be matched because it doesn't have the `colo_name` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
+          pos:
+            - line: 4
+              firstcolumn: 7
+              lastcolumn: 67
+            - line: 5
+              firstcolumn: 7
+              lastcolumn: 64
+            - line: 6
+              firstcolumn: 7
+              lastcolumn: 83
+            - line: 7
+              firstcolumn: 7
+              lastcolumn: 72
+            - line: 8
+              firstcolumn: 7
+              lastcolumn: 27
+            - line: 9
+              firstcolumn: 7
+              lastcolumn: 25
+            - line: 10
+              firstcolumn: 7
+              lastcolumn: 25
+            - line: 11
+              firstcolumn: 7
+              lastcolumn: 54
+            - line: 12
+              firstcolumn: 7
+              lastcolumn: 25
+            - line: 13
+              firstcolumn: 7
+              lastcolumn: 63
+          firstcolumn: 431
+          lastcolumn: 436
+          kind: 0
+    lines:
+        first: 4
+        last: 13
+    severity: 1
+    anchor: 0
+- description: complex query with or vector()
+  content: |4
+      - alert: Foo
+        expr: |
+          (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
+            (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
+          > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
+            avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
+          # Multi-line comment
+          # inside the query
+          and on (colo_name)
+            (colo_job:foo_total:rate2m or vector(0)) > 80
+          and on (colo_name)
+            (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
+        annotations:
+          summary: High rejectsion rate in {{ $labels.colo_name }}
+  output: |4
+     4 |       (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
+                                                ^^^^^^^^^ `vector(0) / vector(1) > 5 * vector(0) / vector(1)` always evaluates to `0 > 0` which is not possible, so it will never return anything
+     5 |         (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
+     6 |       > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
+     7 |         avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
+     8 |       # Multi-line comment
+     9 |       # inside the query
+    10 |       and on (colo_name)
+    11 |         (colo_job:foo_total:rate2m or vector(0)) > 80
+    12 |       and on (colo_name)
+    13 |         (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
+  problem:
+    reporter: promql/impossible
+    summary: dead code in query
+    details: ""
+    diagnostics:
+        - message: '`vector(0) / vector(1) > 5 * vector(0) / vector(1)` always evaluates to `0 > 0` which is not possible, so it will never return anything'
+          pos:
+            - line: 4
+              firstcolumn: 7
+              lastcolumn: 67
+            - line: 5
+              firstcolumn: 7
+              lastcolumn: 64
+            - line: 6
+              firstcolumn: 7
+              lastcolumn: 83
+            - line: 7
+              firstcolumn: 7
+              lastcolumn: 72
+            - line: 8
+              firstcolumn: 7
+              lastcolumn: 27
+            - line: 9
+              firstcolumn: 7
+              lastcolumn: 25
+            - line: 10
+              firstcolumn: 7
+              lastcolumn: 25
+            - line: 11
+              firstcolumn: 7
+              lastcolumn: 54
+            - line: 12
+              firstcolumn: 7
+              lastcolumn: 25
+            - line: 13
+              firstcolumn: 7
+              lastcolumn: 63
+          firstcolumn: 34
+          lastcolumn: 42
+          kind: 0
+    lines:
+        first: 4
+        last: 13
+    severity: 1
+    anchor: 0
+- description: complex query with or vector()
+  content: |4
+      - alert: Foo
+        expr: |
+          (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
+            (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
+          > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
+            avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
+          # Multi-line comment
+          # inside the query
+          and on (colo_name)
+            (colo_job:foo_total:rate2m or vector(0)) > 80
+          and on (colo_name)
+            (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
+        annotations:
+          summary: High rejectsion rate in {{ $labels.colo_name }}
+  output: |4
+     4 |       (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
+     5 |         (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
+     6 |       > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
+     7 |         avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
+     8 |       # Multi-line comment
+     9 |       # inside the query
+    10 |       and on (colo_name)
+    11 |         (colo_job:foo_total:rate2m or vector(0)) > 80
+                                               ^^^^^^ The right hand side will never be matched because it doesn't have the `colo_name` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
+    12 |       and on (colo_name)
+    13 |         (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
+  problem:
+    reporter: promql/impossible
+    summary: dead code in query
+    details: ""
+    diagnostics:
+        - message: The right hand side will never be matched because it doesn't have the `colo_name` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
+          pos:
+            - line: 4
+              firstcolumn: 7
+              lastcolumn: 67
+            - line: 5
+              firstcolumn: 7
+              lastcolumn: 64
+            - line: 6
+              firstcolumn: 7
+              lastcolumn: 83
+            - line: 7
+              firstcolumn: 7
+              lastcolumn: 72
+            - line: 8
+              firstcolumn: 7
+              lastcolumn: 27
+            - line: 9
+              firstcolumn: 7
+              lastcolumn: 25
+            - line: 10
+              firstcolumn: 7
+              lastcolumn: 25
+            - line: 11
+              firstcolumn: 7
+              lastcolumn: 54
+            - line: 12
+              firstcolumn: 7
+              lastcolumn: 25
+            - line: 13
+              firstcolumn: 7
+              lastcolumn: 63
+          firstcolumn: 354
+          lastcolumn: 359
+          kind: 0
+    lines:
+        first: 4
+        last: 13
+    severity: 1
+    anchor: 0
+- description: complex query with or vector()
+  content: |4
+      - alert: Foo
+        expr: |
+          (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
+            (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
+          > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
+            avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
+          # Multi-line comment
+          # inside the query
+          and on (colo_name)
+            (colo_job:foo_total:rate2m or vector(0)) > 80
+          and on (colo_name)
+            (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
+        annotations:
+          summary: High rejectsion rate in {{ $labels.colo_name }}
+  output: |4
+     4 |       (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
+     5 |         (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
+     6 |       > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
+     7 |         avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
+     8 |       # Multi-line comment
+     9 |       # inside the query
+    10 |       and on (colo_name)
+    11 |         (colo_job:foo_total:rate2m or vector(0)) > 80
+    12 |       and on (colo_name)
+    13 |         (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
+                                                         ^^^^^^ The right hand side will never be matched because it doesn't have the `colo_name` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
+  problem:
+    reporter: promql/impossible
+    summary: dead code in query
+    details: ""
+    diagnostics:
+        - message: The right hand side will never be matched because it doesn't have the `colo_name` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
+          pos:
+            - line: 4
+              firstcolumn: 7
+              lastcolumn: 67
+            - line: 5
+              firstcolumn: 7
+              lastcolumn: 64
+            - line: 6
+              firstcolumn: 7
+              lastcolumn: 83
+            - line: 7
+              firstcolumn: 7
+              lastcolumn: 72
+            - line: 8
+              firstcolumn: 7
+              lastcolumn: 27
+            - line: 9
+              firstcolumn: 7
+              lastcolumn: 25
+            - line: 10
+              firstcolumn: 7
+              lastcolumn: 25
+            - line: 11
+              firstcolumn: 7
+              lastcolumn: 54
+            - line: 12
+              firstcolumn: 7
+              lastcolumn: 25
+            - line: 13
+              firstcolumn: 7
+              lastcolumn: 63
+          firstcolumn: 431
+          lastcolumn: 436
+          kind: 0
+    lines:
+        first: 4
+        last: 13
     severity: 1
     anchor: 0
 
@@ -247,13 +616,13 @@
       expr: sum(foo or vector(0)) > 0
   output: |
     3 |   expr: sum(foo or vector(0)) > 0
-                           ^^^^^^^^^ this query always evaluates to `0 > 0` which is not possible, so it will never return anything
+                           ^^^^^^^^^ `vector(0) > 0` always evaluates to `0 > 0` which is not possible, so it will never return anything
   problem:
     reporter: promql/impossible
     summary: dead code in query
     details: ""
     diagnostics:
-        - message: this query always evaluates to `0 > 0` which is not possible, so it will never return anything
+        - message: '`vector(0) > 0` always evaluates to `0 > 0` which is not possible, so it will never return anything'
           pos:
             - line: 3
               firstcolumn: 9
@@ -276,13 +645,13 @@
       expr: ((( group(vector(0)) ))) > 0
   output: |
     3 |   expr: ((( group(vector(0)) ))) > 0
-                          ^^^^^^^^^ this query always evaluates to `0 > 0` which is not possible, so it will never return anything
+                          ^^^^^^^^^ `vector(0) > 0` always evaluates to `0 > 0` which is not possible, so it will never return anything
   problem:
     reporter: promql/impossible
     summary: dead code in query
     details: ""
     diagnostics:
-        - message: this query always evaluates to `0 > 0` which is not possible, so it will never return anything
+        - message: '`vector(0) > 0` always evaluates to `0 > 0` which is not possible, so it will never return anything'
           pos:
             - line: 3
               firstcolumn: 9

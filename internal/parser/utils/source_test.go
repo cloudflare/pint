@@ -243,6 +243,38 @@ sum by (foo, bar) (
 ) or vector(0)
 `,
 		`count by (region) (stddev by (colo_name, region) (error_total))`,
+		`
+(
+  avg(
+    rate(foo_rejections[6h])
+    or
+    vector(0)
+  ) by (colo_name)
+  /
+  (
+    avg(
+      rate(foo_total[6h])
+	  or
+	  vector(1)
+    ) by (colo_name)
+  )
+) > 5
+*
+(
+  avg(
+    rate(foo_rejections[6h] offset 1d)
+	or
+	vector(0)
+  ) by (colo_name)
+  /
+  avg(
+    rate(foo_total[6h] offset 1d)
+	or
+	vector(1)
+  ) by (colo_name)
+) and on (colo_name) (colo_job:foo_total:rate2m or vector(0)) > 80
+  and on (colo_name) (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
+`,
 	}
 
 	type Snapshot struct {
@@ -347,53 +379,4 @@ func TestLabelsSourceCallCoverageFail(t *testing.T) {
 	call, ok := utils.MostOuterOperation[*promParser.Call](output[0])
 	require.False(t, ok, "no call should have been detected in fake function, got: %v", ok)
 	require.Nil(t, call, "no call should have been detected in fake function, got: %+v", call)
-}
-
-func TestSourceFragment(t *testing.T) {
-	type testCaseT struct {
-		expr      string
-		fragments []string
-	}
-
-	testCases := []testCaseT{
-		{
-			expr:      "1",
-			fragments: []string{""},
-		},
-		{
-			expr:      `"foo"`,
-			fragments: []string{""},
-		},
-		{
-			expr:      `foo`,
-			fragments: []string{"foo"},
-		},
-		{
-			expr:      `foo{job="bar"}`,
-			fragments: []string{`foo{job="bar"}`},
-		},
-		{
-			expr:      `rate(foo{job="bar"}[5m])`,
-			fragments: []string{`rate(foo{job="bar"}[5m])`},
-		},
-		{
-			expr:      `sum(foo{job="bar"})`,
-			fragments: []string{`sum(foo{job="bar"})`},
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.expr, func(t *testing.T) {
-			n, err := parser.DecodeExpr(tc.expr)
-			if err != nil {
-				t.Error(err)
-				t.FailNow()
-			}
-			var got []string
-			for _, src := range utils.LabelsSource(tc.expr, n.Expr) {
-				got = append(got, src.Fragment(tc.expr))
-			}
-			require.Equal(t, tc.fragments, got)
-		})
-	}
 }

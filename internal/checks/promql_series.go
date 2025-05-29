@@ -933,7 +933,7 @@ func selectorWithoutOffset(vs *promParser.VectorSelector) *promParser.VectorSele
 
 func sourceHasFallback(src []utils.Source) bool {
 	for _, ls := range src {
-		if ls.AlwaysReturns {
+		if ls.ReturnInfo.AlwaysReturns {
 			return true
 		}
 	}
@@ -942,7 +942,7 @@ func sourceHasFallback(src []utils.Source) bool {
 
 func joinHasFallback(src []utils.Source) bool {
 	for _, ls := range src {
-		if ls.AlwaysReturns {
+		if ls.ReturnInfo.AlwaysReturns {
 			return true
 		}
 	}
