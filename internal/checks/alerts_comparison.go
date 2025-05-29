@@ -73,13 +73,13 @@ func (c ComparisonCheck) Check(_ context.Context, entry discovery.Entry, _ []dis
 		}
 
 		switch {
-		case src.AlwaysReturns && !src.IsConditional:
+		case src.ReturnInfo.AlwaysReturns && !src.IsConditional:
 			if len(srcs) == 1 {
 				msg = "This query will always return a result and so this alert will always fire."
 			} else {
 				msg = "If other parts of this query don't return anything then this part will always return a result and so this alert will fire."
 			}
-		case src.IsReturnBool:
+		case src.ReturnInfo.IsReturnBool:
 			msg = "Results of this query are using the `bool` modifier, which means it will always return a result and the alert will always fire."
 		case !src.IsConditional:
 			msg = "This query doesn't have any condition and so this alert will always fire if it matches anything."

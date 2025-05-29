@@ -116,6 +116,28 @@ func TestImpossibleCheck(t *testing.T) {
 			prometheus: newSimpleProm,
 			problems:   true,
 		},
+		{
+			description: "complex query with or vector()",
+			content: `
+  - alert: Foo
+    expr: |
+      (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
+        (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
+      > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
+        avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
+      # Multi-line comment
+      # inside the query
+      and on (colo_name)
+        (colo_job:foo_total:rate2m or vector(0)) > 80
+      and on (colo_name)
+        (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
+    annotations:
+      summary: High rejectsion rate in {{ $labels.colo_name }}
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
 	}
 
 	runTests(t, testCases)

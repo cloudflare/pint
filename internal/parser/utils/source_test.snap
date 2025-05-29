@@ -15,16 +15,21 @@ output:
       operations: []
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 1
+        returnednumber: 1
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: false
       position:
         start: 0
         end: 1
-      returnednumber: 1
       type: number
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: true
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -44,16 +49,21 @@ output:
       operations: []
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: 1 / 5
+        valueposition:
+            start: 0
+            end: 1
+        returnednumber: 0.2
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: false
       position:
         start: 0
         end: 1
-      returnednumber: 0.2
       type: number
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: true
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -68,7 +78,7 @@ output:
                 start: 1
                 end: 2
       deadinfo:
-        reason: this query always evaluates to `32 == 5` which is not possible, so it will never return anything
+        reason: '`2 ^ 5 == 5` always evaluates to `32 == 5` and uses the `bool` modifier which means it will always return 0'
         fragment:
             start: 1
             end: 2
@@ -77,16 +87,21 @@ output:
       operations: []
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: 2 ^ 5
+        valueposition:
+            start: 1
+            end: 2
+        returnednumber: 32
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: true
       position:
         start: 1
         end: 2
-      returnednumber: 32
       type: number
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: true
       isconditional: true
-      isreturnbool: true
 
 ---
 
@@ -101,7 +116,7 @@ output:
                 start: 1
                 end: 2
       deadinfo:
-        reason: this query always evaluates to `3 <= 2` which is not possible, so it will never return anything
+        reason: '`2 ^ 5 + 11 % 5 <= 2` always evaluates to `3 <= 2` and uses the `bool` modifier which means it will always return 0'
         fragment:
             start: 1
             end: 2
@@ -110,16 +125,21 @@ output:
       operations: []
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: 2 ^ 5 + 11 % 5
+        valueposition:
+            start: 1
+            end: 2
+        returnednumber: 3
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: true
       position:
         start: 1
         end: 2
-      returnednumber: 3
       type: number
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: true
       isconditional: true
-      isreturnbool: true
 
 ---
 
@@ -134,7 +154,7 @@ output:
                 start: 1
                 end: 2
       deadinfo:
-        reason: this query always evaluates to `3 >= 20` which is not possible, so it will never return anything
+        reason: '`2 ^ 5 + 11 % 5 >= 20` always evaluates to `3 >= 20` and uses the `bool` modifier which means it will always return 0'
         fragment:
             start: 1
             end: 2
@@ -143,16 +163,21 @@ output:
       operations: []
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: 2 ^ 5 + 11 % 5
+        valueposition:
+            start: 1
+            end: 2
+        returnednumber: 3
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: true
       position:
         start: 1
         end: 2
-      returnednumber: 3
       type: number
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: true
       isconditional: true
-      isreturnbool: true
 
 ---
 
@@ -172,16 +197,21 @@ output:
       operations: []
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: 2 ^ 5 + 11 % 5
+        valueposition:
+            start: 1
+            end: 2
+        returnednumber: 3
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: true
       position:
         start: 1
         end: 2
-      returnednumber: 3
       type: number
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: true
       isconditional: true
-      isreturnbool: true
 
 ---
 
@@ -196,7 +226,7 @@ output:
                 start: 1
                 end: 2
       deadinfo:
-        reason: this query always evaluates to `3 < 1` which is not possible, so it will never return anything
+        reason: '`2 ^ 5 + 11 % 5 < 1` always evaluates to `3 < 1` and uses the `bool` modifier which means it will always return 0'
         fragment:
             start: 1
             end: 2
@@ -205,16 +235,21 @@ output:
       operations: []
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: 2 ^ 5 + 11 % 5
+        valueposition:
+            start: 1
+            end: 2
+        returnednumber: 3
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: true
       position:
         start: 1
         end: 2
-      returnednumber: 3
       type: number
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: true
       isconditional: true
-      isreturnbool: true
 
 ---
 
@@ -229,7 +264,7 @@ output:
                 start: 0
                 end: 2
       deadinfo:
-        reason: this query always evaluates to `5 < 1` which is not possible, so it will never return anything
+        reason: '`20 - 15 < 1` always evaluates to `5 < 1` and uses the `bool` modifier which means it will always return 0'
         fragment:
             start: 0
             end: 2
@@ -238,16 +273,21 @@ output:
       operations: []
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: 20 - 15
+        valueposition:
+            start: 0
+            end: 2
+        returnednumber: 5
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: true
       position:
         start: 0
         end: 2
-      returnednumber: 5
       type: number
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: true
       isconditional: true
-      isreturnbool: true
 
 ---
 
@@ -267,16 +307,21 @@ output:
       operations: []
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: 2 * 5
+        valueposition:
+            start: 0
+            end: 1
+        returnednumber: 10
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: false
       position:
         start: 0
         end: 1
-      returnednumber: 10
       type: number
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: true
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -291,16 +336,21 @@ output:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 1
         end: 4
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
     - labels: {}
       deadinfo: null
       operation: many-to-many
@@ -309,16 +359,21 @@ output:
         - '[*parser.VectorSelector] bar'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 8
         end: 11
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -333,16 +388,21 @@ output:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 1
         end: 4
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
     - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
@@ -357,16 +417,21 @@ output:
         - '[*parser.Call] vector(2)'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: vector(2) * 5
+        valueposition:
+            start: 8
+            end: 17
+        returnednumber: 10
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: false
       position:
         start: 8
         end: 17
-      returnednumber: 10
       type: function
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: true
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -394,16 +459,21 @@ output:
             - '[*parser.Call] vector(2)'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 22
+                end: 31
+            returnednumber: 2
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
           position:
             start: 22
             end: 31
-          returnednumber: 2
           type: function
           fixedlabels: true
-          alwaysreturns: true
-          knownreturn: true
           isconditional: false
-          isreturnbool: false
         - labels: {}
           deadinfo:
             reason: the left hand side always returs something and so the right hand side is never used
@@ -416,27 +486,37 @@ output:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 35
             end: 38
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 1
         end: 4
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
     - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
@@ -464,16 +544,21 @@ output:
             - '[*parser.Call] vector(2)'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 22
+                end: 31
+            returnednumber: 2
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
           position:
             start: 22
             end: 31
-          returnednumber: 2
           type: function
           fixedlabels: true
-          alwaysreturns: true
-          knownreturn: true
           isconditional: false
-          isreturnbool: false
         - labels: {}
           deadinfo:
             reason: the left hand side always returs something and so the right hand side is never used
@@ -486,27 +571,37 @@ output:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 35
             end: 38
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: vector(5) * vector(2)
+        valueposition:
+            start: 8
+            end: 17
+        returnednumber: 10
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: false
       position:
         start: 8
         end: 17
-      returnednumber: 10
       type: function
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: true
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -526,16 +621,21 @@ output:
       operations: []
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 1
+        returnednumber: 1
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: true
       position:
         start: 0
         end: 1
-      returnednumber: 1
       type: number
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: true
       isconditional: true
-      isreturnbool: true
 
 ---
 
@@ -555,16 +655,21 @@ output:
       operations: []
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 2
+        returnednumber: 20
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: true
       position:
         start: 0
         end: 2
-      returnednumber: 20
       type: number
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: true
       isconditional: true
-      isreturnbool: true
 
 ---
 
@@ -584,16 +689,21 @@ output:
       operations: []
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: true
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 6
-      returnednumber: 0
       type: string
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -608,16 +718,21 @@ output:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 3
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -632,16 +747,21 @@ output:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 1
         end: 4
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: true
-      isreturnbool: false
 
 ---
 
@@ -656,16 +776,21 @@ output:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: true
       position:
         start: 0
         end: 3
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: true
-      isreturnbool: true
 
 ---
 
@@ -680,16 +805,21 @@ output:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 3
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: true
-      isreturnbool: false
 
 ---
 
@@ -711,27 +841,37 @@ output:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 11
             end: 14
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: true
       position:
         start: 0
         end: 3
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: true
-      isreturnbool: true
 
 ---
 
@@ -753,27 +893,37 @@ output:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 12
             end: 15
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 1
         end: 4
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: true
-      isreturnbool: false
 
 ---
 
@@ -807,27 +957,37 @@ output:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 24
             end: 27
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: true
       position:
         start: 0
         end: 3
-      returnednumber: 0
       type: selector
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: true
-      isreturnbool: true
 
 ---
 
@@ -861,27 +1021,37 @@ output:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 25
             end: 28
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 1
         end: 4
-      returnednumber: 0
       type: selector
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: true
-      isreturnbool: false
 
 ---
 
@@ -915,27 +1085,37 @@ output:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 44
             end: 47
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: true
       position:
         start: 0
         end: 3
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: true
-      isreturnbool: true
 
 ---
 
@@ -969,27 +1149,37 @@ output:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 0
             end: 3
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: true
       position:
         start: 45
         end: 48
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: true
-      isreturnbool: true
 
 ---
 
@@ -1011,27 +1201,37 @@ output:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: true
           position:
             start: 8
             end: 11
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: true
-          isreturnbool: true
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 3
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: true
-      isreturnbool: false
 
 ---
 
@@ -1046,16 +1246,21 @@ output:
         - '[*parser.VectorSelector] foo offset 5m'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 13
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -1076,16 +1281,21 @@ output:
         - '[*parser.VectorSelector] foo{job="bar"}'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 14
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -1106,16 +1316,21 @@ output:
         - '[*parser.VectorSelector] foo{job=""}'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 11
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -1136,16 +1351,21 @@ output:
         - '[*parser.VectorSelector] foo{job="bar"}'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 14
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
     - labels:
         job:
             reason: Query will only return series where these labels are present.
@@ -1160,16 +1380,21 @@ output:
         - '[*parser.VectorSelector] bar{job="foo"}'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 18
         end: 32
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -1190,16 +1415,21 @@ output:
         - '[*parser.VectorSelector] foo{a="bar"}'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 12
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
     - labels:
         b:
             reason: Query will only return series where these labels are present.
@@ -1214,16 +1444,21 @@ output:
         - '[*parser.VectorSelector] bar{b="foo"}'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 16
         end: 28
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -1238,16 +1473,21 @@ output:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 3
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -1262,16 +1502,21 @@ output:
         - '[*parser.VectorSelector] prometheus_build_info'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 21
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -1288,16 +1533,21 @@ output:
         - '[*parser.Call] deriv(rate(distance_covered_meters_total[1m])[5m:1m])'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 6
         end: 52
-      returnednumber: 0
       type: function
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -1312,16 +1562,21 @@ output:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 3
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -1336,16 +1591,21 @@ output:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 3
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -1360,16 +1620,21 @@ output:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 1
         end: 4
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -1403,16 +1668,21 @@ output:
         - '[*parser.AggregateExpr] sum(foo{job="myjob"})'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 4
         end: 20
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -1453,16 +1723,21 @@ output:
         - '[*parser.AggregateExpr] sum(count by (instance) (foo{job="myjob"}))'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 10
         end: 26
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -1496,16 +1771,21 @@ output:
         - '[*parser.AggregateExpr] sum(foo{job="myjob"})'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 4
         end: 20
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: true
-      isreturnbool: false
 
 ---
 
@@ -1533,16 +1813,21 @@ output:
         - '[*parser.AggregateExpr] sum without (job) (foo{job="myjob"})'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 4
         end: 20
-      returnednumber: 0
       type: aggregation
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -1576,16 +1861,21 @@ output:
         - '[*parser.AggregateExpr] sum by (job) (foo)'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 4
         end: 7
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -1619,16 +1909,21 @@ output:
         - '[*parser.AggregateExpr] sum by (job) (foo{job="myjob"})'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 4
         end: 20
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -1650,16 +1945,21 @@ output:
         - '[*parser.Call] abs(foo{job="myjob"} offset 5m)'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 4
         end: 30
-      returnednumber: 0
       type: function
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -1681,16 +1981,21 @@ output:
         - '[*parser.Call] abs(foo{job="myjob"} or bar{cluster="dev"})'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 4
         end: 42
-      returnednumber: 0
       type: function
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
     - labels:
         cluster:
             reason: Query will only return series where these labels are present.
@@ -1706,16 +2011,21 @@ output:
         - '[*parser.Call] abs(foo{job="myjob"} or bar{cluster="dev"})'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 4
         end: 42
-      returnednumber: 0
       type: function
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -1749,16 +2059,21 @@ output:
         - '[*parser.AggregateExpr] sum without (instance) (foo{job="myjob"} or bar{cluster="dev"})'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 4
         end: 20
-      returnednumber: 0
       type: aggregation
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
     - labels:
         __name__:
             reason: Aggregation removes metric name.
@@ -1786,16 +2101,21 @@ output:
         - '[*parser.AggregateExpr] sum without (instance) (foo{job="myjob"} or bar{cluster="dev"})'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 24
         end: 42
-      returnednumber: 0
       type: aggregation
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -1829,16 +2149,21 @@ output:
         - '[*parser.AggregateExpr] sum without (instance) (foo{job="myjob"})'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 4
         end: 20
-      returnednumber: 0
       type: aggregation
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -1898,27 +2223,37 @@ output:
             - '[*parser.AggregateExpr] max(foo{job="myjob"})'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 28
             end: 44
-          returnednumber: 0
           type: aggregation
           fixedlabels: true
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 4
         end: 20
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -1978,27 +2313,37 @@ output:
             - '[*parser.AggregateExpr] min(foo{job="myjob"})'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 28
             end: 44
-          returnednumber: 0
           type: aggregation
           fixedlabels: true
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 4
         end: 20
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -2032,16 +2377,21 @@ output:
         - '[*parser.AggregateExpr] avg by (job) (foo{job="myjob"})'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 4
         end: 20
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -2075,16 +2425,21 @@ output:
         - '[*parser.AggregateExpr] group by (job) (foo)'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 6
         end: 9
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -2113,16 +2468,21 @@ output:
         - '[*parser.AggregateExpr] stddev(rate(foo[5m]))'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 12
         end: 19
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -2151,16 +2511,21 @@ output:
         - '[*parser.AggregateExpr] stdvar(rate(foo[5m]))'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 12
         end: 19
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -2176,16 +2541,21 @@ output:
         - '[*parser.Call] stddev_over_time(foo[5m])'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 17
         end: 24
-      returnednumber: 0
       type: function
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -2201,16 +2571,21 @@ output:
         - '[*parser.Call] stdvar_over_time(foo[5m])'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 17
         end: 24
-      returnednumber: 0
       type: function
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -2239,16 +2614,21 @@ output:
         - '[*parser.AggregateExpr] quantile(0.9, rate(foo[5m]))'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 19
         end: 26
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -2282,16 +2662,21 @@ output:
         - '[*parser.AggregateExpr] count_values("version", build_version)'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 24
         end: 37
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -2325,16 +2710,21 @@ output:
         - '[*parser.AggregateExpr] count_values without (job) ("version", build_version)'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 24
         end: 37
-      returnednumber: 0
       type: aggregation
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -2368,16 +2758,21 @@ output:
         - '[*parser.AggregateExpr] count_values without (job) ("version", build_version{job="foo"})'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 24
         end: 48
-      returnednumber: 0
       type: aggregation
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -2417,16 +2812,21 @@ output:
         - '[*parser.AggregateExpr] count_values by (job) ("version", build_version)'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 24
         end: 37
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -2448,16 +2848,21 @@ output:
         - '[*parser.AggregateExpr] topk(10, foo{job="myjob"})'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 9
         end: 25
-      returnednumber: 0
       type: aggregation
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: true
-      isreturnbool: false
 
 ---
 
@@ -2473,16 +2878,21 @@ output:
         - '[*parser.AggregateExpr] topk(10, foo or bar)'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 9
         end: 12
-      returnednumber: 0
       type: aggregation
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
     - labels: {}
       deadinfo: null
       operation: topk
@@ -2492,16 +2902,21 @@ output:
         - '[*parser.AggregateExpr] topk(10, foo or bar)'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 16
         end: 19
-      returnednumber: 0
       type: aggregation
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -2517,16 +2932,21 @@ output:
         - '[*parser.Call] rate(foo[10m])'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 5
         end: 13
-      returnednumber: 0
       type: function
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -2555,16 +2975,21 @@ output:
         - '[*parser.AggregateExpr] sum without (instance) (rate(foo[10m]))'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 9
         end: 17
-      returnednumber: 0
       type: aggregation
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -2592,27 +3017,37 @@ output:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 17
             end: 20
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 14
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -2652,27 +3087,37 @@ output:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 30
             end: 33
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 14
-      returnednumber: 0
       type: selector
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -2712,27 +3157,37 @@ output:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 46
             end: 49
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 14
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -2784,27 +3239,37 @@ output:
             - '[*parser.VectorSelector] bar{cluster="bar",ignored="true"}'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 50
             end: 84
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 14
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -2856,27 +3321,37 @@ output:
             - '[*parser.VectorSelector] foo{ignored="true",job="foo"}'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 0
             end: 30
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 63
         end: 81
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -2911,27 +3386,37 @@ output:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 12
             end: 15
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 6
         end: 9
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -2978,27 +3463,37 @@ output:
             - '[*parser.VectorSelector] up{job="b"}'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 26
             end: 37
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 6
         end: 17
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -3051,27 +3546,37 @@ output:
             - '[*parser.VectorSelector] up{job="b"}'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 29
             end: 40
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 6
         end: 17
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -3105,27 +3610,37 @@ output:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 33
             end: 36
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 28
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -3165,27 +3680,37 @@ output:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 45
             end: 48
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 28
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -3201,16 +3726,21 @@ output:
         - '[*parser.AggregateExpr] topk(10, foo)'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 9
         end: 12
-      returnednumber: 0
       type: aggregation
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -3226,16 +3756,21 @@ output:
         - '[*parser.AggregateExpr] topk without (cluster) (10, foo)'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 9
         end: 12
-      returnednumber: 0
       type: aggregation
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -3251,16 +3786,21 @@ output:
         - '[*parser.AggregateExpr] topk by (cluster) (10, foo)'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 9
         end: 12
-      returnednumber: 0
       type: aggregation
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -3290,16 +3830,21 @@ output:
         - '[*parser.AggregateExpr] bottomk(10, sum without (job) (rate(foo[5m])))'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 21
         end: 28
-      returnednumber: 0
       type: aggregation
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -3314,16 +3859,21 @@ output:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 3
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
     - labels: {}
       deadinfo: null
       operation: many-to-many
@@ -3332,16 +3882,21 @@ output:
         - '[*parser.VectorSelector] bar'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 7
         end: 10
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -3356,16 +3911,21 @@ output:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 3
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
     - labels: {}
       deadinfo: null
       operation: many-to-many
@@ -3374,16 +3934,21 @@ output:
         - '[*parser.VectorSelector] bar'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 7
         end: 10
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
     - labels: {}
       deadinfo: null
       operation: many-to-many
@@ -3392,16 +3957,21 @@ output:
         - '[*parser.VectorSelector] baz'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 14
         end: 17
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -3416,16 +3986,21 @@ output:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 1
         end: 4
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
     - labels: {}
       deadinfo: null
       operation: many-to-many
@@ -3434,16 +4009,21 @@ output:
         - '[*parser.VectorSelector] bar'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 8
         end: 11
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
     - labels: {}
       deadinfo: null
       operation: many-to-many
@@ -3452,16 +4032,21 @@ output:
         - '[*parser.VectorSelector] baz'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 16
         end: 19
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -3484,26 +4069,36 @@ output:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 11
             end: 14
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 3
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -3526,26 +4121,36 @@ output:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 11
             end: 14
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: true
-          isreturnbool: false
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 3
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -3568,16 +4173,21 @@ output:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 11
             end: 14
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
         - labels: {}
           deadinfo: null
           operation: ""
@@ -3586,26 +4196,36 @@ output:
             - '[*parser.VectorSelector] baz'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 22
             end: 25
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 3
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -3646,16 +4266,21 @@ output:
         - '[*parser.AggregateExpr] count without (job, cluster) (sum by (job, cluster) (up{cluster="dev",job="foo"}) == 0)'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 10
         end: 38
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: true
-      isreturnbool: false
 
 ---
 
@@ -3676,16 +4301,21 @@ output:
         - '[*parser.Call] year()'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: true
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 6
-      returnednumber: 0
       type: function
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -3701,16 +4331,21 @@ output:
         - '[*parser.Call] year(foo)'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 5
         end: 8
-      returnednumber: 0
       type: function
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -3756,16 +4391,21 @@ output:
         - '[*parser.Call] label_join(up{job="api-server",src1="a",src2="b",src3="c"}, "foo", ",", "src1", "src2", "src3")'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 11
         end: 58
-      returnednumber: 0
       type: function
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -3813,16 +4453,21 @@ output:
             - '[*parser.VectorSelector] job:notify'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 68
             end: 78
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
         - labels:
             "":
                 reason: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
@@ -3850,27 +4495,37 @@ output:
             - '[*parser.AggregateExpr] sum by (job) (foo:count)'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 97
             end: 106
-          returnednumber: 0
           type: aggregation
           fixedlabels: true
-          alwaysreturns: false
-          knownreturn: false
           isconditional: true
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 8
         end: 15
-      returnednumber: 0
       type: aggregation
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: true
-      isreturnbool: false
 
 ---
 
@@ -3916,27 +4571,37 @@ output:
             - '[*parser.VectorSelector] container_ulimits_soft{ulimit="max_open_files"}'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 53
             end: 100
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 26
-      returnednumber: 0
       type: selector
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -3976,27 +4641,37 @@ output:
             - '[*parser.VectorSelector] container_ulimits_soft{ulimit="max_open_files"}'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 66
             end: 113
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 26
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -4029,16 +4704,21 @@ output:
         - '[*parser.Call] absent(foo{job="bar"})'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 7
         end: 21
-      returnednumber: 0
       type: function
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -4088,16 +4768,21 @@ output:
         - '[*parser.Call] absent(foo{cluster!="dev",env="prod",instance=~".+",job="bar"})'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 7
         end: 65
-      returnednumber: 0
       type: function
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -4153,16 +4838,21 @@ output:
         - '[*parser.Call] absent(sum by (job, instance) (foo))'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 7
         end: 33
-      returnednumber: 0
       type: function
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -4208,27 +4898,37 @@ output:
             - '[*parser.VectorSelector] prometheus_build_info'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 51
             end: 72
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 7
         end: 37
-      returnednumber: 0
       type: function
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -4262,16 +4962,21 @@ output:
         - '[*parser.AggregateExpr] sum by (notjob) (foo)'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 8
         end: 11
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -4355,27 +5060,37 @@ output:
             - '[*parser.AggregateExpr] count by (instance, version, package) (deb_package_version)'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 106
             end: 125
-          returnednumber: 0
           type: aggregation
           fixedlabels: true
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 6
         end: 30
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: true
-      isreturnbool: false
 
 ---
 
@@ -4402,16 +5117,21 @@ output:
         - '[*parser.Call] absent(foo)'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 7
         end: 10
-      returnednumber: 0
       type: function
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
     - labels:
         "":
             reason: |-
@@ -4432,16 +5152,21 @@ output:
         - '[*parser.Call] absent(bar)'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 22
         end: 25
-      returnednumber: 0
       type: function
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -4468,16 +5193,21 @@ output:
         - '[*parser.Call] absent_over_time(foo[5m])'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 17
         end: 24
-      returnednumber: 0
       type: function
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
     - labels:
         "":
             reason: |-
@@ -4498,16 +5228,21 @@ output:
         - '[*parser.Call] absent(bar)'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 36
         end: 39
-      returnednumber: 0
       type: function
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -4559,27 +5294,37 @@ output:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 0
             end: 3
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 44
         end: 58
-      returnednumber: 0
       type: function
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -4619,27 +5364,37 @@ output:
             - '[*parser.VectorSelector] bar'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 0
             end: 3
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 32
         end: 46
-      returnednumber: 0
       type: function
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -4660,16 +5415,21 @@ output:
         - '[*parser.Call] vector(1)'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 9
+        returnednumber: 1
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: false
       position:
         start: 0
         end: 9
-      returnednumber: 1
       type: function
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: true
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -4690,16 +5450,21 @@ output:
         - '[*parser.Call] vector(scalar(foo))'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 19
+        returnednumber: 0
+        alwaysreturns: true
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 19
-      returnednumber: 0
       type: function
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -4714,7 +5479,7 @@ output:
                 start: 0
                 end: 6
       deadinfo:
-        reason: this query always evaluates to `0 == 1` which is not possible, so it will never return anything
+        reason: '`vector(0.0  >= bool 0.5) == 1` always evaluates to `0 == 1` which is not possible, so it will never return anything'
         fragment:
             start: 0
             end: 24
@@ -4724,16 +5489,21 @@ output:
         - '[*parser.Call] vector(0 >= bool 0.5)'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 24
+        returnednumber: 0
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: false
       position:
         start: 0
         end: 24
-      returnednumber: 0
       type: function
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: true
       isconditional: true
-      isreturnbool: false
 
 ---
 
@@ -4755,16 +5525,21 @@ output:
         - '[*parser.Call] sum_over_time(foo{job="myjob"}[5m])'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 14
         end: 34
-      returnednumber: 0
       type: function
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -4785,16 +5560,21 @@ output:
         - '[*parser.Call] days_in_month()'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: true
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 15
-      returnednumber: 0
       type: function
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -4816,16 +5596,21 @@ output:
         - '[*parser.Call] days_in_month(foo{job="foo"})'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 14
         end: 28
-      returnednumber: 0
       type: function
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -4859,16 +5644,21 @@ output:
         - '[*parser.Call] label_replace(up{job="api-server",service="a:c"}, "foo", "$1", "service", "(.*):.*")'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 14
         end: 48
-      returnednumber: 0
       type: function
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -4909,16 +5699,21 @@ output:
         - '[*parser.Call] label_replace(sum by (pod) (pod_status) > 0, "cluster", "$1", "pod", "(.*)")'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 14
         end: 43
-      returnednumber: 0
       type: function
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: true
-      isreturnbool: false
 
 ---
 
@@ -4933,16 +5728,21 @@ output:
         - '[*parser.VectorSelector] my_metric'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 10
         end: 19
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: true
-      isreturnbool: false
 
 ---
 
@@ -4988,27 +5788,37 @@ output:
             - '[*parser.VectorSelector] up{instance="a",job="pint"}'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 51
             end: 79
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 34
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -5054,16 +5864,21 @@ output:
         - '[*parser.AggregateExpr] avg without (router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"})'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 41
         end: 100
-      returnednumber: 0
       type: aggregation
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: true
-      isreturnbool: false
     - labels:
         "":
             reason: Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.
@@ -5141,27 +5956,37 @@ output:
             - '[*parser.AggregateExpr] count(colo_router_tier:disabled_pops:max{router=~"edge.*",tier="1"})'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 227
             end: 288
-          returnednumber: 0
           type: aggregation
           fixedlabels: true
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 155
         end: 212
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: true
-      isreturnbool: false
     - labels:
         __name__:
             reason: Aggregation removes metric name.
@@ -5201,16 +6026,21 @@ output:
         - '[*parser.AggregateExpr] avg without (router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*regional.*"})'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 343
         end: 403
-      returnednumber: 0
       type: aggregation
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: true
-      isreturnbool: false
 
 ---
 
@@ -5239,16 +6069,21 @@ output:
         - '[*parser.Call] label_replace(sum without (instance) (foo), "instance", "none", "", "")'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 14
         end: 40
-      returnednumber: 0
       type: function
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -5306,16 +6141,21 @@ output:
         - '[*parser.AggregateExpr] sum by (region, target, colo_name) (sum_over_time(probe_success{job="abc"}[5m]) or vector(1))'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 56
         end: 84
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: true
-      isreturnbool: false
     - labels:
         "":
             reason: Query is using aggregation with `by(region, target, colo_name)`, only labels included inside `by(...)` will be present on the results.
@@ -5348,7 +6188,7 @@ output:
                 start: 91
                 end: 97
       deadinfo:
-        reason: this query always evaluates to `1 == 0` which is not possible, so it will never return anything
+        reason: '`vector(1) == 0` always evaluates to `1 == 0` which is not possible, so it will never return anything'
         fragment:
             start: 91
             end: 100
@@ -5359,16 +6199,21 @@ output:
         - '[*parser.AggregateExpr] sum by (region, target, colo_name) (sum_over_time(probe_success{job="abc"}[5m]) or vector(1))'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 91
+            end: 100
+        returnednumber: 1
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: false
       position:
         start: 91
         end: 100
-      returnednumber: 1
       type: aggregation
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: true
       isconditional: true
-      isreturnbool: false
 
 ---
 
@@ -5389,16 +6234,21 @@ output:
         - '[*parser.Call] vector(1)'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 9
+        returnednumber: 1
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: false
       position:
         start: 0
         end: 9
-      returnednumber: 1
       type: function
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: true
       isconditional: false
-      isreturnbool: false
     - labels: {}
       deadinfo:
         reason: the left hand side always returs something and so the right hand side is never used
@@ -5411,16 +6261,21 @@ output:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 13
         end: 16
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -5435,7 +6290,7 @@ output:
                 start: 0
                 end: 6
       deadinfo:
-        reason: this query always evaluates to `0 > 0` which is not possible, so it will never return anything
+        reason: '`vector(0) > 0` always evaluates to `0 > 0` which is not possible, so it will never return anything'
         fragment:
             start: 0
             end: 9
@@ -5445,16 +6300,21 @@ output:
         - '[*parser.Call] vector(0)'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 9
+        returnednumber: 0
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: false
       position:
         start: 0
         end: 9
-      returnednumber: 0
       type: function
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: true
       isconditional: true
-      isreturnbool: false
 
 ---
 
@@ -5492,27 +6352,37 @@ output:
             - '[*parser.Call] vector(1)'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 12
+                end: 21
+            returnednumber: 1
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
           position:
             start: 12
             end: 21
-          returnednumber: 1
           type: function
           fixedlabels: true
-          alwaysreturns: true
-          knownreturn: true
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 9
+        returnednumber: 0
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: false
       position:
         start: 0
         end: 9
-      returnednumber: 0
       type: function
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: true
       isconditional: true
-      isreturnbool: false
 
 ---
 
@@ -5540,16 +6410,21 @@ output:
         - '[*parser.AggregateExpr] sum(foo or vector(0))'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 4
         end: 7
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: true
-      isreturnbool: false
     - labels:
         "":
             reason: Query is using aggregation that removes all labels.
@@ -5564,7 +6439,7 @@ output:
                 start: 0
                 end: 21
       deadinfo:
-        reason: this query always evaluates to `0 > 0` which is not possible, so it will never return anything
+        reason: '`vector(0) > 0` always evaluates to `0 > 0` which is not possible, so it will never return anything'
         fragment:
             start: 11
             end: 20
@@ -5575,16 +6450,21 @@ output:
         - '[*parser.AggregateExpr] sum(foo or vector(0))'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 11
+            end: 20
+        returnednumber: 0
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: false
       position:
         start: 11
         end: 20
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: true
       isconditional: true
-      isreturnbool: false
 
 ---
 
@@ -5612,16 +6492,21 @@ output:
         - '[*parser.AggregateExpr] sum(foo or vector(1))'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 5
         end: 8
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: true
-      isreturnbool: false
     - labels:
         "":
             reason: Query is using aggregation that removes all labels.
@@ -5636,7 +6521,7 @@ output:
                 start: 1
                 end: 22
       deadinfo:
-        reason: this query always evaluates to `1 == 2` which is not possible, so it will never return anything
+        reason: '`vector(1) == 2` always evaluates to `1 == 2` which is not possible, so it will never return anything'
         fragment:
             start: 12
             end: 21
@@ -5647,16 +6532,21 @@ output:
         - '[*parser.AggregateExpr] sum(foo or vector(1))'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 12
+            end: 21
+        returnednumber: 1
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: false
       position:
         start: 12
         end: 21
-      returnednumber: 1
       type: aggregation
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: true
       isconditional: true
-      isreturnbool: false
 
 ---
 
@@ -5684,16 +6574,21 @@ output:
         - '[*parser.AggregateExpr] sum(foo or vector(1))'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 5
         end: 8
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: true
-      isreturnbool: false
     - labels:
         "":
             reason: Query is using aggregation that removes all labels.
@@ -5715,16 +6610,21 @@ output:
         - '[*parser.AggregateExpr] sum(foo or vector(1))'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 12
+            end: 21
+        returnednumber: 1
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: false
       position:
         start: 12
         end: 21
-      returnednumber: 1
       type: aggregation
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: true
       isconditional: true
-      isreturnbool: false
 
 ---
 
@@ -5752,16 +6652,21 @@ output:
         - '[*parser.AggregateExpr] sum(foo or vector(2))'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 5
         end: 8
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: true
-      isreturnbool: false
     - labels:
         "":
             reason: Query is using aggregation that removes all labels.
@@ -5776,7 +6681,7 @@ output:
                 start: 1
                 end: 22
       deadinfo:
-        reason: this query always evaluates to `2 != 2` which is not possible, so it will never return anything
+        reason: '`vector(2) != 2` always evaluates to `2 != 2` which is not possible, so it will never return anything'
         fragment:
             start: 12
             end: 21
@@ -5787,16 +6692,21 @@ output:
         - '[*parser.AggregateExpr] sum(foo or vector(2))'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 12
+            end: 21
+        returnednumber: 2
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: false
       position:
         start: 12
         end: 21
-      returnednumber: 2
       type: aggregation
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: true
       isconditional: true
-      isreturnbool: false
 
 ---
 
@@ -5827,16 +6737,21 @@ output:
         - '[*parser.AggregateExpr] sum(sometimes{foo!="bar"} or vector(0))'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 5
         end: 26
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
     - labels:
         "":
             reason: Query is using aggregation that removes all labels.
@@ -5858,16 +6773,21 @@ output:
         - '[*parser.AggregateExpr] sum(sometimes{foo!="bar"} or vector(0))'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 30
+            end: 39
+        returnednumber: 0
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: false
       position:
         start: 30
         end: 39
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: true
       isconditional: false
-      isreturnbool: false
     - labels: {}
       deadinfo: null
       operation: many-to-many
@@ -5876,16 +6796,21 @@ output:
         - '[*parser.VectorSelector] bob'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 47
         end: 50
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: true
-      isreturnbool: false
     - labels:
         "":
             reason: Query is using aggregation that removes all labels.
@@ -5907,16 +6832,21 @@ output:
         - '[*parser.AggregateExpr] sum(foo)'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 64
         end: 67
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
     - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
@@ -5931,16 +6861,21 @@ output:
         - '[*parser.Call] vector(1)'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 72
+            end: 81
+        returnednumber: 1
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: false
       position:
         start: 72
         end: 81
-      returnednumber: 1
       type: function
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: true
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -5984,16 +6919,21 @@ output:
             - '[*parser.VectorSelector] bob'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 57
             end: 60
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: true
-          isreturnbool: false
         - labels:
             "":
                 reason: Query is using aggregation that removes all labels.
@@ -6015,16 +6955,21 @@ output:
             - '[*parser.AggregateExpr] sum(bar)'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 74
             end: 77
-          returnednumber: 0
           type: aggregation
           fixedlabels: true
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
         - labels: {}
           deadinfo: null
           operation: many-to-many
@@ -6033,27 +6978,37 @@ output:
             - '[*parser.VectorSelector] notfound'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 85
             end: 93
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: true
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 8
         end: 29
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: true
-      isreturnbool: false
     - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
@@ -6075,16 +7030,21 @@ output:
             - '[*parser.VectorSelector] bob'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 57
             end: 60
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: true
-          isreturnbool: false
         - labels:
             "":
                 reason: Query is using aggregation that removes all labels.
@@ -6106,16 +7066,21 @@ output:
             - '[*parser.AggregateExpr] sum(bar)'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 74
             end: 77
-          returnednumber: 0
           type: aggregation
           fixedlabels: true
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
         - labels: {}
           deadinfo: null
           operation: many-to-many
@@ -6124,27 +7089,37 @@ output:
             - '[*parser.VectorSelector] notfound'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 85
             end: 93
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: true
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 36
+            end: 45
+        returnednumber: 1
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: false
       position:
         start: 36
         end: 45
-      returnednumber: 1
       type: function
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: true
       isconditional: true
-      isreturnbool: false
 
 ---
 
@@ -6159,16 +7134,21 @@ output:
         - '[*parser.VectorSelector] foo offset 5m'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 13
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: true
-      isreturnbool: false
 
 ---
 
@@ -6195,16 +7175,21 @@ output:
             - '[*parser.Call] rate(metric1[5m])'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 42
             end: 53
-          returnednumber: 0
           type: function
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
         - labels:
             "":
                 reason: Calling `vector()` will return a vector value with no labels.
@@ -6219,16 +7204,21 @@ output:
             - '[*parser.Call] vector(1)'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 58
+                end: 67
+            returnednumber: 1
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
           position:
             start: 58
             end: 67
-          returnednumber: 1
           type: function
           fixedlabels: true
-          alwaysreturns: true
-          knownreturn: true
           isconditional: false
-          isreturnbool: false
         - labels:
             log_name:
                 reason: Query will only return series where these labels are present.
@@ -6244,16 +7234,21 @@ output:
             - '[*parser.Call] rate(metric3{log_name="samplerd"}[5m])'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 77
             end: 109
-          returnednumber: 0
           type: function
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
         - labels:
             "":
                 reason: Calling `vector()` will return a vector value with no labels.
@@ -6268,27 +7263,37 @@ output:
             - '[*parser.Call] vector(2)'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 114
+                end: 123
+            returnednumber: 2
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
           position:
             start: 114
             end: 123
-          returnednumber: 2
           type: function
           fixedlabels: true
-          alwaysreturns: true
-          knownreturn: true
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 7
         end: 18
-      returnednumber: 0
       type: function
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: true
-      isreturnbool: false
     - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
@@ -6311,16 +7316,21 @@ output:
             - '[*parser.Call] rate(metric1[5m])'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 42
             end: 53
-          returnednumber: 0
           type: function
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
         - labels:
             "":
                 reason: Calling `vector()` will return a vector value with no labels.
@@ -6335,16 +7345,21 @@ output:
             - '[*parser.Call] vector(1)'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 58
+                end: 67
+            returnednumber: 1
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
           position:
             start: 58
             end: 67
-          returnednumber: 1
           type: function
           fixedlabels: true
-          alwaysreturns: true
-          knownreturn: true
           isconditional: false
-          isreturnbool: false
         - labels:
             log_name:
                 reason: Query will only return series where these labels are present.
@@ -6360,16 +7375,21 @@ output:
             - '[*parser.Call] rate(metric3{log_name="samplerd"}[5m])'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 77
             end: 109
-          returnednumber: 0
           type: function
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
         - labels:
             "":
                 reason: Calling `vector()` will return a vector value with no labels.
@@ -6384,27 +7404,37 @@ output:
             - '[*parser.Call] vector(2)'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 114
+                end: 123
+            returnednumber: 2
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
           position:
             start: 114
             end: 123
-          returnednumber: 2
           type: function
           fixedlabels: true
-          alwaysreturns: true
-          knownreturn: true
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: vector(0) + vector(1) + vector(2)
+        valueposition:
+            start: 23
+            end: 32
+        returnednumber: 3
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: false
       position:
         start: 23
         end: 32
-      returnednumber: 3
       type: function
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: true
       isconditional: true
-      isreturnbool: false
 
 ---
 
@@ -6432,16 +7462,21 @@ output:
         - '[*parser.Call] label_replace(vector(1), "nexthop_tag", "$1", "nexthop", "(.+)")'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 14
+            end: 23
+        returnednumber: 1
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: false
       position:
         start: 14
         end: 23
-      returnednumber: 1
       type: function
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: true
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -6475,16 +7510,21 @@ output:
         - '[*parser.AggregateExpr] sum(foo{job="myjob"})'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 5
         end: 21
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -6505,16 +7545,21 @@ output:
         - '[*parser.VectorSelector] foo{job="myjob"}'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 2
         end: 18
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -6536,7 +7581,7 @@ output:
                 start: 5
                 end: 23
       deadinfo:
-        reason: this query always evaluates to `0 > 0` which is not possible, so it will never return anything
+        reason: '`vector(0) > 0` always evaluates to `0 > 0` which is not possible, so it will never return anything'
         fragment:
             start: 11
             end: 20
@@ -6547,16 +7592,21 @@ output:
         - '[*parser.AggregateExpr] group(vector(0))'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 11
+            end: 20
+        returnednumber: 0
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: false
       position:
         start: 11
         end: 20
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: true
       isconditional: true
-      isreturnbool: false
 
 ---
 
@@ -6571,7 +7621,7 @@ output:
                 start: 0
                 end: 1
       deadinfo:
-        reason: this query always evaluates to `1 > 5` which is not possible, so it will never return anything
+        reason: '`1 > 5` always evaluates to `1 > 5` and uses the `bool` modifier which means it will always return 0'
         fragment:
             start: 0
             end: 1
@@ -6580,16 +7630,21 @@ output:
       operations: []
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 1
+        returnednumber: 1
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: true
       position:
         start: 0
         end: 1
-      returnednumber: 1
       type: number
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: true
       isconditional: true
-      isreturnbool: true
 
 ---
 
@@ -6628,26 +7683,36 @@ output:
             - '[*parser.Call] vector(0)'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 42
+                end: 51
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
           position:
             start: 42
             end: 51
-          returnednumber: 0
           type: function
           fixedlabels: true
-          alwaysreturns: true
-          knownreturn: true
           isconditional: false
-          isreturnbool: false
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 34
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -6686,26 +7751,36 @@ output:
             - '[*parser.Call] vector(0)'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 47
+                end: 56
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
           position:
             start: 47
             end: 56
-          returnednumber: 0
           type: function
           fixedlabels: true
-          alwaysreturns: true
-          knownreturn: true
           isconditional: false
-          isreturnbool: false
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 34
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -6744,26 +7819,36 @@ output:
             - '[*parser.Call] vector(0)'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 50
+                end: 59
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
           position:
             start: 50
             end: 59
-          returnednumber: 0
           type: function
           fixedlabels: true
-          alwaysreturns: true
-          knownreturn: true
           isconditional: false
-          isreturnbool: false
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 34
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -6878,37 +7963,52 @@ output:
                 - '[*parser.VectorSelector] cf_node_role{kubernetes_role="master",role="kubernetes"}'
               joins: []
               unless: []
+              returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
               position:
                 start: 247
                 end: 303
-              returnednumber: 0
               type: selector
               fixedlabels: false
-              alwaysreturns: false
-              knownreturn: false
               isconditional: false
-              isreturnbool: false
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 132
             end: 201
-          returnednumber: 0
           type: aggregation
           fixedlabels: true
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 29
         end: 85
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -6948,27 +8048,37 @@ output:
             - '[*parser.VectorSelector] bar{b="2"}'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 18
             end: 28
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 10
-      returnednumber: 0
       type: selector
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -7020,27 +8130,37 @@ output:
             - '[*parser.VectorSelector] bar{b="2"}'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 42
             end: 52
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 10
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -7092,27 +8212,37 @@ output:
             - '[*parser.VectorSelector] foo{a="1"}'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 0
             end: 10
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 43
         end: 53
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -7175,27 +8305,37 @@ output:
             - '[*parser.AggregateExpr] sum(bar{b="2"})'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 30
             end: 40
-          returnednumber: 0
           type: aggregation
           fixedlabels: true
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 10
-      returnednumber: 0
       type: selector
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -7264,27 +8404,37 @@ output:
             - '[*parser.AggregateExpr] sum(bar{b="2"})'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 46
             end: 56
-          returnednumber: 0
           type: aggregation
           fixedlabels: true
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 10
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -7353,27 +8503,37 @@ output:
             - '[*parser.AggregateExpr] sum(foo{a="1"})'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 4
             end: 14
-          returnednumber: 0
           type: aggregation
           fixedlabels: true
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 48
         end: 58
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -7442,27 +8602,37 @@ output:
             - '[*parser.AggregateExpr] sum without (instance) (bar{b="2"})'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 46
             end: 56
-          returnednumber: 0
           type: aggregation
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 0
         end: 10
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -7531,27 +8701,37 @@ output:
             - '[*parser.AggregateExpr] sum without (instance) (foo{a="1"})'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 4
             end: 14
-          returnednumber: 0
           type: aggregation
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 66
         end: 76
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -7632,16 +8812,21 @@ output:
             - '[*parser.Call] absent(node_disk_info)'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 299
             end: 313
-          returnednumber: 0
           type: function
           fixedlabels: true
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
         - labels:
             instance:
                 reason: This label will be added to the result by label_replace() call.
@@ -7657,16 +8842,21 @@ output:
             - '[*parser.Call] label_replace(salt_highstate_runner_configured_minions, "instance", "$1", "minion", "(.+)")'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 365
             end: 405
-          returnednumber: 0
           type: function
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless:
         - labels: {}
           deadinfo: null
@@ -7685,37 +8875,52 @@ output:
                 - '[*parser.Call] increase(kernel_device_io_errors_total[2h])'
               joins: []
               unless: []
+              returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
               position:
                 start: 222
                 end: 257
-              returnednumber: 0
               type: function
               fixedlabels: false
-              alwaysreturns: false
-              knownreturn: false
               isconditional: false
-              isreturnbool: false
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 149
             end: 207
-          returnednumber: 0
           type: function
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: true
-          isreturnbool: false
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 46
         end: 99
-      returnednumber: 0
       type: aggregation
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: true
-      isreturnbool: false
 
 ---
 
@@ -7768,27 +8973,37 @@ output:
             - '[*parser.VectorSelector] bar{b="2"}'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 31
             end: 41
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 4
         end: 14
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -7823,16 +9038,21 @@ output:
         - '[*parser.AggregateExpr] sum by (job) (sum without (job) (foo))'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 8
         end: 11
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -7929,38 +9149,53 @@ output:
                 - '[*parser.AggregateExpr] max by (instance) (max_over_time(prometheus_tsdb_head_series[2h]))'
               joins: []
               unless: []
+              returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
               position:
                 start: 195
                 end: 226
-              returnednumber: 0
               type: aggregation
               fixedlabels: true
-              alwaysreturns: false
-              knownreturn: false
               isconditional: false
-              isreturnbool: false
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 92
             end: 241
-          returnednumber: 0
           type: function
           fixedlabels: true
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 1
         end: 44
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -7994,27 +9229,37 @@ output:
             - '[*parser.Call] hour()'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 24
             end: 30
-          returnednumber: 0
           type: function
           fixedlabels: true
-          alwaysreturns: true
-          knownreturn: false
           isconditional: true
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: true
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 1
         end: 14
-      returnednumber: 0
       type: function
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: false
       isconditional: true
-      isreturnbool: false
     - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
@@ -8029,16 +9274,21 @@ output:
         - '[*parser.Call] vector(1)'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 39
+            end: 48
+        returnednumber: 1
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: false
       position:
         start: 39
         end: 48
-      returnednumber: 1
       type: function
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: true
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -8109,27 +9359,37 @@ output:
             - '[*parser.VectorSelector] server_errors_total'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 94
             end: 113
-          returnednumber: 0
           type: selector
           fixedlabels: false
-          alwaysreturns: false
-          knownreturn: false
           isconditional: false
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 30
         end: 46
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -8144,16 +9404,21 @@ output:
         - '[*parser.VectorSelector] foo'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 5
         end: 8
-      returnednumber: 0
       type: selector
       fixedlabels: false
-      alwaysreturns: false
-      knownreturn: false
       isconditional: true
-      isreturnbool: false
     - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
@@ -8162,7 +9427,7 @@ output:
                 start: 12
                 end: 18
       deadinfo:
-        reason: this query always evaluates to `1 < 0.999` which is not possible, so it will never return anything
+        reason: '`1 - vector(0) < 0.999` always evaluates to `1 < 0.999` which is not possible, so it will never return anything'
         fragment:
             start: 12
             end: 21
@@ -8172,16 +9437,21 @@ output:
         - '[*parser.Call] vector(0)'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: 1 - vector(0)
+        valueposition:
+            start: 0
+            end: 1
+        returnednumber: 1
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: false
       position:
         start: 12
         end: 21
-      returnednumber: 1
       type: function
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: true
       isconditional: true
-      isreturnbool: false
 
 ---
 
@@ -8218,27 +9488,37 @@ output:
             - '[*parser.Call] month()'
           joins: []
           unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
           position:
             start: 19
             end: 26
-          returnednumber: 0
           type: function
           fixedlabels: true
-          alwaysreturns: true
-          knownreturn: false
           isconditional: true
-          isreturnbool: false
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 5
+            end: 14
+        returnednumber: 1
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: false
       position:
         start: 5
         end: 14
-      returnednumber: 1
       type: function
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: true
       isconditional: true
-      isreturnbool: false
     - labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
@@ -8253,16 +9533,21 @@ output:
         - '[*parser.Call] vector(0)'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 37
+            end: 46
+        returnednumber: 0
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: false
       position:
         start: 37
         end: 46
-      returnednumber: 0
       type: function
       fixedlabels: true
-      alwaysreturns: true
-      knownreturn: true
       isconditional: false
-      isreturnbool: false
 
 ---
 
@@ -8303,15 +9588,1049 @@ output:
         - '[*parser.AggregateExpr] count by (region) (stddev by (colo_name, region) (error_total))'
       joins: []
       unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
       position:
         start: 50
         end: 61
-      returnednumber: 0
       type: aggregation
       fixedlabels: true
-      alwaysreturns: false
-      knownreturn: false
       isconditional: false
-      isreturnbool: false
+
+---
+
+[TestLabelsSource/152 - 1]
+expr: |4
+    (
+      avg(
+        rate(foo_rejections[6h])
+        or
+        vector(0)
+      ) by (colo_name)
+      /
+      (
+        avg(
+          rate(foo_total[6h])
+       or
+       vector(1)
+        ) by (colo_name)
+      )
+    ) > 5
+    *
+    (
+      avg(
+        rate(foo_rejections[6h] offset 1d)
+     or
+     vector(0)
+      ) by (colo_name)
+      /
+      avg(
+        rate(foo_total[6h] offset 1d)
+     or
+     vector(1)
+      ) by (colo_name)
+    ) and on (colo_name) (colo_job:foo_total:rate2m or vector(0)) > 80
+      and on (colo_name) (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
+output:
+    - labels:
+        "":
+            reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 64
+                end: 67
+        __name__:
+            reason: Aggregation removes metric name.
+            kind: excluded
+            fragment:
+                start: 5
+                end: 78
+        colo_name:
+            reason: Query is using many-to-many vector matching with `on(colo_name)`, labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 341
+                end: 344
+      deadinfo: null
+      operation: avg
+      returns: vector
+      operations:
+        - '[*parser.VectorSelector] foo_rejections'
+        - '[*parser.Call] rate(foo_rejections[6h])'
+        - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h]) or vector(0))'
+      joins:
+        - labels:
+            "":
+                reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
+                kind: excluded
+                fragment:
+                    start: 147
+                    end: 150
+            __name__:
+                reason: Aggregation removes metric name.
+                kind: excluded
+                fragment:
+                    start: 91
+                    end: 161
+            colo_name:
+                reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
+                kind: included
+                fragment:
+                    start: 147
+                    end: 150
+          deadinfo: null
+          operation: avg
+          returns: vector
+          operations:
+            - '[*parser.VectorSelector] foo_total'
+            - '[*parser.Call] rate(foo_total[6h])'
+            - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h]) or vector(1))'
+          joins: []
+          unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 107
+            end: 120
+          type: aggregation
+          fixedlabels: true
+          isconditional: false
+        - labels:
+            "":
+                reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
+                kind: excluded
+                fragment:
+                    start: 147
+                    end: 150
+            __name__:
+                reason: Aggregation removes metric name.
+                kind: excluded
+                fragment:
+                    start: 91
+                    end: 161
+            colo_name:
+                reason: Calling `vector()` will return a vector value with no labels.
+                kind: excluded
+                fragment:
+                    start: 131
+                    end: 137
+          deadinfo: null
+          operation: avg
+          returns: vector
+          operations:
+            - '[*parser.Call] vector(1)'
+            - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h]) or vector(1))'
+          joins: []
+          unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 131
+                end: 140
+            returnednumber: 1
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 131
+            end: 140
+          type: aggregation
+          fixedlabels: true
+          isconditional: false
+        - labels:
+            "":
+                reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
+                kind: excluded
+                fragment:
+                    start: 241
+                    end: 244
+            __name__:
+                reason: Aggregation removes metric name.
+                kind: excluded
+                fragment:
+                    start: 178
+                    end: 255
+            colo_name:
+                reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
+                kind: included
+                fragment:
+                    start: 241
+                    end: 244
+          deadinfo: null
+          operation: avg
+          returns: vector
+          operations:
+            - '[*parser.VectorSelector] foo_rejections offset 1d'
+            - '[*parser.Call] rate(foo_rejections[6h] offset 1d)'
+            - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h] offset 1d) or vector(0))'
+          joins:
+            - labels:
+                "":
+                    reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
+                    kind: excluded
+                    fragment:
+                        start: 320
+                        end: 323
+                __name__:
+                    reason: Aggregation removes metric name.
+                    kind: excluded
+                    fragment:
+                        start: 262
+                        end: 334
+                colo_name:
+                    reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
+                    kind: included
+                    fragment:
+                        start: 320
+                        end: 323
+              deadinfo: null
+              operation: avg
+              returns: vector
+              operations:
+                - '[*parser.VectorSelector] foo_total offset 1d'
+                - '[*parser.Call] rate(foo_total[6h] offset 1d)'
+                - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h] offset 1d) or vector(1))'
+              joins: []
+              unless: []
+              returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+              position:
+                start: 276
+                end: 299
+              type: aggregation
+              fixedlabels: true
+              isconditional: false
+            - labels:
+                "":
+                    reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
+                    kind: excluded
+                    fragment:
+                        start: 320
+                        end: 323
+                __name__:
+                    reason: Aggregation removes metric name.
+                    kind: excluded
+                    fragment:
+                        start: 262
+                        end: 334
+                colo_name:
+                    reason: Calling `vector()` will return a vector value with no labels.
+                    kind: excluded
+                    fragment:
+                        start: 306
+                        end: 312
+              deadinfo: null
+              operation: avg
+              returns: vector
+              operations:
+                - '[*parser.Call] vector(1)'
+                - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h] offset 1d) or vector(1))'
+              joins: []
+              unless: []
+              returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 306
+                    end: 315
+                returnednumber: 1
+                alwaysreturns: true
+                knownreturn: true
+                isreturnbool: false
+              position:
+                start: 306
+                end: 315
+              type: aggregation
+              fixedlabels: true
+              isconditional: false
+          unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 192
+            end: 220
+          type: aggregation
+          fixedlabels: true
+          isconditional: false
+        - labels:
+            "":
+                reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
+                kind: excluded
+                fragment:
+                    start: 241
+                    end: 244
+            __name__:
+                reason: Aggregation removes metric name.
+                kind: excluded
+                fragment:
+                    start: 178
+                    end: 255
+            colo_name:
+                reason: Calling `vector()` will return a vector value with no labels.
+                kind: excluded
+                fragment:
+                    start: 227
+                    end: 233
+          deadinfo: null
+          operation: avg
+          returns: vector
+          operations:
+            - '[*parser.Call] vector(0)'
+            - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h] offset 1d) or vector(0))'
+          joins:
+            - labels:
+                "":
+                    reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
+                    kind: excluded
+                    fragment:
+                        start: 320
+                        end: 323
+                __name__:
+                    reason: Aggregation removes metric name.
+                    kind: excluded
+                    fragment:
+                        start: 262
+                        end: 334
+                colo_name:
+                    reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
+                    kind: included
+                    fragment:
+                        start: 320
+                        end: 323
+              deadinfo: null
+              operation: avg
+              returns: vector
+              operations:
+                - '[*parser.VectorSelector] foo_total offset 1d'
+                - '[*parser.Call] rate(foo_total[6h] offset 1d)'
+                - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h] offset 1d) or vector(1))'
+              joins: []
+              unless: []
+              returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+              position:
+                start: 276
+                end: 299
+              type: aggregation
+              fixedlabels: true
+              isconditional: false
+            - labels:
+                "":
+                    reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
+                    kind: excluded
+                    fragment:
+                        start: 320
+                        end: 323
+                __name__:
+                    reason: Aggregation removes metric name.
+                    kind: excluded
+                    fragment:
+                        start: 262
+                        end: 334
+                colo_name:
+                    reason: Calling `vector()` will return a vector value with no labels.
+                    kind: excluded
+                    fragment:
+                        start: 306
+                        end: 312
+              deadinfo: null
+              operation: avg
+              returns: vector
+              operations:
+                - '[*parser.Call] vector(1)'
+                - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h] offset 1d) or vector(1))'
+              joins: []
+              unless: []
+              returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 306
+                    end: 315
+                returnednumber: 1
+                alwaysreturns: true
+                knownreturn: true
+                isreturnbool: false
+              position:
+                start: 306
+                end: 315
+              type: aggregation
+              fixedlabels: true
+              isconditional: false
+          unless: []
+          returninfo:
+            logicalexpr: 5 * vector(0) / vector(1)
+            valueposition:
+                start: 170
+                end: 171
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 227
+            end: 236
+          type: aggregation
+          fixedlabels: true
+          isconditional: false
+        - labels: {}
+          deadinfo: null
+          operation: many-to-many
+          returns: vector
+          operations:
+            - '[*parser.VectorSelector] colo_job:foo_total:rate2m'
+          joins: []
+          unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 357
+            end: 382
+          type: selector
+          fixedlabels: false
+          isconditional: true
+        - labels:
+            "":
+                reason: Calling `vector()` will return a vector value with no labels.
+                kind: excluded
+                fragment:
+                    start: 386
+                    end: 392
+          deadinfo:
+            reason: The right hand side will never be matched because it doesn't have the `colo_name` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
+            fragment:
+                start: 386
+                end: 392
+          operation: vector
+          returns: vector
+          operations:
+            - '[*parser.Call] vector(0)'
+          joins: []
+          unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 386
+                end: 395
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 386
+            end: 395
+          type: function
+          fixedlabels: true
+          isconditional: true
+        - labels: {}
+          deadinfo: null
+          operation: many-to-many
+          returns: vector
+          operations:
+            - '[*parser.VectorSelector] colo_job:foo_total:rate2m offset 1d'
+          joins: []
+          unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 424
+            end: 459
+          type: selector
+          fixedlabels: false
+          isconditional: true
+        - labels:
+            "":
+                reason: Calling `vector()` will return a vector value with no labels.
+                kind: excluded
+                fragment:
+                    start: 463
+                    end: 469
+          deadinfo:
+            reason: The right hand side will never be matched because it doesn't have the `colo_name` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
+            fragment:
+                start: 463
+                end: 469
+          operation: vector
+          returns: vector
+          operations:
+            - '[*parser.Call] vector(0)'
+          joins: []
+          unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 463
+                end: 472
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 463
+            end: 472
+          type: function
+          fixedlabels: true
+          isconditional: true
+      unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
+      position:
+        start: 19
+        end: 37
+      type: aggregation
+      fixedlabels: true
+      isconditional: true
+    - labels:
+        "":
+            reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 64
+                end: 67
+        __name__:
+            reason: Aggregation removes metric name.
+            kind: excluded
+            fragment:
+                start: 5
+                end: 78
+        colo_name:
+            reason: Query is using many-to-many vector matching with `on(colo_name)`, labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 341
+                end: 344
+      deadinfo:
+        reason: '`vector(0) / vector(1) > 5 * vector(0) / vector(1)` always evaluates to `0 > 0` which is not possible, so it will never return anything'
+        fragment:
+            start: 50
+            end: 59
+      operation: avg
+      returns: vector
+      operations:
+        - '[*parser.Call] vector(0)'
+        - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h]) or vector(0))'
+      joins:
+        - labels:
+            "":
+                reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
+                kind: excluded
+                fragment:
+                    start: 147
+                    end: 150
+            __name__:
+                reason: Aggregation removes metric name.
+                kind: excluded
+                fragment:
+                    start: 91
+                    end: 161
+            colo_name:
+                reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
+                kind: included
+                fragment:
+                    start: 147
+                    end: 150
+          deadinfo: null
+          operation: avg
+          returns: vector
+          operations:
+            - '[*parser.VectorSelector] foo_total'
+            - '[*parser.Call] rate(foo_total[6h])'
+            - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h]) or vector(1))'
+          joins: []
+          unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 107
+            end: 120
+          type: aggregation
+          fixedlabels: true
+          isconditional: false
+        - labels:
+            "":
+                reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
+                kind: excluded
+                fragment:
+                    start: 147
+                    end: 150
+            __name__:
+                reason: Aggregation removes metric name.
+                kind: excluded
+                fragment:
+                    start: 91
+                    end: 161
+            colo_name:
+                reason: Calling `vector()` will return a vector value with no labels.
+                kind: excluded
+                fragment:
+                    start: 131
+                    end: 137
+          deadinfo: null
+          operation: avg
+          returns: vector
+          operations:
+            - '[*parser.Call] vector(1)'
+            - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h]) or vector(1))'
+          joins: []
+          unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 131
+                end: 140
+            returnednumber: 1
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 131
+            end: 140
+          type: aggregation
+          fixedlabels: true
+          isconditional: false
+        - labels:
+            "":
+                reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
+                kind: excluded
+                fragment:
+                    start: 241
+                    end: 244
+            __name__:
+                reason: Aggregation removes metric name.
+                kind: excluded
+                fragment:
+                    start: 178
+                    end: 255
+            colo_name:
+                reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
+                kind: included
+                fragment:
+                    start: 241
+                    end: 244
+          deadinfo: null
+          operation: avg
+          returns: vector
+          operations:
+            - '[*parser.VectorSelector] foo_rejections offset 1d'
+            - '[*parser.Call] rate(foo_rejections[6h] offset 1d)'
+            - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h] offset 1d) or vector(0))'
+          joins:
+            - labels:
+                "":
+                    reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
+                    kind: excluded
+                    fragment:
+                        start: 320
+                        end: 323
+                __name__:
+                    reason: Aggregation removes metric name.
+                    kind: excluded
+                    fragment:
+                        start: 262
+                        end: 334
+                colo_name:
+                    reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
+                    kind: included
+                    fragment:
+                        start: 320
+                        end: 323
+              deadinfo: null
+              operation: avg
+              returns: vector
+              operations:
+                - '[*parser.VectorSelector] foo_total offset 1d'
+                - '[*parser.Call] rate(foo_total[6h] offset 1d)'
+                - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h] offset 1d) or vector(1))'
+              joins: []
+              unless: []
+              returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+              position:
+                start: 276
+                end: 299
+              type: aggregation
+              fixedlabels: true
+              isconditional: false
+            - labels:
+                "":
+                    reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
+                    kind: excluded
+                    fragment:
+                        start: 320
+                        end: 323
+                __name__:
+                    reason: Aggregation removes metric name.
+                    kind: excluded
+                    fragment:
+                        start: 262
+                        end: 334
+                colo_name:
+                    reason: Calling `vector()` will return a vector value with no labels.
+                    kind: excluded
+                    fragment:
+                        start: 306
+                        end: 312
+              deadinfo: null
+              operation: avg
+              returns: vector
+              operations:
+                - '[*parser.Call] vector(1)'
+                - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h] offset 1d) or vector(1))'
+              joins: []
+              unless: []
+              returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 306
+                    end: 315
+                returnednumber: 1
+                alwaysreturns: true
+                knownreturn: true
+                isreturnbool: false
+              position:
+                start: 306
+                end: 315
+              type: aggregation
+              fixedlabels: true
+              isconditional: false
+          unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 192
+            end: 220
+          type: aggregation
+          fixedlabels: true
+          isconditional: false
+        - labels:
+            "":
+                reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
+                kind: excluded
+                fragment:
+                    start: 241
+                    end: 244
+            __name__:
+                reason: Aggregation removes metric name.
+                kind: excluded
+                fragment:
+                    start: 178
+                    end: 255
+            colo_name:
+                reason: Calling `vector()` will return a vector value with no labels.
+                kind: excluded
+                fragment:
+                    start: 227
+                    end: 233
+          deadinfo: null
+          operation: avg
+          returns: vector
+          operations:
+            - '[*parser.Call] vector(0)'
+            - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h] offset 1d) or vector(0))'
+          joins:
+            - labels:
+                "":
+                    reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
+                    kind: excluded
+                    fragment:
+                        start: 320
+                        end: 323
+                __name__:
+                    reason: Aggregation removes metric name.
+                    kind: excluded
+                    fragment:
+                        start: 262
+                        end: 334
+                colo_name:
+                    reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
+                    kind: included
+                    fragment:
+                        start: 320
+                        end: 323
+              deadinfo: null
+              operation: avg
+              returns: vector
+              operations:
+                - '[*parser.VectorSelector] foo_total offset 1d'
+                - '[*parser.Call] rate(foo_total[6h] offset 1d)'
+                - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h] offset 1d) or vector(1))'
+              joins: []
+              unless: []
+              returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+              position:
+                start: 276
+                end: 299
+              type: aggregation
+              fixedlabels: true
+              isconditional: false
+            - labels:
+                "":
+                    reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
+                    kind: excluded
+                    fragment:
+                        start: 320
+                        end: 323
+                __name__:
+                    reason: Aggregation removes metric name.
+                    kind: excluded
+                    fragment:
+                        start: 262
+                        end: 334
+                colo_name:
+                    reason: Calling `vector()` will return a vector value with no labels.
+                    kind: excluded
+                    fragment:
+                        start: 306
+                        end: 312
+              deadinfo: null
+              operation: avg
+              returns: vector
+              operations:
+                - '[*parser.Call] vector(1)'
+                - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h] offset 1d) or vector(1))'
+              joins: []
+              unless: []
+              returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 306
+                    end: 315
+                returnednumber: 1
+                alwaysreturns: true
+                knownreturn: true
+                isreturnbool: false
+              position:
+                start: 306
+                end: 315
+              type: aggregation
+              fixedlabels: true
+              isconditional: false
+          unless: []
+          returninfo:
+            logicalexpr: 5 * vector(0) / vector(1)
+            valueposition:
+                start: 170
+                end: 171
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 227
+            end: 236
+          type: aggregation
+          fixedlabels: true
+          isconditional: false
+        - labels: {}
+          deadinfo: null
+          operation: many-to-many
+          returns: vector
+          operations:
+            - '[*parser.VectorSelector] colo_job:foo_total:rate2m'
+          joins: []
+          unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 357
+            end: 382
+          type: selector
+          fixedlabels: false
+          isconditional: true
+        - labels:
+            "":
+                reason: Calling `vector()` will return a vector value with no labels.
+                kind: excluded
+                fragment:
+                    start: 386
+                    end: 392
+          deadinfo:
+            reason: The right hand side will never be matched because it doesn't have the `colo_name` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
+            fragment:
+                start: 386
+                end: 392
+          operation: vector
+          returns: vector
+          operations:
+            - '[*parser.Call] vector(0)'
+          joins: []
+          unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 386
+                end: 395
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 386
+            end: 395
+          type: function
+          fixedlabels: true
+          isconditional: true
+        - labels: {}
+          deadinfo: null
+          operation: many-to-many
+          returns: vector
+          operations:
+            - '[*parser.VectorSelector] colo_job:foo_total:rate2m offset 1d'
+          joins: []
+          unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: false
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 424
+            end: 459
+          type: selector
+          fixedlabels: false
+          isconditional: true
+        - labels:
+            "":
+                reason: Calling `vector()` will return a vector value with no labels.
+                kind: excluded
+                fragment:
+                    start: 463
+                    end: 469
+          deadinfo:
+            reason: The right hand side will never be matched because it doesn't have the `colo_name` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
+            fragment:
+                start: 463
+                end: 469
+          operation: vector
+          returns: vector
+          operations:
+            - '[*parser.Call] vector(0)'
+          joins: []
+          unless: []
+          returninfo:
+            logicalexpr: ""
+            valueposition:
+                start: 463
+                end: 472
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 463
+            end: 472
+          type: function
+          fixedlabels: true
+          isconditional: true
+      unless: []
+      returninfo:
+        logicalexpr: vector(0) / vector(1)
+        valueposition:
+            start: 50
+            end: 59
+        returnednumber: 0
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: false
+      position:
+        start: 50
+        end: 59
+      type: aggregation
+      fixedlabels: true
+      isconditional: true
 
 ---

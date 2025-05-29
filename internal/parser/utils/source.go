@@ -77,6 +77,15 @@ type DeadInfo struct {
 	Fragment posrange.PositionRange
 }
 
+type ReturnInfo struct {
+	LogicalExpr    string
+	ValuePosition  posrange.PositionRange
+	ReturnedNumber float64 // If AlwaysReturns=true this is the number that's returned
+	AlwaysReturns  bool    // True if this source always returns results.
+	KnownReturn    bool    // True if we always know the return value.
+	IsReturnBool   bool    // True if this source uses the 'bool' modifier.
+}
+
 type SourceOperations []promParser.Node
 
 // Used for test snapshots.
@@ -105,41 +114,18 @@ func newSource() Source {
 }
 
 type Source struct {
-	Labels         map[string]LabelTransform
-	DeadInfo       *DeadInfo
-	Operation      string
-	Returns        promParser.ValueType
-	Operations     SourceOperations
-	Joins          []Source // Any other sources this source joins with.
-	Unless         []Source // Any other sources this source is suppressed by.
-	Position       posrange.PositionRange
-	ReturnedNumber float64 // If AlwaysReturns=true this is the number that's returned
-	Type           SourceType
-	FixedLabels    bool // Labels are fixed and only allowed labels can be present.
-	AlwaysReturns  bool // True if this source always returns results.
-	KnownReturn    bool // True if we always know the return value.
-	IsConditional  bool // True if this source is guarded by 'foo > 5' or other condition.
-	IsReturnBool   bool // True if this source uses the 'bool' modifier.
-}
-
-func (s Source) Fragment(expr string) string {
-	for i := len(s.Operations) - 1; i >= 0; i-- {
-		op := s.Operations[i]
-		switch n := op.(type) {
-		case *promParser.Call:
-			if s.Type == FuncSource {
-				return GetQueryFragment(expr, n.PosRange)
-			}
-		case *promParser.AggregateExpr:
-			if s.Type == AggregateSource {
-				return GetQueryFragment(expr, n.PosRange)
-			}
-		}
-	}
-	if vs, ok := MostOuterOperation[*promParser.VectorSelector](s); ok {
-		return GetQueryFragment(expr, vs.PosRange)
-	}
-	return ""
+	Labels        map[string]LabelTransform
+	DeadInfo      *DeadInfo
+	Operation     string
+	Returns       promParser.ValueType
+	Operations    SourceOperations
+	Joins         []Source // Any other sources this source joins with.
+	Unless        []Source // Any other sources this source is suppressed by.
+	ReturnInfo    ReturnInfo
+	Position      posrange.PositionRange
+	Type          SourceType
+	FixedLabels   bool // Labels are fixed and only allowed labels can be present.
+	IsConditional bool // True if this source is guarded by 'foo > 5' or other condition.
 }
 
 func (s Source) CanHaveLabel(name string) bool {
@@ -289,9 +275,10 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 	case *promParser.NumberLiteral:
 		s.Type = NumberSource
 		s.Returns = promParser.ValueTypeScalar
-		s.KnownReturn = true
-		s.ReturnedNumber = n.Val
-		s.AlwaysReturns = true
+		s.ReturnInfo.KnownReturn = true
+		s.ReturnInfo.ReturnedNumber = n.Val
+		s.ReturnInfo.AlwaysReturns = true
+		s.ReturnInfo.ValuePosition = n.PosRange
 		s.excludeAllLabels("This query returns a number value with no labels.", n.PosRange, nil)
 		s.Position = n.PosRange
 		src = append(src, s)
@@ -302,7 +289,7 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 	case *promParser.StringLiteral:
 		s.Type = StringSource
 		s.Returns = promParser.ValueTypeString
-		s.AlwaysReturns = true
+		s.ReturnInfo.AlwaysReturns = true
 		s.excludeAllLabels("This query returns a string value with no labels.", n.PosRange, nil)
 		s.Position = n.PosRange
 		src = append(src, s)
@@ -618,7 +605,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 		// No labels if we don't pass any arguments.
 		// Otherwise no change to labels.
 		if len(n.Args) == 0 {
-			s.AlwaysReturns = true
+			s.ReturnInfo.AlwaysReturns = true
 			s.excludeAllLabels(
 				fmt.Sprintf("Calling `%s()` with no arguments will return an empty time series with no labels.",
 					n.Func.Name),
@@ -683,7 +670,10 @@ If you're hoping to get instance specific labels this way and alert when some ta
 
 	case "pi":
 		s.Returns = promParser.ValueTypeScalar
-		s.AlwaysReturns = true
+		s.ReturnInfo.AlwaysReturns = true
+		s.ReturnInfo.KnownReturn = true
+		s.ReturnInfo.ReturnedNumber = math.Pi
+		s.ReturnInfo.ValuePosition = n.PosRange
 		s.excludeAllLabels(
 			fmt.Sprintf("Calling `%s()` will return a scalar value with no labels.", n.Func.Name),
 			n.PosRange,
@@ -692,7 +682,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 
 	case "scalar":
 		s.Returns = promParser.ValueTypeScalar
-		s.AlwaysReturns = true
+		s.ReturnInfo.AlwaysReturns = true
 		s.excludeAllLabels(
 			fmt.Sprintf("Calling `%s()` will return a scalar value with no labels.", n.Func.Name),
 			FindPosition(expr, n.PositionRange(), n.Func.Name),
@@ -705,7 +695,8 @@ If you're hoping to get instance specific labels this way and alert when some ta
 
 	case "time":
 		s.Returns = promParser.ValueTypeScalar
-		s.AlwaysReturns = true
+		s.ReturnInfo.AlwaysReturns = true
+		s.ReturnInfo.ValuePosition = n.PosRange
 		s.excludeAllLabels(
 			fmt.Sprintf("Calling `%s()` will return a scalar value with no labels.", n.Func.Name),
 			n.PosRange,
@@ -724,11 +715,12 @@ If you're hoping to get instance specific labels this way and alert when some ta
 
 	case "vector":
 		s.Returns = promParser.ValueTypeVector
-		s.AlwaysReturns = true
+		s.ReturnInfo.AlwaysReturns = true
+		s.ReturnInfo.ValuePosition = n.PosRange
 		for _, vs := range walkNode(expr, n.Args[0]) {
-			if vs.KnownReturn {
-				s.ReturnedNumber = vs.ReturnedNumber
-				s.KnownReturn = true
+			if vs.ReturnInfo.KnownReturn {
+				s.ReturnInfo.ReturnedNumber = vs.ReturnInfo.ReturnedNumber
+				s.ReturnInfo.KnownReturn = true
 			}
 		}
 		s.excludeAllLabels(
@@ -781,7 +773,6 @@ func parseCall(expr string, n *promParser.Call) (src []Source) {
 }
 
 func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
-	s := newSource()
 	switch {
 	// foo{} + 1
 	// 1 + foo{}
@@ -791,10 +782,10 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 		lhs := walkNode(expr, n.LHS)
 		rhs := walkNode(expr, n.RHS)
 		for _, ls := range lhs {
-			ls.IsConditional, ls.IsReturnBool = checkConditions(ls, n.Op, n.ReturnBool)
+			ls.IsConditional, ls.ReturnInfo.IsReturnBool = checkConditions(ls, n.Op, n.ReturnBool)
 			for _, rs := range rhs {
-				rs.IsConditional, rs.IsReturnBool = checkConditions(rs, n.Op, n.ReturnBool)
-				side := newSource()
+				rs.IsConditional, rs.ReturnInfo.IsReturnBool = checkConditions(rs, n.Op, n.ReturnBool)
+				var side Source
 				switch {
 				case ls.Returns == promParser.ValueTypeVector, ls.Returns == promParser.ValueTypeMatrix:
 					// Use labels from LHS
@@ -805,14 +796,9 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 				default:
 					side = ls
 				}
-				if ls.AlwaysReturns && rs.AlwaysReturns && ls.KnownReturn && rs.KnownReturn {
+				if ls.ReturnInfo.AlwaysReturns && rs.ReturnInfo.AlwaysReturns && ls.ReturnInfo.KnownReturn && rs.ReturnInfo.KnownReturn {
 					// Both sides always return something
-					side.ReturnedNumber, side.DeadInfo = calculateStaticReturn(
-						expr,
-						ls, rs,
-						n.Op,
-						ls.DeadInfo,
-					)
+					side.ReturnInfo, side.DeadInfo = calculateStaticReturn(expr, ls, rs, n)
 				}
 				src = append(src, side)
 			}
@@ -824,9 +810,9 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 		// foo{} /               bar{}
 	case n.VectorMatching.Card == promParser.CardOneToOne:
 		rhs := walkNode(expr, n.RHS)
-		for _, s = range walkNode(expr, n.LHS) {
+		for _, ls := range walkNode(expr, n.LHS) {
 			if n.VectorMatching.On {
-				s.excludeAllLabels(
+				ls.excludeAllLabels(
 					fmt.Sprintf(
 						"Query is using %s vector matching with `on(%s)`, only labels included inside `on(...)` will be present on the results.",
 						n.VectorMatching.Card, strings.Join(n.VectorMatching.MatchingLabels, ", "),
@@ -835,7 +821,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					n.VectorMatching.MatchingLabels,
 				)
 			} else {
-				s.excludeLabel(
+				ls.excludeLabel(
 					fmt.Sprintf(
 						"Query is using %s vector matching with `ignoring(%s)`, all labels included inside `ignoring(...)` will be removed on the results.",
 						n.VectorMatching.Card, strings.Join(n.VectorMatching.MatchingLabels, ", "),
@@ -844,40 +830,35 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					n.VectorMatching.MatchingLabels...,
 				)
 				for _, rs := range rhs {
-					rs.IsConditional, rs.IsReturnBool = checkConditions(rs, n.Op, n.ReturnBool)
-					if s.AlwaysReturns && rs.AlwaysReturns && s.KnownReturn && rs.KnownReturn {
+					rs.IsConditional, rs.ReturnInfo.IsReturnBool = checkConditions(rs, n.Op, n.ReturnBool)
+					if ls.ReturnInfo.AlwaysReturns && rs.ReturnInfo.AlwaysReturns && ls.ReturnInfo.KnownReturn && rs.ReturnInfo.KnownReturn {
 						// Both sides always return something
-						s.ReturnedNumber, s.DeadInfo = calculateStaticReturn(
-							expr,
-							s, rs,
-							n.Op,
-							s.DeadInfo,
-						)
+						ls.ReturnInfo, ls.DeadInfo = calculateStaticReturn(expr, ls, rs, n)
 					}
 				}
 			}
-			if s.Operation == "" {
-				s.Operation = n.VectorMatching.Card.String()
+			if ls.Operation == "" {
+				ls.Operation = n.VectorMatching.Card.String()
 			}
 			for _, rs := range rhs {
-				if ok, s, pos := canJoin(s, rs, n.VectorMatching); !ok {
+				if ok, s, pos := canJoin(ls, rs, n.VectorMatching); !ok {
 					rs.DeadInfo = &DeadInfo{
 						Reason:   s,
 						Fragment: pos,
 					}
 				}
-				s.Joins = append(s.Joins, rs)
+				ls.Joins = append(ls.Joins, rs)
 			}
-			s.IsConditional, s.IsReturnBool = checkConditions(s, n.Op, n.ReturnBool)
-			src = append(src, s)
+			ls.IsConditional, ls.ReturnInfo.IsReturnBool = checkConditions(ls, n.Op, n.ReturnBool)
+			src = append(src, ls)
 		}
 
 		// foo{} + on(...)       group_right(...) bar{}
 		// foo{} + ignoring(...) group_right(...) bar{}
 	case n.VectorMatching.Card == promParser.CardOneToMany:
 		lhs := walkNode(expr, n.LHS)
-		for _, s = range walkNode(expr, n.RHS) {
-			s.includeLabel(
+		for _, rs := range walkNode(expr, n.RHS) {
+			rs.includeLabel(
 				fmt.Sprintf(
 					"Query is using %s vector matching with `group_right(%s)`, all labels included inside `group_right(...)` will be include on the results.",
 					n.VectorMatching.Card, strings.Join(n.VectorMatching.Include, ", "),
@@ -889,7 +870,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 			// foo * on(instance) group_left(a,b) bar{x="y"}
 			// then only group_left() labels will be included.
 			if n.VectorMatching.On {
-				s.includeLabel(
+				rs.includeLabel(
 					fmt.Sprintf(
 						"Query is using %s vector matching with `on(%s)`, labels included inside `on(...)` will be present on the results.",
 						n.VectorMatching.Card, strings.Join(n.VectorMatching.MatchingLabels, ", "),
@@ -898,28 +879,28 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					n.VectorMatching.MatchingLabels...,
 				)
 			}
-			if s.Operation == "" {
-				s.Operation = n.VectorMatching.Card.String()
+			if rs.Operation == "" {
+				rs.Operation = n.VectorMatching.Card.String()
 			}
 			for _, ls := range lhs {
-				if ok, s, pos := canJoin(s, ls, n.VectorMatching); !ok {
+				if ok, s, pos := canJoin(rs, ls, n.VectorMatching); !ok {
 					ls.DeadInfo = &DeadInfo{
 						Reason:   s,
 						Fragment: pos,
 					}
 				}
-				s.Joins = append(s.Joins, ls)
+				rs.Joins = append(rs.Joins, ls)
 			}
-			s.IsConditional, s.IsReturnBool = checkConditions(s, n.Op, n.ReturnBool)
-			src = append(src, s)
+			rs.IsConditional, rs.ReturnInfo.IsReturnBool = checkConditions(rs, n.Op, n.ReturnBool)
+			src = append(src, rs)
 		}
 
 		// foo{} + on(...)       group_left(...) bar{}
 		// foo{} + ignoring(...) group_left(...) bar{}
 	case n.VectorMatching.Card == promParser.CardManyToOne:
 		rhs := walkNode(expr, n.RHS)
-		for _, s = range walkNode(expr, n.LHS) {
-			s.includeLabel(
+		for _, ls := range walkNode(expr, n.LHS) {
+			ls.includeLabel(
 				fmt.Sprintf(
 					"Query is using %s vector matching with `group_left(%s)`, all labels included inside `group_left(...)` will be include on the results.",
 					n.VectorMatching.Card, strings.Join(n.VectorMatching.Include, ", "),
@@ -928,7 +909,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 				n.VectorMatching.Include...,
 			)
 			if n.VectorMatching.On {
-				s.includeLabel(
+				ls.includeLabel(
 					fmt.Sprintf(
 						"Query is using %s vector matching with `on(%s)`, labels included inside `on(...)` will be present on the results.",
 						n.VectorMatching.Card, strings.Join(n.VectorMatching.MatchingLabels, ", "),
@@ -937,20 +918,20 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					n.VectorMatching.MatchingLabels...,
 				)
 			}
-			if s.Operation == "" {
-				s.Operation = n.VectorMatching.Card.String()
+			if ls.Operation == "" {
+				ls.Operation = n.VectorMatching.Card.String()
 			}
 			for _, rs := range rhs {
-				if ok, s, pos := canJoin(s, rs, n.VectorMatching); !ok {
+				if ok, s, pos := canJoin(ls, rs, n.VectorMatching); !ok {
 					rs.DeadInfo = &DeadInfo{
 						Reason:   s,
 						Fragment: pos,
 					}
 				}
-				s.Joins = append(s.Joins, rs)
+				ls.Joins = append(ls.Joins, rs)
 			}
-			s.IsConditional, s.IsReturnBool = checkConditions(s, n.Op, n.ReturnBool)
-			src = append(src, s)
+			ls.IsConditional, ls.ReturnInfo.IsReturnBool = checkConditions(ls, n.Op, n.ReturnBool)
+			src = append(src, ls)
 		}
 
 		// foo{} and on(...)       bar{}
@@ -959,10 +940,10 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 	case n.VectorMatching.Card == promParser.CardManyToMany:
 		var lhsCanBeEmpty bool // true if any of the LHS query can produce empty results.
 		rhs := walkNode(expr, n.RHS)
-		for _, s = range walkNode(expr, n.LHS) {
+		for _, ls := range walkNode(expr, n.LHS) {
 			var rhsConditional bool
 			if n.VectorMatching.On {
-				s.includeLabel(
+				ls.includeLabel(
 					fmt.Sprintf(
 						"Query is using %s vector matching with `on(%s)`, labels included inside `on(...)` will be present on the results.",
 						n.VectorMatching.Card, strings.Join(n.VectorMatching.MatchingLabels, ", "),
@@ -971,10 +952,10 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					n.VectorMatching.MatchingLabels...,
 				)
 			}
-			if s.Operation == "" {
-				s.Operation = n.VectorMatching.Card.String()
+			if ls.Operation == "" {
+				ls.Operation = n.VectorMatching.Card.String()
 			}
-			if !s.AlwaysReturns || s.IsConditional {
+			if !ls.ReturnInfo.AlwaysReturns || ls.IsConditional {
 				lhsCanBeEmpty = true
 			}
 			for _, rs := range rhs {
@@ -982,7 +963,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 				if isConditional {
 					rhsConditional = true
 				}
-				if ok, s, pos := canJoin(s, rs, n.VectorMatching); !ok {
+				if ok, s, pos := canJoin(ls, rs, n.VectorMatching); !ok {
 					rs.DeadInfo = &DeadInfo{
 						Reason:   s,
 						Fragment: pos,
@@ -990,35 +971,35 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 				}
 				switch {
 				case n.Op == promParser.LUNLESS:
-					if n.VectorMatching.On && len(n.VectorMatching.MatchingLabels) == 0 && rs.AlwaysReturns && !rs.IsConditional {
-						s.DeadInfo = &DeadInfo{
+					if n.VectorMatching.On && len(n.VectorMatching.MatchingLabels) == 0 && rs.ReturnInfo.AlwaysReturns && !rs.IsConditional {
+						ls.DeadInfo = &DeadInfo{
 							Reason:   "this query will never return anything because the `unless` query always returns something",
 							Fragment: rs.Position,
 						}
 					}
-					s.Unless = append(s.Unless, rs)
+					ls.Unless = append(ls.Unless, rs)
 				case n.Op != promParser.LOR:
-					s.Joins = append(s.Joins, rs)
+					ls.Joins = append(ls.Joins, rs)
 				}
 			}
 			if n.Op == promParser.LAND && rhsConditional {
-				s.IsConditional = true
+				ls.IsConditional = true
 			}
-			src = append(src, s)
+			src = append(src, ls)
 		}
 		if n.Op == promParser.LOR {
-			for _, s = range rhs {
-				if s.Operation == "" {
-					s.Operation = n.VectorMatching.Card.String()
+			for _, rs := range rhs {
+				if rs.Operation == "" {
+					rs.Operation = n.VectorMatching.Card.String()
 				}
 				// If LHS can NOT be empty then RHS is dead code.
 				if !lhsCanBeEmpty {
-					s.DeadInfo = &DeadInfo{
+					rs.DeadInfo = &DeadInfo{
 						Reason:   "the left hand side always returs something and so the right hand side is never used",
-						Fragment: s.Position,
+						Fragment: rs.Position,
 					}
 				}
-				src = append(src, s)
+				src = append(src, rs)
 			}
 		}
 	}
@@ -1071,83 +1052,102 @@ func canJoin(ls, rs Source, vm *promParser.VectorMatching) (bool, string, posran
 	return true, "", posrange.PositionRange{}
 }
 
-func ftos(v float64) string {
-	return strconv.FormatFloat(v, 'f', -1, 64)
+func describeDeadCode(expr string, ls, rs Source, op *promParser.BinaryExpr, match string) *DeadInfo {
+	var lse, rse string
+	if ls.ReturnInfo.LogicalExpr != "" {
+		lse = ls.ReturnInfo.LogicalExpr
+	} else {
+		lse = GetQueryFragment(expr, ls.ReturnInfo.ValuePosition)
+	}
+	if rs.ReturnInfo.LogicalExpr != "" {
+		rse = rs.ReturnInfo.LogicalExpr
+	} else {
+		rse = GetQueryFragment(expr, rs.ReturnInfo.ValuePosition)
+	}
+
+	cmpPrefix := fmt.Sprintf("`%s %s %s` always evaluates to", lse, op.Op, rse)
+
+	var cmpSuffix string
+	if op.ReturnBool {
+		cmpSuffix = "and uses the `bool` modifier which means it will always return 0"
+	} else {
+		cmpSuffix = "which is not possible, so it will never return anything"
+	}
+	return &DeadInfo{
+		Reason: fmt.Sprintf(
+			"%s `%s %s %s` %s",
+			cmpPrefix,
+			strconv.FormatFloat(ls.ReturnInfo.ReturnedNumber, 'f', -1, 64),
+			match,
+			strconv.FormatFloat(rs.ReturnInfo.ReturnedNumber, 'f', -1, 64),
+			cmpSuffix,
+		),
+		Fragment: ls.Position,
+	}
 }
 
-func calculateStaticReturn(expr string, ls, rs Source, op promParser.ItemType, fallbackDeadInfo *DeadInfo) (float64, *DeadInfo) {
-	lf := ls.Fragment(expr)
-	rf := rs.Fragment(expr)
-	var cmpPrefix string
-	if lf != "" && rf != "" {
-		cmpPrefix = fmt.Sprintf("`%s %s %s` always evaluates to", lf, op, rf)
-	} else {
-		cmpPrefix = "this query always evaluates to"
-	}
-	cmpSuffix := "which is not possible, so it will never return anything"
-	switch op {
+func calculateStaticReturn(expr string, ls, rs Source, op *promParser.BinaryExpr) (ret ReturnInfo, deadinfo *DeadInfo) {
+	ret = ls.ReturnInfo
+	switch op.Op {
 	case promParser.EQLC:
-		if ls.ReturnedNumber != rs.ReturnedNumber {
-			return ls.ReturnedNumber,
-				&DeadInfo{
-					Reason:   fmt.Sprintf("%s `%s == %s` %s", cmpPrefix, ftos(ls.ReturnedNumber), ftos(rs.ReturnedNumber), cmpSuffix),
-					Fragment: ls.Position,
-				}
+		if ls.ReturnInfo.ReturnedNumber != rs.ReturnInfo.ReturnedNumber {
+			deadinfo = describeDeadCode(expr, ls, rs, op, "==")
 		}
 	case promParser.NEQ:
-		if ls.ReturnedNumber == rs.ReturnedNumber {
-			return ls.ReturnedNumber,
-				&DeadInfo{
-					Reason:   fmt.Sprintf("%s `%s != %s` %s", cmpPrefix, ftos(ls.ReturnedNumber), ftos(rs.ReturnedNumber), cmpSuffix),
-					Fragment: ls.Position,
-				}
+		if ls.ReturnInfo.ReturnedNumber == rs.ReturnInfo.ReturnedNumber {
+			deadinfo = describeDeadCode(expr, ls, rs, op, "!=")
 		}
 	case promParser.LTE:
-		if ls.ReturnedNumber > rs.ReturnedNumber {
-			return ls.ReturnedNumber,
-				&DeadInfo{
-					Reason:   fmt.Sprintf("%s `%s <= %s` %s", cmpPrefix, ftos(ls.ReturnedNumber), ftos(rs.ReturnedNumber), cmpSuffix),
-					Fragment: ls.Position,
-				}
+		if ls.ReturnInfo.ReturnedNumber > rs.ReturnInfo.ReturnedNumber {
+			deadinfo = describeDeadCode(expr, ls, rs, op, "<=")
 		}
 	case promParser.LSS:
-		if ls.ReturnedNumber >= rs.ReturnedNumber {
-			return ls.ReturnedNumber,
-				&DeadInfo{
-					Reason:   fmt.Sprintf("%s `%s < %s` %s", cmpPrefix, ftos(ls.ReturnedNumber), ftos(rs.ReturnedNumber), cmpSuffix),
-					Fragment: ls.Position,
-				}
+		if ls.ReturnInfo.ReturnedNumber >= rs.ReturnInfo.ReturnedNumber {
+			deadinfo = describeDeadCode(expr, ls, rs, op, "<")
 		}
 	case promParser.GTE:
-		if ls.ReturnedNumber < rs.ReturnedNumber {
-			return ls.ReturnedNumber,
-				&DeadInfo{
-					Reason:   fmt.Sprintf("%s `%s >= %s` %s", cmpPrefix, ftos(ls.ReturnedNumber), ftos(rs.ReturnedNumber), cmpSuffix),
-					Fragment: ls.Position,
-				}
+		if ls.ReturnInfo.ReturnedNumber < rs.ReturnInfo.ReturnedNumber {
+			deadinfo = describeDeadCode(expr, ls, rs, op, ">=")
 		}
 	case promParser.GTR:
-		if ls.ReturnedNumber <= rs.ReturnedNumber {
-			return ls.ReturnedNumber,
-				&DeadInfo{
-					Reason:   fmt.Sprintf("%s `%s > %s` %s", cmpPrefix, ftos(ls.ReturnedNumber), ftos(rs.ReturnedNumber), cmpSuffix),
-					Fragment: ls.Position,
-				}
+		if ls.ReturnInfo.ReturnedNumber <= rs.ReturnInfo.ReturnedNumber {
+			deadinfo = describeDeadCode(expr, ls, rs, op, ">")
 		}
 	case promParser.ADD:
-		return ls.ReturnedNumber + rs.ReturnedNumber, fallbackDeadInfo
+		ret.ReturnedNumber = ls.ReturnInfo.ReturnedNumber + rs.ReturnInfo.ReturnedNumber
+		ret.LogicalExpr = formatDesc(expr, ls, rs, "+")
 	case promParser.SUB:
-		return ls.ReturnedNumber - rs.ReturnedNumber, fallbackDeadInfo
+		ret.ReturnedNumber = ls.ReturnInfo.ReturnedNumber - rs.ReturnInfo.ReturnedNumber
+		ret.LogicalExpr = formatDesc(expr, ls, rs, "-")
 	case promParser.MUL:
-		return ls.ReturnedNumber * rs.ReturnedNumber, fallbackDeadInfo
+		ret.ReturnedNumber = ls.ReturnInfo.ReturnedNumber * rs.ReturnInfo.ReturnedNumber
+		ret.LogicalExpr = formatDesc(expr, ls, rs, "*")
 	case promParser.DIV:
-		return ls.ReturnedNumber / rs.ReturnedNumber, fallbackDeadInfo
+		ret.ReturnedNumber = ls.ReturnInfo.ReturnedNumber / rs.ReturnInfo.ReturnedNumber
+		ret.LogicalExpr = formatDesc(expr, ls, rs, "/")
 	case promParser.MOD:
-		return math.Mod(ls.ReturnedNumber, rs.ReturnedNumber), fallbackDeadInfo
+		ret.ReturnedNumber = math.Mod(ls.ReturnInfo.ReturnedNumber, rs.ReturnInfo.ReturnedNumber)
+		ret.LogicalExpr = formatDesc(expr, ls, rs, "%")
 	case promParser.POW:
-		return math.Pow(ls.ReturnedNumber, rs.ReturnedNumber), fallbackDeadInfo
+		ret.ReturnedNumber = math.Pow(ls.ReturnInfo.ReturnedNumber, rs.ReturnInfo.ReturnedNumber)
+		ret.LogicalExpr = formatDesc(expr, ls, rs, "^")
 	}
-	return ls.ReturnedNumber, fallbackDeadInfo
+	return ret, deadinfo
+}
+
+func formatDesc(expr string, ls, rs Source, op string) string {
+	var lse, rse string
+	if ls.ReturnInfo.LogicalExpr != "" {
+		lse = ls.ReturnInfo.LogicalExpr
+	} else {
+		lse = GetQueryFragment(expr, ls.ReturnInfo.ValuePosition)
+	}
+	if rs.ReturnInfo.LogicalExpr != "" {
+		rse = rs.ReturnInfo.LogicalExpr
+	} else {
+		rse = GetQueryFragment(expr, rs.ReturnInfo.ValuePosition)
+	}
+	return lse + " " + op + " " + rse
 }
 
 // FIXME sum() on ().
