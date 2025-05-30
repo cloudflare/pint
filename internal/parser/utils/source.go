@@ -114,8 +114,9 @@ func newSource() Source {
 }
 
 type Join struct {
-	Src Source
-	Op  promParser.ItemType
+	Src   Source              // The source we're joining with.
+	Op    promParser.ItemType // The binary operation used for this join.
+	Depth int                 // Zero if this is a direct join, non-zero otherwise. sum(foo * bar) would be in-direct join.
 }
 
 type Source struct {
@@ -473,6 +474,9 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 		}
 	case promParser.TOPK:
 		for _, s = range walkNode(expr, n.Expr) {
+			for i := range s.Joins {
+				s.Joins[i].Depth++
+			}
 			s.Type = AggregateSource
 			s.Operations = append(s.Operations, n)
 			s.Operation = "topk"
@@ -480,6 +484,9 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 		}
 	case promParser.BOTTOMK:
 		for _, s = range walkNode(expr, n.Expr) {
+			for i := range s.Joins {
+				s.Joins[i].Depth++
+			}
 			s.Type = AggregateSource
 			s.Operations = append(s.Operations, n)
 			s.Operation = "bottomk"
@@ -503,6 +510,17 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 func parseAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 	s := newSource()
 	for _, s = range walkNode(expr, n.Expr) {
+		// If we have sum(foo * bar) then we start with:
+		// - source: foo
+		//   joins: bar
+		// Then we parse aggregation and end up with:
+		// - source: sum(foo)
+		//   joins: bar
+		// Which is misleading and wrong, so we bump depth value to know about it.
+		for i := range s.Joins {
+			s.Joins[i].Depth++
+		}
+
 		if n.Without {
 			s.excludeLabel(
 				fmt.Sprintf("Query is using aggregation with `without(%s)`, all labels included inside `without(...)` will be removed from the results.",
@@ -852,7 +870,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 						Fragment: pos,
 					}
 				}
-				ls.Joins = append(ls.Joins, Join{Src: rs, Op: n.Op})
+				ls.Joins = append(ls.Joins, Join{Src: rs, Op: n.Op, Depth: 0})
 			}
 			ls.IsConditional, ls.ReturnInfo.IsReturnBool = checkConditions(ls, n.Op, n.ReturnBool)
 			src = append(src, ls)
@@ -894,7 +912,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 						Fragment: pos,
 					}
 				}
-				rs.Joins = append(rs.Joins, Join{Src: ls, Op: n.Op})
+				rs.Joins = append(rs.Joins, Join{Src: ls, Op: n.Op, Depth: 0})
 			}
 			rs.IsConditional, rs.ReturnInfo.IsReturnBool = checkConditions(rs, n.Op, n.ReturnBool)
 			src = append(src, rs)
@@ -933,7 +951,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 						Fragment: pos,
 					}
 				}
-				ls.Joins = append(ls.Joins, Join{Src: rs, Op: n.Op})
+				ls.Joins = append(ls.Joins, Join{Src: rs, Op: n.Op, Depth: 0})
 			}
 			ls.IsConditional, ls.ReturnInfo.IsReturnBool = checkConditions(ls, n.Op, n.ReturnBool)
 			src = append(src, ls)
@@ -978,13 +996,13 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 				case n.Op == promParser.LUNLESS:
 					if n.VectorMatching.On && len(n.VectorMatching.MatchingLabels) == 0 && rs.ReturnInfo.AlwaysReturns && !rs.IsConditional {
 						ls.DeadInfo = &DeadInfo{
-							Reason:   "this query will never return anything because the `unless` query always returns something",
+							Reason:   "This query will never return anything because the `unless` query always returns something.",
 							Fragment: rs.Position,
 						}
 					}
 					ls.Unless = append(ls.Unless, rs)
 				case n.Op != promParser.LOR:
-					ls.Joins = append(ls.Joins, Join{Src: rs, Op: n.Op})
+					ls.Joins = append(ls.Joins, Join{Src: rs, Op: n.Op, Depth: 0})
 				}
 			}
 			if n.Op == promParser.LAND && rhsConditional {
@@ -1000,7 +1018,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 				// If LHS can NOT be empty then RHS is dead code.
 				if !lhsCanBeEmpty {
 					rs.DeadInfo = &DeadInfo{
-						Reason:   "the left hand side always returs something and so the right hand side is never used",
+						Reason:   "The left hand side always returs something and so the right hand side is never used.",
 						Fragment: rs.Position,
 					}
 				}
@@ -1076,7 +1094,7 @@ func describeDeadCode(expr string, ls, rs Source, op *promParser.BinaryExpr, mat
 	if op.ReturnBool {
 		cmpSuffix = "and uses the `bool` modifier which means it will always return 0"
 	} else {
-		cmpSuffix = "which is not possible, so it will never return anything"
+		cmpSuffix = "which is not possible, so it will never return anything."
 	}
 	return &DeadInfo{
 		Reason: fmt.Sprintf(

@@ -476,10 +476,11 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57395
+          depth: 0
         - src:
             labels: {}
             deadinfo:
-                reason: the left hand side always returs something and so the right hand side is never used
+                reason: The left hand side always returs something and so the right hand side is never used.
                 fragment:
                     start: 35
                     end: 38
@@ -505,6 +506,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -565,10 +567,11 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57395
+          depth: 0
         - src:
             labels: {}
             deadinfo:
-                reason: the left hand side always returs something and so the right hand side is never used
+                reason: The left hand side always returs something and so the right hand side is never used.
                 fragment:
                     start: 35
                     end: 38
@@ -594,6 +597,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: vector(5) * vector(2)
@@ -866,6 +870,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57388
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -920,6 +925,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57388
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -986,6 +992,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57388
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -1052,6 +1059,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57388
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -1118,6 +1126,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57388
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -1184,6 +1193,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57388
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -1238,6 +1248,7 @@ output:
             fixedlabels: false
             isconditional: true
           op: 57389
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -2262,6 +2273,7 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57384
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -2354,6 +2366,7 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57384
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -3060,6 +3073,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57384
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -3132,6 +3146,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -3204,6 +3219,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -3288,6 +3304,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -3372,6 +3389,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -3439,6 +3457,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57384
+          depth: 1
       unless: []
       returninfo:
         logicalexpr: ""
@@ -3518,6 +3537,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57384
+          depth: 1
       unless: []
       returninfo:
         logicalexpr: ""
@@ -3603,6 +3623,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57384
+          depth: 1
       unless: []
       returninfo:
         logicalexpr: ""
@@ -3669,6 +3690,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57389
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -3741,6 +3763,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57389
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -4516,6 +4539,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
+          depth: 0
         - src:
             labels:
                 "":
@@ -4560,6 +4584,7 @@ output:
             fixedlabels: true
             isconditional: true
           op: 57389
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -4638,6 +4663,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57384
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -4710,6 +4736,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57384
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -4969,6 +4996,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57389
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -5133,6 +5161,7 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57396
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -5369,6 +5398,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -5441,6 +5471,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -5541,7 +5572,7 @@ output:
                 start: 0
                 end: 6
       deadinfo:
-        reason: '`vector(0.0  >= bool 0.5) == 1` always evaluates to `0 == 1` which is not possible, so it will never return anything'
+        reason: '`vector(0.0  >= bool 0.5) == 1` always evaluates to `0 == 1` which is not possible, so it will never return anything.'
         fragment:
             start: 0
             end: 24
@@ -5867,6 +5898,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -6037,6 +6069,7 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57391
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -6254,7 +6287,7 @@ output:
                 start: 91
                 end: 97
       deadinfo:
-        reason: '`vector(1) == 0` always evaluates to `1 == 0` which is not possible, so it will never return anything'
+        reason: '`vector(1) == 0` always evaluates to `1 == 0` which is not possible, so it will never return anything.'
         fragment:
             start: 91
             end: 100
@@ -6317,7 +6350,7 @@ output:
       isconditional: false
     - labels: {}
       deadinfo:
-        reason: the left hand side always returs something and so the right hand side is never used
+        reason: The left hand side always returs something and so the right hand side is never used.
         fragment:
             start: 13
             end: 16
@@ -6356,7 +6389,7 @@ output:
                 start: 0
                 end: 6
       deadinfo:
-        reason: '`vector(0) > 0` always evaluates to `0 > 0` which is not possible, so it will never return anything'
+        reason: '`vector(0) > 0` always evaluates to `0 > 0` which is not possible, so it will never return anything.'
         fragment:
             start: 0
             end: 9
@@ -6395,7 +6428,7 @@ output:
                 start: 0
                 end: 6
       deadinfo:
-        reason: '`vector(0) > vector(1)` always evaluates to `0 > 1` which is not possible, so it will never return anything'
+        reason: '`vector(0) > vector(1)` always evaluates to `0 > 1` which is not possible, so it will never return anything.'
         fragment:
             start: 0
             end: 9
@@ -6435,6 +6468,7 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57388
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -6507,7 +6541,7 @@ output:
                 start: 0
                 end: 21
       deadinfo:
-        reason: '`vector(0) > 0` always evaluates to `0 > 0` which is not possible, so it will never return anything'
+        reason: '`vector(0) > 0` always evaluates to `0 > 0` which is not possible, so it will never return anything.'
         fragment:
             start: 11
             end: 20
@@ -6589,7 +6623,7 @@ output:
                 start: 1
                 end: 22
       deadinfo:
-        reason: '`vector(1) == 2` always evaluates to `1 == 2` which is not possible, so it will never return anything'
+        reason: '`vector(1) == 2` always evaluates to `1 == 2` which is not possible, so it will never return anything.'
         fragment:
             start: 12
             end: 21
@@ -6749,7 +6783,7 @@ output:
                 start: 1
                 end: 22
       deadinfo:
-        reason: '`vector(2) != 2` always evaluates to `2 != 2` which is not possible, so it will never return anything'
+        reason: '`vector(2) != 2` always evaluates to `2 != 2` which is not possible, so it will never return anything.'
         fragment:
             start: 12
             end: 21
@@ -7004,6 +7038,7 @@ output:
             fixedlabels: false
             isconditional: true
           op: 57389
+          depth: 0
         - src:
             labels:
                 "":
@@ -7042,6 +7077,7 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57389
+          depth: 0
         - src:
             labels: {}
             deadinfo: null
@@ -7067,6 +7103,7 @@ output:
             fixedlabels: false
             isconditional: true
           op: 57389
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -7121,6 +7158,7 @@ output:
             fixedlabels: false
             isconditional: true
           op: 57389
+          depth: 0
         - src:
             labels:
                 "":
@@ -7159,6 +7197,7 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57389
+          depth: 0
         - src:
             labels: {}
             deadinfo: null
@@ -7184,6 +7223,7 @@ output:
             fixedlabels: false
             isconditional: true
           op: 57389
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -7272,6 +7312,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57383
+          depth: 0
         - src:
             labels:
                 "":
@@ -7303,6 +7344,7 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57383
+          depth: 0
         - src:
             labels:
                 log_name:
@@ -7335,6 +7377,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57383
+          depth: 0
         - src:
             labels:
                 "":
@@ -7366,6 +7409,7 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57383
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -7421,6 +7465,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57383
+          depth: 0
         - src:
             labels:
                 "":
@@ -7452,6 +7497,7 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57383
+          depth: 0
         - src:
             labels:
                 log_name:
@@ -7484,6 +7530,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57383
+          depth: 0
         - src:
             labels:
                 "":
@@ -7515,6 +7562,7 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57383
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: vector(0) + vector(1) + vector(2)
@@ -7677,7 +7725,7 @@ output:
                 start: 5
                 end: 23
       deadinfo:
-        reason: '`vector(0) > 0` always evaluates to `0 > 0` which is not possible, so it will never return anything'
+        reason: '`vector(0) > 0` always evaluates to `0 > 0` which is not possible, so it will never return anything.'
         fragment:
             start: 11
             end: 20
@@ -7823,7 +7871,7 @@ output:
                 start: 0
                 end: 34
       deadinfo:
-        reason: this query will never return anything because the `unless` query always returns something
+        reason: This query will never return anything because the `unless` query always returns something.
         fragment:
             start: 47
             end: 56
@@ -8076,6 +8124,7 @@ output:
                 fixedlabels: false
                 isconditional: false
               op: 57395
+              depth: 0
           unless: []
           returninfo:
             logicalexpr: ""
@@ -8163,6 +8212,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -8247,6 +8297,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -8331,6 +8382,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -8426,6 +8478,7 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57395
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -8527,6 +8580,7 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57395
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -8628,6 +8682,7 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57395
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -8729,6 +8784,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -8830,6 +8886,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -8943,6 +9000,7 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57389
+          depth: 1
         - src:
             labels:
                 instance:
@@ -8975,6 +9033,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
+          depth: 0
       unless:
         - labels: {}
           deadinfo: null
@@ -9010,6 +9069,7 @@ output:
                 fixedlabels: false
                 isconditional: false
               op: 57388
+              depth: 0
           unless: []
           returninfo:
             logicalexpr: ""
@@ -9110,6 +9170,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -9289,6 +9350,7 @@ output:
                     fixedlabels: true
                     isconditional: false
                   op: 57384
+                  depth: 0
             unless: []
             returninfo:
                 logicalexpr: ""
@@ -9306,6 +9368,7 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57395
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -9372,6 +9435,7 @@ output:
             fixedlabels: true
             isconditional: true
           op: 57389
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -9504,6 +9568,7 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
+          depth: 1
       unless: []
       returninfo:
         logicalexpr: ""
@@ -9557,7 +9622,7 @@ output:
                 start: 12
                 end: 18
       deadinfo:
-        reason: '`1 - vector(0) < 0.999` always evaluates to `1 < 0.999` which is not possible, so it will never return anything'
+        reason: '`1 - vector(0) < 0.999` always evaluates to `1 < 0.999` which is not possible, so it will never return anything.'
         fragment:
             start: 12
             end: 21
@@ -9635,6 +9700,7 @@ output:
             fixedlabels: true
             isconditional: true
           op: 57389
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -9843,6 +9909,7 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57384
+          depth: 0
         - src:
             labels:
                 "":
@@ -9887,6 +9954,7 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57384
+          depth: 0
         - src:
             labels:
                 "":
@@ -9960,6 +10028,7 @@ output:
                     fixedlabels: true
                     isconditional: false
                   op: 57384
+                  depth: 0
                 - src:
                     labels:
                         "":
@@ -10004,6 +10073,7 @@ output:
                     fixedlabels: true
                     isconditional: false
                   op: 57384
+                  depth: 0
             unless: []
             returninfo:
                 logicalexpr: ""
@@ -10021,6 +10091,7 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57388
+          depth: 0
         - src:
             labels:
                 "":
@@ -10093,6 +10164,7 @@ output:
                     fixedlabels: true
                     isconditional: false
                   op: 57384
+                  depth: 0
                 - src:
                     labels:
                         "":
@@ -10137,6 +10209,7 @@ output:
                     fixedlabels: true
                     isconditional: false
                   op: 57384
+                  depth: 0
             unless: []
             returninfo:
                 logicalexpr: 5 * vector(0) / vector(1)
@@ -10154,6 +10227,7 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57388
+          depth: 0
         - src:
             labels: {}
             deadinfo: null
@@ -10179,6 +10253,7 @@ output:
             fixedlabels: false
             isconditional: true
           op: 57389
+          depth: 0
         - src:
             labels:
                 "":
@@ -10214,6 +10289,7 @@ output:
             fixedlabels: true
             isconditional: true
           op: 57389
+          depth: 0
         - src:
             labels: {}
             deadinfo: null
@@ -10239,6 +10315,7 @@ output:
             fixedlabels: false
             isconditional: true
           op: 57389
+          depth: 0
         - src:
             labels:
                 "":
@@ -10274,6 +10351,7 @@ output:
             fixedlabels: true
             isconditional: true
           op: 57389
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -10310,7 +10388,7 @@ output:
                 start: 341
                 end: 344
       deadinfo:
-        reason: '`vector(0) / vector(1) > 5 * vector(0) / vector(1)` always evaluates to `0 > 0` which is not possible, so it will never return anything'
+        reason: '`vector(0) / vector(1) > 5 * vector(0) / vector(1)` always evaluates to `0 > 0` which is not possible, so it will never return anything.'
         fragment:
             start: 50
             end: 59
@@ -10365,6 +10443,7 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57384
+          depth: 0
         - src:
             labels:
                 "":
@@ -10409,6 +10488,7 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57384
+          depth: 0
         - src:
             labels:
                 "":
@@ -10482,6 +10562,7 @@ output:
                     fixedlabels: true
                     isconditional: false
                   op: 57384
+                  depth: 0
                 - src:
                     labels:
                         "":
@@ -10526,6 +10607,7 @@ output:
                     fixedlabels: true
                     isconditional: false
                   op: 57384
+                  depth: 0
             unless: []
             returninfo:
                 logicalexpr: ""
@@ -10543,6 +10625,7 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57388
+          depth: 0
         - src:
             labels:
                 "":
@@ -10615,6 +10698,7 @@ output:
                     fixedlabels: true
                     isconditional: false
                   op: 57384
+                  depth: 0
                 - src:
                     labels:
                         "":
@@ -10659,6 +10743,7 @@ output:
                     fixedlabels: true
                     isconditional: false
                   op: 57384
+                  depth: 0
             unless: []
             returninfo:
                 logicalexpr: 5 * vector(0) / vector(1)
@@ -10676,6 +10761,7 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57388
+          depth: 0
         - src:
             labels: {}
             deadinfo: null
@@ -10701,6 +10787,7 @@ output:
             fixedlabels: false
             isconditional: true
           op: 57389
+          depth: 0
         - src:
             labels:
                 "":
@@ -10736,6 +10823,7 @@ output:
             fixedlabels: true
             isconditional: true
           op: 57389
+          depth: 0
         - src:
             labels: {}
             deadinfo: null
@@ -10761,6 +10849,7 @@ output:
             fixedlabels: false
             isconditional: true
           op: 57389
+          depth: 0
         - src:
             labels:
                 "":
@@ -10796,6 +10885,7 @@ output:
             fixedlabels: true
             isconditional: true
           op: 57389
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: vector(0) / vector(1)
@@ -10876,6 +10966,7 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57384
+          depth: 0
       unless: []
       returninfo:
         logicalexpr: ""
@@ -10980,6 +11071,7 @@ output:
             fixedlabels: true
             isconditional: true
           op: 57395
+          depth: 1
       unless: []
       returninfo:
         logicalexpr: ""
@@ -10996,5 +11088,117 @@ output:
       type: aggregation
       fixedlabels: true
       isconditional: true
+
+---
+
+[TestLabelsSource/155 - 1]
+expr: topk(10, prometheus_build_info*prometheus_ready)
+output:
+    - labels: {}
+      deadinfo: null
+      operation: topk
+      returns: vector
+      operations:
+        - '[*parser.VectorSelector] prometheus_build_info'
+        - '[*parser.AggregateExpr] topk(10, prometheus_build_info * prometheus_ready)'
+      joins:
+        - src:
+            labels: {}
+            deadinfo: null
+            operation: ""
+            returns: vector
+            operations:
+                - '[*parser.VectorSelector] prometheus_ready'
+            joins: []
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+            position:
+                start: 31
+                end: 47
+            type: selector
+            fixedlabels: false
+            isconditional: false
+          op: 57395
+          depth: 1
+      unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
+      position:
+        start: 9
+        end: 30
+      type: aggregation
+      fixedlabels: false
+      isconditional: false
+
+---
+
+[TestLabelsSource/156 - 1]
+expr: bottomk(10, prometheus_build_info*prometheus_ready)
+output:
+    - labels: {}
+      deadinfo: null
+      operation: bottomk
+      returns: vector
+      operations:
+        - '[*parser.VectorSelector] prometheus_build_info'
+        - '[*parser.AggregateExpr] bottomk(10, prometheus_build_info * prometheus_ready)'
+      joins:
+        - src:
+            labels: {}
+            deadinfo: null
+            operation: ""
+            returns: vector
+            operations:
+                - '[*parser.VectorSelector] prometheus_ready'
+            joins: []
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+            position:
+                start: 34
+                end: 50
+            type: selector
+            fixedlabels: false
+            isconditional: false
+          op: 57395
+          depth: 1
+      unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
+      position:
+        start: 12
+        end: 33
+      type: aggregation
+      fixedlabels: false
+      isconditional: false
 
 ---

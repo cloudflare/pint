@@ -290,7 +290,7 @@
           summary: High rejectsion rate in {{ $labels.colo_name }}
   output: |4
      4 |       (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
-                                                ^^^^^^^^^ `vector(0) / vector(1) > 5 * vector(0) / vector(1)` always evaluates to `0 > 0` which is not possible, so it will never return anything
+                                                ^^^^^^^^^ `vector(0) / vector(1) > 5 * vector(0) / vector(1)` always evaluates to `0 > 0` which is not possible, so it will never return anything.
      5 |         (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
      6 |       > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
      7 |         avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
@@ -305,7 +305,7 @@
     summary: dead code in query
     details: ""
     diagnostics:
-        - message: '`vector(0) / vector(1) > 5 * vector(0) / vector(1)` always evaluates to `0 > 0` which is not possible, so it will never return anything'
+        - message: '`vector(0) / vector(1) > 5 * vector(0) / vector(1)` always evaluates to `0 > 0` which is not possible, so it will never return anything.'
           pos:
             - line: 4
               firstcolumn: 7
@@ -616,13 +616,13 @@
       expr: sum(foo or vector(0)) > 0
   output: |
     3 |   expr: sum(foo or vector(0)) > 0
-                           ^^^^^^^^^ `vector(0) > 0` always evaluates to `0 > 0` which is not possible, so it will never return anything
+                           ^^^^^^^^^ `vector(0) > 0` always evaluates to `0 > 0` which is not possible, so it will never return anything.
   problem:
     reporter: promql/impossible
     summary: dead code in query
     details: ""
     diagnostics:
-        - message: '`vector(0) > 0` always evaluates to `0 > 0` which is not possible, so it will never return anything'
+        - message: '`vector(0) > 0` always evaluates to `0 > 0` which is not possible, so it will never return anything.'
           pos:
             - line: 3
               firstcolumn: 9
@@ -645,13 +645,13 @@
       expr: ((( group(vector(0)) ))) > 0
   output: |
     3 |   expr: ((( group(vector(0)) ))) > 0
-                          ^^^^^^^^^ `vector(0) > 0` always evaluates to `0 > 0` which is not possible, so it will never return anything
+                          ^^^^^^^^^ `vector(0) > 0` always evaluates to `0 > 0` which is not possible, so it will never return anything.
   problem:
     reporter: promql/impossible
     summary: dead code in query
     details: ""
     diagnostics:
-        - message: '`vector(0) > 0` always evaluates to `0 > 0` which is not possible, so it will never return anything'
+        - message: '`vector(0) > 0` always evaluates to `0 > 0` which is not possible, so it will never return anything.'
           pos:
             - line: 3
               firstcolumn: 9
