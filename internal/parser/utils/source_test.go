@@ -275,6 +275,13 @@ sum by (foo, bar) (
 ) and on (colo_name) (colo_job:foo_total:rate2m or vector(0)) > 80
   and on (colo_name) (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
 `,
+		`sum(selector) / sum(selector offset 30m) > 5`,
+		`
+count by (dc) (
+  max(0 < (token_expiration - time()) < (6*60*60)) by (instance)
+  * on (instance) group_right label_replace(
+    configured_minions, "instance", "$1", "minion", "(.+)")
+  ) > 5`,
 	}
 
 	type Snapshot struct {

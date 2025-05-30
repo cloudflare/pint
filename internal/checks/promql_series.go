@@ -940,9 +940,9 @@ func sourceHasFallback(src []utils.Source) bool {
 	return false
 }
 
-func joinHasFallback(src []utils.Source) bool {
+func joinHasFallback(src []utils.Join) bool {
 	for _, ls := range src {
-		if ls.ReturnInfo.AlwaysReturns {
+		if ls.Src.ReturnInfo.AlwaysReturns {
 			return true
 		}
 	}
@@ -960,7 +960,7 @@ func getNonFallbackSelectors(n parser.PromQLExpr) (selectors []*promParser.Vecto
 		}
 		if !joinHasFallback(ls.Joins) {
 			for _, js := range ls.Joins {
-				if vs, ok := utils.MostOuterOperation[*promParser.VectorSelector](js); ok {
+				if vs, ok := utils.MostOuterOperation[*promParser.VectorSelector](js.Src); ok {
 					selectors = append(selectors, selectorWithoutOffset(vs))
 				}
 			}
