@@ -113,13 +113,18 @@ func newSource() Source {
 	}
 }
 
+type Join struct {
+	Src Source
+	Op  promParser.ItemType
+}
+
 type Source struct {
 	Labels        map[string]LabelTransform
 	DeadInfo      *DeadInfo
 	Operation     string
 	Returns       promParser.ValueType
 	Operations    SourceOperations
-	Joins         []Source // Any other sources this source joins with.
+	Joins         []Join   // Any other sources this source joins with.
 	Unless        []Source // Any other sources this source is suppressed by.
 	ReturnInfo    ReturnInfo
 	Position      posrange.PositionRange
@@ -240,7 +245,7 @@ type Visitor func(s Source)
 func (s Source) WalkSources(fn Visitor) {
 	fn(s)
 	for _, j := range s.Joins {
-		j.WalkSources(fn)
+		j.Src.WalkSources(fn)
 	}
 	for _, u := range s.Unless {
 		u.WalkSources(fn)
@@ -847,7 +852,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 						Fragment: pos,
 					}
 				}
-				ls.Joins = append(ls.Joins, rs)
+				ls.Joins = append(ls.Joins, Join{Src: rs, Op: n.Op})
 			}
 			ls.IsConditional, ls.ReturnInfo.IsReturnBool = checkConditions(ls, n.Op, n.ReturnBool)
 			src = append(src, ls)
@@ -889,7 +894,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 						Fragment: pos,
 					}
 				}
-				rs.Joins = append(rs.Joins, ls)
+				rs.Joins = append(rs.Joins, Join{Src: ls, Op: n.Op})
 			}
 			rs.IsConditional, rs.ReturnInfo.IsReturnBool = checkConditions(rs, n.Op, n.ReturnBool)
 			src = append(src, rs)
@@ -928,7 +933,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 						Fragment: pos,
 					}
 				}
-				ls.Joins = append(ls.Joins, rs)
+				ls.Joins = append(ls.Joins, Join{Src: rs, Op: n.Op})
 			}
 			ls.IsConditional, ls.ReturnInfo.IsReturnBool = checkConditions(ls, n.Op, n.ReturnBool)
 			src = append(src, ls)
@@ -979,7 +984,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					}
 					ls.Unless = append(ls.Unless, rs)
 				case n.Op != promParser.LOR:
-					ls.Joins = append(ls.Joins, rs)
+					ls.Joins = append(ls.Joins, Join{Src: rs, Op: n.Op})
 				}
 			}
 			if n.Op == promParser.LAND && rhsConditional {

@@ -2,6 +2,11 @@
 
 ## v0.74.0
 
+### Added
+
+- [promql/fragile](checks/promql/fragile.md) check will now warn about alerting rules using
+  aggregations that might cause false positives when Prometheus restarts.
+
 ### Fixed
 
 - Improved accuracy of messages produced by the [promql/impossible](checks/promql/impossible.md) check.
