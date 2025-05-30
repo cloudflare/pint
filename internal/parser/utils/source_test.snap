@@ -11090,3 +11090,115 @@ output:
       isconditional: true
 
 ---
+
+[TestLabelsSource/155 - 1]
+expr: topk(10, prometheus_build_info*prometheus_ready)
+output:
+    - labels: {}
+      deadinfo: null
+      operation: topk
+      returns: vector
+      operations:
+        - '[*parser.VectorSelector] prometheus_build_info'
+        - '[*parser.AggregateExpr] topk(10, prometheus_build_info * prometheus_ready)'
+      joins:
+        - src:
+            labels: {}
+            deadinfo: null
+            operation: ""
+            returns: vector
+            operations:
+                - '[*parser.VectorSelector] prometheus_ready'
+            joins: []
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+            position:
+                start: 31
+                end: 47
+            type: selector
+            fixedlabels: false
+            isconditional: false
+          op: 57395
+          depth: 1
+      unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
+      position:
+        start: 9
+        end: 30
+      type: aggregation
+      fixedlabels: false
+      isconditional: false
+
+---
+
+[TestLabelsSource/156 - 1]
+expr: bottomk(10, prometheus_build_info*prometheus_ready)
+output:
+    - labels: {}
+      deadinfo: null
+      operation: bottomk
+      returns: vector
+      operations:
+        - '[*parser.VectorSelector] prometheus_build_info'
+        - '[*parser.AggregateExpr] bottomk(10, prometheus_build_info * prometheus_ready)'
+      joins:
+        - src:
+            labels: {}
+            deadinfo: null
+            operation: ""
+            returns: vector
+            operations:
+                - '[*parser.VectorSelector] prometheus_ready'
+            joins: []
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+            position:
+                start: 34
+                end: 50
+            type: selector
+            fixedlabels: false
+            isconditional: false
+          op: 57395
+          depth: 1
+      unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
+      position:
+        start: 12
+        end: 33
+      type: aggregation
+      fixedlabels: false
+      isconditional: false
+
+---

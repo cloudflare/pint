@@ -282,6 +282,8 @@ count by (dc) (
   * on (instance) group_right label_replace(
     configured_minions, "instance", "$1", "minion", "(.+)")
   ) > 5`,
+		`topk(10, prometheus_build_info*prometheus_ready)`,
+		`bottomk(10, prometheus_build_info*prometheus_ready)`,
 	}
 
 	type Snapshot struct {
