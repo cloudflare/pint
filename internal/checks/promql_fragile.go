@@ -120,7 +120,7 @@ func (c FragileCheck) checkPartialData(expr parser.PromQLExpr, src utils.Source,
 		if j.Src.Type != utils.AggregateSource {
 			continue
 		}
-		if j.Src.IsConditional {
+		if j.Depth > 0 {
 			continue
 		}
 
