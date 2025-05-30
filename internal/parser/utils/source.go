@@ -996,7 +996,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 				case n.Op == promParser.LUNLESS:
 					if n.VectorMatching.On && len(n.VectorMatching.MatchingLabels) == 0 && rs.ReturnInfo.AlwaysReturns && !rs.IsConditional {
 						ls.DeadInfo = &DeadInfo{
-							Reason:   "this query will never return anything because the `unless` query always returns something",
+							Reason:   "This query will never return anything because the `unless` query always returns something.",
 							Fragment: rs.Position,
 						}
 					}
@@ -1018,7 +1018,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 				// If LHS can NOT be empty then RHS is dead code.
 				if !lhsCanBeEmpty {
 					rs.DeadInfo = &DeadInfo{
-						Reason:   "the left hand side always returs something and so the right hand side is never used",
+						Reason:   "The left hand side always returs something and so the right hand side is never used.",
 						Fragment: rs.Position,
 					}
 				}
@@ -1094,7 +1094,7 @@ func describeDeadCode(expr string, ls, rs Source, op *promParser.BinaryExpr, mat
 	if op.ReturnBool {
 		cmpSuffix = "and uses the `bool` modifier which means it will always return 0"
 	} else {
-		cmpSuffix = "which is not possible, so it will never return anything"
+		cmpSuffix = "which is not possible, so it will never return anything."
 	}
 	return &DeadInfo{
 		Reason: fmt.Sprintf(
