@@ -138,6 +138,7 @@ func baseRules(proms []*promapi.FailoverGroup, match []Match) (rules []parsedRul
 			baseParsedRule(match, checks.AlertsExternalLabelsCheckName, checks.NewAlertsExternalLabelsCheck(p), p.Tags()),
 			baseParsedRule(match, checks.CounterCheckName, checks.NewCounterCheck(p), p.Tags()),
 			baseParsedRule(match, checks.AlertsAbsentCheckName, checks.NewAlertsAbsentCheck(p), p.Tags()),
+			baseParsedRule(match, checks.PerformanceCheckName, checks.NewPerformanceCheck(p), p.Tags()),
 		)
 	}
 

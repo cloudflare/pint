@@ -52,28 +52,10 @@ func (c RuleDuplicateCheck) Check(ctx context.Context, entry discovery.Entry, en
 	}
 
 	for _, other := range entries {
-		if other.State == discovery.Removed {
-			continue
-		}
-		if other.PathError != nil {
-			continue
-		}
-		if other.Rule.Error.Err != nil {
-			continue
-		}
-		if other.Rule.Expr().SyntaxError != nil {
+		if ignoreOtherEntry(entry, other, c.prom) {
 			continue
 		}
 		if other.Rule.RecordingRule == nil {
-			continue
-		}
-		if other.Path.Name == entry.Path.Name && other.Rule.Lines.First == entry.Rule.Lines.First {
-			continue
-		}
-		if !c.prom.IsEnabledForPath(entry.Path.Name) {
-			continue
-		}
-		if !c.prom.IsEnabledForPath(other.Path.Name) {
 			continue
 		}
 
@@ -126,4 +108,29 @@ func buildRuleLabels(l *parser.YamlMap) labels.Labels {
 		pairs = append(pairs, label.Key.Value, label.Value.Value)
 	}
 	return labels.FromStrings(pairs...)
+}
+
+func ignoreOtherEntry(entry, other discovery.Entry, prom *promapi.FailoverGroup) bool {
+	if other.State == discovery.Removed {
+		return true
+	}
+	if other.PathError != nil {
+		return true
+	}
+	if other.Rule.Error.Err != nil {
+		return true
+	}
+	if other.Rule.Expr().SyntaxError != nil {
+		return true
+	}
+	if other.Path.Name == entry.Path.Name && other.Rule.Lines.First == entry.Rule.Lines.First {
+		return true
+	}
+	if !prom.IsEnabledForPath(entry.Path.Name) {
+		return true
+	}
+	if !prom.IsEnabledForPath(other.Path.Name) {
+		return true
+	}
+	return false
 }
