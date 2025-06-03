@@ -35,6 +35,7 @@ matcher
 matchers
 md
 nav
+precomputed
 printf
 prometheus
 promql

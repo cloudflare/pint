@@ -58,6 +58,7 @@ checks:
     - alerts/external_labels(prom1)
     - promql/counter(prom1)
     - alerts/absent(prom1)
+    - promql/performance(prom1)
     - alerts/count(prom1)
 
 ---

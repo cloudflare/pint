@@ -29,6 +29,7 @@ config: |-
           "promql/vector_matching",
           "query/cost",
           "promql/counter",
+          "promql/performance",
           "promql/series",
           "rule/dependency",
           "rule/duplicate",
@@ -76,5 +77,6 @@ checks:
     - alerts/external_labels(prom)
     - promql/counter(prom)
     - alerts/absent(prom)
+    - promql/performance(prom)
 
 ---

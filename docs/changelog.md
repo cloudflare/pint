@@ -6,6 +6,7 @@
 
 - [promql/fragile](checks/promql/fragile.md) check will now warn about alerting rules using
   aggregations that might cause false positives when Prometheus restarts.
+- Add new [promql/performance](checks/promql/performance.md) check.
 
 ### Fixed
 

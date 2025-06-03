@@ -1,0 +1,88 @@
+
+[TestPerformanceCheck/ignores_entries_with_path_errors - 1]
+[]
+
+---
+
+[TestPerformanceCheck/ignores_rules_with_syntax_errors - 1]
+[]
+
+---
+
+[TestPerformanceCheck/ignores_self - 1]
+[]
+
+---
+
+[TestPerformanceCheck/suggest_recording_rule_/_aggregation - 1]
+- description: suggest recording rule / aggregation
+  content: |
+    - alert: foo
+      expr: sum(rate(foo_total[5m])) without(instance) > 10
+  output: |
+    2 |   expr: sum(rate(foo_total[5m])) without(instance) > 10
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Use `colo:foo` here instead to speed up the query
+  problem:
+    reporter: promql/performance
+    summary: query should use recording rule
+    details: There is a recording rule that already stores the result of this query, use it here to speed up this query.
+    diagnostics:
+        - message: Use `colo:foo` here instead to speed up the query
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 55
+          firstcolumn: 1
+          lastcolumn: 42
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 0
+    anchor: 0
+
+---
+
+[TestPerformanceCheck/suggest_recording_rule_/_ignore_multi-source - 1]
+[]
+
+---
+
+[TestPerformanceCheck/suggest_recording_rule_/_ignore_selector - 1]
+[]
+
+---
+
+[TestPerformanceCheck/suggest_recording_rule_/_ignore_vector - 1]
+[]
+
+---
+
+[TestPerformanceCheck/suggest_recording_rule_/_rate - 1]
+- description: suggest recording rule / rate
+  content: |
+    - alert: foo
+      expr: sum(rate(foo_total[5m])) without(instance) > 10
+  output: |
+    2 |   expr: sum(rate(foo_total[5m])) without(instance) > 10
+                    ^^^^^^^^^^^^^^^^^^^ Use `foo:rate5m` here instead to speed up the query
+  problem:
+    reporter: promql/performance
+    summary: query should use recording rule
+    details: There is a recording rule that already stores the result of this query, use it here to speed up this query.
+    diagnostics:
+        - message: Use `foo:rate5m` here instead to speed up the query
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 55
+          firstcolumn: 5
+          lastcolumn: 23
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 0
+    anchor: 0
+
+---

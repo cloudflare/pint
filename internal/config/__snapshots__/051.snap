@@ -29,6 +29,7 @@ config: |-
           "promql/vector_matching",
           "query/cost",
           "promql/counter",
+          "promql/performance",
           "promql/series",
           "rule/dependency",
           "rule/duplicate",
@@ -99,5 +100,6 @@ checks:
     - promql/series(prom)
     - labels/conflict(prom)
     - promql/counter(prom)
+    - promql/performance(prom)
 
 ---
