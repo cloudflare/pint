@@ -21,7 +21,12 @@ Here we have an alert `Rate Too High` that uses `rate(foo_total[5m])` as part of
 We also have a recording rule `foo:rate5m` that calculates the same expression and stores it
 as a metric.
 Instead of calculating `rate(foo_total[5m])` in both rules we can simply query `foo:rate5m` inside
-`Rate Too High` alert to speed it up.
+`Rate Too High` alert to speed it up:
+
+```yaml
+- alert: Rate Too High
+  expr: sum(foo:rate5m) without(instance) > 10
+```
 
 `promql/performance` will try to find cases like this and emit an information report for it.
 
