@@ -502,6 +502,11 @@
 
 ---
 
+[TestCostCheck/suggest_recording_rule_/_label_mismatch - 1]
+[]
+
+---
+
 [TestCostCheck/suggest_recording_rule_/_no_matchers - 1]
 - description: suggest recording rule / no matchers
   content: |

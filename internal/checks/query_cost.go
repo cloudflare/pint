@@ -400,7 +400,10 @@ func (c CostCheck) isSuggestionFor(src, potential utils.Source, join *utils.Join
 
 			lms := c.selectorLabels(ops)
 			for _, lm := range lms {
-				if src.CanHaveLabel(lm.Name) && !potential.CanHaveLabel(lm.Name) {
+				if lm.Name == labels.MetricName {
+					continue
+				}
+				if !potential.CanHaveLabel(lm.Name) {
 					goto NEXT
 				}
 			}
