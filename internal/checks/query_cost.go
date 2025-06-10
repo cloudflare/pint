@@ -467,11 +467,12 @@ func (c CostCheck) metricName(ops utils.SourceOperations) string {
 	return ""
 }
 
-func (c CostCheck) selectorLabels(ops utils.SourceOperations) []*labels.Matcher {
+func (c CostCheck) selectorLabels(ops utils.SourceOperations) (lms []*labels.Matcher) {
 	for i := len(ops) - 1; i >= 0; i-- {
 		if vs, ok := ops[i].Node.(*promParser.VectorSelector); ok {
-			return vs.LabelMatchers
+			lms = vs.LabelMatchers
+			break
 		}
 	}
-	return nil
+	return lms
 }

@@ -1127,6 +1127,51 @@ func TestCostCheck(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "suggest recording rule / sum(vector)",
+			content:     "- alert: foo\n  expr: sum(vector(1)) > 0\n",
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 100, 100, 0, 0, "check comment", checks.Warning)
+			},
+			prometheus: newSimpleProm,
+			entries: mustParseContent(`
+- record: vec
+  expr: sum(vector(1))
+`),
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(sum(vector(1)) > 0)`},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 0,
+								PeakSamples:           0,
+							},
+							Timings: promapi.QueryTimings{
+								EvalTotalTime: 0.1,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: checks.BytesPerSampleQuery},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSampleWithValue(map[string]string{}, 4096),
+						},
+					},
+				},
+			},
+		},
 	}
 
 	runTests(t, testCases)
