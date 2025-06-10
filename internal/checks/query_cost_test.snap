@@ -275,6 +275,11 @@
 
 ---
 
+[TestCostCheck/ignores_self - 1]
+[]
+
+---
+
 [TestCostCheck/response_timeout - 1]
 - description: response timeout
   content: |
@@ -388,5 +393,157 @@
         last: 2
     severity: 0
     anchor: 0
+
+---
+
+[TestCostCheck/suggest_recording_rule_/_aggregation - 1]
+- description: suggest recording rule / aggregation
+  content: |
+    - alert: foo
+      expr: sum(rate(foo_total[5m])) without(instance) > 10
+  output: |
+    2 |   expr: sum(rate(foo_total[5m])) without(instance) > 10
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Use `colo:foo` here instead to speed up the query
+  problem:
+    reporter: query/cost
+    summary: query could use a recording rule
+    details: |
+        There is a recording rule that already stores the result of this query, use it here to speed up this query.
+        Using `colo:foo` rule would speed up this query:
+
+        - Total queried samples would be 10 instead of 100 (-90.00%)
+        - Peak queried samples would be 9 instead of 50 (-82.00%)
+        - Query evaluation time would be 0 (no change)
+
+        To get results for both original and suggested query click below:
+
+        - [Original query](https://simple.example.com/graph?g0.expr=sum%28rate%28foo_total%5B5m%5D%29%29+without%28instance%29+%3E+10&g0.tab=table)
+        - [Suggested query](https://simple.example.com/graph?g0.expr=colo%3Afoo+%3E+10&g0.tab=table)
+    diagnostics:
+        - message: Use `colo:foo` here instead to speed up the query
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 55
+          firstcolumn: 1
+          lastcolumn: 42
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 0
+    anchor: 0
+
+---
+
+[TestCostCheck/suggest_recording_rule_/_ignore_multi-source - 1]
+[]
+
+---
+
+[TestCostCheck/suggest_recording_rule_/_ignore_selector - 1]
+[]
+
+---
+
+[TestCostCheck/suggest_recording_rule_/_ignore_vector - 1]
+[]
+
+---
+
+[TestCostCheck/suggest_recording_rule_/_irate_vs_rate - 1]
+- description: suggest recording rule / irate vs rate
+  content: "\n- alert: Host_CPU_Utilization_High\n  expr: |\n    server_role{role=\"foo\"} \n    and on(instance)\n    sum by (instance) (irate(node_cpu_seconds_total{job=\"foo\", mode!=\"idle\"}[5m])) > 20\n"
+  output: "4 |     server_role{role=\"foo\"} \n5 |     and on(instance)\n6 |     sum by (instance) (irate(node_cpu_seconds_total{job=\"foo\", mode!=\"idle\"}[5m])) > 20\n                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Use `instance_mode:node_cpu:rate2m` here instead to speed up the query\n"
+  problem:
+    reporter: query/cost
+    summary: query could use a recording rule
+    details: |
+        There is a recording rule that stores result of a query that might work the same, you can try to use it here to speed up this query.
+        Using `instance_mode:node_cpu:rate2m` rule would speed up this query:
+
+        - Total queried samples would be 29 instead of 99 (-70.71%)
+        - Peak queried samples would be 11 instead of 19 (-42.11%)
+        - Query evaluation time would be 21s300ms instead of 1m300ms (-64.68%)
+
+        To get results for both original and suggested query click below:
+
+        - [Original query](https://simple.example.com/graph?g0.expr=server_role%7Brole%3D%22foo%22%7D+%0Aand+on%28instance%29%0Asum+by+%28instance%29+%28irate%28node_cpu_seconds_total%7Bjob%3D%22foo%22%2C+mode%21%3D%22idle%22%7D%5B5m%5D%29%29+%3E+20%0A&g0.tab=table)
+        - [Suggested query](https://simple.example.com/graph?g0.expr=server_role%7Brole%3D%22foo%22%7D+%0Aand+on%28instance%29%0Asum+by+%28instance%29+%28irate%28instance_mode%3Anode_cpu%3Arate2m%7Bjob%3D%22foo%22%2C+mode%21%3D%22idle%22%7D%5B5m%5D%29%29+%3E+20%0A&g0.tab=table)
+    diagnostics:
+        - message: Use `instance_mode:node_cpu:rate2m` here instead to speed up the query
+          pos:
+            - line: 4
+              firstcolumn: 5
+              lastcolumn: 29
+            - line: 5
+              firstcolumn: 5
+              lastcolumn: 21
+            - line: 6
+              firstcolumn: 5
+              lastcolumn: 87
+          firstcolumn: 68
+          lastcolumn: 114
+          kind: 0
+    lines:
+        first: 4
+        last: 6
+    severity: 0
+    anchor: 0
+
+---
+
+[TestCostCheck/suggest_recording_rule_/_rate - 1]
+- description: suggest recording rule / rate
+  content: |
+    - alert: foo
+      expr: sum(rate(foo_total[5m])) without(instance) > 10
+  output: |
+    2 |   expr: sum(rate(foo_total[5m])) without(instance) > 10
+                    ^^^^^^^^^^^^^^^^^^^ Use `foo:rate5m` here instead to speed up the query
+  problem:
+    reporter: query/cost
+    summary: query could use a recording rule
+    details: |
+        There is a recording rule that already stores the result of this query, use it here to speed up this query.
+        Using `foo:rate5m` rule would speed up this query:
+
+        - Total queried samples would be 10 instead of 100 (-90.00%)
+        - Peak queried samples would be 50 (no change)
+        - Query evaluation time would be 30s300ms (no change)
+
+        To get results for both original and suggested query click below:
+
+        - [Original query](https://simple.example.com/graph?g0.expr=sum%28rate%28foo_total%5B5m%5D%29%29+without%28instance%29+%3E+10&g0.tab=table)
+        - [Suggested query](https://simple.example.com/graph?g0.expr=sum%28foo%3Arate5m%29+without%28instance%29+%3E+10&g0.tab=table)
+    diagnostics:
+        - message: Use `foo:rate5m` here instead to speed up the query
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 55
+          firstcolumn: 5
+          lastcolumn: 23
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 0
+    anchor: 0
+
+---
+
+[TestCostCheck/suggest_recording_rule_/_replacement_is_more_expensive - 1]
+[]
+
+---
+
+[TestCostCheck/suggest_recording_rule_/_replacement_with_different_number_of_series - 1]
+[]
+
+---
+
+[TestCostCheck/suggest_recording_rule_/_rule_mismatch - 1]
+[]
 
 ---

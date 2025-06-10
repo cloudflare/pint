@@ -31,7 +31,6 @@ var (
 		VectorMatchingCheckName,
 		CostCheckName,
 		CounterCheckName,
-		PerformanceCheckName,
 		SeriesCheckName,
 		RuleDependencyCheckName,
 		RuleDuplicateCheckName,

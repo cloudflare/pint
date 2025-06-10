@@ -6,7 +6,9 @@
 
 - [promql/fragile](checks/promql/fragile.md) check will now warn about alerting rules using
   aggregations that might cause false positives when Prometheus restarts.
-- Add new [promql/performance](checks/promql/performance.md) check.
+- [query/cost](checks/query/cost.md) check will now try to find queries that perform operations
+  for which there is a recording rule, and suggest using these recording rules instead to speed
+  up the query.
 
 ### Fixed
 

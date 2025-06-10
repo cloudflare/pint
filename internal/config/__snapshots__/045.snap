@@ -29,7 +29,6 @@ config: |-
           "promql/vector_matching",
           "query/cost",
           "promql/counter",
-          "promql/performance",
           "promql/series",
           "rule/dependency",
           "rule/duplicate",
@@ -149,7 +148,6 @@ checks:
     - promql/fragile
     - promql/regexp
     - promql/impossible
-    - promql/performance(prom1)
     - promql/rate(prom2)
     - promql/series(prom2)
     - promql/vector_matching(prom2)
@@ -159,7 +157,6 @@ checks:
     - alerts/external_labels(prom2)
     - promql/counter(prom2)
     - alerts/absent(prom2)
-    - promql/performance(prom2)
     - promql/rate(prom3)
     - promql/series(prom3)
     - promql/vector_matching(prom3)
@@ -169,6 +166,5 @@ checks:
     - alerts/external_labels(prom3)
     - promql/counter(prom3)
     - alerts/absent(prom3)
-    - promql/performance(prom3)
 
 ---

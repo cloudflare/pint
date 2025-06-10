@@ -247,7 +247,7 @@ func (c TemplateCheck) checkHumanizeIsNeeded(expr parser.PromQLExpr, ann *parser
 
 func isRateResult(src utils.Source) *promParser.Call {
 	if src.Type == utils.AggregateSource {
-		switch src.Operation {
+		switch src.Operation() {
 		case "count", "count_values", "group":
 			return nil
 		}

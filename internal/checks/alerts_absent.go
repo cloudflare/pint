@@ -64,7 +64,7 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, entry discovery.Entry, _ [
 	src := utils.LabelsSource(entry.Rule.AlertingRule.Expr.Value.Value, entry.Rule.AlertingRule.Expr.Query.Expr)
 	absentSources := make([]utils.Source, 0, len(src))
 	for _, s := range src {
-		if s.Operation != "absent" {
+		if s.Operation() != "absent" {
 			continue
 		}
 		absentSources = append(absentSources, s)
