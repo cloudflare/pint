@@ -251,15 +251,8 @@ func (c CostCheck) suggestRecordingRules(
 						continue
 					}
 
-					var prefix string
-					if exact {
-						prefix = "There is a recording rule that already stores the result of this query, use it here to speed up this query."
-					} else {
-						prefix = "There is a recording rule that stores result of a query that might work the same, you can try to use it here to speed up this query."
-					}
-
 					sq := c.rewriteRuleFragment(expr.Value.Value, op.PositionRange(), other.Rule.RecordingRule.Record.Value+extra)
-					var suffix strings.Builder
+					var details strings.Builder
 					qr, afterSeries, err := c.getQueryCost(ctx, sq)
 					if err == nil {
 						if qr.Stats.Samples.TotalQueryableSamples >= beforeStats.Samples.TotalQueryableSamples &&
@@ -271,24 +264,39 @@ func (c CostCheck) suggestRecordingRules(
 							// Got different number of series returned, using suggestion is unsafe.
 							continue
 						}
-						suffix.WriteRune('\n')
-						suffix.WriteString("Using `")
-						suffix.WriteString(other.Rule.RecordingRule.Record.Value)
-						suffix.WriteString("` rule would speed up this query:\n\n")
-						suffix.WriteString("- Total queried samples would be ")
-						suffix.WriteString(c.diffStatsInt(beforeStats.Samples.TotalQueryableSamples, qr.Stats.Samples.TotalQueryableSamples))
-						suffix.WriteRune('\n')
-						suffix.WriteString("- Peak queried samples would be ")
-						suffix.WriteString(c.diffStatsInt(beforeStats.Samples.PeakSamples, qr.Stats.Samples.PeakSamples))
-						suffix.WriteRune('\n')
-						suffix.WriteString("- Query evaluation time would be ")
-						suffix.WriteString(c.diffStatsDuration(beforeStats.Timings.EvalTotalTime, qr.Stats.Timings.EvalTotalTime))
-						suffix.WriteRune('\n')
-						suffix.WriteRune('\n')
-						suffix.WriteString("To get results for both original and suggested query click below:\n\n")
-						suffix.WriteString(fmt.Sprintf("- [Original query](%s/graph?g0.expr=%s&g0.tab=table)\n",
+						if exact {
+							details.WriteString("There is a recording rule that already stores the result of this query, use it here to speed up this query.")
+						} else {
+							details.WriteString("There is a recording rule that stores result of a query that might work the same, you can try to use it here to speed up this query.")
+						}
+
+						details.WriteString("\n\n")
+						details.WriteString("```yaml\n")
+						details.WriteString("- record: ")
+						details.WriteString(other.Rule.RecordingRule.Record.Value)
+						details.WriteRune('\n')
+						details.WriteString("  expr: ")
+						details.WriteString(other.Rule.RecordingRule.Expr.Value.Value)
+						details.WriteRune('\n')
+						details.WriteString("```\n\n")
+
+						details.WriteString("Using `")
+						details.WriteString(other.Rule.RecordingRule.Record.Value)
+						details.WriteString("` rule would speed up this query:\n\n")
+						details.WriteString("- Total queried samples would be ")
+						details.WriteString(c.diffStatsInt(beforeStats.Samples.TotalQueryableSamples, qr.Stats.Samples.TotalQueryableSamples))
+						details.WriteRune('\n')
+						details.WriteString("- Peak queried samples would be ")
+						details.WriteString(c.diffStatsInt(beforeStats.Samples.PeakSamples, qr.Stats.Samples.PeakSamples))
+						details.WriteRune('\n')
+						details.WriteString("- Query evaluation time would be ")
+						details.WriteString(c.diffStatsDuration(beforeStats.Timings.EvalTotalTime, qr.Stats.Timings.EvalTotalTime))
+						details.WriteRune('\n')
+						details.WriteRune('\n')
+						details.WriteString("To get results for both original and suggested query click below:\n\n")
+						details.WriteString(fmt.Sprintf("- [Original query](%s/graph?g0.expr=%s&g0.tab=table)\n",
 							qr.URI, url.QueryEscape(expr.Value.Value)))
-						suffix.WriteString(fmt.Sprintf("- [Suggested query](%s/graph?g0.expr=%s&g0.tab=table)\n",
+						details.WriteString(fmt.Sprintf("- [Suggested query](%s/graph?g0.expr=%s&g0.tab=table)\n",
 							qr.URI, url.QueryEscape(sq)))
 					}
 
@@ -297,7 +305,7 @@ func (c CostCheck) suggestRecordingRules(
 						Lines:    expr.Value.Pos.Lines(),
 						Reporter: c.Reporter(),
 						Summary:  "query could use a recording rule",
-						Details:  prefix + suffix.String(),
+						Details:  details.String(),
 						Severity: Information,
 						Diagnostics: []diags.Diagnostic{
 							{
