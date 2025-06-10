@@ -403,7 +403,7 @@
       expr: sum(rate(foo_total[5m])) without(instance) > 10
   output: |
     2 |   expr: sum(rate(foo_total[5m])) without(instance) > 10
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Use `colo:foo` here instead to speed up the query
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Use `colo:foo` here instead to speed up the query.
   problem:
     reporter: query/cost
     summary: query could use a recording rule
@@ -420,7 +420,7 @@
         - [Original query](https://simple.example.com/graph?g0.expr=sum%28rate%28foo_total%5B5m%5D%29%29+without%28instance%29+%3E+10&g0.tab=table)
         - [Suggested query](https://simple.example.com/graph?g0.expr=colo%3Afoo+%3E+10&g0.tab=table)
     diagnostics:
-        - message: Use `colo:foo` here instead to speed up the query
+        - message: Use `colo:foo` here instead to speed up the query.
           pos:
             - line: 2
               firstcolumn: 9
@@ -453,8 +453,17 @@
 
 [TestCostCheck/suggest_recording_rule_/_irate_vs_rate - 1]
 - description: suggest recording rule / irate vs rate
-  content: "\n- alert: Host_CPU_Utilization_High\n  expr: |\n    server_role{role=\"foo\"} \n    and on(instance)\n    sum by (instance) (irate(node_cpu_seconds_total{job=\"foo\", mode!=\"idle\"}[5m])) > 20\n"
-  output: "4 |     server_role{role=\"foo\"} \n5 |     and on(instance)\n6 |     sum by (instance) (irate(node_cpu_seconds_total{job=\"foo\", mode!=\"idle\"}[5m])) > 20\n                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Use `instance_mode:node_cpu:rate2m` here instead to speed up the query\n"
+  content: |4
+    - alert: Host_CPU_Utilization_High
+      expr: |
+        server_role{role="foo"}
+        and on(instance)
+        sum by (instance) (irate(node_cpu_seconds_total{job="foo", mode!="idle"}[5m])) > 20
+  output: |
+    4 |     server_role{role="foo"}
+    5 |     and on(instance)
+    6 |     sum by (instance) (irate(node_cpu_seconds_total{job="foo", mode!="idle"}[5m])) > 20
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Use `instance_mode:node_cpu:rate2m` here instead to speed up the query.
   problem:
     reporter: query/cost
     summary: query could use a recording rule
@@ -468,26 +477,77 @@
 
         To get results for both original and suggested query click below:
 
-        - [Original query](https://simple.example.com/graph?g0.expr=server_role%7Brole%3D%22foo%22%7D+%0Aand+on%28instance%29%0Asum+by+%28instance%29+%28irate%28node_cpu_seconds_total%7Bjob%3D%22foo%22%2C+mode%21%3D%22idle%22%7D%5B5m%5D%29%29+%3E+20%0A&g0.tab=table)
-        - [Suggested query](https://simple.example.com/graph?g0.expr=server_role%7Brole%3D%22foo%22%7D+%0Aand+on%28instance%29%0Asum+by+%28instance%29+%28irate%28instance_mode%3Anode_cpu%3Arate2m%7Bjob%3D%22foo%22%2C+mode%21%3D%22idle%22%7D%5B5m%5D%29%29+%3E+20%0A&g0.tab=table)
+        - [Original query](https://simple.example.com/graph?g0.expr=server_role%7Brole%3D%22foo%22%7D%0Aand+on%28instance%29%0Asum+by+%28instance%29+%28irate%28node_cpu_seconds_total%7Bjob%3D%22foo%22%2C+mode%21%3D%22idle%22%7D%5B5m%5D%29%29+%3E+20%0A&g0.tab=table)
+        - [Suggested query](https://simple.example.com/graph?g0.expr=server_role%7Brole%3D%22foo%22%7D%0Aand+on%28instance%29%0Ainstance_mode%3Anode_cpu%3Arate2m%7Bjob%3D%22foo%22%2C+mode%21%3D%22idle%22%7D+%3E+20%0A&g0.tab=table)
     diagnostics:
-        - message: Use `instance_mode:node_cpu:rate2m` here instead to speed up the query
+        - message: Use `instance_mode:node_cpu:rate2m` here instead to speed up the query.
           pos:
             - line: 4
               firstcolumn: 5
-              lastcolumn: 29
+              lastcolumn: 28
             - line: 5
               firstcolumn: 5
               lastcolumn: 21
             - line: 6
               firstcolumn: 5
               lastcolumn: 87
-          firstcolumn: 68
-          lastcolumn: 114
+          firstcolumn: 42
+          lastcolumn: 119
           kind: 0
     lines:
         first: 4
         last: 6
+    severity: 0
+    anchor: 0
+
+---
+
+[TestCostCheck/suggest_recording_rule_/_no_matchers - 1]
+- description: suggest recording rule / no matchers
+  content: |
+    - alert: Host_CPU_Utilization_High
+      expr: |
+        server_role{role="foo"}
+        and on(instance)
+        sum by (instance) (irate(node_cpu_seconds_total[5m])) > 20
+  output: |
+    3 |     server_role{role="foo"}
+    4 |     and on(instance)
+    5 |     sum by (instance) (irate(node_cpu_seconds_total[5m])) > 20
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Use `colo:node_cpu:rate2m` here instead to speed up the query.
+  problem:
+    reporter: query/cost
+    summary: query could use a recording rule
+    details: |
+        There is a recording rule that stores result of a query that might work the same, you can try to use it here to speed up this query.
+        Using `colo:node_cpu:rate2m` rule would speed up this query:
+
+        - Total queried samples would be 10 instead of 99 (-89.90%)
+        - Peak queried samples would be 10 instead of 19 (-47.37%)
+        - Query evaluation time would be 10s instead of 1m300ms (-83.42%)
+
+        To get results for both original and suggested query click below:
+
+        - [Original query](https://simple.example.com/graph?g0.expr=server_role%7Brole%3D%22foo%22%7D%0Aand+on%28instance%29%0Asum+by+%28instance%29+%28irate%28node_cpu_seconds_total%5B5m%5D%29%29+%3E+20%0A&g0.tab=table)
+        - [Suggested query](https://simple.example.com/graph?g0.expr=server_role%7Brole%3D%22foo%22%7D%0Aand+on%28instance%29%0Asum+by+%28instance%29+%28colo%3Anode_cpu%3Arate2m%29+%3E+20%0A&g0.tab=table)
+    diagnostics:
+        - message: Use `colo:node_cpu:rate2m` here instead to speed up the query.
+          pos:
+            - line: 3
+              firstcolumn: 5
+              lastcolumn: 28
+            - line: 4
+              firstcolumn: 5
+              lastcolumn: 21
+            - line: 5
+              firstcolumn: 5
+              lastcolumn: 62
+          firstcolumn: 61
+          lastcolumn: 93
+          kind: 0
+    lines:
+        first: 3
+        last: 5
     severity: 0
     anchor: 0
 
@@ -500,7 +560,7 @@
       expr: sum(rate(foo_total[5m])) without(instance) > 10
   output: |
     2 |   expr: sum(rate(foo_total[5m])) without(instance) > 10
-                    ^^^^^^^^^^^^^^^^^^^ Use `foo:rate5m` here instead to speed up the query
+                    ^^^^^^^^^^^^^^^^^^^ Use `foo:rate5m` here instead to speed up the query.
   problem:
     reporter: query/cost
     summary: query could use a recording rule
@@ -517,7 +577,7 @@
         - [Original query](https://simple.example.com/graph?g0.expr=sum%28rate%28foo_total%5B5m%5D%29%29+without%28instance%29+%3E+10&g0.tab=table)
         - [Suggested query](https://simple.example.com/graph?g0.expr=sum%28foo%3Arate5m%29+without%28instance%29+%3E+10&g0.tab=table)
     diagnostics:
-        - message: Use `foo:rate5m` here instead to speed up the query
+        - message: Use `foo:rate5m` here instead to speed up the query.
           pos:
             - line: 2
               firstcolumn: 9

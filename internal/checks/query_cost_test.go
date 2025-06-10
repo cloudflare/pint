@@ -730,7 +730,7 @@ func TestCostCheck(t *testing.T) {
 			content: `
 - alert: Host_CPU_Utilization_High
   expr: |
-    server_role{role="foo"} 
+    server_role{role="foo"}
     and on(instance)
     sum by (instance) (irate(node_cpu_seconds_total{job="foo", mode!="idle"}[5m])) > 20
 `,
@@ -756,7 +756,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "count(server_role{role=\"foo\"} \nand on(instance)\nsum by (instance) (irate(node_cpu_seconds_total{job=\"foo\", mode!=\"idle\"}[5m])) > 20\n)"},
+						formCond{key: "query", value: "count(server_role{role=\"foo\"}\nand on(instance)\nsum by (instance) (irate(node_cpu_seconds_total{job=\"foo\", mode!=\"idle\"}[5m])) > 20\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -782,7 +782,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "count(server_role{role=\"foo\"} \nand on(instance)\nsum by (instance) (irate(instance_mode:node_cpu:rate2m{job=\"foo\", mode!=\"idle\"}[5m])) > 20\n)"},
+						formCond{key: "query", value: "count(server_role{role=\"foo\"}\nand on(instance)\ninstance_mode:node_cpu:rate2m{job=\"foo\", mode!=\"idle\"} > 20\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -976,7 +976,7 @@ func TestCostCheck(t *testing.T) {
 			content: `
 - alert: Host_CPU_Utilization_High
   expr: |
-    server_role{role="foo"} 
+    server_role{role="foo"}
     and on(instance)
     sum by (instance) (irate(node_cpu_seconds_total{job="foo", mode!="idle"}[5m])) > 20
 `,
@@ -994,6 +994,9 @@ func TestCostCheck(t *testing.T) {
 - record: wrong_metric
   expr: sum(rate(node_foo_seconds_total[2m])) without (cpu)
 
+- record: no_name
+  expr: sum(rate({job="foo"}[2m])) without (cpu)
+
 - record: colo:node_cpu:rate2m:nojob
   expr: sum(rate(node_cpu_seconds_total[2m])) without (cpu, instance, job)
 
@@ -1004,7 +1007,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "count(server_role{role=\"foo\"} \nand on(instance)\nsum by (instance) (irate(node_cpu_seconds_total{job=\"foo\", mode!=\"idle\"}[5m])) > 20\n)"},
+						formCond{key: "query", value: "count(server_role{role=\"foo\"}\nand on(instance)\nsum by (instance) (irate(node_cpu_seconds_total{job=\"foo\", mode!=\"idle\"}[5m])) > 20\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -1023,6 +1026,90 @@ func TestCostCheck(t *testing.T) {
 							},
 							Timings: promapi.QueryTimings{
 								EvalTotalTime: 60.3,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: checks.BytesPerSampleQuery},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSampleWithValue(map[string]string{}, 2048),
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "suggest recording rule / no matchers",
+			content: `- alert: Host_CPU_Utilization_High
+  expr: |
+    server_role{role="foo"}
+    and on(instance)
+    sum by (instance) (irate(node_cpu_seconds_total[5m])) > 20
+`,
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 100, 100, 0, 0, "check comment", checks.Warning)
+			},
+			prometheus: newSimpleProm,
+			entries: mustParseContent(`
+
+- record: colo:node_cpu:rate2m
+  expr: rate(node_cpu_seconds_total[2m])
+`),
+			problems: true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(server_role{role=\"foo\"}\nand on(instance)\nsum by (instance) (irate(node_cpu_seconds_total[5m])) > 20\n)"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 99,
+								PeakSamples:           19,
+							},
+							Timings: promapi.QueryTimings{
+								EvalTotalTime: 60.3,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(server_role{role=\"foo\"}\nand on(instance)\nsum by (instance) (colo:node_cpu:rate2m) > 20\n)"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 10,
+								PeakSamples:           10,
+							},
+							Timings: promapi.QueryTimings{
+								EvalTotalTime: 10,
 							},
 						},
 					},

@@ -301,7 +301,7 @@ func (c CostCheck) suggestRecordingRules(
 						Severity: Information,
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message:     fmt.Sprintf("Use `%s` here instead to speed up the query", other.Rule.RecordingRule.Record.Value),
+								Message:     fmt.Sprintf("Use `%s` here instead to speed up the query.", other.Rule.RecordingRule.Record.Value),
 								Pos:         expr.Value.Pos,
 								FirstColumn: int(op.PositionRange().Start) + 1,
 								LastColumn:  int(op.PositionRange().End),
@@ -351,9 +351,11 @@ func (c CostCheck) isSuggestionFor(src, potential utils.Source, join *utils.Join
 	if potential.Type != utils.FuncSource && potential.Type != utils.AggregateSource {
 		return nil, "", false, false
 	}
+
 	if potential.Returns != src.Returns {
 		return nil, "", false, false
 	}
+
 	// We're only looking at potential source that have a vector selector.
 	if _, ok := utils.MostOuterOperation[*promParser.VectorSelector](potential); !ok {
 		return nil, "", false, false
@@ -389,13 +391,14 @@ func (c CostCheck) isSuggestionFor(src, potential utils.Source, join *utils.Join
 		return nil, "", false, false
 	}
 
-	for i := range src.Operations {
-		if c.equalOperations(src.Operations[i:], potential.Operations) {
-			if c.metricName(src.Operations[i:]) != c.metricName(potential.Operations) {
+	for i := len(src.Operations); i > 0; i-- {
+		ops := src.Operations[:i]
+		if c.equalOperations(ops, potential.Operations) {
+			if c.metricName(ops) != c.metricName(potential.Operations) {
 				goto NEXT
 			}
 
-			lms := c.selectorLabels(src.Operations[i:])
+			lms := c.selectorLabels(ops)
 			for _, lm := range lms {
 				if src.CanHaveLabel(lm.Name) && !potential.CanHaveLabel(lm.Name) {
 					goto NEXT
@@ -404,22 +407,25 @@ func (c CostCheck) isSuggestionFor(src, potential utils.Source, join *utils.Join
 			var extra string
 			if len(lms) > 0 {
 				var buf strings.Builder
-				buf.WriteRune('{')
-				var j int
+				var added int
 				for _, lm := range lms {
 					if lm.Name == labels.MetricName {
 						continue
 					}
-					if j > 0 {
+					if added == 0 {
+						buf.WriteRune('{')
+					} else if added > 0 {
 						buf.WriteString(", ")
 					}
 					buf.WriteString(lm.String())
-					j++
+					added++
 				}
-				buf.WriteRune('}')
+				if added > 0 {
+					buf.WriteRune('}')
+				}
 				extra = buf.String()
 			}
-			return src.Operations[i].Node, extra, false, true
+			return src.Operations[i-1].Node, extra, false, true
 		}
 	NEXT:
 	}
