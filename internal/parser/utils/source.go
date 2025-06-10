@@ -118,11 +118,11 @@ func newSource() Source {
 }
 
 type Join struct {
-	Src      Source              // The source we're joining with.
-	Op       promParser.ItemType // The binary operation used for this join.
 	On       []string
 	Ignoring []string
-	Depth    int // Zero if this is a direct join, non-zero otherwise. sum(foo * bar) would be in-direct join.
+	Src      Source              // The source we're joining with.
+	Op       promParser.ItemType // The binary operation used for this join.
+	Depth    int                 // Zero if this is a direct join, non-zero otherwise. sum(foo * bar) would be in-direct join.
 }
 
 type Source struct {
