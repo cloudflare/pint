@@ -68,7 +68,7 @@ func (c ComparisonCheck) Check(_ context.Context, entry discovery.Entry, _ []dis
 				goto NEXT
 			}
 		}
-		if src.Operation == "absent" || src.Operation == "absent_over_time" {
+		if src.Operation() == "absent" || src.Operation() == "absent_over_time" {
 			continue
 		}
 

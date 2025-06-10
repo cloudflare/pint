@@ -13,7 +13,7 @@ level=DEBUG msg="Starting query workers" name=prom uri=http://127.0.0.1:7103 wor
 level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
 level=DEBUG msg="Generated all Prometheus servers" count=1
 level=DEBUG msg="Found recording rule" path=rules/0001.yml record=colo:test1 lines=9-10 state=noop
-level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/impossible","promql/vector_matching(prom)","labels/conflict(prom)","alerts/external_labels(prom)","alerts/absent(prom)","promql/performance(prom)"] path=rules/0001.yml rule=colo:test1
+level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/impossible","promql/vector_matching(prom)","labels/conflict(prom)","alerts/external_labels(prom)","alerts/absent(prom)"] path=rules/0001.yml rule=colo:test1
 level=DEBUG msg="Stopping query workers" name=prom uri=http://127.0.0.1:7103
 -- rules/0001.yml --
 # This should skip all online checks

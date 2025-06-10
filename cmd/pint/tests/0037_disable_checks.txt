@@ -13,11 +13,11 @@ level=DEBUG msg="Starting query workers" name=prom uri=http://127.0.0.1 workers=
 level=INFO msg="Checking Prometheus rules" entries=3 workers=10 online=true
 level=DEBUG msg="Generated all Prometheus servers" count=1
 level=DEBUG msg="Found alerting rule" path=rules/0001.yml alert=default-for lines=1-3 state=noop
-level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/template","promql/fragile","promql/regexp","promql/impossible","promql/vector_matching(prom)","rule/duplicate(prom)","labels/conflict(prom)","alerts/absent(prom)","promql/performance(prom)"] path=rules/0001.yml rule=default-for
+level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/template","promql/fragile","promql/regexp","promql/impossible","promql/vector_matching(prom)","rule/duplicate(prom)","labels/conflict(prom)","alerts/absent(prom)"] path=rules/0001.yml rule=default-for
 level=DEBUG msg="Found recording rule" path=rules/0001.yml record=sum:job lines=5-6 state=noop
-level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/template","promql/fragile","promql/regexp","promql/impossible","promql/vector_matching(prom)","rule/duplicate(prom)","labels/conflict(prom)","alerts/absent(prom)","promql/performance(prom)","promql/aggregate(job:true)"] path=rules/0001.yml rule=sum:job
+level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/template","promql/fragile","promql/regexp","promql/impossible","promql/vector_matching(prom)","rule/duplicate(prom)","labels/conflict(prom)","alerts/absent(prom)","promql/aggregate(job:true)"] path=rules/0001.yml rule=sum:job
 level=DEBUG msg="Found alerting rule" path=rules/0001.yml alert=no-comparison lines=8-9 state=noop
-level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/template","promql/fragile","promql/regexp","promql/impossible","promql/vector_matching(prom)","rule/duplicate(prom)","labels/conflict(prom)","alerts/absent(prom)","promql/performance(prom)"] path=rules/0001.yml rule=no-comparison
+level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/template","promql/fragile","promql/regexp","promql/impossible","promql/vector_matching(prom)","rule/duplicate(prom)","labels/conflict(prom)","alerts/absent(prom)"] path=rules/0001.yml rule=no-comparison
 Warning: required label is being removed via aggregation (promql/aggregate)
   ---> rules/0001.yml:6 -> `sum:job`
 6 |   expr: sum(foo)

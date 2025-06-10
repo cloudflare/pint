@@ -10,7 +10,6 @@ output:
                 start: 0
                 end: 1
       deadinfo: null
-      operation: ""
       returns: scalar
       operations: []
       joins: []
@@ -44,7 +43,6 @@ output:
                 start: 0
                 end: 1
       deadinfo: null
-      operation: ""
       returns: scalar
       operations: []
       joins: []
@@ -82,7 +80,6 @@ output:
         fragment:
             start: 1
             end: 2
-      operation: ""
       returns: scalar
       operations: []
       joins: []
@@ -120,7 +117,6 @@ output:
         fragment:
             start: 1
             end: 2
-      operation: ""
       returns: scalar
       operations: []
       joins: []
@@ -158,7 +154,6 @@ output:
         fragment:
             start: 1
             end: 2
-      operation: ""
       returns: scalar
       operations: []
       joins: []
@@ -192,7 +187,6 @@ output:
                 start: 1
                 end: 2
       deadinfo: null
-      operation: ""
       returns: scalar
       operations: []
       joins: []
@@ -230,7 +224,6 @@ output:
         fragment:
             start: 1
             end: 2
-      operation: ""
       returns: scalar
       operations: []
       joins: []
@@ -268,7 +261,6 @@ output:
         fragment:
             start: 0
             end: 2
-      operation: ""
       returns: scalar
       operations: []
       joins: []
@@ -302,7 +294,6 @@ output:
                 start: 0
                 end: 1
       deadinfo: null
-      operation: ""
       returns: scalar
       operations: []
       joins: []
@@ -330,10 +321,10 @@ expr: (foo or bar) * 5
 output:
     - labels: {}
       deadinfo: null
-      operation: many-to-many
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
       joins: []
       unless: []
       returninfo:
@@ -353,10 +344,10 @@ output:
       isconditional: false
     - labels: {}
       deadinfo: null
-      operation: many-to-many
       returns: vector
       operations:
-        - '[*parser.VectorSelector] bar'
+        - node: '[*parser.VectorSelector] bar'
+          op: ""
       joins: []
       unless: []
       returninfo:
@@ -382,10 +373,10 @@ expr: (foo or vector(2)) * 5
 output:
     - labels: {}
       deadinfo: null
-      operation: many-to-many
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
       joins: []
       unless: []
       returninfo:
@@ -411,10 +402,10 @@ output:
                 start: 8
                 end: 14
       deadinfo: null
-      operation: vector
       returns: vector
       operations:
-        - '[*parser.Call] vector(2)'
+        - node: '[*parser.Call] vector(2)'
+          op: vector
       joins: []
       unless: []
       returninfo:
@@ -440,12 +431,14 @@ expr: (foo or vector(5)) * (vector(2) or bar)
 output:
     - labels: {}
       deadinfo: null
-      operation: many-to-many
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Calling `vector()` will return a vector value with no labels.
@@ -454,10 +447,10 @@ output:
                         start: 22
                         end: 28
             deadinfo: null
-            operation: vector
             returns: vector
             operations:
-                - '[*parser.Call] vector(2)'
+                - node: '[*parser.Call] vector(2)'
+                  op: vector
             joins: []
             unless: []
             returninfo:
@@ -477,17 +470,19 @@ output:
             isconditional: false
           op: 57395
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo:
                 reason: The left hand side always returs something and so the right hand side is never used.
                 fragment:
                     start: 35
                     end: 38
-            operation: many-to-many
             returns: vector
             operations:
-                - '[*parser.VectorSelector] bar'
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -531,12 +526,14 @@ output:
                 start: 8
                 end: 14
       deadinfo: null
-      operation: vector
       returns: vector
       operations:
-        - '[*parser.Call] vector(5)'
+        - node: '[*parser.Call] vector(5)'
+          op: vector
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Calling `vector()` will return a vector value with no labels.
@@ -545,10 +542,10 @@ output:
                         start: 22
                         end: 28
             deadinfo: null
-            operation: vector
             returns: vector
             operations:
-                - '[*parser.Call] vector(2)'
+                - node: '[*parser.Call] vector(2)'
+                  op: vector
             joins: []
             unless: []
             returninfo:
@@ -568,17 +565,19 @@ output:
             isconditional: false
           op: 57395
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo:
                 reason: The left hand side always returs something and so the right hand side is never used.
                 fragment:
                     start: 35
                     end: 38
-            operation: many-to-many
             returns: vector
             operations:
-                - '[*parser.VectorSelector] bar'
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -628,7 +627,6 @@ output:
                 start: 0
                 end: 1
       deadinfo: null
-      operation: ""
       returns: scalar
       operations: []
       joins: []
@@ -662,7 +660,6 @@ output:
                 start: 0
                 end: 2
       deadinfo: null
-      operation: ""
       returns: scalar
       operations: []
       joins: []
@@ -696,7 +693,6 @@ output:
                 start: 0
                 end: 6
       deadinfo: null
-      operation: ""
       returns: string
       operations: []
       joins: []
@@ -724,10 +720,10 @@ expr: foo
 output:
     - labels: {}
       deadinfo: null
-      operation: ""
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
       joins: []
       unless: []
       returninfo:
@@ -753,10 +749,10 @@ expr: (foo > 1) > bool 1
 output:
     - labels: {}
       deadinfo: null
-      operation: ""
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
       joins: []
       unless: []
       returninfo:
@@ -782,10 +778,10 @@ expr: foo > bool 5
 output:
     - labels: {}
       deadinfo: null
-      operation: ""
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
       joins: []
       unless: []
       returninfo:
@@ -811,10 +807,10 @@ expr: foo > bool 5 == 1
 output:
     - labels: {}
       deadinfo: null
-      operation: ""
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
       joins: []
       unless: []
       returninfo:
@@ -840,18 +836,20 @@ expr: foo > bool bar
 output:
     - labels: {}
       deadinfo: null
-      operation: one-to-one
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
-            operation: ""
             returns: vector
             operations:
-                - '[*parser.VectorSelector] bar'
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -895,18 +893,20 @@ expr: (foo > bool bar) == 0
 output:
     - labels: {}
       deadinfo: null
-      operation: one-to-one
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
-            operation: ""
             returns: vector
             operations:
-                - '[*parser.VectorSelector] bar'
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -962,18 +962,21 @@ output:
                 start: 11
                 end: 13
       deadinfo: null
-      operation: one-to-one
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
       joins:
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
-            operation: ""
             returns: vector
             operations:
-                - '[*parser.VectorSelector] bar'
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -1029,18 +1032,21 @@ output:
                 start: 12
                 end: 14
       deadinfo: null
-      operation: one-to-one
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
       joins:
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
-            operation: ""
             returns: vector
             operations:
-                - '[*parser.VectorSelector] bar'
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -1096,18 +1102,21 @@ output:
                 start: 24
                 end: 34
       deadinfo: null
-      operation: many-to-one
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
       joins:
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
-            operation: ""
             returns: vector
             operations:
-                - '[*parser.VectorSelector] bar'
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -1163,18 +1172,21 @@ output:
                 start: 24
                 end: 35
       deadinfo: null
-      operation: one-to-many
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
       joins:
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
-            operation: ""
             returns: vector
             operations:
-                - '[*parser.VectorSelector] bar'
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -1218,18 +1230,20 @@ expr: foo and bar > bool 0
 output:
     - labels: {}
       deadinfo: null
-      operation: many-to-many
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
-            operation: ""
             returns: vector
             operations:
-                - '[*parser.VectorSelector] bar'
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -1273,10 +1287,10 @@ expr: foo offset 5m
 output:
     - labels: {}
       deadinfo: null
-      operation: ""
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo offset 5m'
+        - node: '[*parser.VectorSelector] foo offset 5m'
+          op: ""
       joins: []
       unless: []
       returninfo:
@@ -1308,10 +1322,10 @@ output:
                 start: 0
                 end: 14
       deadinfo: null
-      operation: ""
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{job="bar"}'
+        - node: '[*parser.VectorSelector] foo{job="bar"}'
+          op: ""
       joins: []
       unless: []
       returninfo:
@@ -1343,10 +1357,10 @@ output:
                 start: 0
                 end: 11
       deadinfo: null
-      operation: ""
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{job=""}'
+        - node: '[*parser.VectorSelector] foo{job=""}'
+          op: ""
       joins: []
       unless: []
       returninfo:
@@ -1378,10 +1392,10 @@ output:
                 start: 0
                 end: 14
       deadinfo: null
-      operation: many-to-many
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{job="bar"}'
+        - node: '[*parser.VectorSelector] foo{job="bar"}'
+          op: ""
       joins: []
       unless: []
       returninfo:
@@ -1407,10 +1421,10 @@ output:
                 start: 18
                 end: 32
       deadinfo: null
-      operation: many-to-many
       returns: vector
       operations:
-        - '[*parser.VectorSelector] bar{job="foo"}'
+        - node: '[*parser.VectorSelector] bar{job="foo"}'
+          op: ""
       joins: []
       unless: []
       returninfo:
@@ -1442,10 +1456,10 @@ output:
                 start: 0
                 end: 12
       deadinfo: null
-      operation: many-to-many
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{a="bar"}'
+        - node: '[*parser.VectorSelector] foo{a="bar"}'
+          op: ""
       joins: []
       unless: []
       returninfo:
@@ -1471,10 +1485,10 @@ output:
                 start: 16
                 end: 28
       deadinfo: null
-      operation: many-to-many
       returns: vector
       operations:
-        - '[*parser.VectorSelector] bar{b="foo"}'
+        - node: '[*parser.VectorSelector] bar{b="foo"}'
+          op: ""
       joins: []
       unless: []
       returninfo:
@@ -1500,10 +1514,10 @@ expr: foo[5m]
 output:
     - labels: {}
       deadinfo: null
-      operation: ""
       returns: matrix
       operations:
-        - '[*parser.VectorSelector] foo'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
       joins: []
       unless: []
       returninfo:
@@ -1529,10 +1543,10 @@ expr: prometheus_build_info[2m:1m]
 output:
     - labels: {}
       deadinfo: null
-      operation: ""
       returns: vector
       operations:
-        - '[*parser.VectorSelector] prometheus_build_info'
+        - node: '[*parser.VectorSelector] prometheus_build_info'
+          op: ""
       joins: []
       unless: []
       returninfo:
@@ -1558,12 +1572,14 @@ expr: deriv(rate(distance_covered_meters_total[1m])[5m:1m])
 output:
     - labels: {}
       deadinfo: null
-      operation: deriv
       returns: vector
       operations:
-        - '[*parser.VectorSelector] distance_covered_meters_total'
-        - '[*parser.Call] rate(distance_covered_meters_total[1m])'
-        - '[*parser.Call] deriv(rate(distance_covered_meters_total[1m])[5m:1m])'
+        - node: '[*parser.VectorSelector] distance_covered_meters_total'
+          op: ""
+        - node: '[*parser.Call] rate(distance_covered_meters_total[1m])'
+          op: rate
+        - node: '[*parser.Call] deriv(rate(distance_covered_meters_total[1m])[5m:1m])'
+          op: deriv
       joins: []
       unless: []
       returninfo:
@@ -1589,10 +1605,10 @@ expr: foo - 1
 output:
     - labels: {}
       deadinfo: null
-      operation: ""
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
       joins: []
       unless: []
       returninfo:
@@ -1618,10 +1634,10 @@ expr: foo / 5
 output:
     - labels: {}
       deadinfo: null
-      operation: ""
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
       joins: []
       unless: []
       returninfo:
@@ -1647,10 +1663,10 @@ expr: -foo
 output:
     - labels: {}
       deadinfo: null
-      operation: ""
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
       joins: []
       unless: []
       returninfo:
@@ -1694,11 +1710,12 @@ output:
                 start: 0
                 end: 3
       deadinfo: null
-      operation: sum
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{job="myjob"}'
-        - '[*parser.AggregateExpr] sum(foo{job="myjob"})'
+        - node: '[*parser.VectorSelector] foo{job="myjob"}'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum(foo{job="myjob"})'
+          op: sum
       joins: []
       unless: []
       returninfo:
@@ -1748,12 +1765,14 @@ output:
                 start: 28
                 end: 30
       deadinfo: null
-      operation: sum
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{job="myjob"}'
-        - '[*parser.AggregateExpr] count by (instance) (foo{job="myjob"})'
-        - '[*parser.AggregateExpr] sum(count by (instance) (foo{job="myjob"}))'
+        - node: '[*parser.VectorSelector] foo{job="myjob"}'
+          op: ""
+        - node: '[*parser.AggregateExpr] count by (instance) (foo{job="myjob"})'
+          op: count
+        - node: '[*parser.AggregateExpr] sum(count by (instance) (foo{job="myjob"}))'
+          op: sum
       joins: []
       unless: []
       returninfo:
@@ -1797,11 +1816,12 @@ output:
                 start: 0
                 end: 3
       deadinfo: null
-      operation: sum
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{job="myjob"}'
-        - '[*parser.AggregateExpr] sum(foo{job="myjob"})'
+        - node: '[*parser.VectorSelector] foo{job="myjob"}'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum(foo{job="myjob"})'
+          op: sum
       joins: []
       unless: []
       returninfo:
@@ -1839,11 +1859,12 @@ output:
                 start: 22
                 end: 29
       deadinfo: null
-      operation: sum
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{job="myjob"}'
-        - '[*parser.AggregateExpr] sum without (job) (foo{job="myjob"})'
+        - node: '[*parser.VectorSelector] foo{job="myjob"}'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum without (job) (foo{job="myjob"})'
+          op: sum
       joins: []
       unless: []
       returninfo:
@@ -1887,11 +1908,12 @@ output:
                 start: 9
                 end: 11
       deadinfo: null
-      operation: sum
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
-        - '[*parser.AggregateExpr] sum by (job) (foo)'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum by (job) (foo)'
+          op: sum
       joins: []
       unless: []
       returninfo:
@@ -1935,11 +1957,12 @@ output:
                 start: 4
                 end: 20
       deadinfo: null
-      operation: sum
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{job="myjob"}'
-        - '[*parser.AggregateExpr] sum by (job) (foo{job="myjob"})'
+        - node: '[*parser.VectorSelector] foo{job="myjob"}'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum by (job) (foo{job="myjob"})'
+          op: sum
       joins: []
       unless: []
       returninfo:
@@ -1971,11 +1994,12 @@ output:
                 start: 0
                 end: 31
       deadinfo: null
-      operation: abs
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{job="myjob"} offset 5m'
-        - '[*parser.Call] abs(foo{job="myjob"} offset 5m)'
+        - node: '[*parser.VectorSelector] foo{job="myjob"} offset 5m'
+          op: ""
+        - node: '[*parser.Call] abs(foo{job="myjob"} offset 5m)'
+          op: abs
       joins: []
       unless: []
       returninfo:
@@ -2007,11 +2031,12 @@ output:
                 start: 0
                 end: 43
       deadinfo: null
-      operation: abs
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{job="myjob"}'
-        - '[*parser.Call] abs(foo{job="myjob"} or bar{cluster="dev"})'
+        - node: '[*parser.VectorSelector] foo{job="myjob"}'
+          op: ""
+        - node: '[*parser.Call] abs(foo{job="myjob"} or bar{cluster="dev"})'
+          op: abs
       joins: []
       unless: []
       returninfo:
@@ -2037,11 +2062,12 @@ output:
                 start: 0
                 end: 43
       deadinfo: null
-      operation: abs
       returns: vector
       operations:
-        - '[*parser.VectorSelector] bar{cluster="dev"}'
-        - '[*parser.Call] abs(foo{job="myjob"} or bar{cluster="dev"})'
+        - node: '[*parser.VectorSelector] bar{cluster="dev"}'
+          op: ""
+        - node: '[*parser.Call] abs(foo{job="myjob"} or bar{cluster="dev"})'
+          op: abs
       joins: []
       unless: []
       returninfo:
@@ -2085,11 +2111,12 @@ output:
                 start: 4
                 end: 20
       deadinfo: null
-      operation: sum
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{job="myjob"}'
-        - '[*parser.AggregateExpr] sum without (instance) (foo{job="myjob"} or bar{cluster="dev"})'
+        - node: '[*parser.VectorSelector] foo{job="myjob"}'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum without (instance) (foo{job="myjob"} or bar{cluster="dev"})'
+          op: sum
       joins: []
       unless: []
       returninfo:
@@ -2127,11 +2154,12 @@ output:
                 start: 44
                 end: 51
       deadinfo: null
-      operation: sum
       returns: vector
       operations:
-        - '[*parser.VectorSelector] bar{cluster="dev"}'
-        - '[*parser.AggregateExpr] sum without (instance) (foo{job="myjob"} or bar{cluster="dev"})'
+        - node: '[*parser.VectorSelector] bar{cluster="dev"}'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum without (instance) (foo{job="myjob"} or bar{cluster="dev"})'
+          op: sum
       joins: []
       unless: []
       returninfo:
@@ -2175,11 +2203,12 @@ output:
                 start: 4
                 end: 20
       deadinfo: null
-      operation: sum
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{job="myjob"}'
-        - '[*parser.AggregateExpr] sum without (instance) (foo{job="myjob"})'
+        - node: '[*parser.VectorSelector] foo{job="myjob"}'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum without (instance) (foo{job="myjob"})'
+          op: sum
       joins: []
       unless: []
       returninfo:
@@ -2223,13 +2252,16 @@ output:
                 start: 0
                 end: 21
       deadinfo: null
-      operation: min
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{job="myjob"}'
-        - '[*parser.AggregateExpr] min(foo{job="myjob"})'
+        - node: '[*parser.VectorSelector] foo{job="myjob"}'
+          op: ""
+        - node: '[*parser.AggregateExpr] min(foo{job="myjob"})'
+          op: min
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation that removes all labels.
@@ -2250,11 +2282,12 @@ output:
                         start: 24
                         end: 45
             deadinfo: null
-            operation: max
             returns: vector
             operations:
-                - '[*parser.VectorSelector] foo{job="myjob"}'
-                - '[*parser.AggregateExpr] max(foo{job="myjob"})'
+                - node: '[*parser.VectorSelector] foo{job="myjob"}'
+                  op: ""
+                - node: '[*parser.AggregateExpr] max(foo{job="myjob"})'
+                  op: max
             joins: []
             unless: []
             returninfo:
@@ -2316,13 +2349,16 @@ output:
                 start: 0
                 end: 21
       deadinfo: null
-      operation: max
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{job="myjob"}'
-        - '[*parser.AggregateExpr] max(foo{job="myjob"})'
+        - node: '[*parser.VectorSelector] foo{job="myjob"}'
+          op: ""
+        - node: '[*parser.AggregateExpr] max(foo{job="myjob"})'
+          op: max
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation that removes all labels.
@@ -2343,11 +2379,12 @@ output:
                         start: 24
                         end: 45
             deadinfo: null
-            operation: min
             returns: vector
             operations:
-                - '[*parser.VectorSelector] foo{job="myjob"}'
-                - '[*parser.AggregateExpr] min(foo{job="myjob"})'
+                - node: '[*parser.VectorSelector] foo{job="myjob"}'
+                  op: ""
+                - node: '[*parser.AggregateExpr] min(foo{job="myjob"})'
+                  op: min
             joins: []
             unless: []
             returninfo:
@@ -2409,11 +2446,12 @@ output:
                 start: 4
                 end: 20
       deadinfo: null
-      operation: avg
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{job="myjob"}'
-        - '[*parser.AggregateExpr] avg by (job) (foo{job="myjob"})'
+        - node: '[*parser.VectorSelector] foo{job="myjob"}'
+          op: ""
+        - node: '[*parser.AggregateExpr] avg by (job) (foo{job="myjob"})'
+          op: avg
       joins: []
       unless: []
       returninfo:
@@ -2457,11 +2495,12 @@ output:
                 start: 11
                 end: 13
       deadinfo: null
-      operation: group
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
-        - '[*parser.AggregateExpr] group by (job) (foo)'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.AggregateExpr] group by (job) (foo)'
+          op: group
       joins: []
       unless: []
       returninfo:
@@ -2499,12 +2538,14 @@ output:
                 start: 0
                 end: 21
       deadinfo: null
-      operation: stddev
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
-        - '[*parser.Call] rate(foo[5m])'
-        - '[*parser.AggregateExpr] stddev(rate(foo[5m]))'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] rate(foo[5m])'
+          op: rate
+        - node: '[*parser.AggregateExpr] stddev(rate(foo[5m]))'
+          op: stddev
       joins: []
       unless: []
       returninfo:
@@ -2542,12 +2583,14 @@ output:
                 start: 0
                 end: 21
       deadinfo: null
-      operation: stdvar
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
-        - '[*parser.Call] rate(foo[5m])'
-        - '[*parser.AggregateExpr] stdvar(rate(foo[5m]))'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] rate(foo[5m])'
+          op: rate
+        - node: '[*parser.AggregateExpr] stdvar(rate(foo[5m]))'
+          op: stdvar
       joins: []
       unless: []
       returninfo:
@@ -2573,11 +2616,12 @@ expr: stddev_over_time(foo[5m])
 output:
     - labels: {}
       deadinfo: null
-      operation: stddev_over_time
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
-        - '[*parser.Call] stddev_over_time(foo[5m])'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] stddev_over_time(foo[5m])'
+          op: stddev_over_time
       joins: []
       unless: []
       returninfo:
@@ -2603,11 +2647,12 @@ expr: stdvar_over_time(foo[5m])
 output:
     - labels: {}
       deadinfo: null
-      operation: stdvar_over_time
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
-        - '[*parser.Call] stdvar_over_time(foo[5m])'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] stdvar_over_time(foo[5m])'
+          op: stdvar_over_time
       joins: []
       unless: []
       returninfo:
@@ -2645,12 +2690,14 @@ output:
                 start: 0
                 end: 28
       deadinfo: null
-      operation: quantile
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
-        - '[*parser.Call] rate(foo[5m])'
-        - '[*parser.AggregateExpr] quantile(0.9, rate(foo[5m]))'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] rate(foo[5m])'
+          op: rate
+        - node: '[*parser.AggregateExpr] quantile(0.9, rate(foo[5m]))'
+          op: quantile
       joins: []
       unless: []
       returninfo:
@@ -2694,11 +2741,12 @@ output:
                 start: 0
                 end: 38
       deadinfo: null
-      operation: count_values
       returns: vector
       operations:
-        - '[*parser.VectorSelector] build_version'
-        - '[*parser.AggregateExpr] count_values("version", build_version)'
+        - node: '[*parser.VectorSelector] build_version'
+          op: ""
+        - node: '[*parser.AggregateExpr] count_values("version", build_version)'
+          op: count_values
       joins: []
       unless: []
       returninfo:
@@ -2742,11 +2790,12 @@ output:
                 start: 0
                 end: 51
       deadinfo: null
-      operation: count_values
       returns: vector
       operations:
-        - '[*parser.VectorSelector] build_version'
-        - '[*parser.AggregateExpr] count_values without (job) ("version", build_version)'
+        - node: '[*parser.VectorSelector] build_version'
+          op: ""
+        - node: '[*parser.AggregateExpr] count_values without (job) ("version", build_version)'
+          op: count_values
       joins: []
       unless: []
       returninfo:
@@ -2790,11 +2839,12 @@ output:
                 start: 0
                 end: 62
       deadinfo: null
-      operation: count_values
       returns: vector
       operations:
-        - '[*parser.VectorSelector] build_version{job="foo"}'
-        - '[*parser.AggregateExpr] count_values without (job) ("version", build_version{job="foo"})'
+        - node: '[*parser.VectorSelector] build_version{job="foo"}'
+          op: ""
+        - node: '[*parser.AggregateExpr] count_values without (job) ("version", build_version{job="foo"})'
+          op: count_values
       joins: []
       unless: []
       returninfo:
@@ -2844,11 +2894,12 @@ output:
                 start: 0
                 end: 46
       deadinfo: null
-      operation: count_values
       returns: vector
       operations:
-        - '[*parser.VectorSelector] build_version'
-        - '[*parser.AggregateExpr] count_values by (job) ("version", build_version)'
+        - node: '[*parser.VectorSelector] build_version'
+          op: ""
+        - node: '[*parser.AggregateExpr] count_values by (job) ("version", build_version)'
+          op: count_values
       joins: []
       unless: []
       returninfo:
@@ -2880,11 +2931,12 @@ output:
                 start: 9
                 end: 25
       deadinfo: null
-      operation: topk
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{job="myjob"}'
-        - '[*parser.AggregateExpr] topk(10, foo{job="myjob"})'
+        - node: '[*parser.VectorSelector] foo{job="myjob"}'
+          op: ""
+        - node: '[*parser.AggregateExpr] topk(10, foo{job="myjob"})'
+          op: topk
       joins: []
       unless: []
       returninfo:
@@ -2910,11 +2962,12 @@ expr: topk(10, foo or bar)
 output:
     - labels: {}
       deadinfo: null
-      operation: topk
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
-        - '[*parser.AggregateExpr] topk(10, foo or bar)'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.AggregateExpr] topk(10, foo or bar)'
+          op: topk
       joins: []
       unless: []
       returninfo:
@@ -2934,11 +2987,12 @@ output:
       isconditional: false
     - labels: {}
       deadinfo: null
-      operation: topk
       returns: vector
       operations:
-        - '[*parser.VectorSelector] bar'
-        - '[*parser.AggregateExpr] topk(10, foo or bar)'
+        - node: '[*parser.VectorSelector] bar'
+          op: ""
+        - node: '[*parser.AggregateExpr] topk(10, foo or bar)'
+          op: topk
       joins: []
       unless: []
       returninfo:
@@ -2964,11 +3018,12 @@ expr: rate(foo[10m])
 output:
     - labels: {}
       deadinfo: null
-      operation: rate
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
-        - '[*parser.Call] rate(foo[10m])'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] rate(foo[10m])'
+          op: rate
       joins: []
       unless: []
       returninfo:
@@ -3006,12 +3061,14 @@ output:
                 start: 20
                 end: 27
       deadinfo: null
-      operation: sum
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
-        - '[*parser.Call] rate(foo[10m])'
-        - '[*parser.AggregateExpr] sum without (instance) (rate(foo[10m]))'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] rate(foo[10m])'
+          op: rate
+        - node: '[*parser.AggregateExpr] sum without (instance) (rate(foo[10m]))'
+          op: sum
       joins: []
       unless: []
       returninfo:
@@ -3043,18 +3100,20 @@ output:
                 start: 0
                 end: 14
       deadinfo: null
-      operation: one-to-one
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{job="foo"}'
+        - node: '[*parser.VectorSelector] foo{job="foo"}'
+          op: ""
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
-            operation: ""
             returns: vector
             operations:
-                - '[*parser.VectorSelector] bar'
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -3116,18 +3175,21 @@ output:
                 start: 17
                 end: 19
       deadinfo: null
-      operation: one-to-one
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{job="foo"}'
+        - node: '[*parser.VectorSelector] foo{job="foo"}'
+          op: ""
       joins:
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
-            operation: ""
             returns: vector
             operations:
-                - '[*parser.VectorSelector] bar'
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -3189,18 +3251,21 @@ output:
                 start: 0
                 end: 14
       deadinfo: null
-      operation: many-to-one
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{job="foo"}'
+        - node: '[*parser.VectorSelector] foo{job="foo"}'
+          op: ""
       joins:
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
-            operation: ""
             returns: vector
             operations:
-                - '[*parser.VectorSelector] bar'
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -3262,12 +3327,15 @@ output:
                 start: 0
                 end: 14
       deadinfo: null
-      operation: many-to-one
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{job="foo"}'
+        - node: '[*parser.VectorSelector] foo{job="foo"}'
+          op: ""
       joins:
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels:
                 cluster:
                     reason: Query will only return series where these labels are present.
@@ -3282,10 +3350,10 @@ output:
                         start: 50
                         end: 84
             deadinfo: null
-            operation: ""
             returns: vector
             operations:
-                - '[*parser.VectorSelector] bar{cluster="bar",ignored="true"}'
+                - node: '[*parser.VectorSelector] bar{cluster="bar",ignored="true"}'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -3347,12 +3415,15 @@ output:
                 start: 46
                 end: 57
       deadinfo: null
-      operation: one-to-many
       returns: vector
       operations:
-        - '[*parser.VectorSelector] bar{cluster="bar"}'
+        - node: '[*parser.VectorSelector] bar{cluster="bar"}'
+          op: ""
       joins:
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels:
                 ignored:
                     reason: Query will only return series where these labels are present.
@@ -3367,10 +3438,10 @@ output:
                         start: 0
                         end: 30
             deadinfo: null
-            operation: ""
             returns: vector
             operations:
-                - '[*parser.VectorSelector] foo{ignored="true",job="foo"}'
+                - node: '[*parser.VectorSelector] foo{ignored="true",job="foo"}'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -3426,19 +3497,22 @@ output:
                 start: 0
                 end: 16
       deadinfo: null
-      operation: count
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
-        - '[*parser.AggregateExpr] count(foo / bar)'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.AggregateExpr] count(foo / bar)'
+          op: count
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
-            operation: ""
             returns: vector
             operations:
-                - '[*parser.VectorSelector] bar'
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -3500,13 +3574,16 @@ output:
                 start: 20
                 end: 23
       deadinfo: null
-      operation: count
       returns: vector
       operations:
-        - '[*parser.VectorSelector] up{job="a"}'
-        - '[*parser.AggregateExpr] count(up{job="a"} / on () up{job="b"})'
+        - node: '[*parser.VectorSelector] up{job="a"}'
+          op: ""
+        - node: '[*parser.AggregateExpr] count(up{job="a"} / on () up{job="b"})'
+          op: count
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 job:
                     reason: Query will only return series where these labels are present.
@@ -3515,10 +3592,10 @@ output:
                         start: 26
                         end: 37
             deadinfo: null
-            operation: ""
             returns: vector
             operations:
-                - '[*parser.VectorSelector] up{job="b"}'
+                - node: '[*parser.VectorSelector] up{job="b"}'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -3586,13 +3663,17 @@ output:
                 start: 20
                 end: 23
       deadinfo: null
-      operation: count
       returns: vector
       operations:
-        - '[*parser.VectorSelector] up{job="a"}'
-        - '[*parser.AggregateExpr] count(up{job="a"} / on (env) up{job="b"})'
+        - node: '[*parser.VectorSelector] up{job="a"}'
+          op: ""
+        - node: '[*parser.AggregateExpr] count(up{job="a"} / on (env) up{job="b"})'
+          op: count
       joins:
-        - src:
+        - "on":
+            - env
+          ignoring: []
+          src:
             labels:
                 job:
                     reason: Query will only return series where these labels are present.
@@ -3601,10 +3682,10 @@ output:
                         start: 29
                         end: 40
             deadinfo: null
-            operation: ""
             returns: vector
             operations:
-                - '[*parser.VectorSelector] up{job="b"}'
+                - node: '[*parser.VectorSelector] up{job="b"}'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -3660,18 +3741,20 @@ output:
                 start: 0
                 end: 28
       deadinfo: null
-      operation: many-to-many
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{instance="1",job="foo"}'
+        - node: '[*parser.VectorSelector] foo{instance="1",job="foo"}'
+          op: ""
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
-            operation: ""
             returns: vector
             operations:
-                - '[*parser.VectorSelector] bar'
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -3733,18 +3816,21 @@ output:
                 start: 0
                 end: 28
       deadinfo: null
-      operation: many-to-many
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{instance="1",job="foo"}'
+        - node: '[*parser.VectorSelector] foo{instance="1",job="foo"}'
+          op: ""
       joins:
-        - src:
+        - "on":
+            - cluster
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
-            operation: ""
             returns: vector
             operations:
-                - '[*parser.VectorSelector] bar'
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -3788,11 +3874,12 @@ expr: topk(10, foo)
 output:
     - labels: {}
       deadinfo: null
-      operation: topk
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
-        - '[*parser.AggregateExpr] topk(10, foo)'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.AggregateExpr] topk(10, foo)'
+          op: topk
       joins: []
       unless: []
       returninfo:
@@ -3818,11 +3905,12 @@ expr: topk(10, foo) without(cluster)
 output:
     - labels: {}
       deadinfo: null
-      operation: topk
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
-        - '[*parser.AggregateExpr] topk without (cluster) (10, foo)'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.AggregateExpr] topk without (cluster) (10, foo)'
+          op: topk
       joins: []
       unless: []
       returninfo:
@@ -3848,11 +3936,12 @@ expr: topk(10, foo) by(cluster)
 output:
     - labels: {}
       deadinfo: null
-      operation: topk
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
-        - '[*parser.AggregateExpr] topk by (cluster) (10, foo)'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.AggregateExpr] topk by (cluster) (10, foo)'
+          op: topk
       joins: []
       unless: []
       returninfo:
@@ -3890,13 +3979,16 @@ output:
                 start: 31
                 end: 38
       deadinfo: null
-      operation: bottomk
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
-        - '[*parser.Call] rate(foo[5m])'
-        - '[*parser.AggregateExpr] sum without (job) (rate(foo[5m]))'
-        - '[*parser.AggregateExpr] bottomk(10, sum without (job) (rate(foo[5m])))'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] rate(foo[5m])'
+          op: rate
+        - node: '[*parser.AggregateExpr] sum without (job) (rate(foo[5m]))'
+          op: sum
+        - node: '[*parser.AggregateExpr] bottomk(10, sum without (job) (rate(foo[5m])))'
+          op: bottomk
       joins: []
       unless: []
       returninfo:
@@ -3922,10 +4014,10 @@ expr: foo or bar
 output:
     - labels: {}
       deadinfo: null
-      operation: many-to-many
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
       joins: []
       unless: []
       returninfo:
@@ -3945,10 +4037,10 @@ output:
       isconditional: false
     - labels: {}
       deadinfo: null
-      operation: many-to-many
       returns: vector
       operations:
-        - '[*parser.VectorSelector] bar'
+        - node: '[*parser.VectorSelector] bar'
+          op: ""
       joins: []
       unless: []
       returninfo:
@@ -3974,10 +4066,10 @@ expr: foo or bar or baz
 output:
     - labels: {}
       deadinfo: null
-      operation: many-to-many
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
       joins: []
       unless: []
       returninfo:
@@ -3997,10 +4089,10 @@ output:
       isconditional: false
     - labels: {}
       deadinfo: null
-      operation: many-to-many
       returns: vector
       operations:
-        - '[*parser.VectorSelector] bar'
+        - node: '[*parser.VectorSelector] bar'
+          op: ""
       joins: []
       unless: []
       returninfo:
@@ -4020,10 +4112,10 @@ output:
       isconditional: false
     - labels: {}
       deadinfo: null
-      operation: many-to-many
       returns: vector
       operations:
-        - '[*parser.VectorSelector] baz'
+        - node: '[*parser.VectorSelector] baz'
+          op: ""
       joins: []
       unless: []
       returninfo:
@@ -4049,10 +4141,10 @@ expr: (foo or bar) or baz
 output:
     - labels: {}
       deadinfo: null
-      operation: many-to-many
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
       joins: []
       unless: []
       returninfo:
@@ -4072,10 +4164,10 @@ output:
       isconditional: false
     - labels: {}
       deadinfo: null
-      operation: many-to-many
       returns: vector
       operations:
-        - '[*parser.VectorSelector] bar'
+        - node: '[*parser.VectorSelector] bar'
+          op: ""
       joins: []
       unless: []
       returninfo:
@@ -4095,10 +4187,10 @@ output:
       isconditional: false
     - labels: {}
       deadinfo: null
-      operation: many-to-many
       returns: vector
       operations:
-        - '[*parser.VectorSelector] baz'
+        - node: '[*parser.VectorSelector] baz'
+          op: ""
       joins: []
       unless: []
       returninfo:
@@ -4124,18 +4216,18 @@ expr: foo unless bar
 output:
     - labels: {}
       deadinfo: null
-      operation: many-to-many
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
       joins: []
       unless:
         - labels: {}
           deadinfo: null
-          operation: ""
           returns: vector
           operations:
-            - '[*parser.VectorSelector] bar'
+            - node: '[*parser.VectorSelector] bar'
+              op: ""
           joins: []
           unless: []
           returninfo:
@@ -4176,18 +4268,18 @@ expr: foo unless bar > 5
 output:
     - labels: {}
       deadinfo: null
-      operation: many-to-many
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
       joins: []
       unless:
         - labels: {}
           deadinfo: null
-          operation: ""
           returns: vector
           operations:
-            - '[*parser.VectorSelector] bar'
+            - node: '[*parser.VectorSelector] bar'
+              op: ""
           joins: []
           unless: []
           returninfo:
@@ -4228,18 +4320,18 @@ expr: foo unless bar unless baz
 output:
     - labels: {}
       deadinfo: null
-      operation: many-to-many
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
       joins: []
       unless:
         - labels: {}
           deadinfo: null
-          operation: ""
           returns: vector
           operations:
-            - '[*parser.VectorSelector] bar'
+            - node: '[*parser.VectorSelector] bar'
+              op: ""
           joins: []
           unless: []
           returninfo:
@@ -4259,10 +4351,10 @@ output:
           isconditional: false
         - labels: {}
           deadinfo: null
-          operation: ""
           returns: vector
           operations:
-            - '[*parser.VectorSelector] baz'
+            - node: '[*parser.VectorSelector] baz'
+              op: ""
           joins: []
           unless: []
           returninfo:
@@ -4327,12 +4419,14 @@ output:
                 start: 63
                 end: 70
       deadinfo: null
-      operation: count
       returns: vector
       operations:
-        - '[*parser.VectorSelector] up{cluster="dev",job="foo"}'
-        - '[*parser.AggregateExpr] sum by (job, cluster) (up{cluster="dev",job="foo"})'
-        - '[*parser.AggregateExpr] count without (job, cluster) (sum by (job, cluster) (up{cluster="dev",job="foo"}) == 0)'
+        - node: '[*parser.VectorSelector] up{cluster="dev",job="foo"}'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum by (job, cluster) (up{cluster="dev",job="foo"})'
+          op: sum
+        - node: '[*parser.AggregateExpr] count without (job, cluster) (sum by (job, cluster) (up{cluster="dev",job="foo"}) == 0)'
+          op: count
       joins: []
       unless: []
       returninfo:
@@ -4364,10 +4458,10 @@ output:
                 start: 0
                 end: 6
       deadinfo: null
-      operation: year
       returns: vector
       operations:
-        - '[*parser.Call] year()'
+        - node: '[*parser.Call] year()'
+          op: year
       joins: []
       unless: []
       returninfo:
@@ -4393,11 +4487,12 @@ expr: year(foo)
 output:
     - labels: {}
       deadinfo: null
-      operation: year
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
-        - '[*parser.Call] year(foo)'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] year(foo)'
+          op: year
       joins: []
       unless: []
       returninfo:
@@ -4453,11 +4548,12 @@ output:
                 start: 11
                 end: 58
       deadinfo: null
-      operation: label_join
       returns: vector
       operations:
-        - '[*parser.VectorSelector] up{job="api-server",src1="a",src2="b",src3="c"}'
-        - '[*parser.Call] label_join(up{job="api-server",src1="a",src2="b",src3="c"}, "foo", ",", "src1", "src2", "src3")'
+        - node: '[*parser.VectorSelector] up{job="api-server",src1="a",src2="b",src3="c"}'
+          op: ""
+        - node: '[*parser.Call] label_join(up{job="api-server",src1="a",src2="b",src3="c"}, "foo", ",", "src1", "src2", "src3")'
+          op: label_join
       joins: []
       unless: []
       returninfo:
@@ -4508,19 +4604,23 @@ output:
                 start: 48
                 end: 58
       deadinfo: null
-      operation: sum
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo:sum'
-        - '[*parser.AggregateExpr] sum without (notify) (foo:sum > 0)'
+        - node: '[*parser.VectorSelector] foo:sum'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum without (notify) (foo:sum > 0)'
+          op: sum
       joins:
-        - src:
+        - "on":
+            - job
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
-            operation: ""
             returns: vector
             operations:
-                - '[*parser.VectorSelector] job:notify'
+                - node: '[*parser.VectorSelector] job:notify'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -4540,7 +4640,10 @@ output:
             isconditional: false
           op: 57395
           depth: 0
-        - src:
+        - "on":
+            - job
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
@@ -4561,11 +4664,12 @@ output:
                         start: 108
                         end: 110
             deadinfo: null
-            operation: sum
             returns: vector
             operations:
-                - '[*parser.VectorSelector] foo:count'
-                - '[*parser.AggregateExpr] sum by (job) (foo:count)'
+                - node: '[*parser.VectorSelector] foo:count'
+                  op: ""
+                - node: '[*parser.AggregateExpr] sum by (job) (foo:count)'
+                  op: sum
             joins: []
             unless: []
             returninfo:
@@ -4627,12 +4731,16 @@ output:
                 start: 29
                 end: 32
       deadinfo: null
-      operation: one-to-one
       returns: vector
       operations:
-        - '[*parser.VectorSelector] container_file_descriptors'
+        - node: '[*parser.VectorSelector] container_file_descriptors'
+          op: ""
       joins:
-        - src:
+        - "on":
+            - instance
+            - app_name
+          ignoring: []
+          src:
             labels:
                 ulimit:
                     reason: Query will only return series where these labels are present.
@@ -4641,10 +4749,10 @@ output:
                         start: 53
                         end: 100
             deadinfo: null
-            operation: ""
             returns: vector
             operations:
-                - '[*parser.VectorSelector] container_ulimits_soft{ulimit="max_open_files"}'
+                - node: '[*parser.VectorSelector] container_ulimits_soft{ulimit="max_open_files"}'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -4700,12 +4808,16 @@ output:
                 start: 29
                 end: 32
       deadinfo: null
-      operation: many-to-one
       returns: vector
       operations:
-        - '[*parser.VectorSelector] container_file_descriptors'
+        - node: '[*parser.VectorSelector] container_file_descriptors'
+          op: ""
       joins:
-        - src:
+        - "on":
+            - instance
+            - app_name
+          ignoring: []
+          src:
             labels:
                 ulimit:
                     reason: Query will only return series where these labels are present.
@@ -4714,10 +4826,10 @@ output:
                         start: 66
                         end: 113
             deadinfo: null
-            operation: ""
             returns: vector
             operations:
-                - '[*parser.VectorSelector] container_ulimits_soft{ulimit="max_open_files"}'
+                - node: '[*parser.VectorSelector] container_ulimits_soft{ulimit="max_open_files"}'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -4778,11 +4890,12 @@ output:
                 start: 0
                 end: 22
       deadinfo: null
-      operation: absent
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{job="bar"}'
-        - '[*parser.Call] absent(foo{job="bar"})'
+        - node: '[*parser.VectorSelector] foo{job="bar"}'
+          op: ""
+        - node: '[*parser.Call] absent(foo{job="bar"})'
+          op: absent
       joins: []
       unless: []
       returninfo:
@@ -4842,11 +4955,12 @@ output:
                 start: 0
                 end: 66
       deadinfo: null
-      operation: absent
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{cluster!="dev",env="prod",instance=~".+",job="bar"}'
-        - '[*parser.Call] absent(foo{cluster!="dev",env="prod",instance=~".+",job="bar"})'
+        - node: '[*parser.VectorSelector] foo{cluster!="dev",env="prod",instance=~".+",job="bar"}'
+          op: ""
+        - node: '[*parser.Call] absent(foo{cluster!="dev",env="prod",instance=~".+",job="bar"})'
+          op: absent
       joins: []
       unless: []
       returninfo:
@@ -4911,12 +5025,14 @@ output:
                 start: 0
                 end: 6
       deadinfo: null
-      operation: absent
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
-        - '[*parser.AggregateExpr] sum by (job, instance) (foo)'
-        - '[*parser.Call] absent(sum by (job, instance) (foo))'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum by (job, instance) (foo)'
+          op: sum
+        - node: '[*parser.Call] absent(sum by (job, instance) (foo))'
+          op: absent
       joins: []
       unless: []
       returninfo:
@@ -4965,19 +5081,23 @@ output:
                 start: 0
                 end: 38
       deadinfo: null
-      operation: absent
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{job="prometheus",xxx="1"}'
-        - '[*parser.Call] absent(foo{job="prometheus",xxx="1"})'
+        - node: '[*parser.VectorSelector] foo{job="prometheus",xxx="1"}'
+          op: ""
+        - node: '[*parser.Call] absent(foo{job="prometheus",xxx="1"})'
+          op: absent
       joins:
-        - src:
+        - "on":
+            - job
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
-            operation: ""
             returns: vector
             operations:
-                - '[*parser.VectorSelector] prometheus_build_info'
+                - node: '[*parser.VectorSelector] prometheus_build_info'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -5039,11 +5159,12 @@ output:
                 start: 13
                 end: 15
       deadinfo: null
-      operation: sum
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
-        - '[*parser.AggregateExpr] sum by (notjob) (foo)'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum by (notjob) (foo)'
+          op: sum
       joins: []
       unless: []
       returninfo:
@@ -5099,13 +5220,18 @@ output:
                 start: 32
                 end: 35
       deadinfo: null
-      operation: count
       returns: vector
       operations:
-        - '[*parser.VectorSelector] node_exporter_build_info'
-        - '[*parser.AggregateExpr] count by (instance, version) (node_exporter_build_info)'
+        - node: '[*parser.VectorSelector] node_exporter_build_info'
+          op: ""
+        - node: '[*parser.AggregateExpr] count by (instance, version) (node_exporter_build_info)'
+          op: count
       joins:
-        - src:
+        - "on": []
+          ignoring:
+            - package
+            - version
+          src:
             labels:
                 "":
                     reason: Query is using aggregation with `by(instance, version, package)`, only labels included inside `by(...)` will be present on the results.
@@ -5138,11 +5264,12 @@ output:
                         start: 127
                         end: 130
             deadinfo: null
-            operation: count
             returns: vector
             operations:
-                - '[*parser.VectorSelector] deb_package_version'
-                - '[*parser.AggregateExpr] count by (instance, version, package) (deb_package_version)'
+                - node: '[*parser.VectorSelector] deb_package_version'
+                  op: ""
+                - node: '[*parser.AggregateExpr] count by (instance, version, package) (deb_package_version)'
+                  op: count
             joins: []
             unless: []
             returninfo:
@@ -5197,11 +5324,12 @@ output:
                 start: 0
                 end: 6
       deadinfo: null
-      operation: absent
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
-        - '[*parser.Call] absent(foo)'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] absent(foo)'
+          op: absent
       joins: []
       unless: []
       returninfo:
@@ -5232,11 +5360,12 @@ output:
                 start: 15
                 end: 21
       deadinfo: null
-      operation: absent
       returns: vector
       operations:
-        - '[*parser.VectorSelector] bar'
-        - '[*parser.Call] absent(bar)'
+        - node: '[*parser.VectorSelector] bar'
+          op: ""
+        - node: '[*parser.Call] absent(bar)'
+          op: absent
       joins: []
       unless: []
       returninfo:
@@ -5273,11 +5402,12 @@ output:
                 start: 0
                 end: 16
       deadinfo: null
-      operation: absent_over_time
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
-        - '[*parser.Call] absent_over_time(foo[5m])'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] absent_over_time(foo[5m])'
+          op: absent_over_time
       joins: []
       unless: []
       returninfo:
@@ -5308,11 +5438,12 @@ output:
                 start: 29
                 end: 35
       deadinfo: null
-      operation: absent
       returns: vector
       operations:
-        - '[*parser.VectorSelector] bar'
-        - '[*parser.Call] absent(bar)'
+        - node: '[*parser.VectorSelector] bar'
+          op: ""
+        - node: '[*parser.Call] absent(bar)'
+          op: absent
       joins: []
       unless: []
       returninfo:
@@ -5367,19 +5498,22 @@ output:
                 start: 37
                 end: 59
       deadinfo: null
-      operation: absent
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{job="xxx"}'
-        - '[*parser.Call] absent(foo{job="xxx"})'
+        - node: '[*parser.VectorSelector] foo{job="xxx"}'
+          op: ""
+        - node: '[*parser.Call] absent(foo{job="xxx"})'
+          op: absent
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
-            operation: ""
             returns: vector
             operations:
-                - '[*parser.VectorSelector] bar'
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -5440,19 +5574,22 @@ output:
                 start: 25
                 end: 47
       deadinfo: null
-      operation: absent
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{job="xxx"}'
-        - '[*parser.Call] absent(foo{job="xxx"})'
+        - node: '[*parser.VectorSelector] foo{job="xxx"}'
+          op: ""
+        - node: '[*parser.Call] absent(foo{job="xxx"})'
+          op: absent
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
-            operation: ""
             returns: vector
             operations:
-                - '[*parser.VectorSelector] bar'
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -5502,10 +5639,10 @@ output:
                 start: 0
                 end: 6
       deadinfo: null
-      operation: vector
       returns: vector
       operations:
-        - '[*parser.Call] vector(1)'
+        - node: '[*parser.Call] vector(1)'
+          op: vector
       joins: []
       unless: []
       returninfo:
@@ -5537,10 +5674,10 @@ output:
                 start: 0
                 end: 6
       deadinfo: null
-      operation: vector
       returns: vector
       operations:
-        - '[*parser.Call] vector(scalar(foo))'
+        - node: '[*parser.Call] vector(scalar(foo))'
+          op: vector
       joins: []
       unless: []
       returninfo:
@@ -5576,10 +5713,10 @@ output:
         fragment:
             start: 0
             end: 24
-      operation: vector
       returns: vector
       operations:
-        - '[*parser.Call] vector(0 >= bool 0.5)'
+        - node: '[*parser.Call] vector(0 >= bool 0.5)'
+          op: vector
       joins: []
       unless: []
       returninfo:
@@ -5611,11 +5748,12 @@ output:
                 start: 0
                 end: 35
       deadinfo: null
-      operation: sum_over_time
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{job="myjob"}'
-        - '[*parser.Call] sum_over_time(foo{job="myjob"}[5m])'
+        - node: '[*parser.VectorSelector] foo{job="myjob"}'
+          op: ""
+        - node: '[*parser.Call] sum_over_time(foo{job="myjob"}[5m])'
+          op: sum_over_time
       joins: []
       unless: []
       returninfo:
@@ -5647,10 +5785,10 @@ output:
                 start: 0
                 end: 15
       deadinfo: null
-      operation: days_in_month
       returns: vector
       operations:
-        - '[*parser.Call] days_in_month()'
+        - node: '[*parser.Call] days_in_month()'
+          op: days_in_month
       joins: []
       unless: []
       returninfo:
@@ -5682,11 +5820,12 @@ output:
                 start: 0
                 end: 29
       deadinfo: null
-      operation: days_in_month
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{job="foo"}'
-        - '[*parser.Call] days_in_month(foo{job="foo"})'
+        - node: '[*parser.VectorSelector] foo{job="foo"}'
+          op: ""
+        - node: '[*parser.Call] days_in_month(foo{job="foo"})'
+          op: days_in_month
       joins: []
       unless: []
       returninfo:
@@ -5730,11 +5869,12 @@ output:
                 start: 14
                 end: 48
       deadinfo: null
-      operation: label_replace
       returns: vector
       operations:
-        - '[*parser.VectorSelector] up{job="api-server",service="a:c"}'
-        - '[*parser.Call] label_replace(up{job="api-server",service="a:c"}, "foo", "$1", "service", "(.*):.*")'
+        - node: '[*parser.VectorSelector] up{job="api-server",service="a:c"}'
+          op: ""
+        - node: '[*parser.Call] label_replace(up{job="api-server",service="a:c"}, "foo", "$1", "service", "(.*):.*")'
+          op: label_replace
       joins: []
       unless: []
       returninfo:
@@ -5784,12 +5924,14 @@ output:
                 start: 18
                 end: 21
       deadinfo: null
-      operation: label_replace
       returns: vector
       operations:
-        - '[*parser.VectorSelector] pod_status'
-        - '[*parser.AggregateExpr] sum by (pod) (pod_status)'
-        - '[*parser.Call] label_replace(sum by (pod) (pod_status) > 0, "cluster", "$1", "pod", "(.*)")'
+        - node: '[*parser.VectorSelector] pod_status'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum by (pod) (pod_status)'
+          op: sum
+        - node: '[*parser.Call] label_replace(sum by (pod) (pod_status) > 0, "cluster", "$1", "pod", "(.*)")'
+          op: label_replace
       joins: []
       unless: []
       returninfo:
@@ -5815,10 +5957,10 @@ expr: (time() - my_metric) > 5*3600
 output:
     - labels: {}
       deadinfo: null
-      operation: ""
       returns: vector
       operations:
-        - '[*parser.VectorSelector] my_metric'
+        - node: '[*parser.VectorSelector] my_metric'
+          op: ""
       joins: []
       unless: []
       returninfo:
@@ -5856,12 +5998,15 @@ output:
                 start: 37
                 end: 45
       deadinfo: null
-      operation: one-to-one
       returns: vector
       operations:
-        - '[*parser.VectorSelector] up{instance="a",job="prometheus"}'
+        - node: '[*parser.VectorSelector] up{instance="a",job="prometheus"}'
+          op: ""
       joins:
-        - src:
+        - "on": []
+          ignoring:
+            - job
+          src:
             labels:
                 instance:
                     reason: Query will only return series where these labels are present.
@@ -5876,10 +6021,10 @@ output:
                         start: 51
                         end: 79
             deadinfo: null
-            operation: ""
             returns: vector
             operations:
-                - '[*parser.VectorSelector] up{instance="a",job="pint"}'
+                - node: '[*parser.VectorSelector] up{instance="a",job="pint"}'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -5953,11 +6098,12 @@ output:
                 start: 5
                 end: 12
       deadinfo: null
-      operation: avg
       returns: vector
       operations:
-        - '[*parser.VectorSelector] router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"}'
-        - '[*parser.AggregateExpr] avg without (router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"})'
+        - node: '[*parser.VectorSelector] router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"}'
+          op: ""
+        - node: '[*parser.AggregateExpr] avg without (router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"})'
+          op: avg
       joins: []
       unless: []
       returninfo:
@@ -6013,13 +6159,16 @@ output:
                 start: 119
                 end: 126
       deadinfo: null
-      operation: sum
       returns: vector
       operations:
-        - '[*parser.VectorSelector] router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"}'
-        - '[*parser.AggregateExpr] sum without (router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"})'
+        - node: '[*parser.VectorSelector] router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"}'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum without (router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"})'
+          op: sum
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation that removes all labels.
@@ -6046,11 +6195,12 @@ output:
                         start: 221
                         end: 289
             deadinfo: null
-            operation: count
             returns: vector
             operations:
-                - '[*parser.VectorSelector] colo_router_tier:disabled_pops:max{router=~"edge.*",tier="1"}'
-                - '[*parser.AggregateExpr] count(colo_router_tier:disabled_pops:max{router=~"edge.*",tier="1"})'
+                - node: '[*parser.VectorSelector] colo_router_tier:disabled_pops:max{router=~"edge.*",tier="1"}'
+                  op: ""
+                - node: '[*parser.AggregateExpr] count(colo_router_tier:disabled_pops:max{router=~"edge.*",tier="1"})'
+                  op: count
             joins: []
             unless: []
             returninfo:
@@ -6118,11 +6268,12 @@ output:
                 start: 307
                 end: 314
       deadinfo: null
-      operation: avg
       returns: vector
       operations:
-        - '[*parser.VectorSelector] router_anycast_prefix_enabled{cidr_use_case=~".*regional.*"}'
-        - '[*parser.AggregateExpr] avg without (router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*regional.*"})'
+        - node: '[*parser.VectorSelector] router_anycast_prefix_enabled{cidr_use_case=~".*regional.*"}'
+          op: ""
+        - node: '[*parser.AggregateExpr] avg without (router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*regional.*"})'
+          op: avg
       joins: []
       unless: []
       returninfo:
@@ -6160,12 +6311,14 @@ output:
                 start: 0
                 end: 69
       deadinfo: null
-      operation: label_replace
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
-        - '[*parser.AggregateExpr] sum without (instance) (foo)'
-        - '[*parser.Call] label_replace(sum without (instance) (foo), "instance", "none", "", "")'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum without (instance) (foo)'
+          op: sum
+        - node: '[*parser.Call] label_replace(sum without (instance) (foo), "instance", "none", "", "")'
+          op: label_replace
       joins: []
       unless: []
       returninfo:
@@ -6232,12 +6385,14 @@ output:
                 start: 5
                 end: 8
       deadinfo: null
-      operation: sum
       returns: vector
       operations:
-        - '[*parser.VectorSelector] probe_success{job="abc"}'
-        - '[*parser.Call] sum_over_time(probe_success{job="abc"}[5m])'
-        - '[*parser.AggregateExpr] sum by (region, target, colo_name) (sum_over_time(probe_success{job="abc"}[5m]) or vector(1))'
+        - node: '[*parser.VectorSelector] probe_success{job="abc"}'
+          op: ""
+        - node: '[*parser.Call] sum_over_time(probe_success{job="abc"}[5m])'
+          op: sum_over_time
+        - node: '[*parser.AggregateExpr] sum by (region, target, colo_name) (sum_over_time(probe_success{job="abc"}[5m]) or vector(1))'
+          op: sum
       joins: []
       unless: []
       returninfo:
@@ -6291,11 +6446,12 @@ output:
         fragment:
             start: 91
             end: 100
-      operation: sum
       returns: vector
       operations:
-        - '[*parser.Call] vector(1)'
-        - '[*parser.AggregateExpr] sum by (region, target, colo_name) (sum_over_time(probe_success{job="abc"}[5m]) or vector(1))'
+        - node: '[*parser.Call] vector(1)'
+          op: vector
+        - node: '[*parser.AggregateExpr] sum by (region, target, colo_name) (sum_over_time(probe_success{job="abc"}[5m]) or vector(1))'
+          op: sum
       joins: []
       unless: []
       returninfo:
@@ -6327,10 +6483,10 @@ output:
                 start: 0
                 end: 6
       deadinfo: null
-      operation: vector
       returns: vector
       operations:
-        - '[*parser.Call] vector(1)'
+        - node: '[*parser.Call] vector(1)'
+          op: vector
       joins: []
       unless: []
       returninfo:
@@ -6354,10 +6510,10 @@ output:
         fragment:
             start: 13
             end: 16
-      operation: many-to-many
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
       joins: []
       unless: []
       returninfo:
@@ -6393,10 +6549,10 @@ output:
         fragment:
             start: 0
             end: 9
-      operation: vector
       returns: vector
       operations:
-        - '[*parser.Call] vector(0)'
+        - node: '[*parser.Call] vector(0)'
+          op: vector
       joins: []
       unless: []
       returninfo:
@@ -6432,12 +6588,14 @@ output:
         fragment:
             start: 0
             end: 9
-      operation: vector
       returns: vector
       operations:
-        - '[*parser.Call] vector(0)'
+        - node: '[*parser.Call] vector(0)'
+          op: vector
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Calling `vector()` will return a vector value with no labels.
@@ -6446,10 +6604,10 @@ output:
                         start: 12
                         end: 18
             deadinfo: null
-            operation: vector
             returns: vector
             operations:
-                - '[*parser.Call] vector(1)'
+                - node: '[*parser.Call] vector(1)'
+                  op: vector
             joins: []
             unless: []
             returninfo:
@@ -6505,11 +6663,12 @@ output:
                 start: 0
                 end: 21
       deadinfo: null
-      operation: sum
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
-        - '[*parser.AggregateExpr] sum(foo or vector(0))'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum(foo or vector(0))'
+          op: sum
       joins: []
       unless: []
       returninfo:
@@ -6545,11 +6704,12 @@ output:
         fragment:
             start: 11
             end: 20
-      operation: sum
       returns: vector
       operations:
-        - '[*parser.Call] vector(0)'
-        - '[*parser.AggregateExpr] sum(foo or vector(0))'
+        - node: '[*parser.Call] vector(0)'
+          op: vector
+        - node: '[*parser.AggregateExpr] sum(foo or vector(0))'
+          op: sum
       joins: []
       unless: []
       returninfo:
@@ -6587,11 +6747,12 @@ output:
                 start: 1
                 end: 22
       deadinfo: null
-      operation: sum
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
-        - '[*parser.AggregateExpr] sum(foo or vector(1))'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum(foo or vector(1))'
+          op: sum
       joins: []
       unless: []
       returninfo:
@@ -6627,11 +6788,12 @@ output:
         fragment:
             start: 12
             end: 21
-      operation: sum
       returns: vector
       operations:
-        - '[*parser.Call] vector(1)'
-        - '[*parser.AggregateExpr] sum(foo or vector(1))'
+        - node: '[*parser.Call] vector(1)'
+          op: vector
+        - node: '[*parser.AggregateExpr] sum(foo or vector(1))'
+          op: sum
       joins: []
       unless: []
       returninfo:
@@ -6669,11 +6831,12 @@ output:
                 start: 1
                 end: 22
       deadinfo: null
-      operation: sum
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
-        - '[*parser.AggregateExpr] sum(foo or vector(1))'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum(foo or vector(1))'
+          op: sum
       joins: []
       unless: []
       returninfo:
@@ -6705,11 +6868,12 @@ output:
                 start: 1
                 end: 22
       deadinfo: null
-      operation: sum
       returns: vector
       operations:
-        - '[*parser.Call] vector(1)'
-        - '[*parser.AggregateExpr] sum(foo or vector(1))'
+        - node: '[*parser.Call] vector(1)'
+          op: vector
+        - node: '[*parser.AggregateExpr] sum(foo or vector(1))'
+          op: sum
       joins: []
       unless: []
       returninfo:
@@ -6747,11 +6911,12 @@ output:
                 start: 1
                 end: 22
       deadinfo: null
-      operation: sum
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
-        - '[*parser.AggregateExpr] sum(foo or vector(2))'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum(foo or vector(2))'
+          op: sum
       joins: []
       unless: []
       returninfo:
@@ -6787,11 +6952,12 @@ output:
         fragment:
             start: 12
             end: 21
-      operation: sum
       returns: vector
       operations:
-        - '[*parser.Call] vector(2)'
-        - '[*parser.AggregateExpr] sum(foo or vector(2))'
+        - node: '[*parser.Call] vector(2)'
+          op: vector
+        - node: '[*parser.AggregateExpr] sum(foo or vector(2))'
+          op: sum
       joins: []
       unless: []
       returninfo:
@@ -6832,11 +6998,12 @@ output:
                 start: 1
                 end: 41
       deadinfo: null
-      operation: sum
       returns: vector
       operations:
-        - '[*parser.VectorSelector] sometimes{foo!="bar"}'
-        - '[*parser.AggregateExpr] sum(sometimes{foo!="bar"} or vector(0))'
+        - node: '[*parser.VectorSelector] sometimes{foo!="bar"}'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum(sometimes{foo!="bar"} or vector(0))'
+          op: sum
       joins: []
       unless: []
       returninfo:
@@ -6868,11 +7035,12 @@ output:
                 start: 1
                 end: 41
       deadinfo: null
-      operation: sum
       returns: vector
       operations:
-        - '[*parser.Call] vector(0)'
-        - '[*parser.AggregateExpr] sum(sometimes{foo!="bar"} or vector(0))'
+        - node: '[*parser.Call] vector(0)'
+          op: vector
+        - node: '[*parser.AggregateExpr] sum(sometimes{foo!="bar"} or vector(0))'
+          op: sum
       joins: []
       unless: []
       returninfo:
@@ -6892,10 +7060,10 @@ output:
       isconditional: false
     - labels: {}
       deadinfo: null
-      operation: many-to-many
       returns: vector
       operations:
-        - '[*parser.VectorSelector] bob'
+        - node: '[*parser.VectorSelector] bob'
+          op: ""
       joins: []
       unless: []
       returninfo:
@@ -6927,11 +7095,12 @@ output:
                 start: 60
                 end: 68
       deadinfo: null
-      operation: sum
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
-        - '[*parser.AggregateExpr] sum(foo)'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum(foo)'
+          op: sum
       joins: []
       unless: []
       returninfo:
@@ -6957,10 +7126,10 @@ output:
                 start: 72
                 end: 78
       deadinfo: null
-      operation: vector
       returns: vector
       operations:
-        - '[*parser.Call] vector(1)'
+        - node: '[*parser.Call] vector(1)'
+          op: vector
       joins: []
       unless: []
       returninfo:
@@ -7007,19 +7176,22 @@ output:
                 start: 4
                 end: 30
       deadinfo: null
-      operation: sum
       returns: vector
       operations:
-        - '[*parser.VectorSelector] sometimes{foo!="bar"}'
-        - '[*parser.AggregateExpr] sum(sometimes{foo!="bar"})'
+        - node: '[*parser.VectorSelector] sometimes{foo!="bar"}'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum(sometimes{foo!="bar"})'
+          op: sum
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
-            operation: many-to-many
             returns: vector
             operations:
-                - '[*parser.VectorSelector] bob'
+                - node: '[*parser.VectorSelector] bob'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -7039,7 +7211,9 @@ output:
             isconditional: true
           op: 57389
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation that removes all labels.
@@ -7054,11 +7228,12 @@ output:
                         start: 70
                         end: 79
             deadinfo: null
-            operation: sum
             returns: vector
             operations:
-                - '[*parser.VectorSelector] bar'
-                - '[*parser.AggregateExpr] sum(bar)'
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+                - node: '[*parser.AggregateExpr] sum(bar)'
+                  op: sum
             joins: []
             unless: []
             returninfo:
@@ -7078,13 +7253,15 @@ output:
             isconditional: false
           op: 57389
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
-            operation: many-to-many
             returns: vector
             operations:
-                - '[*parser.VectorSelector] notfound'
+                - node: '[*parser.VectorSelector] notfound'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -7128,18 +7305,20 @@ output:
                 start: 36
                 end: 42
       deadinfo: null
-      operation: vector
       returns: vector
       operations:
-        - '[*parser.Call] vector(1)'
+        - node: '[*parser.Call] vector(1)'
+          op: vector
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
-            operation: many-to-many
             returns: vector
             operations:
-                - '[*parser.VectorSelector] bob'
+                - node: '[*parser.VectorSelector] bob'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -7159,7 +7338,9 @@ output:
             isconditional: true
           op: 57389
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation that removes all labels.
@@ -7174,11 +7355,12 @@ output:
                         start: 70
                         end: 79
             deadinfo: null
-            operation: sum
             returns: vector
             operations:
-                - '[*parser.VectorSelector] bar'
-                - '[*parser.AggregateExpr] sum(bar)'
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+                - node: '[*parser.AggregateExpr] sum(bar)'
+                  op: sum
             joins: []
             unless: []
             returninfo:
@@ -7198,13 +7380,15 @@ output:
             isconditional: false
           op: 57389
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
-            operation: many-to-many
             returns: vector
             operations:
-                - '[*parser.VectorSelector] notfound'
+                - node: '[*parser.VectorSelector] notfound'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -7248,10 +7432,10 @@ expr: foo offset 5m > 5
 output:
     - labels: {}
       deadinfo: null
-      operation: ""
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo offset 5m'
+        - node: '[*parser.VectorSelector] foo offset 5m'
+          op: ""
       joins: []
       unless: []
       returninfo:
@@ -7280,20 +7464,24 @@ expr: |4
 output:
     - labels: {}
       deadinfo: null
-      operation: rate
       returns: vector
       operations:
-        - '[*parser.VectorSelector] metric2'
-        - '[*parser.Call] rate(metric2[5m])'
+        - node: '[*parser.VectorSelector] metric2'
+          op: ""
+        - node: '[*parser.Call] rate(metric2[5m])'
+          op: rate
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
-            operation: rate
             returns: vector
             operations:
-                - '[*parser.VectorSelector] metric1'
-                - '[*parser.Call] rate(metric1[5m])'
+                - node: '[*parser.VectorSelector] metric1'
+                  op: ""
+                - node: '[*parser.Call] rate(metric1[5m])'
+                  op: rate
             joins: []
             unless: []
             returninfo:
@@ -7313,7 +7501,9 @@ output:
             isconditional: false
           op: 57383
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Calling `vector()` will return a vector value with no labels.
@@ -7322,10 +7512,10 @@ output:
                         start: 58
                         end: 64
             deadinfo: null
-            operation: vector
             returns: vector
             operations:
-                - '[*parser.Call] vector(1)'
+                - node: '[*parser.Call] vector(1)'
+                  op: vector
             joins: []
             unless: []
             returninfo:
@@ -7345,7 +7535,9 @@ output:
             isconditional: false
           op: 57383
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 log_name:
                     reason: Query will only return series where these labels are present.
@@ -7354,11 +7546,12 @@ output:
                         start: 72
                         end: 110
             deadinfo: null
-            operation: rate
             returns: vector
             operations:
-                - '[*parser.VectorSelector] metric3{log_name="samplerd"}'
-                - '[*parser.Call] rate(metric3{log_name="samplerd"}[5m])'
+                - node: '[*parser.VectorSelector] metric3{log_name="samplerd"}'
+                  op: ""
+                - node: '[*parser.Call] rate(metric3{log_name="samplerd"}[5m])'
+                  op: rate
             joins: []
             unless: []
             returninfo:
@@ -7378,7 +7571,9 @@ output:
             isconditional: false
           op: 57383
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Calling `vector()` will return a vector value with no labels.
@@ -7387,10 +7582,10 @@ output:
                         start: 114
                         end: 120
             deadinfo: null
-            operation: vector
             returns: vector
             operations:
-                - '[*parser.Call] vector(2)'
+                - node: '[*parser.Call] vector(2)'
+                  op: vector
             joins: []
             unless: []
             returninfo:
@@ -7434,19 +7629,22 @@ output:
                 start: 23
                 end: 29
       deadinfo: null
-      operation: vector
       returns: vector
       operations:
-        - '[*parser.Call] vector(0)'
+        - node: '[*parser.Call] vector(0)'
+          op: vector
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
-            operation: rate
             returns: vector
             operations:
-                - '[*parser.VectorSelector] metric1'
-                - '[*parser.Call] rate(metric1[5m])'
+                - node: '[*parser.VectorSelector] metric1'
+                  op: ""
+                - node: '[*parser.Call] rate(metric1[5m])'
+                  op: rate
             joins: []
             unless: []
             returninfo:
@@ -7466,7 +7664,9 @@ output:
             isconditional: false
           op: 57383
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Calling `vector()` will return a vector value with no labels.
@@ -7475,10 +7675,10 @@ output:
                         start: 58
                         end: 64
             deadinfo: null
-            operation: vector
             returns: vector
             operations:
-                - '[*parser.Call] vector(1)'
+                - node: '[*parser.Call] vector(1)'
+                  op: vector
             joins: []
             unless: []
             returninfo:
@@ -7498,7 +7698,9 @@ output:
             isconditional: false
           op: 57383
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 log_name:
                     reason: Query will only return series where these labels are present.
@@ -7507,11 +7709,12 @@ output:
                         start: 72
                         end: 110
             deadinfo: null
-            operation: rate
             returns: vector
             operations:
-                - '[*parser.VectorSelector] metric3{log_name="samplerd"}'
-                - '[*parser.Call] rate(metric3{log_name="samplerd"}[5m])'
+                - node: '[*parser.VectorSelector] metric3{log_name="samplerd"}'
+                  op: ""
+                - node: '[*parser.Call] rate(metric3{log_name="samplerd"}[5m])'
+                  op: rate
             joins: []
             unless: []
             returninfo:
@@ -7531,7 +7734,9 @@ output:
             isconditional: false
           op: 57383
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Calling `vector()` will return a vector value with no labels.
@@ -7540,10 +7745,10 @@ output:
                         start: 114
                         end: 120
             deadinfo: null
-            operation: vector
             returns: vector
             operations:
-                - '[*parser.Call] vector(2)'
+                - node: '[*parser.Call] vector(2)'
+                  op: vector
             joins: []
             unless: []
             returninfo:
@@ -7599,11 +7804,12 @@ output:
                 start: 0
                 end: 64
       deadinfo: null
-      operation: label_replace
       returns: vector
       operations:
-        - '[*parser.Call] vector(1)'
-        - '[*parser.Call] label_replace(vector(1), "nexthop_tag", "$1", "nexthop", "(.+)")'
+        - node: '[*parser.Call] vector(1)'
+          op: vector
+        - node: '[*parser.Call] label_replace(vector(1), "nexthop_tag", "$1", "nexthop", "(.+)")'
+          op: label_replace
       joins: []
       unless: []
       returninfo:
@@ -7647,11 +7853,12 @@ output:
                 start: 1
                 end: 4
       deadinfo: null
-      operation: sum
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{job="myjob"}'
-        - '[*parser.AggregateExpr] sum(foo{job="myjob"})'
+        - node: '[*parser.VectorSelector] foo{job="myjob"}'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum(foo{job="myjob"})'
+          op: sum
       joins: []
       unless: []
       returninfo:
@@ -7683,10 +7890,10 @@ output:
                 start: 2
                 end: 18
       deadinfo: null
-      operation: ""
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{job="myjob"}'
+        - node: '[*parser.VectorSelector] foo{job="myjob"}'
+          op: ""
       joins: []
       unless: []
       returninfo:
@@ -7729,11 +7936,12 @@ output:
         fragment:
             start: 11
             end: 20
-      operation: group
       returns: vector
       operations:
-        - '[*parser.Call] vector(0)'
-        - '[*parser.AggregateExpr] group(vector(0))'
+        - node: '[*parser.Call] vector(0)'
+          op: vector
+        - node: '[*parser.AggregateExpr] group(vector(0))'
+          op: group
       joins: []
       unless: []
       returninfo:
@@ -7769,7 +7977,6 @@ output:
         fragment:
             start: 0
             end: 1
-      operation: ""
       returns: scalar
       operations: []
       joins: []
@@ -7803,10 +8010,10 @@ output:
                 start: 0
                 end: 34
       deadinfo: null
-      operation: many-to-many
       returns: vector
       operations:
-        - '[*parser.VectorSelector] prometheus_ready{job="prometheus"}'
+        - node: '[*parser.VectorSelector] prometheus_ready{job="prometheus"}'
+          op: ""
       joins: []
       unless:
         - labels:
@@ -7821,10 +8028,10 @@ output:
             fragment:
                 start: 42
                 end: 48
-          operation: vector
           returns: vector
           operations:
-            - '[*parser.Call] vector(0)'
+            - node: '[*parser.Call] vector(0)'
+              op: vector
           joins: []
           unless: []
           returninfo:
@@ -7875,10 +8082,10 @@ output:
         fragment:
             start: 47
             end: 56
-      operation: many-to-many
       returns: vector
       operations:
-        - '[*parser.VectorSelector] prometheus_ready{job="prometheus"}'
+        - node: '[*parser.VectorSelector] prometheus_ready{job="prometheus"}'
+          op: ""
       joins: []
       unless:
         - labels:
@@ -7889,10 +8096,10 @@ output:
                     start: 47
                     end: 53
           deadinfo: null
-          operation: vector
           returns: vector
           operations:
-            - '[*parser.Call] vector(0)'
+            - node: '[*parser.Call] vector(0)'
+              op: vector
           joins: []
           unless: []
           returninfo:
@@ -7939,10 +8146,10 @@ output:
                 start: 0
                 end: 34
       deadinfo: null
-      operation: many-to-many
       returns: vector
       operations:
-        - '[*parser.VectorSelector] prometheus_ready{job="prometheus"}'
+        - node: '[*parser.VectorSelector] prometheus_ready{job="prometheus"}'
+          op: ""
       joins: []
       unless:
         - labels:
@@ -7957,10 +8164,10 @@ output:
             fragment:
                 start: 50
                 end: 56
-          operation: vector
           returns: vector
           operations:
-            - '[*parser.Call] vector(0)'
+            - node: '[*parser.Call] vector(0)'
+              op: vector
           joins: []
           unless: []
           returninfo:
@@ -8042,11 +8249,12 @@ output:
                 start: 5
                 end: 8
       deadinfo: null
-      operation: max
       returns: vector
       operations:
-        - '[*parser.VectorSelector] cf_node_role{kubernetes_role="master",role="kubernetes"}'
-        - '[*parser.AggregateExpr] max by (instance, cluster) (cf_node_role{kubernetes_role="master",role="kubernetes"})'
+        - node: '[*parser.VectorSelector] cf_node_role{kubernetes_role="master",role="kubernetes"}'
+          op: ""
+        - node: '[*parser.AggregateExpr] max by (instance, cluster) (cf_node_role{kubernetes_role="master",role="kubernetes"})'
+          op: max
       joins: []
       unless:
         - labels:
@@ -8081,13 +8289,17 @@ output:
                     start: 99
                     end: 102
           deadinfo: null
-          operation: sum
           returns: vector
           operations:
-            - '[*parser.VectorSelector] node_systemd_timer_last_trigger_seconds{name=~"etcd-defrag-.*.timer"}'
-            - '[*parser.AggregateExpr] sum by (instance, cluster) (time() - node_systemd_timer_last_trigger_seconds{name=~"etcd-defrag-.*.timer"})'
+            - node: '[*parser.VectorSelector] node_systemd_timer_last_trigger_seconds{name=~"etcd-defrag-.*.timer"}'
+              op: ""
+            - node: '[*parser.AggregateExpr] sum by (instance, cluster) (time() - node_systemd_timer_last_trigger_seconds{name=~"etcd-defrag-.*.timer"})'
+              op: sum
           joins:
-            - src:
+            - "on":
+                - instance
+              ignoring: []
+              src:
                 labels:
                     kubernetes_role:
                         reason: Query will only return series where these labels are present.
@@ -8102,10 +8314,10 @@ output:
                             start: 247
                             end: 303
                 deadinfo: null
-                operation: ""
                 returns: vector
                 operations:
-                    - '[*parser.VectorSelector] cf_node_role{kubernetes_role="master",role="kubernetes"}'
+                    - node: '[*parser.VectorSelector] cf_node_role{kubernetes_role="master",role="kubernetes"}'
+                      op: ""
                 joins: []
                 unless: []
                 returninfo:
@@ -8176,12 +8388,14 @@ output:
                 start: 13
                 end: 15
       deadinfo: null
-      operation: one-to-one
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{a="1"}'
+        - node: '[*parser.VectorSelector] foo{a="1"}'
+          op: ""
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 b:
                     reason: Query will only return series where these labels are present.
@@ -8190,10 +8404,10 @@ output:
                         start: 18
                         end: 28
             deadinfo: null
-            operation: ""
             returns: vector
             operations:
-                - '[*parser.VectorSelector] bar{b="2"}'
+                - node: '[*parser.VectorSelector] bar{b="2"}'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -8261,12 +8475,15 @@ output:
                 start: 13
                 end: 15
       deadinfo: null
-      operation: many-to-one
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{a="1"}'
+        - node: '[*parser.VectorSelector] foo{a="1"}'
+          op: ""
       joins:
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels:
                 b:
                     reason: Query will only return series where these labels are present.
@@ -8275,10 +8492,10 @@ output:
                         start: 42
                         end: 52
             deadinfo: null
-            operation: ""
             returns: vector
             operations:
-                - '[*parser.VectorSelector] bar{b="2"}'
+                - node: '[*parser.VectorSelector] bar{b="2"}'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -8346,12 +8563,15 @@ output:
                 start: 13
                 end: 15
       deadinfo: null
-      operation: one-to-many
       returns: vector
       operations:
-        - '[*parser.VectorSelector] bar{b="2"}'
+        - node: '[*parser.VectorSelector] bar{b="2"}'
+          op: ""
       joins:
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels:
                 a:
                     reason: Query will only return series where these labels are present.
@@ -8360,10 +8580,10 @@ output:
                         start: 0
                         end: 10
             deadinfo: null
-            operation: ""
             returns: vector
             operations:
-                - '[*parser.VectorSelector] foo{a="1"}'
+                - node: '[*parser.VectorSelector] foo{a="1"}'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -8425,12 +8645,15 @@ output:
                 start: 13
                 end: 15
       deadinfo: null
-      operation: one-to-one
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{a="1"}'
+        - node: '[*parser.VectorSelector] foo{a="1"}'
+          op: ""
       joins:
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation that removes all labels.
@@ -8455,11 +8678,12 @@ output:
                 fragment:
                     start: 26
                     end: 29
-            operation: sum
             returns: vector
             operations:
-                - '[*parser.VectorSelector] bar{b="2"}'
-                - '[*parser.AggregateExpr] sum(bar{b="2"})'
+                - node: '[*parser.VectorSelector] bar{b="2"}'
+                  op: ""
+                - node: '[*parser.AggregateExpr] sum(bar{b="2"})'
+                  op: sum
             joins: []
             unless: []
             returninfo:
@@ -8527,12 +8751,15 @@ output:
                 start: 13
                 end: 15
       deadinfo: null
-      operation: many-to-one
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{a="1"}'
+        - node: '[*parser.VectorSelector] foo{a="1"}'
+          op: ""
       joins:
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation that removes all labels.
@@ -8557,11 +8784,12 @@ output:
                 fragment:
                     start: 42
                     end: 45
-            operation: sum
             returns: vector
             operations:
-                - '[*parser.VectorSelector] bar{b="2"}'
-                - '[*parser.AggregateExpr] sum(bar{b="2"})'
+                - node: '[*parser.VectorSelector] bar{b="2"}'
+                  op: ""
+                - node: '[*parser.AggregateExpr] sum(bar{b="2"})'
+                  op: sum
             joins: []
             unless: []
             returninfo:
@@ -8629,12 +8857,15 @@ output:
                 start: 18
                 end: 20
       deadinfo: null
-      operation: one-to-many
       returns: vector
       operations:
-        - '[*parser.VectorSelector] bar{b="2"}'
+        - node: '[*parser.VectorSelector] bar{b="2"}'
+          op: ""
       joins:
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation that removes all labels.
@@ -8659,11 +8890,12 @@ output:
                 fragment:
                     start: 0
                     end: 3
-            operation: sum
             returns: vector
             operations:
-                - '[*parser.VectorSelector] foo{a="1"}'
-                - '[*parser.AggregateExpr] sum(foo{a="1"})'
+                - node: '[*parser.VectorSelector] foo{a="1"}'
+                  op: ""
+                - node: '[*parser.AggregateExpr] sum(foo{a="1"})'
+                  op: sum
             joins: []
             unless: []
             returninfo:
@@ -8731,12 +8963,15 @@ output:
                 start: 13
                 end: 15
       deadinfo: null
-      operation: many-to-one
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{a="1"}'
+        - node: '[*parser.VectorSelector] foo{a="1"}'
+          op: ""
       joins:
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels:
                 __name__:
                     reason: Aggregation removes metric name.
@@ -8761,11 +8996,12 @@ output:
                 fragment:
                     start: 58
                     end: 65
-            operation: sum
             returns: vector
             operations:
-                - '[*parser.VectorSelector] bar{b="2"}'
-                - '[*parser.AggregateExpr] sum without (instance) (bar{b="2"})'
+                - node: '[*parser.VectorSelector] bar{b="2"}'
+                  op: ""
+                - node: '[*parser.AggregateExpr] sum without (instance) (bar{b="2"})'
+                  op: sum
             joins: []
             unless: []
             returninfo:
@@ -8833,12 +9069,15 @@ output:
                 start: 36
                 end: 38
       deadinfo: null
-      operation: one-to-many
       returns: vector
       operations:
-        - '[*parser.VectorSelector] bar{b="2"}'
+        - node: '[*parser.VectorSelector] bar{b="2"}'
+          op: ""
       joins:
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels:
                 __name__:
                     reason: Aggregation removes metric name.
@@ -8863,11 +9102,12 @@ output:
                 fragment:
                     start: 16
                     end: 23
-            operation: sum
             returns: vector
             operations:
-                - '[*parser.VectorSelector] foo{a="1"}'
-                - '[*parser.AggregateExpr] sum without (instance) (foo{a="1"})'
+                - node: '[*parser.VectorSelector] foo{a="1"}'
+                  op: ""
+                - node: '[*parser.AggregateExpr] sum without (instance) (foo{a="1"})'
+                  op: sum
             joins: []
             unless: []
             returninfo:
@@ -8947,14 +9187,20 @@ output:
                 start: 6
                 end: 14
       deadinfo: null
-      operation: max
       returns: vector
       operations:
-        - '[*parser.VectorSelector] kernel_device_io_errors_total{device!~"loop.+"}'
-        - '[*parser.Call] increase(kernel_device_io_errors_total{device!~"loop.+"}[2h])'
-        - '[*parser.AggregateExpr] max without (source_instance) (increase(kernel_device_io_errors_total{device!~"loop.+"}[2h]) > 3 unless on (instance, device) (increase(kernel_device_io_soft_errors_total{device!~"loop.+"}[2h5m]) * 2 > increase(kernel_device_io_errors_total[2h])) and on (device, instance) absent(node_disk_info))'
+        - node: '[*parser.VectorSelector] kernel_device_io_errors_total{device!~"loop.+"}'
+          op: ""
+        - node: '[*parser.Call] increase(kernel_device_io_errors_total{device!~"loop.+"}[2h])'
+          op: increase
+        - node: '[*parser.AggregateExpr] max without (source_instance) (increase(kernel_device_io_errors_total{device!~"loop.+"}[2h]) > 3 unless on (instance, device) (increase(kernel_device_io_soft_errors_total{device!~"loop.+"}[2h5m]) * 2 > increase(kernel_device_io_errors_total[2h])) and on (device, instance) absent(node_disk_info))'
+          op: max
       joins:
-        - src:
+        - "on":
+            - device
+            - instance
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: |-
@@ -8977,11 +9223,12 @@ output:
                 fragment:
                     start: 292
                     end: 298
-            operation: absent
             returns: vector
             operations:
-                - '[*parser.VectorSelector] node_disk_info'
-                - '[*parser.Call] absent(node_disk_info)'
+                - node: '[*parser.VectorSelector] node_disk_info'
+                  op: ""
+                - node: '[*parser.Call] absent(node_disk_info)'
+                  op: absent
             joins: []
             unless: []
             returninfo:
@@ -9001,7 +9248,10 @@ output:
             isconditional: false
           op: 57389
           depth: 1
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels:
                 instance:
                     reason: This label will be added to the result by label_replace() call.
@@ -9010,11 +9260,12 @@ output:
                         start: 351
                         end: 442
             deadinfo: null
-            operation: label_replace
             returns: vector
             operations:
-                - '[*parser.VectorSelector] salt_highstate_runner_configured_minions'
-                - '[*parser.Call] label_replace(salt_highstate_runner_configured_minions, "instance", "$1", "minion", "(.+)")'
+                - node: '[*parser.VectorSelector] salt_highstate_runner_configured_minions'
+                  op: ""
+                - node: '[*parser.Call] label_replace(salt_highstate_runner_configured_minions, "instance", "$1", "minion", "(.+)")'
+                  op: label_replace
             joins: []
             unless: []
             returninfo:
@@ -9037,20 +9288,24 @@ output:
       unless:
         - labels: {}
           deadinfo: null
-          operation: increase
           returns: vector
           operations:
-            - '[*parser.VectorSelector] kernel_device_io_soft_errors_total{device!~"loop.+"}'
-            - '[*parser.Call] increase(kernel_device_io_soft_errors_total{device!~"loop.+"}[2h5m])'
+            - node: '[*parser.VectorSelector] kernel_device_io_soft_errors_total{device!~"loop.+"}'
+              op: ""
+            - node: '[*parser.Call] increase(kernel_device_io_soft_errors_total{device!~"loop.+"}[2h5m])'
+              op: increase
           joins:
-            - src:
+            - "on": []
+              ignoring: []
+              src:
                 labels: {}
                 deadinfo: null
-                operation: increase
                 returns: vector
                 operations:
-                    - '[*parser.VectorSelector] kernel_device_io_errors_total'
-                    - '[*parser.Call] increase(kernel_device_io_errors_total[2h])'
+                    - node: '[*parser.VectorSelector] kernel_device_io_errors_total'
+                      op: ""
+                    - node: '[*parser.Call] increase(kernel_device_io_errors_total[2h])'
+                      op: increase
                 joins: []
                 unless: []
                 returninfo:
@@ -9133,13 +9388,16 @@ output:
                 start: 26
                 end: 28
       deadinfo: null
-      operation: sum
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo{a="1"}'
-        - '[*parser.AggregateExpr] sum by (job) (foo{a="1"})'
+        - node: '[*parser.VectorSelector] foo{a="1"}'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum by (job) (foo{a="1"})'
+          op: sum
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 b:
                     reason: Query will only return series where these labels are present.
@@ -9148,10 +9406,10 @@ output:
                         start: 31
                         end: 41
             deadinfo: null
-            operation: ""
             returns: vector
             operations:
-                - '[*parser.VectorSelector] bar{b="2"}'
+                - node: '[*parser.VectorSelector] bar{b="2"}'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -9213,12 +9471,14 @@ output:
                 start: 13
                 end: 20
       deadinfo: null
-      operation: sum
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
-        - '[*parser.AggregateExpr] sum without (job) (foo)'
-        - '[*parser.AggregateExpr] sum by (job) (sum without (job) (foo))'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum without (job) (foo)'
+          op: sum
+        - node: '[*parser.AggregateExpr] sum by (job) (sum without (job) (foo))'
+          op: sum
       joins: []
       unless: []
       returninfo:
@@ -9259,12 +9519,15 @@ output:
                 start: 47
                 end: 49
       deadinfo: null
-      operation: many-to-one
       returns: vector
       operations:
-        - '[*parser.VectorSelector] prometheus:scrape_series_added:since_gc:sum'
+        - node: '[*parser.VectorSelector] prometheus:scrape_series_added:since_gc:sum'
+          op: ""
       joins:
-        - src:
+        - "on":
+            - prometheus
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
@@ -9297,15 +9560,20 @@ output:
                         start: 75
                         end: 287
             deadinfo: null
-            operation: label_replace
             returns: vector
             operations:
-                - '[*parser.VectorSelector] go_memstats_alloc_bytes{job="prometheus"}'
-                - '[*parser.Call] max_over_time(go_memstats_alloc_bytes{job="prometheus"}[2h])'
-                - '[*parser.AggregateExpr] max by (instance) (max_over_time(go_memstats_alloc_bytes{job="prometheus"}[2h]))'
-                - '[*parser.Call] label_replace(max by (instance) (max_over_time(go_memstats_alloc_bytes{job="prometheus"}[2h])) / max by (instance) (max_over_time(prometheus_tsdb_head_series[2h])), "prometheus", "$1", "instance", "(.+)")'
+                - node: '[*parser.VectorSelector] go_memstats_alloc_bytes{job="prometheus"}'
+                  op: ""
+                - node: '[*parser.Call] max_over_time(go_memstats_alloc_bytes{job="prometheus"}[2h])'
+                  op: max_over_time
+                - node: '[*parser.AggregateExpr] max by (instance) (max_over_time(go_memstats_alloc_bytes{job="prometheus"}[2h]))'
+                  op: max
+                - node: '[*parser.Call] label_replace(max by (instance) (max_over_time(go_memstats_alloc_bytes{job="prometheus"}[2h])) / max by (instance) (max_over_time(prometheus_tsdb_head_series[2h])), "prometheus", "$1", "instance", "(.+)")'
+                  op: label_replace
             joins:
-                - src:
+                - "on": []
+                  ignoring: []
+                  src:
                     labels:
                         "":
                             reason: Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
@@ -9326,12 +9594,14 @@ output:
                                 start: 229
                                 end: 231
                     deadinfo: null
-                    operation: max
                     returns: vector
                     operations:
-                        - '[*parser.VectorSelector] prometheus_tsdb_head_series'
-                        - '[*parser.Call] max_over_time(prometheus_tsdb_head_series[2h])'
-                        - '[*parser.AggregateExpr] max by (instance) (max_over_time(prometheus_tsdb_head_series[2h]))'
+                        - node: '[*parser.VectorSelector] prometheus_tsdb_head_series'
+                          op: ""
+                        - node: '[*parser.Call] max_over_time(prometheus_tsdb_head_series[2h])'
+                          op: max_over_time
+                        - node: '[*parser.AggregateExpr] max by (instance) (max_over_time(prometheus_tsdb_head_series[2h]))'
+                          op: max
                     joins: []
                     unless: []
                     returninfo:
@@ -9399,12 +9669,14 @@ output:
                 start: 1
                 end: 14
       deadinfo: null
-      operation: day_of_week
       returns: vector
       operations:
-        - '[*parser.Call] day_of_week()'
+        - node: '[*parser.Call] day_of_week()'
+          op: day_of_week
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Calling `hour()` with no arguments will return an empty time series with no labels.
@@ -9413,10 +9685,10 @@ output:
                         start: 24
                         end: 30
             deadinfo: null
-            operation: hour
             returns: vector
             operations:
-                - '[*parser.Call] hour()'
+                - node: '[*parser.Call] hour()'
+                  op: hour
             joins: []
             unless: []
             returninfo:
@@ -9460,10 +9732,10 @@ output:
                 start: 39
                 end: 45
       deadinfo: null
-      operation: vector
       returns: vector
       operations:
-        - '[*parser.Call] vector(1)'
+        - node: '[*parser.Call] vector(1)'
+          op: vector
       joins: []
       unless: []
       returninfo:
@@ -9536,20 +9808,25 @@ output:
                 start: 5
                 end: 8
       deadinfo: null
-      operation: sum
       returns: vector
       operations:
-        - '[*parser.VectorSelector] errors_total'
-        - '[*parser.Call] rate(errors_total[5m])'
-        - '[*parser.AggregateExpr] sum by (foo, bar) (rate(errors_total[5m]) * on (instance) group_left (bob, alice) server_errors_total)'
+        - node: '[*parser.VectorSelector] errors_total'
+          op: ""
+        - node: '[*parser.Call] rate(errors_total[5m])'
+          op: rate
+        - node: '[*parser.AggregateExpr] sum by (foo, bar) (rate(errors_total[5m]) * on (instance) group_left (bob, alice) server_errors_total)'
+          op: sum
       joins:
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
-            operation: ""
             returns: vector
             operations:
-                - '[*parser.VectorSelector] server_errors_total'
+                - node: '[*parser.VectorSelector] server_errors_total'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -9593,10 +9870,10 @@ expr: 1 - (foo or vector(0)) < 0.999
 output:
     - labels: {}
       deadinfo: null
-      operation: many-to-many
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo'
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
       joins: []
       unless: []
       returninfo:
@@ -9626,10 +9903,10 @@ output:
         fragment:
             start: 12
             end: 21
-      operation: vector
       returns: vector
       operations:
-        - '[*parser.Call] vector(0)'
+        - node: '[*parser.Call] vector(0)'
+          op: vector
       joins: []
       unless: []
       returninfo:
@@ -9664,12 +9941,14 @@ output:
                 start: 5
                 end: 11
       deadinfo: null
-      operation: vector
       returns: vector
       operations:
-        - '[*parser.Call] vector(1)'
+        - node: '[*parser.Call] vector(1)'
+          op: vector
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Calling `month()` with no arguments will return an empty time series with no labels.
@@ -9678,10 +9957,10 @@ output:
                         start: 19
                         end: 26
             deadinfo: null
-            operation: month
             returns: vector
             operations:
-                - '[*parser.Call] month()'
+                - node: '[*parser.Call] month()'
+                  op: month
             joins: []
             unless: []
             returninfo:
@@ -9725,10 +10004,10 @@ output:
                 start: 37
                 end: 43
       deadinfo: null
-      operation: vector
       returns: vector
       operations:
-        - '[*parser.Call] vector(0)'
+        - node: '[*parser.Call] vector(0)'
+          op: vector
       joins: []
       unless: []
       returninfo:
@@ -9778,12 +10057,14 @@ output:
                 start: 6
                 end: 9
       deadinfo: null
-      operation: count
       returns: vector
       operations:
-        - '[*parser.VectorSelector] error_total'
-        - '[*parser.AggregateExpr] stddev by (colo_name, region) (error_total)'
-        - '[*parser.AggregateExpr] count by (region) (stddev by (colo_name, region) (error_total))'
+        - node: '[*parser.VectorSelector] error_total'
+          op: ""
+        - node: '[*parser.AggregateExpr] stddev by (colo_name, region) (error_total)'
+          op: stddev
+        - node: '[*parser.AggregateExpr] count by (region) (stddev by (colo_name, region) (error_total))'
+          op: count
       joins: []
       unless: []
       returninfo:
@@ -9857,14 +10138,18 @@ output:
                 start: 341
                 end: 344
       deadinfo: null
-      operation: avg
       returns: vector
       operations:
-        - '[*parser.VectorSelector] foo_rejections'
-        - '[*parser.Call] rate(foo_rejections[6h])'
-        - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h]) or vector(0))'
+        - node: '[*parser.VectorSelector] foo_rejections'
+          op: ""
+        - node: '[*parser.Call] rate(foo_rejections[6h])'
+          op: rate
+        - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h]) or vector(0))'
+          op: avg
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
@@ -9885,12 +10170,14 @@ output:
                         start: 147
                         end: 150
             deadinfo: null
-            operation: avg
             returns: vector
             operations:
-                - '[*parser.VectorSelector] foo_total'
-                - '[*parser.Call] rate(foo_total[6h])'
-                - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h]) or vector(1))'
+                - node: '[*parser.VectorSelector] foo_total'
+                  op: ""
+                - node: '[*parser.Call] rate(foo_total[6h])'
+                  op: rate
+                - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h]) or vector(1))'
+                  op: avg
             joins: []
             unless: []
             returninfo:
@@ -9910,7 +10197,9 @@ output:
             isconditional: false
           op: 57384
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
@@ -9931,11 +10220,12 @@ output:
                         start: 131
                         end: 137
             deadinfo: null
-            operation: avg
             returns: vector
             operations:
-                - '[*parser.Call] vector(1)'
-                - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h]) or vector(1))'
+                - node: '[*parser.Call] vector(1)'
+                  op: vector
+                - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h]) or vector(1))'
+                  op: avg
             joins: []
             unless: []
             returninfo:
@@ -9955,7 +10245,9 @@ output:
             isconditional: false
           op: 57384
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
@@ -9976,14 +10268,18 @@ output:
                         start: 241
                         end: 244
             deadinfo: null
-            operation: avg
             returns: vector
             operations:
-                - '[*parser.VectorSelector] foo_rejections offset 1d'
-                - '[*parser.Call] rate(foo_rejections[6h] offset 1d)'
-                - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h] offset 1d) or vector(0))'
+                - node: '[*parser.VectorSelector] foo_rejections offset 1d'
+                  op: ""
+                - node: '[*parser.Call] rate(foo_rejections[6h] offset 1d)'
+                  op: rate
+                - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h] offset 1d) or vector(0))'
+                  op: avg
             joins:
-                - src:
+                - "on": []
+                  ignoring: []
+                  src:
                     labels:
                         "":
                             reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
@@ -10004,12 +10300,14 @@ output:
                                 start: 320
                                 end: 323
                     deadinfo: null
-                    operation: avg
                     returns: vector
                     operations:
-                        - '[*parser.VectorSelector] foo_total offset 1d'
-                        - '[*parser.Call] rate(foo_total[6h] offset 1d)'
-                        - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h] offset 1d) or vector(1))'
+                        - node: '[*parser.VectorSelector] foo_total offset 1d'
+                          op: ""
+                        - node: '[*parser.Call] rate(foo_total[6h] offset 1d)'
+                          op: rate
+                        - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h] offset 1d) or vector(1))'
+                          op: avg
                     joins: []
                     unless: []
                     returninfo:
@@ -10029,7 +10327,9 @@ output:
                     isconditional: false
                   op: 57384
                   depth: 0
-                - src:
+                - "on": []
+                  ignoring: []
+                  src:
                     labels:
                         "":
                             reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
@@ -10050,11 +10350,12 @@ output:
                                 start: 306
                                 end: 312
                     deadinfo: null
-                    operation: avg
                     returns: vector
                     operations:
-                        - '[*parser.Call] vector(1)'
-                        - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h] offset 1d) or vector(1))'
+                        - node: '[*parser.Call] vector(1)'
+                          op: vector
+                        - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h] offset 1d) or vector(1))'
+                          op: avg
                     joins: []
                     unless: []
                     returninfo:
@@ -10092,7 +10393,9 @@ output:
             isconditional: false
           op: 57388
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
@@ -10113,13 +10416,16 @@ output:
                         start: 227
                         end: 233
             deadinfo: null
-            operation: avg
             returns: vector
             operations:
-                - '[*parser.Call] vector(0)'
-                - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h] offset 1d) or vector(0))'
+                - node: '[*parser.Call] vector(0)'
+                  op: vector
+                - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h] offset 1d) or vector(0))'
+                  op: avg
             joins:
-                - src:
+                - "on": []
+                  ignoring: []
+                  src:
                     labels:
                         "":
                             reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
@@ -10140,12 +10446,14 @@ output:
                                 start: 320
                                 end: 323
                     deadinfo: null
-                    operation: avg
                     returns: vector
                     operations:
-                        - '[*parser.VectorSelector] foo_total offset 1d'
-                        - '[*parser.Call] rate(foo_total[6h] offset 1d)'
-                        - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h] offset 1d) or vector(1))'
+                        - node: '[*parser.VectorSelector] foo_total offset 1d'
+                          op: ""
+                        - node: '[*parser.Call] rate(foo_total[6h] offset 1d)'
+                          op: rate
+                        - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h] offset 1d) or vector(1))'
+                          op: avg
                     joins: []
                     unless: []
                     returninfo:
@@ -10165,7 +10473,9 @@ output:
                     isconditional: false
                   op: 57384
                   depth: 0
-                - src:
+                - "on": []
+                  ignoring: []
+                  src:
                     labels:
                         "":
                             reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
@@ -10186,11 +10496,12 @@ output:
                                 start: 306
                                 end: 312
                     deadinfo: null
-                    operation: avg
                     returns: vector
                     operations:
-                        - '[*parser.Call] vector(1)'
-                        - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h] offset 1d) or vector(1))'
+                        - node: '[*parser.Call] vector(1)'
+                          op: vector
+                        - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h] offset 1d) or vector(1))'
+                          op: avg
                     joins: []
                     unless: []
                     returninfo:
@@ -10228,13 +10539,16 @@ output:
             isconditional: false
           op: 57388
           depth: 0
-        - src:
+        - "on":
+            - colo_name
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
-            operation: many-to-many
             returns: vector
             operations:
-                - '[*parser.VectorSelector] colo_job:foo_total:rate2m'
+                - node: '[*parser.VectorSelector] colo_job:foo_total:rate2m'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -10254,7 +10568,10 @@ output:
             isconditional: true
           op: 57389
           depth: 0
-        - src:
+        - "on":
+            - colo_name
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Calling `vector()` will return a vector value with no labels.
@@ -10267,10 +10584,10 @@ output:
                 fragment:
                     start: 386
                     end: 392
-            operation: vector
             returns: vector
             operations:
-                - '[*parser.Call] vector(0)'
+                - node: '[*parser.Call] vector(0)'
+                  op: vector
             joins: []
             unless: []
             returninfo:
@@ -10290,13 +10607,16 @@ output:
             isconditional: true
           op: 57389
           depth: 0
-        - src:
+        - "on":
+            - colo_name
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
-            operation: many-to-many
             returns: vector
             operations:
-                - '[*parser.VectorSelector] colo_job:foo_total:rate2m offset 1d'
+                - node: '[*parser.VectorSelector] colo_job:foo_total:rate2m offset 1d'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -10316,7 +10636,10 @@ output:
             isconditional: true
           op: 57389
           depth: 0
-        - src:
+        - "on":
+            - colo_name
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Calling `vector()` will return a vector value with no labels.
@@ -10329,10 +10652,10 @@ output:
                 fragment:
                     start: 463
                     end: 469
-            operation: vector
             returns: vector
             operations:
-                - '[*parser.Call] vector(0)'
+                - node: '[*parser.Call] vector(0)'
+                  op: vector
             joins: []
             unless: []
             returninfo:
@@ -10392,13 +10715,16 @@ output:
         fragment:
             start: 50
             end: 59
-      operation: avg
       returns: vector
       operations:
-        - '[*parser.Call] vector(0)'
-        - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h]) or vector(0))'
+        - node: '[*parser.Call] vector(0)'
+          op: vector
+        - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h]) or vector(0))'
+          op: avg
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
@@ -10419,12 +10745,14 @@ output:
                         start: 147
                         end: 150
             deadinfo: null
-            operation: avg
             returns: vector
             operations:
-                - '[*parser.VectorSelector] foo_total'
-                - '[*parser.Call] rate(foo_total[6h])'
-                - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h]) or vector(1))'
+                - node: '[*parser.VectorSelector] foo_total'
+                  op: ""
+                - node: '[*parser.Call] rate(foo_total[6h])'
+                  op: rate
+                - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h]) or vector(1))'
+                  op: avg
             joins: []
             unless: []
             returninfo:
@@ -10444,7 +10772,9 @@ output:
             isconditional: false
           op: 57384
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
@@ -10465,11 +10795,12 @@ output:
                         start: 131
                         end: 137
             deadinfo: null
-            operation: avg
             returns: vector
             operations:
-                - '[*parser.Call] vector(1)'
-                - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h]) or vector(1))'
+                - node: '[*parser.Call] vector(1)'
+                  op: vector
+                - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h]) or vector(1))'
+                  op: avg
             joins: []
             unless: []
             returninfo:
@@ -10489,7 +10820,9 @@ output:
             isconditional: false
           op: 57384
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
@@ -10510,14 +10843,18 @@ output:
                         start: 241
                         end: 244
             deadinfo: null
-            operation: avg
             returns: vector
             operations:
-                - '[*parser.VectorSelector] foo_rejections offset 1d'
-                - '[*parser.Call] rate(foo_rejections[6h] offset 1d)'
-                - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h] offset 1d) or vector(0))'
+                - node: '[*parser.VectorSelector] foo_rejections offset 1d'
+                  op: ""
+                - node: '[*parser.Call] rate(foo_rejections[6h] offset 1d)'
+                  op: rate
+                - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h] offset 1d) or vector(0))'
+                  op: avg
             joins:
-                - src:
+                - "on": []
+                  ignoring: []
+                  src:
                     labels:
                         "":
                             reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
@@ -10538,12 +10875,14 @@ output:
                                 start: 320
                                 end: 323
                     deadinfo: null
-                    operation: avg
                     returns: vector
                     operations:
-                        - '[*parser.VectorSelector] foo_total offset 1d'
-                        - '[*parser.Call] rate(foo_total[6h] offset 1d)'
-                        - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h] offset 1d) or vector(1))'
+                        - node: '[*parser.VectorSelector] foo_total offset 1d'
+                          op: ""
+                        - node: '[*parser.Call] rate(foo_total[6h] offset 1d)'
+                          op: rate
+                        - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h] offset 1d) or vector(1))'
+                          op: avg
                     joins: []
                     unless: []
                     returninfo:
@@ -10563,7 +10902,9 @@ output:
                     isconditional: false
                   op: 57384
                   depth: 0
-                - src:
+                - "on": []
+                  ignoring: []
+                  src:
                     labels:
                         "":
                             reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
@@ -10584,11 +10925,12 @@ output:
                                 start: 306
                                 end: 312
                     deadinfo: null
-                    operation: avg
                     returns: vector
                     operations:
-                        - '[*parser.Call] vector(1)'
-                        - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h] offset 1d) or vector(1))'
+                        - node: '[*parser.Call] vector(1)'
+                          op: vector
+                        - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h] offset 1d) or vector(1))'
+                          op: avg
                     joins: []
                     unless: []
                     returninfo:
@@ -10626,7 +10968,9 @@ output:
             isconditional: false
           op: 57388
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
@@ -10647,13 +10991,16 @@ output:
                         start: 227
                         end: 233
             deadinfo: null
-            operation: avg
             returns: vector
             operations:
-                - '[*parser.Call] vector(0)'
-                - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h] offset 1d) or vector(0))'
+                - node: '[*parser.Call] vector(0)'
+                  op: vector
+                - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h] offset 1d) or vector(0))'
+                  op: avg
             joins:
-                - src:
+                - "on": []
+                  ignoring: []
+                  src:
                     labels:
                         "":
                             reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
@@ -10674,12 +11021,14 @@ output:
                                 start: 320
                                 end: 323
                     deadinfo: null
-                    operation: avg
                     returns: vector
                     operations:
-                        - '[*parser.VectorSelector] foo_total offset 1d'
-                        - '[*parser.Call] rate(foo_total[6h] offset 1d)'
-                        - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h] offset 1d) or vector(1))'
+                        - node: '[*parser.VectorSelector] foo_total offset 1d'
+                          op: ""
+                        - node: '[*parser.Call] rate(foo_total[6h] offset 1d)'
+                          op: rate
+                        - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h] offset 1d) or vector(1))'
+                          op: avg
                     joins: []
                     unless: []
                     returninfo:
@@ -10699,7 +11048,9 @@ output:
                     isconditional: false
                   op: 57384
                   depth: 0
-                - src:
+                - "on": []
+                  ignoring: []
+                  src:
                     labels:
                         "":
                             reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
@@ -10720,11 +11071,12 @@ output:
                                 start: 306
                                 end: 312
                     deadinfo: null
-                    operation: avg
                     returns: vector
                     operations:
-                        - '[*parser.Call] vector(1)'
-                        - '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h] offset 1d) or vector(1))'
+                        - node: '[*parser.Call] vector(1)'
+                          op: vector
+                        - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h] offset 1d) or vector(1))'
+                          op: avg
                     joins: []
                     unless: []
                     returninfo:
@@ -10762,13 +11114,16 @@ output:
             isconditional: false
           op: 57388
           depth: 0
-        - src:
+        - "on":
+            - colo_name
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
-            operation: many-to-many
             returns: vector
             operations:
-                - '[*parser.VectorSelector] colo_job:foo_total:rate2m'
+                - node: '[*parser.VectorSelector] colo_job:foo_total:rate2m'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -10788,7 +11143,10 @@ output:
             isconditional: true
           op: 57389
           depth: 0
-        - src:
+        - "on":
+            - colo_name
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Calling `vector()` will return a vector value with no labels.
@@ -10801,10 +11159,10 @@ output:
                 fragment:
                     start: 386
                     end: 392
-            operation: vector
             returns: vector
             operations:
-                - '[*parser.Call] vector(0)'
+                - node: '[*parser.Call] vector(0)'
+                  op: vector
             joins: []
             unless: []
             returninfo:
@@ -10824,13 +11182,16 @@ output:
             isconditional: true
           op: 57389
           depth: 0
-        - src:
+        - "on":
+            - colo_name
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
-            operation: many-to-many
             returns: vector
             operations:
-                - '[*parser.VectorSelector] colo_job:foo_total:rate2m offset 1d'
+                - node: '[*parser.VectorSelector] colo_job:foo_total:rate2m offset 1d'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -10850,7 +11211,10 @@ output:
             isconditional: true
           op: 57389
           depth: 0
-        - src:
+        - "on":
+            - colo_name
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Calling `vector()` will return a vector value with no labels.
@@ -10863,10 +11227,10 @@ output:
                 fragment:
                     start: 463
                     end: 469
-            operation: vector
             returns: vector
             operations:
-                - '[*parser.Call] vector(0)'
+                - node: '[*parser.Call] vector(0)'
+                  op: vector
             joins: []
             unless: []
             returninfo:
@@ -10922,13 +11286,16 @@ output:
                 start: 0
                 end: 13
       deadinfo: null
-      operation: sum
       returns: vector
       operations:
-        - '[*parser.VectorSelector] selector'
-        - '[*parser.AggregateExpr] sum(selector)'
+        - node: '[*parser.VectorSelector] selector'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum(selector)'
+          op: sum
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation that removes all labels.
@@ -10943,11 +11310,12 @@ output:
                         start: 16
                         end: 40
             deadinfo: null
-            operation: sum
             returns: vector
             operations:
-                - '[*parser.VectorSelector] selector offset 30m'
-                - '[*parser.AggregateExpr] sum(selector offset 30m)'
+                - node: '[*parser.VectorSelector] selector offset 30m'
+                  op: ""
+                - node: '[*parser.AggregateExpr] sum(selector offset 30m)'
+                  op: sum
             joins: []
             unless: []
             returninfo:
@@ -11020,14 +11388,19 @@ output:
                 start: 7
                 end: 10
       deadinfo: null
-      operation: count
       returns: vector
       operations:
-        - '[*parser.VectorSelector] configured_minions'
-        - '[*parser.Call] label_replace(configured_minions, "instance", "$1", "minion", "(.+)")'
-        - '[*parser.AggregateExpr] count by (dc) (max by (instance) (0 < (token_expiration - time()) < (6 * 60 * 60)) * on (instance) group_right () label_replace(configured_minions, "instance", "$1", "minion", "(.+)"))'
+        - node: '[*parser.VectorSelector] configured_minions'
+          op: ""
+        - node: '[*parser.Call] label_replace(configured_minions, "instance", "$1", "minion", "(.+)")'
+          op: label_replace
+        - node: '[*parser.AggregateExpr] count by (dc) (max by (instance) (0 < (token_expiration - time()) < (6 * 60 * 60)) * on (instance) group_right () label_replace(configured_minions, "instance", "$1", "minion", "(.+)"))'
+          op: count
       joins:
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
@@ -11048,11 +11421,12 @@ output:
                         start: 68
                         end: 71
             deadinfo: null
-            operation: max
             returns: vector
             operations:
-                - '[*parser.VectorSelector] token_expiration'
-                - '[*parser.AggregateExpr] max by (instance) (0 < (token_expiration - time()) < (6 * 60 * 60))'
+                - node: '[*parser.VectorSelector] token_expiration'
+                  op: ""
+                - node: '[*parser.AggregateExpr] max by (instance) (0 < (token_expiration - time()) < (6 * 60 * 60))'
+                  op: max
             joins: []
             unless: []
             returninfo:
@@ -11096,19 +11470,22 @@ expr: topk(10, prometheus_build_info*prometheus_ready)
 output:
     - labels: {}
       deadinfo: null
-      operation: topk
       returns: vector
       operations:
-        - '[*parser.VectorSelector] prometheus_build_info'
-        - '[*parser.AggregateExpr] topk(10, prometheus_build_info * prometheus_ready)'
+        - node: '[*parser.VectorSelector] prometheus_build_info'
+          op: ""
+        - node: '[*parser.AggregateExpr] topk(10, prometheus_build_info * prometheus_ready)'
+          op: topk
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
-            operation: ""
             returns: vector
             operations:
-                - '[*parser.VectorSelector] prometheus_ready'
+                - node: '[*parser.VectorSelector] prometheus_ready'
+                  op: ""
             joins: []
             unless: []
             returninfo:
@@ -11152,19 +11529,22 @@ expr: bottomk(10, prometheus_build_info*prometheus_ready)
 output:
     - labels: {}
       deadinfo: null
-      operation: bottomk
       returns: vector
       operations:
-        - '[*parser.VectorSelector] prometheus_build_info'
-        - '[*parser.AggregateExpr] bottomk(10, prometheus_build_info * prometheus_ready)'
+        - node: '[*parser.VectorSelector] prometheus_build_info'
+          op: ""
+        - node: '[*parser.AggregateExpr] bottomk(10, prometheus_build_info * prometheus_ready)'
+          op: bottomk
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
-            operation: ""
             returns: vector
             operations:
-                - '[*parser.VectorSelector] prometheus_ready'
+                - node: '[*parser.VectorSelector] prometheus_ready'
+                  op: ""
             joins: []
             unless: []
             returninfo:

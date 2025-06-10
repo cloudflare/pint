@@ -78,7 +78,7 @@ func (c FragileCheck) checkTopK(expr parser.PromQLExpr, src utils.Source) (probl
 	if src.FixedLabels && len(src.TransformedLabels(utils.PossibleLabel)) == 0 {
 		return problems
 	}
-	if !slices.Contains([]string{"topk", "bottomk", "limit", "limit_ratio"}, src.Operation) {
+	if !slices.Contains([]string{"topk", "bottomk", "limit", "limit_ratio"}, src.Operation()) {
 		return problems
 	}
 	problems = append(problems, Problem{
@@ -90,7 +90,7 @@ func (c FragileCheck) checkTopK(expr parser.PromQLExpr, src utils.Source) (probl
 		Severity: Warning,
 		Diagnostics: []diags.Diagnostic{
 			{
-				Message:     fmt.Sprintf("Using `%s` to select time series might return different set of time series on every query, which would cause flapping alerts.", src.Operation),
+				Message:     fmt.Sprintf("Using `%s` to select time series might return different set of time series on every query, which would cause flapping alerts.", src.Operation()),
 				Pos:         expr.Value.Pos,
 				FirstColumn: int(src.Position.Start) + 1,
 				LastColumn:  int(src.Position.End),

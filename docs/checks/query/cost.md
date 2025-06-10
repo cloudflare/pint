@@ -56,6 +56,32 @@ sum of all memory allocations, depending on many factors like memory pressure,
 Go version, `GOGC` settings etc. The estimate `pint` gives you should be considered
 `best case` scenario.
 
+## Optimization suggestions
+
+`query/cost` check will try to find rules using queries that are being precomputed using recording rules.
+Consider these rules:
+
+```yaml
+- record: foo:rate5m
+  expr: rate(foo_total[5m])
+
+- alert: Rate Too High
+  expr: sum(rate(foo_total[5m])) without(instance) > 10
+```
+
+Here we have an alert `Rate Too High` that uses `rate(foo_total[5m])` as part of the query.
+We also have a recording rule `foo:rate5m` that calculates the same expression and stores it
+as a metric.
+Instead of calculating `rate(foo_total[5m])` in both rules we can simply query `foo:rate5m` inside
+`Rate Too High` alert to speed it up:
+
+```yaml
+- alert: Rate Too High
+  expr: sum(foo:rate5m) without(instance) > 10
+```
+
+This check will try to find cases like this and emit an information report for it.
+
 ## Configuration
 
 Syntax:

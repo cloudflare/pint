@@ -500,6 +500,735 @@ func TestCostCheck(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "ignores self",
+			content:     "- record: foo\n  expr: up == 0\n",
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 100, 100, 0, 0, "check comment", checks.Warning)
+			},
+			prometheus: newSimpleProm,
+			entries:    mustParseContent("- record: foo\n  expr: up == 0\n"),
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{},
+					},
+				},
+			},
+		},
+		{
+			description: "suggest recording rule / aggregation",
+			content:     "- alert: foo\n  expr: sum(rate(foo_total[5m])) without(instance) > 10\n",
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 100, 100, 0, 0, "check comment", checks.Warning)
+			},
+			prometheus: newSimpleProm,
+			entries: mustParseContent(`
+- alert: foo
+  expr: vector(1)
+- record: colo:foo
+  expr: sum(rate(foo_total[5m])) without(instance)
+`),
+			problems: true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(sum(rate(foo_total[5m])) without(instance) > 10)`},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 100,
+								PeakSamples:           50,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(colo:foo > 10)`},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 10,
+								PeakSamples:           9,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: checks.BytesPerSampleQuery},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSampleWithValue(map[string]string{}, 4096),
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "suggest recording rule / rate",
+			content:     "- alert: foo\n  expr: sum(rate(foo_total[5m])) without(instance) > 10\n",
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 100, 100, 0, 0, "check comment", checks.Warning)
+			},
+			prometheus: newSimpleProm,
+			entries: mustParseContent(`
+- record: foo:rate5m
+  expr: rate(foo_total[5m])
+`),
+			problems: true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(sum(rate(foo_total[5m])) without(instance) > 10)`},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 100,
+								PeakSamples:           50,
+							},
+							Timings: promapi.QueryTimings{
+								EvalTotalTime: 30.3,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(sum(foo:rate5m) without(instance) > 10)`},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 10,
+								PeakSamples:           50,
+							},
+							Timings: promapi.QueryTimings{
+								EvalTotalTime: 30.3,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: checks.BytesPerSampleQuery},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSampleWithValue(map[string]string{}, 4096),
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "suggest recording rule / ignore vector",
+			content:     "- alert: foo\n  expr: sum(rate(foo_total[5m]) or vector(0)) without(instance) > 10\n",
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 100, 100, 0, 0, "check comment", checks.Warning)
+			},
+			prometheus: newSimpleProm,
+			entries: mustParseContent(`
+- record: colo:foo
+  expr: vector(0)
+`),
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{},
+					},
+				},
+			},
+		},
+		{
+			description: "suggest recording rule / ignore selector",
+			content:     "- alert: foo\n  expr: sum(foo == 1) without(instance) > 10\n",
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 100, 100, 0, 0, "check comment", checks.Warning)
+			},
+			prometheus: newSimpleProm,
+			entries: mustParseContent(`
+- record: colo:foo
+  expr: foo == 1
+`),
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{},
+					},
+				},
+			},
+		},
+		{
+			description: "suggest recording rule / ignore multi-source",
+			content:     "- alert: foo\n  expr: sum(foo == 1) without(instance) > 10\n",
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 100, 100, 0, 0, "check comment", checks.Warning)
+			},
+			prometheus: newSimpleProm,
+			entries: mustParseContent(`
+- record: colo:foo
+  expr: foo == 1 or bar == 1
+`),
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{},
+					},
+				},
+			},
+		},
+		{
+			description: "suggest recording rule / irate vs rate",
+			content: `
+- alert: Host_CPU_Utilization_High
+  expr: |
+    server_role{role="foo"}
+    and on(instance)
+    sum by (instance) (irate(node_cpu_seconds_total{job="foo", mode!="idle"}[5m])) > 20
+`,
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 100, 100, 0, 0, "check comment", checks.Warning)
+			},
+			prometheus: newSimpleProm,
+			entries: mustParseContent(`
+- record: instance_mode:node_cpu:sum
+  expr: sum(node_cpu_seconds_total) without (cpu)
+
+- record: instance_mode:node_cpu:rate2m
+  expr: sum(rate(node_cpu_seconds_total[2m])) without (cpu)
+
+- record: colo:node_cpu:rate2m:by_mode
+  expr: sum(instance_mode:node_cpu:rate2m{mode=~"user|system|nice|softirq"}) without (instance)
+
+- record: colo_instance:node_cpu:count
+  expr: count(node_cpu_seconds_total{mode="idle"}) without (cpu, mode)
+`),
+			problems: true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(server_role{role=\"foo\"}\nand on(instance)\nsum by (instance) (irate(node_cpu_seconds_total{job=\"foo\", mode!=\"idle\"}[5m])) > 20\n)"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 99,
+								PeakSamples:           19,
+							},
+							Timings: promapi.QueryTimings{
+								EvalTotalTime: 60.3,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(server_role{role=\"foo\"}\nand on(instance)\ninstance_mode:node_cpu:rate2m{job=\"foo\", mode!=\"idle\"} > 20\n)"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 29,
+								PeakSamples:           11,
+							},
+							Timings: promapi.QueryTimings{
+								EvalTotalTime: 21.3,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: checks.BytesPerSampleQuery},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSampleWithValue(map[string]string{}, 2048),
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "suggest recording rule / replacement with different number of series",
+			content:     "- alert: foo\n  expr: sum(rate(foo_total[5m])) without(instance) > 10\n",
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 100, 100, 0, 0, "check comment", checks.Warning)
+			},
+			prometheus: newSimpleProm,
+			entries: mustParseContent(`
+- record: foo:rate5m
+  expr: rate(foo_total[5m])
+`),
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(sum(rate(foo_total[5m])) without(instance) > 10)`},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 100,
+								PeakSamples:           50,
+							},
+							Timings: promapi.QueryTimings{
+								EvalTotalTime: 30.3,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(sum(foo:rate5m) without(instance) > 10)`},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 10,
+								PeakSamples:           50,
+							},
+							Timings: promapi.QueryTimings{
+								EvalTotalTime: 30.3,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: checks.BytesPerSampleQuery},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSampleWithValue(map[string]string{}, 4096),
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "suggest recording rule / replacement is more expensive",
+			content:     "- alert: foo\n  expr: sum(rate(foo_total[5m])) without(instance) > 10\n",
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 100, 100, 0, 0, "check comment", checks.Warning)
+			},
+			prometheus: newSimpleProm,
+			entries: mustParseContent(`
+- record: foo:rate5m
+  expr: rate(foo_total[5m])
+`),
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(sum(rate(foo_total[5m])) without(instance) > 10)`},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 100,
+								PeakSamples:           50,
+							},
+							Timings: promapi.QueryTimings{
+								EvalTotalTime: 30.3,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(sum(foo:rate5m) without(instance) > 10)`},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 101,
+								PeakSamples:           50,
+							},
+							Timings: promapi.QueryTimings{
+								EvalTotalTime: 30.3,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: checks.BytesPerSampleQuery},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSampleWithValue(map[string]string{}, 4096),
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "suggest recording rule / rule mismatch",
+			content: `
+- alert: Host_CPU_Utilization_High
+  expr: |
+    server_role{role="foo"}
+    and on(instance)
+    sum by (instance) (irate(node_cpu_seconds_total{job="foo", mode!="idle"}[5m])) > 20
+`,
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 100, 100, 0, 0, "check comment", checks.Warning)
+			},
+			prometheus: newSimpleProm,
+			entries: mustParseContent(`
+- record: scalar
+  expr: scalar(foo)
+
+- record: time
+  expr: time()
+
+- record: wrong_metric
+  expr: sum(rate(node_foo_seconds_total[2m])) without (cpu)
+
+- record: no_name
+  expr: sum(rate({job="foo"}[2m])) without (cpu)
+
+- record: colo:node_cpu:rate2m:nojob
+  expr: sum(rate(node_cpu_seconds_total[2m])) without (cpu, instance, job)
+
+- record: colo:node_cpu:rate2m
+  expr: sum(rate(node_cpu_seconds_total[2m])) without (cpu, instance)
+`),
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(server_role{role=\"foo\"}\nand on(instance)\nsum by (instance) (irate(node_cpu_seconds_total{job=\"foo\", mode!=\"idle\"}[5m])) > 20\n)"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 99,
+								PeakSamples:           19,
+							},
+							Timings: promapi.QueryTimings{
+								EvalTotalTime: 60.3,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: checks.BytesPerSampleQuery},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSampleWithValue(map[string]string{}, 2048),
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "suggest recording rule / no matchers",
+			content: `- alert: Host_CPU_Utilization_High
+  expr: |
+    server_role{role="foo"}
+    and on(instance)
+    sum by (instance) (irate(node_cpu_seconds_total[5m])) > 20
+`,
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 100, 100, 0, 0, "check comment", checks.Warning)
+			},
+			prometheus: newSimpleProm,
+			entries: mustParseContent(`
+
+- record: colo:node_cpu:rate2m
+  expr: rate(node_cpu_seconds_total[2m])
+`),
+			problems: true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(server_role{role=\"foo\"}\nand on(instance)\nsum by (instance) (irate(node_cpu_seconds_total[5m])) > 20\n)"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 99,
+								PeakSamples:           19,
+							},
+							Timings: promapi.QueryTimings{
+								EvalTotalTime: 60.3,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(server_role{role=\"foo\"}\nand on(instance)\nsum by (instance) (colo:node_cpu:rate2m) > 20\n)"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 10,
+								PeakSamples:           10,
+							},
+							Timings: promapi.QueryTimings{
+								EvalTotalTime: 10,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: checks.BytesPerSampleQuery},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSampleWithValue(map[string]string{}, 2048),
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "suggest recording rule / sum(vector)",
+			content:     "- alert: foo\n  expr: sum(vector(1)) > 0\n",
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 100, 100, 0, 0, "check comment", checks.Warning)
+			},
+			prometheus: newSimpleProm,
+			entries: mustParseContent(`
+- record: vec
+  expr: sum(vector(1))
+`),
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(sum(vector(1)) > 0)`},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 0,
+								PeakSamples:           0,
+							},
+							Timings: promapi.QueryTimings{
+								EvalTotalTime: 0.1,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: checks.BytesPerSampleQuery},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSampleWithValue(map[string]string{}, 4096),
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "suggest recording rule / label mismatch",
+			content: `- alert: Host_CPU_Utilization_High
+  expr: |
+    server_role{job="foo", role="foo"}
+    and on(job, instance)
+    sum by (instance) (irate(node_cpu_seconds_total{job="foo"}[5m])) > 20
+`,
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 100, 100, 0, 0, "check comment", checks.Warning)
+			},
+			prometheus: newSimpleProm,
+			entries: mustParseContent(`
+
+- record: colo:node_cpu:rate2m
+  expr: sum(rate(node_cpu_seconds_total[2m])) without(job)
+`),
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(server_role{job=\"foo\", role=\"foo\"}\nand on(job, instance)\nsum by (instance) (irate(node_cpu_seconds_total{job=\"foo\"}[5m])) > 20\n)"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 99,
+								PeakSamples:           19,
+							},
+							Timings: promapi.QueryTimings{
+								EvalTotalTime: 60.3,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: checks.BytesPerSampleQuery},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSampleWithValue(map[string]string{}, 2048),
+						},
+					},
+				},
+			},
+		},
 	}
 
 	runTests(t, testCases)

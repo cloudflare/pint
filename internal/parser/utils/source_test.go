@@ -311,7 +311,7 @@ count by (dc) (
 			output := utils.LabelsSource(expr, n.Expr)
 
 			for _, src := range output {
-				src.WalkSources(func(s utils.Source) {
+				src.WalkSources(func(s utils.Source, _ *utils.Join) {
 					require.Positive(t, s.Position.End, "empty position %+v", s)
 					if s.DeadInfo != nil {
 						require.Positive(t, s.DeadInfo.Fragment.End, "empty dead position %+v", s)
@@ -369,7 +369,7 @@ func TestLabelsSourceCallCoverage(t *testing.T) {
 			call, ok := utils.MostOuterOperation[*promParser.Call](output[0])
 			require.True(t, ok, "no call found in operations for: %q ~> %+v", b.String(), output)
 			require.NotNil(t, call, "no call detected in: %q ~> %+v", b.String(), output)
-			require.Equal(t, name, output[0].Operation)
+			require.Equal(t, name, output[0].Operation())
 			require.Equal(t, def.ReturnType, output[0].Returns, "incorrect return type on Source{}")
 		})
 	}
@@ -388,4 +388,15 @@ func TestLabelsSourceCallCoverageFail(t *testing.T) {
 	call, ok := utils.MostOuterOperation[*promParser.Call](output[0])
 	require.False(t, ok, "no call should have been detected in fake function, got: %v", ok)
 	require.Nil(t, call, "no call should have been detected in fake function, got: %+v", call)
+}
+
+func TestVectorOperation(t *testing.T) {
+	n := &parser.PromQLNode{
+		Expr: &promParser.NumberLiteral{
+			Val: 1,
+		},
+	}
+	output := utils.LabelsSource("1", n.Expr)
+	require.Len(t, output, 1)
+	require.Empty(t, output[0].Operation())
 }

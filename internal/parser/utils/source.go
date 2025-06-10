@@ -86,21 +86,25 @@ type ReturnInfo struct {
 	IsReturnBool   bool    // True if this source uses the 'bool' modifier.
 }
 
-type SourceOperations []promParser.Node
+type SourceOperation struct {
+	Node      promParser.Node
+	Operation string
+}
 
 // Used for test snapshots.
-func (so SourceOperations) MarshalYAML() (any, error) {
-	ops := make([]string, 0, len(so))
-	for _, o := range so {
-		ops = append(ops, fmt.Sprintf("[%T] %s", o, o.String()))
-	}
-	return ops, nil
+func (so SourceOperation) MarshalYAML() (any, error) {
+	return map[string]any{
+		"op":   so.Operation,
+		"node": fmt.Sprintf("[%T] %s", so.Node, so.Node.String()),
+	}, nil
 }
+
+type SourceOperations []SourceOperation
 
 func MostOuterOperation[T promParser.Node](s Source) (T, bool) {
 	for i := len(s.Operations) - 1; i >= 0; i-- {
 		op := s.Operations[i]
-		if o, ok := op.(T); ok {
+		if o, ok := op.Node.(T); ok {
 			return o, true
 		}
 	}
@@ -114,15 +118,16 @@ func newSource() Source {
 }
 
 type Join struct {
-	Src   Source              // The source we're joining with.
-	Op    promParser.ItemType // The binary operation used for this join.
-	Depth int                 // Zero if this is a direct join, non-zero otherwise. sum(foo * bar) would be in-direct join.
+	On       []string
+	Ignoring []string
+	Src      Source              // The source we're joining with.
+	Op       promParser.ItemType // The binary operation used for this join.
+	Depth    int                 // Zero if this is a direct join, non-zero otherwise. sum(foo * bar) would be in-direct join.
 }
 
 type Source struct {
 	Labels        map[string]LabelTransform
 	DeadInfo      *DeadInfo
-	Operation     string
 	Returns       promParser.ValueType
 	Operations    SourceOperations
 	Joins         []Join   // Any other sources this source joins with.
@@ -132,6 +137,13 @@ type Source struct {
 	Type          SourceType
 	FixedLabels   bool // Labels are fixed and only allowed labels can be present.
 	IsConditional bool // True if this source is guarded by 'foo > 5' or other condition.
+}
+
+func (s Source) Operation() string {
+	if len(s.Operations) > 0 {
+		return s.Operations[len(s.Operations)-1].Operation
+	}
+	return ""
 }
 
 func (s Source) CanHaveLabel(name string) bool {
@@ -241,16 +253,20 @@ func (s *Source) guaranteeLabel(reason string, fragment posrange.PositionRange, 
 	}
 }
 
-type Visitor func(s Source)
+type Visitor func(s Source, j *Join)
 
-func (s Source) WalkSources(fn Visitor) {
-	fn(s)
+func innerWalk(fn Visitor, s Source, j *Join) {
+	fn(s, j)
 	for _, j := range s.Joins {
-		j.Src.WalkSources(fn)
+		innerWalk(fn, j.Src, &j)
 	}
 	for _, u := range s.Unless {
-		u.WalkSources(fn)
+		innerWalk(fn, u, nil)
 	}
+}
+
+func (s Source) WalkSources(fn Visitor) {
+	innerWalk(fn, s, nil)
 }
 
 func LabelsSource(expr string, node promParser.Node) (src []Source) {
@@ -309,7 +325,10 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 	case *promParser.VectorSelector:
 		s.Type = SelectorSource
 		s.Returns = promParser.ValueTypeVector
-		s.Operations = append(s.Operations, n)
+		s.Operations = append(s.Operations, SourceOperation{
+			Operation: "",
+			Node:      n,
+		})
 		s.guaranteeLabel(
 			"Query will only return series where these labels are present.",
 			n.PosRange,
@@ -378,8 +397,10 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 	switch n.Op {
 	case promParser.SUM:
 		for _, s = range parseAggregation(expr, n) {
-			s.Operations = append(s.Operations, n)
-			s.Operation = "sum"
+			s.Operations = append(s.Operations, SourceOperation{
+				Operation: "sum",
+				Node:      n,
+			})
 			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
 				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
 			}
@@ -387,8 +408,10 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 		}
 	case promParser.MIN:
 		for _, s = range parseAggregation(expr, n) {
-			s.Operations = append(s.Operations, n)
-			s.Operation = "min"
+			s.Operations = append(s.Operations, SourceOperation{
+				Operation: "min",
+				Node:      n,
+			})
 			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
 				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
 			}
@@ -396,8 +419,10 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 		}
 	case promParser.MAX:
 		for _, s = range parseAggregation(expr, n) {
-			s.Operations = append(s.Operations, n)
-			s.Operation = "max"
+			s.Operations = append(s.Operations, SourceOperation{
+				Operation: "max",
+				Node:      n,
+			})
 			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
 				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
 			}
@@ -405,8 +430,10 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 		}
 	case promParser.AVG:
 		for _, s = range parseAggregation(expr, n) {
-			s.Operations = append(s.Operations, n)
-			s.Operation = "avg"
+			s.Operations = append(s.Operations, SourceOperation{
+				Operation: "avg",
+				Node:      n,
+			})
 			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
 				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
 			}
@@ -414,8 +441,10 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 		}
 	case promParser.GROUP:
 		for _, s = range parseAggregation(expr, n) {
-			s.Operations = append(s.Operations, n)
-			s.Operation = "group"
+			s.Operations = append(s.Operations, SourceOperation{
+				Operation: "group",
+				Node:      n,
+			})
 			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
 				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
 			}
@@ -423,8 +452,10 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 		}
 	case promParser.STDDEV:
 		for _, s = range parseAggregation(expr, n) {
-			s.Operations = append(s.Operations, n)
-			s.Operation = "stddev"
+			s.Operations = append(s.Operations, SourceOperation{
+				Operation: "stddev",
+				Node:      n,
+			})
 			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
 				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
 			}
@@ -432,8 +463,10 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 		}
 	case promParser.STDVAR:
 		for _, s = range parseAggregation(expr, n) {
-			s.Operations = append(s.Operations, n)
-			s.Operation = "stdvar"
+			s.Operations = append(s.Operations, SourceOperation{
+				Operation: "stdvar",
+				Node:      n,
+			})
 			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
 				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
 			}
@@ -441,8 +474,10 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 		}
 	case promParser.COUNT:
 		for _, s = range parseAggregation(expr, n) {
-			s.Operations = append(s.Operations, n)
-			s.Operation = "count"
+			s.Operations = append(s.Operations, SourceOperation{
+				Operation: "count",
+				Node:      n,
+			})
 			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
 				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
 			}
@@ -450,8 +485,10 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 		}
 	case promParser.COUNT_VALUES:
 		for _, s = range parseAggregation(expr, n) {
-			s.Operations = append(s.Operations, n)
-			s.Operation = "count_values"
+			s.Operations = append(s.Operations, SourceOperation{
+				Operation: "count_values",
+				Node:      n,
+			})
 			// Param is the label to store the count value in.
 			s.guaranteeLabel(
 				"This label will be added to the results by the count_values() call.",
@@ -465,8 +502,10 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 		}
 	case promParser.QUANTILE:
 		for _, s = range parseAggregation(expr, n) {
-			s.Operations = append(s.Operations, n)
-			s.Operation = "quantile"
+			s.Operations = append(s.Operations, SourceOperation{
+				Operation: "quantile",
+				Node:      n,
+			})
 			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
 				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
 			}
@@ -478,8 +517,10 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 				s.Joins[i].Depth++
 			}
 			s.Type = AggregateSource
-			s.Operations = append(s.Operations, n)
-			s.Operation = "topk"
+			s.Operations = append(s.Operations, SourceOperation{
+				Operation: "topk",
+				Node:      n,
+			})
 			src = append(src, s)
 		}
 	case promParser.BOTTOMK:
@@ -488,8 +529,10 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 				s.Joins[i].Depth++
 			}
 			s.Type = AggregateSource
-			s.Operations = append(s.Operations, n)
-			s.Operation = "bottomk"
+			s.Operations = append(s.Operations, SourceOperation{
+				Operation: "bottomk",
+				Node:      n,
+			})
 			src = append(src, s)
 		}
 		/*
@@ -772,8 +815,10 @@ func parseCall(expr string, n *promParser.Call) (src []Source) {
 		case promParser.ValueTypeVector, promParser.ValueTypeMatrix:
 			for _, es := range walkNode(expr, e) {
 				es.Type = FuncSource
-				es.Operation = n.Func.Name
-				es.Operations = append(es.Operations, n)
+				es.Operations = append(es.Operations, SourceOperation{
+					Operation: n.Func.Name,
+					Node:      n,
+				})
 				es.Position = e.PositionRange()
 				src = append(src, parsePromQLFunc(es, expr, n))
 			}
@@ -783,11 +828,15 @@ func parseCall(expr string, n *promParser.Call) (src []Source) {
 
 	if len(src) == 0 {
 		s := Source{ // nolint: exhaustruct
-			Labels:     map[string]LabelTransform{},
-			Type:       FuncSource,
-			Operation:  n.Func.Name,
-			Operations: SourceOperations{n},
-			Position:   n.PosRange,
+			Labels: map[string]LabelTransform{},
+			Type:   FuncSource,
+			Operations: SourceOperations{
+				{
+					Operation: n.Func.Name,
+					Node:      n,
+				},
+			},
+			Position: n.PosRange,
 		}
 		src = append(src, parsePromQLFunc(s, expr, n))
 	}
@@ -860,9 +909,6 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					}
 				}
 			}
-			if ls.Operation == "" {
-				ls.Operation = n.VectorMatching.Card.String()
-			}
 			for _, rs := range rhs {
 				if ok, s, pos := canJoin(ls, rs, n.VectorMatching); !ok {
 					rs.DeadInfo = &DeadInfo{
@@ -870,7 +916,13 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 						Fragment: pos,
 					}
 				}
-				ls.Joins = append(ls.Joins, Join{Src: rs, Op: n.Op, Depth: 0})
+				ls.Joins = append(ls.Joins, Join{
+					Src:      rs,
+					Op:       n.Op,
+					Depth:    0,
+					On:       onLabels(n.VectorMatching),
+					Ignoring: ignoringLabels(n.VectorMatching),
+				})
 			}
 			ls.IsConditional, ls.ReturnInfo.IsReturnBool = checkConditions(ls, n.Op, n.ReturnBool)
 			src = append(src, ls)
@@ -902,9 +954,6 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					n.VectorMatching.MatchingLabels...,
 				)
 			}
-			if rs.Operation == "" {
-				rs.Operation = n.VectorMatching.Card.String()
-			}
 			for _, ls := range lhs {
 				if ok, s, pos := canJoin(rs, ls, n.VectorMatching); !ok {
 					ls.DeadInfo = &DeadInfo{
@@ -912,7 +961,13 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 						Fragment: pos,
 					}
 				}
-				rs.Joins = append(rs.Joins, Join{Src: ls, Op: n.Op, Depth: 0})
+				rs.Joins = append(rs.Joins, Join{
+					Src:      ls,
+					Op:       n.Op,
+					Depth:    0,
+					On:       onLabels(n.VectorMatching),
+					Ignoring: ignoringLabels(n.VectorMatching),
+				})
 			}
 			rs.IsConditional, rs.ReturnInfo.IsReturnBool = checkConditions(rs, n.Op, n.ReturnBool)
 			src = append(src, rs)
@@ -941,9 +996,6 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					n.VectorMatching.MatchingLabels...,
 				)
 			}
-			if ls.Operation == "" {
-				ls.Operation = n.VectorMatching.Card.String()
-			}
 			for _, rs := range rhs {
 				if ok, s, pos := canJoin(ls, rs, n.VectorMatching); !ok {
 					rs.DeadInfo = &DeadInfo{
@@ -951,7 +1003,13 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 						Fragment: pos,
 					}
 				}
-				ls.Joins = append(ls.Joins, Join{Src: rs, Op: n.Op, Depth: 0})
+				ls.Joins = append(ls.Joins, Join{
+					Src:      rs,
+					Op:       n.Op,
+					Depth:    0,
+					On:       onLabels(n.VectorMatching),
+					Ignoring: ignoringLabels(n.VectorMatching),
+				})
 			}
 			ls.IsConditional, ls.ReturnInfo.IsReturnBool = checkConditions(ls, n.Op, n.ReturnBool)
 			src = append(src, ls)
@@ -974,9 +1032,6 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					FindPosition(expr, n.PositionRange(), "on"),
 					n.VectorMatching.MatchingLabels...,
 				)
-			}
-			if ls.Operation == "" {
-				ls.Operation = n.VectorMatching.Card.String()
 			}
 			if !ls.ReturnInfo.AlwaysReturns || ls.IsConditional {
 				lhsCanBeEmpty = true
@@ -1002,7 +1057,13 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					}
 					ls.Unless = append(ls.Unless, rs)
 				case n.Op != promParser.LOR:
-					ls.Joins = append(ls.Joins, Join{Src: rs, Op: n.Op, Depth: 0})
+					ls.Joins = append(ls.Joins, Join{
+						Src:      rs,
+						Op:       n.Op,
+						Depth:    0,
+						On:       onLabels(n.VectorMatching),
+						Ignoring: ignoringLabels(n.VectorMatching),
+					})
 				}
 			}
 			if n.Op == promParser.LAND && rhsConditional {
@@ -1012,9 +1073,6 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 		}
 		if n.Op == promParser.LOR {
 			for _, rs := range rhs {
-				if rs.Operation == "" {
-					rs.Operation = n.VectorMatching.Card.String()
-				}
 				// If LHS can NOT be empty then RHS is dead code.
 				if !lhsCanBeEmpty {
 					rs.DeadInfo = &DeadInfo{
@@ -1027,6 +1085,20 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 		}
 	}
 	return src
+}
+
+func onLabels(vm *promParser.VectorMatching) []string {
+	if vm.On {
+		return vm.MatchingLabels
+	}
+	return nil
+}
+
+func ignoringLabels(vm *promParser.VectorMatching) []string {
+	if !vm.On {
+		return vm.MatchingLabels
+	}
+	return nil
 }
 
 func checkConditions(s Source, op promParser.ItemType, isBool bool) (isConditional, isReturnBool bool) {
