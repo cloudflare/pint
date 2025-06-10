@@ -436,7 +436,9 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Calling `vector()` will return a vector value with no labels.
@@ -467,10 +469,10 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57395
-          "on": []
-          ignoring: []
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo:
                 reason: The left hand side always returs something and so the right hand side is never used.
@@ -499,8 +501,6 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
-          "on": []
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -531,7 +531,9 @@ output:
         - node: '[*parser.Call] vector(5)'
           op: vector
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Calling `vector()` will return a vector value with no labels.
@@ -562,10 +564,10 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57395
-          "on": []
-          ignoring: []
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo:
                 reason: The left hand side always returs something and so the right hand side is never used.
@@ -594,8 +596,6 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
-          "on": []
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -841,7 +841,9 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
             returns: vector
@@ -866,8 +868,6 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57388
-          "on": []
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -898,7 +898,9 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
             returns: vector
@@ -923,8 +925,6 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57388
-          "on": []
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -967,7 +967,10 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
             returns: vector
@@ -992,9 +995,6 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57388
-          "on":
-            - instance
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -1037,7 +1037,10 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
             returns: vector
@@ -1062,9 +1065,6 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57388
-          "on":
-            - instance
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -1107,7 +1107,10 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
             returns: vector
@@ -1132,9 +1135,6 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57388
-          "on":
-            - instance
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -1177,7 +1177,10 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
             returns: vector
@@ -1202,9 +1205,6 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57388
-          "on":
-            - instance
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -1235,7 +1235,9 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
             returns: vector
@@ -1260,8 +1262,6 @@ output:
             fixedlabels: false
             isconditional: true
           op: 57389
-          "on": []
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -2259,7 +2259,9 @@ output:
         - node: '[*parser.AggregateExpr] min(foo{job="myjob"})'
           op: min
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation that removes all labels.
@@ -2304,8 +2306,6 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57384
-          "on": []
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -2356,7 +2356,9 @@ output:
         - node: '[*parser.AggregateExpr] max(foo{job="myjob"})'
           op: max
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation that removes all labels.
@@ -2401,8 +2403,6 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57384
-          "on": []
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -3105,7 +3105,9 @@ output:
         - node: '[*parser.VectorSelector] foo{job="foo"}'
           op: ""
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
             returns: vector
@@ -3130,8 +3132,6 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57384
-          "on": []
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -3180,7 +3180,10 @@ output:
         - node: '[*parser.VectorSelector] foo{job="foo"}'
           op: ""
       joins:
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
             returns: vector
@@ -3205,9 +3208,6 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
-          "on":
-            - instance
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -3256,7 +3256,10 @@ output:
         - node: '[*parser.VectorSelector] foo{job="foo"}'
           op: ""
       joins:
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
             returns: vector
@@ -3281,9 +3284,6 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
-          "on":
-            - instance
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -3332,7 +3332,10 @@ output:
         - node: '[*parser.VectorSelector] foo{job="foo"}'
           op: ""
       joins:
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels:
                 cluster:
                     reason: Query will only return series where these labels are present.
@@ -3369,9 +3372,6 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
-          "on":
-            - instance
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -3420,7 +3420,10 @@ output:
         - node: '[*parser.VectorSelector] bar{cluster="bar"}'
           op: ""
       joins:
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels:
                 ignored:
                     reason: Query will only return series where these labels are present.
@@ -3457,9 +3460,6 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
-          "on":
-            - instance
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -3504,7 +3504,9 @@ output:
         - node: '[*parser.AggregateExpr] count(foo / bar)'
           op: count
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
             returns: vector
@@ -3529,8 +3531,6 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57384
-          "on": []
-          ignoring: []
           depth: 1
       unless: []
       returninfo:
@@ -3581,7 +3581,9 @@ output:
         - node: '[*parser.AggregateExpr] count(up{job="a"} / on () up{job="b"})'
           op: count
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 job:
                     reason: Query will only return series where these labels are present.
@@ -3612,8 +3614,6 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57384
-          "on": []
-          ignoring: []
           depth: 1
       unless: []
       returninfo:
@@ -3670,7 +3670,10 @@ output:
         - node: '[*parser.AggregateExpr] count(up{job="a"} / on (env) up{job="b"})'
           op: count
       joins:
-        - src:
+        - "on":
+            - env
+          ignoring: []
+          src:
             labels:
                 job:
                     reason: Query will only return series where these labels are present.
@@ -3701,9 +3704,6 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57384
-          "on":
-            - env
-          ignoring: []
           depth: 1
       unless: []
       returninfo:
@@ -3746,7 +3746,9 @@ output:
         - node: '[*parser.VectorSelector] foo{instance="1",job="foo"}'
           op: ""
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
             returns: vector
@@ -3771,8 +3773,6 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57389
-          "on": []
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -3821,7 +3821,10 @@ output:
         - node: '[*parser.VectorSelector] foo{instance="1",job="foo"}'
           op: ""
       joins:
-        - src:
+        - "on":
+            - cluster
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
             returns: vector
@@ -3846,9 +3849,6 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57389
-          "on":
-            - cluster
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -4611,7 +4611,10 @@ output:
         - node: '[*parser.AggregateExpr] sum without (notify) (foo:sum > 0)'
           op: sum
       joins:
-        - src:
+        - "on":
+            - job
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
             returns: vector
@@ -4636,11 +4639,11 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
-          "on":
+          depth: 0
+        - "on":
             - job
           ignoring: []
-          depth: 0
-        - src:
+          src:
             labels:
                 "":
                     reason: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
@@ -4685,9 +4688,6 @@ output:
             fixedlabels: true
             isconditional: true
           op: 57389
-          "on":
-            - job
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -4736,7 +4736,11 @@ output:
         - node: '[*parser.VectorSelector] container_file_descriptors'
           op: ""
       joins:
-        - src:
+        - "on":
+            - instance
+            - app_name
+          ignoring: []
+          src:
             labels:
                 ulimit:
                     reason: Query will only return series where these labels are present.
@@ -4767,10 +4771,6 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57384
-          "on":
-            - instance
-            - app_name
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -4813,7 +4813,11 @@ output:
         - node: '[*parser.VectorSelector] container_file_descriptors'
           op: ""
       joins:
-        - src:
+        - "on":
+            - instance
+            - app_name
+          ignoring: []
+          src:
             labels:
                 ulimit:
                     reason: Query will only return series where these labels are present.
@@ -4844,10 +4848,6 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57384
-          "on":
-            - instance
-            - app_name
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -5088,7 +5088,10 @@ output:
         - node: '[*parser.Call] absent(foo{job="prometheus",xxx="1"})'
           op: absent
       joins:
-        - src:
+        - "on":
+            - job
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
             returns: vector
@@ -5113,9 +5116,6 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57389
-          "on":
-            - job
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -5227,7 +5227,11 @@ output:
         - node: '[*parser.AggregateExpr] count by (instance, version) (node_exporter_build_info)'
           op: count
       joins:
-        - src:
+        - "on": []
+          ignoring:
+            - package
+            - version
+          src:
             labels:
                 "":
                     reason: Query is using aggregation with `by(instance, version, package)`, only labels included inside `by(...)` will be present on the results.
@@ -5284,10 +5288,6 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57396
-          "on": []
-          ignoring:
-            - package
-            - version
           depth: 0
       unless: []
       returninfo:
@@ -5505,7 +5505,9 @@ output:
         - node: '[*parser.Call] absent(foo{job="xxx"})'
           op: absent
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
             returns: vector
@@ -5530,8 +5532,6 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
-          "on": []
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -5581,7 +5581,9 @@ output:
         - node: '[*parser.Call] absent(foo{job="xxx"})'
           op: absent
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
             returns: vector
@@ -5606,8 +5608,6 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
-          "on": []
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -6003,7 +6003,10 @@ output:
         - node: '[*parser.VectorSelector] up{instance="a",job="prometheus"}'
           op: ""
       joins:
-        - src:
+        - "on": []
+          ignoring:
+            - job
+          src:
             labels:
                 instance:
                     reason: Query will only return series where these labels are present.
@@ -6040,9 +6043,6 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
-          "on": []
-          ignoring:
-            - job
           depth: 0
       unless: []
       returninfo:
@@ -6166,7 +6166,9 @@ output:
         - node: '[*parser.AggregateExpr] sum without (router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"})'
           op: sum
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation that removes all labels.
@@ -6217,8 +6219,6 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57391
-          "on": []
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -6593,7 +6593,9 @@ output:
         - node: '[*parser.Call] vector(0)'
           op: vector
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Calling `vector()` will return a vector value with no labels.
@@ -6624,8 +6626,6 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57388
-          "on": []
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -7183,7 +7183,9 @@ output:
         - node: '[*parser.AggregateExpr] sum(sometimes{foo!="bar"})'
           op: sum
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
             returns: vector
@@ -7208,10 +7210,10 @@ output:
             fixedlabels: false
             isconditional: true
           op: 57389
-          "on": []
-          ignoring: []
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation that removes all labels.
@@ -7250,10 +7252,10 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57389
-          "on": []
-          ignoring: []
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
             returns: vector
@@ -7278,8 +7280,6 @@ output:
             fixedlabels: false
             isconditional: true
           op: 57389
-          "on": []
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -7310,7 +7310,9 @@ output:
         - node: '[*parser.Call] vector(1)'
           op: vector
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
             returns: vector
@@ -7335,10 +7337,10 @@ output:
             fixedlabels: false
             isconditional: true
           op: 57389
-          "on": []
-          ignoring: []
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation that removes all labels.
@@ -7377,10 +7379,10 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57389
-          "on": []
-          ignoring: []
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
             returns: vector
@@ -7405,8 +7407,6 @@ output:
             fixedlabels: false
             isconditional: true
           op: 57389
-          "on": []
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -7471,7 +7471,9 @@ output:
         - node: '[*parser.Call] rate(metric2[5m])'
           op: rate
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
             returns: vector
@@ -7498,10 +7500,10 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57383
-          "on": []
-          ignoring: []
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Calling `vector()` will return a vector value with no labels.
@@ -7532,10 +7534,10 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57383
-          "on": []
-          ignoring: []
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 log_name:
                     reason: Query will only return series where these labels are present.
@@ -7568,10 +7570,10 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57383
-          "on": []
-          ignoring: []
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Calling `vector()` will return a vector value with no labels.
@@ -7602,8 +7604,6 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57383
-          "on": []
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -7634,7 +7634,9 @@ output:
         - node: '[*parser.Call] vector(0)'
           op: vector
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
             returns: vector
@@ -7661,10 +7663,10 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57383
-          "on": []
-          ignoring: []
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Calling `vector()` will return a vector value with no labels.
@@ -7695,10 +7697,10 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57383
-          "on": []
-          ignoring: []
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 log_name:
                     reason: Query will only return series where these labels are present.
@@ -7731,10 +7733,10 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57383
-          "on": []
-          ignoring: []
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Calling `vector()` will return a vector value with no labels.
@@ -7765,8 +7767,6 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57383
-          "on": []
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -8296,7 +8296,10 @@ output:
             - node: '[*parser.AggregateExpr] sum by (instance, cluster) (time() - node_systemd_timer_last_trigger_seconds{name=~"etcd-defrag-.*.timer"})'
               op: sum
           joins:
-            - src:
+            - "on":
+                - instance
+              ignoring: []
+              src:
                 labels:
                     kubernetes_role:
                         reason: Query will only return series where these labels are present.
@@ -8333,9 +8336,6 @@ output:
                 fixedlabels: false
                 isconditional: false
               op: 57395
-              "on":
-                - instance
-              ignoring: []
               depth: 0
           unless: []
           returninfo:
@@ -8393,7 +8393,9 @@ output:
         - node: '[*parser.VectorSelector] foo{a="1"}'
           op: ""
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 b:
                     reason: Query will only return series where these labels are present.
@@ -8424,8 +8426,6 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
-          "on": []
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -8480,7 +8480,10 @@ output:
         - node: '[*parser.VectorSelector] foo{a="1"}'
           op: ""
       joins:
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels:
                 b:
                     reason: Query will only return series where these labels are present.
@@ -8511,9 +8514,6 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
-          "on":
-            - instance
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -8568,7 +8568,10 @@ output:
         - node: '[*parser.VectorSelector] bar{b="2"}'
           op: ""
       joins:
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels:
                 a:
                     reason: Query will only return series where these labels are present.
@@ -8599,9 +8602,6 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
-          "on":
-            - instance
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -8650,7 +8650,10 @@ output:
         - node: '[*parser.VectorSelector] foo{a="1"}'
           op: ""
       joins:
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation that removes all labels.
@@ -8699,9 +8702,6 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57395
-          "on":
-            - instance
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -8756,7 +8756,10 @@ output:
         - node: '[*parser.VectorSelector] foo{a="1"}'
           op: ""
       joins:
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation that removes all labels.
@@ -8805,9 +8808,6 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57395
-          "on":
-            - instance
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -8862,7 +8862,10 @@ output:
         - node: '[*parser.VectorSelector] bar{b="2"}'
           op: ""
       joins:
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation that removes all labels.
@@ -8911,9 +8914,6 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57395
-          "on":
-            - instance
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -8968,7 +8968,10 @@ output:
         - node: '[*parser.VectorSelector] foo{a="1"}'
           op: ""
       joins:
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels:
                 __name__:
                     reason: Aggregation removes metric name.
@@ -9017,9 +9020,6 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
-          "on":
-            - instance
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -9074,7 +9074,10 @@ output:
         - node: '[*parser.VectorSelector] bar{b="2"}'
           op: ""
       joins:
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels:
                 __name__:
                     reason: Aggregation removes metric name.
@@ -9123,9 +9126,6 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
-          "on":
-            - instance
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -9196,7 +9196,11 @@ output:
         - node: '[*parser.AggregateExpr] max without (source_instance) (increase(kernel_device_io_errors_total{device!~"loop.+"}[2h]) > 3 unless on (instance, device) (increase(kernel_device_io_soft_errors_total{device!~"loop.+"}[2h5m]) * 2 > increase(kernel_device_io_errors_total[2h])) and on (device, instance) absent(node_disk_info))'
           op: max
       joins:
-        - src:
+        - "on":
+            - device
+            - instance
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: |-
@@ -9243,12 +9247,11 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57389
-          "on":
-            - device
+          depth: 1
+        - "on":
             - instance
           ignoring: []
-          depth: 1
-        - src:
+          src:
             labels:
                 instance:
                     reason: This label will be added to the result by label_replace() call.
@@ -9281,9 +9284,6 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
-          "on":
-            - instance
-          ignoring: []
           depth: 0
       unless:
         - labels: {}
@@ -9295,7 +9295,9 @@ output:
             - node: '[*parser.Call] increase(kernel_device_io_soft_errors_total{device!~"loop.+"}[2h5m])'
               op: increase
           joins:
-            - src:
+            - "on": []
+              ignoring: []
+              src:
                 labels: {}
                 deadinfo: null
                 returns: vector
@@ -9322,8 +9324,6 @@ output:
                 fixedlabels: false
                 isconditional: false
               op: 57388
-              "on": []
-              ignoring: []
               depth: 0
           unless: []
           returninfo:
@@ -9395,7 +9395,9 @@ output:
         - node: '[*parser.AggregateExpr] sum by (job) (foo{a="1"})'
           op: sum
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 b:
                     reason: Query will only return series where these labels are present.
@@ -9426,8 +9428,6 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
-          "on": []
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -9524,7 +9524,10 @@ output:
         - node: '[*parser.VectorSelector] prometheus:scrape_series_added:since_gc:sum'
           op: ""
       joins:
-        - src:
+        - "on":
+            - prometheus
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
@@ -9568,7 +9571,9 @@ output:
                 - node: '[*parser.Call] label_replace(max by (instance) (max_over_time(go_memstats_alloc_bytes{job="prometheus"}[2h])) / max by (instance) (max_over_time(prometheus_tsdb_head_series[2h])), "prometheus", "$1", "instance", "(.+)")'
                   op: label_replace
             joins:
-                - src:
+                - "on": []
+                  ignoring: []
+                  src:
                     labels:
                         "":
                             reason: Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
@@ -9615,8 +9620,6 @@ output:
                     fixedlabels: true
                     isconditional: false
                   op: 57384
-                  "on": []
-                  ignoring: []
                   depth: 0
             unless: []
             returninfo:
@@ -9635,9 +9638,6 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57395
-          "on":
-            - prometheus
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -9674,7 +9674,9 @@ output:
         - node: '[*parser.Call] day_of_week()'
           op: day_of_week
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Calling `hour()` with no arguments will return an empty time series with no labels.
@@ -9705,8 +9707,6 @@ output:
             fixedlabels: true
             isconditional: true
           op: 57389
-          "on": []
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -9817,7 +9817,10 @@ output:
         - node: '[*parser.AggregateExpr] sum by (foo, bar) (rate(errors_total[5m]) * on (instance) group_left (bob, alice) server_errors_total)'
           op: sum
       joins:
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
             returns: vector
@@ -9842,9 +9845,6 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
-          "on":
-            - instance
-          ignoring: []
           depth: 1
       unless: []
       returninfo:
@@ -9946,7 +9946,9 @@ output:
         - node: '[*parser.Call] vector(1)'
           op: vector
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Calling `month()` with no arguments will return an empty time series with no labels.
@@ -9977,8 +9979,6 @@ output:
             fixedlabels: true
             isconditional: true
           op: 57389
-          "on": []
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -10147,7 +10147,9 @@ output:
         - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h]) or vector(0))'
           op: avg
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
@@ -10194,10 +10196,10 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57384
-          "on": []
-          ignoring: []
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
@@ -10242,10 +10244,10 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57384
-          "on": []
-          ignoring: []
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
@@ -10275,7 +10277,9 @@ output:
                 - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h] offset 1d) or vector(0))'
                   op: avg
             joins:
-                - src:
+                - "on": []
+                  ignoring: []
+                  src:
                     labels:
                         "":
                             reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
@@ -10322,10 +10326,10 @@ output:
                     fixedlabels: true
                     isconditional: false
                   op: 57384
-                  "on": []
-                  ignoring: []
                   depth: 0
-                - src:
+                - "on": []
+                  ignoring: []
+                  src:
                     labels:
                         "":
                             reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
@@ -10370,8 +10374,6 @@ output:
                     fixedlabels: true
                     isconditional: false
                   op: 57384
-                  "on": []
-                  ignoring: []
                   depth: 0
             unless: []
             returninfo:
@@ -10390,10 +10392,10 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57388
-          "on": []
-          ignoring: []
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
@@ -10421,7 +10423,9 @@ output:
                 - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h] offset 1d) or vector(0))'
                   op: avg
             joins:
-                - src:
+                - "on": []
+                  ignoring: []
+                  src:
                     labels:
                         "":
                             reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
@@ -10468,10 +10472,10 @@ output:
                     fixedlabels: true
                     isconditional: false
                   op: 57384
-                  "on": []
-                  ignoring: []
                   depth: 0
-                - src:
+                - "on": []
+                  ignoring: []
+                  src:
                     labels:
                         "":
                             reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
@@ -10516,8 +10520,6 @@ output:
                     fixedlabels: true
                     isconditional: false
                   op: 57384
-                  "on": []
-                  ignoring: []
                   depth: 0
             unless: []
             returninfo:
@@ -10536,10 +10538,11 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57388
-          "on": []
-          ignoring: []
           depth: 0
-        - src:
+        - "on":
+            - colo_name
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
             returns: vector
@@ -10564,11 +10567,11 @@ output:
             fixedlabels: false
             isconditional: true
           op: 57389
-          "on":
+          depth: 0
+        - "on":
             - colo_name
           ignoring: []
-          depth: 0
-        - src:
+          src:
             labels:
                 "":
                     reason: Calling `vector()` will return a vector value with no labels.
@@ -10603,11 +10606,11 @@ output:
             fixedlabels: true
             isconditional: true
           op: 57389
-          "on":
+          depth: 0
+        - "on":
             - colo_name
           ignoring: []
-          depth: 0
-        - src:
+          src:
             labels: {}
             deadinfo: null
             returns: vector
@@ -10632,11 +10635,11 @@ output:
             fixedlabels: false
             isconditional: true
           op: 57389
-          "on":
+          depth: 0
+        - "on":
             - colo_name
           ignoring: []
-          depth: 0
-        - src:
+          src:
             labels:
                 "":
                     reason: Calling `vector()` will return a vector value with no labels.
@@ -10671,9 +10674,6 @@ output:
             fixedlabels: true
             isconditional: true
           op: 57389
-          "on":
-            - colo_name
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -10722,7 +10722,9 @@ output:
         - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h]) or vector(0))'
           op: avg
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
@@ -10769,10 +10771,10 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57384
-          "on": []
-          ignoring: []
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
@@ -10817,10 +10819,10 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57384
-          "on": []
-          ignoring: []
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
@@ -10850,7 +10852,9 @@ output:
                 - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h] offset 1d) or vector(0))'
                   op: avg
             joins:
-                - src:
+                - "on": []
+                  ignoring: []
+                  src:
                     labels:
                         "":
                             reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
@@ -10897,10 +10901,10 @@ output:
                     fixedlabels: true
                     isconditional: false
                   op: 57384
-                  "on": []
-                  ignoring: []
                   depth: 0
-                - src:
+                - "on": []
+                  ignoring: []
+                  src:
                     labels:
                         "":
                             reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
@@ -10945,8 +10949,6 @@ output:
                     fixedlabels: true
                     isconditional: false
                   op: 57384
-                  "on": []
-                  ignoring: []
                   depth: 0
             unless: []
             returninfo:
@@ -10965,10 +10967,10 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57388
-          "on": []
-          ignoring: []
           depth: 0
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
@@ -10996,7 +10998,9 @@ output:
                 - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h] offset 1d) or vector(0))'
                   op: avg
             joins:
-                - src:
+                - "on": []
+                  ignoring: []
+                  src:
                     labels:
                         "":
                             reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
@@ -11043,10 +11047,10 @@ output:
                     fixedlabels: true
                     isconditional: false
                   op: 57384
-                  "on": []
-                  ignoring: []
                   depth: 0
-                - src:
+                - "on": []
+                  ignoring: []
+                  src:
                     labels:
                         "":
                             reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
@@ -11091,8 +11095,6 @@ output:
                     fixedlabels: true
                     isconditional: false
                   op: 57384
-                  "on": []
-                  ignoring: []
                   depth: 0
             unless: []
             returninfo:
@@ -11111,10 +11113,11 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57388
-          "on": []
-          ignoring: []
           depth: 0
-        - src:
+        - "on":
+            - colo_name
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
             returns: vector
@@ -11139,11 +11142,11 @@ output:
             fixedlabels: false
             isconditional: true
           op: 57389
-          "on":
+          depth: 0
+        - "on":
             - colo_name
           ignoring: []
-          depth: 0
-        - src:
+          src:
             labels:
                 "":
                     reason: Calling `vector()` will return a vector value with no labels.
@@ -11178,11 +11181,11 @@ output:
             fixedlabels: true
             isconditional: true
           op: 57389
-          "on":
+          depth: 0
+        - "on":
             - colo_name
           ignoring: []
-          depth: 0
-        - src:
+          src:
             labels: {}
             deadinfo: null
             returns: vector
@@ -11207,11 +11210,11 @@ output:
             fixedlabels: false
             isconditional: true
           op: 57389
-          "on":
+          depth: 0
+        - "on":
             - colo_name
           ignoring: []
-          depth: 0
-        - src:
+          src:
             labels:
                 "":
                     reason: Calling `vector()` will return a vector value with no labels.
@@ -11246,9 +11249,6 @@ output:
             fixedlabels: true
             isconditional: true
           op: 57389
-          "on":
-            - colo_name
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -11293,7 +11293,9 @@ output:
         - node: '[*parser.AggregateExpr] sum(selector)'
           op: sum
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation that removes all labels.
@@ -11332,8 +11334,6 @@ output:
             fixedlabels: true
             isconditional: false
           op: 57384
-          "on": []
-          ignoring: []
           depth: 0
       unless: []
       returninfo:
@@ -11397,7 +11397,10 @@ output:
         - node: '[*parser.AggregateExpr] count by (dc) (max by (instance) (0 < (token_expiration - time()) < (6 * 60 * 60)) * on (instance) group_right () label_replace(configured_minions, "instance", "$1", "minion", "(.+)"))'
           op: count
       joins:
-        - src:
+        - "on":
+            - instance
+          ignoring: []
+          src:
             labels:
                 "":
                     reason: Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
@@ -11442,9 +11445,6 @@ output:
             fixedlabels: true
             isconditional: true
           op: 57395
-          "on":
-            - instance
-          ignoring: []
           depth: 1
       unless: []
       returninfo:
@@ -11477,7 +11477,9 @@ output:
         - node: '[*parser.AggregateExpr] topk(10, prometheus_build_info * prometheus_ready)'
           op: topk
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
             returns: vector
@@ -11502,8 +11504,6 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
-          "on": []
-          ignoring: []
           depth: 1
       unless: []
       returninfo:
@@ -11536,7 +11536,9 @@ output:
         - node: '[*parser.AggregateExpr] bottomk(10, prometheus_build_info * prometheus_ready)'
           op: bottomk
       joins:
-        - src:
+        - "on": []
+          ignoring: []
+          src:
             labels: {}
             deadinfo: null
             returns: vector
@@ -11561,8 +11563,6 @@ output:
             fixedlabels: false
             isconditional: false
           op: 57395
-          "on": []
-          ignoring: []
           depth: 1
       unless: []
       returninfo:
