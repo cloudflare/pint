@@ -44,7 +44,7 @@ func describeTag(tag string) string {
 	}
 }
 
-func parseGroups(doc *yaml.Node, schema Schema, offsetLine, offsetColumn int, contentLines []string) (groups []Group, _ ParseError) {
+func (p Parser) parseGroups(doc *yaml.Node, offsetLine, offsetColumn int, contentLines []string) (groups []Group, _ ParseError) {
 	names := map[string]struct{}{}
 
 	for _, node := range unpackNodes(doc) {
@@ -75,7 +75,7 @@ func parseGroups(doc *yaml.Node, schema Schema, offsetLine, offsetColumn int, co
 				}
 			}
 			for _, group := range unpackNodes(entry.val) {
-				g := parseGroup(group, schema, offsetLine, offsetColumn, contentLines)
+				g := p.parseGroup(group, offsetLine, offsetColumn, contentLines)
 				if _, ok := names[g.Name]; ok {
 					return nil, ParseError{
 						Line: group.Line,
@@ -90,7 +90,7 @@ func parseGroups(doc *yaml.Node, schema Schema, offsetLine, offsetColumn int, co
 	return groups, ParseError{}
 }
 
-func parseGroup(node *yaml.Node, schema Schema, offsetLine, offsetColumn int, contentLines []string) (group Group) {
+func (p Parser) parseGroup(node *yaml.Node, offsetLine, offsetColumn int, contentLines []string) (group Group) {
 	if !isTag(node.ShortTag(), mapTag) {
 		group.Error = ParseError{
 			Line: node.Line,
@@ -191,10 +191,10 @@ func parseGroup(node *yaml.Node, schema Schema, offsetLine, offsetColumn int, co
 				return group
 			}
 			for _, rule := range unpackNodes(entry.val) {
-				group.Rules = append(group.Rules, parseRuleStrict(rule, contentLines))
+				group.Rules = append(group.Rules, p.parseRuleStrict(rule, contentLines))
 			}
 		case "partial_response_strategy":
-			if schema != ThanosSchema {
+			if p.schema != ThanosSchema {
 				group.Error = ParseError{
 					Line: entry.key.Line,
 					Err:  errors.New("partial_response_strategy is only valid when parser is configured to use the Thanos rule schema"),
@@ -249,7 +249,7 @@ func parseGroup(node *yaml.Node, schema Schema, offsetLine, offsetColumn int, co
 	return group
 }
 
-func parseRuleStrict(rule *yaml.Node, contentLines []string) Rule {
+func (p Parser) parseRuleStrict(rule *yaml.Node, contentLines []string) Rule {
 	if !isTag(rule.ShortTag(), mapTag) {
 		return Rule{
 			Error: ParseError{
@@ -281,6 +281,6 @@ func parseRuleStrict(rule *yaml.Node, contentLines []string) Rule {
 		}
 	}
 
-	pr, _ := parseRule(rule, 0, 0, contentLines)
+	pr, _ := p.parseRule(rule, 0, 0, contentLines)
 	return pr
 }
