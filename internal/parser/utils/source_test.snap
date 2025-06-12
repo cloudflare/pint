@@ -4222,29 +4222,32 @@ output:
           op: ""
       joins: []
       unless:
-        - labels: {}
-          deadinfo: null
-          returns: vector
-          operations:
-            - node: '[*parser.VectorSelector] bar'
-              op: ""
-          joins: []
-          unless: []
-          returninfo:
-            logicalexpr: ""
-            valueposition:
-                start: 0
-                end: 0
-            returnednumber: 0
-            alwaysreturns: false
-            knownreturn: false
-            isreturnbool: false
-          position:
-            start: 11
-            end: 14
-          type: selector
-          fixedlabels: false
-          isconditional: false
+        - "on": []
+          ignoring: []
+          src:
+            labels: {}
+            deadinfo: null
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+            joins: []
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+            position:
+                start: 11
+                end: 14
+            type: selector
+            fixedlabels: false
+            isconditional: false
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -4274,29 +4277,32 @@ output:
           op: ""
       joins: []
       unless:
-        - labels: {}
-          deadinfo: null
-          returns: vector
-          operations:
-            - node: '[*parser.VectorSelector] bar'
-              op: ""
-          joins: []
-          unless: []
-          returninfo:
-            logicalexpr: ""
-            valueposition:
-                start: 0
-                end: 0
-            returnednumber: 0
-            alwaysreturns: false
-            knownreturn: false
-            isreturnbool: false
-          position:
-            start: 11
-            end: 14
-          type: selector
-          fixedlabels: false
-          isconditional: true
+        - "on": []
+          ignoring: []
+          src:
+            labels: {}
+            deadinfo: null
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+            joins: []
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+            position:
+                start: 11
+                end: 14
+            type: selector
+            fixedlabels: false
+            isconditional: true
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -4326,52 +4332,58 @@ output:
           op: ""
       joins: []
       unless:
-        - labels: {}
-          deadinfo: null
-          returns: vector
-          operations:
-            - node: '[*parser.VectorSelector] bar'
-              op: ""
-          joins: []
-          unless: []
-          returninfo:
-            logicalexpr: ""
-            valueposition:
-                start: 0
-                end: 0
-            returnednumber: 0
-            alwaysreturns: false
-            knownreturn: false
-            isreturnbool: false
-          position:
-            start: 11
-            end: 14
-          type: selector
-          fixedlabels: false
-          isconditional: false
-        - labels: {}
-          deadinfo: null
-          returns: vector
-          operations:
-            - node: '[*parser.VectorSelector] baz'
-              op: ""
-          joins: []
-          unless: []
-          returninfo:
-            logicalexpr: ""
-            valueposition:
-                start: 0
-                end: 0
-            returnednumber: 0
-            alwaysreturns: false
-            knownreturn: false
-            isreturnbool: false
-          position:
-            start: 22
-            end: 25
-          type: selector
-          fixedlabels: false
-          isconditional: false
+        - "on": []
+          ignoring: []
+          src:
+            labels: {}
+            deadinfo: null
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+            joins: []
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+            position:
+                start: 11
+                end: 14
+            type: selector
+            fixedlabels: false
+            isconditional: false
+        - "on": []
+          ignoring: []
+          src:
+            labels: {}
+            deadinfo: null
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] baz'
+                  op: ""
+            joins: []
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+            position:
+                start: 22
+                end: 25
+            type: selector
+            fixedlabels: false
+            isconditional: false
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -8016,39 +8028,42 @@ output:
           op: ""
       joins: []
       unless:
-        - labels:
-            "":
-                reason: Calling `vector()` will return a vector value with no labels.
-                kind: excluded
+        - "on": []
+          ignoring: []
+          src:
+            labels:
+                "":
+                    reason: Calling `vector()` will return a vector value with no labels.
+                    kind: excluded
+                    fragment:
+                        start: 42
+                        end: 48
+            deadinfo:
+                reason: The right hand side will never be matched because it doesn't have the `job` label while the left hand side will. Calling `vector()` will return a vector value with no labels.
                 fragment:
                     start: 42
                     end: 48
-          deadinfo:
-            reason: The right hand side will never be matched because it doesn't have the `job` label while the left hand side will. Calling `vector()` will return a vector value with no labels.
-            fragment:
-                start: 42
-                end: 48
-          returns: vector
-          operations:
-            - node: '[*parser.Call] vector(0)'
-              op: vector
-          joins: []
-          unless: []
-          returninfo:
-            logicalexpr: ""
-            valueposition:
+            returns: vector
+            operations:
+                - node: '[*parser.Call] vector(0)'
+                  op: vector
+            joins: []
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 42
+                    end: 51
+                returnednumber: 0
+                alwaysreturns: true
+                knownreturn: true
+                isreturnbool: false
+            position:
                 start: 42
                 end: 51
-            returnednumber: 0
-            alwaysreturns: true
-            knownreturn: true
-            isreturnbool: false
-          position:
-            start: 42
-            end: 51
-          type: function
-          fixedlabels: true
-          isconditional: false
+            type: function
+            fixedlabels: true
+            isconditional: false
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -8088,35 +8103,38 @@ output:
           op: ""
       joins: []
       unless:
-        - labels:
-            "":
-                reason: Calling `vector()` will return a vector value with no labels.
-                kind: excluded
-                fragment:
+        - "on": []
+          ignoring: []
+          src:
+            labels:
+                "":
+                    reason: Calling `vector()` will return a vector value with no labels.
+                    kind: excluded
+                    fragment:
+                        start: 47
+                        end: 53
+            deadinfo: null
+            returns: vector
+            operations:
+                - node: '[*parser.Call] vector(0)'
+                  op: vector
+            joins: []
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
                     start: 47
-                    end: 53
-          deadinfo: null
-          returns: vector
-          operations:
-            - node: '[*parser.Call] vector(0)'
-              op: vector
-          joins: []
-          unless: []
-          returninfo:
-            logicalexpr: ""
-            valueposition:
+                    end: 56
+                returnednumber: 0
+                alwaysreturns: true
+                knownreturn: true
+                isreturnbool: false
+            position:
                 start: 47
                 end: 56
-            returnednumber: 0
-            alwaysreturns: true
-            knownreturn: true
-            isreturnbool: false
-          position:
-            start: 47
-            end: 56
-          type: function
-          fixedlabels: true
-          isconditional: false
+            type: function
+            fixedlabels: true
+            isconditional: false
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -8152,39 +8170,43 @@ output:
           op: ""
       joins: []
       unless:
-        - labels:
-            "":
-                reason: Calling `vector()` will return a vector value with no labels.
-                kind: excluded
+        - "on":
+            - job
+          ignoring: []
+          src:
+            labels:
+                "":
+                    reason: Calling `vector()` will return a vector value with no labels.
+                    kind: excluded
+                    fragment:
+                        start: 50
+                        end: 56
+            deadinfo:
+                reason: The right hand side will never be matched because it doesn't have the `job` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
                 fragment:
                     start: 50
                     end: 56
-          deadinfo:
-            reason: The right hand side will never be matched because it doesn't have the `job` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
-            fragment:
-                start: 50
-                end: 56
-          returns: vector
-          operations:
-            - node: '[*parser.Call] vector(0)'
-              op: vector
-          joins: []
-          unless: []
-          returninfo:
-            logicalexpr: ""
-            valueposition:
+            returns: vector
+            operations:
+                - node: '[*parser.Call] vector(0)'
+                  op: vector
+            joins: []
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 50
+                    end: 59
+                returnednumber: 0
+                alwaysreturns: true
+                knownreturn: true
+                isreturnbool: false
+            position:
                 start: 50
                 end: 59
-            returnednumber: 0
-            alwaysreturns: true
-            knownreturn: true
-            isreturnbool: false
-          position:
-            start: 50
-            end: 59
-          type: function
-          fixedlabels: true
-          isconditional: false
+            type: function
+            fixedlabels: true
+            isconditional: false
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -8257,102 +8279,105 @@ output:
           op: max
       joins: []
       unless:
-        - labels:
-            "":
-                reason: Query is using aggregation with `by(instance, cluster)`, only labels included inside `by(...)` will be present on the results.
-                kind: excluded
-                fragment:
-                    start: 99
-                    end: 102
-            __name__:
-                reason: Aggregation removes metric name.
-                kind: excluded
-                fragment:
-                    start: 95
-                    end: 202
-            cluster:
-                reason: Query is using many-to-one vector matching with `group_left(cluster)`, all labels included inside `group_left(...)` will be include on the results.
-                kind: included
-                fragment:
-                    start: 222
-                    end: 233
-            instance:
-                reason: Query is using many-to-one vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
-                kind: included
-                fragment:
-                    start: 208
-                    end: 211
-            name:
-                reason: Query is using aggregation with `by(instance, cluster)`, only labels included inside `by(...)` will be present on the results.
-                kind: excluded
-                fragment:
-                    start: 99
-                    end: 102
-          deadinfo: null
-          returns: vector
-          operations:
-            - node: '[*parser.VectorSelector] node_systemd_timer_last_trigger_seconds{name=~"etcd-defrag-.*.timer"}'
-              op: ""
-            - node: '[*parser.AggregateExpr] sum by (instance, cluster) (time() - node_systemd_timer_last_trigger_seconds{name=~"etcd-defrag-.*.timer"})'
-              op: sum
-          joins:
-            - "on":
-                - instance
-              ignoring: []
-              src:
-                labels:
-                    kubernetes_role:
-                        reason: Query will only return series where these labels are present.
-                        kind: guaranteed
-                        fragment:
-                            start: 247
-                            end: 303
-                    role:
-                        reason: Query will only return series where these labels are present.
-                        kind: guaranteed
-                        fragment:
-                            start: 247
-                            end: 303
-                deadinfo: null
-                returns: vector
-                operations:
-                    - node: '[*parser.VectorSelector] cf_node_role{kubernetes_role="master",role="kubernetes"}'
-                      op: ""
-                joins: []
-                unless: []
-                returninfo:
-                    logicalexpr: ""
-                    valueposition:
-                        start: 0
-                        end: 0
-                    returnednumber: 0
-                    alwaysreturns: false
-                    knownreturn: false
-                    isreturnbool: false
-                position:
-                    start: 247
-                    end: 303
-                type: selector
-                fixedlabels: false
-                isconditional: false
-              op: 57395
-              depth: 0
-          unless: []
-          returninfo:
-            logicalexpr: ""
-            valueposition:
-                start: 0
-                end: 0
-            returnednumber: 0
-            alwaysreturns: false
-            knownreturn: false
-            isreturnbool: false
-          position:
-            start: 132
-            end: 201
-          type: aggregation
-          fixedlabels: true
-          isconditional: false
+        - "on": []
+          ignoring: []
+          src:
+            labels:
+                "":
+                    reason: Query is using aggregation with `by(instance, cluster)`, only labels included inside `by(...)` will be present on the results.
+                    kind: excluded
+                    fragment:
+                        start: 99
+                        end: 102
+                __name__:
+                    reason: Aggregation removes metric name.
+                    kind: excluded
+                    fragment:
+                        start: 95
+                        end: 202
+                cluster:
+                    reason: Query is using many-to-one vector matching with `group_left(cluster)`, all labels included inside `group_left(...)` will be include on the results.
+                    kind: included
+                    fragment:
+                        start: 222
+                        end: 233
+                instance:
+                    reason: Query is using many-to-one vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
+                    kind: included
+                    fragment:
+                        start: 208
+                        end: 211
+                name:
+                    reason: Query is using aggregation with `by(instance, cluster)`, only labels included inside `by(...)` will be present on the results.
+                    kind: excluded
+                    fragment:
+                        start: 99
+                        end: 102
+            deadinfo: null
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] node_systemd_timer_last_trigger_seconds{name=~"etcd-defrag-.*.timer"}'
+                  op: ""
+                - node: '[*parser.AggregateExpr] sum by (instance, cluster) (time() - node_systemd_timer_last_trigger_seconds{name=~"etcd-defrag-.*.timer"})'
+                  op: sum
+            joins:
+                - "on":
+                    - instance
+                  ignoring: []
+                  src:
+                    labels:
+                        kubernetes_role:
+                            reason: Query will only return series where these labels are present.
+                            kind: guaranteed
+                            fragment:
+                                start: 247
+                                end: 303
+                        role:
+                            reason: Query will only return series where these labels are present.
+                            kind: guaranteed
+                            fragment:
+                                start: 247
+                                end: 303
+                    deadinfo: null
+                    returns: vector
+                    operations:
+                        - node: '[*parser.VectorSelector] cf_node_role{kubernetes_role="master",role="kubernetes"}'
+                          op: ""
+                    joins: []
+                    unless: []
+                    returninfo:
+                        logicalexpr: ""
+                        valueposition:
+                            start: 0
+                            end: 0
+                        returnednumber: 0
+                        alwaysreturns: false
+                        knownreturn: false
+                        isreturnbool: false
+                    position:
+                        start: 247
+                        end: 303
+                    type: selector
+                    fixedlabels: false
+                    isconditional: false
+                  op: 57395
+                  depth: 0
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+            position:
+                start: 132
+                end: 201
+            type: aggregation
+            fixedlabels: true
+            isconditional: false
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -9286,61 +9311,66 @@ output:
           op: 57395
           depth: 0
       unless:
-        - labels: {}
-          deadinfo: null
-          returns: vector
-          operations:
-            - node: '[*parser.VectorSelector] kernel_device_io_soft_errors_total{device!~"loop.+"}'
-              op: ""
-            - node: '[*parser.Call] increase(kernel_device_io_soft_errors_total{device!~"loop.+"}[2h5m])'
-              op: increase
-          joins:
-            - "on": []
-              ignoring: []
-              src:
-                labels: {}
-                deadinfo: null
-                returns: vector
-                operations:
-                    - node: '[*parser.VectorSelector] kernel_device_io_errors_total'
-                      op: ""
-                    - node: '[*parser.Call] increase(kernel_device_io_errors_total[2h])'
-                      op: increase
-                joins: []
-                unless: []
-                returninfo:
-                    logicalexpr: ""
-                    valueposition:
-                        start: 0
-                        end: 0
-                    returnednumber: 0
-                    alwaysreturns: false
-                    knownreturn: false
-                    isreturnbool: false
-                position:
-                    start: 222
-                    end: 257
-                type: function
-                fixedlabels: false
-                isconditional: false
-              op: 57388
-              depth: 0
-          unless: []
-          returninfo:
-            logicalexpr: ""
-            valueposition:
-                start: 0
-                end: 0
-            returnednumber: 0
-            alwaysreturns: false
-            knownreturn: false
-            isreturnbool: false
-          position:
-            start: 149
-            end: 207
-          type: function
-          fixedlabels: false
-          isconditional: true
+        - "on":
+            - instance
+            - device
+          ignoring: []
+          src:
+            labels: {}
+            deadinfo: null
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] kernel_device_io_soft_errors_total{device!~"loop.+"}'
+                  op: ""
+                - node: '[*parser.Call] increase(kernel_device_io_soft_errors_total{device!~"loop.+"}[2h5m])'
+                  op: increase
+            joins:
+                - "on": []
+                  ignoring: []
+                  src:
+                    labels: {}
+                    deadinfo: null
+                    returns: vector
+                    operations:
+                        - node: '[*parser.VectorSelector] kernel_device_io_errors_total'
+                          op: ""
+                        - node: '[*parser.Call] increase(kernel_device_io_errors_total[2h])'
+                          op: increase
+                    joins: []
+                    unless: []
+                    returninfo:
+                        logicalexpr: ""
+                        valueposition:
+                            start: 0
+                            end: 0
+                        returnednumber: 0
+                        alwaysreturns: false
+                        knownreturn: false
+                        isreturnbool: false
+                    position:
+                        start: 222
+                        end: 257
+                    type: function
+                    fixedlabels: false
+                    isconditional: false
+                  op: 57388
+                  depth: 0
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+            position:
+                start: 149
+                end: 207
+            type: function
+            fixedlabels: false
+            isconditional: true
       returninfo:
         logicalexpr: ""
         valueposition:

@@ -125,13 +125,19 @@ type Join struct {
 	Depth    int                 // Zero if this is a direct join, non-zero otherwise. sum(foo * bar) would be in-direct join.
 }
 
+type Unless struct {
+	On       []string
+	Ignoring []string
+	Src      Source
+}
+
 type Source struct {
 	Labels        map[string]LabelTransform
 	DeadInfo      *DeadInfo
 	Returns       promParser.ValueType
 	Operations    SourceOperations
 	Joins         []Join   // Any other sources this source joins with.
-	Unless        []Source // Any other sources this source is suppressed by.
+	Unless        []Unless // Any other sources this source is suppressed by.
 	ReturnInfo    ReturnInfo
 	Position      posrange.PositionRange
 	Type          SourceType
@@ -253,20 +259,20 @@ func (s *Source) guaranteeLabel(reason string, fragment posrange.PositionRange, 
 	}
 }
 
-type Visitor func(s Source, j *Join)
+type Visitor func(s Source, j *Join, u *Unless)
 
-func innerWalk(fn Visitor, s Source, j *Join) {
-	fn(s, j)
+func innerWalk(fn Visitor, s Source, j *Join, u *Unless) {
+	fn(s, j, u)
 	for _, j := range s.Joins {
-		innerWalk(fn, j.Src, &j)
+		innerWalk(fn, j.Src, &j, nil)
 	}
 	for _, u := range s.Unless {
-		innerWalk(fn, u, nil)
+		innerWalk(fn, u.Src, nil, &u)
 	}
 }
 
 func (s Source) WalkSources(fn Visitor) {
-	innerWalk(fn, s, nil)
+	innerWalk(fn, s, nil, nil)
 }
 
 func LabelsSource(expr string, node promParser.Node) (src []Source) {
@@ -1055,7 +1061,11 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 							Fragment: rs.Position,
 						}
 					}
-					ls.Unless = append(ls.Unless, rs)
+					ls.Unless = append(ls.Unless, Unless{
+						Src:      rs,
+						On:       onLabels(n.VectorMatching),
+						Ignoring: ignoringLabels(n.VectorMatching),
+					})
 				case n.Op != promParser.LOR:
 					ls.Joins = append(ls.Joins, Join{
 						Src:      rs,

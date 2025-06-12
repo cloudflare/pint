@@ -47,7 +47,7 @@ func (c ImpossibleCheck) Check(_ context.Context, entry discovery.Entry, _ []dis
 	}
 
 	for _, src := range utils.LabelsSource(expr.Value.Value, expr.Query.Expr) {
-		src.WalkSources(func(s utils.Source, _ *utils.Join) {
+		src.WalkSources(func(s utils.Source, _ *utils.Join, _ *utils.Unless) {
 			problems = append(problems, c.checkSource(expr, s)...)
 		})
 	}

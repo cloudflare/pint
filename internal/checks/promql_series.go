@@ -966,10 +966,10 @@ func getNonFallbackSelectors(n parser.PromQLExpr) (selectors []*promParser.Vecto
 			}
 		}
 		for _, us := range ls.Unless {
-			if !us.IsConditional {
+			if !us.Src.IsConditional {
 				continue
 			}
-			if vs, ok := utils.MostOuterOperation[*promParser.VectorSelector](us); ok {
+			if vs, ok := utils.MostOuterOperation[*promParser.VectorSelector](us.Src); ok {
 				selectors = append(selectors, selectorWithoutOffset(vs))
 			}
 		}

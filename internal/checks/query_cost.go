@@ -244,9 +244,9 @@ func (c CostCheck) suggestRecordingRules(
 			continue
 		}
 		for _, s := range src {
-			s.WalkSources(func(s utils.Source, j *utils.Join) {
+			s.WalkSources(func(s utils.Source, j *utils.Join, u *utils.Unless) {
 				for _, os := range otherSrc {
-					op, extra, exact, ok := c.isSuggestionFor(s, os, j)
+					op, extra, exact, ok := c.isSuggestionFor(s, os, j, u)
 					if !ok {
 						continue
 					}
@@ -355,7 +355,7 @@ func (c CostCheck) diffStatsDuration(a, b float64) string {
 		delta)
 }
 
-func (c CostCheck) isSuggestionFor(src, potential utils.Source, join *utils.Join) (promParser.Node, string, bool, bool) {
+func (c CostCheck) isSuggestionFor(src, potential utils.Source, join *utils.Join, unless *utils.Unless) (promParser.Node, string, bool, bool) {
 	if potential.Type != utils.FuncSource && potential.Type != utils.AggregateSource {
 		return nil, "", false, false
 	}
@@ -373,6 +373,28 @@ func (c CostCheck) isSuggestionFor(src, potential utils.Source, join *utils.Join
 		// Check if potential can have all the labels we use in a join.
 		for _, name := range join.On {
 			if src.CanHaveLabel(name) && !potential.CanHaveLabel(name) {
+				return nil, "", false, false
+			}
+		}
+	}
+	if unless != nil {
+		// Check if potential can have all the labels we use in unless.
+		for _, name := range unless.On {
+			if src.CanHaveLabel(name) && !potential.CanHaveLabel(name) {
+				return nil, "", false, false
+			}
+		}
+	}
+	for _, j := range src.Joins {
+		for _, name := range j.On {
+			if !potential.CanHaveLabel(name) {
+				return nil, "", false, false
+			}
+		}
+	}
+	for _, u := range src.Unless {
+		for _, name := range u.On {
+			if !potential.CanHaveLabel(name) {
 				return nil, "", false, false
 			}
 		}
