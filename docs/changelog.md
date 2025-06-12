@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.74.1
+
+### Fixed
+
+- Fixed incorrect suggestion from [query/cost](checks/query/cost.md) when a query uses joins or unless.
+
 ## v0.74.0
 
 ### Added

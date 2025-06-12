@@ -514,6 +514,11 @@
 
 ---
 
+[TestCostCheck/suggest_recording_rule_/_join_mismatch - 1]
+[]
+
+---
+
 [TestCostCheck/suggest_recording_rule_/_label_mismatch - 1]
 []
 
@@ -638,6 +643,11 @@
 ---
 
 [TestCostCheck/suggest_recording_rule_/_sum(vector) - 1]
+[]
+
+---
+
+[TestCostCheck/suggest_recording_rule_/_unless_mismatch - 1]
 []
 
 ---

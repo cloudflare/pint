@@ -311,7 +311,7 @@ count by (dc) (
 			output := utils.LabelsSource(expr, n.Expr)
 
 			for _, src := range output {
-				src.WalkSources(func(s utils.Source, _ *utils.Join) {
+				src.WalkSources(func(s utils.Source, _ *utils.Join, _ *utils.Unless) {
 					require.Positive(t, s.Position.End, "empty position %+v", s)
 					if s.DeadInfo != nil {
 						require.Positive(t, s.DeadInfo.Fragment.End, "empty dead position %+v", s)
