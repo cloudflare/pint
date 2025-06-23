@@ -14,7 +14,7 @@ require (
 	github.com/neilotoole/slogt v1.1.0
 	github.com/prometheus/client_golang v1.22.0
 	github.com/prometheus/client_model v0.6.2
-	github.com/prometheus/common v0.64.0
+	github.com/prometheus/common v0.65.0
 	github.com/prometheus/prometheus v0.304.1
 	github.com/prymitive/current v0.1.1
 	github.com/rogpeppe/go-internal v1.14.1
