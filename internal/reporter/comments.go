@@ -13,10 +13,11 @@ import (
 )
 
 type PendingComment struct {
-	path   string
-	text   string
-	line   int
-	anchor checks.Anchor
+	path         string
+	text         string
+	line         int
+	anchor       checks.Anchor
+	modifiedLine bool
 }
 
 type ExistingComment struct {
@@ -155,10 +156,11 @@ func makeComments(summary Summary, showDuplicates bool) (comments []PendingComme
 		}
 
 		comments = append(comments, PendingComment{
-			anchor: reports[0].Problem.Anchor,
-			path:   reports[0].Path.SymlinkTarget,
-			line:   line,
-			text:   buf.String(),
+			anchor:       reports[0].Problem.Anchor,
+			path:         reports[0].Path.SymlinkTarget,
+			line:         line,
+			text:         buf.String(),
+			modifiedLine: slices.Contains(reports[0].ModifiedLines, line),
 		})
 	}
 	return comments
