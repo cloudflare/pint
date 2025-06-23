@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.74.2
+
+### Fixed
+
+- Fixed an issue where pint would fail to create MR comment if GitLab API returned empty diff body.
+
 ## v0.74.1
 
 ### Fixed

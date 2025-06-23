@@ -456,6 +456,24 @@ func reportToGitLabDiscussion(pending PendingComment, diffs []*gitlab.MergeReque
 			renamed = true
 		}
 
+		// Diff is empty, decide if it was modified based on git history.
+		if diff.Diff == "" {
+			slog.Debug("Empty diff from GitLab",
+				slog.String("path", pending.path),
+				slog.Int("line", pending.line),
+				slog.Bool("modified", pending.modifiedLine))
+			switch {
+			case pending.anchor == checks.AnchorBefore:
+				d.Position.OldLine = gitlab.Ptr(pending.line)
+			case pending.modifiedLine:
+				d.Position.NewLine = gitlab.Ptr(pending.line)
+			case !pending.modifiedLine:
+				d.Position.NewLine = gitlab.Ptr(pending.line)
+				d.Position.OldLine = gitlab.Ptr(pending.line)
+			}
+			continue
+		}
+
 		dl, ok := diffLineFor(parseDiffLines(diff.Diff), pending.line)
 		switch {
 		case !ok:
