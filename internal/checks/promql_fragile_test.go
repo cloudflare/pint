@@ -189,6 +189,22 @@ func TestFragileCheck(t *testing.T) {
 			checker:    newFragileCheck,
 			prometheus: noProm,
 		},
+		{
+			description: "false positive max - issues 1466",
+			content: `
+- alert: KubeNodeEviction
+  expr: |
+    sum(rate(kubelet_evictions{job="kubelet"}[15m])) by(cluster, eviction_signal, instance)
+    * on (cluster, instance) group_left(node)
+    max by (cluster, instance, node) (
+      kubelet_node_name{job="kubelet"}
+    )
+    > 0
+  for: 0s
+`,
+			checker:    newFragileCheck,
+			prometheus: noProm,
+		},
 	}
 
 	runTests(t, testCases)
