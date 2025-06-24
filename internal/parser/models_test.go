@@ -198,6 +198,16 @@ func TestRuleIsIdentical(t *testing.T) {
 			b:     newMustRule("- alert: foo\n  # pint disable promql/series\n  expr: bob\n"),
 			equal: false,
 		},
+		{
+			a:     newMustRule("- record: colo:labels:equal\n  expr: sum(foo) without(job)\n  labels:\n    same: yes\n"),
+			b:     newMustRule("- record: colo:labels:equal\n  expr: sum(foo) without(job)\n  labels:\n    same: yes\n"),
+			equal: true,
+		},
+		{
+			a:     newMustRule("- record: foo\n  expr: sum(foo)\n  labels:\n    same: yes\n    a: b\n    d: c\n"),
+			b:     newMustRule("- record: foo\n  expr: sum(foo)\n  labels:\n    same: yes\n    a: b\n    c: d\n"),
+			equal: false,
+		},
 	}
 
 	for i, tc := range testCases {
