@@ -5,6 +5,8 @@
 ### Fixed
 
 - Fixed false positive reports from [promql/fragile](checks/promql/fragile.md) check - [#1466](https://github.com/cloudflare/pint/issues/1466).
+- Fixed incorrect reports from [query/cost](checks/query/cost.md) when multiple rules with `rate(...)` were present
+  and each had a different rate time window.
 
 ## v0.74.2
 

@@ -251,6 +251,13 @@ func (c CostCheck) suggestRecordingRules(
 						continue
 					}
 
+					// Don't replace the whole rule, that's usually not what we want.
+					// Useful suggestions should find parts of the query that can be improved.
+					if op.PositionRange().Start == expr.Query.Expr.PositionRange().Start &&
+						op.PositionRange().End == expr.Query.Expr.PositionRange().End {
+						continue
+					}
+
 					sq := c.rewriteRuleFragment(expr.Value.Value, op.PositionRange(), other.Rule.RecordingRule.Record.Value+extra)
 					var details strings.Builder
 					qr, afterSeries, err := c.getQueryCost(ctx, sq)
@@ -414,9 +421,10 @@ func (c CostCheck) isSuggestionFor(src, potential utils.Source, join *utils.Join
 	//   * sum -> rate -> selector
 	//   * rate -> selector
 	// - On same the selector.
-	// - With the same labels possible. All? Only from joins?
+	// - With the same labels possible.
 
 	// Src must have all operations potential does, so skip checks if potential is shorter.
+	// Ideally potential is shorter than src because we're looking to speed up part of the query, not replace it.
 	if len(potential.Operations) > len(src.Operations) {
 		return nil, "", false, false
 	}
