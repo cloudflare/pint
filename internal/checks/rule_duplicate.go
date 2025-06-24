@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/prometheus/prometheus/model/labels"
-
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
@@ -68,10 +66,7 @@ func (c RuleDuplicateCheck) Check(ctx context.Context, entry discovery.Entry, en
 }
 
 func (c RuleDuplicateCheck) compareRules(_ context.Context, rule *parser.RecordingRule, entry discovery.Entry, lines diags.LineRange) (problems []Problem) {
-	ruleALabels := buildRuleLabels(rule.Labels)
-	ruleBLabels := buildRuleLabels(entry.Rule.RecordingRule.Labels)
-
-	if ruleALabels.Hash() != ruleBLabels.Hash() {
+	if !rule.Labels.IsIdentical(entry.Rule.RecordingRule.Labels) {
 		return nil
 	}
 
@@ -96,18 +91,6 @@ func (c RuleDuplicateCheck) compareRules(_ context.Context, rule *parser.Recordi
 	}
 
 	return problems
-}
-
-func buildRuleLabels(l *parser.YamlMap) labels.Labels {
-	if l == nil || len(l.Items) == 0 {
-		return labels.EmptyLabels()
-	}
-
-	pairs := make([]string, 0, len(l.Items))
-	for _, label := range l.Items {
-		pairs = append(pairs, label.Key.Value, label.Value.Value)
-	}
-	return labels.FromStrings(pairs...)
 }
 
 func ignoreOtherEntry(entry, other discovery.Entry, prom *promapi.FailoverGroup) bool {
