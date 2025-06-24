@@ -72,25 +72,34 @@ type YamlMap struct {
 }
 
 func (ym *YamlMap) IsIdentical(b *YamlMap) bool {
-	var al, bl []string
-
-	if ym != nil && ym.Items != nil {
-		al = make([]string, 0, len(ym.Items))
-		for _, kv := range ym.Items {
-			al = append(al, kv.Key.Value+": "+kv.Value.Value)
-		}
-		slices.Sort(al)
+	var aItems, bItems []*YamlKeyValue
+	if ym != nil {
+		aItems = ym.Items
+	}
+	if b != nil {
+		bItems = b.Items
+	}
+	if len(aItems) != len(bItems) {
+		return false
 	}
 
-	if b != nil && b.Items != nil {
-		bl = make([]string, 0, len(b.Items))
-		for _, kv := range b.Items {
-			bl = append(bl, kv.Key.Value+": "+kv.Value.Value)
+	for _, ai := range aItems {
+		var found bool
+		for _, bi := range bItems {
+			if ai.Key.Value == bi.Key.Value {
+				if ai.Value.Value != bi.Value.Value {
+					return false
+				}
+				found = true
+				break
+			}
 		}
-		slices.Sort(bl)
+		if !found {
+			return false
+		}
 	}
 
-	return slices.Equal(al, bl)
+	return true
 }
 
 func (ym YamlMap) GetValue(key string) *YamlNode {
