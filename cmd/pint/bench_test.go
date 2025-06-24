@@ -159,3 +159,29 @@ rule {
 		_, _ = checkRules(b.Context(), 10, false, gen, cfg, entries)
 	}
 }
+
+func BenchmarkRuleIsIdentical(b *testing.B) {
+	log.Setup(slog.LevelError, true)
+
+	finder := discovery.NewGlobFinder(
+		[]string{"bench/rules"},
+		git.NewPathFilter(nil, nil, nil),
+		parser.PrometheusSchema,
+		model.UTF8Validation,
+		nil,
+	)
+	entries, err := finder.Find()
+	if err != nil {
+		b.Errorf("Find() error: %s", err)
+		b.FailNow()
+	}
+
+	b.ResetTimer()
+	for b.Loop() {
+		for _, e := range entries {
+			for _, o := range entries {
+				e.Rule.IsIdentical(o.Rule)
+			}
+		}
+	}
+}
