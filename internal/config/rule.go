@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"regexp"
+	"slices"
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -155,16 +156,14 @@ func isDisabledForRule(rule parser.Rule, name string, check checks.RuleChecker, 
 		if !snooze.Until.After(time.Now()) {
 			continue
 		}
-		for _, match := range matches {
-			if match == snooze.Match {
-				slog.Debug(
-					"Check snoozed by comment",
-					slog.String("check", check.String()),
-					slog.String("match", snooze.Match),
-					slog.Time("until", snooze.Until),
-				)
-				return true
-			}
+		if slices.Contains(matches, snooze.Match) {
+			slog.Debug(
+				"Check snoozed by comment",
+				slog.String("check", check.String()),
+				slog.String("match", snooze.Match),
+				slog.Time("until", snooze.Until),
+			)
+			return true
 		}
 	}
 	return false
@@ -192,12 +191,7 @@ func isEnabled(enabledChecks, disabledChecks []string, rule parser.Rule, name st
 	if len(enabledChecks) == 0 {
 		return true
 	}
-	for _, c := range enabledChecks {
-		if c == name {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(enabledChecks, name)
 }
 
 func strictRegex(s string) *regexp.Regexp {

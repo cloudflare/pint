@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/cloudflare/pint/internal/checks"
 )
@@ -27,10 +28,8 @@ func (c Checks) validate() error {
 }
 
 func validateCheckName(name string) error {
-	for _, c := range checks.CheckNames {
-		if name == c {
-			return nil
-		}
+	if slices.Contains(checks.CheckNames, name) {
+		return nil
 	}
 	return fmt.Errorf("unknown check name %s", name)
 }
