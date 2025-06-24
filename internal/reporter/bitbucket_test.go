@@ -2001,8 +2001,8 @@ func TestBitBucketReporter(t *testing.T) {
 						return
 					}
 
-					if strings.HasPrefix(r.URL.Path, "/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/") {
-						filename := strings.TrimPrefix(r.URL.Path, "/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/")
+					if after, ok := strings.CutPrefix(r.URL.Path, "/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/"); ok {
+						filename := after
 						assert.NotNil(t, tc.pullRequestFileDiffs)
 						v, ok := tc.pullRequestFileDiffs[filename]
 						assert.True(t, ok, "file is missing from pullRequestFileDiffs: %s", filename)

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -549,12 +550,7 @@ func nodeKeys(node *yaml.Node) (keys []string) {
 }
 
 func hasKey(node *yaml.Node, key string) bool {
-	for _, k := range nodeKeys(node) {
-		if k == key {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(nodeKeys(node), key)
 }
 
 func hasValue(node *YamlNode) bool {

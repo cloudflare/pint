@@ -451,7 +451,7 @@ func TestAppendSampleToRanges(t *testing.T) {
 
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			for i := 0; i < 50; i++ {
+			for range 50 {
 				tc := tc
 				for _, s := range tc.samples {
 					lset := promapi.MetricToLabels(s.Metric)
@@ -535,7 +535,7 @@ func TestMergeRanges(t *testing.T) {
 
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			for i := 0; i < 50; i++ {
+			for range 50 {
 				out, wasMerged := promapi.MergeRanges(tc.in, tc.step)
 				promapi.ExpandRangesEnd(out, tc.step)
 				require.Equal(t, tc.wasMerged, wasMerged)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 	textTemplate "text/template"
 	"text/template/parse"
@@ -337,10 +338,8 @@ func containsAliasedNode(am aliasMap, node parse.Node, alias string) (string, bo
 	valAliases := am.varAliases(alias)
 	for _, vars := range getVariables(node) {
 		for _, v := range vars.value {
-			for _, a := range valAliases {
-				if v == a {
-					return v, true
-				}
+			if slices.Contains(valAliases, v) {
+				return v, true
 			}
 		}
 	}
@@ -387,10 +386,8 @@ func hasHumanize(name, text string) bool {
 				for _, arg := range cmd.Args {
 					if m, ok := arg.(*parse.IdentifierNode); ok {
 						for _, f := range []string{"humanize", "humanize1024", "humanizePercentage", "humanizeDuration", "printf"} {
-							for _, a := range aliases.varAliases(f) {
-								if m.Ident == a {
-									return true
-								}
+							if slices.Contains(aliases.varAliases(f), m.Ident) {
+								return true
 							}
 						}
 					}

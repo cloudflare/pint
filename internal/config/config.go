@@ -35,11 +35,8 @@ type Config struct {
 func (cfg *Config) DisableOnlineChecks() {
 	for _, name := range checks.OnlineChecks {
 		var found bool
-		for _, n := range cfg.Checks.Disabled {
-			if n == name {
-				found = true
-				break
-			}
+		if slices.Contains(cfg.Checks.Disabled, name) {
+			found = true
 		}
 		if !found {
 			cfg.Checks.Disabled = append(cfg.Checks.Disabled, name)
@@ -62,11 +59,8 @@ func (cfg *Config) SetDisabledChecks(l []string) {
 	}
 	for name := range disabled {
 		var found bool
-		for _, c := range cfg.Checks.Disabled {
-			if c == name {
-				found = true
-				break
-			}
+		if slices.Contains(cfg.Checks.Disabled, name) {
+			found = true
 		}
 		if !found {
 			cfg.Checks.Disabled = append(cfg.Checks.Disabled, name)

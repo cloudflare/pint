@@ -326,12 +326,7 @@ func (ls *labelSet) add(n string) {
 }
 
 func (ls labelSet) hasName(n string) bool {
-	for _, l := range ls.names {
-		if l == n {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(ls.names, n)
 }
 
 func (ls labelSet) isEqual(b labelSet) bool {
@@ -361,10 +356,8 @@ func (ls labelSets) hasName(n string) bool {
 
 func (ls labelSets) overlaps(bs labelSets) bool {
 	for _, a := range ls {
-		for _, b := range bs {
-			if a.isEqual(b) {
-				return true
-			}
+		if slices.ContainsFunc(bs, a.isEqual) {
+			return true
 		}
 	}
 	return false
