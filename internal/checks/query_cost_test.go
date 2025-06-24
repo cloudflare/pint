@@ -1325,6 +1325,56 @@ func TestCostCheck(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "suggest recording rule / ignore whole rule",
+			content: `- record: sum:foo:rate5m
+  expr: sum(rate(foo_total[5m]))
+`,
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 100, 100, 0, 0, "check comment", checks.Warning)
+			},
+			prometheus: newSimpleProm,
+			entries: mustParseContent(`
+
+- record: sum:foo:rate15m
+  expr: sum(rate(foo_total[15m]))
+- record: sum:foo:rate30m
+  expr: sum(rate(foo_total[30m]))
+`),
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(sum(rate(foo_total[5m])))"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 50,
+								PeakSamples:           50,
+							},
+							Timings: promapi.QueryTimings{
+								EvalTotalTime: 10,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: checks.BytesPerSampleQuery},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSampleWithValue(map[string]string{}, 2048),
+						},
+					},
+				},
+			},
+		},
 	}
 
 	runTests(t, testCases)

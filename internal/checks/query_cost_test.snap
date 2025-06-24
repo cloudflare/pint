@@ -457,6 +457,11 @@
 
 ---
 
+[TestCostCheck/suggest_recording_rule_/_ignore_whole_rule - 1]
+[]
+
+---
+
 [TestCostCheck/suggest_recording_rule_/_irate_vs_rate - 1]
 - description: suggest recording rule / irate vs rate
   content: |4
