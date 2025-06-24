@@ -79,6 +79,31 @@ func TestRuleIsIdentical(t *testing.T) {
 			equal: false,
 		},
 		{
+			a:     newMustRule("- record: foo\n  expr: bob\n  labels:\n    foo: bar\n    extra: foo\n"),
+			b:     newMustRule("- record: foo\n  expr: bob\n  labels:\n    foo: bar\n"),
+			equal: false,
+		},
+		{
+			a:     newMustRule("- record: foo\n  expr: bob\n  labels:\n    foo: bar\n    extra: foo\n"),
+			b:     newMustRule("- record: foo\n  expr: bob\n  labels:\n    foo: bar\n    extra: bar\n"),
+			equal: false,
+		},
+		{
+			a:     newMustRule("- record: foo\n  expr: bob\n  labels:\n    foo: bar\n    abc: foo\n"),
+			b:     newMustRule("- record: foo\n  expr: bob\n  labels:\n    foo: bar\n    cba: foo\n"),
+			equal: false,
+		},
+		{
+			a:     newMustRule("- record: foo\n  expr: bob\n  labels:\n    foo: bar\n"),
+			b:     newMustRule("- record: foo\n  expr: bob\n  labels:\n    foo: bar\n    extra: foo\n"),
+			equal: false,
+		},
+		{
+			a:     newMustRule("- record: foo\n  expr: bob\n  labels:\n    foo: bar\n    extra: foo\n"),
+			b:     newMustRule("- record: foo\n  expr: bob\n  labels:\n    foo: bar\n    extra: bar\n"),
+			equal: false,
+		},
+		{
 			a:     newMustRule("- record: foo\n  expr: bob\n"),
 			b:     newMustRule("- alert: foo\n  expr: bob\n"),
 			equal: false,
@@ -178,7 +203,7 @@ func TestRuleIsIdentical(t *testing.T) {
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i+1), func(t *testing.T) {
 			equal := tc.a.IsIdentical(tc.b)
-			require.Equal(t, tc.equal, equal)
+			require.Equal(t, tc.equal, equal, tc.a)
 		})
 	}
 }

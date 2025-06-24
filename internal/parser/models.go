@@ -77,7 +77,7 @@ func (ym *YamlMap) IsIdentical(b *YamlMap) bool {
 	if ym != nil && ym.Items != nil {
 		al = make([]string, 0, len(ym.Items))
 		for _, kv := range ym.Items {
-			al = append(al, fmt.Sprintf("%s: %s", kv.Key.Value, kv.Value.Value))
+			al = append(al, kv.Key.Value+": "+kv.Value.Value)
 		}
 		slices.Sort(al)
 	}
@@ -85,7 +85,7 @@ func (ym *YamlMap) IsIdentical(b *YamlMap) bool {
 	if b != nil && b.Items != nil {
 		bl = make([]string, 0, len(b.Items))
 		for _, kv := range b.Items {
-			bl = append(bl, fmt.Sprintf("%s: %s", kv.Key.Value, kv.Value.Value))
+			bl = append(bl, kv.Key.Value+": "+kv.Value.Value)
 		}
 		slices.Sort(bl)
 	}
