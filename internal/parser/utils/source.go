@@ -118,11 +118,12 @@ func newSource() Source {
 }
 
 type Join struct {
-	On       []string
-	Ignoring []string
-	Src      Source              // The source we're joining with.
-	Op       promParser.ItemType // The binary operation used for this join.
-	Depth    int                 // Zero if this is a direct join, non-zero otherwise. sum(foo * bar) would be in-direct join.
+	On          []string
+	Ignoring    []string
+	AddedLabels []string
+	Src         Source              // The source we're joining with.
+	Op          promParser.ItemType // The binary operation used for this join.
+	Depth       int                 // Zero if this is a direct join, non-zero otherwise. sum(foo * bar) would be in-direct join.
 }
 
 type Unless struct {
@@ -923,11 +924,12 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					}
 				}
 				ls.Joins = append(ls.Joins, Join{
-					Src:      rs,
-					Op:       n.Op,
-					Depth:    0,
-					On:       onLabels(n.VectorMatching),
-					Ignoring: ignoringLabels(n.VectorMatching),
+					Src:         rs,
+					Op:          n.Op,
+					Depth:       0,
+					On:          onLabels(n.VectorMatching),
+					Ignoring:    ignoringLabels(n.VectorMatching),
+					AddedLabels: n.VectorMatching.Include,
 				})
 			}
 			ls.IsConditional, ls.ReturnInfo.IsReturnBool = checkConditions(ls, n.Op, n.ReturnBool)
@@ -968,11 +970,12 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					}
 				}
 				rs.Joins = append(rs.Joins, Join{
-					Src:      ls,
-					Op:       n.Op,
-					Depth:    0,
-					On:       onLabels(n.VectorMatching),
-					Ignoring: ignoringLabels(n.VectorMatching),
+					Src:         ls,
+					Op:          n.Op,
+					Depth:       0,
+					On:          onLabels(n.VectorMatching),
+					Ignoring:    ignoringLabels(n.VectorMatching),
+					AddedLabels: n.VectorMatching.Include,
 				})
 			}
 			rs.IsConditional, rs.ReturnInfo.IsReturnBool = checkConditions(rs, n.Op, n.ReturnBool)
@@ -1010,11 +1013,12 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					}
 				}
 				ls.Joins = append(ls.Joins, Join{
-					Src:      rs,
-					Op:       n.Op,
-					Depth:    0,
-					On:       onLabels(n.VectorMatching),
-					Ignoring: ignoringLabels(n.VectorMatching),
+					Src:         rs,
+					Op:          n.Op,
+					Depth:       0,
+					On:          onLabels(n.VectorMatching),
+					Ignoring:    ignoringLabels(n.VectorMatching),
+					AddedLabels: n.VectorMatching.Include,
 				})
 			}
 			ls.IsConditional, ls.ReturnInfo.IsReturnBool = checkConditions(ls, n.Op, n.ReturnBool)
@@ -1068,11 +1072,12 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					})
 				case n.Op != promParser.LOR:
 					ls.Joins = append(ls.Joins, Join{
-						Src:      rs,
-						Op:       n.Op,
-						Depth:    0,
-						On:       onLabels(n.VectorMatching),
-						Ignoring: ignoringLabels(n.VectorMatching),
+						Src:         rs,
+						Op:          n.Op,
+						Depth:       0,
+						On:          onLabels(n.VectorMatching),
+						Ignoring:    ignoringLabels(n.VectorMatching),
+						AddedLabels: n.VectorMatching.Include,
 					})
 				}
 			}

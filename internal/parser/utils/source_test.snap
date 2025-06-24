@@ -438,6 +438,7 @@ output:
       joins:
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 "":
@@ -472,6 +473,7 @@ output:
           depth: 0
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels: {}
             deadinfo:
@@ -533,6 +535,7 @@ output:
       joins:
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 "":
@@ -567,6 +570,7 @@ output:
           depth: 0
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels: {}
             deadinfo:
@@ -843,6 +847,7 @@ output:
       joins:
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels: {}
             deadinfo: null
@@ -900,6 +905,7 @@ output:
       joins:
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels: {}
             deadinfo: null
@@ -970,6 +976,7 @@ output:
         - "on":
             - instance
           ignoring: []
+          addedlabels: []
           src:
             labels: {}
             deadinfo: null
@@ -1040,6 +1047,7 @@ output:
         - "on":
             - instance
           ignoring: []
+          addedlabels: []
           src:
             labels: {}
             deadinfo: null
@@ -1110,6 +1118,8 @@ output:
         - "on":
             - instance
           ignoring: []
+          addedlabels:
+            - version
           src:
             labels: {}
             deadinfo: null
@@ -1180,6 +1190,8 @@ output:
         - "on":
             - instance
           ignoring: []
+          addedlabels:
+            - version
           src:
             labels: {}
             deadinfo: null
@@ -1237,6 +1249,7 @@ output:
       joins:
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels: {}
             deadinfo: null
@@ -2261,6 +2274,7 @@ output:
       joins:
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 "":
@@ -2358,6 +2372,7 @@ output:
       joins:
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 "":
@@ -3107,6 +3122,7 @@ output:
       joins:
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels: {}
             deadinfo: null
@@ -3183,6 +3199,7 @@ output:
         - "on":
             - instance
           ignoring: []
+          addedlabels: []
           src:
             labels: {}
             deadinfo: null
@@ -3259,6 +3276,8 @@ output:
         - "on":
             - instance
           ignoring: []
+          addedlabels:
+            - bar
           src:
             labels: {}
             deadinfo: null
@@ -3335,6 +3354,8 @@ output:
         - "on":
             - instance
           ignoring: []
+          addedlabels:
+            - cluster
           src:
             labels:
                 cluster:
@@ -3423,6 +3444,8 @@ output:
         - "on":
             - instance
           ignoring: []
+          addedlabels:
+            - job
           src:
             labels:
                 ignored:
@@ -3506,6 +3529,7 @@ output:
       joins:
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels: {}
             deadinfo: null
@@ -3583,6 +3607,7 @@ output:
       joins:
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 job:
@@ -3673,6 +3698,7 @@ output:
         - "on":
             - env
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 job:
@@ -3748,6 +3774,7 @@ output:
       joins:
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels: {}
             deadinfo: null
@@ -3824,6 +3851,7 @@ output:
         - "on":
             - cluster
           ignoring: []
+          addedlabels: []
           src:
             labels: {}
             deadinfo: null
@@ -4626,6 +4654,8 @@ output:
         - "on":
             - job
           ignoring: []
+          addedlabels:
+            - notify
           src:
             labels: {}
             deadinfo: null
@@ -4655,6 +4685,7 @@ output:
         - "on":
             - job
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 "":
@@ -4752,6 +4783,7 @@ output:
             - instance
             - app_name
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 ulimit:
@@ -4829,6 +4861,7 @@ output:
             - instance
             - app_name
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 ulimit:
@@ -5103,6 +5136,7 @@ output:
         - "on":
             - job
           ignoring: []
+          addedlabels: []
           src:
             labels: {}
             deadinfo: null
@@ -5243,6 +5277,8 @@ output:
           ignoring:
             - package
             - version
+          addedlabels:
+            - foo
           src:
             labels:
                 "":
@@ -5519,6 +5555,9 @@ output:
       joins:
         - "on": []
           ignoring: []
+          addedlabels:
+            - cluster
+            - env
           src:
             labels: {}
             deadinfo: null
@@ -5595,6 +5634,7 @@ output:
       joins:
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels: {}
             deadinfo: null
@@ -6018,6 +6058,7 @@ output:
         - "on": []
           ignoring:
             - job
+          addedlabels: []
           src:
             labels:
                 instance:
@@ -6180,6 +6221,7 @@ output:
       joins:
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 "":
@@ -6607,6 +6649,7 @@ output:
       joins:
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 "":
@@ -7197,6 +7240,7 @@ output:
       joins:
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels: {}
             deadinfo: null
@@ -7225,6 +7269,7 @@ output:
           depth: 0
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 "":
@@ -7267,6 +7312,7 @@ output:
           depth: 0
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels: {}
             deadinfo: null
@@ -7324,6 +7370,7 @@ output:
       joins:
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels: {}
             deadinfo: null
@@ -7352,6 +7399,7 @@ output:
           depth: 0
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 "":
@@ -7394,6 +7442,7 @@ output:
           depth: 0
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels: {}
             deadinfo: null
@@ -7485,6 +7534,7 @@ output:
       joins:
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels: {}
             deadinfo: null
@@ -7515,6 +7565,7 @@ output:
           depth: 0
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 "":
@@ -7549,6 +7600,7 @@ output:
           depth: 0
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 log_name:
@@ -7585,6 +7637,7 @@ output:
           depth: 0
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 "":
@@ -7648,6 +7701,7 @@ output:
       joins:
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels: {}
             deadinfo: null
@@ -7678,6 +7732,7 @@ output:
           depth: 0
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 "":
@@ -7712,6 +7767,7 @@ output:
           depth: 0
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 log_name:
@@ -7748,6 +7804,7 @@ output:
           depth: 0
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 "":
@@ -8324,6 +8381,8 @@ output:
                 - "on":
                     - instance
                   ignoring: []
+                  addedlabels:
+                    - cluster
                   src:
                     labels:
                         kubernetes_role:
@@ -8420,6 +8479,7 @@ output:
       joins:
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 b:
@@ -8508,6 +8568,9 @@ output:
         - "on":
             - instance
           ignoring: []
+          addedlabels:
+            - c
+            - d
           src:
             labels:
                 b:
@@ -8596,6 +8659,9 @@ output:
         - "on":
             - instance
           ignoring: []
+          addedlabels:
+            - c
+            - d
           src:
             labels:
                 a:
@@ -8678,6 +8744,7 @@ output:
         - "on":
             - instance
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 "":
@@ -8784,6 +8851,9 @@ output:
         - "on":
             - instance
           ignoring: []
+          addedlabels:
+            - c
+            - d
           src:
             labels:
                 "":
@@ -8890,6 +8960,9 @@ output:
         - "on":
             - instance
           ignoring: []
+          addedlabels:
+            - c
+            - d
           src:
             labels:
                 "":
@@ -8996,6 +9069,9 @@ output:
         - "on":
             - instance
           ignoring: []
+          addedlabels:
+            - c
+            - d
           src:
             labels:
                 __name__:
@@ -9102,6 +9178,9 @@ output:
         - "on":
             - instance
           ignoring: []
+          addedlabels:
+            - c
+            - d
           src:
             labels:
                 __name__:
@@ -9225,6 +9304,7 @@ output:
             - device
             - instance
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 "":
@@ -9276,6 +9356,8 @@ output:
         - "on":
             - instance
           ignoring: []
+          addedlabels:
+            - group
           src:
             labels:
                 instance:
@@ -9327,6 +9409,7 @@ output:
             joins:
                 - "on": []
                   ignoring: []
+                  addedlabels: []
                   src:
                     labels: {}
                     deadinfo: null
@@ -9427,6 +9510,7 @@ output:
       joins:
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 b:
@@ -9557,6 +9641,7 @@ output:
         - "on":
             - prometheus
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 "":
@@ -9603,6 +9688,7 @@ output:
             joins:
                 - "on": []
                   ignoring: []
+                  addedlabels: []
                   src:
                     labels:
                         "":
@@ -9706,6 +9792,7 @@ output:
       joins:
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 "":
@@ -9850,6 +9937,9 @@ output:
         - "on":
             - instance
           ignoring: []
+          addedlabels:
+            - bob
+            - alice
           src:
             labels: {}
             deadinfo: null
@@ -9978,6 +10068,7 @@ output:
       joins:
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 "":
@@ -10179,6 +10270,7 @@ output:
       joins:
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 "":
@@ -10229,6 +10321,7 @@ output:
           depth: 0
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 "":
@@ -10277,6 +10370,7 @@ output:
           depth: 0
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 "":
@@ -10309,6 +10403,7 @@ output:
             joins:
                 - "on": []
                   ignoring: []
+                  addedlabels: []
                   src:
                     labels:
                         "":
@@ -10359,6 +10454,7 @@ output:
                   depth: 0
                 - "on": []
                   ignoring: []
+                  addedlabels: []
                   src:
                     labels:
                         "":
@@ -10425,6 +10521,7 @@ output:
           depth: 0
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 "":
@@ -10455,6 +10552,7 @@ output:
             joins:
                 - "on": []
                   ignoring: []
+                  addedlabels: []
                   src:
                     labels:
                         "":
@@ -10505,6 +10603,7 @@ output:
                   depth: 0
                 - "on": []
                   ignoring: []
+                  addedlabels: []
                   src:
                     labels:
                         "":
@@ -10572,6 +10671,7 @@ output:
         - "on":
             - colo_name
           ignoring: []
+          addedlabels: []
           src:
             labels: {}
             deadinfo: null
@@ -10601,6 +10701,7 @@ output:
         - "on":
             - colo_name
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 "":
@@ -10640,6 +10741,7 @@ output:
         - "on":
             - colo_name
           ignoring: []
+          addedlabels: []
           src:
             labels: {}
             deadinfo: null
@@ -10669,6 +10771,7 @@ output:
         - "on":
             - colo_name
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 "":
@@ -10754,6 +10857,7 @@ output:
       joins:
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 "":
@@ -10804,6 +10908,7 @@ output:
           depth: 0
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 "":
@@ -10852,6 +10957,7 @@ output:
           depth: 0
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 "":
@@ -10884,6 +10990,7 @@ output:
             joins:
                 - "on": []
                   ignoring: []
+                  addedlabels: []
                   src:
                     labels:
                         "":
@@ -10934,6 +11041,7 @@ output:
                   depth: 0
                 - "on": []
                   ignoring: []
+                  addedlabels: []
                   src:
                     labels:
                         "":
@@ -11000,6 +11108,7 @@ output:
           depth: 0
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 "":
@@ -11030,6 +11139,7 @@ output:
             joins:
                 - "on": []
                   ignoring: []
+                  addedlabels: []
                   src:
                     labels:
                         "":
@@ -11080,6 +11190,7 @@ output:
                   depth: 0
                 - "on": []
                   ignoring: []
+                  addedlabels: []
                   src:
                     labels:
                         "":
@@ -11147,6 +11258,7 @@ output:
         - "on":
             - colo_name
           ignoring: []
+          addedlabels: []
           src:
             labels: {}
             deadinfo: null
@@ -11176,6 +11288,7 @@ output:
         - "on":
             - colo_name
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 "":
@@ -11215,6 +11328,7 @@ output:
         - "on":
             - colo_name
           ignoring: []
+          addedlabels: []
           src:
             labels: {}
             deadinfo: null
@@ -11244,6 +11358,7 @@ output:
         - "on":
             - colo_name
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 "":
@@ -11325,6 +11440,7 @@ output:
       joins:
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 "":
@@ -11430,6 +11546,7 @@ output:
         - "on":
             - instance
           ignoring: []
+          addedlabels: []
           src:
             labels:
                 "":
@@ -11509,6 +11626,7 @@ output:
       joins:
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels: {}
             deadinfo: null
@@ -11568,6 +11686,7 @@ output:
       joins:
         - "on": []
           ignoring: []
+          addedlabels: []
           src:
             labels: {}
             deadinfo: null

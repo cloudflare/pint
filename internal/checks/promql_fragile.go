@@ -117,7 +117,12 @@ func (c FragileCheck) checkPartialData(expr parser.PromQLExpr, src utils.Source,
 	}
 
 	for _, j := range src.Joins {
+		// Only look for joins that are aggregations.
 		if j.Src.Type != utils.AggregateSource {
+			continue
+		}
+		// Ignore joins that are not conditional and instead are used to add labels.
+		if len(j.AddedLabels) > 0 && !j.Src.IsConditional {
 			continue
 		}
 		if j.Depth > 0 {

@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.74.3
+
+### Fixed
+
+- Fixed false positive reports from [promql/fragile](checks/promql/fragile.md) check - [#1466](https://github.com/cloudflare/pint/issues/1466).
+
 ## v0.74.2
 
 ### Fixed

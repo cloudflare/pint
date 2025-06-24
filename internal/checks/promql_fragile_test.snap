@@ -9,6 +9,11 @@
 
 ---
 
+[TestFragileCheck/false_positive_max_-_issues_1466 - 1]
+[]
+
+---
+
 [TestFragileCheck/fragile_division_/_different_targets - 1]
 - description: fragile division / different targets
   content: |4
