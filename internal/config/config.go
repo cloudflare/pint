@@ -20,6 +20,11 @@ import (
 	"github.com/prometheus/common/model"
 )
 
+type staticRule struct {
+	checker checks.RuleChecker
+	name    string
+}
+
 type Config struct {
 	CI         *CI                `hcl:"ci,block" json:"ci,omitempty"`
 	Parser     *Parser            `hcl:"parser,block" json:"parser,omitempty"`
@@ -30,6 +35,8 @@ type Config struct {
 	Prometheus []PrometheusConfig `hcl:"prometheus,block" json:"prometheus,omitempty"`
 	Check      []Check            `hcl:"check,block" json:"check,omitempty"`
 	Rules      []Rule             `hcl:"rule,block" json:"rules,omitempty"`
+
+	staticRules []staticRule
 }
 
 func (cfg *Config) DisableOnlineChecks() {
@@ -85,7 +92,7 @@ func (cfg *Config) GetChecksForEntry(ctx context.Context, gen *PrometheusGenerat
 		check := checks.NewErrorCheck(entry)
 		parsedRules = append(parsedRules, baseParsedRule(defaultMatch, check.Reporter(), check, nil))
 	} else {
-		parsedRules = append(parsedRules, baseRules(proms, defaultMatch)...)
+		parsedRules = append(parsedRules, baseRules(cfg.staticRules, proms, defaultMatch)...)
 		for _, rule := range cfg.Rules {
 			parsedRules = append(parsedRules, parseRule(rule, proms, defaultStates)...)
 		}
@@ -99,7 +106,7 @@ func (cfg *Config) GetChecksForEntry(ctx context.Context, gen *PrometheusGenerat
 		}
 	}
 
-	el := []string{}
+	el := make([]string, 0, len(enabled))
 	for _, e := range enabled {
 		el = append(el, fmt.Sprintf("%v", e))
 	}
@@ -215,6 +222,17 @@ func Load(path string, failOnMissing bool) (cfg Config, fromFile bool, err error
 			return cfg, fromFile, err
 		}
 	}
+
+	cfg.staticRules = append(cfg.staticRules,
+		staticRule{name: checks.SyntaxCheckName, checker: checks.NewSyntaxCheck()},
+		staticRule{name: checks.AlertForCheckName, checker: checks.NewAlertsForCheck()},
+		staticRule{name: checks.ComparisonCheckName, checker: checks.NewComparisonCheck()},
+		staticRule{name: checks.TemplateCheckName, checker: checks.NewTemplateCheck()},
+		staticRule{name: checks.FragileCheckName, checker: checks.NewFragileCheck()},
+		staticRule{name: checks.RegexpCheckName, checker: checks.NewRegexpCheck()},
+		staticRule{name: checks.RuleDependencyCheckName, checker: checks.NewRuleDependencyCheck()},
+		staticRule{name: checks.ImpossibleCheckName, checker: checks.NewImpossibleCheck()},
+	)
 
 	return cfg, fromFile, nil
 }

@@ -23,12 +23,14 @@ const (
 
 func NewAlertsAbsentCheck(prom *promapi.FailoverGroup) AlertsAbsentCheck {
 	return AlertsAbsentCheck{
-		prom: prom,
+		prom:     prom,
+		instance: fmt.Sprintf("%s(%s)", AlertsAbsentCheckName, prom.Name()),
 	}
 }
 
 type AlertsAbsentCheck struct {
-	prom *promapi.FailoverGroup
+	prom     *promapi.FailoverGroup
+	instance string
 }
 
 func (c AlertsAbsentCheck) Meta() CheckMeta {
@@ -45,7 +47,7 @@ func (c AlertsAbsentCheck) Meta() CheckMeta {
 }
 
 func (c AlertsAbsentCheck) String() string {
-	return fmt.Sprintf("%s(%s)", AlertsAbsentCheckName, c.prom.Name())
+	return c.instance
 }
 
 func (c AlertsAbsentCheck) Reporter() string {

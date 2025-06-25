@@ -28,12 +28,14 @@ func NewAlertsCheck(prom *promapi.FailoverGroup, lookBack, step, resolve time.Du
 		minCount: minCount,
 		comment:  comment,
 		severity: severity,
+		instance: fmt.Sprintf("%s(%s)", AlertsCheckName, prom.Name()),
 	}
 }
 
 type AlertsCheck struct {
 	prom     *promapi.FailoverGroup
 	comment  string
+	instance string
 	lookBack time.Duration
 	step     time.Duration
 	resolve  time.Duration
@@ -55,7 +57,7 @@ func (c AlertsCheck) Meta() CheckMeta {
 }
 
 func (c AlertsCheck) String() string {
-	return fmt.Sprintf("%s(%s)", AlertsCheckName, c.prom.Name())
+	return c.instance
 }
 
 func (c AlertsCheck) Reporter() string {

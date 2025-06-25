@@ -23,11 +23,15 @@ Once you calculate the rate you can use that result in other functions or aggreg
 )
 
 func NewCounterCheck(prom *promapi.FailoverGroup) CounterCheck {
-	return CounterCheck{prom: prom}
+	return CounterCheck{
+		prom:     prom,
+		instance: fmt.Sprintf("%s(%s)", CounterCheckName, prom.Name()),
+	}
 }
 
 type CounterCheck struct {
-	prom *promapi.FailoverGroup
+	prom     *promapi.FailoverGroup
+	instance string
 }
 
 func (c CounterCheck) Meta() CheckMeta {
@@ -44,7 +48,7 @@ func (c CounterCheck) Meta() CheckMeta {
 }
 
 func (c CounterCheck) String() string {
-	return fmt.Sprintf("%s(%s)", CounterCheckName, c.prom.Name())
+	return c.instance
 }
 
 func (c CounterCheck) Reporter() string {

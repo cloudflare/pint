@@ -30,15 +30,17 @@ func NewRuleForCheck(key RuleForKey, minFor, maxFor time.Duration, comment strin
 		maxFor:   maxFor,
 		comment:  comment,
 		severity: severity,
+		instance: fmt.Sprintf("%s(%s:%s)", RuleForCheckName, output.HumanizeDuration(minFor), output.HumanizeDuration(maxFor)),
 	}
 }
 
 type RuleForCheck struct {
 	key      RuleForKey
 	comment  string
-	severity Severity
+	instance string
 	minFor   time.Duration
 	maxFor   time.Duration
+	severity Severity
 }
 
 func (c RuleForCheck) Meta() CheckMeta {
@@ -55,7 +57,7 @@ func (c RuleForCheck) Meta() CheckMeta {
 }
 
 func (c RuleForCheck) String() string {
-	return fmt.Sprintf("%s(%s:%s)", RuleForCheckName, output.HumanizeDuration(c.minFor), output.HumanizeDuration(c.maxFor))
+	return c.instance
 }
 
 func (c RuleForCheck) Reporter() string {

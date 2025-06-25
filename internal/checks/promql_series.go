@@ -102,7 +102,10 @@ To fully validate your changes it's best to first deploy the rules that generate
 )
 
 func NewSeriesCheck(prom *promapi.FailoverGroup) SeriesCheck {
-	return SeriesCheck{prom: prom}
+	return SeriesCheck{
+		prom:     prom,
+		instance: fmt.Sprintf("%s(%s)", SeriesCheckName, prom.Name()),
+	}
 }
 
 func (c SeriesCheck) Meta() CheckMeta {
@@ -119,11 +122,12 @@ func (c SeriesCheck) Meta() CheckMeta {
 }
 
 type SeriesCheck struct {
-	prom *promapi.FailoverGroup
+	prom     *promapi.FailoverGroup
+	instance string
 }
 
 func (c SeriesCheck) String() string {
-	return fmt.Sprintf("%s(%s)", SeriesCheckName, c.prom.Name())
+	return c.instance
 }
 
 func (c SeriesCheck) Reporter() string {

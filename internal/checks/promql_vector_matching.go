@@ -26,11 +26,15 @@ You can match time series with different labels by using special keywords and fo
 )
 
 func NewVectorMatchingCheck(prom *promapi.FailoverGroup) VectorMatchingCheck {
-	return VectorMatchingCheck{prom: prom}
+	return VectorMatchingCheck{
+		prom:     prom,
+		instance: fmt.Sprintf("%s(%s)", VectorMatchingCheckName, prom.Name()),
+	}
 }
 
 type VectorMatchingCheck struct {
-	prom *promapi.FailoverGroup
+	prom     *promapi.FailoverGroup
+	instance string
 }
 
 func (c VectorMatchingCheck) Meta() CheckMeta {
@@ -47,7 +51,7 @@ func (c VectorMatchingCheck) Meta() CheckMeta {
 }
 
 func (c VectorMatchingCheck) String() string {
-	return fmt.Sprintf("%s(%s)", VectorMatchingCheckName, c.prom.Name())
+	return c.instance
 }
 
 func (c VectorMatchingCheck) Reporter() string {

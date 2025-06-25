@@ -33,11 +33,16 @@ Each scrape produces a sample, so if your application is scrape every minute the
 )
 
 func NewRateCheck(prom *promapi.FailoverGroup) RateCheck {
-	return RateCheck{prom: prom, minIntervals: 2}
+	return RateCheck{
+		prom:         prom,
+		minIntervals: 2,
+		instance:     fmt.Sprintf("%s(%s)", RateCheckName, prom.Name()),
+	}
 }
 
 type RateCheck struct {
 	prom         *promapi.FailoverGroup
+	instance     string
 	minIntervals int
 }
 
@@ -55,7 +60,7 @@ func (c RateCheck) Meta() CheckMeta {
 }
 
 func (c RateCheck) String() string {
-	return fmt.Sprintf("%s(%s)", RateCheckName, c.prom.Name())
+	return c.instance
 }
 
 func (c RateCheck) Reporter() string {

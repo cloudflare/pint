@@ -3,40 +3,36 @@ package checks
 import (
 	"bytes"
 	"regexp"
-	"strings"
 	"text/template"
+	"unique"
 
 	"github.com/cloudflare/pint/internal/parser"
 )
 
-func NewTemplatedRegexp(s string) (*TemplatedRegexp, error) {
+var aliases = "{{ $alert := .Alert }}{{ $record := .Record }}{{ $for := .For }}{{ $labels := .Labels }}{{ $annotations := .Annotations }}"
+
+func NewTemplatedRegexp(s string) (unique.Handle[TemplatedRegexp], error) {
 	tr := TemplatedRegexp{anchored: "^" + s + "$", original: s}
 	_, err := tr.Expand(parser.Rule{})
-	if err != nil {
-		return nil, err
-	}
-
-	return &tr, nil
+	return unique.Make(tr), err
 }
 
-func NewRawTemplatedRegexp(s string) (*TemplatedRegexp, error) {
+func NewRawTemplatedRegexp(s string) (unique.Handle[TemplatedRegexp], error) {
 	tr := TemplatedRegexp{anchored: s, original: s}
 	_, err := tr.Expand(parser.Rule{})
-	if err != nil {
-		return nil, err
-	}
-
-	return &tr, nil
+	return unique.Make(tr), err
 }
 
 func MustTemplatedRegexp(re string) *TemplatedRegexp {
 	tr, _ := NewTemplatedRegexp(re)
-	return tr
+	v := tr.Value()
+	return &v
 }
 
 func MustRawTemplatedRegexp(re string) *TemplatedRegexp {
 	tr, _ := NewRawTemplatedRegexp(re)
-	return tr
+	v := tr.Value()
+	return &v
 }
 
 type TemplatedRegexp struct {
@@ -46,7 +42,7 @@ type TemplatedRegexp struct {
 
 func (tr TemplatedRegexp) Expand(rule parser.Rule) (*regexp.Regexp, error) {
 	tctx := newTemplateContext(rule)
-	tmpl, err := newTemplateFromContext(tctx, tr.anchored)
+	tmpl, err := newTemplateFromContext(tr.anchored)
 	if err != nil {
 		return nil, err
 	}
@@ -65,8 +61,8 @@ func (tr TemplatedRegexp) MustExpand(rule parser.Rule) *regexp.Regexp {
 	return re
 }
 
-func newTemplateFromContext(tctx TemplateContext, content string) (*template.Template, error) {
-	tmpl, err := template.New("regexp").Parse(tctx.Aliases() + content)
+func newTemplateFromContext(content string) (*template.Template, error) {
+	tmpl, err := template.New("regexp").Parse(aliases + content)
 	if err != nil {
 		return nil, err
 	}
@@ -114,14 +110,4 @@ type TemplateContext struct {
 	Record      string
 	Expr        string
 	For         string
-}
-
-func (tc TemplateContext) Aliases() string {
-	var vars strings.Builder
-	vars.WriteString("{{ $alert := .Alert }}")
-	vars.WriteString("{{ $record := .Record }}")
-	vars.WriteString("{{ $for := .For }}")
-	vars.WriteString("{{ $labels := .Labels }}")
-	vars.WriteString("{{ $annotations := .Annotations }}")
-	return vars.String()
 }

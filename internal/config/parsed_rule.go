@@ -115,17 +115,11 @@ func defaultMatchStates(cmd ContextCommandVal) []string {
 	}
 }
 
-func baseRules(proms []*promapi.FailoverGroup, match []Match) (rules []parsedRule) {
-	rules = append(rules,
-		baseParsedRule(match, checks.SyntaxCheckName, checks.NewSyntaxCheck(), nil),
-		baseParsedRule(match, checks.AlertForCheckName, checks.NewAlertsForCheck(), nil),
-		baseParsedRule(match, checks.ComparisonCheckName, checks.NewComparisonCheck(), nil),
-		baseParsedRule(match, checks.TemplateCheckName, checks.NewTemplateCheck(), nil),
-		baseParsedRule(match, checks.FragileCheckName, checks.NewFragileCheck(), nil),
-		baseParsedRule(match, checks.RegexpCheckName, checks.NewRegexpCheck(), nil),
-		baseParsedRule(match, checks.RuleDependencyCheckName, checks.NewRuleDependencyCheck(), nil),
-		baseParsedRule(match, checks.ImpossibleCheckName, checks.NewImpossibleCheck(), nil),
-	)
+func baseRules(staticRules []staticRule, proms []*promapi.FailoverGroup, match []Match) (rules []parsedRule) {
+	rules = make([]parsedRule, 0, len(staticRules)+(len(proms)*9))
+	for _, sr := range staticRules {
+		rules = append(rules, baseParsedRule(match, sr.name, sr.checker, nil))
+	}
 
 	for _, p := range proms {
 		rules = append(rules,

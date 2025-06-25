@@ -17,6 +17,12 @@ const (
 )
 
 func NewLabelCheck(keyRe, tokenRe, valueRe *TemplatedRegexp, values []string, isRequired bool, comment string, severity Severity) LabelCheck {
+	var instance string
+	if valueRe != nil {
+		instance = fmt.Sprintf("%s(%s=~%s:%v)", LabelCheckName, keyRe.original, valueRe.anchored, isRequired)
+	} else {
+		instance = fmt.Sprintf("%s(%s:%v)", LabelCheckName, keyRe.original, isRequired)
+	}
 	return LabelCheck{
 		keyRe:      keyRe,
 		tokenRe:    tokenRe,
@@ -25,6 +31,7 @@ func NewLabelCheck(keyRe, tokenRe, valueRe *TemplatedRegexp, values []string, is
 		isRequired: isRequired,
 		comment:    comment,
 		severity:   severity,
+		instance:   instance,
 	}
 }
 
@@ -33,6 +40,7 @@ type LabelCheck struct {
 	tokenRe    *TemplatedRegexp
 	valueRe    *TemplatedRegexp
 	comment    string
+	instance   string
 	values     []string
 	severity   Severity
 	isRequired bool
@@ -52,10 +60,7 @@ func (c LabelCheck) Meta() CheckMeta {
 }
 
 func (c LabelCheck) String() string {
-	if c.valueRe != nil {
-		return fmt.Sprintf("%s(%s=~%s:%v)", LabelCheckName, c.keyRe.original, c.valueRe.anchored, c.isRequired)
-	}
-	return fmt.Sprintf("%s(%s:%v)", LabelCheckName, c.keyRe.original, c.isRequired)
+	return c.instance
 }
 
 func (c LabelCheck) Reporter() string {

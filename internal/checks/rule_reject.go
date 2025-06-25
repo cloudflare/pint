@@ -15,12 +15,30 @@ const (
 )
 
 func NewRejectCheck(l, a bool, k, v *TemplatedRegexp, s Severity) Reject {
-	return Reject{checkLabels: l, checkAnnotations: a, keyRe: k, valueRe: v, severity: s}
+	var instance string
+	r := []string{}
+	if k != nil {
+		r = append(r, fmt.Sprintf("key=~'%s'", k.anchored))
+	}
+	if v != nil {
+		r = append(r, fmt.Sprintf("val=~'%s'", v.anchored))
+	}
+	instance = fmt.Sprintf("%s(%s)", RejectCheckName, strings.Join(r, " "))
+
+	return Reject{
+		checkLabels:      l,
+		checkAnnotations: a,
+		keyRe:            k,
+		valueRe:          v,
+		severity:         s,
+		instance:         instance,
+	}
 }
 
 type Reject struct {
 	keyRe            *TemplatedRegexp
 	valueRe          *TemplatedRegexp
+	instance         string
 	severity         Severity
 	checkLabels      bool
 	checkAnnotations bool
@@ -40,14 +58,7 @@ func (c Reject) Meta() CheckMeta {
 }
 
 func (c Reject) String() string {
-	r := []string{}
-	if c.keyRe != nil {
-		r = append(r, fmt.Sprintf("key=~'%s'", c.keyRe.anchored))
-	}
-	if c.valueRe != nil {
-		r = append(r, fmt.Sprintf("val=~'%s'", c.valueRe.anchored))
-	}
-	return fmt.Sprintf("%s(%s)", RejectCheckName, strings.Join(r, " "))
+	return c.instance
 }
 
 func (c Reject) Reporter() string {

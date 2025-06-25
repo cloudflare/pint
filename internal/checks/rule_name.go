@@ -17,12 +17,14 @@ func NewRuleNameCheck(re *TemplatedRegexp, comment string, severity Severity) Ru
 		re:       re,
 		comment:  comment,
 		severity: severity,
+		instance: fmt.Sprintf("%s(%s)", RuleNameCheckName, re.anchored),
 	}
 }
 
 type RuleNameCheck struct {
 	re       *TemplatedRegexp
 	comment  string
+	instance string
 	severity Severity
 }
 
@@ -40,7 +42,7 @@ func (c RuleNameCheck) Meta() CheckMeta {
 }
 
 func (c RuleNameCheck) String() string {
-	return fmt.Sprintf("%s(%s)", RuleNameCheckName, c.re.anchored)
+	return c.instance
 }
 
 func (c RuleNameCheck) Reporter() string {

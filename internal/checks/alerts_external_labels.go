@@ -16,12 +16,14 @@ const (
 
 func NewAlertsExternalLabelsCheck(prom *promapi.FailoverGroup) AlertsExternalLabelsCheck {
 	return AlertsExternalLabelsCheck{
-		prom: prom,
+		prom:     prom,
+		instance: fmt.Sprintf("%s(%s)", AlertsExternalLabelsCheckName, prom.Name()),
 	}
 }
 
 type AlertsExternalLabelsCheck struct {
-	prom *promapi.FailoverGroup
+	prom     *promapi.FailoverGroup
+	instance string
 }
 
 func (c AlertsExternalLabelsCheck) Meta() CheckMeta {
@@ -38,7 +40,7 @@ func (c AlertsExternalLabelsCheck) Meta() CheckMeta {
 }
 
 func (c AlertsExternalLabelsCheck) String() string {
-	return fmt.Sprintf("%s(%s)", AlertsExternalLabelsCheckName, c.prom.Name())
+	return c.instance
 }
 
 func (c AlertsExternalLabelsCheck) Reporter() string {
