@@ -21,7 +21,20 @@ const (
 )
 
 func NewRangeQueryCheck(prom *promapi.FailoverGroup, limit time.Duration, comment string, severity Severity) RangeQueryCheck {
-	return RangeQueryCheck{prom: prom, limit: limit, comment: comment, severity: severity}
+	var instance string
+	if limit > 0 {
+		instance = fmt.Sprintf("%s(%s)", RangeQueryCheckName, output.HumanizeDuration(limit))
+	} else {
+		instance = fmt.Sprintf("%s(%s)", RangeQueryCheckName, prom.Name())
+	}
+
+	return RangeQueryCheck{
+		prom:     prom,
+		limit:    limit,
+		comment:  comment,
+		severity: severity,
+		instance: instance,
+	}
 }
 
 type RangeQueryCheck struct {
@@ -29,6 +42,7 @@ type RangeQueryCheck struct {
 	comment  string
 	limit    time.Duration
 	severity Severity
+	instance string
 }
 
 func (c RangeQueryCheck) Meta() CheckMeta {
@@ -45,10 +59,7 @@ func (c RangeQueryCheck) Meta() CheckMeta {
 }
 
 func (c RangeQueryCheck) String() string {
-	if c.limit > 0 {
-		return fmt.Sprintf("%s(%s)", RangeQueryCheckName, output.HumanizeDuration(c.limit))
-	}
-	return fmt.Sprintf("%s(%s)", RangeQueryCheckName, c.prom.Name())
+	return c.instance
 }
 
 func (c RangeQueryCheck) Reporter() string {

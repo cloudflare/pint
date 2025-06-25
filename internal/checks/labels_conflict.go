@@ -16,11 +16,15 @@ const (
 )
 
 func NewLabelsConflictCheck(prom *promapi.FailoverGroup) LabelsConflictCheck {
-	return LabelsConflictCheck{prom: prom}
+	return LabelsConflictCheck{
+		prom:     prom,
+		instance: fmt.Sprintf("%s(%s)", LabelsConflictCheckName, prom.Name()),
+	}
 }
 
 type LabelsConflictCheck struct {
-	prom *promapi.FailoverGroup
+	prom     *promapi.FailoverGroup
+	instance string
 }
 
 func (c LabelsConflictCheck) Meta() CheckMeta {
@@ -37,7 +41,7 @@ func (c LabelsConflictCheck) Meta() CheckMeta {
 }
 
 func (c LabelsConflictCheck) String() string {
-	return fmt.Sprintf("%s(%s)", LabelsConflictCheckName, c.prom.Name())
+	return c.instance
 }
 
 func (c LabelsConflictCheck) Reporter() string {

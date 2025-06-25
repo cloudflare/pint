@@ -99,7 +99,7 @@ func (cfg *Config) GetChecksForEntry(ctx context.Context, gen *PrometheusGenerat
 		}
 	}
 
-	el := []string{}
+	el := make([]string, 0, len(enabled))
 	for _, e := range enabled {
 		el = append(el, fmt.Sprintf("%v", e))
 	}

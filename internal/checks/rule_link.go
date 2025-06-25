@@ -28,6 +28,7 @@ func NewRuleLinkCheck(re *TemplatedRegexp, uriRewrite string, timeout time.Durat
 		headers:    headers,
 		comment:    comment,
 		severity:   s,
+		instance:   fmt.Sprintf("%s(%s)", RuleLinkCheckName, re.anchored),
 	}
 }
 
@@ -39,6 +40,7 @@ type RuleLinkCheck struct {
 	scheme     []string
 	timeout    time.Duration
 	severity   Severity
+	instance   string
 }
 
 func (c RuleLinkCheck) Meta() CheckMeta {
@@ -55,7 +57,7 @@ func (c RuleLinkCheck) Meta() CheckMeta {
 }
 
 func (c RuleLinkCheck) String() string {
-	return fmt.Sprintf("%s(%s)", RuleLinkCheckName, c.re.anchored)
+	return c.instance
 }
 
 func (c RuleLinkCheck) Reporter() string {

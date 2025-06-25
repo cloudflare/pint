@@ -17,6 +17,12 @@ const (
 )
 
 func NewAnnotationCheck(keyRe, tokenRe, valueRe *TemplatedRegexp, values []string, isRequired bool, comment string, severity Severity) AnnotationCheck {
+	var instance string
+	if valueRe != nil {
+		instance = fmt.Sprintf("%s(%s=~%s:%v)", AnnotationCheckName, keyRe.original, valueRe.anchored, isRequired)
+	} else {
+		instance = fmt.Sprintf("%s(%s:%v)", AnnotationCheckName, keyRe.original, isRequired)
+	}
 	return AnnotationCheck{
 		keyRe:      keyRe,
 		tokenRe:    tokenRe,
@@ -25,6 +31,7 @@ func NewAnnotationCheck(keyRe, tokenRe, valueRe *TemplatedRegexp, values []strin
 		isRequired: isRequired,
 		comment:    comment,
 		severity:   severity,
+		instance:   instance,
 	}
 }
 
@@ -32,6 +39,7 @@ type AnnotationCheck struct {
 	keyRe      *TemplatedRegexp
 	tokenRe    *TemplatedRegexp
 	valueRe    *TemplatedRegexp
+	instance   string
 	comment    string
 	values     []string
 	severity   Severity
@@ -52,10 +60,7 @@ func (c AnnotationCheck) Meta() CheckMeta {
 }
 
 func (c AnnotationCheck) String() string {
-	if c.valueRe != nil {
-		return fmt.Sprintf("%s(%s=~%s:%v)", AnnotationCheckName, c.keyRe.original, c.valueRe.anchored, c.isRequired)
-	}
-	return fmt.Sprintf("%s(%s:%v)", AnnotationCheckName, c.keyRe.original, c.isRequired)
+	return c.instance
 }
 
 func (c AnnotationCheck) Reporter() string {

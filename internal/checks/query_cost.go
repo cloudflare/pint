@@ -27,6 +27,13 @@ const (
 )
 
 func NewCostCheck(prom *promapi.FailoverGroup, maxSeries, maxTotalSamples, maxPeakSamples int, maxEvaluationDuration time.Duration, comment string, severity Severity) CostCheck {
+	var instance string
+	if maxSeries > 0 {
+		instance = fmt.Sprintf("%s(%s:%d)", CostCheckName, prom.Name(), maxSeries)
+	} else {
+		instance = fmt.Sprintf("%s(%s)", CostCheckName, prom.Name())
+	}
+
 	return CostCheck{
 		prom:                  prom,
 		maxSeries:             maxSeries,
@@ -35,6 +42,7 @@ func NewCostCheck(prom *promapi.FailoverGroup, maxSeries, maxTotalSamples, maxPe
 		maxEvaluationDuration: maxEvaluationDuration,
 		comment:               comment,
 		severity:              severity,
+		instance:              instance,
 	}
 }
 
@@ -46,6 +54,7 @@ type CostCheck struct {
 	maxPeakSamples        int
 	maxEvaluationDuration time.Duration
 	severity              Severity
+	instance              string
 }
 
 func (c CostCheck) Meta() CheckMeta {
@@ -62,10 +71,7 @@ func (c CostCheck) Meta() CheckMeta {
 }
 
 func (c CostCheck) String() string {
-	if c.maxSeries > 0 {
-		return fmt.Sprintf("%s(%s:%d)", CostCheckName, c.prom.Name(), c.maxSeries)
-	}
-	return fmt.Sprintf("%s(%s)", CostCheckName, c.prom.Name())
+	return c.instance
 }
 
 func (c CostCheck) Reporter() string {

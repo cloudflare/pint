@@ -22,6 +22,7 @@ func NewAggregationCheck(nameRegex *TemplatedRegexp, label string, keep bool, co
 		keep:      keep,
 		comment:   comment,
 		severity:  severity,
+		instance:  fmt.Sprintf("%s(%s:%v)", AggregationCheckName, label, keep),
 	}
 }
 
@@ -31,6 +32,7 @@ type AggregationCheck struct {
 	comment   string
 	severity  Severity
 	keep      bool
+	instance  string
 }
 
 func (c AggregationCheck) Meta() CheckMeta {
@@ -47,7 +49,7 @@ func (c AggregationCheck) Meta() CheckMeta {
 }
 
 func (c AggregationCheck) String() string {
-	return fmt.Sprintf("%s(%s:%v)", AggregationCheckName, c.label, c.keep)
+	return c.instance
 }
 
 func (c AggregationCheck) Reporter() string {

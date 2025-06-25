@@ -15,11 +15,15 @@ const (
 )
 
 func NewRuleDuplicateCheck(prom *promapi.FailoverGroup) RuleDuplicateCheck {
-	return RuleDuplicateCheck{prom: prom}
+	return RuleDuplicateCheck{
+		prom:     prom,
+		instance: fmt.Sprintf("%s(%s)", RuleDuplicateCheckName, prom.Name()),
+	}
 }
 
 type RuleDuplicateCheck struct {
-	prom *promapi.FailoverGroup
+	prom     *promapi.FailoverGroup
+	instance string
 }
 
 func (c RuleDuplicateCheck) Meta() CheckMeta {
@@ -36,7 +40,7 @@ func (c RuleDuplicateCheck) Meta() CheckMeta {
 }
 
 func (c RuleDuplicateCheck) String() string {
-	return fmt.Sprintf("%s(%s)", RuleDuplicateCheckName, c.prom.Name())
+	return c.instance
 }
 
 func (c RuleDuplicateCheck) Reporter() string {

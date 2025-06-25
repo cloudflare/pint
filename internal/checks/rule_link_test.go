@@ -51,7 +51,7 @@ func TestRuleLinkCheck(t *testing.T) {
 			description: "ignores recording rules",
 			content:     "- record: foo\n  expr: sum(foo)\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewRuleLinkCheck(nil, "", time.Second, nil, "", checks.Bug)
+				return checks.NewRuleLinkCheck(checks.MustTemplatedRegexp(".*"), "", time.Second, nil, "", checks.Bug)
 			},
 			prometheus: noProm,
 		},
@@ -59,7 +59,7 @@ func TestRuleLinkCheck(t *testing.T) {
 			description: "ignores unparsable link annotations",
 			content:     "- alert: foo\n  expr: sum(foo)\n  annotations:\n    link: \"%gh&%ij\"",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewRuleLinkCheck(nil, "", time.Second, nil, "", checks.Bug)
+				return checks.NewRuleLinkCheck(checks.MustTemplatedRegexp(".*"), "", time.Second, nil, "", checks.Bug)
 			},
 			prometheus: noProm,
 		},
@@ -67,7 +67,7 @@ func TestRuleLinkCheck(t *testing.T) {
 			description: "ignores non link annotations",
 			content:     "- alert: foo\n  expr: sum(foo)\n  annotations:\n    link: not a link",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewRuleLinkCheck(nil, "", time.Second, nil, "", checks.Bug)
+				return checks.NewRuleLinkCheck(checks.MustTemplatedRegexp(".*"), "", time.Second, nil, "", checks.Bug)
 			},
 			prometheus: noProm,
 		},
