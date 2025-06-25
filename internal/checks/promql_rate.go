@@ -42,8 +42,8 @@ func NewRateCheck(prom *promapi.FailoverGroup) RateCheck {
 
 type RateCheck struct {
 	prom         *promapi.FailoverGroup
-	minIntervals int
 	instance     string
+	minIntervals int
 }
 
 func (c RateCheck) Meta() CheckMeta {

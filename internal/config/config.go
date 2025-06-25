@@ -21,8 +21,8 @@ import (
 )
 
 type staticRule struct {
-	name    string
 	checker checks.RuleChecker
+	name    string
 }
 
 type Config struct {

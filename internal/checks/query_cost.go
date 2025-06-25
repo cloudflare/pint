@@ -49,12 +49,12 @@ func NewCostCheck(prom *promapi.FailoverGroup, maxSeries, maxTotalSamples, maxPe
 type CostCheck struct {
 	prom                  *promapi.FailoverGroup
 	comment               string
+	instance              string
 	maxSeries             int
 	maxTotalSamples       int
 	maxPeakSamples        int
 	maxEvaluationDuration time.Duration
 	severity              Severity
-	instance              string
 }
 
 func (c CostCheck) Meta() CheckMeta {

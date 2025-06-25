@@ -35,12 +35,12 @@ func NewAlertsCheck(prom *promapi.FailoverGroup, lookBack, step, resolve time.Du
 type AlertsCheck struct {
 	prom     *promapi.FailoverGroup
 	comment  string
+	instance string
 	lookBack time.Duration
 	step     time.Duration
 	resolve  time.Duration
 	minCount int
 	severity Severity
-	instance string
 }
 
 func (c AlertsCheck) Meta() CheckMeta {

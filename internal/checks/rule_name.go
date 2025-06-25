@@ -24,8 +24,8 @@ func NewRuleNameCheck(re *TemplatedRegexp, comment string, severity Severity) Ru
 type RuleNameCheck struct {
 	re       *TemplatedRegexp
 	comment  string
-	severity Severity
 	instance string
+	severity Severity
 }
 
 func (c RuleNameCheck) Meta() CheckMeta {

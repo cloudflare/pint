@@ -40,9 +40,9 @@ func NewRangeQueryCheck(prom *promapi.FailoverGroup, limit time.Duration, commen
 type RangeQueryCheck struct {
 	prom     *promapi.FailoverGroup
 	comment  string
+	instance string
 	limit    time.Duration
 	severity Severity
-	instance string
 }
 
 func (c RangeQueryCheck) Meta() CheckMeta {

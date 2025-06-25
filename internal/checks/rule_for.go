@@ -37,10 +37,10 @@ func NewRuleForCheck(key RuleForKey, minFor, maxFor time.Duration, comment strin
 type RuleForCheck struct {
 	key      RuleForKey
 	comment  string
-	severity Severity
+	instance string
 	minFor   time.Duration
 	maxFor   time.Duration
-	instance string
+	severity Severity
 }
 
 func (c RuleForCheck) Meta() CheckMeta {

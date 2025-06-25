@@ -38,10 +38,10 @@ func NewRejectCheck(l, a bool, k, v *TemplatedRegexp, s Severity) Reject {
 type Reject struct {
 	keyRe            *TemplatedRegexp
 	valueRe          *TemplatedRegexp
+	instance         string
 	severity         Severity
 	checkLabels      bool
 	checkAnnotations bool
-	instance         string
 }
 
 func (c Reject) Meta() CheckMeta {

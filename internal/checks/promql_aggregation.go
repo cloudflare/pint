@@ -30,9 +30,9 @@ type AggregationCheck struct {
 	nameRegex *TemplatedRegexp
 	label     string
 	comment   string
+	instance  string
 	severity  Severity
 	keep      bool
-	instance  string
 }
 
 func (c AggregationCheck) Meta() CheckMeta {

@@ -37,10 +37,10 @@ type RuleLinkCheck struct {
 	headers    map[string]string
 	uriRewrite string
 	comment    string
+	instance   string
 	scheme     []string
 	timeout    time.Duration
 	severity   Severity
-	instance   string
 }
 
 func (c RuleLinkCheck) Meta() CheckMeta {

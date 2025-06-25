@@ -9,14 +9,7 @@ import (
 	"github.com/cloudflare/pint/internal/parser"
 )
 
-var (
-	aliases = `{{ $alert := .Alert }}
-{{ $record := .Record }}
-{{ $for := .For }}
-{{ $labels := .Labels }}
-{{ $annotations := .Annotations }}
-`
-)
+var aliases = "{{ $alert := .Alert }}{{ $record := .Record }}{{ $for := .For }}{{ $labels := .Labels }}{{ $annotations := .Annotations }}"
 
 func NewTemplatedRegexp(s string) (unique.Handle[TemplatedRegexp], error) {
 	tr := TemplatedRegexp{anchored: "^" + s + "$", original: s}

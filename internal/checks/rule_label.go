@@ -40,10 +40,10 @@ type LabelCheck struct {
 	tokenRe    *TemplatedRegexp
 	valueRe    *TemplatedRegexp
 	comment    string
+	instance   string
 	values     []string
 	severity   Severity
 	isRequired bool
-	instance   string
 }
 
 func (c LabelCheck) Meta() CheckMeta {
