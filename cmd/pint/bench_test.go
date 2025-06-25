@@ -185,3 +185,109 @@ func BenchmarkRuleIsIdentical(b *testing.B) {
 		}
 	}
 }
+
+func BenchmarkGetChecksForEntry(b *testing.B) {
+	log.Setup(slog.LevelError, true)
+
+	finder := discovery.NewGlobFinder(
+		[]string{"bench/rules"},
+		git.NewPathFilter(nil, nil, nil),
+		parser.PrometheusSchema,
+		model.UTF8Validation,
+		nil,
+	)
+	entries, err := finder.Find()
+	if err != nil {
+		b.Errorf("Find() error: %s", err)
+		b.FailNow()
+	}
+
+	tmp := b.TempDir()
+	content := []byte(`
+prometheus "prom" {
+  uri         = "http://localhost:9090"
+  timeout     = "30s"
+  uptime      = "prometheus_ready"
+  concurrency = 10
+  rateLimit   = 5000
+}
+
+rule {
+  alerts {
+    range    = "1h"
+    step     = "1m"
+    resolve  = "5m"
+    minCount = 50
+  }
+}
+rule {
+  reject "https?://.+" {
+    label_keys   = true
+    label_values = true
+  }
+}
+
+rule {
+  match {
+    kind = "alerting"
+  }
+  annotation "summary" {
+    severity = "bug"
+    required = true
+  }
+  annotation "dashboard" {
+    severity = "warning"
+	value    = "https://(.+)"
+  }
+
+  label "priority" {
+    severity = "bug"
+    value    = "(1|2|3|4)"
+    required = true
+  }
+
+  label "component" {
+    severity = "bug"
+    required = true
+  }
+
+  annotation "link" {
+    severity = "warning"
+    value    = "https://(.+)"
+  }
+}
+
+rule {
+  match {
+    kind = "recording"
+  }
+  aggregate ".+" {
+    severity = "bug"
+    keep     = ["job"]
+  }
+}
+
+rule {
+  cost {
+    maxSeries             = 2000
+    maxPeakSamples        = 200000
+    maxEvaluationDuration = "30s"
+    severity              = "warning"
+  }
+}
+`)
+	require.NoError(b, os.WriteFile(tmp+"/.pint.hcl", content, 0o644))
+
+	cfg, _, err := config.Load(tmp+"/.pint.hcl", false)
+	require.NoError(b, err)
+
+	gen := config.NewPrometheusGenerator(cfg, prometheus.NewRegistry())
+	require.NoError(b, gen.GenerateStatic())
+
+	b.ResetTimer()
+	for b.Loop() {
+		for _, entry := range entries {
+			cfg.GetChecksForEntry(b.Context(), gen, entry)
+		}
+	}
+}
