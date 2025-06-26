@@ -22,6 +22,7 @@ $(PINT_BIN): $(PINT_SRC) go.mod go.sum
 .PHONY: lint
 lint:
 	go tool -modfile=tools/golangci-lint/go.mod golangci-lint run
+	go tool -modfile=tools/deadcode/go.mod deadcode -test -generated ./...
 
 .PHONY: format
 format:
