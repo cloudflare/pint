@@ -4,35 +4,38 @@ import (
 	"bytes"
 	"regexp"
 	"text/template"
-	"unique"
 
 	"github.com/cloudflare/pint/internal/parser"
 )
 
 var aliases = "{{ $alert := .Alert }}{{ $record := .Record }}{{ $for := .For }}{{ $labels := .Labels }}{{ $annotations := .Annotations }}"
 
-func NewTemplatedRegexp(s string) (unique.Handle[TemplatedRegexp], error) {
+func NewTemplatedRegexp(s string) (*TemplatedRegexp, error) {
 	tr := TemplatedRegexp{anchored: "^" + s + "$", original: s}
 	_, err := tr.Expand(parser.Rule{})
-	return unique.Make(tr), err
+	if err != nil {
+		return nil, err
+	}
+	return &tr, err
 }
 
-func NewRawTemplatedRegexp(s string) (unique.Handle[TemplatedRegexp], error) {
+func NewRawTemplatedRegexp(s string) (*TemplatedRegexp, error) {
 	tr := TemplatedRegexp{anchored: s, original: s}
 	_, err := tr.Expand(parser.Rule{})
-	return unique.Make(tr), err
+	if err != nil {
+		return nil, err
+	}
+	return &tr, err
 }
 
 func MustTemplatedRegexp(re string) *TemplatedRegexp {
 	tr, _ := NewTemplatedRegexp(re)
-	v := tr.Value()
-	return &v
+	return tr
 }
 
 func MustRawTemplatedRegexp(re string) *TemplatedRegexp {
 	tr, _ := NewRawTemplatedRegexp(re)
-	v := tr.Value()
-	return &v
+	return tr
 }
 
 type TemplatedRegexp struct {

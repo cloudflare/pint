@@ -95,7 +95,7 @@ func TestTemplatedRegexpExpand(t *testing.T) {
 				return
 			}
 
-			re, err := tr.Value().Expand(tc.rule)
+			re, err := tr.Expand(tc.rule)
 			if err != nil {
 				require.EqualError(t, err, tc.err)
 				return
