@@ -127,10 +127,10 @@ parser {
 
 **NOTE**: remember that all options that accept regexp patterns (shown as `"(.*)"` in syntax docs) are **anchored**.
 If you do set any patterns in the `parser` section then they must match the way you run pint.
-For example if you have a git repository with a `rules` directory containing Prometheus rules then
-you might set `include = ["rules/.*"]` in the config. Which internally will be parsed as `$rules/.*$` regexp pattern.
+For example, if you have a git repository with a `rules` directory containing Prometheus rules then
+you might set `include = ["rules/.*"]` in the config. Internally, it will be parsed as the regexp `^rules/.*$`.
 This means that if you then pass absolute paths to pint commands (`pint lint /my/repo/rules`) it won't match that regexp.
-If you do want to use pint with both relative and absolute paths make sure your regexp patterns allow for it, example:
+If you do want to use pint with both relative and absolute paths, make sure your regexp patterns allow for it, example:
 
 ```js
 parser {
