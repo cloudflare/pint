@@ -32,6 +32,13 @@ The number of samples depends on how often your application is being scraped by 
 Each scrape produces a sample, so if your application is scrape every minute then the minimal time window you can use is two minutes.`
 )
 
+var allowedRateTypes = []v1.MetricType{
+	v1.MetricTypeCounter,
+	v1.MetricTypeHistogram,
+	v1.MetricTypeSummary,
+	v1.MetricTypeUnknown,
+}
+
 func NewRateCheck(prom *promapi.FailoverGroup) RateCheck {
 	return RateCheck{
 		prom:         prom,
@@ -132,7 +139,7 @@ func (c RateCheck) checkNode(ctx context.Context, rule parser.Rule, expr parser.
 					continue
 				}
 				for _, m := range metadata.Metadata {
-					if m.Type != v1.MetricTypeCounter && m.Type != v1.MetricTypeUnknown {
+					if !slices.Contains(allowedRateTypes, m.Type) {
 						problems = append(problems, Problem{
 							Anchor:   AnchorAfter,
 							Lines:    expr.Value.Pos.Lines(),

@@ -742,6 +742,42 @@ func TestRateCheck(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "rate(histogram)",
+			content:     "- record: foo\n  expr: rate(foo[2m])\n",
+			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
+				},
+				{
+					conds: []requestCondition{requireMetadataPath},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{
+						"foo": {{Type: "histogram"}},
+					}},
+				},
+			},
+		},
+		{
+			description: "rate(summary)",
+			content:     "- record: foo\n  expr: rate(foo[2m])\n",
+			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
+				},
+				{
+					conds: []requestCondition{requireMetadataPath},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{
+						"foo": {{Type: "summary"}},
+					}},
+				},
+			},
+		},
 	}
 	runTests(t, testCases)
 }

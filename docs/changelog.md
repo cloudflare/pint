@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.74.4
+
+### Fixed
+
+- Fixed false positive reports from [promql/rate](checks/promql/rate.md) check when native histograms or summaries are used.
+
 ## v0.74.3
 
 ### Fixed
