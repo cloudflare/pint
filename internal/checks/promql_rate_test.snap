@@ -529,6 +529,16 @@
 
 ---
 
+[TestRateCheck/rate(histogram) - 1]
+[]
+
+---
+
+[TestRateCheck/rate(summary) - 1]
+[]
+
+---
+
 [TestRateCheck/rate(unknown) - 1]
 []
 
