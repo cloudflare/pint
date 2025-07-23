@@ -54,6 +54,10 @@ linters:
       - linters:
           - exhaustruct
         path: ^.*_test\.go$
+      - linters:
+          - revive
+        path: ^internal/parser/utils/
+        text: "var-naming: avoid meaningless package names"
 issues:
   max-same-issues: 0
 formatters:
