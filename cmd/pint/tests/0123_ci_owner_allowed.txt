@@ -148,6 +148,6 @@ annotations:
     severity: MEDIUM
     type: BUG
     link: https://cloudflare.github.io/pint/checks/rule/owner.html
-    line: 8
+    line: 7
 --- END ---
 

@@ -867,7 +867,7 @@ groups:
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{8, 9},
+					ModifiedLines: []int{8},
 					Rule:          mustParse(7, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
 				},
 			},
@@ -1080,7 +1080,7 @@ groups:
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{3, 11, 12, 13, 14, 15, 16},
+					ModifiedLines: []int{3, 11, 12, 15, 16},
 					PathError: parser.ParseError{
 						Line: 11,
 						Err:  errors.New("could not find expected ':'"),

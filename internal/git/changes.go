@@ -204,7 +204,7 @@ func Changes(cmd CommandRunner, baseBranch string, filter PathFilter) ([]*FileCh
 			slog.Debug("File was turned into a symlink", slog.String("path", change.Path.After.Name))
 			change.Body.ModifiedLines = CountLines(change.Body.After)
 		case change.Path.Before.Type != Missing && change.Path.After.Type != Missing && change.Path.After.Type != Symlink:
-			change.Body.ModifiedLines, err = getModifiedLines(cmd, change.Commits, change.Path.After.EffectivePath(), lastCommit)
+			change.Body.ModifiedLines, err = getModifiedLines(cmd, change.Commits, change.Path.After.EffectivePath(), lastCommit, change.Body.Before, change.Body.After)
 			if err != nil {
 				return nil, fmt.Errorf("failed to run git blame for %s: %w", change.Path.After.EffectivePath(), err)
 			}
@@ -261,7 +261,7 @@ func getChangeByPath(changes []*FileChange, fpath string) *FileChange {
 	return nil
 }
 
-func getModifiedLines(cmd CommandRunner, commits []string, fpath, atCommit string) ([]int, error) {
+func getModifiedLines(cmd CommandRunner, commits []string, fpath, atCommit string, bodyBefore, bodyAfter []byte) ([]int, error) {
 	slog.Debug("Getting list of modified lines",
 		slog.Any("commits", commits),
 		slog.String("path", fpath),
@@ -271,11 +271,21 @@ func getModifiedLines(cmd CommandRunner, commits []string, fpath, atCommit strin
 		return nil, err
 	}
 
+	linesBefore := bytes.Split(bodyBefore, []byte("\n"))
+	linesAfter := bytes.Split(bodyAfter, []byte("\n"))
+
 	modLines := make([]int, 0, len(lines))
 	for _, line := range lines {
 		if !slices.Contains(commits, line.Commit) && line.Line == line.PrevLine {
 			continue
 		}
+
+		if line.PrevLine <= len(linesBefore) && line.Line <= len(linesAfter) {
+			if bytes.Equal(linesBefore[line.PrevLine-1], linesAfter[line.Line-1]) {
+				continue
+			}
+		}
+
 		modLines = append(modLines, line.Line)
 	}
 	slog.Debug("List of modified lines",
