@@ -442,6 +442,52 @@
 
 ---
 
+[TestCostCheck/suggest_recording_rule_/_complex - 1]
+- description: suggest recording rule / complex
+  content: |
+    - record: instance_job:fl2_hmd_request_phase_latency_30ms_good:rate5m
+      expr: sum without (le) (histogram_fraction(0, 0.03, rate(fl2_request_phase_duration_seconds[5m])) * histogram_count(rate(fl2_request_phase_duration_seconds[5m])))
+  output: |
+    2 |   expr: sum without (le) (histogram_fraction(0, 0.03, rate(fl2_request_phase_duration_seconds[5m])) * histogram_count(rate(fl2_request_phase_duration_seconds[5m])))
+                                                                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Use `instance_job:fl2_hmd_request_phase_latency_count:rate5m` here instead to speed up the query.
+  problem:
+    reporter: query/cost
+    summary: query could use a recording rule
+    details: |
+        There is a recording rule that already stores the result of this query, use it here to speed up this query.
+
+        ```yaml
+        - record: instance_job:fl2_hmd_request_phase_latency_count:rate5m
+          expr: histogram_count(rate(fl2_request_phase_duration_seconds[5m]))
+        ```
+
+        Using `instance_job:fl2_hmd_request_phase_latency_count:rate5m` rule would speed up this query:
+
+        - Total queried samples would be 30 instead of 50 (-40.00%)
+        - Peak queried samples would be 30 instead of 50 (-40.00%)
+        - Query evaluation time would be 11s instead of 10s (+10.00%)
+
+        To get results for both original and suggested query click below:
+
+        - [Original query](https://simple.example.com/graph?g0.expr=sum+without+%28le%29+%28histogram_fraction%280%2C+0.03%2C+rate%28fl2_request_phase_duration_seconds%5B5m%5D%29%29+%2A+histogram_count%28rate%28fl2_request_phase_duration_seconds%5B5m%5D%29%29%29&g0.tab=table)
+        - [Suggested query](https://simple.example.com/graph?g0.expr=sum+without+%28le%29+%28histogram_fraction%280%2C+0.03%2C+rate%28fl2_request_phase_duration_seconds%5B5m%5D%29%29+%2A+instance_job%3Afl2_hmd_request_phase_latency_count%3Arate5m%29&g0.tab=table)
+    diagnostics:
+        - message: Use `instance_job:fl2_hmd_request_phase_latency_count:rate5m` here instead to speed up the query.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 164
+          firstcolumn: 95
+          lastcolumn: 155
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 0
+    anchor: 0
+
+---
+
 [TestCostCheck/suggest_recording_rule_/_ignore_multi-source - 1]
 []
 
