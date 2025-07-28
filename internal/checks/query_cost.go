@@ -3,6 +3,7 @@ package checks
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"math"
 	"net/url"
 	"strings"
@@ -85,6 +86,7 @@ func (c CostCheck) Check(ctx context.Context, entry discovery.Entry, entries []d
 		return problems
 	}
 
+	slog.Debug("Calculating cost of the raw query", slog.String("expr", expr.Value.Value))
 	qr, series, err := c.getQueryCost(ctx, expr.Value.Value)
 	if err != nil {
 		problems = append(problems, problemFromError(err, entry.Rule, c.Reporter(), c.prom.Name(), Bug))
@@ -266,6 +268,7 @@ func (c CostCheck) suggestRecordingRules(
 
 					sq := c.rewriteRuleFragment(expr.Value.Value, op.PositionRange(), other.Rule.RecordingRule.Record.Value+extra)
 					var details strings.Builder
+					slog.Debug("Calculating cost of the new query", slog.String("expr", sq))
 					qr, afterSeries, err := c.getQueryCost(ctx, sq)
 					if err == nil {
 						if qr.Stats.Samples.TotalQueryableSamples >= beforeStats.Samples.TotalQueryableSamples &&
@@ -343,7 +346,7 @@ func (c CostCheck) rewriteRuleFragment(expr string, fragment posrange.PositionRa
 		buf.WriteString(expr[:int(fragment.Start)])
 	}
 	buf.WriteString(replacement)
-	if int(fragment.End)+1 < len(expr) {
+	if int(fragment.End) < len(expr) {
 		buf.WriteString(expr[int(fragment.End):])
 	}
 	return buf.String()
@@ -354,7 +357,7 @@ func (c CostCheck) diffStatsInt(a, b int) string {
 	if delta == 0 || math.IsNaN(delta) {
 		return fmt.Sprintf("%d (no change)", a)
 	}
-	return fmt.Sprintf("%d instead of %d (%0.2f%%)", b, a, delta)
+	return fmt.Sprintf("%d instead of %d (%s%%)", b, a, formatDelta(delta))
 }
 
 func (c CostCheck) diffStatsDuration(a, b float64) string {
@@ -362,10 +365,17 @@ func (c CostCheck) diffStatsDuration(a, b float64) string {
 	if delta == 0 || math.IsNaN(delta) {
 		return output.HumanizeDuration(c.statToDuration(a)) + " (no change)"
 	}
-	return fmt.Sprintf("%s instead of %s (%0.2f%%)",
+	return fmt.Sprintf("%s instead of %s (%s%%)",
 		output.HumanizeDuration(c.statToDuration(b)),
 		output.HumanizeDuration(c.statToDuration(a)),
-		delta)
+		formatDelta(delta))
+}
+
+func formatDelta(delta float64) string {
+	if delta <= 0 {
+		return fmt.Sprintf("%0.2f", delta)
+	}
+	return fmt.Sprintf("+%0.2f", delta)
 }
 
 func (c CostCheck) isSuggestionFor(src, potential utils.Source, join *utils.Join, unless *utils.Unless) (promParser.Node, string, bool, bool) {
