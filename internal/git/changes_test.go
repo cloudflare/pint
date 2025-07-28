@@ -188,7 +188,7 @@ func TestChanges(t *testing.T) {
 					Body: git.BodyDiff{
 						Before:        []byte("foo"),
 						After:         []byte("foo"),
-						ModifiedLines: []int{1},
+						ModifiedLines: []int{},
 					},
 				},
 			},
@@ -583,7 +583,7 @@ func TestChanges(t *testing.T) {
 					Body: git.BodyDiff{
 						Before:        []byte("l1\nl2\nl3\n"),
 						After:         []byte("l1\nl3\n"),
-						ModifiedLines: []int{2},
+						ModifiedLines: []int{1, 2},
 					},
 				},
 			},

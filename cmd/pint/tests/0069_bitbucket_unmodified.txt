@@ -147,22 +147,22 @@ annotations:
     link: https://cloudflare.github.io/pint/checks/alerts/for.html
     line: 3
   - path: rules.yml
-    message: "alerts/comparison: always firing alert"
+    message: "Problem reported on unmodified line 5, annotation moved here: alerts/comparison: always firing alert"
     severity: LOW
     type: CODE_SMELL
     link: https://cloudflare.github.io/pint/checks/alerts/comparison.html
-    line: 5
+    line: 4
   - path: rules.yml
-    message: "promql/regexp: redundant regexp"
+    message: "Problem reported on unmodified line 5, annotation moved here: promql/regexp: redundant regexp"
     severity: LOW
     type: CODE_SMELL
     link: https://cloudflare.github.io/pint/checks/promql/regexp.html
-    line: 5
+    line: 4
   - path: rules.yml
-    message: "alerts/for: redundant field with default value"
+    message: "Problem reported on unmodified line 6, annotation moved here: alerts/for: redundant field with default value"
     severity: LOW
     type: CODE_SMELL
     link: https://cloudflare.github.io/pint/checks/alerts/for.html
-    line: 6
+    line: 4
 --- END ---
 
