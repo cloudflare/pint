@@ -446,14 +446,10 @@ func reportToGitLabDiscussion(pending PendingComment, diffs []*gitlab.MergeReque
 		},
 	}
 
-	var renamed bool
 	for _, diff := range pathDiffs {
 		d.Position.OldPath = gitlab.Ptr(diff.OldPath)
 		if d.Position.NewPath == nil {
 			d.Position.NewPath = gitlab.Ptr(diff.NewPath)
-		}
-		if diff.OldPath != diff.NewPath {
-			renamed = true
 		}
 
 		// Diff is empty, decide if it was modified based on git history.
@@ -491,9 +487,6 @@ func reportToGitLabDiscussion(pending PendingComment, diffs []*gitlab.MergeReque
 			// Comment on new or modified line.
 			d.Position.NewLine = gitlab.Ptr(dl.new)
 		}
-	}
-	if renamed {
-		d.Position.OldLine = nil
 	}
 
 	return &d
