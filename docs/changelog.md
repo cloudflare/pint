@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.74.6
+
+### Fixed
+
+- Fixed a bug in GitLab integration causing some problems fail to create comments when files were renamed and modified.
+
 ## v0.74.5
 
 ### Fixed
