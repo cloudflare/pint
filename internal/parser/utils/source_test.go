@@ -1,6 +1,7 @@
 package utils_test
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -20,7 +21,10 @@ import (
 
 func TestMain(t *testing.M) {
 	v := t.Run()
-	snaps.Clean(t, snaps.CleanOpts{Sort: true})
+	if _, err := snaps.Clean(t, snaps.CleanOpts{Sort: true}); err != nil {
+		fmt.Printf("snaps.Clean() returned an error: %s", err)
+		os.Exit(100)
+	}
 	os.Exit(v)
 }
 
