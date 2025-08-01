@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.74.7
+
+### Fixed
+
+- Fixed a bug in GitLab integration causing problems fail to create comments when they are reported on deleted lines.
+
 ## v0.74.6
 
 ### Fixed

@@ -461,6 +461,7 @@ func reportToGitLabDiscussion(pending PendingComment, diffs []*gitlab.MergeReque
 			switch {
 			case pending.anchor == checks.AnchorBefore:
 				d.Position.OldLine = gitlab.Ptr(pending.line)
+				d.Position.NewLine = nil
 			case pending.modifiedLine:
 				d.Position.NewLine = gitlab.Ptr(pending.line)
 			case !pending.modifiedLine:
@@ -478,7 +479,8 @@ func reportToGitLabDiscussion(pending PendingComment, diffs []*gitlab.MergeReque
 			d.Position.OldLine = gitlab.Ptr(pending.line)
 		case pending.anchor == checks.AnchorBefore:
 			// Comment on removed line.
-			d.Position.OldLine = gitlab.Ptr(dl.old)
+			d.Position.OldLine = gitlab.Ptr(pending.line)
+			d.Position.NewLine = nil
 		case ok && !dl.wasModified:
 			// Comment on unmodified line.
 			d.Position.NewLine = gitlab.Ptr(dl.new)
