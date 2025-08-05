@@ -5,6 +5,7 @@
 ### Fixed
 
 - Fixed a bug in GitLab integration causing problems fail to create comments when they are reported on deleted lines.
+- Fixed incorrect suggestions from [query/cost](checks/query/cost.md) for rules joining on multiple metrics.
 
 ## v0.74.6
 
