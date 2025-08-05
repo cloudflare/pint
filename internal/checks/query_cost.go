@@ -267,6 +267,10 @@ func (c CostCheck) suggestRecordingRules(
 					}
 
 					sq := c.rewriteRuleFragment(expr.Value.Value, op.PositionRange(), other.Rule.RecordingRule.Record.Value+extra)
+					slog.Debug("Found a possible replacement",
+						slog.String("original", utils.GetQueryFragment(expr.Value.Value, s.Position)),
+						slog.String("replacement", other.Rule.RecordingRule.Record.Value+extra),
+					)
 					var details strings.Builder
 					slog.Debug("Calculating cost of the new query", slog.String("expr", sq))
 					qr, afterSeries, err := c.getQueryCost(ctx, sq)
@@ -384,6 +388,10 @@ func (c CostCheck) isSuggestionFor(src, potential utils.Source, join *utils.Join
 	}
 
 	if potential.Returns != src.Returns {
+		return nil, "", false, false
+	}
+
+	if len(potential.Joins) > 0 || len(potential.Unless) > 0 {
 		return nil, "", false, false
 	}
 

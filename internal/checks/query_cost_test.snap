@@ -442,6 +442,11 @@
 
 ---
 
+[TestCostCheck/suggest_recording_rule_/_bad_join - 1]
+[]
+
+---
+
 [TestCostCheck/suggest_recording_rule_/_complex - 1]
 - description: suggest recording rule / complex
   content: |
@@ -485,6 +490,16 @@
         last: 2
     severity: 0
     anchor: 0
+
+---
+
+[TestCostCheck/suggest_recording_rule_/_correct_join - 1]
+[]
+
+---
+
+[TestCostCheck/suggest_recording_rule_/_ignore_joins - 1]
+[]
 
 ---
 

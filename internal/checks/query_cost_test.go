@@ -1376,6 +1376,150 @@ func TestCostCheck(t *testing.T) {
 			},
 		},
 		{
+			description: "suggest recording rule / ignore joins",
+			content: `- record: sum:foo:rate5m
+  expr: sum(rate(foo_total[5m])) / rate(bar_total[5m])
+`,
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 100, 100, 0, 0, "check comment", checks.Warning)
+			},
+			prometheus: newSimpleProm,
+			entries: mustParseContent(`
+
+- record: bar:rate5m:ratio
+  expr: rate(bar_total[5m]) / bad
+`),
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(sum(rate(foo_total[5m])) / rate(bar_total[5m]))"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 50,
+								PeakSamples:           50,
+							},
+							Timings: promapi.QueryTimings{
+								EvalTotalTime: 10,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: checks.BytesPerSampleQuery},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSampleWithValue(map[string]string{}, 2048),
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "suggest recording rule / bad join",
+			content: `- record: sum:foo:rate5m
+  expr: sum(rate(foo_total[5m])) / (rate(bar_total[5m]) / on(foo) bad)
+`,
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 100, 100, 0, 0, "check comment", checks.Warning)
+			},
+			prometheus: newSimpleProm,
+			entries: mustParseContent(`
+
+- record: bar:rate5m:ratio
+  expr: rate(bar_total[5m]) / on(bob) bad
+`),
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(sum(rate(foo_total[5m])) / (rate(bar_total[5m]) / on(foo) bad))"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 50,
+								PeakSamples:           50,
+							},
+							Timings: promapi.QueryTimings{
+								EvalTotalTime: 10,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: checks.BytesPerSampleQuery},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSampleWithValue(map[string]string{}, 2048),
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "suggest recording rule / correct join",
+			content: `- record: sum:foo:rate5m
+  expr: sum(rate(foo_total[5m])) / (rate(bar_total[5m]) / on(foo) bad)
+`,
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 100, 100, 0, 0, "check comment", checks.Warning)
+			},
+			prometheus: newSimpleProm,
+			entries: mustParseContent(`
+
+- record: bar:rate5m:ratio
+  expr: rate(bar_total[5m]) / on(foo) bad
+`),
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(sum(rate(foo_total[5m])) / (rate(bar_total[5m]) / on(foo) bad))"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 50,
+								PeakSamples:           50,
+							},
+							Timings: promapi.QueryTimings{
+								EvalTotalTime: 10,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: checks.BytesPerSampleQuery},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSampleWithValue(map[string]string{}, 2048),
+						},
+					},
+				},
+			},
+		},
+		{
 			description: "suggest recording rule / complex",
 			content: `- record: instance_job:fl2_hmd_request_phase_latency_30ms_good:rate5m
   expr: sum without (le) (histogram_fraction(0, 0.03, rate(fl2_request_phase_duration_seconds[5m])) * histogram_count(rate(fl2_request_phase_duration_seconds[5m])))
