@@ -25,15 +25,13 @@ func TestSyntaxCheck(t *testing.T) {
 			checker:     newSyntaxCheck,
 			prometheus:  noProm,
 		},
-		/* FIXME this test rendomly fails because promql error has empty position.
 		{
 			description: "no arguments for aggregate expression provided",
 			content:     "- record: foo\n  expr: sum(\n",
 			checker:     newSyntaxCheck,
 			prometheus:  noProm,
-			problems: true,
+			problems:    true,
 		},
-		*/
 		{
 			description: "unclosed left parenthesis",
 			content:     "- record: foo\n  expr: sum(foo) by(",
