@@ -1,4 +1,33 @@
 
+[TestSyntaxCheck/no_arguments_for_aggregate_expression_provided - 1]
+- description: no arguments for aggregate expression provided
+  content: |
+    - record: foo
+      expr: sum(
+  output: |
+    2 |   expr: sum(
+                   ^ unclosed left parenthesis
+  problem:
+    reporter: promql/syntax
+    summary: PromQL syntax error
+    details: '[Click here](https://prometheus.io/docs/prometheus/latest/querying/basics/) for PromQL documentation.'
+    diagnostics:
+        - message: unclosed left parenthesis
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 12
+          firstcolumn: 5
+          lastcolumn: 4
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 3
+    anchor: 0
+
+---
+
 [TestSyntaxCheck/unclosed_left_parenthesis - 1]
 - description: unclosed left parenthesis
   content: |-
