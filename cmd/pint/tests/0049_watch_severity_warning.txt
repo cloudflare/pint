@@ -34,5 +34,5 @@ rule {
 -- metrics.txt --
 pint_problem{filename="rules/1.yml",kind="alerting",name="comparison",owner="",problem="always firing alert: This query doesn't have any condition and so this alert will always fire if it matches anything.",reporter="alerts/comparison",severity="warning"} 1
 pint_problem{filename="rules/1.yml",kind="recording",name="aggregate",owner="",problem="required label is being removed via aggregation: `job` label is required and should be preserved when aggregating all rules.",reporter="promql/aggregate",severity="warning"} 1
-pint_problem{filename="rules/1.yml",kind="recording",name="broken",owner="",problem="PromQL syntax error: no arguments for aggregate expression provided",reporter="promql/syntax",severity="fatal"} 1
+pint_problem{filename="rules/1.yml",kind="recording",name="broken",owner="",problem="PromQL syntax error: unexpected right parenthesis ')'",reporter="promql/syntax",severity="fatal"} 1
 pint_problems 3

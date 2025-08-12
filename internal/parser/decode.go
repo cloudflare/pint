@@ -2,6 +2,8 @@ package parser
 
 import (
 	"encoding/json"
+	"errors"
+	"slices"
 
 	promParser "github.com/prometheus/prometheus/promql/parser"
 )
@@ -95,6 +97,27 @@ func WalkUpParent[T promParser.Node](node *PromQLNode) (nodes []*PromQLNode) {
 func DecodeExpr(expr string) (*PromQLNode, error) {
 	node, err := promParser.ParseExpr(expr)
 	if err != nil {
+		var errorList promParser.ParseErrors
+		if errors.As(err, &errorList) {
+			// Find the error pointing at the shortest query fragment.
+			slices.SortFunc(errorList, func(a, b promParser.ParseErr) int {
+				ar := a.PositionRange.End - a.PositionRange.Start
+				br := b.PositionRange.End - b.PositionRange.Start
+				switch {
+				case ar < br:
+					return -1
+				case ar > br:
+					return 1
+				default:
+					return 0
+				}
+			})
+			for _, el := range errorList {
+				if el.PositionRange.Start > 0 && el.PositionRange.End > 0 {
+					return nil, promParser.ParseErrors{el}
+				}
+			}
+		}
 		return nil, err
 	}
 	return tree(node, nil), nil

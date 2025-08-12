@@ -181,11 +181,11 @@ pint_last_run_duration_seconds
 pint_last_run_time_seconds
 # HELP pint_problem Prometheus rule problem reported by pint
 # TYPE pint_problem gauge
-pint_problem{filename="rules/alice.yml",kind="alerting",name="broken",owner="alice",problem="PromQL syntax error: no arguments for aggregate expression provided",reporter="promql/syntax",severity="fatal"}
+pint_problem{filename="rules/alice.yml",kind="alerting",name="broken",owner="alice",problem="PromQL syntax error: unexpected right parenthesis ')'",reporter="promql/syntax",severity="fatal"}
 pint_problem{filename="rules/badyaml.yml",kind="invalid",name="unknown",owner="",problem="top level field must be a groups key, got list",reporter="yaml/parse",severity="fatal"}
-pint_problem{filename="rules/bob.yml",kind="alerting",name="broken1",owner="bob",problem="PromQL syntax error: no arguments for aggregate expression provided",reporter="promql/syntax",severity="fatal"}
-pint_problem{filename="rules/bob.yml",kind="alerting",name="broken2",owner="bob",problem="PromQL syntax error: no arguments for aggregate expression provided",reporter="promql/syntax",severity="fatal"}
-pint_problem{filename="rules/unknown.yml",kind="recording",name="broken",owner="",problem="PromQL syntax error: no arguments for aggregate expression provided",reporter="promql/syntax",severity="fatal"}
+pint_problem{filename="rules/bob.yml",kind="alerting",name="broken1",owner="bob",problem="PromQL syntax error: unexpected right parenthesis ')'",reporter="promql/syntax",severity="fatal"}
+pint_problem{filename="rules/bob.yml",kind="alerting",name="broken2",owner="bob",problem="PromQL syntax error: unexpected right parenthesis ')'",reporter="promql/syntax",severity="fatal"}
+pint_problem{filename="rules/unknown.yml",kind="recording",name="broken",owner="",problem="PromQL syntax error: unexpected right parenthesis ')'",reporter="promql/syntax",severity="fatal"}
 # HELP pint_problems Total number of problems reported by pint
 # TYPE pint_problems gauge
 pint_problems
