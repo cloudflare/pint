@@ -21,7 +21,7 @@ require (
 	github.com/stretchr/testify v1.10.0
 	github.com/urfave/cli/v3 v3.4.1
 	github.com/zclconf/go-cty v1.16.4
-	gitlab.com/gitlab-org/api/client-go v0.141.1
+	gitlab.com/gitlab-org/api/client-go v0.142.0
 	go.nhat.io/httpmock v0.11.0
 	go.uber.org/automaxprocs v1.6.0
 	go.uber.org/ratelimit v0.3.1
@@ -83,5 +83,5 @@ require (
 	golang.org/x/text v0.27.0 // indirect
 	golang.org/x/time v0.12.0 // indirect
 	golang.org/x/tools v0.34.0 // indirect
-	google.golang.org/protobuf v1.36.7 // indirect
+	google.golang.org/protobuf v1.36.8 // indirect
 )
