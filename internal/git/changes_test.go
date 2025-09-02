@@ -646,6 +646,46 @@ func TestChanges(t *testing.T) {
 			},
 			err: "",
 		},
+		{
+			title: "rule partially replaced",
+			setup: func(t *testing.T) git.CommandRunner {
+				mustRun(t, "init", "--initial-branch=main", ".")
+				require.NoError(t, os.WriteFile("main.txt", []byte("l1\nl2\nl3\n"), 0o644))
+				mustRun(t, "add", "main.txt")
+				gitCommit(t, "init")
+
+				mustRun(t, "checkout", "-b", "v2")
+				require.NoError(t, os.WriteFile("main.txt", []byte("l1\nl3\n"), 0o644))
+				mustRun(t, "add", "main.txt")
+				gitCommit(t, "edit")
+
+				mustRun(t, "mv", "main.txt", "pr.txt")
+				gitCommit(t, "rename")
+
+				return debugGitRun(t)
+			},
+			changes: []*git.FileChange{
+				{
+					Commits: []string{"1", "2"},
+					Path: git.PathDiff{
+						Before: git.Path{
+							Name: "main.txt",
+							Type: git.File,
+						},
+						After: git.Path{
+							Name: "pr.txt",
+							Type: git.File,
+						},
+					},
+					Body: git.BodyDiff{
+						Before:        []byte("l1\nl2\nl3\n"),
+						After:         []byte("l1\nl3\n"),
+						ModifiedLines: []int{1, 2},
+					},
+				},
+			},
+			err: "",
+		},
 	}
 
 	for _, tc := range testCases {
