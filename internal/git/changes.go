@@ -273,14 +273,17 @@ func getModifiedLines(cmd CommandRunner, commits []string, fpath, atCommit strin
 
 	linesBefore := bytes.Split(bodyBefore, []byte("\n"))
 	linesAfter := bytes.Split(bodyAfter, []byte("\n"))
+	slog.Debug("Number of lines", slog.Int("before", len(linesBefore)), slog.Int("after", len(linesAfter)))
 
 	modLines := make([]int, 0, len(lines))
 	for _, line := range lines {
-		if !slices.Contains(commits, line.Commit) && line.Line == line.PrevLine {
+		slog.Debug("Checking line", slog.String("commit", line.Commit), slog.Int("prev", line.PrevLine), slog.Int("line", line.Line))
+		if !slices.Contains(commits, line.Commit) {
 			continue
 		}
 
 		if line.PrevLine <= len(linesBefore) && line.Line <= len(linesAfter) {
+			slog.Debug("Checking line content", slog.String("before", string(linesBefore[line.PrevLine-1])), slog.String("after", string(linesAfter[line.Line-1])))
 			if bytes.Equal(linesBefore[line.PrevLine-1], linesAfter[line.Line-1]) {
 				continue
 			}

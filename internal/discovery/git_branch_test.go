@@ -1270,6 +1270,56 @@ groups:
 				},
 			},
 		},
+		{
+			title: "rule partially replaced",
+			setup: func(t *testing.T) {
+				commitFile(t, "rules.yml", `
+groups:
+- name: v1
+  rules:
+  - record: up:sum
+    expr: |
+      sum(
+        up
+      )
+`, "v1")
+
+				_, err := git.RunGit("checkout", "-b", "v2")
+				require.NoError(t, err, "git checkout v2")
+
+				commitFile(t, "rules.yml", `
+groups:
+- name: v1
+  rules:
+  - record: up:count
+    expr: |
+      count(
+        up
+      )
+`, "v2")
+			},
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4, parser.PrometheusSchema, model.UTF8Validation, nil),
+			entries: []discovery.Entry{
+				{
+					State: discovery.Added,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
+					ModifiedLines: []int{5, 7},
+					Rule:          mustParse(4, "  - record: up:count\n    expr: |\n      count(\n        up\n      )\n"),
+				},
+				{
+					State: discovery.Removed,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
+					ModifiedLines: []int{5, 7},
+					Rule:          mustParse(4, "  - record: up:sum\n    expr: |\n      sum(\n        up\n      )\n"),
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {
