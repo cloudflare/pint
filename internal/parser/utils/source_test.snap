@@ -404,7 +404,9 @@ output:
       deadinfo: null
       returns: vector
       operations:
-        - node: '[*parser.Call] vector(2)'
+        - args:
+            - "2"
+          node: '[*parser.Call] vector(2)'
           op: vector
       joins: []
       unless: []
@@ -450,7 +452,9 @@ output:
             deadinfo: null
             returns: vector
             operations:
-                - node: '[*parser.Call] vector(2)'
+                - args:
+                    - "2"
+                  node: '[*parser.Call] vector(2)'
                   op: vector
             joins: []
             unless: []
@@ -530,7 +534,9 @@ output:
       deadinfo: null
       returns: vector
       operations:
-        - node: '[*parser.Call] vector(5)'
+        - args:
+            - "5"
+          node: '[*parser.Call] vector(5)'
           op: vector
       joins:
         - "on": []
@@ -547,7 +553,9 @@ output:
             deadinfo: null
             returns: vector
             operations:
-                - node: '[*parser.Call] vector(2)'
+                - args:
+                    - "2"
+                  node: '[*parser.Call] vector(2)'
                   op: vector
             joins: []
             unless: []
@@ -2711,7 +2719,9 @@ output:
           op: ""
         - node: '[*parser.Call] rate(foo[5m])'
           op: rate
-        - node: '[*parser.AggregateExpr] quantile(0.9, rate(foo[5m]))'
+        - args:
+            - "0.9"
+          node: '[*parser.AggregateExpr] quantile(0.9, rate(foo[5m]))'
           op: quantile
       joins: []
       unless: []
@@ -2760,7 +2770,9 @@ output:
       operations:
         - node: '[*parser.VectorSelector] build_version'
           op: ""
-        - node: '[*parser.AggregateExpr] count_values("version", build_version)'
+        - args:
+            - '"version"'
+          node: '[*parser.AggregateExpr] count_values("version", build_version)'
           op: count_values
       joins: []
       unless: []
@@ -2809,7 +2821,9 @@ output:
       operations:
         - node: '[*parser.VectorSelector] build_version'
           op: ""
-        - node: '[*parser.AggregateExpr] count_values without (job) ("version", build_version)'
+        - args:
+            - '"version"'
+          node: '[*parser.AggregateExpr] count_values without (job) ("version", build_version)'
           op: count_values
       joins: []
       unless: []
@@ -2858,7 +2872,9 @@ output:
       operations:
         - node: '[*parser.VectorSelector] build_version{job="foo"}'
           op: ""
-        - node: '[*parser.AggregateExpr] count_values without (job) ("version", build_version{job="foo"})'
+        - args:
+            - '"version"'
+          node: '[*parser.AggregateExpr] count_values without (job) ("version", build_version{job="foo"})'
           op: count_values
       joins: []
       unless: []
@@ -2913,7 +2929,9 @@ output:
       operations:
         - node: '[*parser.VectorSelector] build_version'
           op: ""
-        - node: '[*parser.AggregateExpr] count_values by (job) ("version", build_version)'
+        - args:
+            - '"version"'
+          node: '[*parser.AggregateExpr] count_values by (job) ("version", build_version)'
           op: count_values
       joins: []
       unless: []
@@ -2950,7 +2968,9 @@ output:
       operations:
         - node: '[*parser.VectorSelector] foo{job="myjob"}'
           op: ""
-        - node: '[*parser.AggregateExpr] topk(10, foo{job="myjob"})'
+        - args:
+            - "10"
+          node: '[*parser.AggregateExpr] topk(10, foo{job="myjob"})'
           op: topk
       joins: []
       unless: []
@@ -2981,7 +3001,9 @@ output:
       operations:
         - node: '[*parser.VectorSelector] foo'
           op: ""
-        - node: '[*parser.AggregateExpr] topk(10, foo or bar)'
+        - args:
+            - "10"
+          node: '[*parser.AggregateExpr] topk(10, foo or bar)'
           op: topk
       joins: []
       unless: []
@@ -3006,7 +3028,9 @@ output:
       operations:
         - node: '[*parser.VectorSelector] bar'
           op: ""
-        - node: '[*parser.AggregateExpr] topk(10, foo or bar)'
+        - args:
+            - "10"
+          node: '[*parser.AggregateExpr] topk(10, foo or bar)'
           op: topk
       joins: []
       unless: []
@@ -3906,7 +3930,9 @@ output:
       operations:
         - node: '[*parser.VectorSelector] foo'
           op: ""
-        - node: '[*parser.AggregateExpr] topk(10, foo)'
+        - args:
+            - "10"
+          node: '[*parser.AggregateExpr] topk(10, foo)'
           op: topk
       joins: []
       unless: []
@@ -3937,7 +3963,9 @@ output:
       operations:
         - node: '[*parser.VectorSelector] foo'
           op: ""
-        - node: '[*parser.AggregateExpr] topk without (cluster) (10, foo)'
+        - args:
+            - "10"
+          node: '[*parser.AggregateExpr] topk without (cluster) (10, foo)'
           op: topk
       joins: []
       unless: []
@@ -3968,7 +3996,9 @@ output:
       operations:
         - node: '[*parser.VectorSelector] foo'
           op: ""
-        - node: '[*parser.AggregateExpr] topk by (cluster) (10, foo)'
+        - args:
+            - "10"
+          node: '[*parser.AggregateExpr] topk by (cluster) (10, foo)'
           op: topk
       joins: []
       unless: []
@@ -4015,7 +4045,9 @@ output:
           op: rate
         - node: '[*parser.AggregateExpr] sum without (job) (rate(foo[5m]))'
           op: sum
-        - node: '[*parser.AggregateExpr] bottomk(10, sum without (job) (rate(foo[5m])))'
+        - args:
+            - "10"
+          node: '[*parser.AggregateExpr] bottomk(10, sum without (job) (rate(foo[5m])))'
           op: bottomk
       joins: []
       unless: []
@@ -4592,7 +4624,13 @@ output:
       operations:
         - node: '[*parser.VectorSelector] up{job="api-server",src1="a",src2="b",src3="c"}'
           op: ""
-        - node: '[*parser.Call] label_join(up{job="api-server",src1="a",src2="b",src3="c"}, "foo", ",", "src1", "src2", "src3")'
+        - args:
+            - '"foo"'
+            - '","'
+            - '"src1"'
+            - '"src2"'
+            - '"src3"'
+          node: '[*parser.Call] label_join(up{job="api-server",src1="a",src2="b",src3="c"}, "foo", ",", "src1", "src2", "src3")'
           op: label_join
       joins: []
       unless: []
@@ -5693,7 +5731,9 @@ output:
       deadinfo: null
       returns: vector
       operations:
-        - node: '[*parser.Call] vector(1)'
+        - args:
+            - "1"
+          node: '[*parser.Call] vector(1)'
           op: vector
       joins: []
       unless: []
@@ -5728,7 +5768,9 @@ output:
       deadinfo: null
       returns: vector
       operations:
-        - node: '[*parser.Call] vector(scalar(foo))'
+        - args:
+            - scalar(foo)
+          node: '[*parser.Call] vector(scalar(foo))'
           op: vector
       joins: []
       unless: []
@@ -5767,7 +5809,9 @@ output:
             end: 24
       returns: vector
       operations:
-        - node: '[*parser.Call] vector(0 >= bool 0.5)'
+        - args:
+            - 0 >= bool 0.5
+          node: '[*parser.Call] vector(0 >= bool 0.5)'
           op: vector
       joins: []
       unless: []
@@ -5925,7 +5969,12 @@ output:
       operations:
         - node: '[*parser.VectorSelector] up{job="api-server",service="a:c"}'
           op: ""
-        - node: '[*parser.Call] label_replace(up{job="api-server",service="a:c"}, "foo", "$1", "service", "(.*):.*")'
+        - args:
+            - '"foo"'
+            - '"$1"'
+            - '"service"'
+            - '"(.*):.*"'
+          node: '[*parser.Call] label_replace(up{job="api-server",service="a:c"}, "foo", "$1", "service", "(.*):.*")'
           op: label_replace
       joins: []
       unless: []
@@ -5982,7 +6031,12 @@ output:
           op: ""
         - node: '[*parser.AggregateExpr] sum by (pod) (pod_status)'
           op: sum
-        - node: '[*parser.Call] label_replace(sum by (pod) (pod_status) > 0, "cluster", "$1", "pod", "(.*)")'
+        - args:
+            - '"cluster"'
+            - '"$1"'
+            - '"pod"'
+            - '"(.*)"'
+          node: '[*parser.Call] label_replace(sum by (pod) (pod_status) > 0, "cluster", "$1", "pod", "(.*)")'
           op: label_replace
       joins: []
       unless: []
@@ -6371,7 +6425,12 @@ output:
           op: ""
         - node: '[*parser.AggregateExpr] sum without (instance) (foo)'
           op: sum
-        - node: '[*parser.Call] label_replace(sum without (instance) (foo), "instance", "none", "", "")'
+        - args:
+            - '"instance"'
+            - '"none"'
+            - '""'
+            - '""'
+          node: '[*parser.Call] label_replace(sum without (instance) (foo), "instance", "none", "", "")'
           op: label_replace
       joins: []
       unless: []
@@ -6502,7 +6561,9 @@ output:
             end: 100
       returns: vector
       operations:
-        - node: '[*parser.Call] vector(1)'
+        - args:
+            - "1"
+          node: '[*parser.Call] vector(1)'
           op: vector
         - node: '[*parser.AggregateExpr] sum by (region, target, colo_name) (sum_over_time(probe_success{job="abc"}[5m]) or vector(1))'
           op: sum
@@ -6539,7 +6600,9 @@ output:
       deadinfo: null
       returns: vector
       operations:
-        - node: '[*parser.Call] vector(1)'
+        - args:
+            - "1"
+          node: '[*parser.Call] vector(1)'
           op: vector
       joins: []
       unless: []
@@ -6605,7 +6668,9 @@ output:
             end: 9
       returns: vector
       operations:
-        - node: '[*parser.Call] vector(0)'
+        - args:
+            - "0"
+          node: '[*parser.Call] vector(0)'
           op: vector
       joins: []
       unless: []
@@ -6644,7 +6709,9 @@ output:
             end: 9
       returns: vector
       operations:
-        - node: '[*parser.Call] vector(0)'
+        - args:
+            - "0"
+          node: '[*parser.Call] vector(0)'
           op: vector
       joins:
         - "on": []
@@ -6661,7 +6728,9 @@ output:
             deadinfo: null
             returns: vector
             operations:
-                - node: '[*parser.Call] vector(1)'
+                - args:
+                    - "1"
+                  node: '[*parser.Call] vector(1)'
                   op: vector
             joins: []
             unless: []
@@ -6761,7 +6830,9 @@ output:
             end: 20
       returns: vector
       operations:
-        - node: '[*parser.Call] vector(0)'
+        - args:
+            - "0"
+          node: '[*parser.Call] vector(0)'
           op: vector
         - node: '[*parser.AggregateExpr] sum(foo or vector(0))'
           op: sum
@@ -6845,7 +6916,9 @@ output:
             end: 21
       returns: vector
       operations:
-        - node: '[*parser.Call] vector(1)'
+        - args:
+            - "1"
+          node: '[*parser.Call] vector(1)'
           op: vector
         - node: '[*parser.AggregateExpr] sum(foo or vector(1))'
           op: sum
@@ -6925,7 +6998,9 @@ output:
       deadinfo: null
       returns: vector
       operations:
-        - node: '[*parser.Call] vector(1)'
+        - args:
+            - "1"
+          node: '[*parser.Call] vector(1)'
           op: vector
         - node: '[*parser.AggregateExpr] sum(foo or vector(1))'
           op: sum
@@ -7009,7 +7084,9 @@ output:
             end: 21
       returns: vector
       operations:
-        - node: '[*parser.Call] vector(2)'
+        - args:
+            - "2"
+          node: '[*parser.Call] vector(2)'
           op: vector
         - node: '[*parser.AggregateExpr] sum(foo or vector(2))'
           op: sum
@@ -7092,7 +7169,9 @@ output:
       deadinfo: null
       returns: vector
       operations:
-        - node: '[*parser.Call] vector(0)'
+        - args:
+            - "0"
+          node: '[*parser.Call] vector(0)'
           op: vector
         - node: '[*parser.AggregateExpr] sum(sometimes{foo!="bar"} or vector(0))'
           op: sum
@@ -7183,7 +7262,9 @@ output:
       deadinfo: null
       returns: vector
       operations:
-        - node: '[*parser.Call] vector(1)'
+        - args:
+            - "1"
+          node: '[*parser.Call] vector(1)'
           op: vector
       joins: []
       unless: []
@@ -7365,7 +7446,9 @@ output:
       deadinfo: null
       returns: vector
       operations:
-        - node: '[*parser.Call] vector(1)'
+        - args:
+            - "1"
+          node: '[*parser.Call] vector(1)'
           op: vector
       joins:
         - "on": []
@@ -7577,7 +7660,9 @@ output:
             deadinfo: null
             returns: vector
             operations:
-                - node: '[*parser.Call] vector(1)'
+                - args:
+                    - "1"
+                  node: '[*parser.Call] vector(1)'
                   op: vector
             joins: []
             unless: []
@@ -7649,7 +7734,9 @@ output:
             deadinfo: null
             returns: vector
             operations:
-                - node: '[*parser.Call] vector(2)'
+                - args:
+                    - "2"
+                  node: '[*parser.Call] vector(2)'
                   op: vector
             joins: []
             unless: []
@@ -7696,7 +7783,9 @@ output:
       deadinfo: null
       returns: vector
       operations:
-        - node: '[*parser.Call] vector(0)'
+        - args:
+            - "0"
+          node: '[*parser.Call] vector(0)'
           op: vector
       joins:
         - "on": []
@@ -7744,7 +7833,9 @@ output:
             deadinfo: null
             returns: vector
             operations:
-                - node: '[*parser.Call] vector(1)'
+                - args:
+                    - "1"
+                  node: '[*parser.Call] vector(1)'
                   op: vector
             joins: []
             unless: []
@@ -7816,7 +7907,9 @@ output:
             deadinfo: null
             returns: vector
             operations:
-                - node: '[*parser.Call] vector(2)'
+                - args:
+                    - "2"
+                  node: '[*parser.Call] vector(2)'
                   op: vector
             joins: []
             unless: []
@@ -7875,9 +7968,16 @@ output:
       deadinfo: null
       returns: vector
       operations:
-        - node: '[*parser.Call] vector(1)'
+        - args:
+            - "1"
+          node: '[*parser.Call] vector(1)'
           op: vector
-        - node: '[*parser.Call] label_replace(vector(1), "nexthop_tag", "$1", "nexthop", "(.+)")'
+        - args:
+            - '"nexthop_tag"'
+            - '"$1"'
+            - '"nexthop"'
+            - '"(.+)"'
+          node: '[*parser.Call] label_replace(vector(1), "nexthop_tag", "$1", "nexthop", "(.+)")'
           op: label_replace
       joins: []
       unless: []
@@ -8007,7 +8107,9 @@ output:
             end: 20
       returns: vector
       operations:
-        - node: '[*parser.Call] vector(0)'
+        - args:
+            - "0"
+          node: '[*parser.Call] vector(0)'
           op: vector
         - node: '[*parser.AggregateExpr] group(vector(0))'
           op: group
@@ -8102,7 +8204,9 @@ output:
                     end: 48
             returns: vector
             operations:
-                - node: '[*parser.Call] vector(0)'
+                - args:
+                    - "0"
+                  node: '[*parser.Call] vector(0)'
                   op: vector
             joins: []
             unless: []
@@ -8173,7 +8277,9 @@ output:
             deadinfo: null
             returns: vector
             operations:
-                - node: '[*parser.Call] vector(0)'
+                - args:
+                    - "0"
+                  node: '[*parser.Call] vector(0)'
                   op: vector
             joins: []
             unless: []
@@ -8245,7 +8351,9 @@ output:
                     end: 56
             returns: vector
             operations:
-                - node: '[*parser.Call] vector(0)'
+                - args:
+                    - "0"
+                  node: '[*parser.Call] vector(0)'
                   op: vector
             joins: []
             unless: []
@@ -9371,7 +9479,12 @@ output:
             operations:
                 - node: '[*parser.VectorSelector] salt_highstate_runner_configured_minions'
                   op: ""
-                - node: '[*parser.Call] label_replace(salt_highstate_runner_configured_minions, "instance", "$1", "minion", "(.+)")'
+                - args:
+                    - '"instance"'
+                    - '"$1"'
+                    - '"minion"'
+                    - '"(.+)"'
+                  node: '[*parser.Call] label_replace(salt_highstate_runner_configured_minions, "instance", "$1", "minion", "(.+)")'
                   op: label_replace
             joins: []
             unless: []
@@ -9683,7 +9796,12 @@ output:
                   op: max_over_time
                 - node: '[*parser.AggregateExpr] max by (instance) (max_over_time(go_memstats_alloc_bytes{job="prometheus"}[2h]))'
                   op: max
-                - node: '[*parser.Call] label_replace(max by (instance) (max_over_time(go_memstats_alloc_bytes{job="prometheus"}[2h])) / max by (instance) (max_over_time(prometheus_tsdb_head_series[2h])), "prometheus", "$1", "instance", "(.+)")'
+                - args:
+                    - '"prometheus"'
+                    - '"$1"'
+                    - '"instance"'
+                    - '"(.+)"'
+                  node: '[*parser.Call] label_replace(max by (instance) (max_over_time(go_memstats_alloc_bytes{job="prometheus"}[2h])) / max by (instance) (max_over_time(prometheus_tsdb_head_series[2h])), "prometheus", "$1", "instance", "(.+)")'
                   op: label_replace
             joins:
                 - "on": []
@@ -9851,7 +9969,9 @@ output:
       deadinfo: null
       returns: vector
       operations:
-        - node: '[*parser.Call] vector(1)'
+        - args:
+            - "1"
+          node: '[*parser.Call] vector(1)'
           op: vector
       joins: []
       unless: []
@@ -10025,7 +10145,9 @@ output:
             end: 21
       returns: vector
       operations:
-        - node: '[*parser.Call] vector(0)'
+        - args:
+            - "0"
+          node: '[*parser.Call] vector(0)'
           op: vector
       joins: []
       unless: []
@@ -10063,7 +10185,9 @@ output:
       deadinfo: null
       returns: vector
       operations:
-        - node: '[*parser.Call] vector(1)'
+        - args:
+            - "1"
+          node: '[*parser.Call] vector(1)'
           op: vector
       joins:
         - "on": []
@@ -10127,7 +10251,9 @@ output:
       deadinfo: null
       returns: vector
       operations:
-        - node: '[*parser.Call] vector(0)'
+        - args:
+            - "0"
+          node: '[*parser.Call] vector(0)'
           op: vector
       joins: []
       unless: []
@@ -10345,7 +10471,9 @@ output:
             deadinfo: null
             returns: vector
             operations:
-                - node: '[*parser.Call] vector(1)'
+                - args:
+                    - "1"
+                  node: '[*parser.Call] vector(1)'
                   op: vector
                 - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h]) or vector(1))'
                   op: avg
@@ -10478,7 +10606,9 @@ output:
                     deadinfo: null
                     returns: vector
                     operations:
-                        - node: '[*parser.Call] vector(1)'
+                        - args:
+                            - "1"
+                          node: '[*parser.Call] vector(1)'
                           op: vector
                         - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h] offset 1d) or vector(1))'
                           op: avg
@@ -10545,7 +10675,9 @@ output:
             deadinfo: null
             returns: vector
             operations:
-                - node: '[*parser.Call] vector(0)'
+                - args:
+                    - "0"
+                  node: '[*parser.Call] vector(0)'
                   op: vector
                 - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h] offset 1d) or vector(0))'
                   op: avg
@@ -10627,7 +10759,9 @@ output:
                     deadinfo: null
                     returns: vector
                     operations:
-                        - node: '[*parser.Call] vector(1)'
+                        - args:
+                            - "1"
+                          node: '[*parser.Call] vector(1)'
                           op: vector
                         - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h] offset 1d) or vector(1))'
                           op: avg
@@ -10717,7 +10851,9 @@ output:
                     end: 392
             returns: vector
             operations:
-                - node: '[*parser.Call] vector(0)'
+                - args:
+                    - "0"
+                  node: '[*parser.Call] vector(0)'
                   op: vector
             joins: []
             unless: []
@@ -10787,7 +10923,9 @@ output:
                     end: 469
             returns: vector
             operations:
-                - node: '[*parser.Call] vector(0)'
+                - args:
+                    - "0"
+                  node: '[*parser.Call] vector(0)'
                   op: vector
             joins: []
             unless: []
@@ -10850,7 +10988,9 @@ output:
             end: 59
       returns: vector
       operations:
-        - node: '[*parser.Call] vector(0)'
+        - args:
+            - "0"
+          node: '[*parser.Call] vector(0)'
           op: vector
         - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h]) or vector(0))'
           op: avg
@@ -10932,7 +11072,9 @@ output:
             deadinfo: null
             returns: vector
             operations:
-                - node: '[*parser.Call] vector(1)'
+                - args:
+                    - "1"
+                  node: '[*parser.Call] vector(1)'
                   op: vector
                 - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h]) or vector(1))'
                   op: avg
@@ -11065,7 +11207,9 @@ output:
                     deadinfo: null
                     returns: vector
                     operations:
-                        - node: '[*parser.Call] vector(1)'
+                        - args:
+                            - "1"
+                          node: '[*parser.Call] vector(1)'
                           op: vector
                         - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h] offset 1d) or vector(1))'
                           op: avg
@@ -11132,7 +11276,9 @@ output:
             deadinfo: null
             returns: vector
             operations:
-                - node: '[*parser.Call] vector(0)'
+                - args:
+                    - "0"
+                  node: '[*parser.Call] vector(0)'
                   op: vector
                 - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h] offset 1d) or vector(0))'
                   op: avg
@@ -11214,7 +11360,9 @@ output:
                     deadinfo: null
                     returns: vector
                     operations:
-                        - node: '[*parser.Call] vector(1)'
+                        - args:
+                            - "1"
+                          node: '[*parser.Call] vector(1)'
                           op: vector
                         - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h] offset 1d) or vector(1))'
                           op: avg
@@ -11304,7 +11452,9 @@ output:
                     end: 392
             returns: vector
             operations:
-                - node: '[*parser.Call] vector(0)'
+                - args:
+                    - "0"
+                  node: '[*parser.Call] vector(0)'
                   op: vector
             joins: []
             unless: []
@@ -11374,7 +11524,9 @@ output:
                     end: 469
             returns: vector
             operations:
-                - node: '[*parser.Call] vector(0)'
+                - args:
+                    - "0"
+                  node: '[*parser.Call] vector(0)'
                   op: vector
             joins: []
             unless: []
@@ -11538,7 +11690,12 @@ output:
       operations:
         - node: '[*parser.VectorSelector] configured_minions'
           op: ""
-        - node: '[*parser.Call] label_replace(configured_minions, "instance", "$1", "minion", "(.+)")'
+        - args:
+            - '"instance"'
+            - '"$1"'
+            - '"minion"'
+            - '"(.+)"'
+          node: '[*parser.Call] label_replace(configured_minions, "instance", "$1", "minion", "(.+)")'
           op: label_replace
         - node: '[*parser.AggregateExpr] count by (dc) (max by (instance) (0 < (token_expiration - time()) < (6 * 60 * 60)) * on (instance) group_right () label_replace(configured_minions, "instance", "$1", "minion", "(.+)"))'
           op: count
@@ -11621,7 +11778,9 @@ output:
       operations:
         - node: '[*parser.VectorSelector] prometheus_build_info'
           op: ""
-        - node: '[*parser.AggregateExpr] topk(10, prometheus_build_info * prometheus_ready)'
+        - args:
+            - "10"
+          node: '[*parser.AggregateExpr] topk(10, prometheus_build_info * prometheus_ready)'
           op: topk
       joins:
         - "on": []
@@ -11681,7 +11840,9 @@ output:
       operations:
         - node: '[*parser.VectorSelector] prometheus_build_info'
           op: ""
-        - node: '[*parser.AggregateExpr] bottomk(10, prometheus_build_info * prometheus_ready)'
+        - args:
+            - "10"
+          node: '[*parser.AggregateExpr] bottomk(10, prometheus_build_info * prometheus_ready)'
           op: bottomk
       joins:
         - "on": []
@@ -11727,6 +11888,40 @@ output:
         start: 12
         end: 33
       type: aggregation
+      fixedlabels: false
+      isconditional: false
+
+---
+
+[TestLabelsSource/157 - 1]
+expr: histogram_fraction(0, 0.1, metric)
+output:
+    - labels: {}
+      deadinfo: null
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] metric'
+          op: ""
+        - args:
+            - "0"
+            - "0.1"
+          node: '[*parser.Call] histogram_fraction(0, 0.1, metric)'
+          op: histogram_fraction
+      joins: []
+      unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
+      position:
+        start: 27
+        end: 33
+      type: function
       fixedlabels: false
       isconditional: false
 

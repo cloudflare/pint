@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"math"
 	"net/url"
+	"slices"
 	"strings"
 	"time"
 
@@ -456,6 +457,7 @@ func (c CostCheck) isSuggestionFor(src, potential utils.Source, join *utils.Join
 	for i := len(src.Operations); i > 0; i-- {
 		ops := src.Operations[:i]
 		if c.equalOperations(ops, potential.Operations) {
+			slog.Debug("Equal operations", slog.Any("query", ops), slog.Any("suggestion", potential.Operations))
 			if c.metricName(ops) != c.metricName(potential.Operations) {
 				goto NEXT
 			}
@@ -503,7 +505,11 @@ func (c CostCheck) equalOperations(a, b utils.SourceOperations) bool {
 		return false
 	}
 	for i := range a {
+		slog.Debug("Compare operations", slog.Int("idx", i), slog.Any("a", a[i]), slog.Any("b", b[i]))
 		if c.normalizeFuncName(a[i].Operation) != c.normalizeFuncName(b[i].Operation) {
+			return false
+		}
+		if !slices.Equal(a[i].Arguments, b[i].Arguments) {
 			return false
 		}
 	}

@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.74.8
+
+### Fixed
+
+- Fixed incorrect suggestions from [query/cost](checks/query/cost.md) for function calls with different arguments.
+
 ## v0.74.7
 
 ### Fixed
