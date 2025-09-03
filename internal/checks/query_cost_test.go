@@ -1588,6 +1588,54 @@ func TestCostCheck(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "suggest recording rule / histogram_fraction",
+			content: `- record: sum:foo:rate5m
+  expr: metric / on() histogram_fraction(0, 0.2, metric)
+`,
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 100, 100, 0, 0, "check comment", checks.Warning)
+			},
+			prometheus: newSimpleProm,
+			entries: mustParseContent(`
+
+- record: metric:fraction
+  expr: histogram_fraction(0, 0.1, metric)
+`),
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(metric / on() histogram_fraction(0, 0.2, metric))"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 50,
+								PeakSamples:           50,
+							},
+							Timings: promapi.QueryTimings{
+								EvalTotalTime: 10,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: checks.BytesPerSampleQuery},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSampleWithValue(map[string]string{}, 2048),
+						},
+					},
+				},
+			},
+		},
 	}
 
 	runTests(t, testCases)

@@ -89,14 +89,19 @@ type ReturnInfo struct {
 type SourceOperation struct {
 	Node      promParser.Node
 	Operation string
+	Arguments []string
 }
 
 // Used for test snapshots.
 func (so SourceOperation) MarshalYAML() (any, error) {
-	return map[string]any{
+	y := map[string]any{
 		"op":   so.Operation,
 		"node": fmt.Sprintf("[%T] %s", so.Node, so.Node.String()),
-	}, nil
+	}
+	if so.Arguments != nil {
+		y["args"] = so.Arguments
+	}
+	return y, nil
 }
 
 type SourceOperations []SourceOperation
@@ -335,6 +340,7 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 		s.Operations = append(s.Operations, SourceOperation{
 			Operation: "",
 			Node:      n,
+			Arguments: nil,
 		})
 		s.guaranteeLabel(
 			"Query will only return series where these labels are present.",
@@ -401,12 +407,19 @@ func GetQueryFragment(expr string, pos posrange.PositionRange) string {
 
 func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 	s := newSource()
+
+	var args []string
+	if n.Param != nil {
+		args = append(args, n.Param.String())
+	}
+
 	switch n.Op {
 	case promParser.SUM:
 		for _, s = range parseAggregation(expr, n) {
 			s.Operations = append(s.Operations, SourceOperation{
 				Operation: "sum",
 				Node:      n,
+				Arguments: args,
 			})
 			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
 				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
@@ -418,6 +431,7 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 			s.Operations = append(s.Operations, SourceOperation{
 				Operation: "min",
 				Node:      n,
+				Arguments: args,
 			})
 			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
 				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
@@ -429,6 +443,7 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 			s.Operations = append(s.Operations, SourceOperation{
 				Operation: "max",
 				Node:      n,
+				Arguments: args,
 			})
 			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
 				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
@@ -440,6 +455,7 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 			s.Operations = append(s.Operations, SourceOperation{
 				Operation: "avg",
 				Node:      n,
+				Arguments: args,
 			})
 			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
 				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
@@ -451,6 +467,7 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 			s.Operations = append(s.Operations, SourceOperation{
 				Operation: "group",
 				Node:      n,
+				Arguments: args,
 			})
 			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
 				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
@@ -462,6 +479,7 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 			s.Operations = append(s.Operations, SourceOperation{
 				Operation: "stddev",
 				Node:      n,
+				Arguments: args,
 			})
 			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
 				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
@@ -473,6 +491,7 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 			s.Operations = append(s.Operations, SourceOperation{
 				Operation: "stdvar",
 				Node:      n,
+				Arguments: args,
 			})
 			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
 				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
@@ -484,6 +503,7 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 			s.Operations = append(s.Operations, SourceOperation{
 				Operation: "count",
 				Node:      n,
+				Arguments: args,
 			})
 			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
 				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
@@ -495,6 +515,7 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 			s.Operations = append(s.Operations, SourceOperation{
 				Operation: "count_values",
 				Node:      n,
+				Arguments: args,
 			})
 			// Param is the label to store the count value in.
 			s.guaranteeLabel(
@@ -512,6 +533,7 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 			s.Operations = append(s.Operations, SourceOperation{
 				Operation: "quantile",
 				Node:      n,
+				Arguments: args,
 			})
 			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
 				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
@@ -527,6 +549,7 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 			s.Operations = append(s.Operations, SourceOperation{
 				Operation: "topk",
 				Node:      n,
+				Arguments: args,
 			})
 			src = append(src, s)
 		}
@@ -539,6 +562,7 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 			s.Operations = append(s.Operations, SourceOperation{
 				Operation: "bottomk",
 				Node:      n,
+				Arguments: args,
 			})
 			src = append(src, s)
 		}
@@ -810,6 +834,9 @@ If you're hoping to get instance specific labels this way and alert when some ta
 }
 
 func parseCall(expr string, n *promParser.Call) (src []Source) {
+	var args []string
+	var exprs []promParser.Expr
+
 	var vt promParser.ValueType
 	for i, e := range n.Args {
 		if i >= len(n.Func.ArgTypes) {
@@ -820,16 +847,22 @@ func parseCall(expr string, n *promParser.Call) (src []Source) {
 
 		switch vt {
 		case promParser.ValueTypeVector, promParser.ValueTypeMatrix:
-			for _, es := range walkNode(expr, e) {
-				es.Type = FuncSource
-				es.Operations = append(es.Operations, SourceOperation{
-					Operation: n.Func.Name,
-					Node:      n,
-				})
-				es.Position = e.PositionRange()
-				src = append(src, parsePromQLFunc(es, expr, n))
-			}
+			exprs = append(exprs, e)
 		case promParser.ValueTypeNone, promParser.ValueTypeScalar, promParser.ValueTypeString:
+			args = append(args, e.String())
+		}
+	}
+
+	for _, e := range exprs {
+		for _, es := range walkNode(expr, e) {
+			es.Type = FuncSource
+			es.Operations = append(es.Operations, SourceOperation{
+				Operation: n.Func.Name,
+				Node:      n,
+				Arguments: args,
+			})
+			es.Position = e.PositionRange()
+			src = append(src, parsePromQLFunc(es, expr, n))
 		}
 	}
 
@@ -841,6 +874,7 @@ func parseCall(expr string, n *promParser.Call) (src []Source) {
 				{
 					Operation: n.Func.Name,
 					Node:      n,
+					Arguments: args,
 				},
 			},
 			Position: n.PosRange,
