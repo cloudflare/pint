@@ -15,16 +15,16 @@ import (
 
 // https://github.com/go-yaml/yaml/blob/v3.0.1/resolve.go#L70-L81
 const (
-	nullTag      = "!!null"
-	boolTag      = "!!bool"
-	strTag       = "!!str"
-	intTag       = "!!int"
-	floatTag     = "!!float"
-	timestampTag = "!!timestamp"
-	seqTag       = "!!seq"
-	mapTag       = "!!map"
-	binaryTag    = "!!binary"
-	mergeTag     = "!!merge"
+	nullTag = "!!null"
+	// boolTag      = "!!bool" unused.
+	strTag = "!!str"
+	intTag = "!!int"
+	// floatTag     = "!!float" unused.
+	// timestampTag = "!!timestamp" unused.
+	seqTag    = "!!seq"
+	mapTag    = "!!map"
+	binaryTag = "!!binary"
+	mergeTag  = "!!merge"
 )
 
 func describeTag(tag string) string {
