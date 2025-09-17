@@ -203,6 +203,7 @@
 [TestComparisonCheck/deep_level_without_comparison - 1]
 - description: deep level without comparison
   content: |4
+
     - alert: High_UDP_Receive_Errors
       expr: quantile_over_time(0.7,(irate(udp_packets_drops[2m]))[10m:2m])
             AND ON (instance)

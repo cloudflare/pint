@@ -25,8 +25,8 @@ require (
 	go.nhat.io/httpmock v0.11.0
 	go.uber.org/automaxprocs v1.6.0
 	go.uber.org/ratelimit v0.3.1
+	go.yaml.in/yaml/v3 v3.0.4
 	golang.org/x/oauth2 v0.31.0
-	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -84,4 +84,5 @@ require (
 	golang.org/x/time v0.12.0 // indirect
 	golang.org/x/tools v0.35.0 // indirect
 	google.golang.org/protobuf v1.36.9 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

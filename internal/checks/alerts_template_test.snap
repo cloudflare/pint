@@ -2,6 +2,7 @@
 [TestTemplateCheck/$value_|_first - 1]
 - description: $value | first
   content: |4
+
     - alert: Foo
       expr: rate(errors[2m])
       annotations:
@@ -29,6 +30,7 @@
     anchor: 0
 - description: $value | first
   content: |4
+
     - alert: Foo
       expr: rate(errors[2m])
       annotations:
@@ -71,6 +73,7 @@
 [TestTemplateCheck/__name___is_stripped - 1]
 - description: __name__ is stripped
   content: |4
+
     - alert: Foo
       expr: sum(foo) > 0
       annotations:
@@ -109,6 +112,7 @@
     anchor: 0
 - description: __name__ is stripped
   content: |4
+
     - alert: Foo
       expr: sum(foo) > 0
       annotations:
@@ -156,6 +160,7 @@
 [TestTemplateCheck/absent()_*_on()_group_left()_bar - 1]
 - description: absent() * on() group_left() bar
   content: |4
+
     - alert: Foo
       expr: absent(foo{job="xxx"}) * on() group_left() bar
       annotations:
@@ -203,6 +208,7 @@
     anchor: 0
 - description: absent() * on() group_left() bar
   content: |4
+
     - alert: Foo
       expr: absent(foo{job="xxx"}) * on() group_left() bar
       annotations:
@@ -423,6 +429,7 @@
 [TestTemplateCheck/annotation_label_missing_from_metrics_(absent())_/_multiple - 1]
 - description: annotation label missing from metrics (absent()) / multiple
   content: |4
+
     - alert: Foo Is Missing
       expr: absent(foo) or absent(bar)
       annotations:
@@ -474,6 +481,7 @@
 [TestTemplateCheck/annotation_label_missing_from_metrics_(absent(sum)) - 1]
 - description: annotation label missing from metrics (absent(sum))
   content: |4
+
     - alert: Foo Is Missing
       expr: absent(sum(foo) by(job))
       annotations:
@@ -521,6 +529,7 @@
     anchor: 0
 - description: annotation label missing from metrics (absent(sum))
   content: |4
+
     - alert: Foo Is Missing
       expr: absent(sum(foo) by(job))
       annotations:
@@ -572,6 +581,7 @@
 [TestTemplateCheck/annotation_label_missing_from_metrics_(absent({job=~})) - 1]
 - description: annotation label missing from metrics (absent({job=~}))
   content: |4
+
     - alert: Foo Is Missing
       expr: absent({job=~".+"})
       annotations:
@@ -623,6 +633,7 @@
 [TestTemplateCheck/annotation_label_missing_from_metrics_(absent,_and) - 1]
 - description: annotation label missing from metrics (absent, and)
   content: |4
+
     - alert: Foo Is Missing
       expr: absent(foo{job="bar"}) AND on(job) foo
       labels:
@@ -673,6 +684,7 @@
     anchor: 0
 - description: annotation label missing from metrics (absent, and)
   content: |4
+
     - alert: Foo Is Missing
       expr: absent(foo{job="bar"}) AND on(job) foo
       labels:
@@ -723,6 +735,7 @@
     anchor: 0
 - description: annotation label missing from metrics (absent, and)
   content: |4
+
     - alert: Foo Is Missing
       expr: absent(foo{job="bar"}) AND on(job) foo
       labels:
@@ -773,6 +786,7 @@
     anchor: 0
 - description: annotation label missing from metrics (absent, and)
   content: |4
+
     - alert: Foo Is Missing
       expr: absent(foo{job="bar"}) AND on(job) foo
       labels:
@@ -911,6 +925,7 @@
 [TestTemplateCheck/annotation_label_missing_from_metrics_(group_left) - 1]
 - description: annotation label missing from metrics (group_left)
   content: |4
+
     - alert: Foo Is Down
       expr: count(build_info) by (instance, version) != ignoring(package) group_left(foo) count(package_installed) by (instance, version, package)
       annotations:
@@ -1080,6 +1095,7 @@
 [TestTemplateCheck/annotation_label_present_on_metrics_(absent(sum)) - 1]
 - description: annotation label present on metrics (absent(sum))
   content: |4
+
     - alert: Foo Is Missing
       expr: absent(sum(foo) by(job, instance))
       annotations:
@@ -1127,6 +1143,7 @@
     anchor: 0
 - description: annotation label present on metrics (absent(sum))
   content: |4
+
     - alert: Foo Is Missing
       expr: absent(sum(foo) by(job, instance))
       annotations:
@@ -1183,6 +1200,7 @@
 [TestTemplateCheck/bar_*_ignoring(job)_foo - 1]
 - description: bar * ignoring(job) foo
   content: |4
+
     - alert: Foo
       expr: bar * ignoring(job) foo
       annotations:
@@ -1225,6 +1243,7 @@
 [TestTemplateCheck/bar_*_on()_group_right()_absent() - 1]
 - description: bar * on() group_right() absent()
   content: |4
+
     - alert: Foo
       expr: bar * on() group_right() absent(foo{job="xxx"})
       annotations:
@@ -1272,6 +1291,7 @@
     anchor: 0
 - description: bar * on() group_right() absent()
   content: |4
+
     - alert: Foo
       expr: bar * on() group_right() absent(foo{job="xxx"})
       annotations:
@@ -1576,6 +1596,7 @@
 [TestTemplateCheck/humanize_still_needed_for_printf_on_another_value - 1]
 - description: humanize still needed for printf on another value
   content: |4
+
     - alert: Foo
       expr: rate(errors_total[5m]) > 0
       annotations:
@@ -1831,6 +1852,7 @@
 [TestTemplateCheck/metric_or_(metric_or_vector) - 1]
 - description: metric or (metric or vector)
   content: |4
+
     - alert: Foo
       expr: |
         max without (instance) (metric1{exported_job="abc"}) == 0 or (metric2 OR on() vector(0)) == 0
@@ -1875,6 +1897,7 @@
 [TestTemplateCheck/multiple_aggregations - 1]
 - description: multiple aggregations
   content: |4
+
       - alert: High_CPU_Imbalance_On_Many_Colos
         expr: |
           count by (region) (
@@ -1944,6 +1967,7 @@
 [TestTemplateCheck/multiple_or_/_missing_group_left() - 1]
 - description: multiple or / missing group_left()
   content: |4
+
     - alert: Foo
       expr: >
         avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"})
@@ -2052,6 +2076,7 @@
 [TestTemplateCheck/no_humanize_on_irate() - 1]
 - description: no humanize on irate()
   content: |4
+
     - alert: Foo
       expr: irate(errors[2m]) > 0
       annotations:
@@ -2094,6 +2119,7 @@
 [TestTemplateCheck/no_humanize_on_irate()#01 - 1]
 - description: no humanize on irate()
   content: |4
+
     - alert: Foo
       expr: deriv(errors[2m]) > 0
       annotations:
@@ -2136,6 +2162,7 @@
 [TestTemplateCheck/no_humanize_on_rate() - 1]
 - description: no humanize on rate()
   content: |4
+
     - alert: Foo
       expr: rate(errors[2m]) > 0
       annotations:
@@ -2178,6 +2205,7 @@
 [TestTemplateCheck/no_humanize_on_rate()_/_alias - 1]
 - description: no humanize on rate() / alias
   content: |4
+
     - alert: Foo
       expr: rate(errors[2m]) > 0
       annotations:
@@ -2255,6 +2283,7 @@
 [TestTemplateCheck/template_query_with_bogus_function - 1]
 - description: template query with bogus function
   content: |4
+
     - alert: Foo
       expr: up == 0
       annotations:
@@ -2297,6 +2326,7 @@
 [TestTemplateCheck/template_query_with_bogus_range - 1]
 - description: template query with bogus range
   content: |4
+
     - alert: Foo
       expr: up == 0
       annotations:
@@ -2339,6 +2369,7 @@
 [TestTemplateCheck/template_query_with_syntax_error - 1]
 - description: template query with syntax error
   content: |4
+
     - alert: Foo
       expr: up == 0
       annotations:

@@ -31,6 +31,7 @@
 [TestLabelCheck/empty_label_in_alerting_rule_/_required - 1]
 - description: empty label in alerting rule / required
   content: |4
+
     - alert: foo
       expr: rate(foo[1m])
       labels:
@@ -64,6 +65,7 @@
 [TestLabelCheck/empty_label_in_recording_rule_/_required - 1]
 - description: empty label in recording rule / required
   content: |4
+
     - record: foo
       expr: rate(foo[1m])
       labels:
@@ -128,6 +130,7 @@
 [TestLabelCheck/invalid_value_in_alerting_rule_/_relaxed_/_required - 1]
 - description: invalid value in alerting rule / relaxed / required
   content: |4
+
     groups:
     - name: mygroup
       labels:
@@ -193,6 +196,7 @@
 [TestLabelCheck/invalid_value_in_alerting_rule_/_strict_/_required - 1]
 - description: invalid value in alerting rule / strict / required
   content: |4
+
     groups:
     - name: mygroup
       labels:
@@ -330,6 +334,7 @@
 [TestLabelCheck/invalid_value_in_recording_rule_/_relaxed_/_required - 1]
 - description: invalid value in recording rule / relaxed / required
   content: |4
+
     groups:
     - name: mygroup
       labels:
@@ -395,6 +400,7 @@
 [TestLabelCheck/invalid_value_in_recording_rule_/_strict_/_required - 1]
 - description: invalid value in recording rule / strict / required
   content: |4
+
     groups:
     - name: mygroup
       labels:

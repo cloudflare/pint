@@ -123,6 +123,7 @@
 [TestCostCheck/7_results#01 - 1]
 - description: 7 results
   content: |4
+
     - record: foo
       expr: 'sum({__name__="foo"})'
   output: |
@@ -498,6 +499,11 @@
 
 ---
 
+[TestCostCheck/suggest_recording_rule_/_histogram_fraction - 1]
+[]
+
+---
+
 [TestCostCheck/suggest_recording_rule_/_ignore_joins - 1]
 []
 
@@ -526,6 +532,7 @@
 [TestCostCheck/suggest_recording_rule_/_irate_vs_rate - 1]
 - description: suggest recording rule / irate vs rate
   content: |4
+
     - alert: Host_CPU_Utilization_High
       expr: |
         server_role{role="foo"}
@@ -714,11 +721,6 @@
 ---
 
 [TestCostCheck/suggest_recording_rule_/_unless_mismatch - 1]
-[]
-
----
-
-[TestCostCheck/suggest_recording_rule_/_histogram_fraction - 1]
 []
 
 ---

@@ -222,6 +222,7 @@
 [TestRegexpCheck/smelly_selector_/_multiple - 1]
 - description: smelly selector / multiple
   content: |4
+
     - record: foo
       expr: |
         sum by (instance, type) (rate(requests_total{env=~"production.*", status="failed"}[5m])) / (1 + sum by (instance, type) (rate(request_total{env=~"production.*"}[5m]))) > 0.1
@@ -248,6 +249,7 @@
     anchor: 0
 - description: smelly selector / multiple
   content: |4
+
     - record: foo
       expr: |
         sum by (instance, type) (rate(requests_total{env=~"production.*", status="failed"}[5m])) / (1 + sum by (instance, type) (rate(request_total{env=~"production.*"}[5m]))) > 0.1

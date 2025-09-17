@@ -4654,6 +4654,7 @@ output:
 
 [TestLabelsSource/89 - 1]
 expr: |4-
+
     (
      sum(foo:sum > 0) without(notify)
      * on(job) group_left(notify)
@@ -6172,6 +6173,7 @@ output:
 
 [TestLabelsSource/112 - 1]
 expr: |4
+
     avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"})
     < 0.5 > 0
     or sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"})
@@ -6454,6 +6456,7 @@ output:
 
 [TestLabelsSource/114 - 1]
 expr: |4-
+
     sum by (region, target, colo_name) (
         sum_over_time(probe_success{job="abc"}[5m])
      or
@@ -7288,6 +7291,7 @@ output:
 
 [TestLabelsSource/123 - 1]
 expr: |4-
+
     (
      sum(sometimes{foo!="bar"})
      or
@@ -7602,6 +7606,7 @@ output:
 
 [TestLabelsSource/125 - 1]
 expr: |4
+
     (rate(metric2[5m]) or vector(0)) +
     (rate(metric1[5m]) or vector(1)) +
     (rate(metric3{log_name="samplerd"}[5m]) or vector(2)) > 0
@@ -8085,6 +8090,7 @@ output:
 
 [TestLabelsSource/129 - 1]
 expr: |4-
+
     ((( group(vector(0)) ))) > 0
 output:
     - labels:
@@ -8392,6 +8398,7 @@ output:
 
 [TestLabelsSource/134 - 1]
 expr: |4
+
     max by (instance, cluster) (cf_node_role{kubernetes_role="master",role="kubernetes"})
     unless
        sum by (instance, cluster) (time() - node_systemd_timer_last_trigger_seconds{name=~"etcd-defrag-.*.timer"})
@@ -9360,6 +9367,7 @@ output:
 
 [TestLabelsSource/143 - 1]
 expr: |4
+
      max without (source_instance) (
        increase(kernel_device_io_errors_total{device!~"loop.+"}[120m]) > 3 unless on(instance, device) (
          increase(kernel_device_io_soft_errors_total{device!~"loop.+"}[125m])*2 > increase(kernel_device_io_errors_total[120m])
@@ -9728,6 +9736,7 @@ output:
 
 [TestLabelsSource/146 - 1]
 expr: |4
+
     prometheus:scrape_series_added:since_gc:sum
     * on(prometheus) group_left()
     label_replace(
@@ -9995,6 +10004,7 @@ output:
 
 [TestLabelsSource/148 - 1]
 expr: |4-
+
     sum by (foo, bar) (
         rate(errors_total[5m])
       * on (instance) group_left (bob, alice)
@@ -10171,6 +10181,7 @@ output:
 
 [TestLabelsSource/150 - 1]
 expr: |4
+
     (
       vector(1) and month() == 2
     ) or vector(0)
@@ -10334,6 +10345,7 @@ output:
 
 [TestLabelsSource/152 - 1]
 expr: |4
+
     (
       avg(
         rate(foo_rejections[6h])
@@ -11654,6 +11666,7 @@ output:
 
 [TestLabelsSource/154 - 1]
 expr: |4-
+
     count by (dc) (
       max(0 < (token_expiration - time()) < (6*60*60)) by (instance)
       * on (instance) group_right label_replace(
