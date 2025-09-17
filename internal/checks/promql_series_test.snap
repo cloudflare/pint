@@ -459,6 +459,7 @@
 [TestSeriesCheck/#4_metric_was_present_but_disappeared_/_min-age_/_fail - 1]
 - description: '#4 metric was present but disappeared / min-age / fail'
   content: |4
+
     - record: foo
       # pint rule/set promql/series min-age 3d
       expr: sum(found{job="foo", instance="bar"})
@@ -489,6 +490,7 @@
 [TestSeriesCheck/#4_metric_was_present_but_disappeared_/_min-age_/_invalid_value - 1]
 - description: '#4 metric was present but disappeared / min-age / invalid value'
   content: |4
+
     - record: foo
       # pint rule/set promql/series(found) min-age foo
       expr: sum(found{job="foo", instance="bar"})
@@ -517,6 +519,7 @@
     anchor: 0
 - description: '#4 metric was present but disappeared / min-age / invalid value'
   content: |4
+
     - record: foo
       # pint rule/set promql/series(found) min-age foo
       expr: sum(found{job="foo", instance="bar"})
@@ -552,6 +555,7 @@
 [TestSeriesCheck/#4_metric_was_present_but_disappeared_/_min-age_/_mismatch - 1]
 - description: '#4 metric was present but disappeared / min-age / mismatch'
   content: |4
+
     - record: foo
       # pint rule/set promql/series(bar) min-age 5d
       expr: sum(found{job="foo", instance="bar"})
@@ -578,6 +582,7 @@
     anchor: 0
 - description: '#4 metric was present but disappeared / min-age / mismatch'
   content: |4
+
     - record: foo
       # pint rule/set promql/series(bar) min-age 5d
       expr: sum(found{job="foo", instance="bar"})
@@ -717,6 +722,7 @@
 [TestSeriesCheck/#5_ignored_label_value_/_selector_mismatch - 1]
 - description: '#5 ignored label value / selector mismatch'
   content: |4
+
     - record: foo
       # pint rule/set promql/series(foo{job="bob"}) ignore/label-value error
       expr: sum(foo{error="notfound"})
@@ -743,6 +749,7 @@
     anchor: 0
 - description: '#5 ignored label value / selector mismatch'
   content: |4
+
     - record: foo
       # pint rule/set promql/series(foo{job="bob"}) ignore/label-value error
       expr: sum(foo{error="notfound"})
@@ -785,6 +792,7 @@
 [TestSeriesCheck/#5_ignored_label_value_globally_/_no_match - 1]
 - description: '#5 ignored label value globally / no match'
   content: |4
+
     - record: foo
       expr: sum(foo{error="notfound"})
   output: |
@@ -935,6 +943,7 @@
 [TestSeriesCheck/#6_metric_was_always_present_but_label_disappeared_/_invalid_min-age - 1]
 - description: '#6 metric was always present but label disappeared / invalid min-age'
   content: |4
+
     # pint rule/set promql/series(found) min-age 1e
     - record: foo
       expr: sum({__name__="found", removed="xxx"})
@@ -963,6 +972,7 @@
     anchor: 0
 - description: '#6 metric was always present but label disappeared / invalid min-age'
   content: |4
+
     # pint rule/set promql/series(found) min-age 1e
     - record: foo
       expr: sum({__name__="found", removed="xxx"})
@@ -1273,6 +1283,7 @@
 [TestSeriesCheck/disable_comment_for_a_mismatched_series - 1]
 - description: disable comment for a mismatched series
   content: |4
+
     # pint disable promql/series(bar)
     # pint disable promql/series(foo)
     - record: my_series
@@ -1326,6 +1337,7 @@
 [TestSeriesCheck/disable_comment_with_vector()_fallback - 1]
 - description: disable comment with vector() fallback
   content: |4
+
     - alert: Foo
       # pint disable promql/series(metric1)
       # pint disable promql/series(metric2)
@@ -1372,6 +1384,7 @@
     anchor: 0
 - description: disable comment with vector() fallback
   content: |4
+
     - alert: Foo
       # pint disable promql/series(metric1)
       # pint disable promql/series(metric2)
@@ -1418,6 +1431,7 @@
     anchor: 0
 - description: disable comment with vector() fallback
   content: |4
+
     - alert: Foo
       # pint disable promql/series(metric1)
       # pint disable promql/series(metric2)
@@ -1517,6 +1531,7 @@
 [TestSeriesCheck/metric_missing_but_found_on_others_/_ignoreMatchingElsewhere_error - 1]
 - description: metric missing but found on others / ignoreMatchingElsewhere error
   content: |4
+
     - record: foo
       expr: sum(foo)
   output: |
@@ -1566,6 +1581,7 @@
 [TestSeriesCheck/metric_missing_but_found_on_others_/_ignoreMatchingElsewhere_mismatch - 1]
 - description: metric missing but found on others / ignoreMatchingElsewhere mismatch
   content: |4
+
     - record: foo
       expr: sum(foo)
   output: |
@@ -1625,6 +1641,7 @@
 [TestSeriesCheck/metric_with_fallback_/_4 - 1]
 - description: metric with fallback / 4
   content: |4
+
     - alert: foo
       expr: |
         (
@@ -1691,6 +1708,7 @@
     anchor: 0
 - description: metric with fallback / 4
   content: |4
+
     - alert: foo
       expr: |
         (
@@ -1757,6 +1775,7 @@
     anchor: 0
 - description: metric with fallback / 4
   content: |4
+
     - alert: foo
       expr: |
         (
@@ -1900,6 +1919,7 @@
 [TestSeriesCheck/series_missing,_disable_comment_with_labels,_invalid_selector - 1]
 - description: series missing, disable comment with labels, invalid selector
   content: |4
+
     # pint disable promql/series(notfound{job=foo})
     - record: foo
       expr: count(notfound{job=~"foo"}) == 0
@@ -1926,6 +1946,7 @@
     anchor: 0
 - description: series missing, disable comment with labels, invalid selector
   content: |4
+
     # pint disable promql/series(notfound{job=foo})
     - record: foo
       expr: count(notfound{job=~"foo"}) == 0
@@ -1958,6 +1979,7 @@
 [TestSeriesCheck/series_missing,_disable_comment_with_labels,_regexp_selector - 1]
 - description: series missing, disable comment with labels, regexp selector
   content: |4
+
     # pint disable promql/series({job="foo"})
     - record: foo
       expr: count(notfound{job=~"foo"}) == 0
@@ -1984,6 +2006,7 @@
     anchor: 0
 - description: series missing, disable comment with labels, regexp selector
   content: |4
+
     # pint disable promql/series({job="foo"})
     - record: foo
       expr: count(notfound{job=~"foo"}) == 0
@@ -2016,6 +2039,7 @@
 [TestSeriesCheck/series_missing,_disabled_comment_for_labels - 1]
 - description: series missing, disabled comment for labels
   content: |4
+
     # pint disable promql/series(notfound{job="foo"})
     - record: foo
       expr: count(notfound) == 0
@@ -2042,6 +2066,7 @@
     anchor: 0
 - description: series missing, disabled comment for labels
   content: |4
+
     # pint disable promql/series(notfound{job="foo"})
     - record: foo
       expr: count(notfound) == 0
@@ -2177,6 +2202,7 @@
 [TestSeriesCheck/series_missing,_selector_snoozed_/_bad_snooze_selector - 1]
 - description: series missing, selector snoozed / bad snooze selector
   content: |4
+
     # pint snooze 2099-12-31 promql/series(notfound{job=foo})
     - record: foo
       expr: count(notfound{job="foo"}) == 0
@@ -2203,6 +2229,7 @@
     anchor: 0
 - description: series missing, selector snoozed / bad snooze selector
   content: |4
+
     # pint snooze 2099-12-31 promql/series(notfound{job=foo})
     - record: foo
       expr: count(notfound{job="foo"}) == 0
@@ -2235,6 +2262,7 @@
 [TestSeriesCheck/series_missing,_selector_snoozed_/_snooze_expired - 1]
 - description: series missing, selector snoozed / snooze expired
   content: |4
+
     # pint snooze 2000-12-31 promql/series(notfound{job="foo"})
     - record: foo
       expr: count(notfound{job="foo"}) == 0
@@ -2265,6 +2293,7 @@
 [TestSeriesCheck/series_missing,_selector_snoozed_/_snooze_mismatch - 1]
 - description: series missing, selector snoozed / snooze mismatch
   content: |4
+
     # pint snooze 2099-12-31 promql/series(notfound{job="bob"})
     - record: foo
       expr: count(notfound{job="foo"}) == 0
@@ -2291,6 +2320,7 @@
     anchor: 0
 - description: series missing, selector snoozed / snooze mismatch
   content: |4
+
     # pint snooze 2099-12-31 promql/series(notfound{job="bob"})
     - record: foo
       expr: count(notfound{job="foo"}) == 0
@@ -2333,6 +2363,7 @@
 [TestSeriesCheck/series_missing,_{__name__=} - 1]
 - description: series missing, {__name__=}
   content: |4
+
     - record: foo
       expr: '{__name__="notfound", job="bar"}'
   output: |
@@ -2688,6 +2719,7 @@
 [TestSeriesCheck/unused_rule/set_comment - 1]
 - description: unused rule/set comment
   content: |4
+
     - alert : Foo
       # pint rule/set promql/series(mymetric) ignore/label-value action
       # pint rule/set promql/series(mymetric) ignore/label-value type
@@ -2721,6 +2753,7 @@
 [TestSeriesCheck/unused_rule/set_comment_or_vector - 1]
 - description: unused rule/set comment or vector
   content: |4
+
     - alert : Foo
       # pint rule/set promql/series(mymetric) ignore/label-value action
       # pint rule/set promql/series(mymetric) ignore/label-value type
@@ -2750,6 +2783,7 @@
     anchor: 0
 - description: unused rule/set comment or vector
   content: |4
+
     - alert : Foo
       # pint rule/set promql/series(mymetric) ignore/label-value action
       # pint rule/set promql/series(mymetric) ignore/label-value type

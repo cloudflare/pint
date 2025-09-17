@@ -17,6 +17,7 @@
 [TestFragileCheck/fragile_division_/_different_targets - 1]
 - description: fragile division / different targets
   content: |4
+
     - alert: foo
       expr: sum(rate(metric_a[30m])) / sum(max_over_time(metric_b[30m])) >= 0.02
   output: |
@@ -51,6 +52,7 @@
 [TestFragileCheck/fragile_offset_% - 1]
 - description: fragile offset %
   content: |4
+
     - alert: foo
       expr: sum(selector{job="foo"}) % sum(selector{job="foo"} offset 30m) > 5
   output: |
@@ -85,6 +87,7 @@
 [TestFragileCheck/fragile_offset_* - 1]
 - description: fragile offset *
   content: |4
+
     - alert: foo
       expr: sum(selector{job="foo"}) * sum(selector{job="foo"} offset 30m) > 5
   output: |
@@ -119,6 +122,7 @@
 [TestFragileCheck/fragile_offset_+ - 1]
 - description: fragile offset +
   content: |4
+
     - alert: foo
       expr: sum(selector{job="foo"}) + sum(selector{job="foo"} offset 30m) > 5
   output: |
@@ -153,6 +157,7 @@
 [TestFragileCheck/fragile_offset_- - 1]
 - description: fragile offset -
   content: |4
+
     - alert: foo
       expr: sum(selector{job="foo"}) - sum(selector{job="foo"} offset 30m) > 5
   output: |
@@ -187,6 +192,7 @@
 [TestFragileCheck/fragile_offset_/ - 1]
 - description: fragile offset /
   content: |4
+
     - alert: foo
       expr: sum(selector{job="foo"}) / sum(selector{job="foo"} offset 30m) > 5
   output: |
@@ -221,6 +227,7 @@
 [TestFragileCheck/fragile_offset_^ - 1]
 - description: fragile offset ^
   content: |4
+
     - alert: foo
       expr: sum(selector{job="foo"}) ^ sum(selector{job="foo"} offset 30m) > 5
   output: |
@@ -260,6 +267,7 @@
 [TestFragileCheck/fragile_offset_but_mismatched_labels - 1]
 - description: fragile offset but mismatched labels
   content: |4
+
     - alert: foo
       expr: sum(selector{job="foo"}) / sum(selector{job="bob"} offset 30m) > 5
   output: |

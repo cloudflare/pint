@@ -2,6 +2,7 @@
 [TestImpossibleCheck/#00 - 1]
 - description: ""
   content: |4
+
       - alert: Device_IO_Errors
         expr: >-
           max without (source_instance) (
@@ -69,6 +70,7 @@
 [TestImpossibleCheck/0_>_0 - 1]
 - description: 0 > 0
   content: |4
+
     - alert: Foo
       expr: 0 > bool 0
   output: |
@@ -98,6 +100,7 @@
 [TestImpossibleCheck/__name___is_stripped - 1]
 - description: __name__ is stripped
   content: |4
+
     - record: count:sum:foo
       expr: |
         {job="foo"} unless on(__name__) count(sum({job="foo"})) by(__name__)
@@ -128,6 +131,7 @@
 [TestImpossibleCheck/complex_query_with_or_vector() - 1]
 - description: complex query with or vector()
   content: |4
+
       - alert: Foo
         expr: |
           (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
@@ -201,6 +205,7 @@
     anchor: 0
 - description: complex query with or vector()
   content: |4
+
       - alert: Foo
         expr: |
           (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
@@ -274,6 +279,7 @@
     anchor: 0
 - description: complex query with or vector()
   content: |4
+
       - alert: Foo
         expr: |
           (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
@@ -347,6 +353,7 @@
     anchor: 0
 - description: complex query with or vector()
   content: |4
+
       - alert: Foo
         expr: |
           (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
@@ -420,6 +427,7 @@
     anchor: 0
 - description: complex query with or vector()
   content: |4
+
       - alert: Foo
         expr: |
           (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
@@ -497,6 +505,7 @@
 [TestImpossibleCheck/foo{job=bar}_unless_sum(foo) - 1]
 - description: foo{job=bar} unless sum(foo)
   content: |4
+
     - alert: Foo
       expr: foo{job="bar"} unless sum(foo)
   output: |
@@ -526,6 +535,7 @@
 [TestImpossibleCheck/foo{job=bar}_unless_vector(0) - 1]
 - description: foo{job=bar} unless vector(0)
   content: |4
+
     - alert: Foo
       expr: foo{job="bar"} unless vector(0)
   output: |
@@ -560,6 +570,7 @@
 [TestImpossibleCheck/or_vector()_labels_are_missing - 1]
 - description: or vector() labels are missing
   content: |4
+
     - alert: Foo
       expr: |
         (
@@ -612,6 +623,7 @@
 [TestImpossibleCheck/sum(foo_or_vector(0))_>_0 - 1]
 - description: sum(foo or vector(0)) > 0
   content: |4
+
     - alert: Foo
       expr: sum(foo or vector(0)) > 0
   output: |
@@ -641,6 +653,7 @@
 [TestImpossibleCheck/vector(0)_>_0 - 1]
 - description: vector(0) > 0
   content: |4
+
     - alert: Foo
       expr: ((( group(vector(0)) ))) > 0
   output: |

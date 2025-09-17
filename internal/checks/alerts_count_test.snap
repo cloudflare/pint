@@ -315,6 +315,7 @@
 [TestAlertsCountCheck/{__name__=} - 1]
 - description: '{__name__=}'
   content: |4
+
     - alert: foo
       expr: '{__name__="up", job="foo"} == 0'
   output: |
@@ -344,6 +345,7 @@
 [TestAlertsCountCheck/{__name__=~} - 1]
 - description: '{__name__=~}'
   content: |4
+
     - alert: foo
       expr: '{__name__=~"(up|foo)", job="foo"} == 0'
   output: |

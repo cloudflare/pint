@@ -31,6 +31,7 @@
 [TestAnnotationCheck/empty_annotations_/_required - 1]
 - description: empty annotations / required
   content: |4
+
     - alert: foo
       expr: sum(foo)
       annotations:
