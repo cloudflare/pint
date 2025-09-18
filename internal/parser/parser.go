@@ -38,6 +38,9 @@ const (
 )
 
 func NewParser(isStrict bool, schema Schema, names model.ValidationScheme) Parser {
+	if names == model.UnsetValidation {
+		names = model.LegacyValidation
+	}
 	return Parser{
 		isStrict: isStrict,
 		schema:   schema,
@@ -419,7 +422,7 @@ func (p Parser) parseRule(node *yaml.Node, offsetLine, offsetColumn int, content
 		return rule, false
 	}
 
-	if recordPart != nil && !p.isValidMetricName(recordPart.Value) {
+	if recordPart != nil && !p.names.IsValidMetricName(recordPart.Value) {
 		return Rule{
 			Lines: lines,
 			Error: ParseError{
@@ -431,7 +434,7 @@ func (p Parser) parseRule(node *yaml.Node, offsetLine, offsetColumn int, content
 
 	if (recordPart != nil || alertPart != nil) && labelsPart != nil {
 		for _, lab := range labelsPart.Items {
-			if !p.isValidLabelName(lab.Key.Value) || lab.Key.Value == model.MetricNameLabel {
+			if !p.names.IsValidLabelName(lab.Key.Value) || lab.Key.Value == model.MetricNameLabel {
 				return Rule{
 					Lines: lines,
 					Error: ParseError{
@@ -454,7 +457,7 @@ func (p Parser) parseRule(node *yaml.Node, offsetLine, offsetColumn int, content
 
 	if alertPart != nil && annotationsPart != nil {
 		for _, ann := range annotationsPart.Items {
-			if !p.isValidLabelName(ann.Key.Value) {
+			if !p.names.IsValidLabelName(ann.Key.Value) {
 				return Rule{
 					Lines: lines,
 					Error: ParseError{
@@ -496,20 +499,6 @@ func (p Parser) parseRule(node *yaml.Node, offsetLine, offsetColumn int, content
 	}
 
 	return rule, true
-}
-
-func (p Parser) isValidMetricName(name string) bool {
-	if p.names == model.LegacyValidation {
-		return model.IsValidLegacyMetricName(name)
-	}
-	return model.IsValidMetricName(model.LabelValue(name))
-}
-
-func (p Parser) isValidLabelName(name string) bool {
-	if p.names == model.LegacyValidation {
-		return model.LabelName(name).IsValidLegacy()
-	}
-	return model.LabelName(name).IsValid()
 }
 
 func unpackNodes(node *yaml.Node) []*yaml.Node {
