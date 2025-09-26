@@ -1,6 +1,6 @@
 
-[TestGetChecksForRule/for_match_/_passing#01 - 1]
-title: for match / passing
+[TestGetChecksForRule/absent_with_required_labels - 1]
+title: absent with required labels
 config: |-
     {
       "ci": {
@@ -44,15 +44,20 @@ config: |-
       "owners": {},
       "rules": [
         {
-          "match": [
+          "call": [
             {
-              "keep_firing_for": "\u003e 15m"
-            }
-          ],
-          "annotation": [
-            {
-              "key": "summary",
-              "required": true
+              "key": "absent",
+              "selector": [
+                {
+                  "key": ".+_total",
+                  "comment": "You must filter by job and namespace.",
+                  "severity": "bug",
+                  "requiredLabels": [
+                    "job",
+                    "namespace"
+                  ]
+                }
+              ]
             }
           ]
         }
@@ -72,6 +77,7 @@ checks:
     - promql/fragile
     - promql/regexp
     - promql/impossible
-    - alerts/annotation(summary:true)
+    - promql/selector(absent:^.+_total$:job)
+    - promql/selector(absent:^.+_total$:namespace)
 
 ---
