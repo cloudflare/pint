@@ -94,10 +94,11 @@ rule {
   match {
     kind = "alerting"
   }
-  call 
-  selector ".+" {
-    requiredLabels = ["job"]
-    comment        = "All alerts using absent() must be specify the `job` label."
+  call "absent|absent_over_time" {
+    selector ".+" {
+      requiredLabels = ["job"]
+      comment        = "All alerts using absent() must be specify the `job` label."
+    }
   }
 }
 ```
