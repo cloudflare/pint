@@ -6,7 +6,7 @@ cmp stderr stderr.txt
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
-level=INFO msg="Checking Prometheus rules" entries=17 workers=10 online=true
+level=INFO msg="Checking Prometheus rules" entries=19 workers=10 online=true
 Warning: required label is being removed via aggregation (promql/aggregate)
   ---> rules/0001.yml:2 -> `colo_job:fl_cf_html_bytes_in:rate10m`
 2 |   expr: sum(rate(fl_cf_html_bytes_in[10m])) WITHOUT (colo_id, instance, node_type, region, node_status, job, colo_name)
@@ -53,6 +53,11 @@ Warning: required label is being removed via aggregation (promql/aggregate)
                              ^^ Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
                                 `job` label is required and should be preserved when aggregating all rules.
 
+Warning: required matcher missing (promql/selector)
+  ---> rules/0003.yaml:52 -> `Instance Is Down`
+52 |   expr: up == 0
+             ^^ This vector selector must specify `job` label. Please add a `{job="..."} matcher.
+
 Information: use humanize filters for the results (alerts/template)
   ---> rules/0003.yaml:58-61 -> `Error Rate`
 58 |   expr: sum(rate(errors[5m])) > 0.5
@@ -61,8 +66,18 @@ Information: use humanize filters for the results (alerts/template)
 61 |     summary: 'error rate: {{ $value }}'
                                   ^^^^^^^ Use one of humanize template functions to make the result more readable.
 
-level=INFO msg="Some problems are duplicated between rules and all the duplicates were hidden, pass `--show-duplicates` to see them" total=14 duplicates=5 shown=9
-level=INFO msg="Problems found" Fatal=1 Warning=12 Information=1
+Warning: required matcher missing (promql/selector)
+  ---> rules/0003.yaml:64 -> `Absent`
+64 |   expr: absent(foo)
+                    ^^^ Vector selectors inside the `absent()` function must specify `job` label. Please add a `{job="..."} matcher.
+
+Warning: required matcher missing (promql/selector)
+  ---> rules/0003.yaml:67 -> `AbsentOverTime`
+67 |   expr: absent_over_time(foo[5m])
+                              ^^^ Vector selectors inside the `absent_over_time()` function must specify `job` label. Please add a `{job="..."} matcher.
+
+level=INFO msg="Some problems are duplicated between rules and all the duplicates were hidden, pass `--show-duplicates` to see them" total=17 duplicates=5 shown=12
+level=INFO msg="Problems found" Fatal=1 Warning=15 Information=1
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
 -- rules/0001.yml --
 - record: colo_job:fl_cf_html_bytes_in:rate10m
@@ -142,6 +157,12 @@ level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with
     link: http://docs
     summary: 'error rate: {{ $value }}'
 
+- alert: Absent
+  expr: absent(foo)
+
+- alert: AbsentOverTime
+  expr: absent_over_time(foo[5m])
+
 -- .pint.hcl --
 parser {
   relaxed = [".*"]
@@ -156,4 +177,18 @@ rule {
     aggregate "colo(?:_.+)?:.+" {
         strip = [ "instance" ]
     }
+}
+rule {
+  selector "up" {
+    requiredLabels = ["job"]
+    comment = "up metric must always specify the job label."
+  }
+}
+rule {
+  call "absent|absent_over_time" {
+    selector ".+" {
+      requiredLabels = ["job"]
+      comment = "All absent calls must specify the job label."
+    }
+  }
 }

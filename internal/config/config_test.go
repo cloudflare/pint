@@ -1721,6 +1721,48 @@ rule {
 `),
 			},
 		},
+		{
+			title: "selector with required labels",
+			config: `
+rule {
+  selector ".+_total" {
+    requiredLabels = ["job", "namespace"]
+    comment  = "You must filter by job and namespace."
+    severity = "bug"
+  }
+}
+`,
+			entry: discovery.Entry{
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			},
+		},
+		{
+			title: "absent with required labels",
+			config: `
+rule {
+  call "absent" {
+    selector ".+_total" {
+      requiredLabels = ["job", "namespace"]
+      comment  = "You must filter by job and namespace."
+      severity = "bug"
+    }
+  }
+}
+`,
+			entry: discovery.Entry{
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- record: foo\n  expr: absent(foo)\n"),
+			},
+		},
 	}
 
 	dir := t.TempDir()
@@ -2155,6 +2197,20 @@ func TestConfigErrors(t *testing.T) {
   }
 }`,
 			err: "unknown severity: xxx",
+		},
+		{
+			config: `rule {
+  selector "up" {
+    requiredLabels = []
+  }
+}`,
+			err: "requiredLabels cannot be empty",
+		},
+		{
+			config: `rule {
+  call "absent" {}
+}`,
+			err: "you must specific at least one `selector` block",
 		},
 	}
 

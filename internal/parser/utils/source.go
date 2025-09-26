@@ -300,6 +300,16 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 	case *promParser.MatrixSelector:
 		for _, s := range walkNode(expr, n.VectorSelector) {
 			s.Returns = promParser.ValueTypeMatrix
+			/*
+				// Prepend Matrix operation
+				s.Operations = append(SourceOperations{
+					{
+						Operation: "",
+						Node:      node,
+						Arguments: nil,
+					},
+				}, s.Operations...)
+			*/
 			src = append(src, s)
 		}
 

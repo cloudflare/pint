@@ -9,27 +9,30 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/comments"
+	"github.com/cloudflare/pint/internal/config/options"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
 type Rule struct {
-	Match         []Match              `hcl:"match,block" json:"match,omitempty"`
-	Ignore        []Match              `hcl:"ignore,block" json:"ignore,omitempty"`
-	Enable        []string             `hcl:"enable,optional" json:"enable,omitempty"`
-	Disable       []string             `hcl:"disable,optional" json:"disable,omitempty"`
-	Aggregate     []AggregateSettings  `hcl:"aggregate,block" json:"aggregate,omitempty"`
-	Annotation    []AnnotationSettings `hcl:"annotation,block" json:"annotation,omitempty"`
-	Label         []AnnotationSettings `hcl:"label,block" json:"label,omitempty"`
-	Cost          *CostSettings        `hcl:"cost,block" json:"cost,omitempty"`
-	Alerts        *AlertsSettings      `hcl:"alerts,block" json:"alerts,omitempty"`
-	For           *ForSettings         `hcl:"for,block" json:"for,omitempty"`
-	KeepFiringFor *ForSettings         `hcl:"keep_firing_for,block" json:"keep_firing_for,omitempty"`
-	RangeQuery    *RangeQuerySettings  `hcl:"range_query,block" json:"range_query,omitempty"`
-	Report        *ReportSettings      `hcl:"report,block" json:"report,omitempty"`
-	Reject        []RejectSettings     `hcl:"reject,block" json:"reject,omitempty"`
-	RuleLink      []RuleLinkSettings   `hcl:"link,block" json:"link,omitempty"`
-	RuleName      []RuleNameSettings   `hcl:"name,block" json:"name,omitempty"`
-	Locked        bool                 `hcl:"locked,optional" json:"locked,omitempty"`
+	Match         []Match                    `hcl:"match,block" json:"match,omitempty"`
+	Ignore        []Match                    `hcl:"ignore,block" json:"ignore,omitempty"`
+	Enable        []string                   `hcl:"enable,optional" json:"enable,omitempty"`
+	Disable       []string                   `hcl:"disable,optional" json:"disable,omitempty"`
+	Aggregate     []AggregateSettings        `hcl:"aggregate,block" json:"aggregate,omitempty"`
+	Annotation    []AnnotationSettings       `hcl:"annotation,block" json:"annotation,omitempty"`
+	Label         []AnnotationSettings       `hcl:"label,block" json:"label,omitempty"`
+	Cost          *CostSettings              `hcl:"cost,block" json:"cost,omitempty"`
+	Alerts        *AlertsSettings            `hcl:"alerts,block" json:"alerts,omitempty"`
+	For           *ForSettings               `hcl:"for,block" json:"for,omitempty"`
+	KeepFiringFor *ForSettings               `hcl:"keep_firing_for,block" json:"keep_firing_for,omitempty"`
+	RangeQuery    *RangeQuerySettings        `hcl:"range_query,block" json:"range_query,omitempty"`
+	Report        *ReportSettings            `hcl:"report,block" json:"report,omitempty"`
+	Reject        []RejectSettings           `hcl:"reject,block" json:"reject,omitempty"`
+	RuleLink      []RuleLinkSettings         `hcl:"link,block" json:"link,omitempty"`
+	RuleName      []RuleNameSettings         `hcl:"name,block" json:"name,omitempty"`
+	Selector      []options.SelectorSettings `hcl:"selector,block" json:"selector,omitempty"`
+	Call          []options.CallSettings     `hcl:"call,block" json:"call,omitempty"`
+	Locked        bool                       `hcl:"locked,optional" json:"locked,omitempty"`
 }
 
 func (rule Rule) validate() (err error) {
@@ -125,6 +128,18 @@ func (rule Rule) validate() (err error) {
 
 	if rule.Report != nil {
 		if err = rule.Report.validate(); err != nil {
+			return err
+		}
+	}
+
+	for _, selector := range rule.Selector {
+		if err = selector.Validate(); err != nil {
+			return err
+		}
+	}
+
+	for _, call := range rule.Call {
+		if err = call.Validate(); err != nil {
 			return err
 		}
 	}

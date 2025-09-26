@@ -377,5 +377,43 @@ func parseRule(rule Rule, prometheusServers []*promapi.FailoverGroup, defaultSta
 		))
 	}
 
+	for _, selector := range rule.Selector {
+		for _, name := range selector.RequiredLabels {
+			rules = append(rules, newParsedRule(
+				rule,
+				defaultStates,
+				checks.SelectorCheckName,
+				checks.NewSelectorCheck(
+					checks.MustTemplatedRegexp(selector.Key),
+					nil,
+					name,
+					selector.Comment,
+					selector.GetSeverity(checks.Warning),
+				),
+				nil,
+			))
+		}
+	}
+
+	for _, call := range rule.Call {
+		for _, selector := range call.Selectors {
+			for _, name := range selector.RequiredLabels {
+				rules = append(rules, newParsedRule(
+					rule,
+					defaultStates,
+					checks.SelectorCheckName,
+					checks.NewSelectorCheck(
+						checks.MustTemplatedRegexp(selector.Key),
+						checks.MustRawTemplatedRegexp(call.Key),
+						name,
+						selector.Comment,
+						selector.GetSeverity(checks.Warning),
+					),
+					nil,
+				))
+			}
+		}
+	}
+
 	return rules
 }

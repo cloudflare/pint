@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.75.0
+
+### Added
+
+- Added [promql/selector](checks/promql/selector.md) check - [#1416](https://github.com/cloudflare/pint/issues/1416)
+  and [#1540](https://github.com/cloudflare/pint/issues/1540).
+
 ## v0.74.8
 
 ### Fixed
