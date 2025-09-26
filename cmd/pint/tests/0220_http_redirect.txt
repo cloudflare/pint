@@ -1,0 +1,30 @@
+http response prometheus /r/flags 200 {"status":"success","data":{"storage.tsdb.retention.time": "1d"}}
+http response prometheus /r/config 200 {"status":"success","data":{"yaml":"global:\n  scrape_interval: 30s\n"}}
+http response prometheus /r/metadata 200 {"status":"success","data":{}}
+http response prometheus /r/query_range 200 {"status":"success","data":{"resultType":"matrix","result":[]}}
+http response prometheus /r/query 200 {"status":"success","data":{"resultType":"vector","result":[{"metric":{},"value":[1666873962.795,"1"]}]}}
+http redirect prometheus /api/v1/status/flags /r/flags
+http redirect prometheus /api/v1/status/config /r/config
+http redirect prometheus /api/v1/metadata /r/metadata
+http redirect prometheus /api/v1/query_range /r/query_range
+http redirect prometheus /api/v1/query /r/query
+http start prometheus 127.0.0.1:7220
+
+exec pint -l debug --no-color lint rules
+! stdout .
+stderr 'level=DEBUG msg="Scheduling prometheus query" uri=http://127.0.0.1:7220 query=count\(foo\)'
+stderr 'level=DEBUG msg="Found series, skipping further checks" check=promql/series selector=foo'
+
+-- rules/1.yml --
+- record: aggregate
+  expr: sum(foo) without(job)
+-- .pint.hcl --
+prometheus "prom" {
+  uri      = "http://127.0.0.1:7220"
+  failover = []
+  timeout  = "5s"
+  required = true
+}
+parser {
+  relaxed = [".*"]
+}
