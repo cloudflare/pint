@@ -1,13 +1,13 @@
 module github.com/cloudflare/pint
 
-go 1.24.0
+go 1.25.0
 
 require (
 	github.com/akedrou/textdiff v0.1.0
 	github.com/cespare/xxhash/v2 v2.3.0
 	github.com/gkampitakis/go-snaps v0.5.15
 	github.com/google/go-cmp v0.7.0
-	github.com/google/go-github/v73 v73.0.0
+	github.com/google/go-github/v75 v75.0.0
 	github.com/hashicorp/hcl/v2 v2.24.0
 	github.com/itchyny/json2yaml v0.1.4
 	github.com/klauspost/compress v1.18.0
