@@ -2,6 +2,7 @@ package reporter
 
 import (
 	"cmp"
+	"context"
 	"slices"
 	"time"
 
@@ -227,7 +228,7 @@ func (s Summary) CountBySeverity() map[checks.Severity]int {
 }
 
 type Reporter interface {
-	Submit(Summary) error
+	Submit(context.Context, Summary) error
 }
 
 func cmpDiags(a, b diags.Diagnostic) int {

@@ -106,7 +106,7 @@ func actionSetup(c *cli.Command) (meta actionMeta, err error) {
 	undo, err := maxprocs.Set()
 	defer undo()
 	if err != nil {
-		slog.Error("failed to set GOMAXPROCS", slog.Any("err", err))
+		slog.LogAttrs(context.Background(), slog.LevelError, "failed to set GOMAXPROCS", slog.Any("err", err))
 	}
 
 	meta.workers = c.Int(workersFlag)
@@ -120,7 +120,7 @@ func actionSetup(c *cli.Command) (meta actionMeta, err error) {
 		return meta, fmt.Errorf("failed to load config file %q: %w", c.String(configFlag), err)
 	}
 	if fromFile {
-		slog.Debug("Adding pint config to the parser exclude list", slog.String("path", c.String(configFlag)))
+		slog.LogAttrs(context.Background(), slog.LevelDebug, "Adding pint config to the parser exclude list", slog.String("path", c.String(configFlag)))
 		meta.cfg.Parser.Exclude = append(meta.cfg.Parser.Exclude, c.String(configFlag))
 	}
 
@@ -139,10 +139,11 @@ func actionSetup(c *cli.Command) (meta actionMeta, err error) {
 }
 
 func main() {
+	ctx := context.Background()
 	app := newApp()
-	err := app.Run(context.Background(), os.Args)
+	err := app.Run(ctx, os.Args)
 	if err != nil {
-		slog.Error("Execution completed with error(s)", slog.Any("err", err))
+		slog.LogAttrs(ctx, slog.LevelError, "Execution completed with error(s)", slog.Any("err", err))
 		os.Exit(1)
 	}
 }

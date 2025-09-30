@@ -15,17 +15,17 @@ import (
 )
 
 func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.PrometheusGenerator, cfg config.Config, entries []discovery.Entry) (summary reporter.Summary, err error) {
-	slog.Info("Checking Prometheus rules", slog.Int("entries", len(entries)), slog.Int("workers", workers), slog.Bool("online", !isOffline))
+	slog.LogAttrs(ctx, slog.LevelInfo, "Checking Prometheus rules", slog.Int("entries", len(entries)), slog.Int("workers", workers), slog.Bool("online", !isOffline))
 	if isOffline {
-		slog.Info("Offline mode, skipping Prometheus discovery")
+		slog.LogAttrs(ctx, slog.LevelInfo, "Offline mode, skipping Prometheus discovery")
 	} else {
 		if len(entries) > 0 {
 			if err = gen.GenerateDynamic(ctx); err != nil {
 				return summary, err
 			}
-			slog.Debug("Generated all Prometheus servers", slog.Int("count", gen.Count()))
+			slog.LogAttrs(ctx, slog.LevelDebug, "Generated all Prometheus servers", slog.Int("count", gen.Count()))
 		} else {
-			slog.Info("No rules found, skipping Prometheus discovery")
+			slog.LogAttrs(ctx, slog.LevelInfo, "No rules found, skipping Prometheus discovery")
 		}
 	}
 
@@ -72,7 +72,7 @@ func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 			default:
 				if entry.Rule.RecordingRule != nil {
 					rulesParsedTotal.WithLabelValues(config.RecordingRuleType).Inc()
-					slog.Debug("Found recording rule",
+					slog.LogAttrs(ctx, slog.LevelDebug, "Found recording rule",
 						slog.String("path", entry.Path.Name),
 						slog.String("record", entry.Rule.RecordingRule.Record.Value),
 						slog.String("lines", entry.Rule.Lines.String()),
@@ -81,7 +81,7 @@ func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 				}
 				if entry.Rule.AlertingRule != nil {
 					rulesParsedTotal.WithLabelValues(config.AlertingRuleType).Inc()
-					slog.Debug("Found alerting rule",
+					slog.LogAttrs(ctx, slog.LevelDebug, "Found alerting rule",
 						slog.String("path", entry.Path.Name),
 						slog.String("alert", entry.Rule.AlertingRule.Alert.Value),
 						slog.String("lines", entry.Rule.Lines.String()),
@@ -89,7 +89,7 @@ func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 					)
 				}
 				if entry.Rule.Error.Err != nil {
-					slog.Debug("Found invalid rule",
+					slog.LogAttrs(ctx, slog.LevelDebug, "Found invalid rule",
 						slog.String("path", entry.Path.Name),
 						slog.String("lines", entry.Rule.Lines.String()),
 						slog.String("state", entry.State.String()),
@@ -129,7 +129,7 @@ func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 	}
 	for _, pd := range summary.GetPrometheusDetails() {
 		for _, dc := range pd.DisabledChecks {
-			slog.Warn(
+			slog.LogAttrs(ctx, slog.LevelWarn,
 				"Some checks were disabled because configured server doesn't seem to support all Prometheus APIs",
 				slog.String("prometheus", pd.Name),
 				slog.String("api", dc.API),
@@ -156,7 +156,7 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 			return
 		default:
 			if job.entry.State == discovery.Unknown {
-				slog.Warn(
+				slog.LogAttrs(ctx, slog.LevelWarn,
 					"Bug: unknown rule state",
 					slog.String("path", job.entry.Path.String()),
 					slog.Int("line", job.entry.Rule.Lines.First),

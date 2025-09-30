@@ -106,12 +106,14 @@ func (cfg *Config) GetChecksForEntry(ctx context.Context, gen *PrometheusGenerat
 		}
 	}
 
-	el := make([]string, 0, len(enabled))
-	for _, e := range enabled {
-		el = append(el, fmt.Sprintf("%v", e))
-	}
-	slog.Debug("Configured checks for rule",
-		slog.Any("enabled", el),
+	slog.LogAttrs(ctx, slog.LevelDebug, "Configured checks for rule",
+		slog.Any("enabled", func() []string {
+			el := make([]string, 0, len(enabled))
+			for _, e := range enabled {
+				el = append(el, fmt.Sprintf("%v", e))
+			}
+			return el
+		}()),
 		slog.String("path", entry.Path.Name),
 		slog.String("rule", entry.Rule.Name()),
 	)
@@ -149,7 +151,7 @@ func Load(path string, failOnMissing bool) (cfg Config, fromFile bool, err error
 
 	if _, err = os.Stat(path); err == nil || failOnMissing {
 		fromFile = true
-		slog.Info("Loading configuration file", slog.String("path", path))
+		slog.LogAttrs(context.Background(), slog.LevelInfo, "Loading configuration file", slog.String("path", path))
 		ectx := getContext()
 		err = hclsimple.DecodeFile(path, ectx, &cfg)
 		if err != nil {

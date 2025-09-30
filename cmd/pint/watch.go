@@ -49,7 +49,7 @@ var watchCmd = &cli.Command{
 		{
 			Name:  "glob",
 			Usage: "Check a list of files or directories (can be a glob).",
-			Action: func(_ context.Context, c *cli.Command) error {
+			Action: func(ctx context.Context, c *cli.Command) error {
 				meta, err := actionSetup(c)
 				if err != nil {
 					return err
@@ -60,7 +60,7 @@ var watchCmd = &cli.Command{
 					return errors.New("at least one file or directory required")
 				}
 
-				slog.Debug("Starting glob watch", slog.Any("paths", paths))
+				slog.LogAttrs(ctx, slog.LevelDebug, "Starting glob watch", slog.Any("paths", paths))
 				return actionWatch(c, meta, func(_ context.Context) ([]string, error) {
 					return paths, nil
 				})
@@ -69,7 +69,7 @@ var watchCmd = &cli.Command{
 		{
 			Name:  "rule_files",
 			Usage: "Check the list of rule files from paths loaded by Prometheus.",
-			Action: func(_ context.Context, c *cli.Command) error {
+			Action: func(ctx context.Context, c *cli.Command) error {
 				meta, err := actionSetup(c)
 				if err != nil {
 					return err
@@ -90,7 +90,7 @@ var watchCmd = &cli.Command{
 					return fmt.Errorf("no Prometheus named %q configured in pint", args[0])
 				}
 
-				slog.Debug("Starting rule_fules watch", slog.String("name", args[0]))
+				slog.LogAttrs(ctx, slog.LevelDebug, "Starting rule_fules watch", slog.String("name", args[0]))
 
 				return actionWatch(c, meta, func(ctx context.Context) ([]string, error) {
 					cfg, err := prom.Config(ctx, time.Millisecond)
@@ -148,13 +148,13 @@ func actionWatch(c *cli.Command, meta actionMeta, f pathFinderFunc) error {
 		if err != nil {
 			return err
 		}
-		slog.Info("Pidfile created", slog.String("path", pidfile))
+		slog.LogAttrs(context.Background(), slog.LevelInfo, "Pidfile created", slog.String("path", pidfile))
 		defer func() {
 			pidErr := os.RemoveAll(pidfile)
 			if pidErr != nil {
-				slog.Error("Failed to remove pidfile", slog.Any("err", pidErr), slog.String("path", pidfile))
+				slog.LogAttrs(context.Background(), slog.LevelError, "Failed to remove pidfile", slog.Any("err", pidErr), slog.String("path", pidfile))
 			}
-			slog.Info("Pidfile removed", slog.String("path", pidfile))
+			slog.LogAttrs(context.Background(), slog.LevelInfo, "Pidfile removed", slog.String("path", pidfile))
 		}()
 	}
 
@@ -198,10 +198,10 @@ func actionWatch(c *cli.Command, meta actionMeta, f pathFinderFunc) error {
 	}
 	go func() {
 		if httpErr := server.ListenAndServe(); !errors.Is(httpErr, http.ErrServerClosed) {
-			slog.Error("HTTP server returned an error", slog.Any("err", httpErr), slog.String("listen", listen))
+			slog.LogAttrs(context.Background(), slog.LevelError, "HTTP server returned an error", slog.Any("err", httpErr), slog.String("listen", listen))
 		}
 	}()
-	slog.Info("Started HTTP server", slog.String("address", listen))
+	slog.LogAttrs(context.Background(), slog.LevelInfo, "Started HTTP server", slog.String("address", listen))
 
 	interval := c.Duration(intervalFlag)
 
@@ -223,11 +223,11 @@ func actionWatch(c *cli.Command, meta actionMeta, f pathFinderFunc) error {
 	signal.Notify(quit, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
-	slog.Info("Shutting down")
+	slog.LogAttrs(context.Background(), slog.LevelInfo, "Shutting down")
 	mainCancel()
 
 	stop <- true
-	slog.Info("Waiting for all background tasks to finish")
+	slog.LogAttrs(context.Background(), slog.LevelInfo, "Waiting for all background tasks to finish")
 	<-ack
 
 	gen.Stop()
@@ -235,7 +235,7 @@ func actionWatch(c *cli.Command, meta actionMeta, f pathFinderFunc) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 	if err = server.Shutdown(ctx); err != nil {
-		slog.Error("HTTP server returned an error while shutting down", slog.Any("err", err))
+		slog.LogAttrs(ctx, slog.LevelError, "HTTP server returned an error while shutting down", slog.Any("err", err))
 	}
 
 	return nil
@@ -250,24 +250,24 @@ func startTimer(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 		for {
 			select {
 			case <-ticker.C:
-				slog.Debug("Running checks")
+				slog.LogAttrs(ctx, slog.LevelDebug, "Running checks")
 				if !wasBootstrapped {
 					ticker.Reset(interval)
 					wasBootstrapped = true
 				}
 				if err := collector.scan(ctx, workers, isOffline, gen, schema, names, allowedOwners); err != nil {
-					slog.Error("Got an error when running checks", slog.Any("err", err))
+					slog.LogAttrs(ctx, slog.LevelError, "Got an error when running checks", slog.Any("err", err))
 				}
 				checkIterationsTotal.Inc()
 			case <-stop:
 				ticker.Stop()
-				slog.Info("Background worker finished")
+				slog.LogAttrs(ctx, slog.LevelInfo, "Background worker finished")
 				ack <- true
 				return
 			}
 		}
 	}()
-	slog.Info("Will continuously run checks until terminated", slog.String("interval", interval.String()))
+	slog.LogAttrs(ctx, slog.LevelInfo, "Will continuously run checks until terminated", slog.String("interval", interval.String()))
 
 	return stop
 }
@@ -321,7 +321,7 @@ func (c *problemCollector) scan(ctx context.Context, workers int, isOffline bool
 		return fmt.Errorf("failed to get the list of paths to check: %w", err)
 	}
 
-	slog.Info("Finding all rules to check", slog.Any("paths", paths))
+	slog.LogAttrs(ctx, slog.LevelInfo, "Finding all rules to check", slog.Any("paths", paths))
 	entries, err := discovery.NewGlobFinder(
 		paths,
 		git.NewPathFilter(
@@ -382,7 +382,7 @@ func (c *problemCollector) Collect(ch chan<- prometheus.Metric) {
 
 	for _, report := range c.summary.Reports() {
 		if report.Problem.Severity < c.minSeverity {
-			slog.Debug(
+			slog.LogAttrs(context.Background(), slog.LevelDebug,
 				"Skipping report with severity lower than minimum configured",
 				slog.String("severity", report.Problem.Severity.String()),
 				slog.String("minimum", c.minSeverity.String()),

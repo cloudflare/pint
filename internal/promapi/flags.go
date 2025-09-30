@@ -30,7 +30,7 @@ type flagsQuery struct {
 }
 
 func (q flagsQuery) Run() queryResult {
-	slog.Debug("Getting prometheus flags", slog.String("uri", q.prom.safeURI))
+	slog.LogAttrs(q.ctx, slog.LevelDebug, "Getting prometheus flags", slog.String("uri", q.prom.safeURI))
 
 	ctx, cancel := q.prom.requestContext(q.ctx)
 	defer cancel()
@@ -72,7 +72,7 @@ func (q flagsQuery) CacheTTL() time.Duration {
 }
 
 func (prom *Prometheus) Flags(ctx context.Context) (*FlagsResult, error) {
-	slog.Debug("Scheduling Prometheus flags query", slog.String("uri", prom.safeURI))
+	slog.LogAttrs(ctx, slog.LevelDebug, "Scheduling Prometheus flags query", slog.String("uri", prom.safeURI))
 
 	prom.locker.lock(APIPathFlags)
 	defer prom.locker.unlock(APIPathFlags)

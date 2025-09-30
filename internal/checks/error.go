@@ -66,7 +66,7 @@ func parseRuleError(rule parser.Rule, err error) Problem {
 
 	switch {
 	case errors.As(err, &ignoreErr):
-		slog.Debug("ignore/file report", slog.Any("err", ignoreErr))
+		slog.LogAttrs(context.Background(), slog.LevelDebug, "ignore/file report", slog.Any("err", ignoreErr))
 		return Problem{
 			Anchor: AnchorAfter,
 			Lines: diags.LineRange{
@@ -83,7 +83,7 @@ func parseRuleError(rule parser.Rule, err error) Problem {
 		}
 
 	case errors.As(err, &commentErr):
-		slog.Debug("invalid comment report", slog.Any("err", commentErr))
+		slog.LogAttrs(context.Background(), slog.LevelDebug, "invalid comment report", slog.Any("err", commentErr))
 		return Problem{
 			Anchor: AnchorAfter,
 			Lines: diags.LineRange{
@@ -100,7 +100,7 @@ func parseRuleError(rule parser.Rule, err error) Problem {
 		}
 
 	case errors.As(err, &ownerErr):
-		slog.Debug("invalid owner report", slog.Any("err", ownerErr))
+		slog.LogAttrs(context.Background(), slog.LevelDebug, "invalid owner report", slog.Any("err", ownerErr))
 		return Problem{
 			Anchor: AnchorAfter,
 			Lines: diags.LineRange{
@@ -117,7 +117,7 @@ func parseRuleError(rule parser.Rule, err error) Problem {
 		}
 
 	case errors.As(err, &parseErr):
-		slog.Debug("parse error", slog.Any("err", parseErr))
+		slog.LogAttrs(context.Background(), slog.LevelDebug, "parse error", slog.Any("err", parseErr))
 		return Problem{
 			Anchor: AnchorAfter,
 			Lines: diags.LineRange{
@@ -135,7 +135,7 @@ If this file is a template that will be rendered into valid YAML then you can in
 		}
 
 	default:
-		slog.Debug("rule error report", slog.Any("err", rule.Error.Err))
+		slog.LogAttrs(context.Background(), slog.LevelDebug, "rule error report", slog.Any("err", rule.Error.Err))
 		details := yamlDetails
 		if rule.Error.Details != "" {
 			details = rule.Error.Details

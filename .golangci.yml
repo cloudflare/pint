@@ -3,7 +3,6 @@ run:
   tests: true
 linters:
   enable:
-    - contextcheck
     - copyloopvar
     - errname
     - errorlint

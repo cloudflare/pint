@@ -35,7 +35,7 @@ type instantQuery struct {
 }
 
 func (q instantQuery) Run() queryResult {
-	slog.Debug(
+	slog.LogAttrs(q.ctx, slog.LevelDebug,
 		"Running prometheus query",
 		slog.String("uri", q.prom.safeURI),
 		slog.String("query", q.expr),
@@ -83,7 +83,7 @@ func (q instantQuery) CacheTTL() time.Duration {
 }
 
 func (prom *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, error) {
-	slog.Debug("Scheduling prometheus query", slog.String("uri", prom.safeURI), slog.String("query", expr))
+	slog.LogAttrs(ctx, slog.LevelDebug, "Scheduling prometheus query", slog.String("uri", prom.safeURI), slog.String("query", expr))
 
 	key := APIPathQuery + expr
 	prom.locker.lock(key)
@@ -105,7 +105,7 @@ func (prom *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, e
 		Series: result.value.([]Sample),
 		Stats:  result.stats,
 	}
-	slog.Debug("Parsed response", slog.String("uri", prom.safeURI), slog.String("query", expr), slog.Int("series", len(qr.Series)))
+	slog.LogAttrs(ctx, slog.LevelDebug, "Parsed response", slog.String("uri", prom.safeURI), slog.String("query", expr), slog.Int("series", len(qr.Series)))
 
 	return &qr, nil
 }

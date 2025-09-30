@@ -65,7 +65,7 @@ func NewGithubReporter(
 	headCommit string,
 	showDuplicates bool,
 ) (_ GithubReporter, err error) {
-	slog.Info(
+	slog.LogAttrs(ctx, slog.LevelInfo,
 		"Will report problems to GitHub",
 		slog.String("baseURL", baseURL),
 		slog.String("uploadURL", uploadURL),
@@ -149,7 +149,7 @@ func (gr GithubReporter) List(ctx context.Context, _ any) ([]ExistingComment, er
 	reqCtx, cancel := gr.reqContext(ctx)
 	defer cancel()
 
-	slog.Debug("Getting the list of pull request comments", slog.Int("pr", gr.prNum))
+	slog.LogAttrs(ctx, slog.LevelDebug, "Getting the list of pull request comments", slog.Int("pr", gr.prNum))
 	existing, _, err := gr.client.PullRequests.ListComments(reqCtx, gr.owner, gr.repo, gr.prNum, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list pull request reviews: %w", err)
@@ -158,7 +158,7 @@ func (gr GithubReporter) List(ctx context.Context, _ any) ([]ExistingComment, er
 	comments := make([]ExistingComment, 0, len(existing))
 	for _, ec := range existing {
 		if ec.GetPath() == "" {
-			slog.Debug("Skipping general comment", slog.Int64("id", ec.GetID()))
+			slog.LogAttrs(ctx, slog.LevelDebug, "Skipping general comment", slog.Int64("id", ec.GetID()))
 			continue
 		}
 		comments = append(comments, ExistingComment{
@@ -177,7 +177,7 @@ func (gr GithubReporter) Create(ctx context.Context, dst any, p PendingComment) 
 
 	file := pr.getFile(p.path)
 	if file == nil {
-		slog.Debug("Skipping report for path with no changes",
+		slog.LogAttrs(ctx, slog.LevelDebug, "Skipping report for path with no changes",
 			slog.String("path", p.path),
 		)
 		return nil
@@ -185,7 +185,7 @@ func (gr GithubReporter) Create(ctx context.Context, dst any, p PendingComment) 
 
 	diffs := parseDiffLines(file.GetPatch())
 	if len(diffs) == 0 {
-		slog.Debug("Skipping report for path with no diff",
+		slog.LogAttrs(ctx, slog.LevelDebug, "Skipping report for path with no diff",
 			slog.String("path", p.path),
 		)
 		return nil
@@ -201,7 +201,7 @@ func (gr GithubReporter) Create(ctx context.Context, dst any, p PendingComment) 
 		Side:     github.Ptr(side),
 	}
 
-	slog.Debug("Creating a pr comment",
+	slog.LogAttrs(ctx, slog.LevelDebug, "Creating a pr comment",
 		slog.String("commit", comment.GetCommitID()),
 		slog.String("path", comment.GetPath()),
 		slog.Int("line", comment.GetLine()),
@@ -258,7 +258,7 @@ func (gr GithubReporter) findExistingReview(ctx context.Context) (*github.PullRe
 }
 
 func (gr GithubReporter) updateReview(ctx context.Context, review *github.PullRequestReview, summary Summary) error {
-	slog.Info("Updating pull request review", slog.String("repo", fmt.Sprintf("%s/%s", gr.owner, gr.repo)))
+	slog.LogAttrs(ctx, slog.LevelInfo, "Updating pull request review", slog.String("repo", fmt.Sprintf("%s/%s", gr.owner, gr.repo)))
 
 	reqCtx, cancel := gr.reqContext(ctx)
 	defer cancel()
@@ -269,23 +269,23 @@ func (gr GithubReporter) updateReview(ctx context.Context, review *github.PullRe
 		gr.repo,
 		gr.prNum,
 		review.GetID(),
-		formatGHReviewBody(gr.version, summary, gr.showDuplicates),
+		formatGHReviewBody(ctx, gr.version, summary, gr.showDuplicates),
 	)
 	return err
 }
 
 func (gr GithubReporter) createReview(ctx context.Context, summary Summary) error {
-	slog.Info("Creating pull request review", slog.String("repo", fmt.Sprintf("%s/%s", gr.owner, gr.repo)), slog.String("commit", gr.headCommit))
+	slog.LogAttrs(ctx, slog.LevelInfo, "Creating pull request review", slog.String("repo", fmt.Sprintf("%s/%s", gr.owner, gr.repo)), slog.String("commit", gr.headCommit))
 
 	reqCtx, cancel := gr.reqContext(ctx)
 	defer cancel()
 
 	review := github.PullRequestReviewRequest{
 		CommitID: github.Ptr(gr.headCommit),
-		Body:     github.Ptr(formatGHReviewBody(gr.version, summary, gr.showDuplicates)),
+		Body:     github.Ptr(formatGHReviewBody(ctx, gr.version, summary, gr.showDuplicates)),
 		Event:    github.Ptr("COMMENT"),
 	}
-	slog.Debug("Creating a review",
+	slog.LogAttrs(ctx, slog.LevelDebug, "Creating a review",
 		slog.String("commit", review.GetCommitID()),
 		slog.String("body", review.GetBody()),
 	)
@@ -299,7 +299,7 @@ func (gr GithubReporter) createReview(ctx context.Context, summary Summary) erro
 	if err != nil {
 		return err
 	}
-	slog.Info("Pull request review created", slog.String("status", resp.Status))
+	slog.LogAttrs(ctx, slog.LevelInfo, "Pull request review created", slog.String("status", resp.Status))
 	return nil
 }
 
@@ -307,7 +307,7 @@ func (gr GithubReporter) listPRFiles(ctx context.Context) ([]*github.CommitFile,
 	reqCtx, cancel := gr.reqContext(ctx)
 	defer cancel()
 
-	slog.Debug("Getting the list of modified files", slog.Int("pr", gr.prNum))
+	slog.LogAttrs(ctx, slog.LevelDebug, "Getting the list of modified files", slog.Int("pr", gr.prNum))
 	files, _, err := gr.client.PullRequests.ListFiles(reqCtx, gr.owner, gr.repo, gr.prNum, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list pull request files: %w", err)
@@ -315,7 +315,7 @@ func (gr GithubReporter) listPRFiles(ctx context.Context) ([]*github.CommitFile,
 	return files, nil
 }
 
-func formatGHReviewBody(version string, summary Summary, showDuplicates bool) string {
+func formatGHReviewBody(ctx context.Context, version string, summary Summary, showDuplicates bool) string {
 	var b strings.Builder
 
 	b.WriteString(reviewBody)
@@ -377,7 +377,7 @@ func formatGHReviewBody(version string, summary Summary, showDuplicates bool) st
 	if len(summary.Reports()) > 0 {
 		buf := bytes.NewBuffer(nil)
 		cr := NewConsoleReporter(buf, checks.Information, true, showDuplicates)
-		err := cr.Submit(summary)
+		err := cr.Submit(ctx, summary)
 		if err != nil {
 			b.WriteString(fmt.Sprintf("Failed to generate list of problems: %s", err))
 		} else {
@@ -402,7 +402,7 @@ func (gr GithubReporter) generalComment(ctx context.Context, body string) error 
 		Body: github.Ptr(body),
 	}
 
-	slog.Debug("Creating PR comment", slog.String("body", comment.GetBody()))
+	slog.LogAttrs(ctx, slog.LevelDebug, "Creating PR comment", slog.String("body", comment.GetBody()))
 
 	reqCtx, cancel := gr.reqContext(ctx)
 	defer cancel()

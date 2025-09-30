@@ -139,7 +139,7 @@ with [new lines] and pipe| chars that are 'quoted'
 			out := bytes.NewBuffer(nil)
 
 			reporter := reporter.NewTeamCityReporter(out)
-			err := reporter.Submit(tc.summary)
+			err := reporter.Submit(t.Context(), tc.summary)
 
 			if tc.err != "" {
 				require.EqualError(t, err, tc.err)

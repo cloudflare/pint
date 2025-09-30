@@ -87,7 +87,7 @@ func (c CostCheck) Check(ctx context.Context, entry discovery.Entry, entries []d
 		return problems
 	}
 
-	slog.Debug("Calculating cost of the raw query", slog.String("expr", expr.Value.Value))
+	slog.LogAttrs(ctx, slog.LevelDebug, "Calculating cost of the raw query", slog.String("expr", expr.Value.Value))
 	qr, series, err := c.getQueryCost(ctx, expr.Value.Value)
 	if err != nil {
 		problems = append(problems, problemFromError(err, entry.Rule, c.Reporter(), c.prom.Name(), Bug))
@@ -268,12 +268,12 @@ func (c CostCheck) suggestRecordingRules(
 					}
 
 					sq := c.rewriteRuleFragment(expr.Value.Value, op.PositionRange(), other.Rule.RecordingRule.Record.Value+extra)
-					slog.Debug("Found a possible replacement",
+					slog.LogAttrs(ctx, slog.LevelDebug, "Found a possible replacement",
 						slog.String("original", utils.GetQueryFragment(expr.Value.Value, s.Position)),
 						slog.String("replacement", other.Rule.RecordingRule.Record.Value+extra),
 					)
 					var details strings.Builder
-					slog.Debug("Calculating cost of the new query", slog.String("expr", sq))
+					slog.LogAttrs(ctx, slog.LevelDebug, "Calculating cost of the new query", slog.String("expr", sq))
 					qr, afterSeries, err := c.getQueryCost(ctx, sq)
 					if err == nil {
 						if qr.Stats.Samples.TotalQueryableSamples >= beforeStats.Samples.TotalQueryableSamples &&
@@ -457,7 +457,7 @@ func (c CostCheck) isSuggestionFor(src, potential utils.Source, join *utils.Join
 	for i := len(src.Operations); i > 0; i-- {
 		ops := src.Operations[:i]
 		if c.equalOperations(ops, potential.Operations) {
-			slog.Debug("Equal operations", slog.Any("query", ops), slog.Any("suggestion", potential.Operations))
+			slog.LogAttrs(context.Background(), slog.LevelDebug, "Equal operations", slog.Any("query", ops), slog.Any("suggestion", potential.Operations))
 			if c.metricName(ops) != c.metricName(potential.Operations) {
 				goto NEXT
 			}
@@ -505,7 +505,7 @@ func (c CostCheck) equalOperations(a, b utils.SourceOperations) bool {
 		return false
 	}
 	for i := range a {
-		slog.Debug("Compare operations", slog.Int("idx", i), slog.Any("a", a[i]), slog.Any("b", b[i]))
+		slog.LogAttrs(context.Background(), slog.LevelDebug, "Compare operations", slog.Int("idx", i), slog.Any("a", a[i]), slog.Any("b", b[i]))
 		if c.normalizeFuncName(a[i].Operation) != c.normalizeFuncName(b[i].Operation) {
 			return false
 		}

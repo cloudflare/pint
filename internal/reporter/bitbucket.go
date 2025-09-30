@@ -1,6 +1,7 @@
 package reporter
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -17,7 +18,7 @@ const (
 )
 
 func NewBitBucketReporter(version, uri string, timeout time.Duration, token, project, repo string, maxComments int, showDuplicates bool, gitCmd git.CommandRunner) BitBucketReporter {
-	slog.Info(
+	slog.LogAttrs(context.Background(), slog.LevelInfo,
 		"Will report problems to BitBucket",
 		slog.String("uri", uri),
 		slog.String("timeout", output.HumanizeDuration(timeout)),
@@ -38,15 +39,15 @@ type BitBucketReporter struct {
 	gitCmd git.CommandRunner
 }
 
-func (bb BitBucketReporter) Submit(summary Summary) (err error) {
+func (bb BitBucketReporter) Submit(ctx context.Context, summary Summary) (err error) {
 	var headCommit string
 	if headCommit, err = git.HeadCommit(bb.gitCmd); err != nil {
 		return fmt.Errorf("failed to get HEAD commit: %w", err)
 	}
-	slog.Info("Got HEAD commit from git", slog.String("commit", headCommit))
+	slog.LogAttrs(ctx, slog.LevelInfo, "Got HEAD commit from git", slog.String("commit", headCommit))
 
 	if err = bb.api.deleteReport(headCommit); err != nil {
-		slog.Error("Failed to delete old BitBucket report", slog.Any("err", err))
+		slog.LogAttrs(ctx, slog.LevelError, "Failed to delete old BitBucket report", slog.Any("err", err))
 	}
 
 	if err = bb.api.createReport(summary, headCommit); err != nil {
@@ -64,7 +65,7 @@ func (bb BitBucketReporter) Submit(summary Summary) (err error) {
 	}
 
 	if pr != nil {
-		slog.Info(
+		slog.LogAttrs(ctx, slog.LevelInfo,
 			"Found open pull request, reporting problems using comments",
 			slog.Int("id", pr.ID),
 			slog.String("srcBranch", pr.srcBranch),
@@ -73,38 +74,38 @@ func (bb BitBucketReporter) Submit(summary Summary) (err error) {
 			slog.String("dstCommit", pr.dstHead),
 		)
 
-		slog.Info("Getting pull request changes from BitBucket")
+		slog.LogAttrs(ctx, slog.LevelInfo, "Getting pull request changes from BitBucket")
 		var changes *bitBucketPRChanges
 		if changes, err = bb.api.getPullRequestChanges(pr); err != nil {
 			return fmt.Errorf("failed to get pull request changes from BitBucket: %w", err)
 		}
-		slog.Debug("Got modified files from BitBucket", slog.Any("files", changes.pathModifiedLines))
+		slog.LogAttrs(ctx, slog.LevelDebug, "Got modified files from BitBucket", slog.Any("files", changes.pathModifiedLines))
 
 		var existingComments []bitBucketComment
 		if existingComments, err = bb.api.getPullRequestComments(pr); err != nil {
 			return fmt.Errorf("failed to get pull request comments from BitBucket: %w", err)
 		}
-		slog.Info("Got existing pull request comments from BitBucket", slog.Int("count", len(existingComments)))
+		slog.LogAttrs(ctx, slog.LevelInfo, "Got existing pull request comments from BitBucket", slog.Int("count", len(existingComments)))
 
 		pendingComments := bb.api.makeComments(summary, changes)
-		slog.Info("Generated comments to add to BitBucket", slog.Int("count", len(pendingComments)))
+		slog.LogAttrs(ctx, slog.LevelInfo, "Generated comments to add to BitBucket", slog.Int("count", len(pendingComments)))
 
 		pendingComments = bb.api.limitComments(pendingComments)
-		slog.Info("Will add comments to BitBucket",
+		slog.LogAttrs(ctx, slog.LevelInfo, "Will add comments to BitBucket",
 			slog.Int("count", len(pendingComments)),
 			slog.Int("limit", bb.api.maxComments),
 		)
 
-		slog.Info("Deleting stale comments from BitBucket")
+		slog.LogAttrs(ctx, slog.LevelInfo, "Deleting stale comments from BitBucket")
 		bb.api.pruneComments(pr, existingComments, pendingComments)
 
-		slog.Info("Adding missing comments to BitBucket")
+		slog.LogAttrs(ctx, slog.LevelInfo, "Adding missing comments to BitBucket")
 		if err = bb.api.addComments(pr, existingComments, pendingComments); err != nil {
 			return fmt.Errorf("failed to create BitBucket pull request comments: %w", err)
 		}
 
 	} else {
-		slog.Info(
+		slog.LogAttrs(ctx, slog.LevelInfo,
 			"No open pull request found, reporting problems using code insight annotations",
 			slog.String("branch", headBranch),
 			slog.String("commit", headCommit),

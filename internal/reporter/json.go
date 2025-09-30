@@ -1,6 +1,7 @@
 package reporter
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 )
@@ -23,7 +24,7 @@ type JSONReport struct {
 	Lines    []int  `json:"lines"`
 }
 
-func (jr JSONReporter) Submit(summary Summary) (err error) {
+func (jr JSONReporter) Submit(_ context.Context, summary Summary) (err error) {
 	reports := summary.Reports()
 	out := make([]JSONReport, 0, len(reports))
 

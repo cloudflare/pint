@@ -27,7 +27,7 @@ func isEqualFailoverGroup(a, b *promapi.FailoverGroup) bool {
 		return false
 	}
 	if !slices.Equal(a.Include(), b.Include()) {
-		slog.Warn(
+		slog.LogAttrs(context.Background(), slog.LevelWarn,
 			"Duplicated prometheus server with different include",
 			slog.String("name", a.Name()),
 			slog.Any("a", a.Include()),
@@ -36,7 +36,7 @@ func isEqualFailoverGroup(a, b *promapi.FailoverGroup) bool {
 		return false
 	}
 	if !slices.Equal(a.Exclude(), b.Exclude()) {
-		slog.Warn(
+		slog.LogAttrs(context.Background(), slog.LevelWarn,
 			"Duplicated prometheus server with different exclude",
 			slog.String("name", a.Name()),
 			slog.Any("a", a.Exclude()),
@@ -45,7 +45,7 @@ func isEqualFailoverGroup(a, b *promapi.FailoverGroup) bool {
 		return false
 	}
 	if !slices.Equal(a.Tags(), b.Tags()) {
-		slog.Warn(
+		slog.LogAttrs(context.Background(), slog.LevelWarn,
 			"Duplicated prometheus server with different tags",
 			slog.String("name", a.Name()),
 			slog.Any("a", a.Tags()),
@@ -252,7 +252,7 @@ func (pt PrometheusTemplate) Render(data map[string]string) (*promapi.FailoverGr
 		return nil, err
 	}
 
-	slog.Debug(
+	slog.LogAttrs(context.Background(), slog.LevelDebug,
 		"Rendered Prometheus server",
 		slog.String("name", prom.Name),
 		slog.String("uri", prom.URI),
@@ -304,10 +304,10 @@ func (fp FilePath) isIgnored(path string) bool {
 	return false
 }
 
-func (fp FilePath) Discover(_ context.Context) ([]*promapi.FailoverGroup, error) {
+func (fp FilePath) Discover(ctx context.Context) ([]*promapi.FailoverGroup, error) {
 	re := strictRegex(fp.Match)
 	servers := []*promapi.FailoverGroup{}
-	slog.Info(
+	slog.LogAttrs(ctx, slog.LevelInfo,
 		"Finding Prometheus servers using file paths",
 		slog.String("dir", fp.Directory),
 		slog.String("match", re.String()),
@@ -325,7 +325,7 @@ func (fp FilePath) Discover(_ context.Context) ([]*promapi.FailoverGroup, error)
 				return nil
 			}
 			if re.MatchString(path) {
-				slog.Debug(
+				slog.LogAttrs(ctx, slog.LevelDebug,
 					"Path discovery match",
 					slog.String("match", re.String()),
 					slog.String("path", path),
@@ -391,7 +391,7 @@ func (pq PrometheusQuery) Discover(ctx context.Context) ([]*promapi.FailoverGrou
 	prom.StartWorkers()
 	defer prom.Close()
 
-	slog.Info(
+	slog.LogAttrs(ctx, slog.LevelInfo,
 		"Finding Prometheus servers using Prometheus API query",
 		slog.String("uri", prom.SafeURI()),
 		slog.String("query", pq.Query),
@@ -449,6 +449,6 @@ func findNamedMatches(re *regexp.Regexp, str string) map[string]string {
 			results[key] = val
 		}
 	}
-	slog.Debug("Extracted regexp variables", slog.String("regexp", re.String()), slog.Any("vars", results))
+	slog.LogAttrs(context.Background(), slog.LevelDebug, "Extracted regexp variables", slog.String("regexp", re.String()), slog.Any("vars", results))
 	return results
 }

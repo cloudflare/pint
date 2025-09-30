@@ -1,6 +1,7 @@
 package discovery
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -43,7 +44,7 @@ func (f GlobFinder) Find() (entries []Entry, err error) {
 
 		for _, path := range matches {
 			if path == ".git" && isDir(path) {
-				slog.Debug(
+				slog.LogAttrs(context.Background(), slog.LevelDebug,
 					"Excluding git directory from glob results",
 					slog.String("path", path),
 					slog.String("glob", p),
@@ -92,7 +93,7 @@ func (f GlobFinder) Find() (entries []Entry, err error) {
 		}
 	}
 
-	slog.Debug("Glob finder completed", slog.Int("count", len(entries)))
+	slog.LogAttrs(context.Background(), slog.LevelDebug, "Glob finder completed", slog.Int("count", len(entries)))
 	return entries, nil
 }
 

@@ -1,6 +1,7 @@
 package reporter
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"strconv"
@@ -37,7 +38,7 @@ func (tc TeamCityReporter) escape(s string) string {
 	return tc.escaper.Replace(s)
 }
 
-func (tc TeamCityReporter) Submit(summary Summary) error {
+func (tc TeamCityReporter) Submit(_ context.Context, summary Summary) error {
 	var buf strings.Builder
 	for _, report := range summary.reports {
 		buf.WriteString("##teamcity[testSuiteStarted name='")

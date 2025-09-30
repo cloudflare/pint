@@ -112,7 +112,7 @@ func decodeError(err error) string {
 }
 
 func tryDecodingAPIError(resp *http.Response) error {
-	slog.Debug("Trying to parse Prometheus error response", slog.Int("code", resp.StatusCode))
+	slog.LogAttrs(context.Background(), slog.LevelDebug, "Trying to parse Prometheus error response", slog.Int("code", resp.StatusCode))
 
 	if resp.StatusCode == http.StatusNotFound {
 		var apiPath string

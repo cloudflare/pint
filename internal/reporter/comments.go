@@ -51,8 +51,8 @@ type CommentReporter struct {
 	showDuplicates bool
 }
 
-func (cr CommentReporter) Submit(summary Summary) (err error) {
-	return Submit(context.Background(), summary, cr.c, cr.showDuplicates)
+func (cr CommentReporter) Submit(ctx context.Context, summary Summary) (err error) {
+	return Submit(ctx, summary, cr.c, cr.showDuplicates)
 }
 
 func makeComments(summary Summary, showDuplicates bool) (comments []PendingComment) {
@@ -251,25 +251,25 @@ func errsToComment(errs []error) string {
 }
 
 func Submit(ctx context.Context, s Summary, c Commenter, showDuplicates bool) error {
-	slog.Info("Will now report problems", slog.String("reporter", c.Describe()))
+	slog.LogAttrs(ctx, slog.LevelInfo, "Will now report problems", slog.String("reporter", c.Describe()))
 	dsts, err := c.Destinations(ctx)
 	if err != nil {
 		return err
 	}
 
 	for _, dst := range dsts {
-		slog.Info("Found a report destination", slog.String("reporter", c.Describe()), slog.Any("dst", dst))
+		slog.LogAttrs(ctx, slog.LevelInfo, "Found a report destination", slog.String("reporter", c.Describe()), slog.Any("dst", dst))
 		if err = updateDestination(ctx, s, c, dst, showDuplicates); err != nil {
 			return err
 		}
 	}
 
-	slog.Info("Finished reporting problems", slog.String("reporter", c.Describe()))
+	slog.LogAttrs(ctx, slog.LevelInfo, "Finished reporting problems", slog.String("reporter", c.Describe()))
 	return nil
 }
 
 func updateDestination(ctx context.Context, s Summary, c Commenter, dst any, showDuplicates bool) (err error) {
-	slog.Info("Listing existing comments", slog.String("reporter", c.Describe()))
+	slog.LogAttrs(ctx, slog.LevelInfo, "Listing existing comments", slog.String("reporter", c.Describe()))
 	existingComments, err := c.List(ctx, dst)
 	if err != nil {
 		return err
@@ -279,7 +279,7 @@ func updateDestination(ctx context.Context, s Summary, c Commenter, dst any, sho
 	var errs []error
 	pendingComments := makeComments(s, showDuplicates)
 	for _, pending := range pendingComments {
-		slog.Debug("Got pending comment",
+		slog.LogAttrs(ctx, slog.LevelDebug, "Got pending comment",
 			slog.String("reporter", c.Describe()),
 			slog.String("path", pending.path),
 			slog.Int("line", pending.line),
@@ -287,7 +287,7 @@ func updateDestination(ctx context.Context, s Summary, c Commenter, dst any, sho
 		)
 		for _, existing := range existingComments {
 			if c.IsEqual(dst, existing, pending) {
-				slog.Debug("Comment already exists",
+				slog.LogAttrs(ctx, slog.LevelDebug, "Comment already exists",
 					slog.String("reporter", c.Describe()),
 					slog.String("path", pending.path),
 					slog.Int("line", pending.line),
@@ -295,14 +295,14 @@ func updateDestination(ctx context.Context, s Summary, c Commenter, dst any, sho
 				goto NEXTCreate
 			}
 		}
-		slog.Debug("Comment doesn't exist yet and needs to be created",
+		slog.LogAttrs(ctx, slog.LevelDebug, "Comment doesn't exist yet and needs to be created",
 			slog.String("reporter", c.Describe()),
 			slog.String("path", pending.path),
 			slog.Int("line", pending.line),
 		)
 
 		if !c.CanCreate(created) {
-			slog.Debug("Cannot create new comment",
+			slog.LogAttrs(ctx, slog.LevelDebug, "Cannot create new comment",
 				slog.String("reporter", c.Describe()),
 				slog.String("path", pending.path),
 				slog.Int("line", pending.line),
@@ -310,13 +310,13 @@ func updateDestination(ctx context.Context, s Summary, c Commenter, dst any, sho
 			goto NEXTCreate
 		}
 
-		slog.Info("Creating a new comment",
+		slog.LogAttrs(ctx, slog.LevelInfo, "Creating a new comment",
 			slog.String("reporter", c.Describe()),
 			slog.String("path", pending.path),
 			slog.Int("line", pending.line),
 		)
 		if err := c.Create(ctx, dst, pending); err != nil {
-			slog.Error("Failed to create a new comment",
+			slog.LogAttrs(ctx, slog.LevelError, "Failed to create a new comment",
 				slog.String("reporter", c.Describe()),
 				slog.String("path", pending.path),
 				slog.Int("line", pending.line),
@@ -337,12 +337,12 @@ func updateDestination(ctx context.Context, s Summary, c Commenter, dst any, sho
 		if !c.CanDelete(existing) {
 			goto NEXTDelete
 		}
-		slog.Info("Trying to delete a stale existing comment",
+		slog.LogAttrs(ctx, slog.LevelInfo, "Trying to delete a stale existing comment",
 			slog.String("path", existing.path),
 			slog.Int("line", existing.line),
 		)
 		if err := c.Delete(ctx, dst, existing); err != nil {
-			slog.Error("Failed to delete a stale comment",
+			slog.LogAttrs(ctx, slog.LevelError, "Failed to delete a stale comment",
 				slog.String("reporter", c.Describe()),
 				slog.String("path", existing.path),
 				slog.Int("line", existing.line),
@@ -353,7 +353,7 @@ func updateDestination(ctx context.Context, s Summary, c Commenter, dst any, sho
 	NEXTDelete:
 	}
 
-	slog.Info("Creating report summary",
+	slog.LogAttrs(ctx, slog.LevelInfo, "Creating report summary",
 		slog.String("reporter", c.Describe()),
 		slog.Int("reports", len(s.reports)),
 		slog.Int("online", int(s.OnlineChecks)),

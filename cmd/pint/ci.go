@@ -89,13 +89,13 @@ func actionCI(ctx context.Context, c *cli.Command) error {
 	if err != nil {
 		return errors.New("failed to get the name of current branch")
 	}
-	slog.Debug("Got branch information", slog.String("base", baseBranch), slog.String("current", currentBranch))
+	slog.LogAttrs(ctx, slog.LevelDebug, "Got branch information", slog.String("base", baseBranch), slog.String("current", currentBranch))
 	if currentBranch == strings.Split(baseBranch, "/")[len(strings.Split(baseBranch, "/"))-1] {
-		slog.Info("Running from base branch, skipping checks", slog.String("branch", currentBranch))
+		slog.LogAttrs(ctx, slog.LevelInfo, "Running from base branch, skipping checks", slog.String("branch", currentBranch))
 		return nil
 	}
 
-	slog.Info("Finding all rules to check on current git branch", slog.String("base", baseBranch))
+	slog.LogAttrs(ctx, slog.LevelInfo, "Finding all rules to check on current git branch", slog.String("base", baseBranch))
 
 	filter := git.NewPathFilter(
 		config.MustCompileRegexes(meta.cfg.Parser.Include...),
@@ -126,7 +126,7 @@ func actionCI(ctx context.Context, c *cli.Command) error {
 		return err
 	}
 
-	slog.Debug("Generated all Prometheus servers", slog.Int("count", gen.Count()))
+	slog.LogAttrs(ctx, slog.LevelDebug, "Generated all Prometheus servers", slog.Int("count", gen.Count()))
 
 	summary, err := checkRules(ctx, meta.workers, meta.isOffline, gen, meta.cfg, entries)
 	if err != nil {
@@ -208,7 +208,7 @@ func actionCI(ctx context.Context, c *cli.Command) error {
 		reps = append(reps, reporter.NewCommentReporter(gl, c.Bool(showDupsFlag)))
 	}
 
-	meta.cfg.Repository = detectRepository(meta.cfg.Repository)
+	meta.cfg.Repository = detectRepository(ctx, meta.cfg.Repository)
 	if meta.cfg.Repository != nil && meta.cfg.Repository.GitHub != nil {
 		token, ok := os.LookupEnv("GITHUB_AUTH_TOKEN")
 		if !ok {
@@ -266,13 +266,13 @@ func actionCI(ctx context.Context, c *cli.Command) error {
 		}
 	}
 	if len(bySeverity) > 0 {
-		slog.Info("Problems found", logSeverityCounters(bySeverity)...)
+		slog.LogAttrs(ctx, slog.LevelInfo, "Problems found", logSeverityCounters(bySeverity)...)
 	}
 
 	summary.SortReports()
 	summary.Dedup()
 	for _, rep := range reps {
-		err = rep.Submit(summary)
+		err = rep.Submit(ctx, summary)
 		if err != nil {
 			return fmt.Errorf("submitting reports: %w", err)
 		}
@@ -285,7 +285,7 @@ func actionCI(ctx context.Context, c *cli.Command) error {
 	return nil
 }
 
-func logSeverityCounters(src map[checks.Severity]int) (attrs []any) {
+func logSeverityCounters(src map[checks.Severity]int) (attrs []slog.Attr) {
 	for _, s := range []checks.Severity{checks.Fatal, checks.Bug, checks.Warning, checks.Information} {
 		if c, ok := src[s]; ok {
 			attrs = append(attrs, slog.Attr{Key: s.String(), Value: slog.IntValue(c)})
@@ -297,14 +297,14 @@ func logSeverityCounters(src map[checks.Severity]int) (attrs []any) {
 func detectCI(cfg *config.CI) *config.CI {
 	if bb := os.Getenv("GITHUB_BASE_REF"); bb != "" {
 		cfg.BaseBranch = bb
-		slog.Debug("got base branch from GITHUB_BASE_REF env variable", slog.String("branch", bb))
+		slog.LogAttrs(context.Background(), slog.LevelDebug, "got base branch from GITHUB_BASE_REF env variable", slog.String("branch", bb))
 	}
 	return cfg
 }
 
-func detectRepository(cfg *config.Repository) *config.Repository {
+func detectRepository(ctx context.Context, cfg *config.Repository) *config.Repository {
 	if os.Getenv("GITHUB_ACTION") != "" {
-		cfg.GitHub = detectGithubActions(cfg.GitHub)
+		cfg.GitHub = detectGithubActions(ctx, cfg.GitHub)
 	}
 	if cfg != nil && cfg.GitHub != nil && cfg.GitHub.MaxComments == 0 {
 		cfg.GitHub.MaxComments = 50
@@ -312,13 +312,13 @@ func detectRepository(cfg *config.Repository) *config.Repository {
 	return cfg
 }
 
-func detectGithubActions(gh *config.GitHub) *config.GitHub {
+func detectGithubActions(ctx context.Context, gh *config.GitHub) *config.GitHub {
 	if os.Getenv("GITHUB_PULL_REQUEST_NUMBER") == "" &&
 		os.Getenv("GITHUB_EVENT_NAME") == "pull_request" &&
 		os.Getenv("GITHUB_REF") != "" {
 		parts := strings.Split(os.Getenv("GITHUB_REF"), "/")
 		if len(parts) >= 4 {
-			slog.Info("Setting GITHUB_PULL_REQUEST_NUMBER from GITHUB_REF env variable", slog.String("pr", parts[2]))
+			slog.LogAttrs(ctx, slog.LevelInfo, "Setting GITHUB_PULL_REQUEST_NUMBER from GITHUB_REF env variable", slog.String("pr", parts[2]))
 			os.Setenv("GITHUB_PULL_REQUEST_NUMBER", parts[2])
 		}
 	}
@@ -334,12 +334,12 @@ func detectGithubActions(gh *config.GitHub) *config.GitHub {
 		parts := strings.SplitN(repo, "/", 2)
 		if len(parts) == 2 {
 			if gh.Owner == "" {
-				slog.Info("Setting repository owner from GITHUB_REPOSITORY env variable", slog.String("owner", parts[0]))
+				slog.LogAttrs(ctx, slog.LevelInfo, "Setting repository owner from GITHUB_REPOSITORY env variable", slog.String("owner", parts[0]))
 				gh.Owner = parts[0]
 				isDirty = true
 			}
 			if gh.Repo == "" {
-				slog.Info("Setting repository name from GITHUB_REPOSITORY env variable", slog.String("repo", parts[1]))
+				slog.LogAttrs(ctx, slog.LevelInfo, "Setting repository name from GITHUB_REPOSITORY env variable", slog.String("repo", parts[1]))
 				gh.Repo = parts[1]
 				isDirty = true
 			}
@@ -348,11 +348,11 @@ func detectGithubActions(gh *config.GitHub) *config.GitHub {
 
 	if api := os.Getenv("GITHUB_API_URL"); api != "" {
 		if gh.BaseURI == "" {
-			slog.Info("Setting repository base URI from GITHUB_API_URL env variable", slog.String("baseuri", api))
+			slog.LogAttrs(ctx, slog.LevelInfo, "Setting repository base URI from GITHUB_API_URL env variable", slog.String("baseuri", api))
 			gh.BaseURI = api
 		}
 		if gh.UploadURI == "" {
-			slog.Info("Setting repository upload URI from GITHUB_API_URL env variable", slog.String("uploaduri", api))
+			slog.LogAttrs(ctx, slog.LevelInfo, "Setting repository upload URI from GITHUB_API_URL env variable", slog.String("uploaduri", api))
 			gh.UploadURI = api
 		}
 	}

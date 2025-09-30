@@ -138,7 +138,7 @@ func TestCheckstyleReporter(t *testing.T) {
 			out := bytes.NewBuffer(nil)
 
 			reporter := reporter.NewCheckStyleReporter(out)
-			err := reporter.Submit(tc.summary)
+			err := reporter.Submit(t.Context(), tc.summary)
 
 			if tc.err != "" {
 				require.EqualError(t, err, tc.err)

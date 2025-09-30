@@ -3,6 +3,7 @@ package git
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -25,7 +26,7 @@ type FileBlames map[string]LineBlames
 type CommandRunner func(args ...string) ([]byte, error)
 
 func RunGit(args ...string) (content []byte, err error) {
-	slog.Debug("Running git command", slog.Any("args", args))
+	slog.LogAttrs(context.Background(), slog.LevelDebug, "Running git command", slog.Any("args", args))
 	cmd := exec.Command("git", args...)
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
@@ -40,7 +41,7 @@ func RunGit(args ...string) (content []byte, err error) {
 }
 
 func Blame(cmd CommandRunner, path, commit string) (lines LineBlames, err error) {
-	slog.Debug("Running git blame", slog.String("path", path))
+	slog.LogAttrs(context.Background(), slog.LevelDebug, "Running git blame", slog.String("path", path))
 	output, err := cmd("blame", "--line-porcelain", commit, "--", path)
 	if err != nil {
 		return nil, err

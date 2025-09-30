@@ -1,6 +1,7 @@
 package discovery
 
 import (
+	"context"
 	"fmt"
 	"io/fs"
 	"log/slog"
@@ -67,7 +68,7 @@ func addSymlinkedEntries(entries []Entry) ([]Entry, error) {
 
 		for _, sl := range slinks {
 			if sl.to == entry.Path.Name {
-				slog.Debug("Found a symlink", slog.String("to", sl.to), slog.String("from", sl.from))
+				slog.LogAttrs(context.Background(), slog.LevelDebug, "Found a symlink", slog.String("to", sl.to), slog.String("from", sl.from))
 				nentries = append(nentries, Entry{
 					State: entry.State,
 					Path: Path{
