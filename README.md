@@ -17,7 +17,7 @@ Check [examples](/docs/examples) dir for sample config files.
 ## License
 
 ```text
-Copyright (c) 2021-2023 Cloudflare, Inc.
+Copyright (c) 2021-2025 Cloudflare, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

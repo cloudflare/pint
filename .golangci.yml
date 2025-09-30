@@ -13,6 +13,7 @@ linters:
     - gocritic
     - godot
     - importas
+    - iotamixing
     - misspell
     - nakedret
     - nilnesserr
