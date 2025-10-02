@@ -2079,7 +2079,7 @@ func TestBitBucketReporter(t *testing.T) {
 				tc.showDuplicates,
 				tc.gitCmd)
 			summary := reporter.NewSummary(tc.reports)
-			err := r.Submit(summary)
+			err := r.Submit(t.Context(), summary)
 
 			if e := tc.errorHandler(err); e != nil {
 				t.Errorf("error check failure: %s", e)

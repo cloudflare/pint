@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"regexp"
@@ -158,7 +159,7 @@ func isDisabledForRule(rule parser.Rule, name string, check checks.RuleChecker, 
 	for _, disable := range comments.Only[comments.Disable](rule.Comments, comments.DisableType) {
 		for _, match := range matches {
 			if match == disable.Match {
-				slog.Debug(
+				slog.LogAttrs(context.Background(), slog.LevelDebug,
 					"Check disabled by comment",
 					slog.String("check", check.String()),
 					slog.String("match", match),
@@ -172,7 +173,7 @@ func isDisabledForRule(rule parser.Rule, name string, check checks.RuleChecker, 
 			continue
 		}
 		if slices.Contains(matches, snooze.Match) {
-			slog.Debug(
+			slog.LogAttrs(context.Background(), slog.LevelDebug,
 				"Check snoozed by comment",
 				slog.String("check", check.String()),
 				slog.String("match", snooze.Match),

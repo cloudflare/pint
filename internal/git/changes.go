@@ -3,6 +3,7 @@ package git
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"fmt"
 	"log/slog"
 	"os"
@@ -95,16 +96,16 @@ func Changes(cmd CommandRunner, baseBranch string, filter PathFilter) ([]*FileCh
 		status := FileStatus(parts[0][0])
 		srcPath := parts[1]
 		dstPath := parts[len(parts)-1]
-		slog.Debug("Git file change", slog.String("change", parts[0]), slog.String("path", dstPath), slog.String("commit", commit))
+		slog.LogAttrs(context.Background(), slog.LevelDebug, "Git file change", slog.String("change", parts[0]), slog.String("path", dstPath), slog.String("commit", commit))
 
 		if !filter.IsPathAllowed(dstPath) {
-			slog.Debug("Skipping file due to include/exclude rules", slog.String("path", dstPath))
+			slog.LogAttrs(context.Background(), slog.LevelDebug, "Skipping file due to include/exclude rules", slog.String("path", dstPath))
 			continue
 		}
 
 		// This should never really happen since git doesn't track directories, only files.
 		if isDir, _ := isDirectoryPath(dstPath); isDir {
-			slog.Debug("Skipping directory entry change", slog.String("path", dstPath))
+			slog.LogAttrs(context.Background(), slog.LevelDebug, "Skipping directory entry change", slog.String("path", dstPath))
 			continue
 		}
 
@@ -119,13 +120,13 @@ func Changes(cmd CommandRunner, baseBranch string, filter PathFilter) ([]*FileCh
 		}
 
 		prev := getChangeByPath(changes, srcPath)
-		slog.Debug("Looking for previous changes",
+		slog.LogAttrs(context.Background(), slog.LevelDebug, "Looking for previous changes",
 			slog.String("src", srcPath),
 			slog.String("dst", dstPath),
 			slog.String("commit", commit),
 		)
 		if prev != nil {
-			slog.Debug("Found a previous change",
+			slog.LogAttrs(context.Background(), slog.LevelDebug, "Found a previous change",
 				slog.Any("commits", prev.Commits),
 				slog.String("status", string(prev.Status)),
 				slog.String("path", prev.Path.Before.Name),
@@ -137,7 +138,7 @@ func Changes(cmd CommandRunner, baseBranch string, filter PathFilter) ([]*FileCh
 			// Remove any changes for "BEFORE" path we might already have
 			changes = changesWithout(changes, srcPath)
 		} else {
-			slog.Debug("No previous change found")
+			slog.LogAttrs(context.Background(), slog.LevelDebug, "No previous change found")
 			switch change.Status {
 			case FileAdded, FileCopied:
 				change.Path.Before.Name = ""
@@ -161,10 +162,10 @@ func Changes(cmd CommandRunner, baseBranch string, filter PathFilter) ([]*FileCh
 		changes = append(changes, change)
 	}
 
-	slog.Debug("Parsed git log", slog.Int("changes", len(changes)))
+	slog.LogAttrs(context.Background(), slog.LevelDebug, "Parsed git log", slog.Int("changes", len(changes)))
 
 	for _, change := range changes {
-		slog.Debug(
+		slog.LogAttrs(context.Background(), slog.LevelDebug,
 			"File change",
 			slog.Any("commits", change.Commits),
 			slog.String("status", string(change.Status)),
@@ -185,7 +186,7 @@ func Changes(cmd CommandRunner, baseBranch string, filter PathFilter) ([]*FileCh
 			change.Body.After = getContentAtCommit(cmd, lastCommit, change.Path.After.EffectivePath())
 		}
 
-		slog.Debug(
+		slog.LogAttrs(context.Background(), slog.LevelDebug,
 			"Updated file change",
 			slog.Any("commits", change.Commits),
 			slog.String("before.path", change.Path.Before.Name),
@@ -201,7 +202,7 @@ func Changes(cmd CommandRunner, baseBranch string, filter PathFilter) ([]*FileCh
 
 		switch {
 		case change.Path.Before.Type != Missing && change.Path.After.Type == Symlink:
-			slog.Debug("File was turned into a symlink", slog.String("path", change.Path.After.Name))
+			slog.LogAttrs(context.Background(), slog.LevelDebug, "File was turned into a symlink", slog.String("path", change.Path.After.Name))
 			change.Body.ModifiedLines = CountLines(change.Body.After)
 		case change.Path.Before.Type != Missing && change.Path.After.Type != Missing && change.Path.After.Type != Symlink:
 			change.Body.ModifiedLines, err = getModifiedLines(cmd, change.Commits, change.Path.After.EffectivePath(), lastCommit, change.Body.Before, change.Body.After)
@@ -211,28 +212,28 @@ func Changes(cmd CommandRunner, baseBranch string, filter PathFilter) ([]*FileCh
 			if len(change.Body.ModifiedLines) == 0 && change.Path.Before.EffectivePath() != change.Path.After.EffectivePath() {
 				// File was moved or renamed. Mark it all as modified.
 				change.Body.ModifiedLines = CountLines(change.Body.After)
-				slog.Debug("File was moved or renamed", slog.String("path", change.Path.After.Name))
+				slog.LogAttrs(context.Background(), slog.LevelDebug, "File was moved or renamed", slog.String("path", change.Path.After.Name))
 			} else {
-				slog.Debug("File was modified", slog.String("path", change.Path.After.Name), slog.Any("lines", change.Body.ModifiedLines))
+				slog.LogAttrs(context.Background(), slog.LevelDebug, "File was modified", slog.String("path", change.Path.After.Name), slog.Any("lines", change.Body.ModifiedLines))
 			}
 		case change.Path.Before.Type == Symlink && change.Path.After.Type == Symlink:
-			slog.Debug("Symlink was modified", slog.String("path", change.Path.After.Name))
+			slog.LogAttrs(context.Background(), slog.LevelDebug, "Symlink was modified", slog.String("path", change.Path.After.Name))
 			// symlink was modified, every source line is modification
 			change.Body.ModifiedLines = CountLines(change.Body.After)
 		case change.Path.Before.Type == Missing && change.Path.After.Type != Missing:
-			slog.Debug("File was added", slog.String("path", change.Path.After.Name))
+			slog.LogAttrs(context.Background(), slog.LevelDebug, "File was added", slog.String("path", change.Path.After.Name))
 			// old file body is empty, meaning that every line was modified
 			change.Body.ModifiedLines = CountLines(change.Body.After)
 		case change.Path.Before.Type != Missing && change.Path.After.Type == Missing:
-			slog.Debug("File was removed", slog.String("path", change.Path.After.Name))
+			slog.LogAttrs(context.Background(), slog.LevelDebug, "File was removed", slog.String("path", change.Path.After.Name))
 			// new file body is empty, meaning that every line was modified
 			change.Body.ModifiedLines = CountLines(change.Body.Before)
 		case change.Path.Before.Type == Missing && change.Path.After.Type == Missing:
-			slog.Debug("File was added and removed", slog.String("path", change.Path.After.Name))
+			slog.LogAttrs(context.Background(), slog.LevelDebug, "File was added and removed", slog.String("path", change.Path.After.Name))
 			// file was added and then removed
 			change.Body.ModifiedLines = []int{}
 		default:
-			slog.Warn("Unhandled change", slog.String("change", fmt.Sprintf("+%v", change)))
+			slog.LogAttrs(context.Background(), slog.LevelWarn, "Unhandled change", slog.String("change", fmt.Sprintf("+%v", change)))
 		}
 
 		if change.Path.Before.Name == change.Path.Before.SymlinkTarget {
@@ -262,7 +263,7 @@ func getChangeByPath(changes []*FileChange, fpath string) *FileChange {
 }
 
 func getModifiedLines(cmd CommandRunner, commits []string, fpath, atCommit string, bodyBefore, bodyAfter []byte) ([]int, error) {
-	slog.Debug("Getting list of modified lines",
+	slog.LogAttrs(context.Background(), slog.LevelDebug, "Getting list of modified lines",
 		slog.Any("commits", commits),
 		slog.String("path", fpath),
 	)
@@ -273,17 +274,17 @@ func getModifiedLines(cmd CommandRunner, commits []string, fpath, atCommit strin
 
 	linesBefore := bytes.Split(bodyBefore, []byte("\n"))
 	linesAfter := bytes.Split(bodyAfter, []byte("\n"))
-	slog.Debug("Number of lines", slog.Int("before", len(linesBefore)), slog.Int("after", len(linesAfter)))
+	slog.LogAttrs(context.Background(), slog.LevelDebug, "Number of lines", slog.Int("before", len(linesBefore)), slog.Int("after", len(linesAfter)))
 
 	modLines := make([]int, 0, len(lines))
 	for _, line := range lines {
-		slog.Debug("Checking line", slog.String("commit", line.Commit), slog.Int("prev", line.PrevLine), slog.Int("line", line.Line))
+		slog.LogAttrs(context.Background(), slog.LevelDebug, "Checking line", slog.String("commit", line.Commit), slog.Int("prev", line.PrevLine), slog.Int("line", line.Line))
 		if !slices.Contains(commits, line.Commit) {
 			continue
 		}
 
 		if line.PrevLine <= len(linesBefore) && line.Line <= len(linesAfter) {
-			slog.Debug("Checking line content", slog.String("before", string(linesBefore[line.PrevLine-1])), slog.String("after", string(linesAfter[line.Line-1])))
+			slog.LogAttrs(context.Background(), slog.LevelDebug, "Checking line content", slog.String("before", string(linesBefore[line.PrevLine-1])), slog.String("after", string(linesAfter[line.Line-1])))
 			if bytes.Equal(linesBefore[line.PrevLine-1], linesAfter[line.Line-1]) {
 				continue
 			}
@@ -291,7 +292,7 @@ func getModifiedLines(cmd CommandRunner, commits []string, fpath, atCommit strin
 
 		modLines = append(modLines, line.Line)
 	}
-	slog.Debug("List of modified lines",
+	slog.LogAttrs(context.Background(), slog.LevelDebug, "List of modified lines",
 		slog.Any("commits", commits),
 		slog.String("path", fpath),
 		slog.Any("lines", modLines),
@@ -303,7 +304,7 @@ func getTypeForPath(cmd CommandRunner, commit, fpath string) PathType {
 	args := []string{"ls-tree", commit, fpath}
 	out, err := cmd(args...)
 	if err != nil {
-		slog.Debug("git command returned an error", slog.Any("err", err), slog.String("args", fmt.Sprint(args)))
+		slog.LogAttrs(context.Background(), slog.LevelDebug, "git command returned an error", slog.Any("err", err), slog.String("args", fmt.Sprint(args)))
 		return Missing
 	}
 
@@ -321,7 +322,7 @@ func getTypeForPath(cmd CommandRunner, commit, fpath string) PathType {
 			continue
 		}
 		objpath := parts[1]
-		slog.Debug("ls-tree line",
+		slog.LogAttrs(context.Background(), slog.LevelDebug, "ls-tree line",
 			slog.String("mode", objmode),
 			slog.String("type", objtype),
 			slog.String("path", objpath),
@@ -364,7 +365,7 @@ func getContentAtCommit(cmd CommandRunner, commit, fpath string) []byte {
 	args := []string{"cat-file", "blob", fmt.Sprintf("%s:%s", commit, fpath)}
 	body, err := cmd(args...)
 	if err != nil {
-		slog.Debug("git command returned an error", slog.Any("err", err), slog.String("args", fmt.Sprint(args)))
+		slog.LogAttrs(context.Background(), slog.LevelDebug, "git command returned an error", slog.Any("err", err), slog.String("args", fmt.Sprint(args)))
 		return nil
 	}
 	return body

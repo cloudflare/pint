@@ -155,7 +155,7 @@ func (fg *FailoverGroup) MergeUpstreams(src *FailoverGroup) {
 		}
 		if !present {
 			fg.servers = append(fg.servers, ns)
-			slog.Debug(
+			slog.LogAttrs(context.Background(), slog.LevelDebug,
 				"Added new failover URI",
 				slog.String("name", ns.name),
 				slog.String("uri", ns.safeURI),
@@ -238,7 +238,7 @@ func (fg *FailoverGroup) Query(ctx context.Context, expr string) (qr *QueryResul
 	var uri string
 	for try, prom := range fg.servers {
 		if try > 0 {
-			slog.Debug(
+			slog.LogAttrs(ctx, slog.LevelDebug,
 				"Using failover URI",
 				slog.String("name", fg.name),
 				slog.Int("retry", try),

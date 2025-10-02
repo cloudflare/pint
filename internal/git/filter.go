@@ -1,6 +1,7 @@
 package git
 
 import (
+	"context"
 	"log/slog"
 	"regexp"
 )
@@ -26,7 +27,7 @@ func (pf PathFilter) IsPathAllowed(path string) (ok bool) {
 
 	for _, pattern := range pf.exclude {
 		if pattern.MatchString(path) {
-			slog.Debug("File path is in the exclude list",
+			slog.LogAttrs(context.Background(), slog.LevelDebug, "File path is in the exclude list",
 				slog.String("path", path),
 				slog.Any("exclude", pf.exclude),
 			)
@@ -36,7 +37,7 @@ func (pf PathFilter) IsPathAllowed(path string) (ok bool) {
 
 	for _, pattern := range pf.include {
 		if pattern.MatchString(path) {
-			slog.Debug("File path is in the include list",
+			slog.LogAttrs(context.Background(), slog.LevelDebug, "File path is in the include list",
 				slog.String("path", path),
 				slog.Any("include", pf.include),
 			)
@@ -46,7 +47,7 @@ func (pf PathFilter) IsPathAllowed(path string) (ok bool) {
 
 	ok = len(pf.include) == 0
 	if !ok {
-		slog.Debug("File path is not allowed",
+		slog.LogAttrs(context.Background(), slog.LevelDebug, "File path is not allowed",
 			slog.String("path", path),
 			slog.Any("include", pf.include),
 			slog.Any("exclude", pf.exclude),

@@ -2,6 +2,7 @@ package discovery
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"log/slog"
 	"regexp"
@@ -75,7 +76,7 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 			nil,
 		)
 		if err != nil {
-			slog.Debug("Cannot read before rules", slog.String("path", change.Path.Before.Name), slog.Any("err", err))
+			slog.LogAttrs(context.Background(), slog.LevelDebug, "Cannot read before rules", slog.String("path", change.Path.Before.Name), slog.Any("err", err))
 		}
 		entriesAfter, err = readRules(
 			change.Path.After.EffectivePath(),
@@ -90,7 +91,7 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 
 		failedEntries := entriesWithPathErrors(entriesAfter)
 
-		slog.Debug(
+		slog.LogAttrs(context.Background(), slog.LevelDebug,
 			"Parsing git file change",
 			slog.Any("commits", change.Commits),
 			slog.String("before.path", change.Path.Before.Name),
@@ -108,7 +109,7 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 			case !me.hasBefore && me.hasAfter:
 				me.after.State = Added
 				me.after.ModifiedLines = commonLines(change.Body.ModifiedLines, me.after.ModifiedLines)
-				slog.Debug(
+				slog.LogAttrs(context.Background(), slog.LevelDebug,
 					"Rule added on HEAD branch",
 					slog.String("name", me.after.Rule.Name()),
 					slog.String("state", me.after.State.String()),
@@ -122,7 +123,7 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 				case me.isIdentical && !me.wasMoved:
 					me.after.State = Noop
 					me.after.ModifiedLines = []int{}
-					slog.Debug(
+					slog.LogAttrs(context.Background(), slog.LevelDebug,
 						"Rule content was not modified on HEAD, identical rule present before",
 						slog.String("name", me.after.Rule.Name()),
 						slog.String("lines", me.after.Rule.Lines.String()),
@@ -130,7 +131,7 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 				case me.wasMoved:
 					me.after.State = Moved
 					me.after.ModifiedLines = git.CountLines(change.Body.After)
-					slog.Debug(
+					slog.LogAttrs(context.Background(), slog.LevelDebug,
 						"Rule content was not modified on HEAD but the file was moved or renamed",
 						slog.String("name", me.after.Rule.Name()),
 						slog.String("lines", me.after.Rule.Lines.String()),
@@ -138,7 +139,7 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 				default:
 					me.after.State = Modified
 					me.after.ModifiedLines = commonLines(change.Body.ModifiedLines, me.after.ModifiedLines)
-					slog.Debug(
+					slog.LogAttrs(context.Background(), slog.LevelDebug,
 						"Rule modified on HEAD branch",
 						slog.String("name", me.after.Rule.Name()),
 						slog.String("state", me.after.State.String()),
@@ -154,7 +155,7 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 				if len(ml) > 0 {
 					me.before.ModifiedLines = ml
 				}
-				slog.Debug(
+				slog.LogAttrs(context.Background(), slog.LevelDebug,
 					"Rule removed on HEAD branch",
 					slog.String("name", me.before.Rule.Name()),
 					slog.String("state", me.before.State.String()),
@@ -164,7 +165,7 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 				)
 				entries = append(entries, me.before)
 			case me.hasBefore && !me.hasAfter && len(failedEntries) > 0:
-				slog.Debug(
+				slog.LogAttrs(context.Background(), slog.LevelDebug,
 					"Rule not present on HEAD branch but there are parse errors",
 					slog.String("name", me.before.Rule.Name()),
 					slog.String("state", me.before.State.String()),
@@ -173,7 +174,7 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 					slog.String("modifiedLines", output.FormatLineRangeString(me.before.ModifiedLines)),
 				)
 			default:
-				slog.Warn(
+				slog.LogAttrs(context.Background(), slog.LevelWarn,
 					"Unknown rule state",
 					slog.String("state", me.before.State.String()),
 					slog.String("path", me.before.Path.Name),
@@ -215,7 +216,7 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 		}
 	}
 
-	slog.Debug("Git branch finder completed", slog.Int("count", len(allEntries)))
+	slog.LogAttrs(context.Background(), slog.LevelDebug, "Git branch finder completed", slog.Int("count", len(allEntries)))
 	return allEntries, nil
 }
 
@@ -234,7 +235,7 @@ func (f GitBranchFinder) shouldSkipAllChecks(changes []*git.FileChange) (bool, e
 		}
 		for _, comment := range []string{"[skip ci]", "[no ci]"} {
 			if strings.Contains(msg, comment) {
-				slog.Info(
+				slog.LogAttrs(context.Background(), slog.LevelInfo,
 					fmt.Sprintf("Found a commit with '%s', skipping all checks", comment),
 					slog.String("commit", commit))
 				return true, nil
@@ -270,7 +271,7 @@ type matchedEntry struct {
 
 func matchEntries(before, after []Entry) (ml []matchedEntry) {
 	for _, a := range after {
-		slog.Debug(
+		slog.LogAttrs(context.Background(), slog.LevelDebug,
 			"Matching HEAD rule",
 			slog.String("path", a.Path.Name),
 			slog.String("source", a.Path.SymlinkTarget),
@@ -289,7 +290,7 @@ func matchEntries(before, after []Entry) (ml []matchedEntry) {
 				m.isIdentical = isEntryIdentical(b, a)
 				m.wasMoved = a.Path.Name != b.Path.Name
 				matched = true
-				slog.Debug(
+				slog.LogAttrs(context.Background(), slog.LevelDebug,
 					"Found identical rule on before & after",
 					slog.Bool("identical", m.isIdentical),
 					slog.Bool("moved", m.wasMoved),
@@ -308,9 +309,9 @@ func matchEntries(before, after []Entry) (ml []matchedEntry) {
 				m.before = matches[0]
 				m.hasBefore = true
 				m.wasMoved = a.Path.Name != matches[0].Path.Name
-				slog.Debug("Found rule with same name on before & after")
+				slog.LogAttrs(context.Background(), slog.LevelDebug, "Found rule with same name on before & after")
 			default:
-				slog.Debug(
+				slog.LogAttrs(context.Background(), slog.LevelDebug,
 					"Found multiple rules with same name on before & after",
 					slog.Int("matches", len(matches)),
 				)
@@ -330,7 +331,7 @@ func matchEntries(before, after []Entry) (ml []matchedEntry) {
 
 func isEntryIdentical(b, a Entry) bool {
 	if !slices.Equal(sort.StringSlice(b.DisabledChecks), sort.StringSlice(a.DisabledChecks)) {
-		slog.Debug("List of disabled checks was modified",
+		slog.LogAttrs(context.Background(), slog.LevelDebug, "List of disabled checks was modified",
 			slog.Any("before", sort.StringSlice(b.DisabledChecks)),
 			slog.Any("after", sort.StringSlice(a.DisabledChecks)))
 		return false

@@ -1,6 +1,7 @@
 package reporter
 
 import (
+	"context"
 	"encoding/xml"
 	"fmt"
 	"io"
@@ -98,11 +99,11 @@ func (r Report) MarshalXML(e *xml.Encoder, _ xml.StartElement) (err error) {
 	return e.EncodeToken(xml.EndElement{Name: xml.Name{Local: "error"}})
 }
 
-func (cs CheckStyleReporter) Submit(summary Summary) error {
+func (cs CheckStyleReporter) Submit(ctx context.Context, summary Summary) error {
 	checkstyleReport := createCheckstyleReport(summary)
 	xmlString, err := xml.MarshalIndent(checkstyleReport, "", "  ")
 	if err != nil {
-		slog.Error("Failed to marshal checkstyle report", slog.Any("err", err))
+		slog.LogAttrs(ctx, slog.LevelError, "Failed to marshal checkstyle report", slog.Any("err", err))
 		return err
 	}
 	_, err = fmt.Fprint(cs.output, string(xml.Header)+string(xmlString)+"\n")

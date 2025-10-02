@@ -89,14 +89,14 @@ func (c RuleLinkCheck) Check(ctx context.Context, entry discovery.Entry, _ []dis
 		}
 
 		uri = u.String()
-		slog.Debug("Found link to check", slog.String("link", uri))
+		slog.LogAttrs(ctx, slog.LevelDebug, "Found link to check", slog.String("link", uri))
 		if c.uriRewrite != "" {
 			var result []byte
 			for _, submatches := range re.FindAllStringSubmatchIndex(uri, -1) {
 				result = re.ExpandString(result, c.uriRewrite, uri, submatches)
 			}
 			uri = string(result)
-			slog.Debug("Link URI rewritten by rule", slog.String("link", u.String()), slog.String("uri", uri))
+			slog.LogAttrs(ctx, slog.LevelDebug, "Link URI rewritten by rule", slog.String("link", u.String()), slog.String("uri", uri))
 		}
 
 		rctx, cancel := context.WithTimeout(ctx, c.timeout)
@@ -130,7 +130,7 @@ func (c RuleLinkCheck) Check(ctx context.Context, entry discovery.Entry, _ []dis
 				},
 				Severity: c.severity,
 			})
-			slog.Debug("Link request returned an error", slog.String("uri", uri), slog.Any("err", err))
+			slog.LogAttrs(ctx, slog.LevelDebug, "Link request returned an error", slog.String("uri", uri), slog.Any("err", err))
 			continue
 		}
 		_, _ = io.Copy(io.Discard, resp.Body)
@@ -157,10 +157,10 @@ func (c RuleLinkCheck) Check(ctx context.Context, entry discovery.Entry, _ []dis
 				},
 				Severity: c.severity,
 			})
-			slog.Debug("Link request returned invalid status code", slog.String("uri", uri), slog.String("status", resp.Status))
+			slog.LogAttrs(ctx, slog.LevelDebug, "Link request returned invalid status code", slog.String("uri", uri), slog.String("status", resp.Status))
 			continue
 		}
-		slog.Debug("Link request returned a valid status code", slog.String("uri", uri), slog.String("status", resp.Status))
+		slog.LogAttrs(ctx, slog.LevelDebug, "Link request returned a valid status code", slog.String("uri", uri), slog.String("status", resp.Status))
 	}
 
 	return problems

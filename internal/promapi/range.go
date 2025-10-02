@@ -111,7 +111,7 @@ func (prom *Prometheus) RangeQuery(ctx context.Context, expr string, params Rang
 		slices = sliceRange(start, end, step, queryStep)
 	}
 
-	slog.Debug("Scheduling prometheus range query",
+	slog.LogAttrs(ctx, slog.LevelDebug, "Scheduling prometheus range query",
 		slog.String("uri", prom.safeURI),
 		slog.String("query", expr),
 		slog.String("lookback", output.HumanizeDuration(lookback)),
@@ -203,7 +203,7 @@ func (prom *Prometheus) RangeQuery(ctx context.Context, expr string, params Rang
 
 	sort.Stable(merged.Series.Ranges)
 
-	slog.Debug(
+	slog.LogAttrs(ctx, slog.LevelDebug,
 		"Parsed range response",
 		slog.String("uri", prom.safeURI),
 		slog.String("query", expr),

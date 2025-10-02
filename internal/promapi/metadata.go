@@ -31,7 +31,7 @@ type metadataQuery struct {
 }
 
 func (q metadataQuery) Run() queryResult {
-	slog.Debug(
+	slog.LogAttrs(q.ctx, slog.LevelDebug,
 		"Getting prometheus metrics metadata",
 		slog.String("uri", q.prom.safeURI),
 		slog.String("metric", q.metric),
@@ -78,7 +78,7 @@ func (q metadataQuery) CacheTTL() time.Duration {
 }
 
 func (prom *Prometheus) Metadata(ctx context.Context, metric string) (*MetadataResult, error) {
-	slog.Debug("Scheduling Prometheus metrics metadata query", slog.String("uri", prom.safeURI), slog.String("metric", metric))
+	slog.LogAttrs(ctx, slog.LevelDebug, "Scheduling Prometheus metrics metadata query", slog.String("uri", prom.safeURI), slog.String("metric", metric))
 
 	key := APIPathMetadata + metric
 	prom.locker.lock(key)

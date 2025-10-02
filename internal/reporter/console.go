@@ -1,6 +1,7 @@
 package reporter
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"log/slog"
@@ -29,7 +30,7 @@ type ConsoleReporter struct {
 	showDuplicates bool
 }
 
-func (cr ConsoleReporter) Submit(summary Summary) (err error) {
+func (cr ConsoleReporter) Submit(ctx context.Context, summary Summary) (err error) {
 	var buf strings.Builder
 	var content string
 	var allReports, hiddenDupes int
@@ -113,7 +114,7 @@ func (cr ConsoleReporter) Submit(summary Summary) (err error) {
 	}
 
 	if hiddenDupes > 0 {
-		slog.Info(
+		slog.LogAttrs(ctx, slog.LevelInfo,
 			"Some problems are duplicated between rules and all the duplicates were hidden, pass `--show-duplicates` to see them",
 			slog.Int("total", allReports),
 			slog.Int("duplicates", hiddenDupes),

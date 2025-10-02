@@ -44,7 +44,7 @@ type configQuery struct {
 }
 
 func (q configQuery) Run() queryResult {
-	slog.Debug("Getting prometheus configuration", slog.String("uri", q.prom.safeURI))
+	slog.LogAttrs(q.ctx, slog.LevelDebug, "Getting prometheus configuration", slog.String("uri", q.prom.safeURI))
 
 	ctx, cancel := q.prom.requestContext(q.ctx)
 	defer cancel()
@@ -89,7 +89,7 @@ func (q configQuery) CacheTTL() time.Duration {
 }
 
 func (prom *Prometheus) Config(ctx context.Context, cacheTTL time.Duration) (*ConfigResult, error) {
-	slog.Debug("Scheduling Prometheus configuration query", slog.String("uri", prom.safeURI))
+	slog.LogAttrs(ctx, slog.LevelDebug, "Scheduling Prometheus configuration query", slog.String("uri", prom.safeURI))
 
 	prom.locker.lock(APIPathConfig)
 	defer prom.locker.unlock(APIPathConfig)

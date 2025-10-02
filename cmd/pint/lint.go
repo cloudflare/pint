@@ -75,7 +75,7 @@ func actionLint(ctx context.Context, c *cli.Command) error {
 		return errors.New("at least one file or directory required")
 	}
 
-	slog.Info("Finding all rules to check", slog.Any("paths", paths))
+	slog.LogAttrs(ctx, slog.LevelInfo, "Finding all rules to check", slog.Any("paths", paths))
 	allowedOwners := meta.cfg.Owners.CompileAllowed()
 	finder := discovery.NewGlobFinder(
 		paths,
@@ -153,7 +153,7 @@ func actionLint(ctx context.Context, c *cli.Command) error {
 	summary.SortReports()
 	summary.Dedup()
 	for _, rep := range reps {
-		err = rep.Submit(summary)
+		err = rep.Submit(ctx, summary)
 		if err != nil {
 			return fmt.Errorf("submitting reports: %w", err)
 		}
@@ -173,10 +173,10 @@ func actionLint(ctx context.Context, c *cli.Command) error {
 		}
 	}
 	if len(bySeverity) > 0 {
-		slog.Info("Problems found", logSeverityCounters(bySeverity)...)
+		slog.LogAttrs(ctx, slog.LevelInfo, "Problems found", logSeverityCounters(bySeverity)...)
 	}
 	if hiddenProblems > 0 {
-		slog.Info(fmt.Sprintf("%d problem(s) not visible because of --%s=%s flag", hiddenProblems, minSeverityFlag, c.String(minSeverityFlag)))
+		slog.LogAttrs(ctx, slog.LevelInfo, fmt.Sprintf("%d problem(s) not visible because of --%s=%s flag", hiddenProblems, minSeverityFlag, c.String(minSeverityFlag)))
 	}
 
 	if failProblems > 0 {
