@@ -6,7 +6,7 @@ http start prometheus 127.0.0.1:7104
 ! stdout .
 stderr 'level=ERROR msg="Query returned an error" err="502 Bad Gateway" uri=http://127.0.0.1:7104 query=/api/v1/status/config'
 stderr 'level=ERROR msg="Query returned an error" err="502 Bad Gateway" uri=http://127.0.0.1:7104 query=/api/v1/status/flags'
-stderr 'level=ERROR msg="Query returned an error" err="502 Bad Gateway" uri=http://127.0.0.1:7104 query=count\(foo\)'
+stderr 'level=ERROR msg="Query returned an error" err="502 Bad Gateway" uri=http://127.0.0.1:7104 query=count\(\\nfoo\\n\)'
 stderr 'level=INFO msg="Problems found" Bug=3'
 -- rules/0001.yml --
 # This should skip all online checks

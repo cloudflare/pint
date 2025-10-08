@@ -73,7 +73,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 		n.Op != promParser.LOR &&
 		n.Op != promParser.LUNLESS {
 
-		q := fmt.Sprintf("count(%s)", n.String())
+		q := wrapExpr(n.String(), "count")
 		qr, err := c.prom.Query(ctx, q)
 		if err != nil {
 			problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug))
@@ -280,9 +280,8 @@ NEXT:
 
 func (c VectorMatchingCheck) seriesLabels(ctx context.Context, query string, ignored ...model.LabelName) (labelSets, string, error) {
 	var expr strings.Builder
-	expr.WriteString("count(")
-	expr.WriteString(query)
-	expr.WriteString(") without(")
+	expr.WriteString(wrapExpr(query, "count"))
+	expr.WriteString(" without(")
 	for i, ln := range ignored {
 		expr.WriteString(string(ln))
 		if i < (len(ignored) - 1) {

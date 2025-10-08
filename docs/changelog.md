@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.75.1
+
+### Fixed
+
+- Some checks would fail to run queries against Prometheus servers if the query had comments in it.
+
 ## v0.75.0
 
 ### Added

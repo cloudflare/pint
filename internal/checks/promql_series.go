@@ -245,7 +245,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry discovery.Entry, entries [
 
 		// 1. If foo{bar, baz} is there -> GOOD
 		slog.LogAttrs(ctx, slog.LevelDebug, "Checking if selector returns anything", slog.String("check", c.Reporter()), slog.String("selector", selector.String()))
-		count, err := c.instantSeriesCount(ctx, fmt.Sprintf("count(%s)", selector.String()))
+		count, err := c.instantSeriesCount(ctx, wrapExpr(selector.String(), "count"))
 		if err != nil {
 			problems = append(problems, problemFromError(err, entry.Rule, c.Reporter(), c.prom.Name(), Bug))
 			continue
@@ -255,7 +255,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry discovery.Entry, entries [
 			continue
 		}
 
-		promUptime, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", c.prom.UptimeMetric()), params)
+		promUptime, err := c.prom.RangeQuery(ctx, wrapExpr(c.prom.UptimeMetric(), "count"), params)
 		if err != nil {
 			slog.LogAttrs(ctx, slog.LevelWarn, "Cannot detect Prometheus uptime gaps", slog.Any("err", err), slog.String("name", c.prom.Name()))
 		}
@@ -299,7 +299,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry discovery.Entry, entries [
 
 		// 2. If foo was NEVER there -> BUG
 		slog.LogAttrs(ctx, slog.LevelDebug, "Checking if base metric has historical series", slog.String("check", c.Reporter()), slog.String("selector", (&bareSelector).String()))
-		trs, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", bareSelector.String()), params)
+		trs, err := c.prom.RangeQuery(ctx, wrapExpr(bareSelector.String(), "count"), params)
 		if err != nil {
 			problems = append(problems, problemFromError(err, entry.Rule, c.Reporter(), c.prom.Name(), Bug))
 			continue
@@ -378,7 +378,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry discovery.Entry, entries [
 			l := stripLabels(selector)
 			l.LabelMatchers = append(l.LabelMatchers, labels.MustNewMatcher(labels.MatchRegexp, name, ".+"))
 			slog.LogAttrs(ctx, slog.LevelDebug, "Checking if base metric has historical series with required label", slog.String("check", c.Reporter()), slog.String("selector", (&l).String()), slog.String("label", name))
-			trsLabelCount, err := c.prom.RangeQuery(ctx, fmt.Sprintf("absent(%s)", l.String()), params)
+			trsLabelCount, err := c.prom.RangeQuery(ctx, wrapExpr(l.String(), "absent"), params)
 			if err != nil {
 				problems = append(problems, problemFromError(err, entry.Rule, c.Reporter(), c.prom.Name(), Bug))
 				continue
@@ -493,7 +493,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry discovery.Entry, entries [
 			addNameSelectorIfNeeded(&labelSelector, selector.LabelMatchers)
 			slog.LogAttrs(ctx, slog.LevelDebug, "Checking if there are historical series matching filter", slog.String("check", c.Reporter()), slog.String("selector", (&labelSelector).String()), slog.String("matcher", lm.String()))
 
-			trsLabel, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", labelSelector.String()), params)
+			trsLabel, err := c.prom.RangeQuery(ctx, wrapExpr(labelSelector.String(), "count"), params)
 			if err != nil {
 				problems = append(problems, problemFromError(err, entry.Rule, c.Reporter(), c.prom.Name(), Bug))
 				continue
@@ -753,7 +753,7 @@ func (c SeriesCheck) checkOtherServer(ctx context.Context, query string, setting
 		)
 
 		tested++
-		qr, err := prom.Query(ctx, fmt.Sprintf("count(%s)", query))
+		qr, err := prom.Query(ctx, wrapExpr(query, "count"))
 		if err != nil {
 			continue
 		}

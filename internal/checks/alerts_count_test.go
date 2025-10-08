@@ -139,7 +139,7 @@ func TestAlertsCountCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(up)`},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1D(),
 				},
@@ -201,7 +201,7 @@ func TestAlertsCountCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(up)`},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1D(),
 				},
@@ -265,7 +265,7 @@ func TestAlertsCountCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(up)`},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1D(),
 				},
@@ -329,7 +329,7 @@ func TestAlertsCountCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(up)`},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1D(),
 				},
@@ -393,7 +393,7 @@ func TestAlertsCountCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(up)`},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1D(),
 				},
@@ -439,7 +439,7 @@ func TestAlertsCountCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(up)`},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1D(),
 				},
@@ -486,7 +486,7 @@ func TestAlertsCountCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(up)`},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1D(),
 				},
@@ -530,7 +530,7 @@ func TestAlertsCountCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(up)`},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithInternalError(),
 				},
@@ -592,7 +592,7 @@ func TestAlertsCountCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(up)`},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1D(),
 				},
@@ -654,7 +654,7 @@ func TestAlertsCountCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(up)`},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1D(),
 				},
