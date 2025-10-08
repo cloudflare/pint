@@ -237,6 +237,11 @@
 
 ---
 
+[TestCostCheck/comments_at_the_end - 1]
+[]
+
+---
+
 [TestCostCheck/connection_refused - 1]
 - description: connection refused
   content: |

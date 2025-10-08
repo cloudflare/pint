@@ -33,7 +33,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(sum(foo))`},
+						formCond{key: "query", value: "count(\nsum(foo)\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
@@ -53,7 +53,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(sum(foo))`},
+						formCond{key: "query", value: "count(\nsum(foo)\n)"},
 					},
 					resp: sleepResponse{sleep: time.Millisecond * 1500},
 				},
@@ -71,7 +71,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(sum(foo))`},
+						formCond{key: "query", value: "count(\nsum(foo)\n)"},
 					},
 					resp: respondWithBadData(),
 				},
@@ -100,7 +100,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(sum(foo))`},
+						formCond{key: "query", value: "count(\nsum(foo)\n)"},
 					},
 					resp: respondWithSingleInstantVector(),
 				},
@@ -129,7 +129,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(sum(foo))`},
+						formCond{key: "query", value: "count(\nsum(foo)\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -168,7 +168,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(sum(foo))`},
+						formCond{key: "query", value: "count(\nsum(foo)\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -207,7 +207,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(sum(foo))`},
+						formCond{key: "query", value: "count(\nsum(foo)\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -246,7 +246,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(sum(foo))`},
+						formCond{key: "query", value: "count(\nsum(foo)\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -280,7 +280,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(sum(foo))`},
+						formCond{key: "query", value: "count(\nsum(foo)\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -318,7 +318,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(sum({__name__="foo"}))`},
+						formCond{key: "query", value: "count(\nsum({__name__=\"foo\"})\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -356,7 +356,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(sum(foo))`},
+						formCond{key: "query", value: "count(\nsum(foo)\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{generateSample(map[string]string{})},
@@ -392,7 +392,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(sum(foo))`},
+						formCond{key: "query", value: "count(\nsum(foo)\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{generateSample(map[string]string{})},
@@ -432,7 +432,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(sum(foo))`},
+						formCond{key: "query", value: "count(\nsum(foo)\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{generateSample(map[string]string{})},
@@ -472,7 +472,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(sum(foo))`},
+						formCond{key: "query", value: "count(\nsum(foo)\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{generateSample(map[string]string{})},
@@ -537,7 +537,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(sum(rate(foo_total[5m])) without(instance) > 10)`},
+						formCond{key: "query", value: "count(\nsum(rate(foo_total[5m])) without(instance) > 10\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -554,7 +554,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(colo:foo > 10)`},
+						formCond{key: "query", value: "count(\ncolo:foo > 10\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -597,7 +597,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(sum(rate(foo_total[5m])) without(instance) > 10)`},
+						formCond{key: "query", value: "count(\nsum(rate(foo_total[5m])) without(instance) > 10\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -623,7 +623,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(sum(foo:rate5m) without(instance) > 10)`},
+						formCond{key: "query", value: "count(\nsum(foo:rate5m) without(instance) > 10\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -756,7 +756,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "count(server_role{role=\"foo\"}\nand on(instance)\nsum by (instance) (irate(node_cpu_seconds_total{job=\"foo\", mode!=\"idle\"}[5m])) > 20\n)"},
+						formCond{key: "query", value: "count(\nserver_role{role=\"foo\"}\nand on(instance)\nsum by (instance) (irate(node_cpu_seconds_total{job=\"foo\", mode!=\"idle\"}[5m])) > 20\n\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -782,7 +782,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "count(server_role{role=\"foo\"}\nand on(instance)\ninstance_mode:node_cpu:rate2m{job=\"foo\", mode!=\"idle\"} > 20\n)"},
+						formCond{key: "query", value: "count(\nserver_role{role=\"foo\"}\nand on(instance)\ninstance_mode:node_cpu:rate2m{job=\"foo\", mode!=\"idle\"} > 20\n\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -833,7 +833,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(sum(rate(foo_total[5m])) without(instance) > 10)`},
+						formCond{key: "query", value: "count(\nsum(rate(foo_total[5m])) without(instance) > 10\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -859,7 +859,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(sum(foo:rate5m) without(instance) > 10)`},
+						formCond{key: "query", value: "count(\nsum(foo:rate5m) without(instance) > 10\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -909,7 +909,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(sum(rate(foo_total[5m])) without(instance) > 10)`},
+						formCond{key: "query", value: "count(\nsum(rate(foo_total[5m])) without(instance) > 10\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -935,7 +935,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(sum(foo:rate5m) without(instance) > 10)`},
+						formCond{key: "query", value: "count(\nsum(foo:rate5m) without(instance) > 10\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -1007,7 +1007,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "count(server_role{role=\"foo\"}\nand on(instance)\nsum by (instance) (irate(node_cpu_seconds_total{job=\"foo\", mode!=\"idle\"}[5m])) > 20\n)"},
+						formCond{key: "query", value: "count(\nserver_role{role=\"foo\"}\nand on(instance)\nsum by (instance) (irate(node_cpu_seconds_total{job=\"foo\", mode!=\"idle\"}[5m])) > 20\n\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -1065,7 +1065,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "count(server_role{role=\"foo\"}\nand on(instance)\nsum by (instance) (irate(node_cpu_seconds_total[5m])) > 20\n)"},
+						formCond{key: "query", value: "count(\nserver_role{role=\"foo\"}\nand on(instance)\nsum by (instance) (irate(node_cpu_seconds_total[5m])) > 20\n\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -1091,7 +1091,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "count(server_role{role=\"foo\"}\nand on(instance)\nsum by (instance) (colo:node_cpu:rate2m) > 20\n)"},
+						formCond{key: "query", value: "count(\nserver_role{role=\"foo\"}\nand on(instance)\nsum by (instance) (colo:node_cpu:rate2m) > 20\n\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -1142,7 +1142,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(sum(vector(1)) > 0)`},
+						formCond{key: "query", value: "count(\nsum(vector(1)) > 0\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -1193,7 +1193,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "count(server_role{job=\"foo\", role=\"foo\"}\nand on(job, instance)\nsum by (instance) (irate(node_cpu_seconds_total{job=\"foo\"}[5m])) > 20\n)"},
+						formCond{key: "query", value: "count(\nserver_role{job=\"foo\", role=\"foo\"}\nand on(job, instance)\nsum by (instance) (irate(node_cpu_seconds_total{job=\"foo\"}[5m])) > 20\n\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -1247,7 +1247,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "count(count(up{job=\"foo\"} and on(instance) enabled == 1) without (instance))"},
+						formCond{key: "query", value: "count(\ncount(up{job=\"foo\"} and on(instance) enabled == 1) without (instance)\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -1295,7 +1295,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "count(count(up{job=\"foo\"} unless on(instance) enabled == 0) without (instance))"},
+						formCond{key: "query", value: "count(\ncount(up{job=\"foo\"} unless on(instance) enabled == 0) without (instance)\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -1345,7 +1345,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "count(sum(rate(foo_total[5m])))"},
+						formCond{key: "query", value: "count(\nsum(rate(foo_total[5m]))\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -1393,7 +1393,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "count(sum(rate(foo_total[5m])) / rate(bar_total[5m]))"},
+						formCond{key: "query", value: "count(\nsum(rate(foo_total[5m])) / rate(bar_total[5m])\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -1441,7 +1441,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "count(sum(rate(foo_total[5m])) / (rate(bar_total[5m]) / on(foo) bad))"},
+						formCond{key: "query", value: "count(\nsum(rate(foo_total[5m])) / (rate(bar_total[5m]) / on(foo) bad)\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -1489,7 +1489,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "count(sum(rate(foo_total[5m])) / (rate(bar_total[5m]) / on(foo) bad))"},
+						formCond{key: "query", value: "count(\nsum(rate(foo_total[5m])) / (rate(bar_total[5m]) / on(foo) bad)\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -1538,7 +1538,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "count(sum without (le) (histogram_fraction(0, 0.03, rate(fl2_request_phase_duration_seconds[5m])) * histogram_count(rate(fl2_request_phase_duration_seconds[5m]))))"},
+						formCond{key: "query", value: "count(\nsum without (le) (histogram_fraction(0, 0.03, rate(fl2_request_phase_duration_seconds[5m])) * histogram_count(rate(fl2_request_phase_duration_seconds[5m])))\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -1558,7 +1558,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "count(sum without (le) (histogram_fraction(0, 0.03, rate(fl2_request_phase_duration_seconds[5m])) * instance_job:fl2_hmd_request_phase_latency_count:rate5m))"},
+						formCond{key: "query", value: "count(\nsum without (le) (histogram_fraction(0, 0.03, rate(fl2_request_phase_duration_seconds[5m])) * instance_job:fl2_hmd_request_phase_latency_count:rate5m)\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -1606,7 +1606,7 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "count(metric / on() histogram_fraction(0, 0.2, metric))"},
+						formCond{key: "query", value: "count(\nmetric / on() histogram_fraction(0, 0.2, metric)\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -1633,6 +1633,33 @@ func TestCostCheck(t *testing.T) {
 							generateSampleWithValue(map[string]string{}, 2048),
 						},
 					},
+				},
+			},
+		},
+		{
+			description: "comments at the end",
+			content: `
+{% raw %} # pint ignore/line
+
+  - record: foo:sum
+    expr: |
+      foo
+      and
+      bar
+
+{% endraw %} # pint ignore/line
+`,
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 0, 0, 0, 0, "", checks.Bug)
+			},
+			prometheus: newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(\nfoo\nand\nbar\n\n       # pint ignore/line\n\n)"},
+					},
+					resp: respondWithEmptyVector(),
 				},
 			},
 		},

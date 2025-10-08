@@ -220,7 +220,7 @@ func (c CostCheck) statToDuration(f float64) time.Duration {
 }
 
 func (c CostCheck) getQueryCost(ctx context.Context, expr string) (*promapi.QueryResult, int, error) {
-	qr, err := c.prom.Query(ctx, fmt.Sprintf("count(%s)", expr))
+	qr, err := c.prom.Query(ctx, wrapExpr(expr, "count"))
 	if err != nil {
 		return nil, 0, err
 	}
@@ -546,4 +546,8 @@ func (c CostCheck) selectorLabels(ops utils.SourceOperations) (lms []*labels.Mat
 		}
 	}
 	return lms
+}
+
+func wrapExpr(expr, call string) string {
+	return call + "(\n" + expr + "\n)"
 }

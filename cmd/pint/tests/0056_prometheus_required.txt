@@ -3,7 +3,7 @@ http start prometheus 127.0.0.1:7056
 
 exec pint -l debug --no-color lint rules
 ! stdout .
-stderr 'level=ERROR msg="Query returned an error" err="500 Internal Server Error" uri=http://127.0.0.1:7056 query=count\(up\)'
+stderr 'level=ERROR msg="Query returned an error" err="500 Internal Server Error" uri=http://127.0.0.1:7056 query=count\(\\nup\\n\)'
 stderr 'level=ERROR msg="Query returned an error" err="500 Internal Server Error" uri=http://127.0.0.1:7056 query=/api/v1/status/config'
 stderr 'level=INFO msg="Problems found" Warning=[0-9]+'
 

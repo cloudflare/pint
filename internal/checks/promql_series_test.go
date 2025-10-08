@@ -125,25 +125,25 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "count(notfound)"},
+						formCond{key: "query", value: "count(\nnotfound\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(notfound)"},
+						formCond{key: "query", value: "count(\nnotfound\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
-					conds: []requestCondition{requireQueryPath, formCond{key: "query", value: "count(found_7)"}},
+					conds: []requestCondition{requireQueryPath, formCond{key: "query", value: "count(\nfound_7\n)"}},
 					resp:  respondWithSingleInstantVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -179,14 +179,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(disk_info{interface_speed!="6.0 Gb/s",type="sat"})`},
+						formCond{key: "query", value: "count(\ndisk_info{interface_speed!=\"6.0 Gb/s\",type=\"sat\"}\n)"},
 					},
 					resp: respondWithSingleInstantVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(node_filesystem_readonly{mountpoint!=""})`},
+						formCond{key: "query", value: "count(\nnode_filesystem_readonly{mountpoint!=\"\"}\n)"},
 					},
 					resp: respondWithSingleInstantVector(),
 				},
@@ -201,7 +201,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(node_filesystem_readonly{mountpoint!=""})`},
+						formCond{key: "query", value: "count(\nnode_filesystem_readonly{mountpoint!=\"\"}\n)"},
 					},
 					resp: respondWithSingleInstantVector(),
 				},
@@ -216,7 +216,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(node_filesystem_readonly{mountpoint!=""})`},
+						formCond{key: "query", value: "count(\nnode_filesystem_readonly{mountpoint!=\"\"}\n)"},
 					},
 					resp: respondWithSingleInstantVector(),
 				},
@@ -303,21 +303,21 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(foo:bar{job="xxx"})`},
+						formCond{key: "query", value: "count(\nfoo:bar{job=\"xxx\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(foo:bar)`},
+						formCond{key: "query", value: "count(\nfoo:bar\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -334,21 +334,21 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(foo:bar{job="xxx"})`},
+						formCond{key: "query", value: "count(\nfoo:bar{job=\"xxx\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(foo:bar)`},
+						formCond{key: "query", value: "count(\nfoo:bar\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -380,21 +380,21 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(foo:bar{job="xxx"})`},
+						formCond{key: "query", value: "count(\nfoo:bar{job=\"xxx\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(foo:bar)`},
+						formCond{key: "query", value: "count(\nfoo:bar\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -454,35 +454,35 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(found{job="foo",notfound="xxx"})`},
+						formCond{key: "query", value: "count(\nfound{job=\"foo\",notfound=\"xxx\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found)`},
+						formCond{key: "query", value: "count(\nfound\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{job=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{job=~\".+\"}\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{notfound=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{notfound=~\".+\"}\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -498,28 +498,28 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(found{notfound="xxx"})`},
+						formCond{key: "query", value: "count(\nfound{notfound=\"xxx\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found)`},
+						formCond{key: "query", value: "count(\nfound\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{notfound=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{notfound=~\".+\"}\n)"},
 					},
 					resp: respondWithInternalError(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -535,14 +535,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(found{job="abc"})`},
+						formCond{key: "query", value: "count(\nfound{job=\"abc\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found)`},
+						formCond{key: "query", value: "count(\nfound\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -558,14 +558,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{job=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{job=~\".+\"}\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -581,14 +581,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(found{cluster="dev",job="abc"})`},
+						formCond{key: "query", value: "count(\nfound{cluster=\"dev\",job=\"abc\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found)`},
+						formCond{key: "query", value: "count(\nfound\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -604,7 +604,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{job="abc"})`},
+						formCond{key: "query", value: "count(\nfound{job=\"abc\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -620,7 +620,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{cluster="dev"})`},
+						formCond{key: "query", value: "count(\nfound{cluster=\"dev\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -636,29 +636,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{job=~".+"})`},
-					},
-					resp: matrixResponse{
-						samples: []*model.SampleStream{
-							generateSampleStream(
-								map[string]string{},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Hour*24*-5).Add(time.Minute*-5),
-								time.Minute*5,
-							),
-							generateSampleStream(
-								map[string]string{},
-								time.Now().Add(time.Hour*24*-5).Add(time.Minute*5),
-								time.Now(),
-								time.Minute*5,
-							),
-						},
-					},
-				},
-				{
-					conds: []requestCondition{
-						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{cluster=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{job=~\".+\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -680,7 +658,29 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "absent(\nfound{cluster=~\".+\"}\n)"},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-5).Add(time.Minute*-5),
+								time.Minute*5,
+							),
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-5).Add(time.Minute*5),
+								time.Now(),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -696,14 +696,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(found{cluster="dev",job="abc"})`},
+						formCond{key: "query", value: "count(\nfound{cluster=\"dev\",job=\"abc\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found)`},
+						formCond{key: "query", value: "count(\nfound\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -719,7 +719,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{job="abc"})`},
+						formCond{key: "query", value: "count(\nfound{job=\"abc\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -735,7 +735,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{cluster="dev"})`},
+						formCond{key: "query", value: "count(\nfound{cluster=\"dev\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -751,7 +751,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{job=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{job=~\".+\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -773,7 +773,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{cluster=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{cluster=~\".+\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -795,7 +795,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -811,14 +811,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(found{cluster="dev",job="abc"})`},
+						formCond{key: "query", value: "count(\nfound{cluster=\"dev\",job=\"abc\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found)`},
+						formCond{key: "query", value: "count(\nfound\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -834,7 +834,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{job="abc"})`},
+						formCond{key: "query", value: "count(\nfound{job=\"abc\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -850,7 +850,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{cluster="dev"})`},
+						formCond{key: "query", value: "count(\nfound{cluster=\"dev\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -866,7 +866,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{job=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{job=~\".+\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -888,7 +888,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{cluster=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{cluster=~\".+\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -910,7 +910,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithInternalError(),
 				},
@@ -925,14 +925,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(found{instance="bar",job="foo"})`},
+						formCond{key: "query", value: "count(\nfound{instance=\"bar\",job=\"foo\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found)`},
+						formCond{key: "query", value: "count(\nfound\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -948,7 +948,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{job=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{job=~\".+\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -964,7 +964,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{instance=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{instance=~\".+\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -980,7 +980,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -996,14 +996,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(found{instance="bar",job="foo"})`},
+						formCond{key: "query", value: "count(\nfound{instance=\"bar\",job=\"foo\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found)`},
+						formCond{key: "query", value: "count(\nfound\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -1019,7 +1019,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{job=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{job=~\".+\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -1035,7 +1035,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{instance=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{instance=~\".+\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -1051,7 +1051,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -1077,14 +1077,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(found{instance="bar",job="foo"})`},
+						formCond{key: "query", value: "count(\nfound{instance=\"bar\",job=\"foo\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found)`},
+						formCond{key: "query", value: "count(\nfound\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -1100,7 +1100,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{job=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{job=~\".+\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -1116,14 +1116,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{instance=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{instance=~\".+\"}\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -1143,14 +1143,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(found{instance="bar",job="foo"})`},
+						formCond{key: "query", value: "count(\nfound{instance=\"bar\",job=\"foo\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found)`},
+						formCond{key: "query", value: "count(\nfound\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -1166,21 +1166,21 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{job=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{job=~\".+\"}\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{instance=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{instance=~\".+\"}\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -1199,14 +1199,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(found{instance="bar",job="foo"})`},
+						formCond{key: "query", value: "count(\nfound{instance=\"bar\",job=\"foo\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found)`},
+						formCond{key: "query", value: "count(\nfound\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -1222,7 +1222,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{job=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{job=~\".+\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -1238,7 +1238,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{instance=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{instance=~\".+\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -1254,7 +1254,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -1273,14 +1273,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(found{instance="bar",job="foo"})`},
+						formCond{key: "query", value: "count(\nfound{instance=\"bar\",job=\"foo\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found)`},
+						formCond{key: "query", value: "count(\nfound\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -1296,7 +1296,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{job=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{job=~\".+\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -1312,7 +1312,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{instance=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{instance=~\".+\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -1328,7 +1328,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -1348,14 +1348,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(found{instance="bar",job="foo"})`},
+						formCond{key: "query", value: "count(\nfound{instance=\"bar\",job=\"foo\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found)`},
+						formCond{key: "query", value: "count(\nfound\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -1371,7 +1371,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{job=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{job=~\".+\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -1387,7 +1387,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{instance=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{instance=~\".+\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -1403,7 +1403,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -1423,14 +1423,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(found{instance="bar",job="foo"})`},
+						formCond{key: "query", value: "count(\nfound{instance=\"bar\",job=\"foo\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found)`},
+						formCond{key: "query", value: "count(\nfound\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -1446,7 +1446,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{job=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{job=~\".+\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -1462,7 +1462,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{instance=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{instance=~\".+\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -1478,7 +1478,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -1498,14 +1498,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(found{instance="bar",job="foo"})`},
+						formCond{key: "query", value: "count(\nfound{instance=\"bar\",job=\"foo\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found)`},
+						formCond{key: "query", value: "count(\nfound\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -1521,7 +1521,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{job=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{job=~\".+\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -1537,7 +1537,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{instance=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{instance=~\".+\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -1553,7 +1553,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -1579,49 +1579,49 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(found{instance!~"bad",instance=~".+",not!="negative",notfound="notfound"})`},
+						formCond{key: "query", value: "count(\nfound{instance!~\"bad\",instance=~\".+\",not!=\"negative\",notfound=\"notfound\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found)`},
+						formCond{key: "query", value: "count(\nfound\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{instance=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{instance=~\".+\"}\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{notfound=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{notfound=~\".+\"}\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{instance=~".+"})`},
+						formCond{key: "query", value: "count(\nfound{instance=~\".+\"}\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{notfound="notfound"})`},
+						formCond{key: "query", value: "count(\nfound{notfound=\"notfound\"}\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -1637,49 +1637,49 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(found{instance!~"bad",instance=~".+",not!="negative",notfound="notfound"})`},
+						formCond{key: "query", value: "count(\nfound{instance!~\"bad\",instance=~\".+\",not!=\"negative\",notfound=\"notfound\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found)`},
+						formCond{key: "query", value: "count(\nfound\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{instance=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{instance=~\".+\"}\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{notfound=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{notfound=~\".+\"}\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{instance=~".+"})`},
+						formCond{key: "query", value: "count(\nfound{instance=~\".+\"}\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{notfound="notfound"})`},
+						formCond{key: "query", value: "count(\nfound{notfound=\"notfound\"}\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -1695,35 +1695,35 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(found{error="xxx"})`},
+						formCond{key: "query", value: "count(\nfound{error=\"xxx\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found)`},
+						formCond{key: "query", value: "count(\nfound\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{error=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{error=~\".+\"}\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{error="xxx"})`},
+						formCond{key: "query", value: "count(\nfound{error=\"xxx\"}\n)"},
 					},
 					resp: respondWithInternalError(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -1739,14 +1739,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(sometimes{churn="notfound"})`},
+						formCond{key: "query", value: "count(\nsometimes{churn=\"notfound\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(sometimes)`},
+						formCond{key: "query", value: "count(\nsometimes\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -1774,7 +1774,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(sometimes{churn=~".+"})`},
+						formCond{key: "query", value: "absent(\nsometimes{churn=~\".+\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -1802,14 +1802,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(sometimes{churn="notfound"})`},
+						formCond{key: "query", value: "count(\nsometimes{churn=\"notfound\"}\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -1828,28 +1828,28 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(foo{error="notfound"})`},
+						formCond{key: "query", value: "count(\nfoo{error=\"notfound\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(foo)`},
+						formCond{key: "query", value: "count(\nfoo\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(foo{error=~".+"})`},
+						formCond{key: "query", value: "absent(\nfoo{error=~\".+\"}\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -1879,28 +1879,28 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(foo{error="notfound"})`},
+						formCond{key: "query", value: "count(\nfoo{error=\"notfound\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(foo)`},
+						formCond{key: "query", value: "count(\nfoo\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(foo{error=~".+"})`},
+						formCond{key: "query", value: "absent(\nfoo{error=~\".+\"}\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -1930,28 +1930,28 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(foo{error="notfound"})`},
+						formCond{key: "query", value: "count(\nfoo{error=\"notfound\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(foo)`},
+						formCond{key: "query", value: "count(\nfoo\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(foo{error=~".+"})`},
+						formCond{key: "query", value: "absent(\nfoo{error=~\".+\"}\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -1982,35 +1982,35 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(foo{error="notfound"})`},
+						formCond{key: "query", value: "count(\nfoo{error=\"notfound\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(foo{error="notfound"})`},
+						formCond{key: "query", value: "count(\nfoo{error=\"notfound\"}\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(foo)`},
+						formCond{key: "query", value: "count(\nfoo\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(foo{error=~".+"})`},
+						formCond{key: "query", value: "absent(\nfoo{error=~\".+\"}\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -2029,28 +2029,28 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(foo{error="notfound"})`},
+						formCond{key: "query", value: "count(\nfoo{error=\"notfound\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(foo)`},
+						formCond{key: "query", value: "count(\nfoo\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(foo{error=~".+"})`},
+						formCond{key: "query", value: "absent(\nfoo{error=~\".+\"}\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -2070,35 +2070,35 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(foo{error="notfound"})`},
+						formCond{key: "query", value: "count(\nfoo{error=\"notfound\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(foo{error="notfound"})`},
+						formCond{key: "query", value: "count(\nfoo{error=\"notfound\"}\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(foo)`},
+						formCond{key: "query", value: "count(\nfoo\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(foo{error=~".+"})`},
+						formCond{key: "query", value: "absent(\nfoo{error=~\".+\"}\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -2114,21 +2114,21 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count({__name__="found",removed="xxx"})`},
+						formCond{key: "query", value: "count(\n{__name__=\"found\",removed=\"xxx\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found)`},
+						formCond{key: "query", value: "count(\nfound\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{removed=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{removed=~\".+\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -2144,7 +2144,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{removed="xxx"})`},
+						formCond{key: "query", value: "count(\nfound{removed=\"xxx\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -2160,7 +2160,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -2180,21 +2180,21 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count({__name__="found",removed="xxx"})`},
+						formCond{key: "query", value: "count(\n{__name__=\"found\",removed=\"xxx\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found)`},
+						formCond{key: "query", value: "count(\nfound\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{removed=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{removed=~\".+\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -2210,7 +2210,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{removed="xxx"})`},
+						formCond{key: "query", value: "count(\nfound{removed=\"xxx\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -2226,7 +2226,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -2245,21 +2245,21 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count({__name__="found",removed="xxx"})`},
+						formCond{key: "query", value: "count(\n{__name__=\"found\",removed=\"xxx\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found)`},
+						formCond{key: "query", value: "count(\nfound\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{removed=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{removed=~\".+\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -2275,7 +2275,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{removed="xxx"})`},
+						formCond{key: "query", value: "count(\nfound{removed=\"xxx\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -2291,7 +2291,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -2307,21 +2307,21 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(found{sometimes="xxx"})`},
+						formCond{key: "query", value: "count(\nfound{sometimes=\"xxx\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found)`},
+						formCond{key: "query", value: "count(\nfound\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{sometimes=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{sometimes=~\".+\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -2355,7 +2355,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{sometimes="xxx"})`},
+						formCond{key: "query", value: "count(\nfound{sometimes=\"xxx\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -2383,7 +2383,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -2399,14 +2399,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(sometimes{foo!="bar"})`},
+						formCond{key: "query", value: "count(\nsometimes{foo!=\"bar\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(sometimes)`},
+						formCond{key: "query", value: "count(\nsometimes\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -2434,7 +2434,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -2449,14 +2449,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(sometimes{foo!="bar"})`},
+						formCond{key: "query", value: "count(\nsometimes{foo!=\"bar\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(sometimes)`},
+						formCond{key: "query", value: "count(\nsometimes\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -2478,7 +2478,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -2509,35 +2509,35 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(found{job="notfound"})`},
+						formCond{key: "query", value: "count(\nfound{job=\"notfound\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(found)"},
+						formCond{key: "query", value: "count(\nfound\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent(found{job=~".+"})`},
+						formCond{key: "query", value: "absent(\nfound{job=~\".+\"}\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{job="notfound"})`},
+						formCond{key: "query", value: "count(\nfound{job=\"notfound\"}\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -2553,21 +2553,21 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(notfound{job="notfound"})`},
+						formCond{key: "query", value: "count(\nnotfound{job=\"notfound\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(notfound)"},
+						formCond{key: "query", value: "count(\nnotfound\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -2586,21 +2586,21 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count({__name__="notfound",job="bar"})`},
+						formCond{key: "query", value: "count(\n{__name__=\"notfound\",job=\"bar\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(notfound)`},
+						formCond{key: "query", value: "count(\nnotfound\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -2649,21 +2649,21 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(notfound{job="foo"})`},
+						formCond{key: "query", value: "count(\nnotfound{job=\"foo\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(notfound)`},
+						formCond{key: "query", value: "count(\nnotfound\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -2683,21 +2683,21 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(notfound{job="foo"})`},
+						formCond{key: "query", value: "count(\nnotfound{job=\"foo\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(notfound)`},
+						formCond{key: "query", value: "count(\nnotfound\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -2717,21 +2717,21 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(notfound{job="foo"})`},
+						formCond{key: "query", value: "count(\nnotfound{job=\"foo\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(notfound)`},
+						formCond{key: "query", value: "count(\nnotfound\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -2904,21 +2904,21 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(notfound)`},
+						formCond{key: "query", value: "count(\nnotfound\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(notfound)`},
+						formCond{key: "query", value: "count(\nnotfound\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -2935,14 +2935,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(foo:count)`},
+						formCond{key: "query", value: "count(\nfoo:count\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(foo:count)`},
+						formCond{key: "query", value: "count(\nfoo:count\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
@@ -2950,21 +2950,21 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(foo:sum)`},
+						formCond{key: "query", value: "count(\nfoo:sum\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(foo:sum)`},
+						formCond{key: "query", value: "count(\nfoo:sum\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -2980,21 +2980,21 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count({__name__=~"(foo|bar)_panics_total",job="myjob"})`},
+						formCond{key: "query", value: "count(\n{__name__=~\"(foo|bar)_panics_total\",job=\"myjob\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count({__name__=~"(foo|bar)_panics_total"})`},
+						formCond{key: "query", value: "count(\n{__name__=~\"(foo|bar)_panics_total\"}\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -3023,28 +3023,28 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count({__name__=~"(foo|bar)_panics_total",job="myjob"})`},
+						formCond{key: "query", value: "count(\n{__name__=~\"(foo|bar)_panics_total\",job=\"myjob\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count({__name__=~"(foo|bar)_panics_total"})`},
+						formCond{key: "query", value: "count(\n{__name__=~\"(foo|bar)_panics_total\"}\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent({__name__=~"(foo|bar)_panics_total",job=~".+"})`},
+						formCond{key: "query", value: "absent(\n{__name__=~\"(foo|bar)_panics_total\",job=~\".+\"}\n)"},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -3060,7 +3060,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count({__name__=~"(foo|bar)_panics_total",job="myjob"})`},
+						formCond{key: "query", value: "count(\n{__name__=~\"(foo|bar)_panics_total\",job=\"myjob\"}\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
@@ -3076,21 +3076,21 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(notfound)`},
+						formCond{key: "query", value: "count(\nnotfound\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(notfound)`},
+						formCond{key: "query", value: "count(\nnotfound\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithInternalError(),
 				},
@@ -3469,7 +3469,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "count(foo)"},
+						formCond{key: "query", value: "count(\nfoo\n)"},
 					},
 					resp: respondWithSingleInstantVector(),
 				},
@@ -3484,14 +3484,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "count(foo)"},
+						formCond{key: "query", value: "count(\nfoo\n)"},
 					},
 					resp: respondWithSingleInstantVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "count(bar)"},
+						formCond{key: "query", value: "count(\nbar\n)"},
 					},
 					resp: respondWithSingleInstantVector(),
 				},
@@ -3526,7 +3526,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requestPathCond{path: "/other" + promapi.APIPathQuery},
-						formCond{key: "query", value: `count(foo)`},
+						formCond{key: "query", value: "count(\nfoo\n)"},
 					},
 					resp: respondWithSingleInstantVector(),
 				},
@@ -3555,21 +3555,21 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(foo)`},
+						formCond{key: "query", value: "count(\nfoo\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(foo)`},
+						formCond{key: "query", value: "count(\nfoo\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -3605,7 +3605,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requestPathCond{path: "/other" + promapi.APIPathQuery},
-						formCond{key: "query", value: `count(foo)`},
+						formCond{key: "query", value: "count(\nfoo\n)"},
 					},
 					resp: respondWithSingleInstantVector(),
 				},
@@ -3634,21 +3634,21 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(foo)`},
+						formCond{key: "query", value: "count(\nfoo\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(foo)`},
+						formCond{key: "query", value: "count(\nfoo\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -3684,7 +3684,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requestPathCond{path: "/other" + promapi.APIPathQuery},
-						formCond{key: "query", value: `count(foo)`},
+						formCond{key: "query", value: "count(\nfoo\n)"},
 					},
 					resp: respondWithSingleInstantVector(),
 				},
@@ -3698,21 +3698,21 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(foo)`},
+						formCond{key: "query", value: "count(\nfoo\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(foo)`},
+						formCond{key: "query", value: "count(\nfoo\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -3727,14 +3727,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count({job="myjob"})`},
+						formCond{key: "query", value: "count(\n{job=\"myjob\"}\n)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(up)`},
+						formCond{key: "query", value: "count(\nup\n)"},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
