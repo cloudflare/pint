@@ -10,6 +10,9 @@ import (
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
+// The number of base rules for each Prometheus server
+const basePrometheusRules = 9
+
 type parsedRule struct {
 	match  []Match
 	ignore []Match
@@ -116,12 +119,13 @@ func defaultMatchStates(cmd ContextCommandVal) []string {
 }
 
 func baseRules(staticRules []staticRule, proms []*promapi.FailoverGroup, match []Match) (rules []parsedRule) {
-	rules = make([]parsedRule, 0, len(staticRules)+(len(proms)*9))
+	rules = make([]parsedRule, 0, len(staticRules)+(len(proms)*basePrometheusRules))
 	for _, sr := range staticRules {
 		rules = append(rules, baseParsedRule(match, sr.name, sr.checker, nil))
 	}
 
 	for _, p := range proms {
+		// basePrometheusRules MUST be adjusted after adding or removing entries here.
 		rules = append(rules,
 			baseParsedRule(match, checks.RateCheckName, checks.NewRateCheck(p), p.Tags()),
 			baseParsedRule(match, checks.SeriesCheckName, checks.NewSeriesCheck(p), p.Tags()),

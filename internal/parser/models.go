@@ -19,6 +19,24 @@ func nodeValue(node *yaml.Node) string {
 }
 
 func mergeComments(node *yaml.Node) (comments []string) {
+	// Only pre-allocate if we know we'll have comments to avoid unnecessary allocations.
+	hasComments := node.HeadComment != "" || node.LineComment != "" || node.FootComment != ""
+	if hasComments || len(node.Content) > 0 {
+		estimatedSize := 0
+		if node.HeadComment != "" {
+			estimatedSize++
+		}
+		if node.LineComment != "" {
+			estimatedSize++
+		}
+		if node.FootComment != "" {
+			estimatedSize++
+		}
+		// Estimate additional space for child comments.
+		estimatedSize += len(node.Content)
+		comments = make([]string, 0, estimatedSize)
+	}
+
 	if node.HeadComment != "" {
 		comments = append(comments, node.HeadComment)
 	}
@@ -134,6 +152,12 @@ func newYamlMap(key, value *yaml.Node, offsetLine, offsetColumn int, contentLine
 	ym := YamlMap{
 		Key:   newYamlNode(key, offsetLine, offsetColumn, contentLines, 1),
 		Items: nil,
+	}
+
+	// Only allocate slice if there are items to add.
+	itemsCapacity := len(value.Content) / 2
+	if itemsCapacity > 0 {
+		ym.Items = make([]*YamlKeyValue, 0, itemsCapacity)
 	}
 
 	var ckey *yaml.Node

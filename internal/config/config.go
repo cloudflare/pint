@@ -81,11 +81,13 @@ func (cfg Config) String() string {
 }
 
 func (cfg *Config) GetChecksForEntry(ctx context.Context, gen *PrometheusGenerator, entry discovery.Entry) []checks.RuleChecker {
-	enabled := []checks.RuleChecker{}
-
 	defaultStates := defaultMatchStates(commandFromContext(ctx))
 	defaultMatch := []Match{{State: defaultStates}}
 	proms := gen.ServersForPath(entry.Path.Name)
+
+	// Estimate capacity: static checks + (prometheus servers * basePrometheusRules checks per server) + config rules
+	estimatedCapacity := len(cfg.staticRules) + (len(proms) * basePrometheusRules) + len(cfg.Rules)
+	enabled := make([]checks.RuleChecker, 0, estimatedCapacity)
 
 	parsedRules := make([]parsedRule, 0, len(cfg.Rules))
 	if entry.PathError != nil || entry.Rule.Error.Err != nil {

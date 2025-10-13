@@ -216,11 +216,11 @@ func (p Parser) parseRule(node *yaml.Node, offsetLine, offsetColumn int, content
 	var labelsNode *yaml.Node
 	var annotationsNode *yaml.Node
 
-	labelsNodes := []yamlMap{}
-	annotationsNodes := []yamlMap{}
+	var labelsNodes []yamlMap
+	var annotationsNodes []yamlMap
 
 	var key *yaml.Node
-	unknownKeys := []*yaml.Node{}
+	var unknownKeys []*yaml.Node
 
 	var lines diags.LineRange
 
