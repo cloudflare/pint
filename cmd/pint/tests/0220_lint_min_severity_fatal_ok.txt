@@ -1,0 +1,38 @@
+! exec pint --no-color lint --min-severity=fatal rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=INFO msg="Loading configuration file" path=.pint.hcl
+level=INFO msg="Finding all rules to check" paths=["rules"]
+level=INFO msg="Checking Prometheus rules" entries=3 workers=10 online=true
+level=WARN msg="You have --min-severity set to a higher severity value than --fail-on, pint might exit with a non-zero code but you won't see the problem that caused it" min-severity=Fatal fail-on=Bug
+level=INFO msg="Problems found" Bug=1 Warning=1 Information=1
+level=INFO msg="3 problem(s) not visible because of --min-severity=fatal flag"
+level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
+-- rules/0001.yml --
+groups:
+- name: foo
+  rules:
+  - alert: info
+    expr: info == 0
+  - alert: warning
+    expr: warning == 0
+  - alert: bug
+    expr: bug == 0
+
+-- .pint.hcl --
+rule {
+  selector "info" {
+    requiredLabels = ["xxx"]
+    severity = "info"
+  }
+  selector "warning" {
+    requiredLabels = ["xxx"]
+    severity = "warning"
+  }
+  selector "bug" {
+    requiredLabels = ["xxx"]
+    severity = "bug"
+  }
+}

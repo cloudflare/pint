@@ -12,6 +12,7 @@ groups:
 -- stderr.txt --
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
+level=WARN msg="You have --min-severity set to a higher severity value than --fail-on, pint might exit with a non-zero code but you won't see the problem that caused it" min-severity=Bug fail-on=Warning
 level=INFO msg="Problems found" Warning=1
 level=INFO msg="1 problem(s) not visible because of --min-severity=bug flag"
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Warning or higher"

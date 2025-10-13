@@ -119,6 +119,18 @@ func actionLint(ctx context.Context, c *cli.Command) error {
 	if err != nil {
 		return fmt.Errorf("invalid --%s value: %w", failOnFlag, err)
 	}
+	if minSeverity > failOn {
+		slog.LogAttrs(
+			ctx,
+			slog.LevelWarn,
+			fmt.Sprintf(
+				"You have --%s set to a higher severity value than --%s, pint might exit with a non-zero code but you won't see the problem that caused it",
+				minSeverityFlag, failOnFlag,
+			),
+			slog.String(minSeverityFlag, minSeverity.String()),
+			slog.String(failOnFlag, failOn.String()),
+		)
+	}
 
 	reps := []reporter.Reporter{}
 	if c.Bool(teamCityFlag) {
