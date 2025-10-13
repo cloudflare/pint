@@ -286,6 +286,16 @@ func (r Rule) IsIdentical(b Rule) bool {
 		return false
 	}
 
+	// Early exit if comment counts differ.
+	if len(r.Comments) != len(b.Comments) {
+		return false
+	}
+
+	// Fast path: if both have no comments, they're equal.
+	if len(r.Comments) == 0 {
+		return true
+	}
+
 	ac := make([]string, 0, len(r.Comments))
 	for _, c := range r.Comments {
 		ac = append(ac, c.Value.String())
