@@ -530,6 +530,11 @@ func nodeKeys(node *yaml.Node) (keys []string) {
 	if node.Kind != yaml.MappingNode {
 		return keys
 	}
+	// Pre-allocate with exact capacity (Content has key-value pairs).
+	keyCount := len(node.Content) / 2
+	if keyCount > 0 {
+		keys = make([]string, 0, keyCount)
+	}
 	for i, n := range node.Content {
 		if i%2 == 0 && n.Value != "" {
 			keys = append(keys, n.Value)
