@@ -90,17 +90,32 @@ func (c *queryCache) gc() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	entries := make(map[uint64]*cacheEntry, len(c.entries)/2)
-
 	now := c.now()
+
+	// First pass: count entries that will survive to allocate exact capacity
+	keepCount := 0
+	for _, ce := range c.entries {
+		if !c.needsEviction(now, ce) {
+			keepCount++
+		}
+	}
+
+	// Allocate new map with exact capacity needed
+	entries := make(map[uint64]*cacheEntry, keepCount)
+
+	// Second pass: copy surviving entries
 	for key, ce := range c.entries {
-		if (!ce.expiresAt.IsZero() && ce.expiresAt.Before(now)) || now.Sub(ce.lastGet) >= c.maxStale {
+		if c.needsEviction(now, ce) {
 			c.evictions++
 			continue
 		}
 		entries[key] = ce
 	}
 	c.entries = entries
+}
+
+func (c *queryCache) needsEviction(now time.Time, ce *cacheEntry) bool {
+	return (!ce.expiresAt.IsZero() && ce.expiresAt.Before(now)) || now.Sub(ce.lastGet) >= c.maxStale
 }
 
 type cacheCollector struct {
