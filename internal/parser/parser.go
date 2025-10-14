@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"regexp"
-	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -526,25 +525,16 @@ func unpackNodes(node *yaml.Node) []*yaml.Node {
 	return nodes
 }
 
-func nodeKeys(node *yaml.Node) (keys []string) {
+func hasKey(node *yaml.Node, key string) bool {
 	if node.Kind != yaml.MappingNode {
-		return keys
-	}
-	// Pre-allocate with exact capacity (Content has key-value pairs).
-	keyCount := len(node.Content) / 2
-	if keyCount > 0 {
-		keys = make([]string, 0, keyCount)
+		return false
 	}
 	for i, n := range node.Content {
-		if i%2 == 0 && n.Value != "" {
-			keys = append(keys, n.Value)
+		if i%2 == 0 && n.Value == key {
+			return true
 		}
 	}
-	return keys
-}
-
-func hasKey(node *yaml.Node, key string) bool {
-	return slices.Contains(nodeKeys(node), key)
+	return false
 }
 
 func hasValue(node *YamlNode) bool {
