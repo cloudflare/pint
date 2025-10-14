@@ -155,6 +155,7 @@ func TestCacheCollector(t *testing.T) {
 
 	names := []string{
 		"pint_prometheus_cache_size",
+		"pint_prometheus_cache_capacity",
 		"pint_prometheus_cache_hits_total",
 		"pint_prometheus_cache_miss_total",
 		"pint_prometheus_cache_evictions_total",
@@ -163,14 +164,17 @@ func TestCacheCollector(t *testing.T) {
 	collector := newCacheCollector(cache, "prom")
 	require.NoError(t, testutil.CollectAndCompare(
 		collector, strings.NewReader(`
-# HELP pint_prometheus_cache_evictions_total Total number of times an entry was evicted from query cache due to size limit or TTL
+# HELP pint_prometheus_cache_evictions_total Total number of times an entry was evicted from query cache due to size limit or TTL.
 # TYPE pint_prometheus_cache_evictions_total counter
 pint_prometheus_cache_evictions_total{name="prom"} 0
-# HELP pint_prometheus_cache_size Total number of entries currently stored in Prometheus query cache
+# HELP pint_prometheus_cache_size Total number of entries currently stored in Prometheus query cache.
 # TYPE pint_prometheus_cache_size gauge
 pint_prometheus_cache_size{name="prom"} 0
+# HELP pint_prometheus_cache_capacity The capacity of Prometheus query cache.
+# TYPE pint_prometheus_cache_capacity gauge
+pint_prometheus_cache_capacity{name="prom"} 0
 `),
-		"pint_prometheus_cache_size", "pint_prometheus_cache_evictions_total",
+		"pint_prometheus_cache_size", "pint_prometheus_cache_capacity", "pint_prometheus_cache_evictions_total",
 	))
 
 	var i uint64
@@ -186,10 +190,10 @@ pint_prometheus_cache_size{name="prom"} 0
 
 	require.NoError(t, testutil.CollectAndCompare(
 		collector, strings.NewReader(`
-# HELP pint_prometheus_cache_evictions_total Total number of times an entry was evicted from query cache due to size limit or TTL
+# HELP pint_prometheus_cache_evictions_total Total number of times an entry was evicted from query cache due to size limit or TTL.
 # TYPE pint_prometheus_cache_evictions_total counter
 pint_prometheus_cache_evictions_total{name="prom"} 0
-# HELP pint_prometheus_cache_hits_total Total number of query cache hits
+# HELP pint_prometheus_cache_hits_total Total number of query cache hits.
 # TYPE pint_prometheus_cache_hits_total counter
 pint_prometheus_cache_hits_total{endpoint="/foo/0",name="prom"} 20
 pint_prometheus_cache_hits_total{endpoint="/foo/1",name="prom"} 20
@@ -201,7 +205,7 @@ pint_prometheus_cache_hits_total{endpoint="/foo/6",name="prom"} 20
 pint_prometheus_cache_hits_total{endpoint="/foo/7",name="prom"} 20
 pint_prometheus_cache_hits_total{endpoint="/foo/8",name="prom"} 20
 pint_prometheus_cache_hits_total{endpoint="/foo/9",name="prom"} 20
-# HELP pint_prometheus_cache_miss_total Total number of query cache misses
+# HELP pint_prometheus_cache_miss_total Total number of query cache misses.
 # TYPE pint_prometheus_cache_miss_total counter
 pint_prometheus_cache_miss_total{endpoint="/foo/0",name="prom"} 20
 pint_prometheus_cache_miss_total{endpoint="/foo/1",name="prom"} 20
@@ -213,9 +217,12 @@ pint_prometheus_cache_miss_total{endpoint="/foo/6",name="prom"} 20
 pint_prometheus_cache_miss_total{endpoint="/foo/7",name="prom"} 20
 pint_prometheus_cache_miss_total{endpoint="/foo/8",name="prom"} 20
 pint_prometheus_cache_miss_total{endpoint="/foo/9",name="prom"} 20
-# HELP pint_prometheus_cache_size Total number of entries currently stored in Prometheus query cache
+# HELP pint_prometheus_cache_size Total number of entries currently stored in Prometheus query cache.
 # TYPE pint_prometheus_cache_size gauge
 pint_prometheus_cache_size{name="prom"} 100
+# HELP pint_prometheus_cache_capacity The capacity of Prometheus query cache.
+# TYPE pint_prometheus_cache_capacity gauge
+pint_prometheus_cache_capacity{name="prom"} 100
 `),
 		names...,
 	))
@@ -229,10 +236,10 @@ pint_prometheus_cache_size{name="prom"} 100
 
 	require.NoError(t, testutil.CollectAndCompare(
 		collector, strings.NewReader(`
-# HELP pint_prometheus_cache_evictions_total Total number of times an entry was evicted from query cache due to size limit or TTL
+# HELP pint_prometheus_cache_evictions_total Total number of times an entry was evicted from query cache due to size limit or TTL.
 # TYPE pint_prometheus_cache_evictions_total counter
 pint_prometheus_cache_evictions_total{name="prom"} 0
-# HELP pint_prometheus_cache_hits_total Total number of query cache hits
+# HELP pint_prometheus_cache_hits_total Total number of query cache hits.
 # TYPE pint_prometheus_cache_hits_total counter
 pint_prometheus_cache_hits_total{endpoint="/foo/0",name="prom"} 20
 pint_prometheus_cache_hits_total{endpoint="/foo/1",name="prom"} 20
@@ -244,7 +251,7 @@ pint_prometheus_cache_hits_total{endpoint="/foo/6",name="prom"} 20
 pint_prometheus_cache_hits_total{endpoint="/foo/7",name="prom"} 20
 pint_prometheus_cache_hits_total{endpoint="/foo/8",name="prom"} 20
 pint_prometheus_cache_hits_total{endpoint="/foo/9",name="prom"} 20
-# HELP pint_prometheus_cache_miss_total Total number of query cache misses
+# HELP pint_prometheus_cache_miss_total Total number of query cache misses.
 # TYPE pint_prometheus_cache_miss_total counter
 pint_prometheus_cache_miss_total{endpoint="/foo/0",name="prom"} 22
 pint_prometheus_cache_miss_total{endpoint="/foo/1",name="prom"} 22
@@ -256,9 +263,12 @@ pint_prometheus_cache_miss_total{endpoint="/foo/6",name="prom"} 22
 pint_prometheus_cache_miss_total{endpoint="/foo/7",name="prom"} 22
 pint_prometheus_cache_miss_total{endpoint="/foo/8",name="prom"} 22
 pint_prometheus_cache_miss_total{endpoint="/foo/9",name="prom"} 22
-# HELP pint_prometheus_cache_size Total number of entries currently stored in Prometheus query cache
+# HELP pint_prometheus_cache_size Total number of entries currently stored in Prometheus query cache.
 # TYPE pint_prometheus_cache_size gauge
 pint_prometheus_cache_size{name="prom"} 110
+# HELP pint_prometheus_cache_capacity The capacity of Prometheus query cache.
+# TYPE pint_prometheus_cache_capacity gauge
+pint_prometheus_cache_capacity{name="prom"} 110
 `),
 		names...,
 	))
@@ -304,17 +314,17 @@ func BenchmarkQueryCacheGC(b *testing.B) {
 
 	for _, percent := range []uint64{0, 1, 10, 20, 25, 50, 75, 99, 100} {
 		b.Run(fmt.Sprintf("%d%%", percent), func(b *testing.B) {
-			b.ResetTimer()
+			const size uint64 = 1000
 			for b.Loop() {
 				b.StopTimer()
-				var now time.Time
+				var (
+					now time.Time
+					ttl time.Duration
+					mod uint64
+				)
 				cache := newQueryCache(time.Hour, func() time.Time {
 					return now
 				})
-
-				var ttl time.Duration
-				var size uint64 = 1000
-				var mod uint64
 				if percent > 0 {
 					mod = uint64(float64(size) / (float64(size) * float64(percent) / 100.0))
 				}
@@ -332,9 +342,12 @@ func BenchmarkQueryCacheGC(b *testing.B) {
 					}
 					cache.set(i, mockErr, ttl)
 				}
+
+				// Bump capacity by test percent to trigger map re-alloc.
+				cache.capacity += int(float64(size) * float64(percent) / 100.0)
+
 				now = now.Add(time.Second)
 				b.StartTimer()
-
 				cache.gc()
 			}
 		})

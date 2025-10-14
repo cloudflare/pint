@@ -40,6 +40,7 @@ type queryCache struct {
 	stats     map[string]*endpointStats
 	maxStale  time.Duration
 	evictions int
+	capacity  int
 	mu        sync.Mutex
 }
 
@@ -85,6 +86,7 @@ func (c *queryCache) set(key uint64, val any, ttl time.Duration) {
 	if ttl > 0 {
 		c.entries[key].expiresAt = c.now().Add(ttl)
 	}
+	c.capacity = max(c.capacity, len(c.entries))
 }
 
 func (c *queryCache) gc() {
@@ -92,7 +94,6 @@ func (c *queryCache) gc() {
 	defer c.mu.Unlock()
 
 	var evictions int
-	initialSize := len(c.entries)
 
 	now := c.now()
 
@@ -106,10 +107,11 @@ func (c *queryCache) gc() {
 	c.evictions += evictions
 
 	// Re-create the map if we evicted >= 25% of entries.
-	if evictions >= initialSize/4 {
+	if c.capacity > 0 && (c.capacity-len(c.entries)) >= (c.capacity/4) {
 		entries := make(map[uint64]*cacheEntry, len(c.entries))
 		maps.Copy(entries, c.entries)
 		c.entries = entries
+		c.capacity = len(c.entries)
 	}
 }
 
@@ -120,9 +122,10 @@ func (c *queryCache) needsEviction(now time.Time, ce *cacheEntry) bool {
 type cacheCollector struct {
 	cache     *queryCache
 	entries   *prometheus.Desc
+	capacity  *prometheus.Desc
+	evictions *prometheus.Desc
 	hits      *prometheus.Desc
 	misses    *prometheus.Desc
-	evictions *prometheus.Desc
 }
 
 func newCacheCollector(cache *queryCache, name string) *cacheCollector {
@@ -130,26 +133,32 @@ func newCacheCollector(cache *queryCache, name string) *cacheCollector {
 		cache: cache,
 		entries: prometheus.NewDesc(
 			"pint_prometheus_cache_size",
-			"Total number of entries currently stored in Prometheus query cache",
+			"Total number of entries currently stored in Prometheus query cache.",
+			nil,
+			prometheus.Labels{"name": name},
+		),
+		capacity: prometheus.NewDesc(
+			"pint_prometheus_cache_capacity",
+			"The capacity of Prometheus query cache.",
+			nil,
+			prometheus.Labels{"name": name},
+		),
+		evictions: prometheus.NewDesc(
+			"pint_prometheus_cache_evictions_total",
+			"Total number of times an entry was evicted from query cache due to size limit or TTL.",
 			nil,
 			prometheus.Labels{"name": name},
 		),
 		hits: prometheus.NewDesc(
 			"pint_prometheus_cache_hits_total",
-			"Total number of query cache hits",
+			"Total number of query cache hits.",
 			[]string{"endpoint"},
 			prometheus.Labels{"name": name},
 		),
 		misses: prometheus.NewDesc(
 			"pint_prometheus_cache_miss_total",
-			"Total number of query cache misses",
+			"Total number of query cache misses.",
 			[]string{"endpoint"},
-			prometheus.Labels{"name": name},
-		),
-		evictions: prometheus.NewDesc(
-			"pint_prometheus_cache_evictions_total",
-			"Total number of times an entry was evicted from query cache due to size limit or TTL",
-			nil,
 			prometheus.Labels{"name": name},
 		),
 	}
@@ -157,19 +166,21 @@ func newCacheCollector(cache *queryCache, name string) *cacheCollector {
 
 func (c *cacheCollector) Describe(ch chan<- *prometheus.Desc) {
 	ch <- c.entries
+	ch <- c.capacity
+	ch <- c.evictions
 	ch <- c.hits
 	ch <- c.misses
-	ch <- c.evictions
 }
 
 func (c *cacheCollector) Collect(ch chan<- prometheus.Metric) {
 	c.cache.mu.Lock()
 	defer c.cache.mu.Unlock()
 	ch <- prometheus.MustNewConstMetric(c.entries, prometheus.GaugeValue, float64(len(c.cache.entries)))
+	ch <- prometheus.MustNewConstMetric(c.capacity, prometheus.GaugeValue, float64(c.cache.capacity))
+	ch <- prometheus.MustNewConstMetric(c.evictions, prometheus.CounterValue, float64(c.cache.evictions))
 
 	for endpoint, stats := range c.cache.stats {
 		ch <- prometheus.MustNewConstMetric(c.hits, prometheus.CounterValue, float64(stats.hits), endpoint)
 		ch <- prometheus.MustNewConstMetric(c.misses, prometheus.CounterValue, float64(stats.misses), endpoint)
 	}
-	ch <- prometheus.MustNewConstMetric(c.evictions, prometheus.CounterValue, float64(c.cache.evictions))
 }

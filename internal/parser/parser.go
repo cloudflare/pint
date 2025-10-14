@@ -529,8 +529,8 @@ func hasKey(node *yaml.Node, key string) bool {
 	if node.Kind != yaml.MappingNode {
 		return false
 	}
-	for i, n := range node.Content {
-		if i%2 == 0 && n.Value == key {
+	for i := 0; i < len(node.Content); i += 2 {
+		if node.Content[i].Value == key {
 			return true
 		}
 	}

@@ -144,7 +144,7 @@ go_sched_gomaxprocs_threads
 # HELP go_threads Number of OS threads created.
 # TYPE go_threads gauge
 go_threads
-# HELP pint_check_duration_seconds How long did a check took to complete
+# HELP pint_check_duration_seconds How long did a check took to complete.
 # TYPE pint_check_duration_seconds summary
 pint_check_duration_seconds_sum{check="alerts/comparison"}
 pint_check_duration_seconds_count{check="alerts/comparison"}
@@ -164,37 +164,37 @@ pint_check_duration_seconds_sum{check="promql/syntax"}
 pint_check_duration_seconds_count{check="promql/syntax"}
 pint_check_duration_seconds_sum{check="yaml/parse"}
 pint_check_duration_seconds_count{check="yaml/parse"}
-# HELP pint_check_iterations_total Total number of completed check iterations since pint start
+# HELP pint_check_iterations_total Total number of completed check iterations since pint start.
 # TYPE pint_check_iterations_total counter
 pint_check_iterations_total
-# HELP pint_last_run_checks The number of checks to run in the current iteration
+# HELP pint_last_run_checks The number of checks to run in the current iteration.
 # TYPE pint_last_run_checks gauge
 pint_last_run_checks
-# HELP pint_last_run_checks_done The number of checks completed in the current iteration
+# HELP pint_last_run_checks_done The number of checks completed in the current iteration.
 # TYPE pint_last_run_checks_done gauge
 pint_last_run_checks_done
-# HELP pint_last_run_duration_seconds Last checks run duration in seconds
+# HELP pint_last_run_duration_seconds Last checks run duration in seconds.
 # TYPE pint_last_run_duration_seconds gauge
 pint_last_run_duration_seconds
-# HELP pint_last_run_time_seconds Last checks run completion time since unix epoch in seconds
+# HELP pint_last_run_time_seconds Last checks run completion time since unix epoch in seconds.
 # TYPE pint_last_run_time_seconds gauge
 pint_last_run_time_seconds
-# HELP pint_problem Prometheus rule problem reported by pint
+# HELP pint_problem Prometheus rule problem reported by pint.
 # TYPE pint_problem gauge
 pint_problem{filename="rules/alice.yml",kind="alerting",name="broken",owner="alice",problem="PromQL syntax error: unexpected right parenthesis ')'",reporter="promql/syntax",severity="fatal"}
 pint_problem{filename="rules/badyaml.yml",kind="invalid",name="unknown",owner="",problem="top level field must be a groups key, got list",reporter="yaml/parse",severity="fatal"}
-# HELP pint_problems Total number of problems reported by pint
+# HELP pint_problems Total number of problems reported by pint.
 # TYPE pint_problems gauge
 pint_problems
-# HELP pint_rule_file_owner This is a boolean metric that describes who is the configured owner for given rule file
+# HELP pint_rule_file_owner This is a boolean metric that describes who is the configured owner for given rule file.
 # TYPE pint_rule_file_owner gauge
 pint_rule_file_owner{filename="rules/alice.yml",owner="alice"}
 pint_rule_file_owner{filename="rules/bob.yml",owner="bob"}
-# HELP pint_rules_parsed_total Total number of rules parsed since startup
+# HELP pint_rules_parsed_total Total number of rules parsed since startup.
 # TYPE pint_rules_parsed_total counter
 pint_rules_parsed_total{kind="alerting"}
 pint_rules_parsed_total{kind="invalid"}
 pint_rules_parsed_total{kind="recording"}
-# HELP pint_version Version information
+# HELP pint_version Version information.
 # TYPE pint_version gauge
 pint_version{version="unknown"}
