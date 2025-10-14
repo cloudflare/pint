@@ -301,44 +301,42 @@ func BenchmarkQueryCacheGetMiss(b *testing.B) {
 
 func BenchmarkQueryCacheGC(b *testing.B) {
 	mockErr := errors.New("Fake Error")
-	var now time.Time
-	cache := newQueryCache(time.Minute, func() time.Time {
-		return now
-	})
 
-	var i uint64
-	var ttl time.Duration
+	for _, percent := range []uint64{0, 1, 10, 20, 25, 50, 75, 99, 100} {
+		b.Run(fmt.Sprintf("%d%%", percent), func(b *testing.B) {
+			b.ResetTimer()
+			for b.Loop() {
+				b.StopTimer()
+				var now time.Time
+				cache := newQueryCache(time.Hour, func() time.Time {
+					return now
+				})
 
-	b.ResetTimer()
-	for n := 0; b.Loop(); n++ {
-		b.StopTimer()
-		if n%2 == 0 {
-			ttl = 0
-		} else {
-			ttl = time.Millisecond
-		}
-		for i = 1; i <= 1000; i++ {
-			cache.set(i, mockErr, ttl)
-		}
-		now = now.Add(time.Millisecond * 2)
-		b.StartTimer()
-		cache.gc()
-	}
-}
+				var ttl time.Duration
+				var size uint64 = 1000
+				var mod uint64
+				if percent > 0 {
+					mod = uint64(float64(size) / (float64(size) * float64(percent) / 100.0))
+				}
 
-func BenchmarkQueryCacheGCNoop(b *testing.B) {
-	var now time.Time
-	cache := newQueryCache(time.Minute, func() time.Time {
-		return now
-	})
-	mockErr := errors.New("Fake Error")
-	var i uint64
-	for i = 1; i <= 1000; i++ {
-		cache.set(i, mockErr, time.Hour)
-	}
+				for i := range size {
+					switch {
+					case mod == 0:
+						ttl = 0
+					case percent == 100:
+						ttl = time.Millisecond
+					case i%mod == 0:
+						ttl = time.Millisecond
+					default:
+						ttl = 0
+					}
+					cache.set(i, mockErr, ttl)
+				}
+				now = now.Add(time.Second)
+				b.StartTimer()
 
-	b.ResetTimer()
-	for b.Loop() {
-		cache.gc()
+				cache.gc()
+			}
+		})
 	}
 }
