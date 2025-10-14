@@ -39,7 +39,7 @@ parser {
 }
 
 -- metrics.txt --
-# HELP pint_check_duration_seconds How long did a check took to complete
+# HELP pint_check_duration_seconds How long did a check took to complete.
 # TYPE pint_check_duration_seconds summary
 pint_check_duration_seconds_sum{check="alerts/absent"}
 pint_check_duration_seconds_count{check="alerts/absent"}
@@ -73,33 +73,37 @@ pint_check_duration_seconds_sum{check="promql/vector_matching"}
 pint_check_duration_seconds_count{check="promql/vector_matching"}
 pint_check_duration_seconds_sum{check="rule/duplicate"}
 pint_check_duration_seconds_count{check="rule/duplicate"}
-# HELP pint_check_iterations_total Total number of completed check iterations since pint start
+# HELP pint_check_iterations_total Total number of completed check iterations since pint start.
 # TYPE pint_check_iterations_total counter
 pint_check_iterations_total
-# HELP pint_last_run_checks The number of checks to run in the current iteration
+# HELP pint_last_run_checks The number of checks to run in the current iteration.
 # TYPE pint_last_run_checks gauge
 pint_last_run_checks
-# HELP pint_last_run_checks_done The number of checks completed in the current iteration
+# HELP pint_last_run_checks_done The number of checks completed in the current iteration.
 # TYPE pint_last_run_checks_done gauge
 pint_last_run_checks_done
-# HELP pint_last_run_duration_seconds Last checks run duration in seconds
+# HELP pint_last_run_duration_seconds Last checks run duration in seconds.
 # TYPE pint_last_run_duration_seconds gauge
 pint_last_run_duration_seconds
-# HELP pint_last_run_time_seconds Last checks run completion time since unix epoch in seconds
+# HELP pint_last_run_time_seconds Last checks run completion time since unix epoch in seconds.
 # TYPE pint_last_run_time_seconds gauge
 pint_last_run_time_seconds
-# HELP pint_problem Prometheus rule problem reported by pint
+# HELP pint_problem Prometheus rule problem reported by pint.
 # TYPE pint_problem gauge
 pint_problem{filename="rules/1.yml",kind="recording",name="aggregate",owner="",problem="unable to run checks: `prom1` Prometheus server at http://127.0.0.1:7057 failed with: `bad_data: bogus query`.",reporter="promql/series",severity="bug"}
 pint_problem{filename="rules/1.yml",kind="recording",name="broken",owner="",problem="PromQL syntax error: unexpected right parenthesis ')'",reporter="promql/syntax",severity="fatal"}
-# HELP pint_problems Total number of problems reported by pint
+# HELP pint_problems Total number of problems reported by pint.
 # TYPE pint_problems gauge
 pint_problems
-# HELP pint_prometheus_cache_evictions_total Total number of times an entry was evicted from query cache due to size limit or TTL
+# HELP pint_prometheus_cache_capacity The capacity of Prometheus query cache.
+# TYPE pint_prometheus_cache_capacity gauge
+pint_prometheus_cache_capacity{name="prom1"}
+pint_prometheus_cache_capacity{name="prom2"}
+# HELP pint_prometheus_cache_evictions_total Total number of times an entry was evicted from query cache due to size limit or TTL.
 # TYPE pint_prometheus_cache_evictions_total counter
 pint_prometheus_cache_evictions_total{name="prom1"}
 pint_prometheus_cache_evictions_total{name="prom2"}
-# HELP pint_prometheus_cache_hits_total Total number of query cache hits
+# HELP pint_prometheus_cache_hits_total Total number of query cache hits.
 # TYPE pint_prometheus_cache_hits_total counter
 pint_prometheus_cache_hits_total{endpoint="/api/v1/metadata",name="prom1"}
 pint_prometheus_cache_hits_total{endpoint="/api/v1/metadata",name="prom2"}
@@ -109,7 +113,7 @@ pint_prometheus_cache_hits_total{endpoint="/api/v1/status/config",name="prom1"}
 pint_prometheus_cache_hits_total{endpoint="/api/v1/status/config",name="prom2"}
 pint_prometheus_cache_hits_total{endpoint="/api/v1/status/flags",name="prom1"}
 pint_prometheus_cache_hits_total{endpoint="/api/v1/status/flags",name="prom2"}
-# HELP pint_prometheus_cache_miss_total Total number of query cache misses
+# HELP pint_prometheus_cache_miss_total Total number of query cache misses.
 # TYPE pint_prometheus_cache_miss_total counter
 pint_prometheus_cache_miss_total{endpoint="/api/v1/metadata",name="prom1"}
 pint_prometheus_cache_miss_total{endpoint="/api/v1/metadata",name="prom2"}
@@ -119,11 +123,11 @@ pint_prometheus_cache_miss_total{endpoint="/api/v1/status/config",name="prom1"}
 pint_prometheus_cache_miss_total{endpoint="/api/v1/status/config",name="prom2"}
 pint_prometheus_cache_miss_total{endpoint="/api/v1/status/flags",name="prom1"}
 pint_prometheus_cache_miss_total{endpoint="/api/v1/status/flags",name="prom2"}
-# HELP pint_prometheus_cache_size Total number of entries currently stored in Prometheus query cache
+# HELP pint_prometheus_cache_size Total number of entries currently stored in Prometheus query cache.
 # TYPE pint_prometheus_cache_size gauge
 pint_prometheus_cache_size{name="prom1"}
 pint_prometheus_cache_size{name="prom2"}
-# HELP pint_prometheus_queries_running Total number of in-flight prometheus queries
+# HELP pint_prometheus_queries_running Total number of in-flight prometheus queries.
 # TYPE pint_prometheus_queries_running gauge
 pint_prometheus_queries_running{endpoint="/api/v1/metadata",name="prom1"}
 pint_prometheus_queries_running{endpoint="/api/v1/metadata",name="prom2"}
@@ -133,7 +137,7 @@ pint_prometheus_queries_running{endpoint="/api/v1/status/config",name="prom1"}
 pint_prometheus_queries_running{endpoint="/api/v1/status/config",name="prom2"}
 pint_prometheus_queries_running{endpoint="/api/v1/status/flags",name="prom1"}
 pint_prometheus_queries_running{endpoint="/api/v1/status/flags",name="prom2"}
-# HELP pint_prometheus_queries_total Total number of all prometheus queries
+# HELP pint_prometheus_queries_total Total number of all prometheus queries.
 # TYPE pint_prometheus_queries_total counter
 pint_prometheus_queries_total{endpoint="/api/v1/metadata",name="prom1"}
 pint_prometheus_queries_total{endpoint="/api/v1/metadata",name="prom2"}
@@ -143,7 +147,7 @@ pint_prometheus_queries_total{endpoint="/api/v1/status/config",name="prom1"}
 pint_prometheus_queries_total{endpoint="/api/v1/status/config",name="prom2"}
 pint_prometheus_queries_total{endpoint="/api/v1/status/flags",name="prom1"}
 pint_prometheus_queries_total{endpoint="/api/v1/status/flags",name="prom2"}
-# HELP pint_prometheus_query_errors_total Total number of failed prometheus queries
+# HELP pint_prometheus_query_errors_total Total number of failed prometheus queries.
 # TYPE pint_prometheus_query_errors_total counter
 pint_prometheus_query_errors_total{endpoint="/api/v1/metadata",name="prom1",reason="api/client_error"}
 pint_prometheus_query_errors_total{endpoint="/api/v1/metadata",name="prom2",reason="connection/error"}
@@ -153,11 +157,11 @@ pint_prometheus_query_errors_total{endpoint="/api/v1/status/config",name="prom1"
 pint_prometheus_query_errors_total{endpoint="/api/v1/status/config",name="prom2",reason="connection/error"}
 pint_prometheus_query_errors_total{endpoint="/api/v1/status/flags",name="prom1",reason="api/unsupported"}
 pint_prometheus_query_errors_total{endpoint="/api/v1/status/flags",name="prom2",reason="connection/error"}
-# HELP pint_rules_parsed_total Total number of rules parsed since startup
+# HELP pint_rules_parsed_total Total number of rules parsed since startup.
 # TYPE pint_rules_parsed_total counter
 pint_rules_parsed_total{kind="alerting"}
 pint_rules_parsed_total{kind="invalid"}
 pint_rules_parsed_total{kind="recording"}
-# HELP pint_version Version information
+# HELP pint_version Version information.
 # TYPE pint_version gauge
 pint_version{version="unknown"}

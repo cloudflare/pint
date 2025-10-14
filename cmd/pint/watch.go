@@ -293,19 +293,19 @@ func newProblemCollector(cfg config.Config, f pathFinderFunc, minSeverity checks
 		fileOwners: map[string]string{},
 		problem: prometheus.NewDesc(
 			"pint_problem",
-			"Prometheus rule problem reported by pint",
+			"Prometheus rule problem reported by pint.",
 			[]string{"filename", "kind", "name", "severity", "reporter", "problem", "owner"},
 			prometheus.Labels{},
 		),
 		problems: prometheus.NewDesc(
 			"pint_problems",
-			"Total number of problems reported by pint",
+			"Total number of problems reported by pint.",
 			[]string{},
 			prometheus.Labels{},
 		),
 		fileOwnersMetric: prometheus.NewDesc(
 			"pint_rule_file_owner",
-			"This is a boolean metric that describes who is the configured owner for given rule file",
+			"This is a boolean metric that describes who is the configured owner for given rule file.",
 			[]string{"filename", "owner"},
 			prometheus.Labels{},
 		),
