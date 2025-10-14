@@ -631,10 +631,15 @@ type yamlMap struct {
 }
 
 func mappingNodes(node *yaml.Node) []yamlMap {
-	count := len(node.Content) / 2
-	m := make([]yamlMap, 0, count)
-	for i := 0; i < len(node.Content); i += 2 {
-		m = append(m, yamlMap{key: node.Content[i], val: node.Content[i+1]})
+	m := make([]yamlMap, 0, len(node.Content)/2)
+	var key *yaml.Node
+	for _, child := range node.Content {
+		if key != nil {
+			m = append(m, yamlMap{key: key, val: child})
+			key = nil
+		} else {
+			key = child
+		}
 	}
 	return m
 }

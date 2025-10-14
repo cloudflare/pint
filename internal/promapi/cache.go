@@ -1,6 +1,7 @@
 package promapi
 
 import (
+	"maps"
 	"sync"
 	"time"
 
@@ -90,28 +91,26 @@ func (c *queryCache) gc() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	var evictions int
+	initialSize := len(c.entries)
+
 	now := c.now()
 
-	// First pass: count entries that will survive to allocate exact capacity
-	keepCount := 0
-	for _, ce := range c.entries {
-		if !c.needsEviction(now, ce) {
-			keepCount++
-		}
-	}
-
-	// Allocate new map with exact capacity needed
-	entries := make(map[uint64]*cacheEntry, keepCount)
-
-	// Second pass: copy surviving entries
 	for key, ce := range c.entries {
 		if c.needsEviction(now, ce) {
-			c.evictions++
-			continue
+			evictions++
+			delete(c.entries, key)
 		}
-		entries[key] = ce
 	}
-	c.entries = entries
+
+	c.evictions += evictions
+
+	// Re-create the map if we evicted >= 25% of entries.
+	if evictions >= initialSize/4 {
+		entries := make(map[uint64]*cacheEntry, len(c.entries))
+		maps.Copy(entries, c.entries)
+		c.entries = entries
+	}
 }
 
 func (c *queryCache) needsEviction(now time.Time, ce *cacheEntry) bool {
