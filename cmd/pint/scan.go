@@ -49,11 +49,9 @@ func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 	}
 
 	for w := 1; w <= workers; w++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			scanWorker(ctx, jobs, results)
-		}()
+		})
 	}
 
 	go func() {
