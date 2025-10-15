@@ -5188,9 +5188,9 @@ func BenchmarkParse(b *testing.B) {
 		f := p.Parse(r)
 
 		b.StopTimer()
-		require.Len(b, f.Groups, 69)
+		require.Len(b, f.Groups, 90)
 		require.NoError(b, f.Error.Err)
-		require.Equal(b, 4669, f.TotalLines)
+		require.Equal(b, 5501, f.TotalLines)
 		b.StartTimer()
 	}
 }
