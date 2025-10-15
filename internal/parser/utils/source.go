@@ -116,12 +116,6 @@ func MostOuterOperation[T promParser.Node](s Source) (T, bool) {
 	return *new(T), false
 }
 
-func newSource() Source {
-	return Source{ // nolint: exhaustruct
-		Labels: map[string]LabelTransform{},
-	}
-}
-
 type Join struct {
 	On          []string
 	Ignoring    []string
@@ -286,7 +280,6 @@ func LabelsSource(expr string, node promParser.Node) (src []Source) {
 }
 
 func walkNode(expr string, node promParser.Node) (src []Source) {
-	s := newSource()
 	switch n := node.(type) {
 	case *promParser.AggregateExpr:
 		src = append(src, walkAggregation(expr, n)...)
@@ -317,6 +310,8 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 		src = append(src, walkNode(expr, n.Expr)...)
 
 	case *promParser.NumberLiteral:
+		var s Source
+		s.Labels = map[string]LabelTransform{}
 		s.Type = NumberSource
 		s.Returns = promParser.ValueTypeScalar
 		s.ReturnInfo.KnownReturn = true
@@ -331,6 +326,8 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 		src = append(src, walkNode(expr, n.Expr)...)
 
 	case *promParser.StringLiteral:
+		var s Source
+		s.Labels = map[string]LabelTransform{}
 		s.Type = StringSource
 		s.Returns = promParser.ValueTypeString
 		s.ReturnInfo.AlwaysReturns = true
@@ -345,6 +342,8 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 		// Not possible to get this from the parser.
 
 	case *promParser.VectorSelector:
+		var s Source
+		s.Labels = map[string]LabelTransform{}
 		s.Type = SelectorSource
 		s.Returns = promParser.ValueTypeVector
 		s.Operations = append(s.Operations, SourceOperation{
@@ -359,7 +358,7 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 		)
 		for _, name := range labelsWithEmptyValueSelector(n) {
 			s.excludeLabel(
-				fmt.Sprintf("Query uses `{%s=\"\"}` selector which will filter out any time series with the `%s` label set.", name, name),
+				"Query uses `{"+name+"=\"\"}` selector which will filter out any time series with the `"+name+"` label set.",
 				n.PosRange,
 				name,
 			)
@@ -416,7 +415,7 @@ func GetQueryFragment(expr string, pos posrange.PositionRange) string {
 }
 
 func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
-	s := newSource()
+	var s Source
 
 	var args []string
 	if n.Param != nil {
@@ -592,7 +591,7 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 }
 
 func parseAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
-	s := newSource()
+	var s Source
 	for _, s = range walkNode(expr, n.Expr) {
 		// If we have sum(foo * bar) then we start with:
 		// - source: foo
