@@ -308,11 +308,11 @@ func (c SeriesCheck) Check(ctx context.Context, entry discovery.Entry, entries [
 		if len(trs.Series.Ranges) == 0 {
 			// Check if we have recording rule that provides this metric before we give up
 			var rrEntry *discovery.Entry
-			for _, entry := range entries {
-				if entry.Rule.RecordingRule != nil &&
-					entry.Rule.Error.Err == nil &&
-					entry.Rule.RecordingRule.Record.Value == bareSelector.String() {
-					rrEntry = &entry
+			for ei := range entries {
+				if entries[ei].Rule.RecordingRule != nil &&
+					entries[ei].Rule.Error.Err == nil &&
+					entries[ei].Rule.RecordingRule.Record.Value == bareSelector.String() {
+					rrEntry = &entries[ei]
 					break
 				}
 			}
