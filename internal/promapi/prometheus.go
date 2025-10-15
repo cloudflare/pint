@@ -194,11 +194,9 @@ func (prom *Prometheus) StartWorkers() {
 	prom.queries = make(chan queryRequest, prom.concurrency*10)
 
 	for w := 1; w <= prom.concurrency; w++ {
-		prom.wg.Add(1)
-		go func() {
-			defer prom.wg.Done()
+		prom.wg.Go(func() {
 			queryWorker(prom, prom.queries)
-		}()
+		})
 	}
 }
 
