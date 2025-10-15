@@ -276,7 +276,7 @@ func queryFunc(_ context.Context, expr string, _ time.Time) (promql.Vector, erro
 }
 
 func normalizeTemplateError(name string, err error) error {
-	e := strings.TrimPrefix(err.Error(), fmt.Sprintf("template: %s:", name))
+	e := strings.TrimPrefix(err.Error(), "template: "+name+":")
 	if v := strings.SplitN(e, ":", 2); len(v) > 1 {
 		e = strings.TrimPrefix(v[1], " ")
 	}

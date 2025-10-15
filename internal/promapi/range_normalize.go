@@ -241,51 +241,55 @@ func (str *SeriesTimeRanges) FindGaps(baseline SeriesTimeRanges, from, until tim
 }
 
 // merge [t1:t2] [t2:t3] together.
+// This will sort the source slice.
 func MergeRanges(source MetricTimeRanges, step time.Duration) (MetricTimeRanges, bool) {
-	merged := map[uint64]MetricTimeRanges{}
-	var ok, found, hadMerged bool
-	var tr TimeRange
-	for _, src := range source {
-		if _, ok = merged[src.Fingerprint]; !ok {
-			merged[src.Fingerprint] = MetricTimeRanges{}
-		}
-
-		found = false
-		for i := 0; i < len(merged[src.Fingerprint]); i++ {
-			if tr, ok = Overlaps(merged[src.Fingerprint][i], src, step); ok {
-				merged[src.Fingerprint][i].Start = tr.Start
-				merged[src.Fingerprint][i].End = tr.End
-				found = true
-				hadMerged = true
-			}
-		}
-		if !found {
-			merged[src.Fingerprint] = append(merged[src.Fingerprint], src)
-		}
-	}
-
-	if !hadMerged {
+	if len(source) < 2 {
 		return source, false
 	}
 
-	for fp := range merged {
-		ok = true
-		for ok {
-			merged[fp], ok = MergeRanges(merged[fp], step)
+	merged := source
+
+	// anyMergeOccurred tracks if any merge happened across all passes.
+	var anyMergeOccurred bool
+	// Loop until no more merges can be made.
+	// This is needed to handle complex cases like [1, 5], [8, 10], [4, 9]
+	// which first merges to [1, 9], [8, 10] and then requires a second pass
+	// to merge to [1, 10].
+	for {
+		sort.Stable(merged)
+
+		// passMerged tracks if any merge happened in the current pass.
+		var passMerged bool
+		result := make(MetricTimeRanges, 0, len(merged))
+		if len(merged) > 0 {
+			result = append(result, merged[0])
+		}
+
+		for i := 1; i < len(merged); i++ {
+			last := len(result) - 1
+			if tr, ok := Overlaps(result[last], merged[i], step); ok {
+				result[last].Start = tr.Start
+				result[last].End = tr.End
+				passMerged = true
+				anyMergeOccurred = true
+			} else {
+				result = append(result, merged[i])
+			}
+		}
+
+		merged = result
+
+		// If a pass completes with no merges, we are done.
+		if !passMerged {
+			break
 		}
 	}
 
-	var total int
-	for _, ranges := range merged {
-		total += len(ranges)
+	if !anyMergeOccurred {
+		return source, false
 	}
-	all := make(MetricTimeRanges, 0, total)
-	for _, ranges := range merged {
-		all = append(all, ranges...)
-	}
-	sort.Stable(all)
 
-	return all, hadMerged
+	return merged, true
 }
 
 func ExpandRangesEnd(src MetricTimeRanges, step time.Duration) {

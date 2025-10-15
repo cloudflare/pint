@@ -133,7 +133,7 @@ type Snooze struct {
 }
 
 func (s Snooze) String() string {
-	return fmt.Sprintf("%s %s", s.Until.Format(time.RFC3339), s.Match)
+	return s.Until.Format(time.RFC3339) + " " + s.Match
 }
 
 type RuleSet struct {

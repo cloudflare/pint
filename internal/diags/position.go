@@ -1,7 +1,6 @@
 package diags
 
 import (
-	"fmt"
 	"strconv"
 
 	"go.yaml.in/yaml/v3"
@@ -16,7 +15,7 @@ func (lr LineRange) String() string {
 	if lr.First == lr.Last {
 		return strconv.Itoa(lr.First)
 	}
-	return fmt.Sprintf("%d-%d", lr.First, lr.Last)
+	return strconv.Itoa(lr.First) + "-" + strconv.Itoa(lr.Last)
 }
 
 func (lr LineRange) Expand() []int {
