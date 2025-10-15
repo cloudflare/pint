@@ -318,7 +318,7 @@ type labelSet struct {
 }
 
 func (ls labelSet) String() string {
-	return fmt.Sprintf("[%s]", strings.Join(ls.names, ", "))
+	return "[" + strings.Join(ls.names, ", ") + "]"
 }
 
 func (ls *labelSet) add(n string) {

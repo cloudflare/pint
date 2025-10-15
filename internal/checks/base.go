@@ -136,7 +136,7 @@ type RuleChecker interface {
 }
 
 func problemFromError(err error, rule parser.Rule, reporter, prom string, s Severity) Problem {
-	promDesc := fmt.Sprintf("%q", prom)
+	promDesc := "\"" + prom + "\""
 	var perr *promapi.FailoverGroupError
 	perrOk := errors.As(err, &perr)
 	if perrOk {

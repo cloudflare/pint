@@ -2,7 +2,6 @@ package config
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"regexp"
 	"slices"
@@ -154,7 +153,7 @@ func isDisabledForRule(rule parser.Rule, name string, check checks.RuleChecker, 
 		check.String(),
 	}
 	for _, tag := range promTags {
-		matches = append(matches, fmt.Sprintf("%s(+%s)", name, tag))
+		matches = append(matches, name+"(+"+tag+")")
 	}
 	for _, disable := range comments.Only[comments.Disable](rule.Comments, comments.DisableType) {
 		for _, match := range matches {
@@ -199,7 +198,7 @@ func isEnabled(enabledChecks, disabledChecks []string, rule parser.Rule, name st
 			return false
 		}
 		for _, tag := range promTags {
-			if c == fmt.Sprintf("%s(+%s)", name, tag) {
+			if c == name+"(+"+tag+")" {
 				return false
 			}
 		}
