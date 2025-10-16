@@ -336,11 +336,3 @@ func AppendSampleToRanges(dst MetricTimeRanges, ls labels.Labels, vals []model.S
 
 	return dst
 }
-
-func MetricToLabels(m model.Metric) labels.Labels {
-	lset := make([]string, 0, len(m)*2)
-	for k, v := range m {
-		lset = append(lset, string(k), string(v))
-	}
-	return labels.FromStrings(lset...)
-}

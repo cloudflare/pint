@@ -16,6 +16,7 @@ import (
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
+	"github.com/prometheus/prometheus/model/labels"
 	"github.com/prymitive/current"
 
 	"github.com/cloudflare/pint/internal/output"
@@ -105,7 +106,7 @@ func (prom *Prometheus) RangeQuery(ctx context.Context, expr string, params Rang
 	queryStep := (time.Hour * 2).Round(step)
 	if queryStep > lookback {
 		queryStep = lookback
-		slices = append(slices, TimeRange{Start: start, End: end})
+		slices = []TimeRange{{Start: start, End: end}}
 	} else {
 		slices = sliceRange(start, end, step, queryStep)
 	}
@@ -143,12 +144,12 @@ func (prom *Prometheus) RangeQuery(ctx context.Context, expr string, params Rang
 				},
 				ttl: s.End.Sub(start) + time.Minute*10,
 			},
+			result: make(chan queryResult),
 		}
 
 		wg.Add(1)
-		go func() {
+		go func(query queryRequest) {
 			var result queryResult
-			query.result = make(chan queryResult)
 			prom.queries <- query
 			result = <-query.result
 			results <- result
@@ -156,7 +157,7 @@ func (prom *Prometheus) RangeQuery(ctx context.Context, expr string, params Rang
 			if result.err != nil {
 				cancel()
 			}
-		}()
+		}(query)
 	}
 
 	go func() {
@@ -173,12 +174,29 @@ func (prom *Prometheus) RangeQuery(ctx context.Context, expr string, params Rang
 		},
 	}
 
+	// Collect all results first, then process.
+	allResults := make([]queryResult, 0, len(slices))
 	for result := range results {
+		allResults = append(allResults, result)
+		wg.Done()
+	}
+
+	// Pre-allocate the slice for all ranges.
+	totalRanges := 0
+	for _, result := range allResults {
+		if result.err != nil {
+			continue
+		}
+		totalRanges += len(result.value.(MetricTimeRanges))
+	}
+	merged.Series.Ranges = make(MetricTimeRanges, 0, totalRanges)
+
+	// Merge all results.
+	for _, result := range allResults {
 		if result.err != nil {
 			if !errors.Is(result.err, context.Canceled) {
 				lastErr = result.err
 			}
-			wg.Done()
 			continue
 		}
 		merged.Series.Ranges = append(merged.Series.Ranges, result.value.(MetricTimeRanges)...)
@@ -190,8 +208,8 @@ func (prom *Prometheus) RangeQuery(ctx context.Context, expr string, params Rang
 		merged.Stats.Timings.InnerEvalTime += result.stats.Timings.InnerEvalTime
 		merged.Stats.Timings.QueryPreparationTime += result.stats.Timings.QueryPreparationTime
 		merged.Stats.Timings.ResultSortTime += result.stats.Timings.ResultSortTime
-		wg.Done()
 	}
+
 	if len(merged.Series.Ranges) > 1 {
 		merged.Series.Ranges, _ = MergeRanges(merged.Series.Ranges, step)
 	}
@@ -216,6 +234,10 @@ func sliceRange(start, end time.Time, resolution, sliceSize time.Duration) (slic
 	if end.Sub(start) <= resolution {
 		return []TimeRange{{Start: start, End: end}}
 	}
+
+	// Estimate the number of slices to pre-allocate memory.
+	estimatedSlices := int(end.Sub(start).Hours()/sliceSize.Hours()) + 2
+	slices = make([]TimeRange, 0, estimatedSlices)
 
 	rstart := start.Round(sliceSize)
 
@@ -278,6 +300,9 @@ func (rr RelativeRange) String() string {
 func streamSampleStream(r io.Reader, step time.Duration) (dst MetricTimeRanges, stats QueryStats, err error) {
 	defer dummyReadAll(r)
 
+	empty := labels.EmptyLabels()
+	lb := labels.NewBuilder(empty)
+
 	var status, errType, errText, resultType string
 	errText = "empty response object"
 	var sample model.SampleStream
@@ -298,10 +323,13 @@ func streamSampleStream(r io.Reader, step time.Duration) (dst MetricTimeRanges, 
 			current.Key("result", current.Array(
 				&sample,
 				func() {
-					lset := MetricToLabels(sample.Metric)
-					dst = AppendSampleToRanges(dst, lset, sample.Values, step)
+					lb.Reset(empty)
+					for k, v := range sample.Metric {
+						lb.Set(string(k), string(v))
+					}
+					dst = AppendSampleToRanges(dst, lb.Labels(), sample.Values, step)
 					sample.Metric = model.Metric{}
-					sample.Values = make([]model.SamplePair, 0, len(sample.Values))
+					sample.Values = sample.Values[:0]
 				},
 			)),
 			current.Key("stats", current.Object(

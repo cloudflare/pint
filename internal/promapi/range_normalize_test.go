@@ -449,13 +449,18 @@ func TestAppendSampleToRanges(t *testing.T) {
 		},
 	}
 
+	empty := labels.EmptyLabels()
+	lb := labels.NewBuilder(empty)
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			for range 50 {
 				tc := tc
 				for _, s := range tc.samples {
-					lset := promapi.MetricToLabels(s.Metric)
-					tc.in = promapi.AppendSampleToRanges(tc.in, lset, s.Values, tc.step)
+					lb.Reset(empty)
+					for k, v := range s.Metric {
+						lb.Set(string(k), string(v))
+					}
+					tc.in = promapi.AppendSampleToRanges(tc.in, lb.Labels(), s.Values, tc.step)
 				}
 				tc.in, _ = promapi.MergeRanges(tc.in, tc.step)
 				sort.Stable(tc.in)

@@ -117,6 +117,9 @@ type Sample struct {
 func streamSamples(r io.Reader) (samples []Sample, stats QueryStats, err error) {
 	defer dummyReadAll(r)
 
+	empty := labels.EmptyLabels()
+	lb := labels.NewBuilder(empty)
+
 	var status, resultType, errType, errText string
 	errText = "empty response object"
 	samples = []Sample{}
@@ -138,8 +141,12 @@ func streamSamples(r io.Reader) (samples []Sample, stats QueryStats, err error) 
 			current.Key("result", current.Array(
 				&sample,
 				func() {
+					lb.Reset(empty)
+					for k, v := range sample.Metric {
+						lb.Set(string(k), string(v))
+					}
 					samples = append(samples, Sample{
-						Labels: MetricToLabels(sample.Metric),
+						Labels: lb.Labels(),
 						Value:  float64(sample.Value),
 					})
 					sample.Metric = model.Metric{}
