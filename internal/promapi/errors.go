@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"log/slog"
 	"net"
 	"net/http"
@@ -105,7 +104,7 @@ func decodeError(err error) string {
 
 	var e1 APIError
 	if ok := errors.As(err, &e1); ok {
-		return fmt.Sprintf("%s: %s", e1.ErrorType, e1.Err)
+		return string(e1.ErrorType) + ": " + e1.Err
 	}
 
 	return err.Error()

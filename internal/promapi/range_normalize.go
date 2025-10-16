@@ -1,7 +1,6 @@
 package promapi
 
 import (
-	"fmt"
 	"slices"
 	"sort"
 	"strings"
@@ -179,7 +178,7 @@ type MetricTimeRanges []MetricTimeRange
 func (mtr MetricTimeRanges) String() string {
 	sl := make([]string, 0, len(mtr))
 	for _, tr := range mtr {
-		sl = append(sl, fmt.Sprintf("%s %s > %s", tr.Labels, tr.Start.UTC().Format(time.RFC3339), tr.End.UTC().Format(time.RFC3339)))
+		sl = append(sl, tr.Labels.String()+" "+tr.Start.UTC().Format(time.RFC3339)+" > "+tr.End.UTC().Format(time.RFC3339))
 	}
 	return strings.Join(sl, " ** ")
 }

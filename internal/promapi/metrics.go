@@ -2,7 +2,6 @@ package promapi
 
 import (
 	"errors"
-	"fmt"
 	"net"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -46,7 +45,7 @@ func errReason(err error) string {
 
 	var e1 APIError
 	if ok := errors.As(err, &e1); ok {
-		return fmt.Sprintf("api/%s", e1.ErrorType)
+		return "api/" + string(e1.ErrorType)
 	}
 
 	return "connection/error"
