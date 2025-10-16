@@ -7131,7 +7131,7 @@ output:
             kind: excluded
             fragment:
                 start: 1
-                end: 41
+                end: 40
       deadinfo: null
       returns: vector
       operations:
@@ -7168,7 +7168,7 @@ output:
             kind: excluded
             fragment:
                 start: 1
-                end: 41
+                end: 40
       deadinfo: null
       returns: vector
       operations:
@@ -7368,7 +7368,7 @@ output:
                     kind: excluded
                     fragment:
                         start: 70
-                        end: 79
+                        end: 78
             deadinfo: null
             returns: vector
             operations:
@@ -7500,7 +7500,7 @@ output:
                     kind: excluded
                     fragment:
                         start: 70
-                        end: 79
+                        end: 78
             deadinfo: null
             returns: vector
             operations:
@@ -8019,7 +8019,7 @@ output:
             kind: excluded
             fragment:
                 start: 1
-                end: 23
+                end: 22
         job:
             reason: Query is using aggregation that removes all labels.
             kind: excluded
@@ -8099,13 +8099,13 @@ output:
             kind: excluded
             fragment:
                 start: 5
-                end: 23
+                end: 21
         __name__:
             reason: Aggregation removes metric name.
             kind: excluded
             fragment:
                 start: 5
-                end: 23
+                end: 21
       deadinfo:
         reason: '`vector(0) > 0` always evaluates to `0 > 0` which is not possible, so it will never return anything.'
         fragment:
