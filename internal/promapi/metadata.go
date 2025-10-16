@@ -126,7 +126,7 @@ func streamMetadata(r io.Reader) (meta map[string][]v1.Metadata, err error) {
 
 	dec := json.NewDecoder(r)
 	if err = decoder.Stream(dec); err != nil {
-		return nil, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("JSON parse error: %s", err)}
+		return nil, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: "JSON parse error: " + err.Error()}
 	}
 
 	if status != "success" {

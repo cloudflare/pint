@@ -4,8 +4,6 @@ PINT_SRC     := $(shell find $(PINT_GO_DIRS) -type f -name '*.go')
 PINT_VERSION ?= $(shell git describe --tags --always --dirty='-dev')
 PINT_COMMIT  ?= $(shell git rev-parse HEAD)
 
-GOFLAGS := -tags stringlabels
-
 COVER_DIR     = .cover
 COVER_PROFILE = $(COVER_DIR)/coverage.out
 
@@ -14,7 +12,6 @@ build: $(PINT_BIN)
 
 $(PINT_BIN): $(PINT_SRC) go.mod go.sum
 	CGO_ENABLED=0 go build \
-	    $(GOFLAGS) \
 		-trimpath \
 		-ldflags='-X main.version=$(PINT_VERSION) -X main.commit=$(PINT_COMMIT) -s -w' \
 		./cmd/pint
@@ -34,7 +31,6 @@ test:
 	mkdir -p $(COVER_DIR)
 	echo 'mode: atomic' > $(COVER_PROFILE)
 	go test \
-		$(GOFLAGS) \
 		-covermode=atomic \
 		-coverprofile=$(COVER_PROFILE) \
 		-coverpkg=./... \
@@ -63,7 +59,6 @@ coverhtml: test
 .PHONY: benchmark
 benchmark:
 	go test \
-	    $(GOFLAGS) \
 		-timeout=15m \
 		-count=5 \
 		-run=none \

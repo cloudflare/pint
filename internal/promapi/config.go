@@ -141,7 +141,7 @@ func streamConfig(r io.Reader) (cfg PrometheusConfig, err error) {
 
 	dec := json.NewDecoder(r)
 	if err = decoder.Stream(dec); err != nil {
-		return cfg, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("JSON parse error: %s", err)}
+		return cfg, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: "JSON parse error: " + err.Error()}
 	}
 
 	if status != "success" {

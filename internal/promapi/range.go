@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"log/slog"
 	"math"
@@ -120,7 +119,7 @@ func (prom *Prometheus) RangeQuery(ctx context.Context, expr string, params Rang
 		slog.Int("slices", len(slices)),
 	)
 
-	key := fmt.Sprintf("%s/%s/%s", APIPathQueryRange, expr, params.String())
+	key := APIPathQueryRange + "\n" + expr + "\n" + params.String()
 	prom.locker.lock(key)
 	defer prom.locker.unlock(key)
 
@@ -273,7 +272,7 @@ func (rr RelativeRange) Step() time.Duration {
 }
 
 func (rr RelativeRange) String() string {
-	return fmt.Sprintf("%s/%s", output.HumanizeDuration(rr.lookback), output.HumanizeDuration(rr.step))
+	return output.HumanizeDuration(rr.lookback) + "/" + output.HumanizeDuration(rr.step)
 }
 
 func streamSampleStream(r io.Reader, step time.Duration) (dst MetricTimeRanges, stats QueryStats, err error) {
@@ -340,7 +339,7 @@ func streamSampleStream(r io.Reader, step time.Duration) (dst MetricTimeRanges, 
 
 	dec := json.NewDecoder(r)
 	if err = decoder.Stream(dec); err != nil {
-		return nil, stats, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("JSON parse error: %s", err)}
+		return nil, stats, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: "JSON parse error: " + err.Error()}
 	}
 
 	if status != "success" {
