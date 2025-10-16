@@ -503,6 +503,17 @@ func TestMergeRanges(t *testing.T) {
 		{
 			in: promapi.MetricTimeRanges{
 				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-20T00:00:44Z"), End: timeParse("2022-10-20T14:00:44Z")},
+				{Fingerprint: labels.FromStrings("foo", "bar").Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-20T00:00:44Z"), End: timeParse("2022-10-20T14:00:44Z")},
+			},
+			out: promapi.MetricTimeRanges{
+				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-20T00:00:44Z"), End: timeParse("2022-10-20T14:01:43Z")},
+				{Fingerprint: labels.FromStrings("foo", "bar").Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-20T00:00:44Z"), End: timeParse("2022-10-20T14:01:43Z")},
+			},
+			step: time.Minute,
+		},
+		{
+			in: promapi.MetricTimeRanges{
+				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-20T00:00:44Z"), End: timeParse("2022-10-20T14:00:44Z")},
 				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-19T16:00:44Z"), End: timeParse("2022-10-19T20:00:44Z")},
 				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-19T14:00:44Z"), End: timeParse("2022-10-19T16:00:44Z")},
 				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-24T18:00:44Z"), End: timeParse("2022-10-25T22:00:44Z")},
