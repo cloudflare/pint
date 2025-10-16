@@ -1,6 +1,10 @@
 # Changelog
 
-## v0.75.1
+## v0.76.0
+
+### Added
+
+- Added support for `toDuration` and `now` template functions added in [Prometheus v3.6](https://github.com/prometheus/prometheus/releases/tag/v3.6.0).
 
 ### Fixed
 

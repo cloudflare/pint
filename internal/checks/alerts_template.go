@@ -61,6 +61,8 @@ var (
 		"humanizePercentage": dummyFuncMap,
 		"humanizeTimestamp":  dummyFuncMap,
 		"toTime":             dummyFuncMap,
+		"toDuration":         dummyFuncMap,
+		"now":                dummyFuncMap,
 		"pathPrefix":         dummyFuncMap,
 		"externalURL":        dummyFuncMap,
 		"parseDuration":      dummyFuncMap,

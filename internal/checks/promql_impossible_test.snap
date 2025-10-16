@@ -106,7 +106,7 @@
         {job="foo"} unless on(__name__) count(sum({job="foo"})) by(__name__)
   output: |
     4 |     {job="foo"} unless on(__name__) count(sum({job="foo"})) by(__name__)
-                                                  ^^^^^^^^^^^^^^^^^ The right hand side will never be matched because it doesn't have the `__name__` label from `on(...)`. Aggregation removes metric name.
+                                                  ^^^^^^^^^^^^^^^^ The right hand side will never be matched because it doesn't have the `__name__` label from `on(...)`. Aggregation removes metric name.
   problem:
     reporter: promql/impossible
     summary: dead code in query
@@ -118,7 +118,7 @@
               firstcolumn: 5
               lastcolumn: 72
           firstcolumn: 39
-          lastcolumn: 55
+          lastcolumn: 54
           kind: 0
     lines:
         first: 4
