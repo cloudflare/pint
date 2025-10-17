@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"regexp"
 	"slices"
+	"strings"
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -148,10 +149,9 @@ func (rule Rule) validate() (err error) {
 }
 
 func isDisabledForRule(rule parser.Rule, name string, check checks.RuleChecker, promTags []string) bool {
-	matches := []string{
-		name,
-		check.String(),
-	}
+	matches := make([]string, 0, len(promTags)+2)
+	matches = append(matches, name)
+	matches = append(matches, check.String())
 	for _, tag := range promTags {
 		matches = append(matches, name+"(+"+tag+")")
 	}
@@ -197,9 +197,11 @@ func isEnabled(enabledChecks, disabledChecks []string, rule parser.Rule, name st
 		if c == name || c == check.String() {
 			return false
 		}
-		for _, tag := range promTags {
-			if c == name+"(+"+tag+")" {
-				return false
+		if strings.HasPrefix(c, name) {
+			for _, tag := range promTags {
+				if c == name+"(+"+tag+")" {
+					return false
+				}
 			}
 		}
 	}
