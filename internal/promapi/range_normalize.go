@@ -9,51 +9,6 @@ import (
 	"github.com/prometheus/prometheus/model/labels"
 )
 
-func labelValue(ls labels.Labels, name string) (val string, ok bool) {
-	ls.Range(func(l labels.Label) {
-		if l.Name == name {
-			val = l.Value
-			ok = true
-		}
-	})
-	return val, ok
-}
-
-func labelsBefore(ls, o labels.Labels) bool {
-	if ls.Len() < o.Len() {
-		return true
-	}
-	if ls.Len() > o.Len() {
-		return false
-	}
-
-	lns := make([]string, 0, ls.Len()+o.Len())
-	ls.Range(func(l labels.Label) {
-		lns = append(lns, l.Name)
-	})
-	o.Range(func(l labels.Label) {
-		lns = append(lns, l.Name)
-	})
-	slices.Sort(lns)
-	for _, ln := range lns {
-		mlv, ok := labelValue(ls, ln)
-		if !ok {
-			return true
-		}
-		olv, ok := labelValue(o, ln)
-		if !ok {
-			return false
-		}
-		if mlv < olv {
-			return true
-		}
-		if mlv > olv {
-			return false
-		}
-	}
-	return false
-}
-
 type TimeRange struct {
 	Start time.Time
 	End   time.Time
@@ -182,19 +137,11 @@ func (mtr MetricTimeRanges) String() string {
 	return strings.Join(sl, " ** ")
 }
 
-func (mtr MetricTimeRanges) Len() int {
-	return len(mtr)
-}
-
-func (mtr MetricTimeRanges) Swap(i, j int) {
-	mtr[i], mtr[j] = mtr[j], mtr[i]
-}
-
-func (mtr MetricTimeRanges) Less(i, j int) bool {
-	if mtr[i].Fingerprint != mtr[j].Fingerprint {
-		return labelsBefore(mtr[i].Labels, mtr[j].Labels)
+func CompareMetricTimeRanges(a, b MetricTimeRange) int {
+	if a.Fingerprint != b.Fingerprint {
+		return labels.Compare(a.Labels, b.Labels)
 	}
-	return mtr[i].Start.Before(mtr[j].Start)
+	return a.Start.Compare(b.Start)
 }
 
 type SeriesTimeRanges struct {
@@ -241,19 +188,14 @@ func (str *SeriesTimeRanges) FindGaps(baseline SeriesTimeRanges, from, until tim
 // merge [t1:t2] [t2:t3] together.
 // This will sort the source slice.
 func MergeRanges(source MetricTimeRanges, step time.Duration) (MetricTimeRanges, bool) {
-	slices.SortStableFunc(source, func(a, b MetricTimeRange) int {
-		if a.Fingerprint != b.Fingerprint {
-			return labels.Compare(a.Labels, b.Labels)
-		}
-		return a.Start.Compare(b.Start)
-	})
+	slices.SortStableFunc(source, CompareMetricTimeRanges)
 
 	var (
 		ok, hadMerged bool
 		tr            TimeRange
 	)
 
-	merged := make(MetricTimeRanges, 0, len(source)/4)
+	merged := make(MetricTimeRanges, 0, len(source))
 L:
 	for i := range source {
 		for j := len(merged) - 1; j >= 0; j-- {

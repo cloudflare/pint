@@ -260,14 +260,14 @@ func (c SeriesCheck) Check(ctx context.Context, entry discovery.Entry, entries [
 		if err != nil {
 			slog.LogAttrs(ctx, slog.LevelWarn, "Cannot detect Prometheus uptime gaps", slog.Any("err", err), slog.String("name", c.prom.Name()))
 		}
-		if promUptime != nil && promUptime.Series.Ranges.Len() == 0 {
+		if promUptime != nil && len(promUptime.Series.Ranges) == 0 {
 			slog.LogAttrs(ctx, slog.LevelWarn,
 				"No results for Prometheus uptime metric, you might have set uptime config option to a missing metric, please check your config",
 				slog.String("name", c.prom.Name()),
 				slog.String("metric", c.prom.UptimeMetric()),
 			)
 		}
-		if promUptime == nil || promUptime.Series.Ranges.Len() == 0 {
+		if promUptime == nil || len(promUptime.Series.Ranges) == 0 {
 			slog.LogAttrs(ctx, slog.LevelWarn,
 				"Using dummy Prometheus uptime metric results with no gaps",
 				slog.String("name", c.prom.Name()),
@@ -401,7 +401,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry discovery.Entry, entries [
 				continue
 			}
 
-			if trsLabelCount.Series.Ranges.Len() == 1 && len(trsLabelCount.Series.Gaps) == 0 {
+			if len(trsLabelCount.Series.Ranges) == 1 && len(trsLabelCount.Series.Gaps) == 0 {
 				problems = append(problems, Problem{
 					Anchor:   AnchorAfter,
 					Lines:    expr.Value.Pos.Lines(),
