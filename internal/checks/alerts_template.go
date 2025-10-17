@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"slices"
 	"strings"
+	"sync"
 	textTemplate "text/template"
 	"text/template/parse"
 	"time"
@@ -35,7 +36,8 @@ var (
 		"{{$externalURL := .ExternalURL}}",
 		"{{$value := .Value}}",
 	}
-	templateDefsLen = len(strings.Join(templateDefs, ""))
+	templateDefsString = strings.Join(templateDefs, "")
+	templateDefsLen    = len(templateDefsString)
 
 	templateFuncMap = textTemplate.FuncMap{
 		"query":              dummyFuncMap,
@@ -66,6 +68,16 @@ var (
 		"pathPrefix":         dummyFuncMap,
 		"externalURL":        dummyFuncMap,
 		"parseDuration":      dummyFuncMap,
+	}
+
+	templatePool = sync.Pool{
+		New: func() any {
+			t := textTemplate.
+				New(TemplateCheckName).
+				Funcs(templateFuncMap).
+				Option("missingkey=zero")
+			return t
+		},
 	}
 )
 
@@ -135,7 +147,7 @@ func (c TemplateCheck) Check(ctx context.Context, entry discovery.Entry, _ []dis
 				},
 			})
 		}
-		for _, msg := range checkForValueInLabels(label.Key.Value, label.Value.Value) {
+		for _, msg := range checkForValueInLabels(label.Value.Value) {
 			problems = append(problems, Problem{
 				Anchor: AnchorAfter,
 				Lines: diags.LineRange{
@@ -194,10 +206,10 @@ func (c TemplateCheck) Check(ctx context.Context, entry discovery.Entry, _ []dis
 }
 
 func (c TemplateCheck) checkHumanizeIsNeeded(expr parser.PromQLExpr, ann *parser.YamlKeyValue) (problems []Problem) {
-	if !hasValue(ann.Key.Value, ann.Value.Value) {
+	if !hasValue(ann.Value.Value) {
 		return problems
 	}
-	if hasHumanize(ann.Key.Value, ann.Value.Value) {
+	if hasHumanize(ann.Value.Value) {
 		return problems
 	}
 	vars, aliases, ok := findTemplateVariables(ann.Key.Value, ann.Value.Value)
@@ -295,7 +307,7 @@ func maybeExpandError(err error) error {
 func checkTemplateSyntax(ctx context.Context, name, text string, data any) error {
 	tmpl := promTemplate.NewTemplateExpander(
 		ctx,
-		strings.Join(append(templateDefs, text), ""),
+		templateDefsString+text,
 		name,
 		data,
 		model.Time(timestamp.FromTime(time.Now())),
@@ -316,18 +328,17 @@ func checkTemplateSyntax(ctx context.Context, name, text string, data any) error
 	return nil
 }
 
-func checkForValueInLabels(name, text string) (msgs []string) {
-	t, err := textTemplate.
-		New(name).
-		Funcs(templateFuncMap).
-		Option("missingkey=zero").
-		Parse(strings.Join(append(templateDefs, text), ""))
+func checkForValueInLabels(text string) (msgs []string) {
+	t := templatePool.Get().(*textTemplate.Template)
+	defer templatePool.Put(t)
+
+	tt, err := t.Parse(templateDefsString + text)
 	if err != nil {
 		// no need to double report errors
 		return nil
 	}
-	aliases := aliasesForTemplate(t)
-	for _, node := range t.Root.Nodes {
+	aliases := aliasesForTemplate(tt)
+	for _, node := range tt.Root.Nodes {
 		if v, ok := containsAliasedNode(aliases, node, ".Value"); ok {
 			msg := fmt.Sprintf("Using `%s` in labels will generate a new alert on every value change, move it to annotations.", v)
 			msgs = append(msgs, msg)
@@ -348,17 +359,16 @@ func containsAliasedNode(am aliasMap, node parse.Node, alias string) (string, bo
 	return "", false
 }
 
-func hasValue(name, text string) bool {
-	t, err := textTemplate.
-		New(name).
-		Funcs(templateFuncMap).
-		Option("missingkey=zero").
-		Parse(strings.Join(append(templateDefs, text), ""))
+func hasValue(text string) bool {
+	t := templatePool.Get().(*textTemplate.Template)
+	defer templatePool.Put(t)
+
+	tt, err := t.Parse(templateDefsString + text)
 	if err != nil {
 		// no need to double report errors
 		return false
 	}
-	aliases := aliasesForTemplate(t)
+	aliases := aliasesForTemplate(tt)
 	for _, node := range t.Root.Nodes {
 		if _, ok := containsAliasedNode(aliases, node, ".Value"); ok {
 			return true
@@ -367,19 +377,18 @@ func hasValue(name, text string) bool {
 	return false
 }
 
-func hasHumanize(name, text string) bool {
-	t, err := textTemplate.
-		New(name).
-		Funcs(templateFuncMap).
-		Option("missingkey=zero").
-		Parse(strings.Join(append(templateDefs, text), ""))
+func hasHumanize(text string) bool {
+	t := templatePool.Get().(*textTemplate.Template)
+	defer templatePool.Put(t)
+
+	tt, err := t.Parse(templateDefsString + text)
 	if err != nil {
 		// no need to double report errors
 		return false
 	}
-	aliases := aliasesForTemplate(t)
+	aliases := aliasesForTemplate(tt)
 
-	for _, node := range t.Root.Nodes {
+	for _, node := range tt.Root.Nodes {
 		if _, ok := containsAliasedNode(aliases, node, ".Value"); !ok {
 			continue
 		}
@@ -474,19 +483,18 @@ func getVariables(node parse.Node) (vars []tmplVar) {
 	return vars
 }
 
-func findTemplateVariables(name, text string) (vars []tmplVar, aliases aliasMap, ok bool) {
-	t, err := textTemplate.
-		New(name).
-		Funcs(templateFuncMap).
-		Option("missingkey=zero").
-		Parse(strings.Join(append(templateDefs, text), ""))
+func findTemplateVariables(_, text string) (vars []tmplVar, aliases aliasMap, ok bool) {
+	t := templatePool.Get().(*textTemplate.Template)
+	defer templatePool.Put(t)
+
+	tt, err := t.Parse(templateDefsString + text)
 	if err != nil {
 		// no need to double report errors
 		return vars, aliases, false
 	}
 
 	aliases.aliases = map[string]map[string]struct{}{}
-	for _, node := range t.Root.Nodes {
+	for _, node := range tt.Root.Nodes {
 		getAliases(node, &aliases)
 		vars = append(vars, getVariables(node)...)
 	}
