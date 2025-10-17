@@ -2,7 +2,7 @@ package promapi_test
 
 import (
 	"fmt"
-	"sort"
+	"slices"
 	"strconv"
 	"strings"
 	"testing"
@@ -107,12 +107,6 @@ func TestAppendSampleToRanges(t *testing.T) {
 					End:         timeParse("2022-06-14T02:55:00Z"),
 				},
 				{
-					Fingerprint: labels.FromStrings("job", "bar").Hash(),
-					Labels:      labels.FromStrings("job", "bar"),
-					Start:       timeParse("2022-06-14T00:00:00Z"),
-					End:         timeParse("2022-06-14T02:55:00Z"),
-				},
-				{
 					Fingerprint: labels.FromStrings("instance", "1").Hash(),
 					Labels:      labels.FromStrings("instance", "1"),
 					Start:       timeParse("2022-06-14T00:00:00Z"),
@@ -121,6 +115,12 @@ func TestAppendSampleToRanges(t *testing.T) {
 				{
 					Fingerprint: labels.FromStrings("instance", "1", "job", "foo").Hash(),
 					Labels:      labels.FromStrings("instance", "1", "job", "foo"),
+					Start:       timeParse("2022-06-14T00:00:00Z"),
+					End:         timeParse("2022-06-14T02:55:00Z"),
+				},
+				{
+					Fingerprint: labels.FromStrings("job", "bar").Hash(),
+					Labels:      labels.FromStrings("job", "bar"),
 					Start:       timeParse("2022-06-14T00:00:00Z"),
 					End:         timeParse("2022-06-14T02:55:00Z"),
 				},
@@ -458,7 +458,7 @@ func TestAppendSampleToRanges(t *testing.T) {
 					tc.in = promapi.AppendSampleToRanges(tc.in, lset, s.Values, tc.step)
 				}
 				tc.in, _ = promapi.MergeRanges(tc.in, tc.step)
-				sort.Stable(tc.in)
+				slices.SortStableFunc(tc.in, promapi.CompareMetricTimeRanges)
 				require.Equal(t, printRange(tc.out), printRange(tc.in))
 			}
 		})
@@ -550,7 +550,7 @@ func TestMergeRanges(t *testing.T) {
 				out, wasMerged := promapi.MergeRanges(tc.in, tc.step)
 				promapi.ExpandRangesEnd(out, tc.step)
 				require.Equal(t, tc.wasMerged, wasMerged)
-				sort.Stable(out)
+				slices.SortStableFunc(tc.in, promapi.CompareMetricTimeRanges)
 				require.Equal(t, printRange(tc.out), printRange(out))
 			}
 		})

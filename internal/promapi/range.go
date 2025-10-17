@@ -9,7 +9,7 @@ import (
 	"math"
 	"net/http"
 	"net/url"
-	"sort"
+	"slices"
 	"strconv"
 	"sync"
 	"time"
@@ -101,13 +101,13 @@ func (prom *Prometheus) RangeQuery(ctx context.Context, expr string, params Rang
 	lookback := params.Dur()
 	step := params.Step()
 
-	var slices []TimeRange
+	var timeSlices []TimeRange
 	queryStep := (time.Hour * 2).Round(step)
 	if queryStep > lookback {
 		queryStep = lookback
-		slices = append(slices, TimeRange{Start: start, End: end})
+		timeSlices = append(timeSlices, TimeRange{Start: start, End: end})
 	} else {
-		slices = sliceRange(start, end, step, queryStep)
+		timeSlices = sliceRange(start, end, step, queryStep)
 	}
 
 	slog.LogAttrs(ctx, slog.LevelDebug, "Scheduling prometheus range query",
@@ -116,7 +116,7 @@ func (prom *Prometheus) RangeQuery(ctx context.Context, expr string, params Rang
 		slog.String("lookback", output.HumanizeDuration(lookback)),
 		slog.String("step", output.HumanizeDuration(step)),
 		slog.String("slice", output.HumanizeDuration(queryStep)),
-		slog.Int("slices", len(slices)),
+		slog.Int("slices", len(timeSlices)),
 	)
 
 	key := APIPathQueryRange + "\n" + expr + "\n" + params.String()
@@ -129,8 +129,8 @@ func (prom *Prometheus) RangeQuery(ctx context.Context, expr string, params Rang
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	results := make(chan queryResult, len(slices))
-	for _, s := range slices {
+	results := make(chan queryResult, len(timeSlices))
+	for _, s := range timeSlices {
 		query := queryRequest{ // nolint: exhaustruct
 			query: rangeQuery{
 				prom: prom,
@@ -200,7 +200,7 @@ func (prom *Prometheus) RangeQuery(ctx context.Context, expr string, params Rang
 		return nil, QueryError{err: lastErr, msg: decodeError(lastErr)}
 	}
 
-	sort.Stable(merged.Series.Ranges)
+	slices.SortStableFunc(merged.Series.Ranges, CompareMetricTimeRanges)
 
 	slog.LogAttrs(ctx, slog.LevelDebug,
 		"Parsed range response",
