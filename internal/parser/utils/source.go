@@ -895,6 +895,7 @@ func parseCall(expr string, n *promParser.Call) (src []Source) {
 }
 
 func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
+	src = make([]Source, 0, 2)
 	switch {
 	// foo{} + 1
 	// 1 + foo{}
