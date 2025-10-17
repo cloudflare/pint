@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.76.1
+
+### Fixed
+
+- CI comments would sometimes print the problematic query fragment twice.
+
 ## v0.76.0
 
 ### Added

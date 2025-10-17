@@ -81,9 +81,9 @@ func makeComments(summary Summary, showDuplicates bool) (comments []PendingComme
 				buf.WriteString("<summary>")
 				buf.WriteString(report.Problem.Summary)
 				buf.WriteString("</summary>\n\n")
+				codeDone := make([]string, 0, len(report.Problem.Diagnostics))
 				for _, diag := range report.Problem.Diagnostics {
-					buf.WriteString("```yaml\n")
-					buf.WriteString(diags.InjectDiagnostics(
+					code := diags.InjectDiagnostics(
 						content,
 						[]diags.Diagnostic{
 							{
@@ -95,8 +95,13 @@ func makeComments(summary Summary, showDuplicates bool) (comments []PendingComme
 							},
 						},
 						output.None,
-					))
-					buf.WriteString("```\n\n")
+					)
+					if !slices.Contains(codeDone, code) {
+						buf.WriteString("```yaml\n")
+						buf.WriteString(code)
+						buf.WriteString("```\n\n")
+						codeDone = append(codeDone, code)
+					}
 					buf.WriteString(diag.Message)
 					buf.WriteString("\n\n")
 

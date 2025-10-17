@@ -173,11 +173,6 @@ body: |
 
   Calling `vector()` will return a vector value with no labels.
 
-  ```yaml
-  8 |   expr: sum without (instance, node_status, node_type) ((rate(http_responses[2m])) or vector(0))
-                                                                                            ^^^^^^ 
-  ```
-
   `job` label is required and should be preserved when aggregating all rules.
 
   Rule comment: job label is required to track ownership.
