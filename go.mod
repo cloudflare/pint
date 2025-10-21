@@ -19,7 +19,7 @@ require (
 	github.com/prymitive/current v0.1.1
 	github.com/rogpeppe/go-internal v1.14.1
 	github.com/stretchr/testify v1.11.1
-	github.com/urfave/cli/v3 v3.4.1
+	github.com/urfave/cli/v3 v3.5.0
 	github.com/zclconf/go-cty v1.17.0
 	gitlab.com/gitlab-org/api/client-go v0.157.0
 	go.nhat.io/httpmock v0.11.0
