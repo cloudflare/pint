@@ -87,7 +87,7 @@ func (cfg *Config) GetChecksForEntry(ctx context.Context, gen *PrometheusGenerat
 	defaultMatch := []Match{{State: defaultStates}}
 	proms := gen.ServersForPath(entry.Path.Name)
 
-	parsedRules := make([]parsedRule, 0, len(cfg.Rules))
+	parsedRules := make([]*parsedRule, 0, len(cfg.Rules))
 	if entry.PathError != nil || entry.Rule.Error.Err != nil {
 		check := checks.NewErrorCheck(entry)
 		parsedRules = append(parsedRules, baseParsedRule(defaultMatch, check.Reporter(), check, nil))
