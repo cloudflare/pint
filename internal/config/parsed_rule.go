@@ -19,8 +19,8 @@ type parsedRule struct {
 	locked bool
 }
 
-func newParsedRule(rule Rule, defaultStates []string, name string, check checks.RuleChecker, tags []string) parsedRule {
-	return parsedRule{
+func newParsedRule(rule Rule, defaultStates []string, name string, check checks.RuleChecker, tags []string) *parsedRule {
+	return &parsedRule{
 		match:  defaultRuleMatch(rule.Match, defaultStates),
 		ignore: rule.Ignore,
 		name:   name,
@@ -30,8 +30,8 @@ func newParsedRule(rule Rule, defaultStates []string, name string, check checks.
 	}
 }
 
-func baseParsedRule(match []Match, name string, check checks.RuleChecker, tags []string) parsedRule {
-	return parsedRule{
+func baseParsedRule(match []Match, name string, check checks.RuleChecker, tags []string) *parsedRule {
+	return &parsedRule{
 		match:  match,
 		ignore: nil,
 		name:   name,
@@ -115,8 +115,8 @@ func defaultMatchStates(cmd ContextCommandVal) []string {
 	}
 }
 
-func baseRules(staticRules []staticRule, proms []*promapi.FailoverGroup, match []Match) (rules []parsedRule) {
-	rules = make([]parsedRule, 0, len(staticRules)+(len(proms)*9))
+func baseRules(staticRules []staticRule, proms []*promapi.FailoverGroup, match []Match) (rules []*parsedRule) {
+	rules = make([]*parsedRule, 0, len(staticRules)+(len(proms)*9))
 	for _, sr := range staticRules {
 		rules = append(rules, baseParsedRule(match, sr.name, sr.checker, nil))
 	}
@@ -152,7 +152,7 @@ func defaultRuleMatch(match []Match, defaultStates []string) []Match {
 	return dst
 }
 
-func parseRule(rule Rule, prometheusServers []*promapi.FailoverGroup, defaultStates []string) (rules []parsedRule) {
+func parseRule(rule Rule, prometheusServers []*promapi.FailoverGroup, defaultStates []string) (rules []*parsedRule) {
 	if len(rule.Aggregate) > 0 {
 		var nameRegex *checks.TemplatedRegexp
 		for _, aggr := range rule.Aggregate {
