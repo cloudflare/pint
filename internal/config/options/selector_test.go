@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/config/options"
 )
 
@@ -56,6 +57,33 @@ func TestSelectorSettings(t *testing.T) {
 			} else {
 				require.EqualError(t, err, tc.err.Error())
 			}
+		})
+	}
+}
+
+func TestSelectorSettingsGetSeverity(t *testing.T) {
+	type testCaseT struct {
+		conf     options.SelectorSettings
+		fallback checks.Severity
+		expected checks.Severity
+	}
+
+	testCases := []testCaseT{
+		{
+			conf:     options.SelectorSettings{Severity: "info"},
+			fallback: checks.Bug,
+			expected: checks.Information,
+		},
+		{
+			conf:     options.SelectorSettings{},
+			fallback: checks.Bug,
+			expected: checks.Bug,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(fmt.Sprintf("%v", tc.conf), func(t *testing.T) {
+			require.Equal(t, tc.expected, tc.conf.GetSeverity(tc.fallback))
 		})
 	}
 }
