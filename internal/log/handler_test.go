@@ -2,11 +2,13 @@ package log
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"log/slog"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 )
@@ -93,6 +95,32 @@ func TestHandler(t *testing.T) {
 				l.Info("bar", slog.Group("group", slog.String("with", "true")))
 			},
 			expected: "level=INFO msg=bar group=[{\"Key\":\"with\",\"Value\":{}}]\n",
+		},
+		{
+			noColor: true,
+			run: func(l *slog.Logger) {
+				l.WithGroup("group").Info("bar", slog.String("with", "true"))
+			},
+			expected: "level=INFO msg=bar with=true\n",
+		},
+		{
+			noColor: true,
+			run: func(l *slog.Logger) {
+				h := l.Handler()
+				r := slog.NewRecord(time.Now(), slog.LevelInfo, "bar", 0)
+				_ = h.Handle(context.Background(), r)
+			},
+			expected: "level=INFO msg=bar\n",
+		},
+		{
+			noColor: true,
+			run: func(l *slog.Logger) {
+				h := l.Handler()
+				r := slog.NewRecord(time.Now(), slog.LevelError, "bar", 0)
+				r.AddAttrs(slog.Any("err", errors.New("error")))
+				_ = h.Handle(context.Background(), r)
+			},
+			expected: "level=ERROR msg=bar err=error\n",
 		},
 	}
 

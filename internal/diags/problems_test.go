@@ -158,3 +158,36 @@ expr: |
 		})
 	}
 }
+
+func TestCountDigits(t *testing.T) {
+	require.Equal(t, 1, countDigits(1))
+	require.Equal(t, 2, countDigits(10))
+	require.Equal(t, 3, countDigits(100))
+}
+
+func TestLineCoverage(t *testing.T) {
+	diags := []Diagnostic{
+		{Pos: PositionRanges{{Line: 1}, {Line: 2}}},
+		{Pos: PositionRanges{{Line: 2}, {Line: 3}}},
+	}
+	require.Equal(t, []int{1, 2, 3}, lineCoverage(diags))
+}
+
+func TestInjectDiagnosticsKind(t *testing.T) {
+	input := "expr: foo(bar) by()"
+	diags := []Diagnostic{
+		{FirstColumn: 1, LastColumn: 13, Message: "this is bad", Kind: Issue},
+		{FirstColumn: 1, LastColumn: 13, Message: "this is context", Kind: Context},
+	}
+	key, val := parseYaml(input)
+	pos := NewPositionRange(strings.Split(input, "\n"), val, key.Column+2)
+	for i := range diags {
+		diags[i].Pos = pos
+	}
+	out := InjectDiagnostics(input, diags, output.None)
+	expected := `1 | expr: foo(bar) by()
+          ^^^^^^^^^^^^^ this is bad
+                        this is context
+`
+	require.Equal(t, expected, out)
+}

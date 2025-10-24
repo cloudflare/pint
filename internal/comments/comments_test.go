@@ -800,3 +800,32 @@ func TestCommentValueString(t *testing.T) {
 		})
 	}
 }
+
+func TestIsRuleComment(t *testing.T) {
+	type testCaseT struct {
+		ctype    comments.Type
+		expected bool
+	}
+
+	testCases := []testCaseT{
+		{comments.RuleOwnerType, true},
+		{comments.DisableType, true},
+		{comments.SnoozeType, true},
+		{comments.RuleSetType, true},
+		{comments.IgnoreLineType, false},
+		{comments.FileOwnerType, false},
+	}
+
+	for _, tc := range testCases {
+		t.Run(fmt.Sprintf("%v", tc.ctype), func(t *testing.T) {
+			require.Equal(t, tc.expected, comments.IsRuleComment(tc.ctype))
+		})
+	}
+}
+
+func TestOwnerError(t *testing.T) {
+	oe := comments.OwnerError{
+		Diagnostic: diags.Diagnostic{Message: "test error"},
+	}
+	require.Equal(t, "test error", oe.Error())
+}
