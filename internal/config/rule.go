@@ -148,30 +148,37 @@ func (rule Rule) validate() (err error) {
 	return nil
 }
 
-func isDisabledForRule(rule parser.Rule, name string, check checks.RuleChecker, promTags []string) bool {
-	matches := make([]string, 0, len(promTags)+2)
-	matches = append(matches, name)
-	matches = append(matches, check.String())
-	for _, tag := range promTags {
-		matches = append(matches, name+"(+"+tag+")")
+func matchesTag(comment, name string, tags []string) bool {
+	// control comment doesn't start with name so it cannot match it.
+	if !strings.HasPrefix(comment, name) {
+		return false
 	}
-	for _, disable := range comments.Only[comments.Disable](rule.Comments, comments.DisableType) {
-		for _, match := range matches {
-			if match == disable.Match {
-				slog.LogAttrs(context.Background(), slog.LevelDebug,
-					"Check disabled by comment",
-					slog.String("check", check.String()),
-					slog.String("match", match),
-				)
+	for _, tag := range tags {
+		if strings.Contains(comment, tag) {
+			if comment == name+"(+"+tag+")" {
 				return true
 			}
+		}
+	}
+	return false
+}
+
+func isDisabledForRule(rule parser.Rule, name string, check checks.RuleChecker, promTags []string) bool {
+	for _, disable := range comments.Only[comments.Disable](rule.Comments, comments.DisableType) {
+		if disable.Match == name || disable.Match == check.String() || matchesTag(disable.Match, name, promTags) {
+			slog.LogAttrs(context.Background(), slog.LevelDebug,
+				"Check disabled by comment",
+				slog.String("check", check.String()),
+				slog.String("match", disable.Match),
+			)
+			return true
 		}
 	}
 	for _, snooze := range comments.Only[comments.Snooze](rule.Comments, comments.SnoozeType) {
 		if !snooze.Until.After(time.Now()) {
 			continue
 		}
-		if slices.Contains(matches, snooze.Match) {
+		if snooze.Match == name || snooze.Match == check.String() || matchesTag(snooze.Match, name, promTags) {
 			slog.LogAttrs(context.Background(), slog.LevelDebug,
 				"Check snoozed by comment",
 				slog.String("check", check.String()),
