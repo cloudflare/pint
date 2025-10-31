@@ -288,6 +288,10 @@ count by (dc) (
 	`topk(10, prometheus_build_info*prometheus_ready)`,
 	`bottomk(10, prometheus_build_info*prometheus_ready)`,
 	`histogram_fraction(0, 0.1, metric)`,
+	`foo * foo `,
+	`foo + on(__name__, job) foo `,
+	`foo + on(__name__, job) group_left foo `,
+	`foo + on(__name__, job) group_right foo `,
 }
 
 func TestLabelsSource(t *testing.T) {

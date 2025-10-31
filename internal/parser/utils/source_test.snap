@@ -431,7 +431,13 @@ output:
 [TestLabelsSource/12 - 1]
 expr: (foo or vector(5)) * (vector(2) or bar)
 output:
-    - labels: {}
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 39
       deadinfo: null
       returns: vector
       operations:
@@ -531,6 +537,12 @@ output:
             fragment:
                 start: 8
                 end: 14
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 39
       deadinfo: null
       returns: vector
       operations:
@@ -846,7 +858,13 @@ output:
 [TestLabelsSource/20 - 1]
 expr: foo > bool bar
 output:
-    - labels: {}
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 14
       deadinfo: null
       returns: vector
       operations:
@@ -904,7 +922,13 @@ output:
 [TestLabelsSource/21 - 1]
 expr: (foo > bool bar) == 0
 output:
-    - labels: {}
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 1
+                end: 15
       deadinfo: null
       returns: vector
       operations:
@@ -969,6 +993,12 @@ output:
             fragment:
                 start: 11
                 end: 13
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 27
         instance:
             reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
             kind: included
@@ -1040,6 +1070,12 @@ output:
             fragment:
                 start: 12
                 end: 14
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 1
+                end: 28
         instance:
             reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
             kind: included
@@ -1105,6 +1141,12 @@ output:
 expr: foo > bool on(instance) group_left(version) bar
 output:
     - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 47
         instance:
             reason: Query is using many-to-one vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
             kind: included
@@ -1177,6 +1219,12 @@ output:
 expr: bar > bool on(instance) group_right(version) foo
 output:
     - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 48
         instance:
             reason: Query is using one-to-many vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
             kind: included
@@ -2261,11 +2309,11 @@ output:
                 start: 0
                 end: 21
         __name__:
-            reason: Aggregation removes metric name.
+            reason: Binary operation between two vectors removes metric names.
             kind: excluded
             fragment:
                 start: 0
-                end: 21
+                end: 45
         job:
             reason: Query is using aggregation that removes all labels.
             kind: excluded
@@ -2359,11 +2407,11 @@ output:
                 start: 0
                 end: 21
         __name__:
-            reason: Aggregation removes metric name.
+            reason: Binary operation between two vectors removes metric names.
             kind: excluded
             fragment:
                 start: 0
-                end: 21
+                end: 45
         job:
             reason: Query is using aggregation that removes all labels.
             kind: excluded
@@ -3132,6 +3180,12 @@ output:
 expr: foo{job="foo"} / bar
 output:
     - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 20
         job:
             reason: Query will only return series where these labels are present.
             kind: guaranteed
@@ -3202,6 +3256,12 @@ output:
             fragment:
                 start: 17
                 end: 19
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 33
         instance:
             reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
             kind: included
@@ -3273,6 +3333,12 @@ output:
 expr: foo{job="foo"} * on(instance) group_left(bar) bar
 output:
     - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 49
         bar:
             reason: Query is using many-to-one vector matching with `group_left(bar)`, all labels included inside `group_left(...)` will be include on the results.
             kind: included
@@ -3351,6 +3417,12 @@ output:
 expr: foo{job="foo"} * on(instance) group_left(cluster) bar{cluster="bar", ignored="true"}
 output:
     - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 84
         cluster:
             reason: Query is using many-to-one vector matching with `group_left(cluster)`, all labels included inside `group_left(...)` will be include on the results.
             kind: included
@@ -3441,6 +3513,12 @@ output:
 expr: foo{job="foo", ignored="true"} * on(instance) group_right(job) bar{cluster="bar"}
 output:
     - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 81
         cluster:
             reason: Query will only return series where these labels are present.
             kind: guaranteed
@@ -4665,11 +4743,11 @@ expr: |4-
 output:
     - labels:
         __name__:
-            reason: Aggregation removes metric name.
+            reason: Binary operation between two vectors removes metric names.
             kind: excluded
             fragment:
                 start: 4
-                end: 36
+                end: 78
         job:
             reason: Query is using many-to-many vector matching with `on(job)`, labels included inside `on(...)` will be present on the results.
             kind: included
@@ -4800,6 +4878,12 @@ output:
             fragment:
                 start: 29
                 end: 32
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 100
         app_name:
             reason: Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.
             kind: included
@@ -4878,6 +4962,12 @@ output:
 expr: container_file_descriptors / on (instance, app_name) group_left() container_ulimits_soft{ulimit="max_open_files"}
 output:
     - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 113
         app_name:
             reason: Query is using many-to-one vector matching with `on(instance, app_name)`, labels included inside `on(...)` will be present on the results.
             kind: included
@@ -5281,11 +5371,11 @@ output:
                 start: 32
                 end: 35
         __name__:
-            reason: Aggregation removes metric name.
+            reason: Binary operation between two vectors removes metric names.
             kind: excluded
             fragment:
                 start: 0
-                end: 54
+                end: 158
         foo:
             reason: Query is using many-to-one vector matching with `group_left(foo)`, all labels included inside `group_left(...)` will be include on the results.
             kind: included
@@ -5566,6 +5656,12 @@ output:
             fragment:
                 start: 37
                 end: 43
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 59
         cluster:
             reason: Query is using one-to-many vector matching with `group_right(cluster, env)`, all labels included inside `group_right(...)` will be include on the results.
             kind: included
@@ -5657,6 +5753,12 @@ output:
             fragment:
                 start: 25
                 end: 31
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 47
         job:
             reason: All labels passed to absent() call will be present on the results if the query doesn't match anything.
             kind: guaranteed
@@ -6092,6 +6194,12 @@ output:
 expr: up{instance="a", job="prometheus"} * ignoring(job) up{instance="a", job="pint"}
 output:
     - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 79
         instance:
             reason: Query will only return series where these labels are present.
             kind: guaranteed
@@ -6238,11 +6346,11 @@ output:
                 start: 216
                 end: 218
         __name__:
-            reason: Aggregation removes metric name.
+            reason: Binary operation between two vectors removes metric names.
             kind: excluded
             fragment:
                 start: 115
-                end: 213
+                end: 295
         cidr_use_case:
             reason: Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.
             kind: excluded
@@ -6705,6 +6813,12 @@ output:
             fragment:
                 start: 0
                 end: 6
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 21
       deadinfo:
         reason: '`vector(0) > vector(1)` always evaluates to `0 > 1` which is not possible, so it will never return anything.'
         fragment:
@@ -7611,7 +7725,13 @@ expr: |4
     (rate(metric1[5m]) or vector(1)) +
     (rate(metric3{log_name="samplerd"}[5m]) or vector(2)) > 0
 output:
-    - labels: {}
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 1
+                end: 124
       deadinfo: null
       returns: vector
       operations:
@@ -7785,6 +7905,12 @@ output:
             fragment:
                 start: 23
                 end: 29
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 1
+                end: 124
       deadinfo: null
       returns: vector
       operations:
@@ -8462,11 +8588,11 @@ output:
                         start: 99
                         end: 102
                 __name__:
-                    reason: Aggregation removes metric name.
+                    reason: Binary operation between two vectors removes metric names.
                     kind: excluded
                     fragment:
                         start: 95
-                        end: 202
+                        end: 303
                 cluster:
                     reason: Query is using many-to-one vector matching with `group_left(cluster)`, all labels included inside `group_left(...)` will be include on the results.
                     kind: included
@@ -8580,6 +8706,12 @@ output:
             fragment:
                 start: 13
                 end: 15
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 28
         a:
             reason: Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.
             kind: excluded
@@ -8650,6 +8782,12 @@ output:
 expr: foo{a="1"} * on(instance) group_left(c,d) bar{b="2"}
 output:
     - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 52
         a:
             reason: Query will only return series where these labels are present.
             kind: guaranteed
@@ -8741,6 +8879,12 @@ output:
 expr: foo{a="1"} * on(instance) group_right(c,d) bar{b="2"}
 output:
     - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 53
         b:
             reason: Query will only return series where these labels are present.
             kind: guaranteed
@@ -8838,6 +8982,12 @@ output:
             fragment:
                 start: 13
                 end: 15
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 41
         a:
             reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
             kind: excluded
@@ -8933,6 +9083,12 @@ output:
 expr: foo{a="1"} * on(instance) group_left(c,d) sum(bar{b="2"})
 output:
     - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 57
         a:
             reason: Query will only return series where these labels are present.
             kind: guaranteed
@@ -9042,6 +9198,12 @@ output:
 expr: sum(foo{a="1"}) * on(instance) group_right(c,d) bar{b="2"}
 output:
     - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 58
         b:
             reason: Query will only return series where these labels are present.
             kind: guaranteed
@@ -9151,6 +9313,12 @@ output:
 expr: foo{a="1"} * on(instance) group_left(c,d) sum(bar{b="2"}) without(instance)
 output:
     - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 75
         a:
             reason: Query will only return series where these labels are present.
             kind: guaranteed
@@ -9260,6 +9428,12 @@ output:
 expr: sum(foo{a="1"}) without(instance) * on(instance) group_right(c,d) bar{b="2"}
 output:
     - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 76
         b:
             reason: Query will only return series where these labels are present.
             kind: guaranteed
@@ -9377,11 +9551,11 @@ expr: |4
 output:
     - labels:
         __name__:
-            reason: Aggregation removes metric name.
+            reason: Binary operation between two vectors removes metric names.
             kind: excluded
             fragment:
                 start: 2
-                end: 317
+                end: 442
         device:
             reason: Query is using many-to-many vector matching with `on(device, instance)`, labels included inside `on(...)` will be present on the results.
             kind: included
@@ -9519,7 +9693,13 @@ output:
             - device
           ignoring: []
           src:
-            labels: {}
+            labels:
+                __name__:
+                    reason: Binary operation between two vectors removes metric names.
+                    kind: excluded
+                    fragment:
+                        start: 140
+                        end: 258
             deadinfo: null
             returns: vector
             operations:
@@ -9604,11 +9784,11 @@ output:
                 start: 26
                 end: 28
         __name__:
-            reason: Aggregation removes metric name.
+            reason: Binary operation between two vectors removes metric names.
             kind: excluded
             fragment:
                 start: 0
-                end: 23
+                end: 41
         a:
             reason: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
             kind: excluded
@@ -9748,6 +9928,12 @@ expr: |4
     )
 output:
     - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 1
+                end: 287
         prometheus:
             reason: Query is using many-to-one vector matching with `on(prometheus)`, labels included inside `on(...)` will be present on the results.
             kind: included
@@ -9773,11 +9959,11 @@ output:
                         start: 158
                         end: 160
                 __name__:
-                    reason: Aggregation removes metric name.
+                    reason: Binary operation between two vectors removes metric names.
                     kind: excluded
                     fragment:
                         start: 92
-                        end: 170
+                        end: 241
                 instance:
                     reason: Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
                     kind: included
@@ -10385,11 +10571,11 @@ output:
                 start: 64
                 end: 67
         __name__:
-            reason: Aggregation removes metric name.
+            reason: Binary operation between two vectors removes metric names.
             kind: excluded
             fragment:
-                start: 5
-                end: 78
+                start: 1
+                end: 336
         colo_name:
             reason: Query is using many-to-many vector matching with `on(colo_name)`, labels included inside `on(...)` will be present on the results.
             kind: included
@@ -10520,11 +10706,11 @@ output:
                         start: 241
                         end: 244
                 __name__:
-                    reason: Aggregation removes metric name.
+                    reason: Binary operation between two vectors removes metric names.
                     kind: excluded
                     fragment:
                         start: 178
-                        end: 255
+                        end: 334
                 colo_name:
                     reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
                     kind: included
@@ -10673,11 +10859,11 @@ output:
                         start: 241
                         end: 244
                 __name__:
-                    reason: Aggregation removes metric name.
+                    reason: Binary operation between two vectors removes metric names.
                     kind: excluded
                     fragment:
                         start: 178
-                        end: 255
+                        end: 334
                 colo_name:
                     reason: Calling `vector()` will return a vector value with no labels.
                     kind: excluded
@@ -10982,11 +11168,11 @@ output:
                 start: 64
                 end: 67
         __name__:
-            reason: Aggregation removes metric name.
+            reason: Binary operation between two vectors removes metric names.
             kind: excluded
             fragment:
-                start: 5
-                end: 78
+                start: 1
+                end: 336
         colo_name:
             reason: Query is using many-to-many vector matching with `on(colo_name)`, labels included inside `on(...)` will be present on the results.
             kind: included
@@ -11121,11 +11307,11 @@ output:
                         start: 241
                         end: 244
                 __name__:
-                    reason: Aggregation removes metric name.
+                    reason: Binary operation between two vectors removes metric names.
                     kind: excluded
                     fragment:
                         start: 178
-                        end: 255
+                        end: 334
                 colo_name:
                     reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
                     kind: included
@@ -11274,11 +11460,11 @@ output:
                         start: 241
                         end: 244
                 __name__:
-                    reason: Aggregation removes metric name.
+                    reason: Binary operation between two vectors removes metric names.
                     kind: excluded
                     fragment:
                         start: 178
-                        end: 255
+                        end: 334
                 colo_name:
                     reason: Calling `vector()` will return a vector value with no labels.
                     kind: excluded
@@ -11589,11 +11775,11 @@ output:
                 start: 0
                 end: 3
         __name__:
-            reason: Aggregation removes metric name.
+            reason: Binary operation between two vectors removes metric names.
             kind: excluded
             fragment:
                 start: 0
-                end: 13
+                end: 40
       deadinfo: null
       returns: vector
       operations:
@@ -11785,7 +11971,13 @@ output:
 [TestLabelsSource/155 - 1]
 expr: topk(10, prometheus_build_info*prometheus_ready)
 output:
-    - labels: {}
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 9
+                end: 47
       deadinfo: null
       returns: vector
       operations:
@@ -11847,7 +12039,13 @@ output:
 [TestLabelsSource/156 - 1]
 expr: bottomk(10, prometheus_build_info*prometheus_ready)
 output:
-    - labels: {}
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 12
+                end: 50
       deadinfo: null
       returns: vector
       operations:
@@ -11935,6 +12133,292 @@ output:
         start: 27
         end: 33
       type: function
+      fixedlabels: false
+      isconditional: false
+
+---
+
+[TestLabelsSource/158 - 1]
+expr: 'foo * foo '
+output:
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 9
+      deadinfo: null
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+      joins:
+        - "on": []
+          ignoring: []
+          addedlabels: []
+          src:
+            labels: {}
+            deadinfo: null
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] foo'
+                  op: ""
+            joins: []
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+            position:
+                start: 6
+                end: 9
+            type: selector
+            fixedlabels: false
+            isconditional: false
+          op: 57395
+          depth: 0
+      unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
+      position:
+        start: 0
+        end: 3
+      type: selector
+      fixedlabels: false
+      isconditional: false
+
+---
+
+[TestLabelsSource/159 - 1]
+expr: 'foo + on(__name__, job) foo '
+output:
+    - labels:
+        "":
+            reason: Query is using one-to-one vector matching with `on(__name__, job)`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 6
+                end: 8
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 27
+        job:
+            reason: Query is using one-to-one vector matching with `on(__name__, job)`, only labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 6
+                end: 8
+      deadinfo: null
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+      joins:
+        - "on":
+            - __name__
+            - job
+          ignoring: []
+          addedlabels: []
+          src:
+            labels: {}
+            deadinfo: null
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] foo'
+                  op: ""
+            joins: []
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+            position:
+                start: 24
+                end: 27
+            type: selector
+            fixedlabels: false
+            isconditional: false
+          op: 57383
+          depth: 0
+      unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
+      position:
+        start: 0
+        end: 3
+      type: selector
+      fixedlabels: true
+      isconditional: false
+
+---
+
+[TestLabelsSource/160 - 1]
+expr: 'foo + on(__name__, job) group_left foo '
+output:
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 38
+        job:
+            reason: Query is using many-to-one vector matching with `on(__name__, job)`, labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 6
+                end: 8
+      deadinfo: null
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+      joins:
+        - "on":
+            - __name__
+            - job
+          ignoring: []
+          addedlabels: []
+          src:
+            labels: {}
+            deadinfo: null
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] foo'
+                  op: ""
+            joins: []
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+            position:
+                start: 35
+                end: 38
+            type: selector
+            fixedlabels: false
+            isconditional: false
+          op: 57383
+          depth: 0
+      unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
+      position:
+        start: 0
+        end: 3
+      type: selector
+      fixedlabels: false
+      isconditional: false
+
+---
+
+[TestLabelsSource/161 - 1]
+expr: 'foo + on(__name__, job) group_right foo '
+output:
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 39
+        job:
+            reason: Query is using one-to-many vector matching with `on(__name__, job)`, labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 6
+                end: 8
+      deadinfo: null
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+      joins:
+        - "on":
+            - __name__
+            - job
+          ignoring: []
+          addedlabels: []
+          src:
+            labels: {}
+            deadinfo: null
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] foo'
+                  op: ""
+            joins: []
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+            position:
+                start: 0
+                end: 3
+            type: selector
+            fixedlabels: false
+            isconditional: false
+          op: 57383
+          depth: 0
+      unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
+      position:
+        start: 36
+        end: 39
+      type: selector
       fixedlabels: false
       isconditional: false
 

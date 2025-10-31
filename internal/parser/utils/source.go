@@ -976,6 +976,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					AddedLabels: n.VectorMatching.Include,
 				})
 			}
+			ls.excludeLabel("Binary operation between two vectors removes metric names.", n.PositionRange(), labels.MetricName)
 			ls.IsConditional, ls.ReturnInfo.IsReturnBool = checkConditions(ls, n.Op, n.ReturnBool)
 			src = append(src, ls)
 		}
@@ -1022,6 +1023,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					AddedLabels: n.VectorMatching.Include,
 				})
 			}
+			rs.excludeLabel("Binary operation between two vectors removes metric names.", n.PositionRange(), labels.MetricName)
 			rs.IsConditional, rs.ReturnInfo.IsReturnBool = checkConditions(rs, n.Op, n.ReturnBool)
 			src = append(src, rs)
 		}
@@ -1065,6 +1067,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					AddedLabels: n.VectorMatching.Include,
 				})
 			}
+			ls.excludeLabel("Binary operation between two vectors removes metric names.", n.PositionRange(), labels.MetricName)
 			ls.IsConditional, ls.ReturnInfo.IsReturnBool = checkConditions(ls, n.Op, n.ReturnBool)
 			src = append(src, ls)
 		}
