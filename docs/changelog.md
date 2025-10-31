@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.76.2
+
+### Fixed
+
+- For queries using binary expressions between two vectors Prometheus will remove the metric name
+  from resulting series, pint will now also apply the same logic when checking queries.
+
 ## v0.76.1
 
 ### Fixed

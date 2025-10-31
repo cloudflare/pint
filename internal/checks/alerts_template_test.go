@@ -776,6 +776,18 @@ func TestTemplateCheck(t *testing.T) {
 			problems:   true,
 		},
 		{
+			description: "__name__ is stripped in foo+foo",
+			content: `
+- alert: Foo
+  expr: foo + on(__name__, job) foo > 0
+  annotations:
+    summary: '{{ .Labels.job }} is above zero on {{ $labels.__name__ }}'
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   true,
+		},
+		{
 			description:   "everything is stripped / strict / group label override",
 			contentStrict: true,
 			content: `groups:

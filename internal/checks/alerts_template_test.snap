@@ -152,6 +152,49 @@
 
 ---
 
+[TestTemplateCheck/__name___is_stripped_in_foo+foo - 1]
+- description: __name__ is stripped in foo+foo
+  content: |4
+
+    - alert: Foo
+      expr: foo + on(__name__, job) foo > 0
+      annotations:
+        summary: '{{ .Labels.job }} is above zero on {{ $labels.__name__ }}'
+  output: |
+    3 |   expr: foo + on(__name__, job) foo > 0
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^ Binary operation between two vectors removes metric names.
+      | [...]
+    5 |     summary: '{{ .Labels.job }} is above zero on {{ $labels.__name__ }}'
+                                                                   ^^^^^^^^^ Template is using `__name__` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `__name__` label but the query results won't have this label.
+          pos:
+            - line: 5
+              firstcolumn: 15
+              lastcolumn: 71
+          firstcolumn: 46
+          lastcolumn: 54
+          kind: 0
+        - message: Binary operation between two vectors removes metric names.
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 39
+          firstcolumn: 1
+          lastcolumn: 27
+          kind: 1
+    lines:
+        first: 2
+        last: 5
+    severity: 2
+    anchor: 0
+
+---
+
 [TestTemplateCheck/abs_/_scalar - 1]
 []
 
