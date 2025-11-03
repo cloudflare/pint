@@ -10,6 +10,7 @@ output:
                 start: 0
                 end: 1
       deadinfo: null
+      deadlabels: []
       returns: scalar
       operations: []
       joins: []
@@ -43,6 +44,7 @@ output:
                 start: 0
                 end: 1
       deadinfo: null
+      deadlabels: []
       returns: scalar
       operations: []
       joins: []
@@ -80,6 +82,7 @@ output:
         fragment:
             start: 1
             end: 2
+      deadlabels: []
       returns: scalar
       operations: []
       joins: []
@@ -117,6 +120,7 @@ output:
         fragment:
             start: 1
             end: 2
+      deadlabels: []
       returns: scalar
       operations: []
       joins: []
@@ -154,6 +158,7 @@ output:
         fragment:
             start: 1
             end: 2
+      deadlabels: []
       returns: scalar
       operations: []
       joins: []
@@ -187,6 +192,7 @@ output:
                 start: 1
                 end: 2
       deadinfo: null
+      deadlabels: []
       returns: scalar
       operations: []
       joins: []
@@ -224,6 +230,7 @@ output:
         fragment:
             start: 1
             end: 2
+      deadlabels: []
       returns: scalar
       operations: []
       joins: []
@@ -261,6 +268,7 @@ output:
         fragment:
             start: 0
             end: 2
+      deadlabels: []
       returns: scalar
       operations: []
       joins: []
@@ -294,6 +302,7 @@ output:
                 start: 0
                 end: 1
       deadinfo: null
+      deadlabels: []
       returns: scalar
       operations: []
       joins: []
@@ -321,6 +330,7 @@ expr: (foo or bar) * 5
 output:
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -344,6 +354,7 @@ output:
       isconditional: false
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] bar'
@@ -373,6 +384,7 @@ expr: (foo or vector(2)) * 5
 output:
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -402,6 +414,7 @@ output:
                 start: 8
                 end: 14
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - args:
@@ -439,6 +452,7 @@ output:
                 start: 0
                 end: 39
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -456,6 +470,7 @@ output:
                         start: 22
                         end: 28
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - args:
@@ -491,6 +506,7 @@ output:
                 fragment:
                     start: 35
                     end: 38
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar'
@@ -544,6 +560,7 @@ output:
                 start: 0
                 end: 39
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - args:
@@ -563,6 +580,7 @@ output:
                         start: 22
                         end: 28
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - args:
@@ -598,6 +616,7 @@ output:
                 fragment:
                     start: 35
                     end: 38
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar'
@@ -651,6 +670,7 @@ output:
                 start: 0
                 end: 1
       deadinfo: null
+      deadlabels: []
       returns: scalar
       operations: []
       joins: []
@@ -684,6 +704,7 @@ output:
                 start: 0
                 end: 2
       deadinfo: null
+      deadlabels: []
       returns: scalar
       operations: []
       joins: []
@@ -717,6 +738,7 @@ output:
                 start: 0
                 end: 6
       deadinfo: null
+      deadlabels: []
       returns: string
       operations: []
       joins: []
@@ -744,6 +766,7 @@ expr: foo
 output:
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -773,6 +796,7 @@ expr: (foo > 1) > bool 1
 output:
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -802,6 +826,7 @@ expr: foo > bool 5
 output:
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -831,6 +856,7 @@ expr: foo > bool 5 == 1
 output:
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -866,6 +892,7 @@ output:
                 start: 0
                 end: 14
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -877,6 +904,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar'
@@ -930,6 +958,7 @@ output:
                 start: 1
                 end: 15
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -941,6 +970,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar'
@@ -1006,6 +1036,7 @@ output:
                 start: 11
                 end: 13
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -1018,6 +1049,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar'
@@ -1083,6 +1115,7 @@ output:
                 start: 12
                 end: 14
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -1095,6 +1128,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar'
@@ -1160,6 +1194,7 @@ output:
                 start: 24
                 end: 34
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -1173,6 +1208,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar'
@@ -1238,6 +1274,7 @@ output:
                 start: 24
                 end: 35
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -1251,6 +1288,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar'
@@ -1298,6 +1336,7 @@ expr: foo and bar > bool 0
 output:
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -1309,6 +1348,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar'
@@ -1356,6 +1396,7 @@ expr: foo offset 5m
 output:
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo offset 5m'
@@ -1391,6 +1432,7 @@ output:
                 start: 0
                 end: 14
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{job="bar"}'
@@ -1426,6 +1468,7 @@ output:
                 start: 0
                 end: 11
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{job=""}'
@@ -1461,6 +1504,7 @@ output:
                 start: 0
                 end: 14
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{job="bar"}'
@@ -1490,6 +1534,7 @@ output:
                 start: 18
                 end: 32
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] bar{job="foo"}'
@@ -1525,6 +1570,7 @@ output:
                 start: 0
                 end: 12
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{a="bar"}'
@@ -1554,6 +1600,7 @@ output:
                 start: 16
                 end: 28
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] bar{b="foo"}'
@@ -1583,6 +1630,7 @@ expr: foo[5m]
 output:
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: matrix
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -1612,6 +1660,7 @@ expr: prometheus_build_info[2m:1m]
 output:
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] prometheus_build_info'
@@ -1641,6 +1690,7 @@ expr: deriv(rate(distance_covered_meters_total[1m])[5m:1m])
 output:
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] distance_covered_meters_total'
@@ -1674,6 +1724,7 @@ expr: foo - 1
 output:
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -1703,6 +1754,7 @@ expr: foo / 5
 output:
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -1732,6 +1784,7 @@ expr: -foo
 output:
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -1779,6 +1832,7 @@ output:
                 start: 0
                 end: 3
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{job="myjob"}'
@@ -1834,6 +1888,7 @@ output:
                 start: 28
                 end: 30
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{job="myjob"}'
@@ -1885,6 +1940,7 @@ output:
                 start: 0
                 end: 3
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{job="myjob"}'
@@ -1928,6 +1984,7 @@ output:
                 start: 22
                 end: 29
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{job="myjob"}'
@@ -1977,6 +2034,7 @@ output:
                 start: 9
                 end: 11
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -2026,6 +2084,7 @@ output:
                 start: 4
                 end: 20
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{job="myjob"}'
@@ -2063,6 +2122,7 @@ output:
                 start: 0
                 end: 31
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{job="myjob"} offset 5m'
@@ -2100,6 +2160,7 @@ output:
                 start: 0
                 end: 43
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{job="myjob"}'
@@ -2131,6 +2192,7 @@ output:
                 start: 0
                 end: 43
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] bar{cluster="dev"}'
@@ -2180,6 +2242,7 @@ output:
                 start: 4
                 end: 20
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{job="myjob"}'
@@ -2223,6 +2286,7 @@ output:
                 start: 44
                 end: 51
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] bar{cluster="dev"}'
@@ -2272,6 +2336,7 @@ output:
                 start: 4
                 end: 20
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{job="myjob"}'
@@ -2307,7 +2372,7 @@ output:
             kind: excluded
             fragment:
                 start: 0
-                end: 21
+                end: 3
         __name__:
             reason: Binary operation between two vectors removes metric names.
             kind: excluded
@@ -2319,8 +2384,9 @@ output:
             kind: excluded
             fragment:
                 start: 0
-                end: 21
+                end: 3
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{job="myjob"}'
@@ -2338,7 +2404,7 @@ output:
                     kind: excluded
                     fragment:
                         start: 24
-                        end: 45
+                        end: 27
                 __name__:
                     reason: Aggregation removes metric name.
                     kind: excluded
@@ -2350,8 +2416,9 @@ output:
                     kind: excluded
                     fragment:
                         start: 24
-                        end: 45
+                        end: 27
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] foo{job="myjob"}'
@@ -2405,7 +2472,7 @@ output:
             kind: excluded
             fragment:
                 start: 0
-                end: 21
+                end: 3
         __name__:
             reason: Binary operation between two vectors removes metric names.
             kind: excluded
@@ -2417,8 +2484,9 @@ output:
             kind: excluded
             fragment:
                 start: 0
-                end: 21
+                end: 3
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{job="myjob"}'
@@ -2436,7 +2504,7 @@ output:
                     kind: excluded
                     fragment:
                         start: 24
-                        end: 45
+                        end: 27
                 __name__:
                     reason: Aggregation removes metric name.
                     kind: excluded
@@ -2448,8 +2516,9 @@ output:
                     kind: excluded
                     fragment:
                         start: 24
-                        end: 45
+                        end: 27
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] foo{job="myjob"}'
@@ -2517,6 +2586,7 @@ output:
                 start: 4
                 end: 20
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{job="myjob"}'
@@ -2566,6 +2636,7 @@ output:
                 start: 11
                 end: 13
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -2601,7 +2672,7 @@ output:
             kind: excluded
             fragment:
                 start: 0
-                end: 21
+                end: 6
         __name__:
             reason: Aggregation removes metric name.
             kind: excluded
@@ -2609,6 +2680,7 @@ output:
                 start: 0
                 end: 21
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -2646,7 +2718,7 @@ output:
             kind: excluded
             fragment:
                 start: 0
-                end: 21
+                end: 6
         __name__:
             reason: Aggregation removes metric name.
             kind: excluded
@@ -2654,6 +2726,7 @@ output:
                 start: 0
                 end: 21
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -2687,6 +2760,7 @@ expr: stddev_over_time(foo[5m])
 output:
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -2718,6 +2792,7 @@ expr: stdvar_over_time(foo[5m])
 output:
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -2753,7 +2828,7 @@ output:
             kind: excluded
             fragment:
                 start: 0
-                end: 28
+                end: 8
         __name__:
             reason: Aggregation removes metric name.
             kind: excluded
@@ -2761,6 +2836,7 @@ output:
                 start: 0
                 end: 28
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -2800,7 +2876,7 @@ output:
             kind: excluded
             fragment:
                 start: 0
-                end: 38
+                end: 12
         __name__:
             reason: Aggregation removes metric name.
             kind: excluded
@@ -2814,6 +2890,7 @@ output:
                 start: 0
                 end: 38
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] build_version'
@@ -2865,6 +2942,7 @@ output:
                 start: 0
                 end: 51
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] build_version'
@@ -2916,6 +2994,7 @@ output:
                 start: 0
                 end: 62
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] build_version{job="foo"}'
@@ -2973,6 +3052,7 @@ output:
                 start: 0
                 end: 46
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] build_version'
@@ -3012,6 +3092,7 @@ output:
                 start: 9
                 end: 25
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{job="myjob"}'
@@ -3045,6 +3126,7 @@ expr: topk(10, foo or bar)
 output:
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -3072,6 +3154,7 @@ output:
       isconditional: false
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] bar'
@@ -3105,6 +3188,7 @@ expr: rate(foo[10m])
 output:
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -3148,6 +3232,7 @@ output:
                 start: 20
                 end: 27
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -3193,6 +3278,7 @@ output:
                 start: 0
                 end: 14
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{job="foo"}'
@@ -3204,6 +3290,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar'
@@ -3275,6 +3362,7 @@ output:
                 start: 17
                 end: 19
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{job="foo"}'
@@ -3287,6 +3375,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar'
@@ -3358,6 +3447,7 @@ output:
                 start: 0
                 end: 14
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{job="foo"}'
@@ -3371,6 +3461,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar'
@@ -3442,6 +3533,7 @@ output:
                 start: 0
                 end: 14
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{job="foo"}'
@@ -3467,6 +3559,7 @@ output:
                         start: 50
                         end: 84
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar{cluster="bar",ignored="true"}'
@@ -3538,6 +3631,7 @@ output:
                 start: 46
                 end: 57
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] bar{cluster="bar"}'
@@ -3563,6 +3657,7 @@ output:
                         start: 0
                         end: 30
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] foo{ignored="true",job="foo"}'
@@ -3614,7 +3709,7 @@ output:
             kind: excluded
             fragment:
                 start: 0
-                end: 16
+                end: 5
         __name__:
             reason: Aggregation removes metric name.
             kind: excluded
@@ -3622,6 +3717,7 @@ output:
                 start: 0
                 end: 16
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -3635,6 +3731,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar'
@@ -3686,7 +3783,7 @@ output:
             kind: excluded
             fragment:
                 start: 0
-                end: 38
+                end: 5
         __name__:
             reason: Aggregation removes metric name.
             kind: excluded
@@ -3700,6 +3797,7 @@ output:
                 start: 20
                 end: 23
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] up{job="a"}'
@@ -3719,6 +3817,7 @@ output:
                         start: 26
                         end: 37
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] up{job="b"}'
@@ -3770,7 +3869,7 @@ output:
             kind: excluded
             fragment:
                 start: 0
-                end: 41
+                end: 5
         __name__:
             reason: Aggregation removes metric name.
             kind: excluded
@@ -3782,7 +3881,7 @@ output:
             kind: excluded
             fragment:
                 start: 0
-                end: 41
+                end: 5
         job:
             reason: Query is using one-to-one vector matching with `on(env)`, only labels included inside `on(...)` will be present on the results.
             kind: excluded
@@ -3790,6 +3889,7 @@ output:
                 start: 20
                 end: 23
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] up{job="a"}'
@@ -3810,6 +3910,7 @@ output:
                         start: 29
                         end: 40
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] up{job="b"}'
@@ -3869,6 +3970,7 @@ output:
                 start: 0
                 end: 28
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{instance="1",job="foo"}'
@@ -3880,6 +3982,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar'
@@ -3945,6 +4048,7 @@ output:
                 start: 0
                 end: 28
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{instance="1",job="foo"}'
@@ -3957,6 +4061,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar'
@@ -4004,6 +4109,7 @@ expr: topk(10, foo)
 output:
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -4037,6 +4143,7 @@ expr: topk(10, foo) without(cluster)
 output:
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -4070,6 +4177,7 @@ expr: topk(10, foo) by(cluster)
 output:
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -4115,6 +4223,7 @@ output:
                 start: 31
                 end: 38
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -4152,6 +4261,7 @@ expr: foo or bar
 output:
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -4175,6 +4285,7 @@ output:
       isconditional: false
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] bar'
@@ -4204,6 +4315,7 @@ expr: foo or bar or baz
 output:
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -4227,6 +4339,7 @@ output:
       isconditional: false
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] bar'
@@ -4250,6 +4363,7 @@ output:
       isconditional: false
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] baz'
@@ -4279,6 +4393,7 @@ expr: (foo or bar) or baz
 output:
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -4302,6 +4417,7 @@ output:
       isconditional: false
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] bar'
@@ -4325,6 +4441,7 @@ output:
       isconditional: false
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] baz'
@@ -4354,6 +4471,7 @@ expr: foo unless bar
 output:
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -4365,6 +4483,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar'
@@ -4409,6 +4528,7 @@ expr: foo unless bar > 5
 output:
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -4420,6 +4540,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar'
@@ -4464,6 +4585,7 @@ expr: foo unless bar unless baz
 output:
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -4475,6 +4597,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar'
@@ -4501,6 +4624,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] baz'
@@ -4569,6 +4693,7 @@ output:
                 start: 63
                 end: 70
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] up{cluster="dev",job="foo"}'
@@ -4608,6 +4733,7 @@ output:
                 start: 0
                 end: 6
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.Call] year()'
@@ -4637,6 +4763,7 @@ expr: year(foo)
 output:
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -4698,6 +4825,7 @@ output:
                 start: 11
                 end: 58
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] up{job="api-server",src1="a",src2="b",src3="c"}'
@@ -4761,6 +4889,7 @@ output:
                 start: 48
                 end: 58
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo:sum'
@@ -4776,6 +4905,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] job:notify'
@@ -4824,6 +4954,7 @@ output:
                         start: 108
                         end: 110
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] foo:count'
@@ -4897,6 +5028,7 @@ output:
                 start: 29
                 end: 32
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] container_file_descriptors'
@@ -4916,6 +5048,7 @@ output:
                         start: 53
                         end: 100
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] container_ulimits_soft{ulimit="max_open_files"}'
@@ -4981,6 +5114,7 @@ output:
                 start: 29
                 end: 32
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] container_file_descriptors'
@@ -5000,6 +5134,7 @@ output:
                         start: 66
                         end: 113
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] container_ulimits_soft{ulimit="max_open_files"}'
@@ -5064,6 +5199,7 @@ output:
                 start: 0
                 end: 22
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{job="bar"}'
@@ -5129,6 +5265,7 @@ output:
                 start: 0
                 end: 66
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{cluster!="dev",env="prod",instance=~".+",job="bar"}'
@@ -5199,6 +5336,7 @@ output:
                 start: 0
                 end: 6
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -5255,6 +5393,7 @@ output:
                 start: 0
                 end: 38
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{job="prometheus",xxx="1"}'
@@ -5269,6 +5408,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] prometheus_build_info'
@@ -5334,6 +5474,7 @@ output:
                 start: 13
                 end: 15
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -5395,6 +5536,7 @@ output:
                 start: 32
                 end: 35
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] node_exporter_build_info'
@@ -5441,6 +5583,7 @@ output:
                         start: 127
                         end: 130
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] deb_package_version'
@@ -5501,6 +5644,7 @@ output:
                 start: 0
                 end: 6
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -5537,6 +5681,7 @@ output:
                 start: 15
                 end: 21
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] bar'
@@ -5579,6 +5724,7 @@ output:
                 start: 0
                 end: 16
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -5615,6 +5761,7 @@ output:
                 start: 29
                 end: 35
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] bar'
@@ -5681,6 +5828,7 @@ output:
                 start: 37
                 end: 59
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{job="xxx"}'
@@ -5696,6 +5844,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar'
@@ -5766,6 +5915,7 @@ output:
                 start: 25
                 end: 47
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{job="xxx"}'
@@ -5779,6 +5929,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar'
@@ -5832,6 +5983,7 @@ output:
                 start: 0
                 end: 6
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - args:
@@ -5869,6 +6021,7 @@ output:
                 start: 0
                 end: 6
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - args:
@@ -5910,6 +6063,7 @@ output:
         fragment:
             start: 0
             end: 24
+      deadlabels: []
       returns: vector
       operations:
         - args:
@@ -5947,6 +6101,7 @@ output:
                 start: 0
                 end: 35
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{job="myjob"}'
@@ -5984,6 +6139,7 @@ output:
                 start: 0
                 end: 15
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.Call] days_in_month()'
@@ -6019,6 +6175,7 @@ output:
                 start: 0
                 end: 29
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{job="foo"}'
@@ -6068,6 +6225,7 @@ output:
                 start: 14
                 end: 48
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] up{job="api-server",service="a:c"}'
@@ -6128,6 +6286,7 @@ output:
                 start: 18
                 end: 21
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] pod_status'
@@ -6166,6 +6325,7 @@ expr: (time() - my_metric) > 5*3600
 output:
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] my_metric'
@@ -6213,6 +6373,7 @@ output:
                 start: 37
                 end: 45
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] up{instance="a",job="prometheus"}'
@@ -6237,6 +6398,7 @@ output:
                         start: 51
                         end: 79
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] up{instance="a",job="pint"}'
@@ -6315,6 +6477,7 @@ output:
                 start: 5
                 end: 12
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"}'
@@ -6376,6 +6539,7 @@ output:
                 start: 119
                 end: 126
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"}'
@@ -6393,7 +6557,7 @@ output:
                     kind: excluded
                     fragment:
                         start: 221
-                        end: 289
+                        end: 226
                 __name__:
                     reason: Aggregation removes metric name.
                     kind: excluded
@@ -6405,14 +6569,15 @@ output:
                     kind: excluded
                     fragment:
                         start: 221
-                        end: 289
+                        end: 226
                 tier:
                     reason: Query is using aggregation that removes all labels.
                     kind: excluded
                     fragment:
                         start: 221
-                        end: 289
+                        end: 226
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] colo_router_tier:disabled_pops:max{router=~"edge.*",tier="1"}'
@@ -6486,6 +6651,7 @@ output:
                 start: 307
                 end: 314
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] router_anycast_prefix_enabled{cidr_use_case=~".*regional.*"}'
@@ -6529,6 +6695,7 @@ output:
                 start: 0
                 end: 69
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -6609,6 +6776,7 @@ output:
                 start: 5
                 end: 8
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] probe_success{job="abc"}'
@@ -6670,6 +6838,31 @@ output:
         fragment:
             start: 91
             end: 100
+      deadlabels:
+        - name: region
+          reason: Calling `vector()` will return a vector value with no labels.
+          namepos:
+            start: 9
+            end: 15
+          fragment:
+            start: 91
+            end: 97
+        - name: target
+          reason: Calling `vector()` will return a vector value with no labels.
+          namepos:
+            start: 17
+            end: 23
+          fragment:
+            start: 91
+            end: 97
+        - name: colo_name
+          reason: Calling `vector()` will return a vector value with no labels.
+          namepos:
+            start: 25
+            end: 34
+          fragment:
+            start: 91
+            end: 97
       returns: vector
       operations:
         - args:
@@ -6709,6 +6902,7 @@ output:
                 start: 0
                 end: 6
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - args:
@@ -6738,6 +6932,7 @@ output:
         fragment:
             start: 13
             end: 16
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -6777,6 +6972,7 @@ output:
         fragment:
             start: 0
             end: 9
+      deadlabels: []
       returns: vector
       operations:
         - args:
@@ -6824,6 +7020,7 @@ output:
         fragment:
             start: 0
             end: 9
+      deadlabels: []
       returns: vector
       operations:
         - args:
@@ -6843,6 +7040,7 @@ output:
                         start: 12
                         end: 18
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - args:
@@ -6904,6 +7102,7 @@ output:
                 start: 0
                 end: 21
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -6945,6 +7144,7 @@ output:
         fragment:
             start: 11
             end: 20
+      deadlabels: []
       returns: vector
       operations:
         - args:
@@ -6990,6 +7190,7 @@ output:
                 start: 1
                 end: 22
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -7031,6 +7232,7 @@ output:
         fragment:
             start: 12
             end: 21
+      deadlabels: []
       returns: vector
       operations:
         - args:
@@ -7076,6 +7278,7 @@ output:
                 start: 1
                 end: 22
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -7113,6 +7316,7 @@ output:
                 start: 1
                 end: 22
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - args:
@@ -7158,6 +7362,7 @@ output:
                 start: 1
                 end: 22
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -7199,6 +7404,7 @@ output:
         fragment:
             start: 12
             end: 21
+      deadlabels: []
       returns: vector
       operations:
         - args:
@@ -7247,6 +7453,7 @@ output:
                 start: 1
                 end: 40
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] sometimes{foo!="bar"}'
@@ -7284,6 +7491,7 @@ output:
                 start: 1
                 end: 40
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - args:
@@ -7311,6 +7519,7 @@ output:
       isconditional: false
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] bob'
@@ -7346,6 +7555,7 @@ output:
                 start: 60
                 end: 68
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -7377,6 +7587,7 @@ output:
                 start: 72
                 end: 78
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - args:
@@ -7430,6 +7641,7 @@ output:
                 start: 4
                 end: 30
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] sometimes{foo!="bar"}'
@@ -7443,6 +7655,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bob'
@@ -7484,6 +7697,7 @@ output:
                         start: 70
                         end: 78
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar'
@@ -7515,6 +7729,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] notfound'
@@ -7562,6 +7777,7 @@ output:
                 start: 36
                 end: 42
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - args:
@@ -7575,6 +7791,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bob'
@@ -7616,6 +7833,7 @@ output:
                         start: 70
                         end: 78
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar'
@@ -7647,6 +7865,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] notfound'
@@ -7694,6 +7913,7 @@ expr: foo offset 5m > 5
 output:
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo offset 5m'
@@ -7733,6 +7953,7 @@ output:
                 start: 1
                 end: 124
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] metric2'
@@ -7746,6 +7967,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] metric1'
@@ -7783,6 +8005,7 @@ output:
                         start: 58
                         end: 64
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - args:
@@ -7820,6 +8043,7 @@ output:
                         start: 72
                         end: 110
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] metric3{log_name="samplerd"}'
@@ -7857,6 +8081,7 @@ output:
                         start: 114
                         end: 120
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - args:
@@ -7912,6 +8137,7 @@ output:
                 start: 1
                 end: 124
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - args:
@@ -7925,6 +8151,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] metric1'
@@ -7962,6 +8189,7 @@ output:
                         start: 58
                         end: 64
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - args:
@@ -7999,6 +8227,7 @@ output:
                         start: 72
                         end: 110
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] metric3{log_name="samplerd"}'
@@ -8036,6 +8265,7 @@ output:
                         start: 114
                         end: 120
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - args:
@@ -8097,6 +8327,7 @@ output:
                 start: 0
                 end: 64
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - args:
@@ -8153,6 +8384,7 @@ output:
                 start: 1
                 end: 4
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{job="myjob"}'
@@ -8190,6 +8422,7 @@ output:
                 start: 2
                 end: 18
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{job="myjob"}'
@@ -8225,7 +8458,7 @@ output:
             kind: excluded
             fragment:
                 start: 5
-                end: 21
+                end: 10
         __name__:
             reason: Aggregation removes metric name.
             kind: excluded
@@ -8237,6 +8470,7 @@ output:
         fragment:
             start: 11
             end: 20
+      deadlabels: []
       returns: vector
       operations:
         - args:
@@ -8280,6 +8514,7 @@ output:
         fragment:
             start: 0
             end: 1
+      deadlabels: []
       returns: scalar
       operations: []
       joins: []
@@ -8313,6 +8548,7 @@ output:
                 start: 0
                 end: 34
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] prometheus_ready{job="prometheus"}'
@@ -8334,6 +8570,7 @@ output:
                 fragment:
                     start: 42
                     end: 48
+            deadlabels: []
             returns: vector
             operations:
                 - args:
@@ -8390,6 +8627,7 @@ output:
         fragment:
             start: 47
             end: 56
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] prometheus_ready{job="prometheus"}'
@@ -8407,6 +8645,7 @@ output:
                         start: 47
                         end: 53
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - args:
@@ -8459,6 +8698,7 @@ output:
                 start: 0
                 end: 34
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] prometheus_ready{job="prometheus"}'
@@ -8481,6 +8721,7 @@ output:
                 fragment:
                     start: 50
                     end: 56
+            deadlabels: []
             returns: vector
             operations:
                 - args:
@@ -8569,6 +8810,7 @@ output:
                 start: 5
                 end: 8
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] cf_node_role{kubernetes_role="master",role="kubernetes"}'
@@ -8612,6 +8854,7 @@ output:
                         start: 99
                         end: 102
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] node_systemd_timer_last_trigger_seconds{name=~"etcd-defrag-.*.timer"}'
@@ -8639,6 +8882,7 @@ output:
                                 start: 247
                                 end: 303
                     deadinfo: null
+                    deadlabels: []
                     returns: vector
                     operations:
                         - node: '[*parser.VectorSelector] cf_node_role{kubernetes_role="master",role="kubernetes"}'
@@ -8719,6 +8963,7 @@ output:
                 start: 13
                 end: 15
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{a="1"}'
@@ -8736,6 +8981,7 @@ output:
                         start: 18
                         end: 28
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar{b="2"}'
@@ -8813,6 +9059,7 @@ output:
                 start: 13
                 end: 15
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{a="1"}'
@@ -8833,6 +9080,7 @@ output:
                         start: 42
                         end: 52
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar{b="2"}'
@@ -8910,6 +9158,7 @@ output:
                 start: 13
                 end: 15
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] bar{b="2"}'
@@ -8930,6 +9179,7 @@ output:
                         start: 0
                         end: 10
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] foo{a="1"}'
@@ -9001,6 +9251,7 @@ output:
                 start: 13
                 end: 15
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{a="1"}'
@@ -9035,6 +9286,7 @@ output:
                 fragment:
                     start: 26
                     end: 29
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar{b="2"}'
@@ -9114,6 +9366,7 @@ output:
                 start: 13
                 end: 15
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{a="1"}'
@@ -9150,6 +9403,7 @@ output:
                 fragment:
                     start: 42
                     end: 45
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar{b="2"}'
@@ -9229,6 +9483,7 @@ output:
                 start: 18
                 end: 20
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] bar{b="2"}'
@@ -9265,6 +9520,7 @@ output:
                 fragment:
                     start: 0
                     end: 3
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] foo{a="1"}'
@@ -9344,6 +9600,7 @@ output:
                 start: 13
                 end: 15
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{a="1"}'
@@ -9380,6 +9637,7 @@ output:
                 fragment:
                     start: 58
                     end: 65
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar{b="2"}'
@@ -9459,6 +9717,7 @@ output:
                 start: 36
                 end: 38
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] bar{b="2"}'
@@ -9495,6 +9754,7 @@ output:
                 fragment:
                     start: 16
                     end: 23
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] foo{a="1"}'
@@ -9581,6 +9841,7 @@ output:
                 start: 6
                 end: 14
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] kernel_device_io_errors_total{device!~"loop.+"}'
@@ -9618,6 +9879,7 @@ output:
                 fragment:
                     start: 292
                     end: 298
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] node_disk_info'
@@ -9657,6 +9919,7 @@ output:
                         start: 351
                         end: 442
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] salt_highstate_runner_configured_minions'
@@ -9701,6 +9964,7 @@ output:
                         start: 140
                         end: 258
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] kernel_device_io_soft_errors_total{device!~"loop.+"}'
@@ -9714,6 +9978,7 @@ output:
                   src:
                     labels: {}
                     deadinfo: null
+                    deadlabels: []
                     returns: vector
                     operations:
                         - node: '[*parser.VectorSelector] kernel_device_io_errors_total'
@@ -9802,6 +10067,7 @@ output:
                 start: 26
                 end: 28
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{a="1"}'
@@ -9821,6 +10087,7 @@ output:
                         start: 31
                         end: 41
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar{b="2"}'
@@ -9886,6 +10153,15 @@ output:
                 start: 13
                 end: 20
       deadinfo: null
+      deadlabels:
+        - name: job
+          reason: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
+          namepos:
+            start: 30
+            end: 33
+          fragment:
+            start: 13
+            end: 20
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -9941,6 +10217,7 @@ output:
                 start: 47
                 end: 49
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] prometheus:scrape_series_added:since_gc:sum'
@@ -9983,6 +10260,7 @@ output:
                         start: 75
                         end: 287
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] go_memstats_alloc_bytes{job="prometheus"}'
@@ -10023,6 +10301,7 @@ output:
                                 start: 229
                                 end: 231
                     deadinfo: null
+                    deadlabels: []
                     returns: vector
                     operations:
                         - node: '[*parser.VectorSelector] prometheus_tsdb_head_series'
@@ -10098,6 +10377,7 @@ output:
                 start: 1
                 end: 14
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.Call] day_of_week()'
@@ -10115,6 +10395,7 @@ output:
                         start: 24
                         end: 30
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.Call] hour()'
@@ -10162,6 +10443,7 @@ output:
                 start: 39
                 end: 45
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - args:
@@ -10241,6 +10523,7 @@ output:
                 start: 5
                 end: 8
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] errors_total'
@@ -10259,6 +10542,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] server_errors_total'
@@ -10306,6 +10590,7 @@ expr: 1 - (foo or vector(0)) < 0.999
 output:
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -10339,6 +10624,7 @@ output:
         fragment:
             start: 12
             end: 21
+      deadlabels: []
       returns: vector
       operations:
         - args:
@@ -10380,6 +10666,7 @@ output:
                 start: 5
                 end: 11
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - args:
@@ -10399,6 +10686,7 @@ output:
                         start: 19
                         end: 26
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.Call] month()'
@@ -10446,6 +10734,7 @@ output:
                 start: 37
                 end: 43
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - args:
@@ -10501,6 +10790,7 @@ output:
                 start: 6
                 end: 9
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] error_total'
@@ -10583,6 +10873,7 @@ output:
                 start: 341
                 end: 344
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo_rejections'
@@ -10616,6 +10907,7 @@ output:
                         start: 147
                         end: 150
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] foo_total'
@@ -10667,6 +10959,15 @@ output:
                         start: 131
                         end: 137
             deadinfo: null
+            deadlabels:
+                - name: colo_name
+                  reason: Calling `vector()` will return a vector value with no labels.
+                  namepos:
+                    start: 151
+                    end: 160
+                  fragment:
+                    start: 131
+                    end: 137
             returns: vector
             operations:
                 - args:
@@ -10718,6 +11019,7 @@ output:
                         start: 241
                         end: 244
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] foo_rejections offset 1d'
@@ -10751,6 +11053,7 @@ output:
                                 start: 320
                                 end: 323
                     deadinfo: null
+                    deadlabels: []
                     returns: vector
                     operations:
                         - node: '[*parser.VectorSelector] foo_total offset 1d'
@@ -10802,6 +11105,15 @@ output:
                                 start: 306
                                 end: 312
                     deadinfo: null
+                    deadlabels:
+                        - name: colo_name
+                          reason: Calling `vector()` will return a vector value with no labels.
+                          namepos:
+                            start: 324
+                            end: 333
+                          fragment:
+                            start: 306
+                            end: 312
                     returns: vector
                     operations:
                         - args:
@@ -10871,6 +11183,15 @@ output:
                         start: 227
                         end: 233
             deadinfo: null
+            deadlabels:
+                - name: colo_name
+                  reason: Calling `vector()` will return a vector value with no labels.
+                  namepos:
+                    start: 245
+                    end: 254
+                  fragment:
+                    start: 227
+                    end: 233
             returns: vector
             operations:
                 - args:
@@ -10904,6 +11225,7 @@ output:
                                 start: 320
                                 end: 323
                     deadinfo: null
+                    deadlabels: []
                     returns: vector
                     operations:
                         - node: '[*parser.VectorSelector] foo_total offset 1d'
@@ -10955,6 +11277,15 @@ output:
                                 start: 306
                                 end: 312
                     deadinfo: null
+                    deadlabels:
+                        - name: colo_name
+                          reason: Calling `vector()` will return a vector value with no labels.
+                          namepos:
+                            start: 324
+                            end: 333
+                          fragment:
+                            start: 306
+                            end: 312
                     returns: vector
                     operations:
                         - args:
@@ -11007,6 +11338,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] colo_job:foo_total:rate2m'
@@ -11047,6 +11379,7 @@ output:
                 fragment:
                     start: 386
                     end: 392
+            deadlabels: []
             returns: vector
             operations:
                 - args:
@@ -11079,6 +11412,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] colo_job:foo_total:rate2m offset 1d'
@@ -11119,6 +11453,7 @@ output:
                 fragment:
                     start: 463
                     end: 469
+            deadlabels: []
             returns: vector
             operations:
                 - args:
@@ -11184,6 +11519,23 @@ output:
         fragment:
             start: 50
             end: 59
+      deadlabels:
+        - name: colo_name
+          reason: Calling `vector()` will return a vector value with no labels.
+          namepos:
+            start: 68
+            end: 77
+          fragment:
+            start: 50
+            end: 56
+        - name: colo_name
+          reason: Calling `vector()` will return a vector value with no labels.
+          namepos:
+            start: 345
+            end: 354
+          fragment:
+            start: 50
+            end: 56
       returns: vector
       operations:
         - args:
@@ -11217,6 +11569,7 @@ output:
                         start: 147
                         end: 150
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] foo_total'
@@ -11268,6 +11621,15 @@ output:
                         start: 131
                         end: 137
             deadinfo: null
+            deadlabels:
+                - name: colo_name
+                  reason: Calling `vector()` will return a vector value with no labels.
+                  namepos:
+                    start: 151
+                    end: 160
+                  fragment:
+                    start: 131
+                    end: 137
             returns: vector
             operations:
                 - args:
@@ -11319,6 +11681,7 @@ output:
                         start: 241
                         end: 244
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] foo_rejections offset 1d'
@@ -11352,6 +11715,7 @@ output:
                                 start: 320
                                 end: 323
                     deadinfo: null
+                    deadlabels: []
                     returns: vector
                     operations:
                         - node: '[*parser.VectorSelector] foo_total offset 1d'
@@ -11403,6 +11767,15 @@ output:
                                 start: 306
                                 end: 312
                     deadinfo: null
+                    deadlabels:
+                        - name: colo_name
+                          reason: Calling `vector()` will return a vector value with no labels.
+                          namepos:
+                            start: 324
+                            end: 333
+                          fragment:
+                            start: 306
+                            end: 312
                     returns: vector
                     operations:
                         - args:
@@ -11472,6 +11845,15 @@ output:
                         start: 227
                         end: 233
             deadinfo: null
+            deadlabels:
+                - name: colo_name
+                  reason: Calling `vector()` will return a vector value with no labels.
+                  namepos:
+                    start: 245
+                    end: 254
+                  fragment:
+                    start: 227
+                    end: 233
             returns: vector
             operations:
                 - args:
@@ -11505,6 +11887,7 @@ output:
                                 start: 320
                                 end: 323
                     deadinfo: null
+                    deadlabels: []
                     returns: vector
                     operations:
                         - node: '[*parser.VectorSelector] foo_total offset 1d'
@@ -11556,6 +11939,15 @@ output:
                                 start: 306
                                 end: 312
                     deadinfo: null
+                    deadlabels:
+                        - name: colo_name
+                          reason: Calling `vector()` will return a vector value with no labels.
+                          namepos:
+                            start: 324
+                            end: 333
+                          fragment:
+                            start: 306
+                            end: 312
                     returns: vector
                     operations:
                         - args:
@@ -11608,6 +12000,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] colo_job:foo_total:rate2m'
@@ -11648,6 +12041,7 @@ output:
                 fragment:
                     start: 386
                     end: 392
+            deadlabels: []
             returns: vector
             operations:
                 - args:
@@ -11680,6 +12074,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] colo_job:foo_total:rate2m offset 1d'
@@ -11720,6 +12115,7 @@ output:
                 fragment:
                     start: 463
                     end: 469
+            deadlabels: []
             returns: vector
             operations:
                 - args:
@@ -11781,6 +12177,7 @@ output:
                 start: 0
                 end: 40
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] selector'
@@ -11806,6 +12203,7 @@ output:
                         start: 16
                         end: 40
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] selector offset 30m'
@@ -11885,6 +12283,7 @@ output:
                 start: 7
                 end: 10
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] configured_minions'
@@ -11924,6 +12323,7 @@ output:
                         start: 68
                         end: 71
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] token_expiration'
@@ -11979,6 +12379,7 @@ output:
                 start: 9
                 end: 47
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] prometheus_build_info'
@@ -11994,6 +12395,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] prometheus_ready'
@@ -12047,6 +12449,7 @@ output:
                 start: 12
                 end: 50
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] prometheus_build_info'
@@ -12062,6 +12465,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] prometheus_ready'
@@ -12109,6 +12513,7 @@ expr: histogram_fraction(0, 0.1, metric)
 output:
     - labels: {}
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] metric'
@@ -12149,6 +12554,7 @@ output:
                 start: 0
                 end: 9
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -12160,6 +12566,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] foo'
@@ -12225,6 +12632,7 @@ output:
                 start: 6
                 end: 8
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -12238,6 +12646,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] foo'
@@ -12297,6 +12706,7 @@ output:
                 start: 6
                 end: 8
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -12310,6 +12720,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] foo'
@@ -12369,6 +12780,7 @@ output:
                 start: 6
                 end: 8
       deadinfo: null
+      deadlabels: []
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -12382,6 +12794,7 @@ output:
           src:
             labels: {}
             deadinfo: null
+            deadlabels: []
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] foo'
@@ -12420,6 +12833,622 @@ output:
         end: 39
       type: selector
       fixedlabels: false
+      isconditional: false
+
+---
+
+[TestLabelsSource/162 - 1]
+expr: |-
+    group by (env, cluster) (
+          up{env="prod", job="foo"} and on (instance) (services_enabled == 999)
+     )
+output:
+    - labels:
+        "":
+            reason: Query is using aggregation with `by(env, cluster)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 6
+                end: 9
+        __name__:
+            reason: Aggregation removes metric name.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 104
+        cluster:
+            reason: Query is using aggregation with `by(env, cluster)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 6
+                end: 9
+        env:
+            reason: Query will only return series where these labels are present.
+            kind: guaranteed
+            fragment:
+                start: 32
+                end: 57
+        instance:
+            reason: Query is using aggregation with `by(env, cluster)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 6
+                end: 9
+        job:
+            reason: Query is using aggregation with `by(env, cluster)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 6
+                end: 9
+      deadinfo: null
+      deadlabels: []
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] up{env="prod",job="foo"}'
+          op: ""
+        - node: '[*parser.AggregateExpr] group by (env, cluster) (up{env="prod",job="foo"} and on (instance) (services_enabled == 999))'
+          op: group
+      joins:
+        - "on":
+            - instance
+          ignoring: []
+          addedlabels: []
+          src:
+            labels: {}
+            deadinfo: null
+            deadlabels: []
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] services_enabled'
+                  op: ""
+            joins: []
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+            position:
+                start: 77
+                end: 93
+            type: selector
+            fixedlabels: false
+            isconditional: true
+          op: 57389
+          depth: 1
+      unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
+      position:
+        start: 32
+        end: 57
+      type: aggregation
+      fixedlabels: true
+      isconditional: true
+
+---
+
+[TestLabelsSource/163 - 1]
+expr: |-
+    group by (env, cluster) (
+          up{env="prod", job="foo"} * on (instance) (services_enabled == 999)
+     )
+output:
+    - labels:
+        "":
+            reason: Query is using aggregation with `by(env, cluster)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 6
+                end: 9
+        __name__:
+            reason: Aggregation removes metric name.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 102
+        cluster:
+            reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 60
+                end: 63
+        env:
+            reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 60
+                end: 63
+        instance:
+            reason: Query is using aggregation with `by(env, cluster)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 6
+                end: 9
+        job:
+            reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 60
+                end: 63
+      deadinfo: null
+      deadlabels:
+        - name: env
+          reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+          namepos:
+            start: 10
+            end: 13
+          fragment:
+            start: 60
+            end: 63
+        - name: cluster
+          reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+          namepos:
+            start: 15
+            end: 22
+          fragment:
+            start: 60
+            end: 63
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] up{env="prod",job="foo"}'
+          op: ""
+        - node: '[*parser.AggregateExpr] group by (env, cluster) (up{env="prod",job="foo"} * on (instance) (services_enabled == 999))'
+          op: group
+      joins:
+        - "on":
+            - instance
+          ignoring: []
+          addedlabels: []
+          src:
+            labels: {}
+            deadinfo: null
+            deadlabels: []
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] services_enabled'
+                  op: ""
+            joins: []
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+            position:
+                start: 75
+                end: 91
+            type: selector
+            fixedlabels: false
+            isconditional: true
+          op: 57395
+          depth: 1
+      unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
+      position:
+        start: 32
+        end: 57
+      type: aggregation
+      fixedlabels: true
+      isconditional: false
+
+---
+
+[TestLabelsSource/164 - 1]
+expr: foo / on(instance) sum(bar)
+output:
+    - labels:
+        "":
+            reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 6
+                end: 8
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 27
+        instance:
+            reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 6
+                end: 8
+      deadinfo: null
+      deadlabels: []
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+      joins:
+        - "on":
+            - instance
+          ignoring: []
+          addedlabels: []
+          src:
+            labels:
+                "":
+                    reason: Query is using aggregation that removes all labels.
+                    kind: excluded
+                    fragment:
+                        start: 19
+                        end: 22
+                __name__:
+                    reason: Aggregation removes metric name.
+                    kind: excluded
+                    fragment:
+                        start: 19
+                        end: 27
+            deadinfo:
+                reason: The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
+                fragment:
+                    start: 19
+                    end: 22
+            deadlabels: []
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+                - node: '[*parser.AggregateExpr] sum(bar)'
+                  op: sum
+            joins: []
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+            position:
+                start: 23
+                end: 26
+            type: aggregation
+            fixedlabels: true
+            isconditional: false
+          op: 57384
+          depth: 0
+      unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
+      position:
+        start: 0
+        end: 3
+      type: selector
+      fixedlabels: true
+      isconditional: false
+
+---
+
+[TestLabelsSource/165 - 1]
+expr: foo / on(instance) group_left(cluster) sum(bar)
+output:
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 47
+        cluster:
+            reason: Query is using many-to-one vector matching with `group_left(cluster)`, all labels included inside `group_left(...)` will be include on the results.
+            kind: included
+            fragment:
+                start: 19
+                end: 29
+        instance:
+            reason: Query is using many-to-one vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 6
+                end: 8
+      deadinfo: null
+      deadlabels: []
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+      joins:
+        - "on":
+            - instance
+          ignoring: []
+          addedlabels:
+            - cluster
+          src:
+            labels:
+                "":
+                    reason: Query is using aggregation that removes all labels.
+                    kind: excluded
+                    fragment:
+                        start: 39
+                        end: 42
+                __name__:
+                    reason: Aggregation removes metric name.
+                    kind: excluded
+                    fragment:
+                        start: 39
+                        end: 47
+            deadinfo:
+                reason: The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
+                fragment:
+                    start: 39
+                    end: 42
+            deadlabels: []
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+                - node: '[*parser.AggregateExpr] sum(bar)'
+                  op: sum
+            joins: []
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+            position:
+                start: 43
+                end: 46
+            type: aggregation
+            fixedlabels: true
+            isconditional: false
+          op: 57384
+          depth: 0
+      unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
+      position:
+        start: 0
+        end: 3
+      type: selector
+      fixedlabels: false
+      isconditional: false
+
+---
+
+[TestLabelsSource/166 - 1]
+expr: sum(bar) / on(instance) group_right(cluster) foo
+output:
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 48
+        cluster:
+            reason: Query is using one-to-many vector matching with `group_right(cluster)`, all labels included inside `group_right(...)` will be include on the results.
+            kind: included
+            fragment:
+                start: 24
+                end: 35
+        instance:
+            reason: Query is using one-to-many vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 11
+                end: 13
+      deadinfo: null
+      deadlabels: []
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+      joins:
+        - "on":
+            - instance
+          ignoring: []
+          addedlabels:
+            - cluster
+          src:
+            labels:
+                "":
+                    reason: Query is using aggregation that removes all labels.
+                    kind: excluded
+                    fragment:
+                        start: 0
+                        end: 3
+                __name__:
+                    reason: Aggregation removes metric name.
+                    kind: excluded
+                    fragment:
+                        start: 0
+                        end: 8
+            deadinfo:
+                reason: The left hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
+                fragment:
+                    start: 0
+                    end: 3
+            deadlabels: []
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+                - node: '[*parser.AggregateExpr] sum(bar)'
+                  op: sum
+            joins: []
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+            position:
+                start: 4
+                end: 7
+            type: aggregation
+            fixedlabels: true
+            isconditional: false
+          op: 57384
+          depth: 0
+      unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
+      position:
+        start: 45
+        end: 48
+      type: selector
+      fixedlabels: false
+      isconditional: false
+
+---
+
+[TestLabelsSource/167 - 1]
+expr: sum(bar) * on(cluster) sum(foo)
+output:
+    - labels:
+        "":
+            reason: Query is using one-to-one vector matching with `on(cluster)`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 11
+                end: 13
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 31
+        cluster:
+            reason: Query is using aggregation that removes all labels.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 3
+      deadinfo: null
+      deadlabels:
+        - name: cluster
+          reason: Query is using aggregation that removes all labels.
+          namepos:
+            start: 14
+            end: 21
+          fragment:
+            start: 0
+            end: 3
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] bar'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum(bar)'
+          op: sum
+      joins:
+        - "on":
+            - cluster
+          ignoring: []
+          addedlabels: []
+          src:
+            labels:
+                "":
+                    reason: Query is using aggregation that removes all labels.
+                    kind: excluded
+                    fragment:
+                        start: 23
+                        end: 26
+                __name__:
+                    reason: Aggregation removes metric name.
+                    kind: excluded
+                    fragment:
+                        start: 23
+                        end: 31
+            deadinfo: null
+            deadlabels: []
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] foo'
+                  op: ""
+                - node: '[*parser.AggregateExpr] sum(foo)'
+                  op: sum
+            joins: []
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+            position:
+                start: 27
+                end: 30
+            type: aggregation
+            fixedlabels: true
+            isconditional: false
+          op: 57395
+          depth: 0
+      unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
+      position:
+        start: 4
+        end: 7
+      type: aggregation
+      fixedlabels: true
       isconditional: false
 
 ---

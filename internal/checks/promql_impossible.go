@@ -75,5 +75,31 @@ func (c ImpossibleCheck) checkSource(expr parser.PromQLExpr, s utils.Source) (pr
 			Severity: Warning,
 		})
 	}
+	for _, dl := range s.DeadLabels {
+		problems = append(problems, Problem{
+			Anchor:   AnchorAfter,
+			Lines:    expr.Value.Pos.Lines(),
+			Reporter: c.Reporter(),
+			Summary:  "impossible label",
+			Details:  "",
+			Diagnostics: []diags.Diagnostic{
+				{
+					Pos:         expr.Value.Pos,
+					FirstColumn: int(dl.NamePos.Start) + 1,
+					LastColumn:  int(dl.NamePos.End),
+					Message:     "You can't use `" + dl.Name + "` because this label is not possible here.",
+					Kind:        diags.Issue,
+				},
+				{
+					Pos:         expr.Value.Pos,
+					FirstColumn: int(dl.Fragment.Start) + 1,
+					LastColumn:  int(dl.Fragment.End),
+					Message:     dl.Reason,
+					Kind:        diags.Context,
+				},
+			},
+			Severity: Warning,
+		})
+	}
 	return problems
 }

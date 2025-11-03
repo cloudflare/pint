@@ -1,11 +1,22 @@
 # Changelog
 
-## v0.76.2
+## v0.77.0
 
 ### Fixed
 
 - For queries using binary expressions between two vectors Prometheus will remove the metric name
   from resulting series, pint will now also apply the same logic when checking queries.
+- The [promql/impossible](checks/promql/impossible.md) check will now warn about aggregations and
+  and binary operations that try to operate on labels that are already removed in the query.
+  Example:
+
+  ```yaml
+  - record: foo
+    expr: sum(foo) / on(cluster) sum(bar)
+  ```
+
+  The above tries to join two series on the `cluster` label, but `sum(...)` already removed labels
+  from the results on both side, so there will be no such label on join on.
 
 ## v0.76.1
 
