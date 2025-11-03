@@ -102,19 +102,19 @@ func (c AggregationCheck) Check(_ context.Context, entry discovery.Entry, _ []di
 				Details:  maybeComment(c.comment),
 				Diagnostics: []diags.Diagnostic{
 					{
-						Message:     reason,
-						Pos:         expr.Value.Pos,
-						FirstColumn: int(fragment.Start) + 1,
-						LastColumn:  int(fragment.End),
-						Kind:        diags.Context,
-					},
-					{
 						Message: fmt.Sprintf("`%s` label is required and should be preserved when aggregating %s rules.",
 							c.label, nameDesc),
 						Pos:         expr.Value.Pos,
 						FirstColumn: int(fragment.Start) + 1,
 						LastColumn:  int(fragment.End),
 						Kind:        diags.Issue,
+					},
+					{
+						Message:     reason,
+						Pos:         expr.Value.Pos,
+						FirstColumn: int(fragment.Start) + 1,
+						LastColumn:  int(fragment.End),
+						Kind:        diags.Context,
 					},
 				},
 				Severity: c.severity,
