@@ -2307,7 +2307,7 @@ output:
             kind: excluded
             fragment:
                 start: 0
-                end: 21
+                end: 3
         __name__:
             reason: Binary operation between two vectors removes metric names.
             kind: excluded
@@ -2319,7 +2319,7 @@ output:
             kind: excluded
             fragment:
                 start: 0
-                end: 21
+                end: 3
       deadinfo: null
       returns: vector
       operations:
@@ -2338,7 +2338,7 @@ output:
                     kind: excluded
                     fragment:
                         start: 24
-                        end: 45
+                        end: 27
                 __name__:
                     reason: Aggregation removes metric name.
                     kind: excluded
@@ -2350,7 +2350,7 @@ output:
                     kind: excluded
                     fragment:
                         start: 24
-                        end: 45
+                        end: 27
             deadinfo: null
             returns: vector
             operations:
@@ -2405,7 +2405,7 @@ output:
             kind: excluded
             fragment:
                 start: 0
-                end: 21
+                end: 3
         __name__:
             reason: Binary operation between two vectors removes metric names.
             kind: excluded
@@ -2417,7 +2417,7 @@ output:
             kind: excluded
             fragment:
                 start: 0
-                end: 21
+                end: 3
       deadinfo: null
       returns: vector
       operations:
@@ -2436,7 +2436,7 @@ output:
                     kind: excluded
                     fragment:
                         start: 24
-                        end: 45
+                        end: 27
                 __name__:
                     reason: Aggregation removes metric name.
                     kind: excluded
@@ -2448,7 +2448,7 @@ output:
                     kind: excluded
                     fragment:
                         start: 24
-                        end: 45
+                        end: 27
             deadinfo: null
             returns: vector
             operations:
@@ -2601,7 +2601,7 @@ output:
             kind: excluded
             fragment:
                 start: 0
-                end: 21
+                end: 6
         __name__:
             reason: Aggregation removes metric name.
             kind: excluded
@@ -2646,7 +2646,7 @@ output:
             kind: excluded
             fragment:
                 start: 0
-                end: 21
+                end: 6
         __name__:
             reason: Aggregation removes metric name.
             kind: excluded
@@ -2753,7 +2753,7 @@ output:
             kind: excluded
             fragment:
                 start: 0
-                end: 28
+                end: 8
         __name__:
             reason: Aggregation removes metric name.
             kind: excluded
@@ -2800,7 +2800,7 @@ output:
             kind: excluded
             fragment:
                 start: 0
-                end: 38
+                end: 12
         __name__:
             reason: Aggregation removes metric name.
             kind: excluded
@@ -3614,7 +3614,7 @@ output:
             kind: excluded
             fragment:
                 start: 0
-                end: 16
+                end: 5
         __name__:
             reason: Aggregation removes metric name.
             kind: excluded
@@ -3686,7 +3686,7 @@ output:
             kind: excluded
             fragment:
                 start: 0
-                end: 38
+                end: 5
         __name__:
             reason: Aggregation removes metric name.
             kind: excluded
@@ -3770,7 +3770,7 @@ output:
             kind: excluded
             fragment:
                 start: 0
-                end: 41
+                end: 5
         __name__:
             reason: Aggregation removes metric name.
             kind: excluded
@@ -3782,7 +3782,7 @@ output:
             kind: excluded
             fragment:
                 start: 0
-                end: 41
+                end: 5
         job:
             reason: Query is using one-to-one vector matching with `on(env)`, only labels included inside `on(...)` will be present on the results.
             kind: excluded
@@ -6393,7 +6393,7 @@ output:
                     kind: excluded
                     fragment:
                         start: 221
-                        end: 289
+                        end: 226
                 __name__:
                     reason: Aggregation removes metric name.
                     kind: excluded
@@ -6405,13 +6405,13 @@ output:
                     kind: excluded
                     fragment:
                         start: 221
-                        end: 289
+                        end: 226
                 tier:
                     reason: Query is using aggregation that removes all labels.
                     kind: excluded
                     fragment:
                         start: 221
-                        end: 289
+                        end: 226
             deadinfo: null
             returns: vector
             operations:
@@ -8225,7 +8225,7 @@ output:
             kind: excluded
             fragment:
                 start: 5
-                end: 21
+                end: 10
         __name__:
             reason: Aggregation removes metric name.
             kind: excluded

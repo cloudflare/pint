@@ -292,6 +292,18 @@ count by (dc) (
 	`foo + on(__name__, job) foo `,
 	`foo + on(__name__, job) group_left foo `,
 	`foo + on(__name__, job) group_right foo `,
+	/*
+			`group by (env, cluster) (
+		        up{env="prod", job="foo"} and on (instance) (services_enabled == 999)
+			)`,
+			`group by (env, cluster) (
+		        up{env="prod", job="foo"} * on (instance) (services_enabled == 999)
+			)`,
+			`foo / on(instance) sum(bar)`,
+			`foo / on(instance) group_left(cluster) sum(bar)`,
+			`sum(bar) / on(instance) group_right(cluster) foo`,
+			`sum(bar) * on(cluster) sum(foo)`,
+	*/
 }
 
 func TestLabelsSource(t *testing.T) {

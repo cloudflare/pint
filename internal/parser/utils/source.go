@@ -506,7 +506,7 @@ func parseAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 			if len(n.Grouping) == 0 {
 				s.excludeAllLabels(
 					"Query is using aggregation that removes all labels.",
-					FindPosition(expr, n.PosRange, "sum"),
+					FindPosition(expr, n.PosRange, promParser.ItemTypeStr[n.Op]),
 					nil,
 				)
 			} else {
