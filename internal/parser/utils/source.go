@@ -423,106 +423,10 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 	}
 
 	switch n.Op {
-	case promParser.SUM:
-		for _, s = range parseAggregation(expr, n) {
-			s.Operations = append(s.Operations, SourceOperation{
-				Operation: "sum",
-				Node:      n,
-				Arguments: args,
-			})
-			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
-				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
-			}
-			src = append(src, s)
-		}
-	case promParser.MIN:
-		for _, s = range parseAggregation(expr, n) {
-			s.Operations = append(s.Operations, SourceOperation{
-				Operation: "min",
-				Node:      n,
-				Arguments: args,
-			})
-			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
-				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
-			}
-			src = append(src, s)
-		}
-	case promParser.MAX:
-		for _, s = range parseAggregation(expr, n) {
-			s.Operations = append(s.Operations, SourceOperation{
-				Operation: "max",
-				Node:      n,
-				Arguments: args,
-			})
-			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
-				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
-			}
-			src = append(src, s)
-		}
-	case promParser.AVG:
-		for _, s = range parseAggregation(expr, n) {
-			s.Operations = append(s.Operations, SourceOperation{
-				Operation: "avg",
-				Node:      n,
-				Arguments: args,
-			})
-			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
-				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
-			}
-			src = append(src, s)
-		}
-	case promParser.GROUP:
-		for _, s = range parseAggregation(expr, n) {
-			s.Operations = append(s.Operations, SourceOperation{
-				Operation: "group",
-				Node:      n,
-				Arguments: args,
-			})
-			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
-				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
-			}
-			src = append(src, s)
-		}
-	case promParser.STDDEV:
-		for _, s = range parseAggregation(expr, n) {
-			s.Operations = append(s.Operations, SourceOperation{
-				Operation: "stddev",
-				Node:      n,
-				Arguments: args,
-			})
-			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
-				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
-			}
-			src = append(src, s)
-		}
-	case promParser.STDVAR:
-		for _, s = range parseAggregation(expr, n) {
-			s.Operations = append(s.Operations, SourceOperation{
-				Operation: "stdvar",
-				Node:      n,
-				Arguments: args,
-			})
-			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
-				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
-			}
-			src = append(src, s)
-		}
-	case promParser.COUNT:
-		for _, s = range parseAggregation(expr, n) {
-			s.Operations = append(s.Operations, SourceOperation{
-				Operation: "count",
-				Node:      n,
-				Arguments: args,
-			})
-			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
-				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
-			}
-			src = append(src, s)
-		}
 	case promParser.COUNT_VALUES:
 		for _, s = range parseAggregation(expr, n) {
 			s.Operations = append(s.Operations, SourceOperation{
-				Operation: "count_values",
+				Operation: promParser.ItemTypeStr[n.Op],
 				Node:      n,
 				Arguments: args,
 			})
@@ -537,42 +441,29 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 			}
 			src = append(src, s)
 		}
-	case promParser.QUANTILE:
+	case promParser.TOPK, promParser.BOTTOMK:
+		for _, s = range walkNode(expr, n.Expr) {
+			for i := range s.Joins {
+				s.Joins[i].Depth++
+			}
+			s.Type = AggregateSource
+			s.Operations = append(s.Operations, SourceOperation{
+				Operation: promParser.ItemTypeStr[n.Op],
+				Node:      n,
+				Arguments: args,
+			})
+			src = append(src, s)
+		}
+	default:
 		for _, s = range parseAggregation(expr, n) {
 			s.Operations = append(s.Operations, SourceOperation{
-				Operation: "quantile",
+				Operation: promParser.ItemTypeStr[n.Op],
 				Node:      n,
 				Arguments: args,
 			})
 			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
 				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
 			}
-			src = append(src, s)
-		}
-	case promParser.TOPK:
-		for _, s = range walkNode(expr, n.Expr) {
-			for i := range s.Joins {
-				s.Joins[i].Depth++
-			}
-			s.Type = AggregateSource
-			s.Operations = append(s.Operations, SourceOperation{
-				Operation: "topk",
-				Node:      n,
-				Arguments: args,
-			})
-			src = append(src, s)
-		}
-	case promParser.BOTTOMK:
-		for _, s = range walkNode(expr, n.Expr) {
-			for i := range s.Joins {
-				s.Joins[i].Depth++
-			}
-			s.Type = AggregateSource
-			s.Operations = append(s.Operations, SourceOperation{
-				Operation: "bottomk",
-				Node:      n,
-				Arguments: args,
-			})
 			src = append(src, s)
 		}
 		/*
