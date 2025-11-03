@@ -119,20 +119,100 @@ func TestImpossibleCheck(t *testing.T) {
 		{
 			description: "complex query with or vector()",
 			content: `
-  - alert: Foo
-    expr: |
-      (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
-        (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
-      > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
-        avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
-      # Multi-line comment
-      # inside the query
-      and on (colo_name)
-        (colo_job:foo_total:rate2m or vector(0)) > 80
-      and on (colo_name)
-        (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
-    annotations:
-      summary: High rejectsion rate in {{ $labels.colo_name }}
+- alert: Foo
+  expr: |
+    (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
+      (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
+    > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
+      avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
+    # Multi-line comment
+    # inside the query
+    and on (colo_name)
+      (colo_job:foo_total:rate2m or vector(0)) > 80
+    and on (colo_name)
+      (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
+  annotations:
+    summary: High rejectsion rate in {{ $labels.colo_name }}
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
+		{
+			description: "group_by and on()",
+			content: `
+- record: foo
+  expr: |
+    group by (env, cluster) (
+      up{env="prod", job="foo"} and on (instance) (services_enabled == 999)
+    )
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   false,
+		},
+		{
+			description: "impossible group_by *",
+			content: `
+- record: foo
+  expr: |
+    group by (env, cluster, status, instance, dc, port) (
+        up{env="prod", job="foo"} * on (instance) (services_enabled == 999)
+    )
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
+		{
+			description: "impossible / on",
+			content: `
+- record: foo
+  expr: foo / on(instance) sum(bar)
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
+		{
+			description: "impossible / on group_left ",
+			content: `
+- record: foo
+  expr: foo / on(instance) group_left(cluster) sum(bar)
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
+		{
+			description: "impossible / on group_right",
+			content: `
+- record: foo
+  expr: sum(bar) / on(instance) group_right(cluster) foo
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
+		{
+			description: "impossible sum * on sum",
+			content: `
+- record: foo
+  expr: sum(bar) * on(cluster) sum(foo)
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
+		{
+			description: "impossible sum by sum by group_left",
+			content: `
+- record: foo
+  expr: |
+    sum by (cluster, err, gen, scope, is_dev, job, slice)
+      ( sum by (instance, job) (rate(cycles_total[2m])) * on (instance)
+      group_left (err, gen, scope, is_dev, slice) (instance_job:node_metadata)
+    )
 `,
 			checker:    newImpossibleCheck,
 			prometheus: newSimpleProm,

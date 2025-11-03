@@ -203,7 +203,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 					})
 				}
 				if !leftLabels.hasName(name) && !rightLabels.hasName(name) {
-					pos := utils.FindPosition(expr.Value.Value, node.Expr.PositionRange(), "on")
+					pos := utils.FindFuncPosition(expr.Value.Value, node.Expr.PositionRange(), "on")
 					link := fmt.Sprintf("%s/query?g0.expr=%s&&g0.tab=table", leftURI, url.QueryEscape(n.String()))
 					problems = append(problems, Problem{
 						Anchor:   AnchorAfter,
@@ -247,7 +247,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 					},
 				})
 			} else {
-				pos := utils.FindPosition(expr.Value.Value, n.PositionRange(), "ignoring")
+				pos := utils.FindFuncPosition(expr.Value.Value, n.PositionRange(), "ignoring")
 				problems = append(problems, Problem{
 					Anchor:   AnchorAfter,
 					Lines:    expr.Value.Pos.Lines(),

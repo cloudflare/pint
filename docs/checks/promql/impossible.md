@@ -24,6 +24,25 @@ foo{job="bar"} unless {}
 
 Both sides can only match if they have the same label set, see [Prometheus docs](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching). A result with `{job="bar"}` will never be matched with empty label set `{}`.
 
+This check will also detect aggregations on labels that are already removed. Example:
+
+```js
+group by(cluster) (
+  sum(errors)
+)
+```
+
+In the above `sum(errors)` removes all labels from the results, so there will be no `cluster` label to aggregate
+in the `group by(cluster)` outer query.
+
+Similarly this check will warn about joins using labels that are already removed, example:
+
+```js
+sum(foo) / on(cluster) count(bar)
+```
+
+Since both `sum(...)` calls remove all labels there won't be any `cluster` label to join on.
+
 ## Configuration
 
 This check doesn't have any configuration options.

@@ -126,9 +126,9 @@ func (c AggregationCheck) Check(_ context.Context, entry discovery.Entry, _ []di
 				posrange = aggr.PosRange
 				if len(aggr.Grouping) != 0 {
 					if aggr.Without {
-						posrange = utils.FindPosition(expr.Value.Value, aggr.PosRange, "without")
+						posrange = utils.FindFuncPosition(expr.Value.Value, aggr.PosRange, "without")
 					} else {
-						posrange = utils.FindPosition(expr.Value.Value, aggr.PosRange, "by")
+						posrange = utils.FindFuncPosition(expr.Value.Value, aggr.PosRange, "by")
 					}
 				}
 			}
