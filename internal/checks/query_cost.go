@@ -401,31 +401,37 @@ func (c CostCheck) isSuggestionFor(src, potential utils.Source, join *utils.Join
 		return nil, "", false, false
 	}
 
-	if join != nil {
+	if join != nil && join.IsOn {
 		// Check if potential can have all the labels we use in a join.
-		for _, name := range join.On {
+		for _, name := range join.MatchingLabels {
 			if src.CanHaveLabel(name) && !potential.CanHaveLabel(name) {
 				return nil, "", false, false
 			}
 		}
 	}
-	if unless != nil {
+	if unless != nil && unless.IsOn {
 		// Check if potential can have all the labels we use in unless.
-		for _, name := range unless.On {
+		for _, name := range unless.MatchingLabels {
 			if src.CanHaveLabel(name) && !potential.CanHaveLabel(name) {
 				return nil, "", false, false
 			}
 		}
 	}
 	for _, j := range src.Joins {
-		for _, name := range j.On {
+		if !j.IsOn {
+			continue
+		}
+		for _, name := range j.MatchingLabels {
 			if !potential.CanHaveLabel(name) {
 				return nil, "", false, false
 			}
 		}
 	}
 	for _, u := range src.Unless {
-		for _, name := range u.On {
+		if !u.IsOn {
+			continue
+		}
+		for _, name := range u.MatchingLabels {
 			if !potential.CanHaveLabel(name) {
 				return nil, "", false, false
 			}

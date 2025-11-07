@@ -44,7 +44,7 @@ const (
 
 var watchCmd = &cli.Command{
 	Name:  "watch",
-	Usage: "Run in the foreground and continuesly check specified rules.",
+	Usage: "Run in the foreground and continuously check specified rules.",
 	Commands: []*cli.Command{
 		{
 			Name:  "glob",

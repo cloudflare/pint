@@ -218,6 +218,420 @@ func TestImpossibleCheck(t *testing.T) {
 			prometheus: newSimpleProm,
 			problems:   true,
 		},
+		{
+			description: "impossible group_by",
+			content: `
+- record: foo
+  expr: |
+    group by (colo_name, instance, tier, animal, brand, sliver, pop_name) (
+      up{node_status="v", job="node_exporter"}
+      and on (instance) (metal_services_enabled == 999)
+      * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+      * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+      unless on (instance) label_join(
+        max by (boring_instance) (boring_reboot_in_maintenance) == 1,
+            "instance",
+            "$1",
+            "boring_instance"
+          )
+      unless on (colo_name) (colostat_disabled_pops == 1)
+    )
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
+		{
+			description: "group_left labels promoted correctly",
+			content: `
+- record: foo
+  expr: |
+    up{node_status="v", job="node_exporter"}
+    * on (colo_name) group_left(tier) colo_metadata{colo_status="v"}
+    * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+		},
+		{
+			description: "impossible match due to orphaned group_left",
+			content: `
+- record: foo
+  expr: |
+    up{node_status="v", job="node_exporter"}
+    and on (instance, animal, brand) (metal_services_enabled == 999)
+    * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+    * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
+		{
+			description: "orphaned group_left labels",
+			content: `
+- record: foo
+  expr: |
+    up{node_status="v", job="node_exporter"}
+    and on (instance) (metal_services_enabled == 999)
+    * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+    * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
+		{
+			description: "orphaned group_right labels (except animal)",
+			content: `
+- record: foo
+  expr: |
+    colo_metadata{colo_status="v"} * on (colo_name) group_right(tier, animal, brand, pop_name)
+    sliver_metadata{node_status="v"} * on (instance) group_right (sliver, animal)
+    (metal_services_enabled == 999) * on (instance)
+    up{node_status="v", job="node_exporter"}
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
+		{
+			description: "orphaned group_right labels (all)",
+			content: `
+- record: foo
+  expr: |
+    colo_metadata{colo_status="v"} * on (colo_name) group_right(tier, animal, brand, pop_name)
+    sliver_metadata{node_status="v"} * on (instance) group_right (sliver)
+    (metal_services_enabled == 999) * on (instance) group_right()
+    up{node_status="v", job="node_exporter"}
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
+		{
+			description: "orphaned group_right labels (except sliver)",
+			content: `
+- record: foo
+  expr: |
+    colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
+    sliver_metadata * on (instance) group_right (sliver)
+    metal_services_enabled
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
+		{
+			description: "correctly passed group_right labels",
+			content: `
+- record: foo
+  expr: |
+    colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
+    (
+        sliver_metadata * on (instance) group_right (sliver)
+        metal_services_enabled
+    )
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+		},
+		{
+			description: "match on group_right label",
+			content: `
+- record: foo
+  expr: |
+    colo_metadata * on (colo_name) group_right(animal)
+    sliver_metadata * on (animal) group_right (sliver)
+    metal_services_enabled
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+		},
+		{
+			description: "unused joined label",
+			content: `
+- record: foo
+  expr: |
+    (prometheus_ready * on(instance) group_left(version) prometheus_build_info)
+    * on(instance) prometheus_config_last_reload_successful
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
+		{
+			description: "joined label ignored via ignoring()",
+			content: `
+- record: foo
+  expr: |
+    (prometheus_ready * on(instance) group_left(version) prometheus_build_info)
+    * ignoring(version) prometheus_config_last_reload_successful
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
+		{
+			description: "joined label NOT ignored via ignoring()",
+			content: `
+- record: foo
+  expr: |
+    (prometheus_ready * on(instance) group_left(version) prometheus_build_info)
+    * ignoring(env) prometheus_config_last_reload_successful
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+		},
+		{
+			description: "group_left on a label already guaranteed on the left",
+			content: `
+- record: foo
+  expr: |
+    up{node_status="v", job="node_exporter"}
+    * on(instance) group_left(node_status) sliver_metadata
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
+		{
+			description: "max by() unless",
+			content: `
+- record: foo
+  expr: |
+    max by (instance, cluster) (cf_node_role{kubernetes_role="master",role="kubernetes"})
+    unless
+       sum by (instance, cluster) (time() - node_systemd_timer_last_trigger_seconds{name=~"etcd-defrag-.*.timer"})
+       * on (instance) group_left (cluster)
+        cf_node_role{kubernetes_role="master",role="kubernetes"}
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+		},
+		{
+			description: "join on impossible label",
+			content: `
+- record: foo
+  expr: |
+    sum by (job) (
+      up{env="prod", job="foo"} * on () group_left(job) services_enabled{job=""}
+    )
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
+		{
+			description: "group_left inside without",
+			content: `
+- record: foo
+  expr: |
+    group without(animal, brand) (
+      up{node_status="v", job="node_exporter"}
+      * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+      * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+    )
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
+		{
+			description: "group_left inside without but used for inner join",
+			content: `
+- record: foo
+  expr: |
+    group without(animal) (
+      (
+        up{node_status="v", job="node_exporter"}
+        * on (colo_name) group_left(animal)
+        colo_metadata{colo_status="v"}
+      )
+      * on(animal, instance)
+      (
+        up{node_status="v", job="blackholebird"}
+        * on (colo_name) group_left(animal)
+        colo_metadata{colo_status="v"}
+      )
+    )
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+		},
+		{
+			description: "group_left inside without but used for inner join but not fully",
+			content: `
+- record: foo
+  expr: |
+    group without(animal) (
+      (
+        up{node_status="v", job="node_exporter"}
+        * on (colo_name) group_left(animal)
+        colo_metadata{colo_status="v"}
+      )
+      * on(animal, instance)
+      (
+        up{node_status="v", job="blackholebird"}
+        * on (colo_name) group_left(animal, brand)
+        colo_metadata{colo_status="v"}
+      )
+    )
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
+		{
+			description: "group_left inside without but used for inner without join",
+			content: `
+- record: foo
+  expr: |
+    group without(animal) (
+      (
+        up{node_status="v", job="node_exporter"}
+        * on (colo_name) group_left(animal)
+        colo_metadata{colo_status="v"}
+      )
+      * ignoring(colo_status)
+      (
+        up{node_status="v", job="blackholebird"}
+        * on (colo_name) group_left(animal, brand)
+        colo_metadata{colo_status="v"}
+      )
+    )
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+		},
+		{
+			description: "group_left not included in by",
+			content: `
+- record: foo
+  expr: |
+    group by(brand) (
+      up{node_status="v", job="node_exporter"}
+      * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+      * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+    )
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
+		{
+			description: "group_left with empty by",
+			content: `
+- record: foo
+  expr: |
+    group (
+      up{node_status="v", job="node_exporter"}
+      * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+      * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+    )
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
+		{
+			description: "unused group_right labels",
+			content: `
+- record: foo
+  expr: |
+    colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
+    group by (colo_name, animal) (
+        sliver_metadata * on (instance) group_right (sliver)
+        metal_services_enabled
+    )
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
+		{
+			description: "unused & impossible group_right labels",
+			content: `
+- record: foo
+  expr: |
+    colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
+    group by (animal) (
+        sliver_metadata * on (instance) group_right (sliver)
+        metal_services_enabled
+    )
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
+		{
+			description: "group_left labels not used in outer join",
+			content: `
+- record: foo
+  expr: |
+    up{node_status="v", job="node_exporter"}
+    * on(instance) metal_services_enabled
+    * on(instance) (
+      metal_services_enabled
+      * on(instance) group_left (sliver)
+      sliver_metadata{node_status="v"}
+    )
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
+		{
+			description: "group_right labels not used in outer join",
+			content: `
+- record: foo
+  expr: |
+    up{node_status="v", job="node_exporter"}
+    * on(instance) metal_services_enabled
+    * on(instance) (
+      sliver_metadata{node_status="v"}
+      * on(instance) group_right (sliver)
+      metal_services_enabled
+    )
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
+		{
+			description: "group_left labels not used in outer join with another group_left",
+			content: `
+- record: foo
+  expr: |
+    up{node_status="v", job="node_exporter"}
+    * on(instance) group_left metal_services_enabled
+    * on(instance, colo_name) (
+      metal_services_enabled
+      * on(instance) group_left (sliver)
+      sliver_metadata{node_status="v"}
+    )
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
+		{
+			description: "group_left labels not used in outer join with another group_right",
+			content: `
+- record: foo
+  expr: |
+    up{node_status="v", job="node_exporter"}
+    * on(instance) group_right metal_services_enabled
+    * on(instance, colo_name) (
+      metal_services_enabled
+      * on(instance) group_left (sliver)
+      sliver_metadata{node_status="v"}
+    )
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
 	}
 
 	runTests(t, testCases)

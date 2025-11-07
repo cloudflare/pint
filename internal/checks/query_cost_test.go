@@ -1278,6 +1278,27 @@ func TestCostCheck(t *testing.T) {
 			},
 		},
 		{
+			description: "suggest recording rule / join dead label",
+			content: `- record: up:foo_enabled:count
+  expr: |
+    count(
+      up{job="foo"}
+      and on(instance)
+      up{job="bar"} and on(cluster) enabled * on(cluster) group_left(cluster) node_info
+    ) without (cluster)
+`,
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 100, 100, 0, 0, "check comment", checks.Warning)
+			},
+			prometheus: newSimpleProm,
+			entries: mustParseContent(`
+
+- record: colo_job:up:count
+  expr: count(up) by (job)
+`),
+			mocks: []*prometheusMock{},
+		},
+		{
 			description: "suggest recording rule / unless mismatch",
 			content: `- record: up:foo_enabled:count
   expr: count(up{job="foo"} unless on(instance) enabled == 0) without (instance)
@@ -1296,6 +1317,54 @@ func TestCostCheck(t *testing.T) {
 					conds: []requestCondition{
 						requireQueryPath,
 						formCond{key: "query", value: "count(\ncount(up{job=\"foo\"} unless on(instance) enabled == 0) without (instance)\n)"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 99,
+								PeakSamples:           19,
+							},
+							Timings: promapi.QueryTimings{
+								EvalTotalTime: 60.3,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: checks.BytesPerSampleQuery},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSampleWithValue(map[string]string{}, 2048),
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "suggest recording rule / unless ignoring mismatch",
+			content: `- record: up:foo_enabled:count
+  expr: count(up{job="foo"} unless ignoring(job) enabled == 0) without (instance)
+`,
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 100, 100, 0, 0, "check comment", checks.Warning)
+			},
+			prometheus: newSimpleProm,
+			entries: mustParseContent(`
+
+- record: colo_job:up:count
+  expr: count(up) by (job)
+`),
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(\ncount(up{job=\"foo\"} unless ignoring(job) enabled == 0) without (instance)\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{

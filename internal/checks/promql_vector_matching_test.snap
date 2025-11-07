@@ -318,7 +318,7 @@
       expr: foo / on(notfound) bar
   output: |
     2 |   expr: foo / on(notfound) bar
-                      ^^ Using `on(notfound)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned from both sides of the query](notfound) don't have the `https://simple.example.com/query?g0.expr=foo+%2F+on+%28notfound%29+bar&&g0.tab=table` label.
+                      ^^^^^^^^^^^^ Using `on(notfound)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned from both sides of the query](notfound) don't have the `https://simple.example.com/query?g0.expr=foo+%2F+on+%28notfound%29+bar&&g0.tab=table` label.
   problem:
     reporter: promql/vector_matching
     summary: impossible binary operation
@@ -329,7 +329,7 @@
     diagnostics:
         - message: Using `on(notfound)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned from both sides of the query](notfound) don't have the `https://simple.example.com/query?g0.expr=foo+%2F+on+%28notfound%29+bar&&g0.tab=table` label.
           firstcolumn: 7
-          lastcolumn: 8
+          lastcolumn: 18
           kind: 0
     lines:
         first: 2

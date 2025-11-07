@@ -880,7 +880,7 @@
         summary: '{{ $labels.job }}'
   output: |
     2 |   expr: sum(foo) without(job) > 0
-                         ^^^^^^^ Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
+                                 ^^^ Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
       | [...]
     4 |     summary: '{{ $labels.job }}'
                                 ^^^^ Template is using `job` label but the query results won't have this label.
@@ -894,8 +894,8 @@
           lastcolumn: 14
           kind: 0
         - message: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
-          firstcolumn: 10
-          lastcolumn: 16
+          firstcolumn: 18
+          lastcolumn: 20
           kind: 1
     lines:
         first: 1
@@ -914,7 +914,7 @@
         summary: '{{ .Labels.job }}'
   output: |
     2 |   expr: sum(foo) without(job) > 0
-                         ^^^^^^^ Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
+                                 ^^^ Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
       | [...]
     4 |     summary: '{{ .Labels.job }}'
                                 ^^^^ Template is using `job` label but the query results won't have this label.
@@ -928,8 +928,8 @@
           lastcolumn: 14
           kind: 0
         - message: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
-          firstcolumn: 10
-          lastcolumn: 16
+          firstcolumn: 18
+          lastcolumn: 20
           kind: 1
     lines:
         first: 1
@@ -1038,7 +1038,7 @@
         summary: '{{ .Labels.job }} in cluster {{$labels.cluster}}/{{ $labels.env }} is missing'
   output: |
     3 |   expr: bar * ignoring(job) foo
-                      ^^^^^^^^ Query is using one-to-one vector matching with `ignoring(job)`, all labels included inside `ignoring(...)` will be removed on the results.
+                               ^^^ Query is using one-to-one vector matching with `ignoring(job)`, all labels included inside `ignoring(...)` will be removed on the results.
       | [...]
     5 |     summary: '{{ .Labels.job }} in cluster {{$labels.cluster}}/{{ $labels.env }} is missing'
                                 ^^^^ Template is using `job` label but the query results won't have this label.
@@ -1052,8 +1052,8 @@
           lastcolumn: 14
           kind: 0
         - message: Query is using one-to-one vector matching with `ignoring(job)`, all labels included inside `ignoring(...)` will be removed on the results.
-          firstcolumn: 7
-          lastcolumn: 14
+          firstcolumn: 16
+          lastcolumn: 18
           kind: 1
     lines:
         first: 2
@@ -1266,7 +1266,7 @@
         job: "{{ $labels.job_name }}"
   output: |
     2 |   expr: container_file_descriptors / on (instance, app_name) container_ulimits_soft{ulimit="max_open_files"}
-                                             ^^^ Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.
+                                             ^^^^^^^^^^^^^^^^^^^^^^^ Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.
       | [...]
     6 |     job: "{{ $labels.job_name }}"
                             ^^^^^^^^^ Template is using `job_name` label but the query results won't have this label.
@@ -1281,7 +1281,7 @@
           kind: 0
         - message: Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.
           firstcolumn: 30
-          lastcolumn: 32
+          lastcolumn: 52
           kind: 1
     lines:
         first: 1
@@ -1298,7 +1298,7 @@
         job: "{{ $labels.job_name }}"
   output: |
     2 |   expr: container_file_descriptors / on (instance, app_name) container_ulimits_soft{ulimit="max_open_files"}
-                                             ^^^ Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.
+                                             ^^^^^^^^^^^^^^^^^^^^^^^ Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.
       | [...]
     4 |     summary: "{{ $labels.app_type }} is using {{ $value }} fds."
                                 ^^^^^^^^^ Template is using `app_type` label but the query results won't have this label.
@@ -1313,7 +1313,7 @@
           kind: 0
         - message: Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.
           firstcolumn: 30
-          lastcolumn: 32
+          lastcolumn: 52
           kind: 1
     lines:
         first: 1
@@ -1525,7 +1525,7 @@
         summary: '{{ $labels.job }}'
   output: |
     2 |   expr: sum(foo) without(job) > 0
-                         ^^^^^^^ Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
+                                 ^^^ Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
       | [...]
     4 |     summary: '{{ $labels.job }}'
                                 ^^^^ Template is using `job` label but the query results won't have this label.
@@ -1539,8 +1539,8 @@
           lastcolumn: 14
           kind: 0
         - message: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
-          firstcolumn: 10
-          lastcolumn: 16
+          firstcolumn: 18
+          lastcolumn: 20
           kind: 1
     lines:
         first: 1
@@ -1637,7 +1637,7 @@
           summary: "Errors in {{ $labels.colo_name }}"
   output: |4
      4 |       count by (region) (
-                     ^^^ Query is using aggregation with `by(region)`, only labels included inside `by(...)` will be present on the results.
+                     ^^^^^^^^^^^ Query is using aggregation with `by(region)`, only labels included inside `by(...)` will be present on the results.
      5 |         stddev by (colo_name, region) (
      6 |           instance_mode:node_cpu:used_p90:rate2m{node_type="metal",node_status="v"}
      7 |         ) > 0.1
@@ -1656,7 +1656,7 @@
           kind: 0
         - message: Query is using aggregation with `by(region)`, only labels included inside `by(...)` will be present on the results.
           firstcolumn: 7
-          lastcolumn: 9
+          lastcolumn: 17
           kind: 1
     lines:
         first: 2
@@ -1702,7 +1702,7 @@
      9 |     < 8 > 0
     10 |     or sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"})
     11 |     < on() count(colo_router_tier:disabled_pops:max{tier="1",router=~"edge.*"}) * 0.4 > 0
-               ^^ Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.
+               ^^^^ Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.
     12 |     or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*regional.*"})
     13 |     < 0.1 > 0
     14 |     or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*brat.*",cidr_use_case!~".*tier1.*",plan=~".*(free|pro).*"})
@@ -1723,7 +1723,7 @@
           kind: 0
         - message: Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.
           firstcolumn: 444
-          lastcolumn: 445
+          lastcolumn: 447
           kind: 1
     lines:
         first: 2

@@ -77,11 +77,36 @@ type DeadInfo struct {
 	Fragment posrange.PositionRange
 }
 
+type DeadLabelKind uint8
+
+const (
+	ImpossibleDeadLabel DeadLabelKind = iota
+	OrphanedLabel
+	DuplicatedJoin
+	UnusedLabel
+)
+
+func (dlk DeadLabelKind) String() string {
+	switch dlk {
+	case ImpossibleDeadLabel:
+		return "impossible label"
+	case OrphanedLabel:
+		return "orphaned label"
+	case DuplicatedJoin:
+		return "redundant label"
+	case UnusedLabel:
+		return "unused label"
+	}
+	return "unknown"
+}
+
 type DeadLabel struct {
-	Name     string
-	Reason   string
-	NamePos  posrange.PositionRange
-	Fragment posrange.PositionRange
+	Name          string
+	Reason        string
+	LabelReason   string
+	UsageFragment posrange.PositionRange
+	LabelFragment posrange.PositionRange
+	Kind          DeadLabelKind
 }
 
 type ReturnInfo struct {
@@ -124,18 +149,18 @@ func MostOuterOperation[T promParser.Node](s Source) (T, bool) {
 }
 
 type Join struct {
-	On          []string
-	Ignoring    []string
-	AddedLabels []string
-	Src         Source              // The source we're joining with.
-	Op          promParser.ItemType // The binary operation used for this join.
-	Depth       int                 // Zero if this is a direct join, non-zero otherwise. sum(foo * bar) would be in-direct join.
+	MatchingLabels []string
+	AddedLabels    []string
+	Src            Source              // The source we're joining with.
+	Op             promParser.ItemType // The binary operation used for this join.
+	Depth          int                 // Zero if this is a direct join, non-zero otherwise. sum(foo * bar) would be in-direct join.
+	IsOn           bool
 }
 
 type Unless struct {
-	On       []string
-	Ignoring []string
-	Src      Source
+	MatchingLabels []string
+	Src            Source
+	IsOn           bool
 }
 
 type Source struct {
@@ -189,7 +214,7 @@ func (s Source) LabelExcludeReason(name string) (string, posrange.PositionRange)
 	return s.Labels[""].Reason, s.Labels[""].Fragment
 }
 
-func (s *Source) excludeAllLabels(reason string, fragment posrange.PositionRange, except []string) {
+func (s *Source) excludeAllLabels(expr, reason string, fragment, allFragment posrange.PositionRange, except []string) {
 	// Everything that was included until now but will be removed needs an explicit stamp to mark it as gone.
 	for name, l := range s.Labels {
 		if slices.Contains(except, name) {
@@ -214,7 +239,7 @@ func (s *Source) excludeAllLabels(reason string, fragment posrange.PositionRange
 			s.Labels[name] = LabelTransform{
 				Kind:     PossibleLabel,
 				Reason:   reason,
-				Fragment: fragment,
+				Fragment: FindArgumentPosition(expr, fragment, name),
 			}
 		} else {
 			r, f := s.LabelExcludeReason(name)
@@ -229,31 +254,59 @@ func (s *Source) excludeAllLabels(reason string, fragment posrange.PositionRange
 	s.Labels[""] = LabelTransform{
 		Kind:     ImpossibleLabel,
 		Reason:   reason,
-		Fragment: fragment,
+		Fragment: allFragment,
 	}
 	s.FixedLabels = true
 }
 
-func (s *Source) excludeLabel(reason string, fragment posrange.PositionRange, names ...string) {
+func (s *Source) excludeLabel(reason string, fragment posrange.PositionRange, name string) {
+	s.Labels[name] = LabelTransform{
+		Kind:     ImpossibleLabel,
+		Reason:   reason,
+		Fragment: fragment,
+	}
+}
+
+func (s *Source) joinLabels(expr string, within posrange.PositionRange, op promParser.ItemType, names []string, outside []posrange.PositionRange) {
 	for _, name := range names {
+		if l, ok := s.Labels[name]; ok && l.Kind == GuaranteedLabel {
+			s.DeadLabels = append(s.DeadLabels, DeadLabel{
+				Kind:   DuplicatedJoin,
+				Name:   name,
+				Reason: "Query is trying to join the `" + name + "` label that is already present on the other side of the query.",
+				UsageFragment: FindArgumentPosition(
+					expr,
+					FindFuncPosition(expr, within, promParser.ItemTypeStr[op], outside),
+					name,
+				),
+				LabelReason:   l.Reason,
+				LabelFragment: l.Fragment,
+			})
+			return
+		}
 		s.Labels[name] = LabelTransform{
-			Kind:     ImpossibleLabel,
-			Reason:   reason,
-			Fragment: fragment,
+			Kind: PossibleLabel,
+			Reason: fmt.Sprintf(
+				"Query is using `%s(%s)`, all labels included inside `%s(...)` will be joined to the results on the other side of the query.",
+				promParser.ItemTypeStr[op], strings.Join(names, ", "), promParser.ItemTypeStr[op],
+			),
+			Fragment: FindArgumentPosition(
+				expr,
+				FindFuncPosition(expr, within, promParser.ItemTypeStr[op], outside),
+				name,
+			),
 		}
 	}
 }
 
-func (s *Source) includeLabel(reason string, fragment posrange.PositionRange, names ...string) {
-	for _, name := range names {
-		if l, ok := s.Labels[name]; ok && l.Kind == GuaranteedLabel {
-			continue
-		}
-		s.Labels[name] = LabelTransform{
-			Kind:     PossibleLabel,
-			Reason:   reason,
-			Fragment: fragment,
-		}
+func (s *Source) includeLabel(expr, reason string, fragment posrange.PositionRange, name string) {
+	if l, ok := s.Labels[name]; ok && l.Kind == GuaranteedLabel {
+		return
+	}
+	s.Labels[name] = LabelTransform{
+		Kind:     PossibleLabel,
+		Reason:   reason,
+		Fragment: FindArgumentPosition(expr, fragment, name),
 	}
 }
 
@@ -272,13 +325,119 @@ func (s *Source) checkIncludedLabels(expr string, pos posrange.PositionRange, na
 		if !s.CanHaveLabel(name) {
 			reason, fragment := s.LabelExcludeReason(name)
 			s.DeadLabels = append(s.DeadLabels, DeadLabel{
-				Name:     name,
-				NamePos:  findArgumentPosition(expr, pos, name),
-				Reason:   reason,
-				Fragment: fragment,
+				Kind:          ImpossibleDeadLabel,
+				Name:          name,
+				Reason:        "You can't use `" + name + "` because this label is not possible here.",
+				UsageFragment: FindArgumentPosition(expr, pos, name),
+				LabelReason:   reason,
+				LabelFragment: fragment,
 			})
 		}
 	}
+}
+
+func (s *Source) hasJoinUsingLabel(name string) bool {
+	for _, j := range s.Joins {
+		if j.IsOn && slices.Contains(j.MatchingLabels, name) {
+			return true
+		}
+		if !j.IsOn && !slices.Contains(j.MatchingLabels, name) {
+			return true
+		}
+	}
+	return false
+}
+
+func (s *Source) checkAggregationLabels(expr string, n *promParser.AggregateExpr) {
+	var pos posrange.PositionRange
+	switch {
+	case len(n.Grouping) == 0:
+		pos = FindFuncNamePosition(expr, n.PosRange, promParser.ItemTypeStr[n.Op])
+	case n.Without:
+		pos = FindFuncPosition(expr, n.PosRange, promParser.ItemTypeStr[promParser.WITHOUT], nil)
+	default:
+		pos = FindFuncPosition(expr, n.PosRange, promParser.ItemTypeStr[promParser.BY], nil)
+	}
+
+	for _, j := range s.Joins {
+		for _, name := range j.AddedLabels {
+			if s.hasJoinUsingLabel(name) {
+				// This label is used for some other join for our source.
+				continue
+			}
+			if !n.Without && slices.Contains(n.Grouping, name) {
+				continue
+			}
+			if n.Without && !slices.Contains(n.Grouping, name) {
+				continue
+			}
+			var (
+				labelPos    = pos
+				labelReason string
+			)
+			if t := s.findLabelTransform(name); t != nil {
+				labelPos = t.Fragment
+				labelReason = t.Reason
+			}
+			s.DeadLabels = append(s.DeadLabels, DeadLabel{
+				Kind:          UnusedLabel,
+				Name:          name,
+				Reason:        fmt.Sprintf("Previously joined label `%s` is being removed from the results.", name),
+				UsageFragment: FindArgumentPosition(expr, pos, name),
+				LabelReason:   labelReason,
+				LabelFragment: labelPos,
+			})
+		}
+	}
+}
+
+func (s *Source) findLabelTransform(name string) *LabelTransform {
+	if t, ok := s.Labels[name]; ok {
+		return &t
+	}
+	for _, j := range s.Joins {
+		if t := j.Src.findLabelTransform(name); t != nil {
+			return t
+		}
+	}
+	return nil
+}
+
+func (s *Source) checkJoinedLabels(expr string, n *promParser.BinaryExpr, dst Source) (dead []DeadLabel) {
+	pos := findBinOpsOperatorPosition(expr, n, promParser.ItemTypeStr[n.Op])
+	for _, j := range s.Joins {
+		for _, name := range j.AddedLabels {
+			if slices.Contains(n.VectorMatching.Include, name) {
+				// label is included in group_left or group_right
+				continue
+			}
+			if n.VectorMatching.On && slices.Contains(n.VectorMatching.MatchingLabels, name) {
+				// label is included inside on(...)
+				continue
+			}
+			if !n.VectorMatching.On && !slices.Contains(n.VectorMatching.MatchingLabels, name) {
+				// label is NOT included inside ignoring(...)
+				continue
+			}
+			var (
+				labelPos    = pos
+				labelReason string
+			)
+			if t := dst.findLabelTransform(name); t != nil {
+				labelPos = t.Fragment
+				labelReason = t.Reason
+			}
+			dead = append(dead, DeadLabel{
+				Kind:          OrphanedLabel,
+				Name:          name,
+				Reason:        fmt.Sprintf("This binary operation prevents previously joined label `%s` from being added to the results.", name),
+				UsageFragment: pos,
+				LabelReason:   labelReason,
+				LabelFragment: labelPos,
+			})
+		}
+	}
+	return dead
 }
 
 type Visitor func(s Source, j *Join, u *Unless)
@@ -340,7 +499,7 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 		s.ReturnInfo.ReturnedNumber = n.Val
 		s.ReturnInfo.AlwaysReturns = true
 		s.ReturnInfo.ValuePosition = n.PosRange
-		s.excludeAllLabels("This query returns a number value with no labels.", n.PosRange, nil)
+		s.excludeAllLabels(expr, "This query returns a number value with no labels.", n.PosRange, n.PosRange, nil)
 		s.Position = n.PosRange
 		src = append(src, s)
 
@@ -353,7 +512,7 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 		s.Type = StringSource
 		s.Returns = promParser.ValueTypeString
 		s.ReturnInfo.AlwaysReturns = true
-		s.excludeAllLabels("This query returns a string value with no labels.", n.PosRange, nil)
+		s.excludeAllLabels(expr, "This query returns a string value with no labels.", n.PosRange, n.PosRange, nil)
 		s.Position = n.PosRange
 		src = append(src, s)
 
@@ -517,26 +676,42 @@ func parseAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 			s.Joins[i].Depth++
 		}
 
+		s.checkAggregationLabels(expr, n)
 		if n.Without {
-			s.excludeLabel(
-				fmt.Sprintf("Query is using aggregation with `without(%s)`, all labels included inside `without(...)` will be removed from the results.",
-					strings.Join(n.Grouping, ", ")),
-				FindFuncPosition(expr, n.PosRange, promParser.ItemTypeStr[promParser.WITHOUT]),
-				n.Grouping...,
-			)
+			for _, name := range n.Grouping {
+				s.excludeLabel(
+					fmt.Sprintf("Query is using aggregation with `%s(%s)`, all labels included inside `%s(...)` will be removed from the results.",
+						promParser.ItemTypeStr[promParser.WITHOUT], strings.Join(n.Grouping, ", "), promParser.ItemTypeStr[promParser.WITHOUT]),
+					FindArgumentPosition(
+						expr,
+						FindFuncPosition(expr, n.PosRange, promParser.ItemTypeStr[promParser.WITHOUT], nil),
+						name,
+					),
+					name,
+				)
+			}
 		} else {
 			if len(n.Grouping) == 0 {
+				funcNamePos := FindFuncNamePosition(expr, n.PosRange, promParser.ItemTypeStr[n.Op])
 				s.excludeAllLabels(
+					expr,
 					"Query is using aggregation that removes all labels.",
-					FindFuncPosition(expr, n.PosRange, promParser.ItemTypeStr[n.Op]),
+					funcNamePos,
+					funcNamePos,
 					nil,
 				)
 			} else {
-				s.checkIncludedLabels(expr, n.PosRange, n.Grouping)
+				s.checkIncludedLabels(
+					expr,
+					FindFuncPosition(expr, n.PosRange, promParser.ItemTypeStr[promParser.BY], nil),
+					n.Grouping,
+				)
 				s.excludeAllLabels(
-					fmt.Sprintf("Query is using aggregation with `by(%s)`, only labels included inside `by(...)` will be present on the results.",
-						strings.Join(n.Grouping, ", ")),
-					FindFuncPosition(expr, n.PosRange, promParser.ItemTypeStr[promParser.BY]),
+					expr,
+					fmt.Sprintf("Query is using aggregation with `%s(%s)`, only labels included inside `%s(...)` will be present on the results.",
+						promParser.ItemTypeStr[promParser.BY], strings.Join(n.Grouping, ", "), promParser.ItemTypeStr[promParser.BY]),
+					FindFuncPosition(expr, n.PosRange, promParser.ItemTypeStr[promParser.BY], nil),
+					FindFuncNamePosition(expr, n.PosRange, promParser.ItemTypeStr[promParser.BY]),
 					n.Grouping,
 				)
 			}
@@ -594,14 +769,17 @@ func parsePromQLFunc(s Source, expr string, n *promParser.Call) Source {
 		s.Returns = promParser.ValueTypeVector
 		vs, _ := MostOuterOperation[*promParser.VectorSelector](s)
 		names := labelsFromSelectors([]labels.MatchType{labels.MatchEqual}, vs)
+		funcNamePos := FindFuncNamePosition(expr, n.PosRange, n.Func.Name)
 		s.excludeAllLabels(
+			expr,
 			fmt.Sprintf(`The [%s()](https://prometheus.io/docs/prometheus/latest/querying/functions/#%s) function is used to check if provided query doesn't match any time series.
 You will only get any results back if the metric selector you pass doesn't match anything.
 Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
 This means that the only labels you can get back from absent call are the ones you pass to it.
 If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `+"`up`"+` metric instead.`,
 				n.Func.Name, n.Func.Name),
-			FindFuncPosition(expr, n.PosRange, n.Func.Name),
+			funcNamePos,
+			funcNamePos,
 			names,
 		)
 		s.guaranteeLabel(
@@ -627,8 +805,10 @@ If you're hoping to get instance specific labels this way and alert when some ta
 		if len(n.Args) == 0 {
 			s.ReturnInfo.AlwaysReturns = true
 			s.excludeAllLabels(
+				expr,
 				fmt.Sprintf("Calling `%s()` with no arguments will return an empty time series with no labels.",
 					n.Func.Name),
+				n.PosRange,
 				n.PosRange,
 				nil,
 			)
@@ -695,7 +875,9 @@ If you're hoping to get instance specific labels this way and alert when some ta
 		s.ReturnInfo.ReturnedNumber = math.Pi
 		s.ReturnInfo.ValuePosition = n.PosRange
 		s.excludeAllLabels(
+			expr,
 			fmt.Sprintf("Calling `%s()` will return a scalar value with no labels.", n.Func.Name),
+			n.PosRange,
 			n.PosRange,
 			nil,
 		)
@@ -703,9 +885,12 @@ If you're hoping to get instance specific labels this way and alert when some ta
 	case "scalar":
 		s.Returns = promParser.ValueTypeScalar
 		s.ReturnInfo.AlwaysReturns = true
+		funcPos := FindFuncPosition(expr, n.PositionRange(), n.Func.Name, nil)
 		s.excludeAllLabels(
+			expr,
 			fmt.Sprintf("Calling `%s()` will return a scalar value with no labels.", n.Func.Name),
-			FindFuncPosition(expr, n.PositionRange(), n.Func.Name),
+			funcPos,
+			funcPos,
 			nil,
 		)
 
@@ -718,7 +903,9 @@ If you're hoping to get instance specific labels this way and alert when some ta
 		s.ReturnInfo.AlwaysReturns = true
 		s.ReturnInfo.ValuePosition = n.PosRange
 		s.excludeAllLabels(
+			expr,
 			fmt.Sprintf("Calling `%s()` will return a scalar value with no labels.", n.Func.Name),
+			n.PosRange,
 			n.PosRange,
 			nil,
 		)
@@ -743,9 +930,12 @@ If you're hoping to get instance specific labels this way and alert when some ta
 				s.ReturnInfo.KnownReturn = true
 			}
 		}
+		funcNamePos := FindFuncNamePosition(expr, n.PosRange, n.Func.Name)
 		s.excludeAllLabels(
+			expr,
 			fmt.Sprintf("Calling `%s()` will return a vector value with no labels.", n.Func.Name),
-			FindFuncPosition(expr, n.PosRange, n.Func.Name),
+			funcNamePos,
+			funcNamePos,
 			nil,
 		)
 
@@ -844,30 +1034,43 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 
 		// foo{} +               bar{}
 		// foo{} + on(...)       bar{}
-		// foo{} + ignoring(...) bar{}
+		// foo{} * ignoring(...) bar{}
 		// foo{} /               bar{}
 	case n.VectorMatching.Card == promParser.CardOneToOne:
 		rhs := walkNode(expr, n.RHS)
 		for _, ls := range walkNode(expr, n.LHS) {
 			if n.VectorMatching.On {
 				ls.checkIncludedLabels(expr, pos, n.VectorMatching.MatchingLabels)
+				funcPos := FindFuncPosition(expr, pos, promParser.ItemTypeStr[promParser.ON], []posrange.PositionRange{
+					n.LHS.PositionRange(), n.RHS.PositionRange(),
+				})
 				ls.excludeAllLabels(
+					expr,
 					fmt.Sprintf(
-						"Query is using %s vector matching with `on(%s)`, only labels included inside `on(...)` will be present on the results.",
-						n.VectorMatching.Card, strings.Join(n.VectorMatching.MatchingLabels, ", "),
+						"Query is using %s vector matching with `%s(%s)`, only labels included inside `%s(...)` will be present on the results.",
+						n.VectorMatching.Card, promParser.ItemTypeStr[promParser.ON], strings.Join(n.VectorMatching.MatchingLabels, ", "), promParser.ItemTypeStr[promParser.ON],
 					),
-					FindFuncPosition(expr, pos, promParser.ItemTypeStr[promParser.ON]),
+					funcPos,
+					funcPos,
 					n.VectorMatching.MatchingLabels,
 				)
 			} else {
-				ls.excludeLabel(
-					fmt.Sprintf(
-						"Query is using %s vector matching with `ignoring(%s)`, all labels included inside `ignoring(...)` will be removed on the results.",
-						n.VectorMatching.Card, strings.Join(n.VectorMatching.MatchingLabels, ", "),
-					),
-					FindFuncPosition(expr, pos, promParser.ItemTypeStr[promParser.IGNORING]),
-					n.VectorMatching.MatchingLabels...,
-				)
+				for _, name := range n.VectorMatching.MatchingLabels {
+					ls.excludeLabel(
+						fmt.Sprintf(
+							"Query is using %s vector matching with `%s(%s)`, all labels included inside `%s(...)` will be removed on the results.",
+							n.VectorMatching.Card, promParser.ItemTypeStr[promParser.IGNORING], strings.Join(n.VectorMatching.MatchingLabels, ", "), promParser.ItemTypeStr[promParser.IGNORING],
+						),
+						FindArgumentPosition(
+							expr,
+							FindFuncPosition(expr, pos, promParser.ItemTypeStr[promParser.IGNORING], []posrange.PositionRange{
+								n.LHS.PositionRange(), n.RHS.PositionRange(),
+							}),
+							name,
+						),
+						name,
+					)
+				}
 				for _, rs := range rhs {
 					rs.IsConditional, rs.ReturnInfo.IsReturnBool = checkConditions(rs, n.Op, n.ReturnBool)
 					if ls.ReturnInfo.AlwaysReturns && rs.ReturnInfo.AlwaysReturns && ls.ReturnInfo.KnownReturn && rs.ReturnInfo.KnownReturn {
@@ -877,6 +1080,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 				}
 			}
 			for _, rs := range rhs {
+				rs.DeadLabels = append(rs.DeadLabels, rs.checkJoinedLabels(expr, n, rs)...)
 				if ok, s, p := canJoin(ls, rs, n.VectorMatching); !ok {
 					rs.DeadInfo = &DeadInfo{
 						Reason:   s,
@@ -884,14 +1088,15 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					}
 				}
 				ls.Joins = append(ls.Joins, Join{
-					Src:         rs,
-					Op:          n.Op,
-					Depth:       0,
-					On:          onLabels(n.VectorMatching),
-					Ignoring:    ignoringLabels(n.VectorMatching),
-					AddedLabels: n.VectorMatching.Include,
+					Src:            rs,
+					Op:             n.Op,
+					Depth:          0,
+					MatchingLabels: n.VectorMatching.MatchingLabels,
+					AddedLabels:    nil,
+					IsOn:           n.VectorMatching.On,
 				})
 			}
+			ls.DeadLabels = append(ls.DeadLabels, ls.checkJoinedLabels(expr, n, ls)...)
 			ls.excludeLabel("Binary operation between two vectors removes metric names.", pos, labels.MetricName)
 			ls.IsConditional, ls.ReturnInfo.IsReturnBool = checkConditions(ls, n.Op, n.ReturnBool)
 			src = append(src, ls)
@@ -902,29 +1107,42 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 	case n.VectorMatching.Card == promParser.CardOneToMany:
 		lhs := walkNode(expr, n.LHS)
 		for _, rs := range walkNode(expr, n.RHS) {
-			rs.includeLabel(
-				fmt.Sprintf(
-					"Query is using %s vector matching with `group_right(%s)`, all labels included inside `group_right(...)` will be include on the results.",
-					n.VectorMatching.Card, strings.Join(n.VectorMatching.Include, ", "),
-				),
-				FindFuncPosition(expr, pos, promParser.ItemTypeStr[promParser.GROUP_RIGHT]),
-				n.VectorMatching.Include...,
-			)
+			rs.joinLabels(expr, pos, promParser.GROUP_RIGHT, n.VectorMatching.Include, []posrange.PositionRange{
+				n.LHS.PositionRange(), n.RHS.PositionRange(),
+			})
 			// If we have:
 			// foo * on(instance) group_left(a,b) bar{x="y"}
 			// then only group_left() labels will be included.
 			if n.VectorMatching.On {
 				rs.checkIncludedLabels(expr, pos, n.VectorMatching.MatchingLabels)
-				rs.includeLabel(
-					fmt.Sprintf(
-						"Query is using %s vector matching with `on(%s)`, labels included inside `on(...)` will be present on the results.",
-						n.VectorMatching.Card, strings.Join(n.VectorMatching.MatchingLabels, ", "),
-					),
-					FindFuncPosition(expr, pos, promParser.ItemTypeStr[promParser.ON]),
-					n.VectorMatching.MatchingLabels...,
-				)
+				for _, name := range n.VectorMatching.MatchingLabels {
+					rs.includeLabel(
+						expr,
+						fmt.Sprintf(
+							"Query is using %s vector matching with `on(%s)`, labels included inside `on(...)` will be present on the results.",
+							n.VectorMatching.Card, strings.Join(n.VectorMatching.MatchingLabels, ", "),
+						),
+						FindArgumentPosition(
+							expr,
+							FindFuncPosition(expr, pos, promParser.ItemTypeStr[promParser.ON], []posrange.PositionRange{
+								n.LHS.PositionRange(), n.RHS.PositionRange(),
+							}),
+							name,
+						),
+						name,
+					)
+				}
 			}
 			for _, ls := range lhs {
+				ls.checkIncludedLabels(
+					expr,
+					FindFuncPosition(expr, pos, promParser.ItemTypeStr[promParser.GROUP_RIGHT], []posrange.PositionRange{
+						n.LHS.PositionRange(),
+						n.RHS.PositionRange(),
+					}),
+					n.VectorMatching.Include,
+				)
+				rs.DeadLabels = append(rs.DeadLabels, ls.checkJoinedLabels(expr, n, rs)...)
 				if ok, s, p := canJoin(rs, ls, n.VectorMatching); !ok {
 					ls.DeadInfo = &DeadInfo{
 						Reason:   s,
@@ -932,12 +1150,12 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					}
 				}
 				rs.Joins = append(rs.Joins, Join{
-					Src:         ls,
-					Op:          n.Op,
-					Depth:       0,
-					On:          onLabels(n.VectorMatching),
-					Ignoring:    ignoringLabels(n.VectorMatching),
-					AddedLabels: n.VectorMatching.Include,
+					Src:            ls,
+					Op:             n.Op,
+					Depth:          0,
+					MatchingLabels: n.VectorMatching.MatchingLabels,
+					AddedLabels:    n.VectorMatching.Include,
+					IsOn:           n.VectorMatching.On,
 				})
 			}
 			rs.excludeLabel("Binary operation between two vectors removes metric names.", pos, labels.MetricName)
@@ -950,26 +1168,39 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 	case n.VectorMatching.Card == promParser.CardManyToOne:
 		rhs := walkNode(expr, n.RHS)
 		for _, ls := range walkNode(expr, n.LHS) {
-			ls.includeLabel(
-				fmt.Sprintf(
-					"Query is using %s vector matching with `group_left(%s)`, all labels included inside `group_left(...)` will be include on the results.",
-					n.VectorMatching.Card, strings.Join(n.VectorMatching.Include, ", "),
-				),
-				FindFuncPosition(expr, pos, promParser.ItemTypeStr[promParser.GROUP_LEFT]),
-				n.VectorMatching.Include...,
-			)
+			ls.joinLabels(expr, pos, promParser.GROUP_LEFT, n.VectorMatching.Include, []posrange.PositionRange{
+				n.LHS.PositionRange(), n.RHS.PositionRange(),
+			})
 			if n.VectorMatching.On {
 				ls.checkIncludedLabels(expr, pos, n.VectorMatching.MatchingLabels)
-				ls.includeLabel(
-					fmt.Sprintf(
-						"Query is using %s vector matching with `on(%s)`, labels included inside `on(...)` will be present on the results.",
-						n.VectorMatching.Card, strings.Join(n.VectorMatching.MatchingLabels, ", "),
-					),
-					FindFuncPosition(expr, pos, promParser.ItemTypeStr[promParser.ON]),
-					n.VectorMatching.MatchingLabels...,
-				)
+				for _, name := range n.VectorMatching.MatchingLabels {
+					ls.includeLabel(
+						expr,
+						fmt.Sprintf(
+							"Query is using %s vector matching with `on(%s)`, labels included inside `on(...)` will be present on the results.",
+							n.VectorMatching.Card, strings.Join(n.VectorMatching.MatchingLabels, ", "),
+						),
+						FindArgumentPosition(
+							expr,
+							FindFuncPosition(expr, pos, promParser.ItemTypeStr[promParser.ON], []posrange.PositionRange{
+								n.LHS.PositionRange(), n.RHS.PositionRange(),
+							}),
+							name,
+						),
+						name,
+					)
+				}
 			}
 			for _, rs := range rhs {
+				rs.checkIncludedLabels(
+					expr,
+					FindFuncPosition(expr, pos, promParser.ItemTypeStr[promParser.GROUP_LEFT], []posrange.PositionRange{
+						n.LHS.PositionRange(),
+						n.RHS.PositionRange(),
+					}),
+					n.VectorMatching.Include,
+				)
+				ls.DeadLabels = append(ls.DeadLabels, rs.checkJoinedLabels(expr, n, ls)...)
 				if ok, s, p := canJoin(ls, rs, n.VectorMatching); !ok {
 					rs.DeadInfo = &DeadInfo{
 						Reason:   s,
@@ -977,12 +1208,12 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					}
 				}
 				ls.Joins = append(ls.Joins, Join{
-					Src:         rs,
-					Op:          n.Op,
-					Depth:       0,
-					On:          onLabels(n.VectorMatching),
-					Ignoring:    ignoringLabels(n.VectorMatching),
-					AddedLabels: n.VectorMatching.Include,
+					Src:            rs,
+					Op:             n.Op,
+					Depth:          0,
+					MatchingLabels: n.VectorMatching.MatchingLabels,
+					AddedLabels:    n.VectorMatching.Include,
+					IsOn:           n.VectorMatching.On,
 				})
 			}
 			ls.excludeLabel("Binary operation between two vectors removes metric names.", pos, labels.MetricName)
@@ -992,6 +1223,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 
 		// foo{} and on(...)       bar{}
 		// foo{} and ignoring(...) bar{}
+		// foo{} and bar{}
 		// foo{} unless bar{}
 	case n.VectorMatching.Card == promParser.CardManyToMany:
 		var lhsCanBeEmpty bool // true if any of the LHS query can produce empty results.
@@ -1000,14 +1232,23 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 			var rhsConditional bool
 			if n.VectorMatching.On {
 				ls.checkIncludedLabels(expr, pos, n.VectorMatching.MatchingLabels)
-				ls.includeLabel(
-					fmt.Sprintf(
-						"Query is using %s vector matching with `on(%s)`, labels included inside `on(...)` will be present on the results.",
-						n.VectorMatching.Card, strings.Join(n.VectorMatching.MatchingLabels, ", "),
-					),
-					FindFuncPosition(expr, pos, promParser.ItemTypeStr[promParser.ON]),
-					n.VectorMatching.MatchingLabels...,
-				)
+				for _, name := range n.VectorMatching.MatchingLabels {
+					ls.includeLabel(
+						expr,
+						fmt.Sprintf(
+							"Query is using %s vector matching with `on(%s)`, labels included inside `on(...)` will be present on the results.",
+							n.VectorMatching.Card, strings.Join(n.VectorMatching.MatchingLabels, ", "),
+						),
+						FindArgumentPosition(
+							expr,
+							FindFuncPosition(expr, pos, promParser.ItemTypeStr[promParser.ON], []posrange.PositionRange{
+								n.LHS.PositionRange(), n.RHS.PositionRange(),
+							}),
+							name,
+						),
+						name,
+					)
+				}
 			}
 			if !ls.ReturnInfo.AlwaysReturns || ls.IsConditional {
 				lhsCanBeEmpty = true
@@ -1017,10 +1258,10 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 				if isConditional {
 					rhsConditional = true
 				}
-				if ok, s, pos := canJoin(ls, rs, n.VectorMatching); !ok {
+				if ok, s, p := canJoin(ls, rs, n.VectorMatching); !ok {
 					rs.DeadInfo = &DeadInfo{
 						Reason:   s,
-						Fragment: pos,
+						Fragment: p,
 					}
 				}
 				switch {
@@ -1032,20 +1273,21 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 						}
 					}
 					ls.Unless = append(ls.Unless, Unless{
-						Src:      rs,
-						On:       onLabels(n.VectorMatching),
-						Ignoring: ignoringLabels(n.VectorMatching),
+						Src:            rs,
+						MatchingLabels: n.VectorMatching.MatchingLabels,
+						IsOn:           n.VectorMatching.On,
 					})
 				case n.Op != promParser.LOR:
 					ls.Joins = append(ls.Joins, Join{
-						Src:         rs,
-						Op:          n.Op,
-						Depth:       0,
-						On:          onLabels(n.VectorMatching),
-						Ignoring:    ignoringLabels(n.VectorMatching),
-						AddedLabels: n.VectorMatching.Include,
+						Src:            rs,
+						Op:             n.Op,
+						Depth:          0,
+						MatchingLabels: n.VectorMatching.MatchingLabels,
+						AddedLabels:    nil,
+						IsOn:           n.VectorMatching.On,
 					})
 				}
+				ls.DeadLabels = append(ls.DeadLabels, rs.checkJoinedLabels(expr, n, ls)...)
 			}
 			if n.Op == promParser.LAND && rhsConditional {
 				ls.IsConditional = true
@@ -1066,20 +1308,6 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 		}
 	}
 	return src
-}
-
-func onLabels(vm *promParser.VectorMatching) []string {
-	if vm.On {
-		return vm.MatchingLabels
-	}
-	return nil
-}
-
-func ignoringLabels(vm *promParser.VectorMatching) []string {
-	if !vm.On {
-		return vm.MatchingLabels
-	}
-	return nil
 }
 
 func checkConditions(s Source, op promParser.ItemType, isBool bool) (isConditional, isReturnBool bool) {
@@ -1226,8 +1454,17 @@ func formatDesc(expr string, ls, rs Source, op string) string {
 	return lse + " " + op + " " + rse
 }
 
-func FindFuncPosition(expr string, within posrange.PositionRange, fn string) posrange.PositionRange {
-	re := regexp.MustCompile("(?i)(" + regexp.QuoteMeta(fn) + ")[ \n\t]*\\(")
+func isOutside(pos posrange.PositionRange, outside []posrange.PositionRange) bool {
+	for _, out := range outside {
+		if pos.Start >= out.Start && pos.End <= out.End {
+			return false
+		}
+	}
+	return true
+}
+
+func FindFuncNamePosition(expr string, within posrange.PositionRange, fn string) posrange.PositionRange {
+	re := regexp.MustCompile("(?si)(" + regexp.QuoteMeta(fn) + ")(?:[ \n\t]*?)\\(")
 	idx := re.FindStringSubmatchIndex(GetQueryFragment(expr, within))
 	if idx == nil {
 		return within
@@ -1238,7 +1475,26 @@ func FindFuncPosition(expr string, within posrange.PositionRange, fn string) pos
 	}
 }
 
-func findArgumentPosition(expr string, within posrange.PositionRange, name string) posrange.PositionRange {
+func FindFuncPosition(expr string, within posrange.PositionRange, fn string, outside []posrange.PositionRange) posrange.PositionRange {
+	re := regexp.MustCompile("(?si)(" + regexp.QuoteMeta(fn) + ")(?:[ \n\t]*?)\\((?:.*?)\\)")
+	idx := re.FindStringSubmatchIndex(GetQueryFragment(expr, within))
+	if idx == nil {
+		return within
+	}
+	var pos posrange.PositionRange
+	for chk := range slices.Chunk(idx, 2) {
+		pos = posrange.PositionRange{
+			Start: within.Start + posrange.Pos(chk[0]),
+			End:   within.Start + posrange.Pos(chk[1]),
+		}
+		if isOutside(pos, outside) {
+			return pos
+		}
+	}
+	return within
+}
+
+func FindArgumentPosition(expr string, within posrange.PositionRange, name string) posrange.PositionRange {
 	re := regexp.MustCompile("(?s)\\((?:(.*,?))(?:[ \n\t]*?)(" + regexp.QuoteMeta(name) + ")(?:[ \n\t]*?)(?:(,.*)?)\\)")
 	idx := re.FindStringSubmatchIndex(GetQueryFragment(expr, within))
 	if idx == nil {
@@ -1247,5 +1503,20 @@ func findArgumentPosition(expr string, within posrange.PositionRange, name strin
 	return posrange.PositionRange{
 		Start: within.Start + posrange.Pos(idx[4]),
 		End:   within.Start + posrange.Pos(idx[5]),
+	}
+}
+
+func findBinOpsOperatorPosition(expr string, n *promParser.BinaryExpr, op string) posrange.PositionRange {
+	within := posrange.PositionRange{
+		Start: n.LHS.PositionRange().End + 1,
+		End:   n.RHS.PositionRange().Start,
+	}
+	idx := strings.Index(GetQueryFragment(expr, within), op)
+	if idx < 0 {
+		return within
+	}
+	return posrange.PositionRange{
+		Start: within.Start + posrange.Pos(idx),
+		End:   within.Start + posrange.Pos(idx+len(op)),
 	}
 }
