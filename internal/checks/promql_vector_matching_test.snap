@@ -16,10 +16,6 @@
         [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
         - message: 'This query will never return anything on `prom` Prometheus server at https://simple.example.com because results from the right and the left hand side have different labels: `[instance, job]` != `[dev, instance, job]`.'
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 98
           firstcolumn: 1
           lastcolumn: 44
           kind: 0
@@ -50,10 +46,6 @@
     details: ""
     diagnostics:
         - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 connection error: `connection refused`.'
-          pos:
-            - line: 1
-              firstcolumn: 11
-              lastcolumn: 13
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -79,10 +71,6 @@
     details: ""
     diagnostics:
         - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 connection error: `connection refused`.'
-          pos:
-            - line: 1
-              firstcolumn: 11
-              lastcolumn: 13
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -108,10 +96,6 @@
     details: ""
     diagnostics:
         - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `server_error: internal error`.'
-          pos:
-            - line: 1
-              firstcolumn: 11
-              lastcolumn: 13
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -137,10 +121,6 @@
     details: ""
     diagnostics:
         - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `server_error: internal error`.'
-          pos:
-            - line: 1
-              firstcolumn: 11
-              lastcolumn: 13
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -189,10 +169,6 @@
         [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
         - message: 'Using `ignoring()` won''t produce any results on `prom` Prometheus server at https://simple.example.com because results from both sides of the query have different labels: `[instance, job]` != `[app_name]`.'
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 40
           firstcolumn: 1
           lastcolumn: 12
           kind: 0
@@ -233,22 +209,6 @@
         [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
         - message: Using `on(cluster)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned by this query](https://simple.example.com/query?g0.expr=max+by+%28cluster%2C+env%29+%28increase%28error_total%5B10m%5D%29%29&&g0.tab=table) doesn't have the `cluster` label.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 28
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 35
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 10
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 21
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 59
           firstcolumn: 1
           lastcolumn: 60
           kind: 0
@@ -277,10 +237,6 @@
         [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
         - message: Using `on(app_name)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned by this query](https://simple.example.com/query?g0.expr=%28memory_bytes+%2F+ignoring+%28job%29+memory_limit%29&&g0.tab=table) doesn't have the `app_name` label.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 103
           firstcolumn: 1
           lastcolumn: 49
           kind: 0
@@ -309,10 +265,6 @@
         [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
         - message: 'This query will never return anything on `prom` Prometheus server at https://simple.example.com because results from the right and the left hand side have different labels: `[instance, job, notfound]` != `[instance, job]`.'
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 31
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -376,10 +328,6 @@
         [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
         - message: Using `on(notfound)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned from both sides of the query](notfound) don't have the `https://simple.example.com/query?g0.expr=foo+%2F+on+%28notfound%29+bar&&g0.tab=table` label.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 30
           firstcolumn: 7
           lastcolumn: 8
           kind: 0
@@ -408,10 +356,6 @@
         [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
         - message: Using `on(notfound)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned by this query](https://simple.example.com/query?g0.expr=foo&&g0.tab=table) doesn't have the `notfound` label.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 44
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -440,10 +384,6 @@
         [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
         - message: Using `on(notfound)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned by this query](https://simple.example.com/query?g0.expr=bar&&g0.tab=table) don't have the `notfound` label.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 44
           firstcolumn: 34
           lastcolumn: 36
           kind: 0
@@ -492,10 +432,6 @@
         [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
         - message: 'This query will never return anything on `prom` Prometheus server at https://simple.example.com because results from the right and the left hand side have different labels: `[instance, job, notfound]` != `[instance, job]`.'
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 60
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -534,10 +470,6 @@
         [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
         - message: The left hand side uses `{job="a"}` while the right hand side uses `{job="b"}`, this will never match.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 33
           firstcolumn: 1
           lastcolumn: 11
           kind: 0

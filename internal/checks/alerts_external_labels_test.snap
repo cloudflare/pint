@@ -26,10 +26,6 @@
     details: ""
     diagnostics:
         - message: '`prom` Prometheus server at http://127.0.0.1:XXXXX failed with: `bad_data: bad input data`.'
-          pos:
-            - line: 2
-              firstcolumn: 10
-              lastcolumn: 20
           firstcolumn: 1
           lastcolumn: 11
           kind: 0
@@ -68,10 +64,6 @@
     details: ""
     diagnostics:
         - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 connection error: `connection refused`.'
-          pos:
-            - line: 2
-              firstcolumn: 10
-              lastcolumn: 20
           firstcolumn: 1
           lastcolumn: 11
           kind: 0
@@ -115,10 +107,6 @@
     details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus runtime configuration.'
     diagnostics:
         - message: Template is using `cluster` external label but `prom` Prometheus server at https://simple.example.com doesn't have this label configured in global:external_labels.
-          pos:
-            - line: 9
-              firstcolumn: 13
-              lastcolumn: 73
           firstcolumn: 1
           lastcolumn: 61
           kind: 0
@@ -148,10 +136,6 @@
     details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus runtime configuration.'
     diagnostics:
         - message: Template is using `cluster` external label but `prom` Prometheus server at https://simple.example.com doesn't have this label configured in global:external_labels.
-          pos:
-            - line: 10
-              firstcolumn: 15
-              lastcolumn: 43
           firstcolumn: 1
           lastcolumn: 29
           kind: 0
@@ -181,10 +165,6 @@
     details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus runtime configuration.'
     diagnostics:
         - message: Template is using `cluster` external label but `prom` Prometheus server at https://simple.example.com doesn't have this label configured in global:external_labels.
-          pos:
-            - line: 6
-              firstcolumn: 15
-              lastcolumn: 59
           firstcolumn: 1
           lastcolumn: 45
           kind: 0
@@ -216,10 +196,6 @@
     details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus runtime configuration.'
     diagnostics:
         - message: Template is using `cluster` external label but `prom` Prometheus server at https://simple.example.com doesn't have this label configured in global:external_labels.
-          pos:
-            - line: 5
-              firstcolumn: 15
-              lastcolumn: 43
           firstcolumn: 1
           lastcolumn: 29
           kind: 0
@@ -251,10 +227,6 @@
     details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus runtime configuration.'
     diagnostics:
         - message: Template is using `cluster` external label but `prom` Prometheus server at https://simple.example.com doesn't have this label configured in global:external_labels.
-          pos:
-            - line: 5
-              firstcolumn: 15
-              lastcolumn: 43
           firstcolumn: 1
           lastcolumn: 29
           kind: 0

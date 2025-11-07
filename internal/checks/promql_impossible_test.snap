@@ -37,25 +37,6 @@
             Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
             This means that the only labels you can get back from absent call are the ones you pass to it.
             If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
-          pos:
-            - line: 4
-              firstcolumn: 7
-              lastcolumn: 38
-            - line: 5
-              firstcolumn: 7
-              lastcolumn: 106
-            - line: 6
-              firstcolumn: 7
-              lastcolumn: 129
-            - line: 7
-              firstcolumn: 7
-              lastcolumn: 10
-            - line: 8
-              firstcolumn: 7
-              lastcolumn: 56
-            - line: 9
-              firstcolumn: 7
-              lastcolumn: 110
           firstcolumn: 287
           lastcolumn: 292
           kind: 0
@@ -82,10 +63,6 @@
     details: ""
     diagnostics:
         - message: '`0 > 0` always evaluates to `0 > 0` and uses the `bool` modifier which means it will always return 0'
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 18
           firstcolumn: 1
           lastcolumn: 1
           kind: 0
@@ -113,10 +90,6 @@
     details: ""
     diagnostics:
         - message: The right hand side will never be matched because it doesn't have the `__name__` label from `on(...)`. Aggregation removes metric name.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 72
           firstcolumn: 39
           lastcolumn: 54
           kind: 0
@@ -141,18 +114,10 @@
     details: ""
     diagnostics:
         - message: You can't use `__name__` because this label is not possible here.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 72
           firstcolumn: 60
           lastcolumn: 67
           kind: 0
         - message: Aggregation removes metric name.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 72
           firstcolumn: 39
           lastcolumn: 54
           kind: 1
@@ -201,72 +166,10 @@
     details: ""
     diagnostics:
         - message: You can't use `colo_name` because this label is not possible here.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 65
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 62
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 81
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 70
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 25
-            - line: 9
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 10
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 11
-              firstcolumn: 5
-              lastcolumn: 52
-            - line: 12
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 13
-              firstcolumn: 5
-              lastcolumn: 61
           firstcolumn: 107
           lastcolumn: 115
           kind: 0
         - message: Calling `vector()` will return a vector value with no labels.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 65
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 62
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 81
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 70
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 25
-            - line: 9
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 10
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 11
-              firstcolumn: 5
-              lastcolumn: 52
-            - line: 12
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 13
-              firstcolumn: 5
-              lastcolumn: 61
           firstcolumn: 92
           lastcolumn: 97
           kind: 1
@@ -311,72 +214,10 @@
     details: ""
     diagnostics:
         - message: You can't use `colo_name` because this label is not possible here.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 65
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 62
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 81
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 70
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 25
-            - line: 9
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 10
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 11
-              firstcolumn: 5
-              lastcolumn: 52
-            - line: 12
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 13
-              firstcolumn: 5
-              lastcolumn: 61
           firstcolumn: 251
           lastcolumn: 259
           kind: 0
         - message: Calling `vector()` will return a vector value with no labels.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 65
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 62
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 81
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 70
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 25
-            - line: 9
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 10
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 11
-              firstcolumn: 5
-              lastcolumn: 52
-            - line: 12
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 13
-              firstcolumn: 5
-              lastcolumn: 61
           firstcolumn: 236
           lastcolumn: 241
           kind: 1
@@ -421,72 +262,10 @@
     details: ""
     diagnostics:
         - message: You can't use `colo_name` because this label is not possible here.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 65
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 62
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 81
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 70
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 25
-            - line: 9
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 10
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 11
-              firstcolumn: 5
-              lastcolumn: 52
-            - line: 12
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 13
-              firstcolumn: 5
-              lastcolumn: 61
           firstcolumn: 184
           lastcolumn: 192
           kind: 0
         - message: Calling `vector()` will return a vector value with no labels.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 65
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 62
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 81
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 70
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 25
-            - line: 9
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 10
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 11
-              firstcolumn: 5
-              lastcolumn: 52
-            - line: 12
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 13
-              firstcolumn: 5
-              lastcolumn: 61
           firstcolumn: 169
           lastcolumn: 174
           kind: 1
@@ -531,72 +310,10 @@
     details: ""
     diagnostics:
         - message: You can't use `colo_name` because this label is not possible here.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 65
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 62
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 81
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 70
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 25
-            - line: 9
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 10
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 11
-              firstcolumn: 5
-              lastcolumn: 52
-            - line: 12
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 13
-              firstcolumn: 5
-              lastcolumn: 61
           firstcolumn: 251
           lastcolumn: 259
           kind: 0
         - message: Calling `vector()` will return a vector value with no labels.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 65
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 62
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 81
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 70
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 25
-            - line: 9
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 10
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 11
-              firstcolumn: 5
-              lastcolumn: 52
-            - line: 12
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 13
-              firstcolumn: 5
-              lastcolumn: 61
           firstcolumn: 236
           lastcolumn: 241
           kind: 1
@@ -640,37 +357,6 @@
     details: ""
     diagnostics:
         - message: The right hand side will never be matched because it doesn't have the `colo_name` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 65
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 62
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 81
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 70
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 25
-            - line: 9
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 10
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 11
-              firstcolumn: 5
-              lastcolumn: 52
-            - line: 12
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 13
-              firstcolumn: 5
-              lastcolumn: 61
           firstcolumn: 354
           lastcolumn: 359
           kind: 0
@@ -714,37 +400,6 @@
     details: ""
     diagnostics:
         - message: The right hand side will never be matched because it doesn't have the `colo_name` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 65
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 62
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 81
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 70
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 25
-            - line: 9
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 10
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 11
-              firstcolumn: 5
-              lastcolumn: 52
-            - line: 12
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 13
-              firstcolumn: 5
-              lastcolumn: 61
           firstcolumn: 431
           lastcolumn: 436
           kind: 0
@@ -788,37 +443,6 @@
     details: ""
     diagnostics:
         - message: '`vector(0) / vector(1) > 5 * vector(0) / vector(1)` always evaluates to `0 > 0` which is not possible, so it will never return anything.'
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 65
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 62
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 81
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 70
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 25
-            - line: 9
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 10
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 11
-              firstcolumn: 5
-              lastcolumn: 52
-            - line: 12
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 13
-              firstcolumn: 5
-              lastcolumn: 61
           firstcolumn: 34
           lastcolumn: 42
           kind: 0
@@ -863,72 +487,10 @@
     details: ""
     diagnostics:
         - message: You can't use `colo_name` because this label is not possible here.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 65
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 62
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 81
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 70
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 25
-            - line: 9
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 10
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 11
-              firstcolumn: 5
-              lastcolumn: 52
-            - line: 12
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 13
-              firstcolumn: 5
-              lastcolumn: 61
           firstcolumn: 49
           lastcolumn: 57
           kind: 0
         - message: Calling `vector()` will return a vector value with no labels.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 65
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 62
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 81
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 70
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 25
-            - line: 9
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 10
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 11
-              firstcolumn: 5
-              lastcolumn: 52
-            - line: 12
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 13
-              firstcolumn: 5
-              lastcolumn: 61
           firstcolumn: 34
           lastcolumn: 39
           kind: 1
@@ -973,72 +535,10 @@
     details: ""
     diagnostics:
         - message: You can't use `colo_name` because this label is not possible here.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 65
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 62
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 81
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 70
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 25
-            - line: 9
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 10
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 11
-              firstcolumn: 5
-              lastcolumn: 52
-            - line: 12
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 13
-              firstcolumn: 5
-              lastcolumn: 61
           firstcolumn: 311
           lastcolumn: 319
           kind: 0
         - message: Calling `vector()` will return a vector value with no labels.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 65
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 62
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 81
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 70
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 25
-            - line: 9
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 10
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 11
-              firstcolumn: 5
-              lastcolumn: 52
-            - line: 12
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 13
-              firstcolumn: 5
-              lastcolumn: 61
           firstcolumn: 34
           lastcolumn: 39
           kind: 1
@@ -1083,72 +583,10 @@
     details: ""
     diagnostics:
         - message: You can't use `colo_name` because this label is not possible here.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 65
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 62
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 81
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 70
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 25
-            - line: 9
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 10
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 11
-              firstcolumn: 5
-              lastcolumn: 52
-            - line: 12
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 13
-              firstcolumn: 5
-              lastcolumn: 61
           firstcolumn: 107
           lastcolumn: 115
           kind: 0
         - message: Calling `vector()` will return a vector value with no labels.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 65
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 62
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 81
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 70
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 25
-            - line: 9
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 10
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 11
-              firstcolumn: 5
-              lastcolumn: 52
-            - line: 12
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 13
-              firstcolumn: 5
-              lastcolumn: 61
           firstcolumn: 92
           lastcolumn: 97
           kind: 1
@@ -1193,72 +631,10 @@
     details: ""
     diagnostics:
         - message: You can't use `colo_name` because this label is not possible here.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 65
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 62
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 81
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 70
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 25
-            - line: 9
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 10
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 11
-              firstcolumn: 5
-              lastcolumn: 52
-            - line: 12
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 13
-              firstcolumn: 5
-              lastcolumn: 61
           firstcolumn: 251
           lastcolumn: 259
           kind: 0
         - message: Calling `vector()` will return a vector value with no labels.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 65
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 62
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 81
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 70
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 25
-            - line: 9
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 10
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 11
-              firstcolumn: 5
-              lastcolumn: 52
-            - line: 12
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 13
-              firstcolumn: 5
-              lastcolumn: 61
           firstcolumn: 236
           lastcolumn: 241
           kind: 1
@@ -1303,72 +679,10 @@
     details: ""
     diagnostics:
         - message: You can't use `colo_name` because this label is not possible here.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 65
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 62
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 81
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 70
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 25
-            - line: 9
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 10
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 11
-              firstcolumn: 5
-              lastcolumn: 52
-            - line: 12
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 13
-              firstcolumn: 5
-              lastcolumn: 61
           firstcolumn: 184
           lastcolumn: 192
           kind: 0
         - message: Calling `vector()` will return a vector value with no labels.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 65
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 62
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 81
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 70
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 25
-            - line: 9
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 10
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 11
-              firstcolumn: 5
-              lastcolumn: 52
-            - line: 12
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 13
-              firstcolumn: 5
-              lastcolumn: 61
           firstcolumn: 169
           lastcolumn: 174
           kind: 1
@@ -1413,72 +727,10 @@
     details: ""
     diagnostics:
         - message: You can't use `colo_name` because this label is not possible here.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 65
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 62
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 81
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 70
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 25
-            - line: 9
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 10
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 11
-              firstcolumn: 5
-              lastcolumn: 52
-            - line: 12
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 13
-              firstcolumn: 5
-              lastcolumn: 61
           firstcolumn: 251
           lastcolumn: 259
           kind: 0
         - message: Calling `vector()` will return a vector value with no labels.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 65
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 62
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 81
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 70
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 25
-            - line: 9
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 10
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 11
-              firstcolumn: 5
-              lastcolumn: 52
-            - line: 12
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 13
-              firstcolumn: 5
-              lastcolumn: 61
           firstcolumn: 236
           lastcolumn: 241
           kind: 1
@@ -1522,37 +774,6 @@
     details: ""
     diagnostics:
         - message: The right hand side will never be matched because it doesn't have the `colo_name` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 65
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 62
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 81
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 70
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 25
-            - line: 9
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 10
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 11
-              firstcolumn: 5
-              lastcolumn: 52
-            - line: 12
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 13
-              firstcolumn: 5
-              lastcolumn: 61
           firstcolumn: 354
           lastcolumn: 359
           kind: 0
@@ -1596,37 +817,6 @@
     details: ""
     diagnostics:
         - message: The right hand side will never be matched because it doesn't have the `colo_name` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 65
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 62
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 81
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 70
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 25
-            - line: 9
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 10
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 11
-              firstcolumn: 5
-              lastcolumn: 52
-            - line: 12
-              firstcolumn: 5
-              lastcolumn: 23
-            - line: 13
-              firstcolumn: 5
-              lastcolumn: 61
           firstcolumn: 431
           lastcolumn: 436
           kind: 0
@@ -1653,10 +843,6 @@
     details: ""
     diagnostics:
         - message: The right hand side will never be matched because it doesn't have the `job` label while the left hand side will. Query is using aggregation that removes all labels.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 38
           firstcolumn: 23
           lastcolumn: 25
           kind: 0
@@ -1683,10 +869,6 @@
     details: ""
     diagnostics:
         - message: The right hand side will never be matched because it doesn't have the `job` label while the left hand side will. Calling `vector()` will return a vector value with no labels.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 39
           firstcolumn: 23
           lastcolumn: 28
           kind: 0
@@ -1723,10 +905,6 @@
     details: ""
     diagnostics:
         - message: The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 35
           firstcolumn: 20
           lastcolumn: 22
           kind: 0
@@ -1753,10 +931,6 @@
     details: ""
     diagnostics:
         - message: The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 55
           firstcolumn: 40
           lastcolumn: 42
           kind: 0
@@ -1783,10 +957,6 @@
     details: ""
     diagnostics:
         - message: The left hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 56
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -1819,30 +989,10 @@
     details: ""
     diagnostics:
         - message: You can't use `env` because this label is not possible here.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 58
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 76
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 5
           firstcolumn: 11
           lastcolumn: 13
           kind: 0
         - message: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 58
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 76
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 5
           firstcolumn: 87
           lastcolumn: 89
           kind: 1
@@ -1871,30 +1021,10 @@
     details: ""
     diagnostics:
         - message: You can't use `cluster` because this label is not possible here.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 58
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 76
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 5
           firstcolumn: 16
           lastcolumn: 22
           kind: 0
         - message: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 58
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 76
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 5
           firstcolumn: 87
           lastcolumn: 89
           kind: 1
@@ -1923,30 +1053,10 @@
     details: ""
     diagnostics:
         - message: You can't use `status` because this label is not possible here.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 58
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 76
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 5
           firstcolumn: 25
           lastcolumn: 30
           kind: 0
         - message: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 58
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 76
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 5
           firstcolumn: 87
           lastcolumn: 89
           kind: 1
@@ -1975,30 +1085,10 @@
     details: ""
     diagnostics:
         - message: You can't use `dc` because this label is not possible here.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 58
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 76
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 5
           firstcolumn: 43
           lastcolumn: 44
           kind: 0
         - message: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 58
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 76
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 5
           firstcolumn: 87
           lastcolumn: 89
           kind: 1
@@ -2027,30 +1117,10 @@
     details: ""
     diagnostics:
         - message: You can't use `port` because this label is not possible here.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 58
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 76
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 5
           firstcolumn: 47
           lastcolumn: 50
           kind: 0
         - message: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 58
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 76
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 5
           firstcolumn: 87
           lastcolumn: 89
           kind: 1
@@ -2078,18 +1148,10 @@
     details: ""
     diagnostics:
         - message: You can't use `cluster` because this label is not possible here.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 39
           firstcolumn: 15
           lastcolumn: 21
           kind: 0
         - message: Query is using aggregation that removes all labels.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 39
           firstcolumn: 1
           lastcolumn: 3
           kind: 1
@@ -2124,36 +1186,10 @@
     details: ""
     diagnostics:
         - message: You can't use `cluster` because this label is not possible here.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 58
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 72
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 79
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 5
           firstcolumn: 9
           lastcolumn: 15
           kind: 0
         - message: Query is using aggregation with `by(instance, job)`, only labels included inside `by(...)` will be present on the results.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 58
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 72
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 79
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 5
           firstcolumn: 63
           lastcolumn: 65
           kind: 1
@@ -2191,22 +1227,6 @@
     details: ""
     diagnostics:
         - message: The right hand side will never be matched because it doesn't have the `region` label while the left hand side will. Calling `vector()` will return a vector value with no labels.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 6
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 111
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 8
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 111
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 76
           firstcolumn: 199
           lastcolumn: 204
           kind: 0
@@ -2241,42 +1261,10 @@
     details: ""
     diagnostics:
         - message: You can't use `region` because this label is not possible here.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 6
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 111
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 8
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 111
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 76
           firstcolumn: 213
           lastcolumn: 218
           kind: 0
         - message: Calling `vector()` will return a vector value with no labels.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 6
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 111
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 8
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 111
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 76
           firstcolumn: 199
           lastcolumn: 204
           kind: 1
@@ -2311,42 +1299,10 @@
     details: ""
     diagnostics:
         - message: You can't use `region` because this label is not possible here.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 6
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 111
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 8
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 111
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 76
           firstcolumn: 102
           lastcolumn: 107
           kind: 0
         - message: Calling `vector()` will return a vector value with no labels.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 6
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 111
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 8
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 111
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 76
           firstcolumn: 88
           lastcolumn: 93
           kind: 1
@@ -2381,42 +1337,10 @@
     details: ""
     diagnostics:
         - message: You can't use `region` because this label is not possible here.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 6
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 111
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 8
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 111
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 76
           firstcolumn: 213
           lastcolumn: 218
           kind: 0
         - message: Calling `vector()` will return a vector value with no labels.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 6
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 111
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 8
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 111
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 76
           firstcolumn: 199
           lastcolumn: 204
           kind: 1
@@ -2443,10 +1367,6 @@
     details: ""
     diagnostics:
         - message: '`vector(0) > 0` always evaluates to `0 > 0` which is not possible, so it will never return anything.'
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 33
           firstcolumn: 12
           lastcolumn: 20
           kind: 0
@@ -2473,10 +1393,6 @@
     details: ""
     diagnostics:
         - message: '`vector(0) > 0` always evaluates to `0 > 0` which is not possible, so it will never return anything.'
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 36
           firstcolumn: 11
           lastcolumn: 19
           kind: 0

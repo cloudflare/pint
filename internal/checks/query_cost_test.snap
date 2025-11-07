@@ -13,10 +13,6 @@
     details: ""
     diagnostics:
         - message: '`prom` Prometheus server at https://simple.example.com returned 1 result(s) with 4.0KiB estimated memory usage.'
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 16
           firstcolumn: 1
           lastcolumn: 8
           kind: 0
@@ -47,10 +43,6 @@
     details: 'Rule comment: Rule comment'
     diagnostics:
         - message: '`prom` Prometheus server at https://simple.example.com returned 6 result(s), maximum allowed series is 5.'
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 16
           firstcolumn: 1
           lastcolumn: 8
           kind: 0
@@ -76,10 +68,6 @@
     details: ""
     diagnostics:
         - message: '`prom` Prometheus server at https://simple.example.com returned 7 result(s) with 7.0MiB estimated memory usage.'
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 16
           firstcolumn: 1
           lastcolumn: 8
           kind: 0
@@ -105,10 +93,6 @@
     details: ""
     diagnostics:
         - message: '`prom` Prometheus server at https://simple.example.com returned 7 result(s) with 707B estimated memory usage.'
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 16
           firstcolumn: 1
           lastcolumn: 8
           kind: 0
@@ -135,10 +119,6 @@
     details: ""
     diagnostics:
         - message: '`prom` Prometheus server at https://simple.example.com returned 7 result(s) with 707B estimated memory usage.'
-          pos:
-            - line: 3
-              firstcolumn: 10
-              lastcolumn: 30
           firstcolumn: 1
           lastcolumn: 21
           kind: 0
@@ -164,10 +144,6 @@
     details: ""
     diagnostics:
         - message: '`prom` Prometheus server at https://simple.example.com returned 7 result(s) with 7.0KiB estimated memory usage, maximum allowed series is 1.'
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 16
           firstcolumn: 1
           lastcolumn: 8
           kind: 0
@@ -193,10 +169,6 @@
     details: 'Rule comment: rule comment'
     diagnostics:
         - message: '`prom` Prometheus server at https://simple.example.com returned 7 result(s), maximum allowed series is 5.'
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 16
           firstcolumn: 1
           lastcolumn: 8
           kind: 0
@@ -222,10 +194,6 @@
     details: ""
     diagnostics:
         - message: '`prom` Prometheus server at http://127.0.0.1:XXXXX failed with: `bad_data: bad input data`.'
-          pos:
-            - line: 1
-              firstcolumn: 11
-              lastcolumn: 13
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -256,10 +224,6 @@
     details: ""
     diagnostics:
         - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 connection error: `connection refused`.'
-          pos:
-            - line: 1
-              firstcolumn: 11
-              lastcolumn: 13
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -300,10 +264,6 @@
     details: ""
     diagnostics:
         - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `connection timeout`.'
-          pos:
-            - line: 1
-              firstcolumn: 11
-              lastcolumn: 13
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -329,10 +289,6 @@
     details: ""
     diagnostics:
         - message: '`prom` Prometheus server at https://simple.example.com queried 200 samples in total when executing this query, which is more than the configured limit of 100.'
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 16
           firstcolumn: 1
           lastcolumn: 8
           kind: 0
@@ -358,10 +314,6 @@
     details: 'Rule comment: some text'
     diagnostics:
         - message: '`prom` Prometheus server at https://simple.example.com took 5s100ms when executing this query, which is more than the configured limit of 5s.'
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 16
           firstcolumn: 1
           lastcolumn: 8
           kind: 0
@@ -387,10 +339,6 @@
     details: 'Rule comment: some text'
     diagnostics:
         - message: '`prom` Prometheus server at https://simple.example.com queried 20 peak samples when executing this query, which is more than the configured limit of 10.'
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 16
           firstcolumn: 1
           lastcolumn: 8
           kind: 0
@@ -433,10 +381,6 @@
         - [Suggested query](https://simple.example.com/graph?g0.expr=colo%3Afoo+%3E+10&g0.tab=table)
     diagnostics:
         - message: Use `colo:foo` here instead to speed up the query.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 55
           firstcolumn: 1
           lastcolumn: 42
           kind: 0
@@ -484,10 +428,6 @@
         - [Suggested query](https://simple.example.com/graph?g0.expr=sum+without+%28le%29+%28histogram_fraction%280%2C+0.03%2C+rate%28fl2_request_phase_duration_seconds%5B5m%5D%29%29+%2A+instance_job%3Afl2_hmd_request_phase_latency_count%3Arate5m%29&g0.tab=table)
     diagnostics:
         - message: Use `instance_job:fl2_hmd_request_phase_latency_count:rate5m` here instead to speed up the query.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 164
           firstcolumn: 95
           lastcolumn: 155
           kind: 0
@@ -571,16 +511,6 @@
         - [Suggested query](https://simple.example.com/graph?g0.expr=server_role%7Brole%3D%22foo%22%7D%0Aand+on%28instance%29%0Ainstance_mode%3Anode_cpu%3Arate2m%7Bjob%3D%22foo%22%2C+mode%21%3D%22idle%22%7D+%3E+20%0A&g0.tab=table)
     diagnostics:
         - message: Use `instance_mode:node_cpu:rate2m` here instead to speed up the query.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 28
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 21
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 87
           firstcolumn: 42
           lastcolumn: 119
           kind: 0
@@ -638,16 +568,6 @@
         - [Suggested query](https://simple.example.com/graph?g0.expr=server_role%7Brole%3D%22foo%22%7D%0Aand+on%28instance%29%0Asum+by+%28instance%29+%28colo%3Anode_cpu%3Arate2m%29+%3E+20%0A&g0.tab=table)
     diagnostics:
         - message: Use `colo:node_cpu:rate2m` here instead to speed up the query.
-          pos:
-            - line: 3
-              firstcolumn: 5
-              lastcolumn: 28
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 21
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 62
           firstcolumn: 61
           lastcolumn: 93
           kind: 0
@@ -690,10 +610,6 @@
         - [Suggested query](https://simple.example.com/graph?g0.expr=sum%28foo%3Arate5m%29+without%28instance%29+%3E+10&g0.tab=table)
     diagnostics:
         - message: Use `foo:rate5m` here instead to speed up the query.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 55
           firstcolumn: 5
           lastcolumn: 23
           kind: 0

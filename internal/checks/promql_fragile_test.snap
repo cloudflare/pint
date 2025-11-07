@@ -34,10 +34,6 @@
         The easiest way to avoid such issues is to add `for: 2m` to you alerting rule.
     diagnostics:
         - message: This query can cause false positives when Prometheus restarts, add `for` option to avoid that.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 76
           firstcolumn: 46
           lastcolumn: 58
           kind: 0
@@ -69,10 +65,6 @@
         The easiest way to avoid such issues is to add `for: 2m` to you alerting rule.
     diagnostics:
         - message: This query can cause false positives when Prometheus restarts, add `for` option to avoid that.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 74
           firstcolumn: 32
           lastcolumn: 61
           kind: 0
@@ -104,10 +96,6 @@
         The easiest way to avoid such issues is to add `for: 2m` to you alerting rule.
     diagnostics:
         - message: This query can cause false positives when Prometheus restarts, add `for` option to avoid that.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 74
           firstcolumn: 32
           lastcolumn: 61
           kind: 0
@@ -139,10 +127,6 @@
         The easiest way to avoid such issues is to add `for: 2m` to you alerting rule.
     diagnostics:
         - message: This query can cause false positives when Prometheus restarts, add `for` option to avoid that.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 74
           firstcolumn: 32
           lastcolumn: 61
           kind: 0
@@ -174,10 +158,6 @@
         The easiest way to avoid such issues is to add `for: 2m` to you alerting rule.
     diagnostics:
         - message: This query can cause false positives when Prometheus restarts, add `for` option to avoid that.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 74
           firstcolumn: 32
           lastcolumn: 61
           kind: 0
@@ -209,10 +189,6 @@
         The easiest way to avoid such issues is to add `for: 2m` to you alerting rule.
     diagnostics:
         - message: This query can cause false positives when Prometheus restarts, add `for` option to avoid that.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 74
           firstcolumn: 32
           lastcolumn: 61
           kind: 0
@@ -244,10 +220,6 @@
         The easiest way to avoid such issues is to add `for: 2m` to you alerting rule.
     diagnostics:
         - message: This query can cause false positives when Prometheus restarts, add `for` option to avoid that.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 74
           firstcolumn: 32
           lastcolumn: 61
           kind: 0
@@ -284,10 +256,6 @@
         The easiest way to avoid such issues is to add `for: 2m` to you alerting rule.
     diagnostics:
         - message: This query can cause false positives when Prometheus restarts, add `for` option to avoid that.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 74
           firstcolumn: 32
           lastcolumn: 61
           kind: 0
@@ -347,10 +315,6 @@
         This can happen when using one of the aggregation operation like topk or bottomk as they can return a different time series each time they are evaluated.
     diagnostics:
         - message: Using `topk` to select time series might return different set of time series on every query, which would cause flapping alerts.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 21
           firstcolumn: 10
           lastcolumn: 12
           kind: 0
@@ -380,10 +344,6 @@
         This can happen when using one of the aggregation operation like topk or bottomk as they can return a different time series each time they are evaluated.
     diagnostics:
         - message: Using `topk` to select time series might return different set of time series on every query, which would cause flapping alerts.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 48
           firstcolumn: 17
           lastcolumn: 19
           kind: 0
@@ -409,10 +369,6 @@
         This can happen when using one of the aggregation operation like topk or bottomk as they can return a different time series each time they are evaluated.
     diagnostics:
         - message: Using `bottomk` to select time series might return different set of time series on every query, which would cause flapping alerts.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 48
           firstcolumn: 37
           lastcolumn: 39
           kind: 0
@@ -442,10 +398,6 @@
         This can happen when using one of the aggregation operation like topk or bottomk as they can return a different time series each time they are evaluated.
     diagnostics:
         - message: Using `topk` to select time series might return different set of time series on every query, which would cause flapping alerts.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 28
           firstcolumn: 17
           lastcolumn: 19
           kind: 0

@@ -13,10 +13,6 @@
     details: ""
     diagnostics:
         - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `server_error: internal error`.'
-          pos:
-            - line: 1
-              firstcolumn: 11
-              lastcolumn: 13
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -47,10 +43,6 @@
     details: ""
     diagnostics:
         - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 connection error: `connection refused`.'
-          pos:
-            - line: 1
-              firstcolumn: 11
-              lastcolumn: 13
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -84,10 +76,6 @@
         Each scrape produces a sample, so if your application is scrape every minute then the minimal time window you can use is two minutes.
     diagnostics:
         - message: Duration for `deriv()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 22
           firstcolumn: 1
           lastcolumn: 14
           kind: 0
@@ -128,10 +116,6 @@
     details: ""
     diagnostics:
         - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `failed to decode config data in http://127.0.0.1:XXXXX response: yaml: line 2: could not find expected '':''`.'
-          pos:
-            - line: 1
-              firstcolumn: 11
-              lastcolumn: 13
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -157,10 +141,6 @@
     details: ""
     diagnostics:
         - message: '`prom` Prometheus server at http://127.0.0.1:XXXXX failed with: `bad_data: bad input data`.'
-          pos:
-            - line: 1
-              firstcolumn: 11
-              lastcolumn: 13
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -194,10 +174,6 @@
         Each scrape produces a sample, so if your application is scrape every minute then the minimal time window you can use is two minutes.
     diagnostics:
         - message: Duration for `irate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 22
           firstcolumn: 1
           lastcolumn: 14
           kind: 0
@@ -271,10 +247,6 @@
         Each scrape produces a sample, so if your application is scrape every minute then the minimal time window you can use is two minutes.
     diagnostics:
         - message: Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 32
           firstcolumn: 1
           lastcolumn: 24
           kind: 0
@@ -296,10 +268,6 @@
     details: ""
     diagnostics:
         - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `server_error: internal error`.'
-          pos:
-            - line: 1
-              firstcolumn: 11
-              lastcolumn: 13
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -333,10 +301,6 @@
         Each scrape produces a sample, so if your application is scrape every minute then the minimal time window you can use is two minutes.
     diagnostics:
         - message: Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 32
           firstcolumn: 1
           lastcolumn: 24
           kind: 0
@@ -370,10 +334,6 @@
         Each scrape produces a sample, so if your application is scrape every minute then the minimal time window you can use is two minutes.
     diagnostics:
         - message: Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 47
           firstcolumn: 26
           lastcolumn: 38
           kind: 0
@@ -407,10 +367,6 @@
         Each scrape produces a sample, so if your application is scrape every minute then the minimal time window you can use is two minutes.
     diagnostics:
         - message: '`rate()` should only be used with counters but `bar_g` is a gauge according to metrics metadata from `prom` Prometheus server at https://simple.example.com.'
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 41
           firstcolumn: 19
           lastcolumn: 33
           kind: 0
@@ -444,10 +400,6 @@
         Each scrape produces a sample, so if your application is scrape every minute then the minimal time window you can use is two minutes.
     diagnostics:
         - message: '`rate()` should only be used with counters but `foo` is a gauge according to metrics metadata from `prom` Prometheus server at https://simple.example.com.'
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 58
           firstcolumn: 1
           lastcolumn: 13
           kind: 0
@@ -481,10 +433,6 @@
         Each scrape produces a sample, so if your application is scrape every minute then the minimal time window you can use is two minutes.
     diagnostics:
         - message: Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 32
           firstcolumn: 1
           lastcolumn: 24
           kind: 0
@@ -514,10 +462,6 @@
         Each scrape produces a sample, so if your application is scrape every minute then the minimal time window you can use is two minutes.
     diagnostics:
         - message: '`rate()` should only be used with counters but `foo` is a gauge according to metrics metadata from `prom` Prometheus server at https://simple.example.com.'
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 32
           firstcolumn: 1
           lastcolumn: 24
           kind: 0
@@ -566,10 +510,6 @@
         Each scrape produces a sample, so if your application is scrape every minute then the minimal time window you can use is two minutes.
     diagnostics:
         - message: Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 21
           firstcolumn: 1
           lastcolumn: 13
           kind: 0
@@ -610,10 +550,6 @@
     details: You can only calculate `rate()` directly from a counter metric. Calling `rate()` on `sum()` results will return bogus results because `sum()` will hide information on when each counter resets. You must first calculate `rate()` before calling any aggregation function. Always `sum(rate(counter))`, never `rate(sum(counter))`
     diagnostics:
         - message: '`rate(sum(counter))` chain detected, `rate(my:sum[5m])` is called here on results of `sum(foo)`.'
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 24
           firstcolumn: 5
           lastcolumn: 7
           kind: 0
@@ -639,10 +575,6 @@
     details: ""
     diagnostics:
         - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `server_error: internal error`.'
-          pos:
-            - line: 1
-              firstcolumn: 10
-              lastcolumn: 17
           firstcolumn: 1
           lastcolumn: 8
           kind: 0
@@ -689,31 +621,6 @@
     details: You can only calculate `rate()` directly from a counter metric. Calling `rate()` on `sum()` results will return bogus results because `sum()` will hide information on when each counter resets. You must first calculate `rate()` before calling any aggregation function. Always `sum(rate(counter))`, never `rate(sum(counter))`
     diagnostics:
         - message: '`rate(sum(counter))` chain detected, `rate(global:response_time_sum{namespace!~"test[.].+"}[15m])` is called here on results of `sum(response_time_sum:rate2m)`.'
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 9
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 66
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 34
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 6
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 9
-            - line: 9
-              firstcolumn: 5
-              lastcolumn: 68
-            - line: 10
-              firstcolumn: 5
-              lastcolumn: 34
-            - line: 11
-              firstcolumn: 5
-              lastcolumn: 10
           firstcolumn: 5
           lastcolumn: 28
           kind: 0

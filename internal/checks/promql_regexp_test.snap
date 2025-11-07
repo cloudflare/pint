@@ -18,10 +18,6 @@
     details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
     diagnostics:
         - message: Unnecessary regexp match on static string `job=~"bar"`, use `job="bar"` instead.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 41
           firstcolumn: 5
           lastcolumn: 14
           kind: 0
@@ -47,10 +43,6 @@
     details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
     diagnostics:
         - message: Unnecessary regexp match on static string `job=~"bar"`, use `job="bar"` instead.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 56
           firstcolumn: 5
           lastcolumn: 14
           kind: 0
@@ -72,10 +64,6 @@
     details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
     diagnostics:
         - message: Unnecessary regexp match on static string `job=~"bar"`, use `job="bar"` instead.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 56
           firstcolumn: 23
           lastcolumn: 32
           kind: 0
@@ -111,10 +99,6 @@
     details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
     diagnostics:
         - message: Unnecessary regexp match on static string `job=~""`, use `job=""` instead.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 20
           firstcolumn: 5
           lastcolumn: 11
           kind: 0
@@ -170,10 +154,6 @@
     details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
     diagnostics:
         - message: '`{job=~"service_.*_prod"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels'
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 35
           firstcolumn: 5
           lastcolumn: 26
           kind: 0
@@ -204,10 +184,6 @@
     details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
     diagnostics:
         - message: '`{job=~"service_.*_prod"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels'
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 35
           firstcolumn: 5
           lastcolumn: 26
           kind: 0
@@ -235,10 +211,6 @@
     details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
     diagnostics:
         - message: '`{env=~"production.*"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels'
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 177
           firstcolumn: 46
           lastcolumn: 64
           kind: 0
@@ -262,10 +234,6 @@
     details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
     diagnostics:
         - message: '`{env=~"production.*"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels'
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 177
           firstcolumn: 141
           lastcolumn: 159
           kind: 0
@@ -296,10 +264,6 @@
     details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
     diagnostics:
         - message: Use `foo{job=""}` if you want to match on all time series for `foo` without the `job` label.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 22
           firstcolumn: 5
           lastcolumn: 13
           kind: 0
@@ -325,10 +289,6 @@
     details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
     diagnostics:
         - message: Unnecessary regexp match on static string `job!~"bar"`, use `job!="bar"` instead.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 23
           firstcolumn: 5
           lastcolumn: 14
           kind: 0
@@ -354,10 +314,6 @@
     details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
     diagnostics:
         - message: Use `foo{job=""}` if you want to match on all time series for `foo` without the `job` label.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 22
           firstcolumn: 5
           lastcolumn: 13
           kind: 0
@@ -383,10 +339,6 @@
     details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
     diagnostics:
         - message: Unnecessary regexp match on static string `job=~"bar"`, use `job="bar"` instead.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 23
           firstcolumn: 5
           lastcolumn: 14
           kind: 0
@@ -412,10 +364,6 @@
     details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
     diagnostics:
         - message: Prometheus regexp matchers are automatically fully anchored so match for `job=~"^.+$"` will result in `job=~"^^.+$$"`, remove regexp anchors `^` and/or `$`.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 24
           firstcolumn: 5
           lastcolumn: 15
           kind: 0
@@ -441,10 +389,6 @@
     details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
     diagnostics:
         - message: Prometheus regexp matchers are automatically fully anchored so match for `job=~"(foo|^.+)$"` will result in `job=~"^(foo|^.+)$$"`, remove regexp anchors `^` and/or `$`.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 30
           firstcolumn: 5
           lastcolumn: 21
           kind: 0
@@ -470,10 +414,6 @@
     details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
     diagnostics:
         - message: Use `foo` if you want to match on all `job` values.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 22
           firstcolumn: 5
           lastcolumn: 13
           kind: 0
@@ -499,10 +439,6 @@
     details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
     diagnostics:
         - message: Use `foo{instance="bob"}` if you want to match on all `job` values.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 53
           firstcolumn: 5
           lastcolumn: 13
           kind: 0
@@ -524,10 +460,6 @@
     details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
     diagnostics:
         - message: Use `foo{instance="bob"}` if you want to match on all `cluster` values.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 53
           firstcolumn: 16
           lastcolumn: 28
           kind: 0
@@ -554,10 +486,6 @@
     details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
     diagnostics:
         - message: Use `{instance="bob"}` if you want to match on all `job` values.
-          pos:
-            - line: 3
-              firstcolumn: 5
-              lastcolumn: 46
           firstcolumn: 2
           lastcolumn: 10
           kind: 0
@@ -580,10 +508,6 @@
     details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
     diagnostics:
         - message: Use `{instance="bob"}` if you want to match on all `cluster` values.
-          pos:
-            - line: 3
-              firstcolumn: 5
-              lastcolumn: 46
           firstcolumn: 13
           lastcolumn: 25
           kind: 0
@@ -610,10 +534,6 @@
     details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
     diagnostics:
         - message: Use `{__name__=~"foo|bar", instance="bob"}` if you want to match on all `job` values.
-          pos:
-            - line: 3
-              firstcolumn: 5
-              lastcolumn: 67
           firstcolumn: 2
           lastcolumn: 10
           kind: 0
@@ -636,10 +556,6 @@
     details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
     diagnostics:
         - message: Use `{__name__=~"foo|bar", instance="bob"}` if you want to match on all `cluster` values.
-          pos:
-            - line: 3
-              firstcolumn: 5
-              lastcolumn: 67
           firstcolumn: 34
           lastcolumn: 46
           kind: 0

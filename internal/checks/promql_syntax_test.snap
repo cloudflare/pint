@@ -13,10 +13,6 @@
     details: '[Click here](https://prometheus.io/docs/prometheus/latest/querying/basics/) for PromQL documentation.'
     diagnostics:
         - message: unclosed left parenthesis
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 12
           firstcolumn: 5
           lastcolumn: 4
           kind: 0
@@ -42,10 +38,6 @@
     details: '[Click here](https://prometheus.io/docs/prometheus/latest/querying/basics/) for PromQL documentation.'
     diagnostics:
         - message: unclosed left parenthesis
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 20
           firstcolumn: 13
           lastcolumn: 12
           kind: 0

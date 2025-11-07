@@ -13,10 +13,6 @@
     details: 'Rule comment: some text'
     diagnostics:
         - message: alerting rule name must match `^total:.+$`.
-          pos:
-            - line: 1
-              firstcolumn: 10
-              lastcolumn: 12
           firstcolumn: 1
           lastcolumn: 2
           kind: 0
@@ -47,10 +43,6 @@
     details: 'Rule comment: some text'
     diagnostics:
         - message: recording rule name must match `^total:.+$`.
-          pos:
-            - line: 1
-              firstcolumn: 11
-              lastcolumn: 13
           firstcolumn: 1
           lastcolumn: 2
           kind: 0

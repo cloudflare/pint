@@ -13,10 +13,6 @@
     details: ""
     diagnostics:
         - message: problem reported
-          pos:
-            - line: 1
-              firstcolumn: 11
-              lastcolumn: 13
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -44,10 +40,6 @@
     details: ""
     diagnostics:
         - message: problem reported
-          pos:
-            - line: 1
-              firstcolumn: 10
-              lastcolumn: 12
           firstcolumn: 1
           lastcolumn: 3
           kind: 0

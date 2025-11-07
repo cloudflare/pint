@@ -40,10 +40,6 @@
     details: 'Rule comment: some text'
     diagnostics:
         - message: 'GET request for http://127.0.0.1:XXXXX/dashboard returned invalid status code: `400 Bad Request`.'
-          pos:
-            - line: 4
-              firstcolumn: 11
-              lastcolumn: 42
           firstcolumn: 1
           lastcolumn: 32
           kind: 0
@@ -81,10 +77,6 @@
     details: 'Rule comment: some text'
     diagnostics:
         - message: 'GET request for http: returned an error: Get "http:": http: no Host in request URL.'
-          pos:
-            - line: 4
-              firstcolumn: 11
-              lastcolumn: 17
           firstcolumn: 1
           lastcolumn: 7
           kind: 0
@@ -118,10 +110,6 @@
     details: ""
     diagnostics:
         - message: 'GET request for http://127.0.0.1:XXXXX/dashboard returned invalid status code: `400 Bad Request`.'
-          pos:
-            - line: 4
-              firstcolumn: 12
-              lastcolumn: 43
           firstcolumn: 1
           lastcolumn: 32
           kind: 0
@@ -146,10 +134,6 @@
     details: ""
     diagnostics:
         - message: 'GET request for http://127.0.0.1:XXXXX/graph returned invalid status code: `400 Bad Request`.'
-          pos:
-            - line: 5
-              firstcolumn: 12
-              lastcolumn: 39
           firstcolumn: 1
           lastcolumn: 28
           kind: 0

@@ -18,10 +18,6 @@
         Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
     diagnostics:
         - message: If other parts of this query don't return anything then this part will always return a result and so this alert will fire.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 30
           firstcolumn: 14
           lastcolumn: 22
           kind: 0
@@ -67,10 +63,6 @@
         Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
     diagnostics:
         - message: If other parts of this query don't return anything then this part will always return a result and so this alert will fire.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 30
           firstcolumn: 14
           lastcolumn: 22
           kind: 0
@@ -126,10 +118,6 @@
         Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
     diagnostics:
         - message: Results of this query are using the `bool` modifier, which means it will always return a result and the alert will always fire.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 38
           firstcolumn: 6
           lastcolumn: 20
           kind: 0
@@ -165,10 +153,6 @@
         Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
     diagnostics:
         - message: This query doesn't have any condition and so this alert will always fire if it matches anything.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 21
           firstcolumn: 1
           lastcolumn: 13
           kind: 0
@@ -224,16 +208,6 @@
         Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
     diagnostics:
         - message: This query doesn't have any condition and so this alert will always fire if it matches anything.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 71
-            - line: 4
-              firstcolumn: 9
-              lastcolumn: 26
-            - line: 5
-              firstcolumn: 9
-              lastcolumn: 88
           firstcolumn: 24
           lastcolumn: 61
           kind: 0
@@ -279,10 +253,6 @@
         Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
     diagnostics:
         - message: This query will always return a result and so this alert will always fire.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 17
           firstcolumn: 1
           lastcolumn: 9
           kind: 0
@@ -313,10 +283,6 @@
         Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
     diagnostics:
         - message: If other parts of this query don't return anything then this part will always return a result and so this alert will fire.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 30
           firstcolumn: 14
           lastcolumn: 22
           kind: 0

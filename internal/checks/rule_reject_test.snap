@@ -50,10 +50,6 @@
     details: ""
     diagnostics:
         - message: value is not allowed to match `^{{ $alert }}$`.
-          pos:
-            - line: 4
-              firstcolumn: 12
-              lastcolumn: 14
           firstcolumn: 1
           lastcolumn: 2
           kind: 0
@@ -86,10 +82,6 @@
     details: ""
     diagnostics:
         - message: key is not allowed to match `^bad$`.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 7
           firstcolumn: 1
           lastcolumn: 2
           kind: 0
@@ -117,10 +109,6 @@
     details: ""
     diagnostics:
         - message: value is not allowed to match `^bad$`.
-          pos:
-            - line: 4
-              firstcolumn: 10
-              lastcolumn: 12
           firstcolumn: 1
           lastcolumn: 2
           kind: 0
@@ -148,10 +136,6 @@
     details: ""
     diagnostics:
         - message: key is not allowed to match `^bad$`.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 7
           firstcolumn: 1
           lastcolumn: 2
           kind: 0
@@ -183,10 +167,6 @@
     details: ""
     diagnostics:
         - message: key is not allowed to match `^bad$`.
-          pos:
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 7
           firstcolumn: 1
           lastcolumn: 2
           kind: 0
@@ -224,10 +204,6 @@
     details: ""
     diagnostics:
         - message: key is not allowed to match `^bad$`.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 7
           firstcolumn: 1
           lastcolumn: 2
           kind: 0
@@ -259,10 +235,6 @@
     details: ""
     diagnostics:
         - message: key is not allowed to match `^bad$`.
-          pos:
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 7
           firstcolumn: 1
           lastcolumn: 2
           kind: 0
@@ -300,10 +272,6 @@
     details: ""
     diagnostics:
         - message: value is not allowed to match `^bad$`.
-          pos:
-            - line: 4
-              firstcolumn: 10
-              lastcolumn: 12
           firstcolumn: 1
           lastcolumn: 2
           kind: 0
@@ -331,10 +299,6 @@
     details: ""
     diagnostics:
         - message: value is not allowed to match `^bad$`.
-          pos:
-            - line: 4
-              firstcolumn: 10
-              lastcolumn: 12
           firstcolumn: 1
           lastcolumn: 2
           kind: 0

@@ -18,10 +18,6 @@
     details: ""
     diagnostics:
         - message: '`foo[20d]` selector is trying to query Prometheus for 20d worth of metrics, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.'
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 22
           firstcolumn: 1
           lastcolumn: 14
           kind: 0
@@ -47,10 +43,6 @@
     details: ""
     diagnostics:
         - message: 'Cannot parse --storage.tsdb.retention.time="abc" flag value: not a valid duration string: "abc"'
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 22
           firstcolumn: 1
           lastcolumn: 14
           kind: 0
@@ -72,10 +64,6 @@
     details: ""
     diagnostics:
         - message: '`foo[30d]` selector is trying to query Prometheus for 30d worth of metrics, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.'
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 22
           firstcolumn: 1
           lastcolumn: 14
           kind: 0
@@ -101,10 +89,6 @@
     details: ""
     diagnostics:
         - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `server_error: internal error`.'
-          pos:
-            - line: 1
-              firstcolumn: 11
-              lastcolumn: 13
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -135,10 +119,6 @@
     details: ""
     diagnostics:
         - message: '`foo[11d1h]` selector is trying to query Prometheus for 11d1h worth of metrics, but `prom` Prometheus server at https://simple.example.com is configured to only keep 11d of metrics history.'
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 24
           firstcolumn: 1
           lastcolumn: 16
           kind: 0
@@ -174,10 +154,6 @@
     details: ""
     diagnostics:
         - message: '`foo[20d]` selector is trying to query Prometheus for 20d worth of metrics, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.'
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 22
           firstcolumn: 1
           lastcolumn: 14
           kind: 0
@@ -213,10 +189,6 @@
     details: 'Rule comment: some text'
     diagnostics:
         - message: '`foo[5h]` selector is trying to query Prometheus for 5h worth of metrics, but 4h is the maximum allowed range query.'
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 21
           firstcolumn: 1
           lastcolumn: 13
           kind: 0

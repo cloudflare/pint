@@ -13,10 +13,6 @@
     details: ""
     diagnostics:
         - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `server_error: internal error`.'
-          pos:
-            - line: 1
-              firstcolumn: 11
-              lastcolumn: 13
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -77,10 +73,6 @@
         Once you calculate the rate you can use that result in other functions or aggregations that are not counter safe, like [sum()](https://prometheus.io/docs/prometheus/latest/querying/operators/#aggregation-operators).
     diagnostics:
         - message: '`http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangarous to use its value directly.'
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 87
           firstcolumn: 1
           lastcolumn: 19
           kind: 0
@@ -110,10 +102,6 @@
         Once you calculate the rate you can use that result in other functions or aggregations that are not counter safe, like [sum()](https://prometheus.io/docs/prometheus/latest/querying/operators/#aggregation-operators).
     diagnostics:
         - message: '`http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangarous to use its value directly.'
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 31
           firstcolumn: 1
           lastcolumn: 19
           kind: 0
@@ -154,10 +142,6 @@
         Once you calculate the rate you can use that result in other functions or aggregations that are not counter safe, like [sum()](https://prometheus.io/docs/prometheus/latest/querying/operators/#aggregation-operators).
     diagnostics:
         - message: '`http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangarous to use its value directly.'
-          pos:
-            - line: 3
-              firstcolumn: 10
-              lastcolumn: 98
           firstcolumn: 1
           lastcolumn: 35
           kind: 0
@@ -187,10 +171,6 @@
         Once you calculate the rate you can use that result in other functions or aggregations that are not counter safe, like [sum()](https://prometheus.io/docs/prometheus/latest/querying/operators/#aggregation-operators).
     diagnostics:
         - message: '`http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangarous to use its value directly.'
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 42
           firstcolumn: 7
           lastcolumn: 25
           kind: 0
@@ -231,10 +211,6 @@
     details: ""
     diagnostics:
         - message: '`prom` Prometheus server at http://127.0.0.1:XXXXX failed with: `bad_data: bad input data`.'
-          pos:
-            - line: 1
-              firstcolumn: 11
-              lastcolumn: 13
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -284,10 +260,6 @@
         Once you calculate the rate you can use that result in other functions or aggregations that are not counter safe, like [sum()](https://prometheus.io/docs/prometheus/latest/querying/operators/#aggregation-operators).
     diagnostics:
         - message: '`http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangarous to use its value directly.'
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 36
           firstcolumn: 5
           lastcolumn: 23
           kind: 0
@@ -317,10 +289,6 @@
         Once you calculate the rate you can use that result in other functions or aggregations that are not counter safe, like [sum()](https://prometheus.io/docs/prometheus/latest/querying/operators/#aggregation-operators).
     diagnostics:
         - message: '`http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangarous to use its value directly.'
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 36
           firstcolumn: 5
           lastcolumn: 23
           kind: 0
