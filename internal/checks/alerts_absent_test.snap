@@ -18,10 +18,6 @@
     details: ""
     diagnostics:
         - message: '`prom` Prometheus server at http://127.0.0.1:XXXXX failed with: `bad_response: 600 status code 600`.'
-          pos:
-            - line: 1
-              firstcolumn: 10
-              lastcolumn: 12
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -52,18 +48,10 @@
         Adding `for` option that is at least 2x scrape interval will prevent this from happening.
     diagnostics:
         - message: Using `absent()` might cause false positive alerts when Prometheus restarts.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 19
           firstcolumn: 1
           lastcolumn: 11
           kind: 0
         - message: Use a value that's at least twice Prometheus scrape interval (`1m`).
-          pos:
-            - line: 3
-              firstcolumn: 8
-              lastcolumn: 9
           firstcolumn: 1
           lastcolumn: 2
           kind: 0
@@ -94,18 +82,10 @@
         Adding `for` option that is at least 2x scrape interval will prevent this from happening.
     diagnostics:
         - message: Using `absent()` might cause false positive alerts when Prometheus restarts.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 19
           firstcolumn: 1
           lastcolumn: 11
           kind: 0
         - message: Use a value that's at least twice Prometheus scrape interval (`53s`).
-          pos:
-            - line: 3
-              firstcolumn: 8
-              lastcolumn: 9
           firstcolumn: 1
           lastcolumn: 2
           kind: 0
@@ -136,18 +116,10 @@
         Adding `for` option that is at least 2x scrape interval will prevent this from happening.
     diagnostics:
         - message: Using `absent()` might cause false positive alerts when Prometheus restarts.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 19
           firstcolumn: 1
           lastcolumn: 11
           kind: 0
         - message: Use a value that's at least twice Prometheus scrape interval (`1m`).
-          pos:
-            - line: 3
-              firstcolumn: 8
-              lastcolumn: 10
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -180,10 +152,6 @@
         Adding `for` option that is at least 2x scrape interval will prevent this from happening.
     diagnostics:
         - message: Using `absent()` might cause false positive alerts when Prometheus restarts.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 19
           firstcolumn: 1
           lastcolumn: 11
           kind: 0
@@ -209,10 +177,6 @@
     details: ""
     diagnostics:
         - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 connection error: `connection refused`.'
-          pos:
-            - line: 1
-              firstcolumn: 10
-              lastcolumn: 12
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -240,10 +204,6 @@
         Adding `for` option that is at least 2x scrape interval will prevent this from happening.
     diagnostics:
         - message: Using `absent()` might cause false positive alerts when Prometheus restarts.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 37
           firstcolumn: 19
           lastcolumn: 29
           kind: 0
@@ -289,10 +249,6 @@
     details: ""
     diagnostics:
         - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `failed to decode config data in http://127.0.0.1:XXXXX response: yaml: line 2: could not find expected '':''`.'
-          pos:
-            - line: 1
-              firstcolumn: 10
-              lastcolumn: 12
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -318,10 +274,6 @@
     details: ""
     diagnostics:
         - message: '`prom` Prometheus server at http://127.0.0.1:XXXXX failed with: `bad_data: bad input data`.'
-          pos:
-            - line: 1
-              firstcolumn: 10
-              lastcolumn: 12
           firstcolumn: 1
           lastcolumn: 3
           kind: 0

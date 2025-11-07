@@ -16,10 +16,6 @@
     details: Supported template syntax is documented [here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#templating).
     diagnostics:
         - message: 'Template failed to parse with this error: `124: executing "summary" at <first>: wrong type for value; expected template.queryResult; got float64`.'
-          pos:
-            - line: 5
-              firstcolumn: 15
-              lastcolumn: 41
           firstcolumn: 1
           lastcolumn: 27
           kind: 0
@@ -47,18 +43,10 @@
     details: '[Click here](https://prometheus.io/docs/prometheus/latest/configuration/template_reference/) for a full list of all available template functions.'
     diagnostics:
         - message: '`rate()` will produce results that are hard to read for humans.'
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 24
           firstcolumn: 1
           lastcolumn: 16
           kind: 1
         - message: Use one of humanize template functions to make the result more readable.
-          pos:
-            - line: 5
-              firstcolumn: 15
-              lastcolumn: 41
           firstcolumn: 4
           lastcolumn: 10
           kind: 0
@@ -90,18 +78,10 @@
     details: ""
     diagnostics:
         - message: Template is using `job` label but the query results won't have this label.
-          pos:
-            - line: 5
-              firstcolumn: 15
-              lastcolumn: 71
           firstcolumn: 11
           lastcolumn: 14
           kind: 0
         - message: Query is using aggregation that removes all labels.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 20
           firstcolumn: 1
           lastcolumn: 3
           kind: 1
@@ -129,18 +109,10 @@
     details: ""
     diagnostics:
         - message: Template is using `__name__` label but the query results won't have this label.
-          pos:
-            - line: 5
-              firstcolumn: 15
-              lastcolumn: 71
           firstcolumn: 46
           lastcolumn: 54
           kind: 0
         - message: Aggregation removes metric name.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 20
           firstcolumn: 1
           lastcolumn: 8
           kind: 1
@@ -172,18 +144,10 @@
     details: ""
     diagnostics:
         - message: Template is using `__name__` label but the query results won't have this label.
-          pos:
-            - line: 5
-              firstcolumn: 15
-              lastcolumn: 71
           firstcolumn: 46
           lastcolumn: 54
           kind: 0
         - message: Binary operation between two vectors removes metric names.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 39
           firstcolumn: 1
           lastcolumn: 27
           kind: 1
@@ -224,10 +188,6 @@
     details: ""
     diagnostics:
         - message: Template is using `cluster` label but the query results won't have this label.
-          pos:
-            - line: 5
-              firstcolumn: 15
-              lastcolumn: 91
           firstcolumn: 39
           lastcolumn: 46
           kind: 0
@@ -237,10 +197,6 @@
             Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
             This means that the only labels you can get back from absent call are the ones you pass to it.
             If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 54
           firstcolumn: 1
           lastcolumn: 6
           kind: 1
@@ -272,10 +228,6 @@
     details: ""
     diagnostics:
         - message: Template is using `env` label but the query results won't have this label.
-          pos:
-            - line: 5
-              firstcolumn: 15
-              lastcolumn: 91
           firstcolumn: 60
           lastcolumn: 63
           kind: 0
@@ -285,10 +237,6 @@
             Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
             This means that the only labels you can get back from absent call are the ones you pass to it.
             If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 54
           firstcolumn: 1
           lastcolumn: 6
           kind: 1
@@ -324,18 +272,10 @@
     details: ""
     diagnostics:
         - message: Template is using `instance` label but the query results won't have this label.
-          pos:
-            - line: 4
-              firstcolumn: 15
-              lastcolumn: 85
           firstcolumn: 30
           lastcolumn: 38
           kind: 0
         - message: This query returns a number value with no labels.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 18
           firstcolumn: 1
           lastcolumn: 1
           kind: 1
@@ -362,18 +302,10 @@
     details: ""
     diagnostics:
         - message: Template is using `job` label but the query results won't have this label.
-          pos:
-            - line: 4
-              firstcolumn: 15
-              lastcolumn: 85
           firstcolumn: 55
           lastcolumn: 58
           kind: 0
         - message: This query returns a number value with no labels.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 18
           firstcolumn: 1
           lastcolumn: 1
           kind: 1
@@ -404,18 +336,10 @@
     details: ""
     diagnostics:
         - message: Template is using `instance` label but the query results won't have this label.
-          pos:
-            - line: 4
-              firstcolumn: 15
-              lastcolumn: 65
           firstcolumn: 30
           lastcolumn: 38
           kind: 0
         - message: Calling `vector()` will return a vector value with no labels.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 17
           firstcolumn: 1
           lastcolumn: 6
           kind: 1
@@ -446,18 +370,10 @@
     details: ""
     diagnostics:
         - message: Template is using `job` label but the query results won't have this label.
-          pos:
-            - line: 4
-              firstcolumn: 15
-              lastcolumn: 31
           firstcolumn: 11
           lastcolumn: 14
           kind: 0
         - message: Query is using aggregation with `by(notjob)`, only labels included inside `by(...)` will be present on the results.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 31
           firstcolumn: 14
           lastcolumn: 15
           kind: 1
@@ -493,10 +409,6 @@
     details: ""
     diagnostics:
         - message: Template is using `job` label but the query results won't have this label.
-          pos:
-            - line: 5
-              firstcolumn: 15
-              lastcolumn: 60
           firstcolumn: 11
           lastcolumn: 14
           kind: 0
@@ -506,10 +418,6 @@
             Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
             This means that the only labels you can get back from absent call are the ones you pass to it.
             If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 34
           firstcolumn: 1
           lastcolumn: 6
           kind: 1
@@ -545,10 +453,6 @@
     details: ""
     diagnostics:
         - message: Template is using `instance` label but the query results won't have this label.
-          pos:
-            - line: 5
-              firstcolumn: 15
-              lastcolumn: 68
           firstcolumn: 11
           lastcolumn: 19
           kind: 0
@@ -558,10 +462,6 @@
             Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
             This means that the only labels you can get back from absent call are the ones you pass to it.
             If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 32
           firstcolumn: 1
           lastcolumn: 6
           kind: 1
@@ -593,10 +493,6 @@
     details: ""
     diagnostics:
         - message: Template is using `job` label but the query results won't have this label.
-          pos:
-            - line: 5
-              firstcolumn: 15
-              lastcolumn: 68
           firstcolumn: 37
           lastcolumn: 40
           kind: 0
@@ -606,10 +502,6 @@
             Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
             This means that the only labels you can get back from absent call are the ones you pass to it.
             If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 32
           firstcolumn: 1
           lastcolumn: 6
           kind: 1
@@ -645,10 +537,6 @@
     details: ""
     diagnostics:
         - message: Template is using `job` label but the query results won't have this label.
-          pos:
-            - line: 5
-              firstcolumn: 15
-              lastcolumn: 42
           firstcolumn: 11
           lastcolumn: 14
           kind: 0
@@ -658,10 +546,6 @@
             Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
             This means that the only labels you can get back from absent call are the ones you pass to it.
             If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 27
           firstcolumn: 1
           lastcolumn: 6
           kind: 1
@@ -700,10 +584,6 @@
     details: ""
     diagnostics:
         - message: Template is using `instance` label but the query results won't have this label.
-          pos:
-            - line: 5
-              firstcolumn: 16
-              lastcolumn: 37
           firstcolumn: 11
           lastcolumn: 19
           kind: 0
@@ -713,10 +593,6 @@
             Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
             This means that the only labels you can get back from absent call are the ones you pass to it.
             If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 46
           firstcolumn: 1
           lastcolumn: 6
           kind: 1
@@ -751,10 +627,6 @@
     details: ""
     diagnostics:
         - message: Template is using `instance` label but the query results won't have this label.
-          pos:
-            - line: 7
-              firstcolumn: 15
-              lastcolumn: 68
           firstcolumn: 11
           lastcolumn: 19
           kind: 0
@@ -764,10 +636,6 @@
             Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
             This means that the only labels you can get back from absent call are the ones you pass to it.
             If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 46
           firstcolumn: 1
           lastcolumn: 6
           kind: 1
@@ -802,10 +670,6 @@
     details: ""
     diagnostics:
         - message: Template is using `foo` label but the query results won't have this label.
-          pos:
-            - line: 7
-              firstcolumn: 15
-              lastcolumn: 68
           firstcolumn: 37
           lastcolumn: 40
           kind: 0
@@ -815,10 +679,6 @@
             Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
             This means that the only labels you can get back from absent call are the ones you pass to it.
             If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 46
           firstcolumn: 1
           lastcolumn: 6
           kind: 1
@@ -853,10 +713,6 @@
     details: ""
     diagnostics:
         - message: Template is using `xxx` label but the query results won't have this label.
-          pos:
-            - line: 8
-              firstcolumn: 12
-              lastcolumn: 28
           firstcolumn: 11
           lastcolumn: 14
           kind: 0
@@ -866,10 +722,6 @@
             Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
             This means that the only labels you can get back from absent call are the ones you pass to it.
             If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 46
           firstcolumn: 1
           lastcolumn: 6
           kind: 1
@@ -900,18 +752,10 @@
     details: ""
     diagnostics:
         - message: Template is using `job` label but the query results won't have this label.
-          pos:
-            - line: 4
-              firstcolumn: 15
-              lastcolumn: 31
           firstcolumn: 11
           lastcolumn: 14
           kind: 0
         - message: Query is using aggregation that removes all labels.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 20
           firstcolumn: 1
           lastcolumn: 3
           kind: 1
@@ -942,18 +786,10 @@
     details: ""
     diagnostics:
         - message: Template is using `job` label but the query results won't have this label.
-          pos:
-            - line: 4
-              firstcolumn: 15
-              lastcolumn: 31
           firstcolumn: 11
           lastcolumn: 14
           kind: 0
         - message: Query is using aggregation that removes all labels.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 20
           firstcolumn: 1
           lastcolumn: 3
           kind: 1
@@ -986,18 +822,10 @@
     details: ""
     diagnostics:
         - message: Template is using `ixtance` label but the query results won't have this label.
-          pos:
-            - line: 6
-              firstcolumn: 12
-              lastcolumn: 32
           firstcolumn: 11
           lastcolumn: 18
           kind: 0
         - message: Query is using aggregation with `by(instance, version)`, only labels included inside `by(...)` will be present on the results.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 142
           firstcolumn: 19
           lastcolumn: 21
           kind: 1
@@ -1028,18 +856,10 @@
     details: ""
     diagnostics:
         - message: Template is using `job` label but the query results won't have this label.
-          pos:
-            - line: 4
-              firstcolumn: 15
-              lastcolumn: 31
           firstcolumn: 11
           lastcolumn: 14
           kind: 0
         - message: Query is using aggregation that removes all labels.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 36
           firstcolumn: 21
           lastcolumn: 23
           kind: 1
@@ -1070,18 +890,10 @@
     details: ""
     diagnostics:
         - message: Template is using `job` label but the query results won't have this label.
-          pos:
-            - line: 4
-              firstcolumn: 15
-              lastcolumn: 31
           firstcolumn: 11
           lastcolumn: 14
           kind: 0
         - message: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 33
           firstcolumn: 10
           lastcolumn: 16
           kind: 1
@@ -1112,18 +924,10 @@
     details: ""
     diagnostics:
         - message: Template is using `job` label but the query results won't have this label.
-          pos:
-            - line: 4
-              firstcolumn: 15
-              lastcolumn: 31
           firstcolumn: 11
           lastcolumn: 14
           kind: 0
         - message: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 33
           firstcolumn: 10
           lastcolumn: 16
           kind: 1
@@ -1159,10 +963,6 @@
     details: ""
     diagnostics:
         - message: Template is using `instance` label but the query results won't have this label.
-          pos:
-            - line: 5
-              firstcolumn: 15
-              lastcolumn: 68
           firstcolumn: 11
           lastcolumn: 19
           kind: 0
@@ -1172,10 +972,6 @@
             Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
             This means that the only labels you can get back from absent call are the ones you pass to it.
             If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 42
           firstcolumn: 1
           lastcolumn: 6
           kind: 1
@@ -1207,10 +1003,6 @@
     details: ""
     diagnostics:
         - message: Template is using `job` label but the query results won't have this label.
-          pos:
-            - line: 5
-              firstcolumn: 15
-              lastcolumn: 68
           firstcolumn: 37
           lastcolumn: 40
           kind: 0
@@ -1220,10 +1012,6 @@
             Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
             This means that the only labels you can get back from absent call are the ones you pass to it.
             If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 42
           firstcolumn: 1
           lastcolumn: 6
           kind: 1
@@ -1260,18 +1048,10 @@
     details: ""
     diagnostics:
         - message: Template is using `job` label but the query results won't have this label.
-          pos:
-            - line: 5
-              firstcolumn: 15
-              lastcolumn: 91
           firstcolumn: 11
           lastcolumn: 14
           kind: 0
         - message: Query is using one-to-one vector matching with `ignoring(job)`, all labels included inside `ignoring(...)` will be removed on the results.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 31
           firstcolumn: 7
           lastcolumn: 14
           kind: 1
@@ -1307,10 +1087,6 @@
     details: ""
     diagnostics:
         - message: Template is using `cluster` label but the query results won't have this label.
-          pos:
-            - line: 5
-              firstcolumn: 15
-              lastcolumn: 91
           firstcolumn: 39
           lastcolumn: 46
           kind: 0
@@ -1320,10 +1096,6 @@
             Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
             This means that the only labels you can get back from absent call are the ones you pass to it.
             If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 55
           firstcolumn: 26
           lastcolumn: 31
           kind: 1
@@ -1355,10 +1127,6 @@
     details: ""
     diagnostics:
         - message: Template is using `env` label but the query results won't have this label.
-          pos:
-            - line: 5
-              firstcolumn: 15
-              lastcolumn: 91
           firstcolumn: 60
           lastcolumn: 63
           kind: 0
@@ -1368,10 +1136,6 @@
             Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
             This means that the only labels you can get back from absent call are the ones you pass to it.
             If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 55
           firstcolumn: 26
           lastcolumn: 31
           kind: 1
@@ -1417,18 +1181,10 @@
     details: ""
     diagnostics:
         - message: Template is using `team` label but the query results won't have this label.
-          pos:
-            - line: 9
-              firstcolumn: 17
-              lastcolumn: 34
           firstcolumn: 11
           lastcolumn: 15
           kind: 0
         - message: Query is using aggregation that removes all labels.
-          pos:
-            - line: 7
-              firstcolumn: 11
-              lastcolumn: 22
           firstcolumn: 1
           lastcolumn: 3
           kind: 1
@@ -1474,18 +1230,10 @@
     details: ""
     diagnostics:
         - message: Template is using `team` label but the query results won't have this label.
-          pos:
-            - line: 9
-              firstcolumn: 17
-              lastcolumn: 34
           firstcolumn: 11
           lastcolumn: 15
           kind: 0
         - message: Query is using aggregation that removes all labels.
-          pos:
-            - line: 7
-              firstcolumn: 11
-              lastcolumn: 22
           firstcolumn: 1
           lastcolumn: 3
           kind: 1
@@ -1528,18 +1276,10 @@
     details: ""
     diagnostics:
         - message: Template is using `job_name` label but the query results won't have this label.
-          pos:
-            - line: 6
-              firstcolumn: 11
-              lastcolumn: 32
           firstcolumn: 11
           lastcolumn: 19
           kind: 0
         - message: Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 108
           firstcolumn: 30
           lastcolumn: 32
           kind: 1
@@ -1568,18 +1308,10 @@
     details: ""
     diagnostics:
         - message: Template is using `app_type` label but the query results won't have this label.
-          pos:
-            - line: 4
-              firstcolumn: 15
-              lastcolumn: 63
           firstcolumn: 11
           lastcolumn: 19
           kind: 0
         - message: Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 108
           firstcolumn: 30
           lastcolumn: 32
           kind: 1
@@ -1656,18 +1388,10 @@
     details: '[Click here](https://prometheus.io/docs/prometheus/latest/configuration/template_reference/) for a full list of all available template functions.'
     diagnostics:
         - message: '`rate()` will produce results that are hard to read for humans.'
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 34
           firstcolumn: 1
           lastcolumn: 22
           kind: 1
         - message: Use one of humanize template functions to make the result more readable.
-          pos:
-            - line: 5
-              firstcolumn: 14
-              lastcolumn: 73
           firstcolumn: 30
           lastcolumn: 36
           kind: 0
@@ -1700,10 +1424,6 @@
     details: Supported template syntax is documented [here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#templating).
     diagnostics:
         - message: 'Template failed to parse with this error: `function "xxx" not defined`.'
-          pos:
-            - line: 4
-              firstcolumn: 15
-              lastcolumn: 32
           firstcolumn: 1
           lastcolumn: 18
           kind: 0
@@ -1731,10 +1451,6 @@
     details: Supported template syntax is documented [here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#templating).
     diagnostics:
         - message: 'Template failed to parse with this error: `function "xxx" not defined`.'
-          pos:
-            - line: 4
-              firstcolumn: 15
-              lastcolumn: 32
           firstcolumn: 1
           lastcolumn: 18
           kind: 0
@@ -1762,10 +1478,6 @@
     details: Supported template syntax is documented [here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#templating).
     diagnostics:
         - message: 'Template failed to parse with this error: `undefined variable "$label"`.'
-          pos:
-            - line: 4
-              firstcolumn: 15
-              lastcolumn: 49
           firstcolumn: 1
           lastcolumn: 35
           kind: 0
@@ -1793,10 +1505,6 @@
     details: Supported template syntax is documented [here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#templating).
     diagnostics:
         - message: 'Template failed to parse with this error: `undefined variable "$label"`.'
-          pos:
-            - line: 4
-              firstcolumn: 15
-              lastcolumn: 49
           firstcolumn: 1
           lastcolumn: 35
           kind: 0
@@ -1827,18 +1535,10 @@
     details: ""
     diagnostics:
         - message: Template is using `job` label but the query results won't have this label.
-          pos:
-            - line: 4
-              firstcolumn: 15
-              lastcolumn: 31
           firstcolumn: 11
           lastcolumn: 14
           kind: 0
         - message: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 33
           firstcolumn: 10
           lastcolumn: 16
           kind: 1
@@ -1869,18 +1569,10 @@
     details: ""
     diagnostics:
         - message: Template is using `instance` label but the query results won't have this label.
-          pos:
-            - line: 4
-              firstcolumn: 15
-              lastcolumn: 65
           firstcolumn: 30
           lastcolumn: 38
           kind: 0
         - message: Calling `vector()` will return a vector value with no labels.
-          pos:
-            - line: 2
-              firstcolumn: 9
-              lastcolumn: 17
           firstcolumn: 1
           lastcolumn: 6
           kind: 1
@@ -1914,18 +1606,10 @@
     details: ""
     diagnostics:
         - message: Template is using `colo_name` label but the query results won't have this label.
-          pos:
-            - line: 7
-              firstcolumn: 15
-              lastcolumn: 52
           firstcolumn: 26
           lastcolumn: 35
           kind: 0
         - message: Calling `vector()` will return a vector value with no labels.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 97
           firstcolumn: 79
           lastcolumn: 84
           kind: 1
@@ -1967,30 +1651,10 @@
     details: ""
     diagnostics:
         - message: Template is using `colo_name` label but the query results won't have this label.
-          pos:
-            - line: 11
-              firstcolumn: 17
-              lastcolumn: 49
           firstcolumn: 21
           lastcolumn: 30
           kind: 0
         - message: Query is using aggregation with `by(region)`, only labels included inside `by(...)` will be present on the results.
-          pos:
-            - line: 4
-              firstcolumn: 7
-              lastcolumn: 26
-            - line: 5
-              firstcolumn: 7
-              lastcolumn: 40
-            - line: 6
-              firstcolumn: 7
-              lastcolumn: 84
-            - line: 7
-              firstcolumn: 7
-              lastcolumn: 16
-            - line: 8
-              firstcolumn: 7
-              lastcolumn: 12
           firstcolumn: 7
           lastcolumn: 9
           kind: 1
@@ -2054,57 +1718,10 @@
     details: ""
     diagnostics:
         - message: Template is using `prefix` label but the query results won't have this label.
-          pos:
-            - line: 19
-              firstcolumn: 17
-              lastcolumn: 46
           firstcolumn: 21
           lastcolumn: 27
           kind: 0
         - message: Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 105
-            - line: 5
-              firstcolumn: 5
-              lastcolumn: 14
-            - line: 6
-              firstcolumn: 5
-              lastcolumn: 110
-            - line: 7
-              firstcolumn: 5
-              lastcolumn: 14
-            - line: 8
-              firstcolumn: 5
-              lastcolumn: 108
-            - line: 9
-              firstcolumn: 5
-              lastcolumn: 12
-            - line: 10
-              firstcolumn: 5
-              lastcolumn: 106
-            - line: 11
-              firstcolumn: 5
-              lastcolumn: 90
-            - line: 12
-              firstcolumn: 5
-              lastcolumn: 109
-            - line: 13
-              firstcolumn: 5
-              lastcolumn: 14
-            - line: 14
-              firstcolumn: 5
-              lastcolumn: 155
-            - line: 15
-              firstcolumn: 5
-              lastcolumn: 15
-            - line: 16
-              firstcolumn: 5
-              lastcolumn: 107
-            - line: 17
-              firstcolumn: 5
-              lastcolumn: 11
           firstcolumn: 444
           lastcolumn: 445
           kind: 1
@@ -2136,18 +1753,10 @@
     details: '[Click here](https://prometheus.io/docs/prometheus/latest/configuration/template_reference/) for a full list of all available template functions.'
     diagnostics:
         - message: '`irate()` will produce results that are hard to read for humans.'
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 29
           firstcolumn: 1
           lastcolumn: 17
           kind: 1
         - message: Use one of humanize template functions to make the result more readable.
-          pos:
-            - line: 5
-              firstcolumn: 15
-              lastcolumn: 40
           firstcolumn: 11
           lastcolumn: 17
           kind: 0
@@ -2179,18 +1788,10 @@
     details: '[Click here](https://prometheus.io/docs/prometheus/latest/configuration/template_reference/) for a full list of all available template functions.'
     diagnostics:
         - message: '`deriv()` will produce results that are hard to read for humans.'
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 29
           firstcolumn: 1
           lastcolumn: 17
           kind: 1
         - message: Use one of humanize template functions to make the result more readable.
-          pos:
-            - line: 5
-              firstcolumn: 15
-              lastcolumn: 40
           firstcolumn: 11
           lastcolumn: 17
           kind: 0
@@ -2222,18 +1823,10 @@
     details: '[Click here](https://prometheus.io/docs/prometheus/latest/configuration/template_reference/) for a full list of all available template functions.'
     diagnostics:
         - message: '`rate()` will produce results that are hard to read for humans.'
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 28
           firstcolumn: 1
           lastcolumn: 16
           kind: 1
         - message: Use one of humanize template functions to make the result more readable.
-          pos:
-            - line: 5
-              firstcolumn: 15
-              lastcolumn: 40
           firstcolumn: 11
           lastcolumn: 17
           kind: 0
@@ -2265,18 +1858,10 @@
     details: '[Click here](https://prometheus.io/docs/prometheus/latest/configuration/template_reference/) for a full list of all available template functions.'
     diagnostics:
         - message: '`rate()` will produce results that are hard to read for humans.'
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 28
           firstcolumn: 1
           lastcolumn: 16
           kind: 1
         - message: Use one of humanize template functions to make the result more readable.
-          pos:
-            - line: 5
-              firstcolumn: 15
-              lastcolumn: 77
           firstcolumn: 50
           lastcolumn: 54
           kind: 0
@@ -2345,16 +1930,6 @@
     details: Supported template syntax is documented [here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#templating).
     diagnostics:
         - message: 'Template failed to parse with this error: `159: executing "summary" at <query>: error calling query: 1:1: parse error: unknown function with name "suz"`.'
-          pos:
-            - line: 6
-              firstcolumn: 7
-              lastcolumn: 62
-            - line: 7
-              firstcolumn: 7
-              lastcolumn: 41
-            - line: 8
-              firstcolumn: 7
-              lastcolumn: 15
           firstcolumn: 1
           lastcolumn: 101
           kind: 0
@@ -2388,16 +1963,6 @@
     details: Supported template syntax is documented [here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#templating).
     diagnostics:
         - message: 'Template failed to parse with this error: `121: executing "summary" at <query "up xxx">: error calling query: 1:4: parse error: unexpected identifier "xxx"`.'
-          pos:
-            - line: 6
-              firstcolumn: 7
-              lastcolumn: 33
-            - line: 7
-              firstcolumn: 7
-              lastcolumn: 42
-            - line: 8
-              firstcolumn: 7
-              lastcolumn: 15
           firstcolumn: 1
           lastcolumn: 73
           kind: 0
@@ -2431,16 +1996,6 @@
     details: Supported template syntax is documented [here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#templating).
     diagnostics:
         - message: 'Template failed to parse with this error: `163: executing "summary" at <query>: error calling query: 1:18: parse error: unclosed left parenthesis`.'
-          pos:
-            - line: 6
-              firstcolumn: 7
-              lastcolumn: 66
-            - line: 7
-              firstcolumn: 7
-              lastcolumn: 41
-            - line: 8
-              firstcolumn: 7
-              lastcolumn: 15
           firstcolumn: 1
           lastcolumn: 105
           kind: 0
@@ -2494,10 +2049,6 @@
     details: ""
     diagnostics:
         - message: Using `$value` in labels will generate a new alert on every value change, move it to annotations.
-          pos:
-            - line: 5
-              firstcolumn: 11
-              lastcolumn: 20
           firstcolumn: 1
           lastcolumn: 10
           kind: 0
@@ -2526,10 +2077,6 @@
     details: ""
     diagnostics:
         - message: Using `.Value` in labels will generate a new alert on every value change, move it to annotations.
-          pos:
-            - line: 4
-              firstcolumn: 11
-              lastcolumn: 22
           firstcolumn: 1
           lastcolumn: 12
           kind: 0
@@ -2554,10 +2101,6 @@
     details: ""
     diagnostics:
         - message: Using `$value` in labels will generate a new alert on every value change, move it to annotations.
-          pos:
-            - line: 5
-              firstcolumn: 11
-              lastcolumn: 20
           firstcolumn: 1
           lastcolumn: 10
           kind: 0
@@ -2586,10 +2129,6 @@
     details: ""
     diagnostics:
         - message: Using `$foo` in labels will generate a new alert on every value change, move it to annotations.
-          pos:
-            - line: 5
-              firstcolumn: 11
-              lastcolumn: 40
           firstcolumn: 1
           lastcolumn: 30
           kind: 0
@@ -2618,10 +2157,6 @@
     details: ""
     diagnostics:
         - message: Using `$foo` in labels will generate a new alert on every value change, move it to annotations.
-          pos:
-            - line: 5
-              firstcolumn: 11
-              lastcolumn: 40
           firstcolumn: 1
           lastcolumn: 30
           kind: 0
@@ -2650,10 +2185,6 @@
     details: ""
     diagnostics:
         - message: Using `.Value` in labels will generate a new alert on every value change, move it to annotations.
-          pos:
-            - line: 5
-              firstcolumn: 11
-              lastcolumn: 28
           firstcolumn: 1
           lastcolumn: 18
           kind: 0
@@ -2682,10 +2213,6 @@
     details: ""
     diagnostics:
         - message: Using `.Value` in labels will generate a new alert on every value change, move it to annotations.
-          pos:
-            - line: 5
-              firstcolumn: 11
-              lastcolumn: 31
           firstcolumn: 1
           lastcolumn: 21
           kind: 0
@@ -2715,10 +2242,6 @@
     details: ""
     diagnostics:
         - message: Using `$value` in labels will generate a new alert on every value change, move it to annotations.
-          pos:
-            - line: 6
-              firstcolumn: 7
-              lastcolumn: 48
           firstcolumn: 1
           lastcolumn: 43
           kind: 0
@@ -2748,10 +2271,6 @@
     details: ""
     diagnostics:
         - message: Using `$value` in labels will generate a new alert on every value change, move it to annotations.
-          pos:
-            - line: 6
-              firstcolumn: 7
-              lastcolumn: 43
           firstcolumn: 1
           lastcolumn: 38
           kind: 0

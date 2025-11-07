@@ -25,9 +25,9 @@ const (
 
 type Diagnostic struct {
 	Message     string
-	Pos         PositionRanges
-	FirstColumn int // 1-indexed
-	LastColumn  int // 1-indexed
+	Pos         PositionRanges `yaml:"-"`
+	FirstColumn int            // 1-indexed
+	LastColumn  int            // 1-indexed
 	Kind        Kind
 }
 

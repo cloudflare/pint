@@ -14,10 +14,6 @@
     details: ""
     diagnostics:
         - message: '`0h` is the default value of `for`, this line is unnecessary.'
-          pos:
-            - line: 3
-              firstcolumn: 8
-              lastcolumn: 9
           firstcolumn: 1
           lastcolumn: 2
           kind: 0
@@ -44,10 +40,6 @@
     details: ""
     diagnostics:
         - message: '`0h` is the default value of `keep_firing_for`, this line is unnecessary.'
-          pos:
-            - line: 3
-              firstcolumn: 20
-              lastcolumn: 21
           firstcolumn: 1
           lastcolumn: 2
           kind: 0
@@ -84,10 +76,6 @@
     details: Supported time durations are documented [here](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-durations).
     diagnostics:
         - message: 'not a valid duration string: "abc"'
-          pos:
-            - line: 3
-              firstcolumn: 8
-              lastcolumn: 10
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -114,10 +102,6 @@
     details: Supported time durations are documented [here](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-durations).
     diagnostics:
         - message: 'not a valid duration string: "abc"'
-          pos:
-            - line: 3
-              firstcolumn: 20
-              lastcolumn: 22
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -144,10 +128,6 @@
     details: Supported time durations are documented [here](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-durations).
     diagnostics:
         - message: 'not a valid duration string: "-5m"'
-          pos:
-            - line: 3
-              firstcolumn: 8
-              lastcolumn: 10
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -174,10 +154,6 @@
     details: Supported time durations are documented [here](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-durations).
     diagnostics:
         - message: 'not a valid duration string: "-5m"'
-          pos:
-            - line: 3
-              firstcolumn: 20
-              lastcolumn: 22
           firstcolumn: 1
           lastcolumn: 3
           kind: 0

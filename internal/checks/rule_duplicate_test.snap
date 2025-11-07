@@ -48,10 +48,6 @@
     details: ""
     diagnostics:
         - message: Duplicated rule, identical rule found at fake.yml:6.
-          pos:
-            - line: 1
-              firstcolumn: 11
-              lastcolumn: 13
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -77,10 +73,6 @@
     details: ""
     diagnostics:
         - message: Duplicated rule, identical rule found at fake.yml:6.
-          pos:
-            - line: 1
-              firstcolumn: 11
-              lastcolumn: 20
           firstcolumn: 1
           lastcolumn: 10
           kind: 0

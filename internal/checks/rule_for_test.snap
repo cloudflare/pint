@@ -34,10 +34,6 @@
     details: ""
     diagnostics:
         - message: This alert rule must have a `for` field with a minimum duration of 5m.
-          pos:
-            - line: 2
-              firstcolumn: 8
-              lastcolumn: 9
           firstcolumn: 1
           lastcolumn: 2
           kind: 0
@@ -64,10 +60,6 @@
     details: 'Rule comment: some text'
     diagnostics:
         - message: This alert rule must have a `for` field with a maximum duration of 2m.
-          pos:
-            - line: 2
-              firstcolumn: 8
-              lastcolumn: 9
           firstcolumn: 1
           lastcolumn: 2
           kind: 0
@@ -99,10 +91,6 @@
     details: ""
     diagnostics:
         - message: This alert rule must have a `keep_firing_for` field with a minimum duration of 5m.
-          pos:
-            - line: 2
-              firstcolumn: 20
-              lastcolumn: 21
           firstcolumn: 1
           lastcolumn: 2
           kind: 0

@@ -15,10 +15,6 @@
     details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus runtime configuration.'
     diagnostics:
         - message: '`prom` Prometheus server at https://simple.example.com external_labels already has foo="bob" label set, please choose a different name for this label to avoid any conflicts.'
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 7
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -46,10 +42,6 @@
     details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus runtime configuration.'
     diagnostics:
         - message: This label is redundant. `prom` Prometheus server at https://simple.example.com external_labels already has foo="bar" label set and it will be automatically added to all alerts, there's no need to set it manually.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 7
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -77,10 +69,6 @@
     details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus runtime configuration.'
     diagnostics:
         - message: '`prom` Prometheus server at https://simple.example.com external_labels already has foo="bob" label set, please choose a different name for this label to avoid any conflicts.'
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 7
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -108,10 +96,6 @@
     details: ""
     diagnostics:
         - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 connection error: `connection refused`.'
-          pos:
-            - line: 1
-              firstcolumn: 11
-              lastcolumn: 13
           firstcolumn: 1
           lastcolumn: 3
           kind: 0

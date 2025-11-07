@@ -24,10 +24,6 @@
     details: 'Rule comment: comment'
     diagnostics:
         - message: This vector selector must specify `job` label. Please add a `{job="..."} matcher.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 18
           firstcolumn: 1
           lastcolumn: 6
           kind: 0
@@ -55,10 +51,6 @@
     details: 'Rule comment: comment'
     diagnostics:
         - message: This vector selector must specify `job` label. Please add a `{job="..."} matcher.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 27
           firstcolumn: 1
           lastcolumn: 19
           kind: 0
@@ -86,10 +78,6 @@
     details: 'Rule comment: comment'
     diagnostics:
         - message: This vector selector must specify `job` label. Please add a `{job="..."} matcher.
-          pos:
-            - line: 4
-              firstcolumn: 5
-              lastcolumn: 28
           firstcolumn: 1
           lastcolumn: 20
           kind: 0
@@ -116,10 +104,6 @@
     details: 'Rule comment: comment'
     diagnostics:
         - message: This vector selector must specify `job` label. Please add a `{job="..."} matcher.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 49
           firstcolumn: 1
           lastcolumn: 37
           kind: 0
@@ -156,10 +140,6 @@
     details: 'Rule comment: comment'
     diagnostics:
         - message: Vector selectors inside the `absent()` function must specify `job` label. Please add a `{job="..."} matcher.
-          pos:
-            - line: 3
-              firstcolumn: 9
-              lastcolumn: 34
           firstcolumn: 8
           lastcolumn: 25
           kind: 0
