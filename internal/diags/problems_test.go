@@ -47,8 +47,8 @@ expr: sum(foo{job="bar"})
 			},
 			output: `2 | expr: sum(foo{job="bar"})
 3 |       / on(a,b)
-            ^^^^^^^ abc
                ^^^ efg
+            ^^^^^^^ abc
 4 |       sum(foo)
 `,
 		},
@@ -188,6 +188,25 @@ func TestInjectDiagnosticsKind(t *testing.T) {
 	expected := `1 | expr: foo(bar) by()
           ^^^^^^^^^^^^^ this is bad
                         this is context
+`
+	require.Equal(t, expected, out)
+}
+
+func TestInjectDiagnosticsOrder(t *testing.T) {
+	input := "expr: foo(bar) by()"
+	diags := []Diagnostic{
+		{FirstColumn: 1, LastColumn: 13, Message: "this is bad", Kind: Issue},
+		{FirstColumn: 10, LastColumn: 13, Message: "this is context", Kind: Context},
+	}
+	key, val := parseYaml(input)
+	pos := NewPositionRange(strings.Split(input, "\n"), val, key.Column+2)
+	for i := range diags {
+		diags[i].Pos = pos
+	}
+	out := InjectDiagnostics(input, diags, output.None)
+	expected := `1 | expr: foo(bar) by()
+                   ^^^^ this is context
+          ^^^^^^^^^^^^^ this is bad
 `
 	require.Equal(t, expected, out)
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/prometheus/common/model"
 	"github.com/prometheus/prometheus/model/labels"
 	promParser "github.com/prometheus/prometheus/promql/parser"
+	"github.com/prometheus/prometheus/promql/parser/posrange"
 
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
@@ -203,7 +204,9 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 					})
 				}
 				if !leftLabels.hasName(name) && !rightLabels.hasName(name) {
-					pos := utils.FindFuncPosition(expr.Value.Value, node.Expr.PositionRange(), "on")
+					pos := utils.FindFuncPosition(expr.Value.Value, node.Expr.PositionRange(), "on", []posrange.PositionRange{
+						n.LHS.PositionRange(), n.RHS.PositionRange(),
+					})
 					link := fmt.Sprintf("%s/query?g0.expr=%s&&g0.tab=table", leftURI, url.QueryEscape(n.String()))
 					problems = append(problems, Problem{
 						Anchor:   AnchorAfter,
@@ -247,7 +250,9 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 					},
 				})
 			} else {
-				pos := utils.FindFuncPosition(expr.Value.Value, n.PositionRange(), "ignoring")
+				pos := utils.FindFuncPosition(expr.Value.Value, n.PositionRange(), "ignoring", []posrange.PositionRange{
+					n.LHS.PositionRange(), n.RHS.PositionRange(),
+				})
 				problems = append(problems, Problem{
 					Anchor:   AnchorAfter,
 					Lines:    expr.Value.Pos.Lines(),

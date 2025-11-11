@@ -43,6 +43,41 @@ sum(foo) / on(cluster) count(bar)
 
 Since both `sum(...)` calls remove all labels there won't be any `cluster` label to join on.
 
+Another problem detected by this check is binary aggregations that block labels from propagating to the results.
+Consider this query:
+
+```js
+service_ready * on (cluster) group_left(env, location) cluster_info
+```
+
+What happens above is that we are joining our results for the `service_ready` series with an extra time series
+`cluster_info` and add two labels (`env` and `location`) to query results.
+But what happens if someone wanted to further filter down the results of `service_ready` with a filter like:
+
+```js
+service_ready and on (instance) (service_errors == 0)
+```
+
+We can simply add it to the query:
+
+```js
+service_ready and on (instance) (service_errors == 0) * on (cluster) group_left(env, location) cluster_info
+```
+
+But doing it this way splits our query in two parts:
+
+- A: `service_ready`
+- B: `(service_errors == 0) * on (cluster) group_left(env, location) cluster_info`
+
+When we the evaluate `A and on(instance) B` we no longer propagate `env` and `location` to the results, because
+these labels are only added to the results on the `B` side.
+One way to fix this is to ensure that we join extra labels with the entire
+`service_ready and on (instance) (service_errors == 0)` expression by wrapping it in parentheses.
+
+```js
+(service_ready and on (instance) (service_errors == 0)) * on (cluster) group_left(env, location) cluster_info
+```
+
 ## Configuration
 
 This check doesn't have any configuration options.

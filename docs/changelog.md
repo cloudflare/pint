@@ -17,6 +17,8 @@
 
   The above tries to join two series on the `cluster` label, but `sum(...)` already removed labels
   from the results on both side, so there will be no such label on join on.
+- The [promql/impossible](checks/promql/impossible.md) check will now warn about label joins
+  using `group_left(...)` and `group_right(...)` that are not used in any way.
 
 ## v0.76.1
 

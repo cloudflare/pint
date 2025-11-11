@@ -458,8 +458,7 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           addedlabels: []
           src:
             labels:
@@ -496,8 +495,8 @@ output:
             isconditional: false
           op: 57395
           depth: 0
-        - "on": []
-          ignoring: []
+          ison: false
+        - matchinglabels: []
           addedlabels: []
           src:
             labels: {}
@@ -530,6 +529,7 @@ output:
             isconditional: false
           op: 57395
           depth: 0
+          ison: false
       unless: []
       returninfo:
         logicalexpr: ""
@@ -568,8 +568,7 @@ output:
           node: '[*parser.Call] vector(5)'
           op: vector
       joins:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           addedlabels: []
           src:
             labels:
@@ -606,8 +605,8 @@ output:
             isconditional: false
           op: 57395
           depth: 0
-        - "on": []
-          ignoring: []
+          ison: false
+        - matchinglabels: []
           addedlabels: []
           src:
             labels: {}
@@ -640,6 +639,7 @@ output:
             isconditional: false
           op: 57395
           depth: 0
+          ison: false
       unless: []
       returninfo:
         logicalexpr: vector(5) * vector(2)
@@ -898,8 +898,7 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           addedlabels: []
           src:
             labels: {}
@@ -928,6 +927,7 @@ output:
             isconditional: false
           op: 57388
           depth: 0
+          ison: false
       unless: []
       returninfo:
         logicalexpr: ""
@@ -964,8 +964,7 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           addedlabels: []
           src:
             labels: {}
@@ -994,6 +993,7 @@ output:
             isconditional: false
           op: 57388
           depth: 0
+          ison: false
       unless: []
       returninfo:
         logicalexpr: ""
@@ -1022,7 +1022,7 @@ output:
             kind: excluded
             fragment:
                 start: 11
-                end: 13
+                end: 23
         __name__:
             reason: Binary operation between two vectors removes metric names.
             kind: excluded
@@ -1033,8 +1033,8 @@ output:
             reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
             kind: included
             fragment:
-                start: 11
-                end: 13
+                start: 14
+                end: 22
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -1042,9 +1042,8 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - "on":
+        - matchinglabels:
             - instance
-          ignoring: []
           addedlabels: []
           src:
             labels: {}
@@ -1073,6 +1072,7 @@ output:
             isconditional: false
           op: 57388
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -1101,7 +1101,7 @@ output:
             kind: excluded
             fragment:
                 start: 12
-                end: 14
+                end: 24
         __name__:
             reason: Binary operation between two vectors removes metric names.
             kind: excluded
@@ -1112,8 +1112,8 @@ output:
             reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
             kind: included
             fragment:
-                start: 12
-                end: 14
+                start: 15
+                end: 23
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -1121,9 +1121,8 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - "on":
+        - matchinglabels:
             - instance
-          ignoring: []
           addedlabels: []
           src:
             labels: {}
@@ -1152,6 +1151,7 @@ output:
             isconditional: false
           op: 57388
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -1185,14 +1185,14 @@ output:
             reason: Query is using many-to-one vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
             kind: included
             fragment:
-                start: 11
-                end: 13
+                start: 14
+                end: 22
         version:
-            reason: Query is using many-to-one vector matching with `group_left(version)`, all labels included inside `group_left(...)` will be include on the results.
+            reason: Query is using `group_left(version)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
             kind: included
             fragment:
-                start: 24
-                end: 34
+                start: 35
+                end: 42
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -1200,9 +1200,8 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - "on":
+        - matchinglabels:
             - instance
-          ignoring: []
           addedlabels:
             - version
           src:
@@ -1232,6 +1231,7 @@ output:
             isconditional: false
           op: 57388
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -1265,14 +1265,14 @@ output:
             reason: Query is using one-to-many vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
             kind: included
             fragment:
-                start: 11
-                end: 13
+                start: 14
+                end: 22
         version:
-            reason: Query is using one-to-many vector matching with `group_right(version)`, all labels included inside `group_right(...)` will be include on the results.
+            reason: Query is using `group_right(version)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
             kind: included
             fragment:
-                start: 24
-                end: 35
+                start: 36
+                end: 43
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -1280,9 +1280,8 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - "on":
+        - matchinglabels:
             - instance
-          ignoring: []
           addedlabels:
             - version
           src:
@@ -1312,6 +1311,7 @@ output:
             isconditional: false
           op: 57388
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -1342,8 +1342,7 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           addedlabels: []
           src:
             labels: {}
@@ -1372,6 +1371,7 @@ output:
             isconditional: true
           op: 57389
           depth: 0
+          ison: false
       unless: []
       returninfo:
         logicalexpr: ""
@@ -1886,7 +1886,7 @@ output:
             kind: excluded
             fragment:
                 start: 28
-                end: 30
+                end: 40
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -1981,8 +1981,8 @@ output:
             reason: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
             kind: excluded
             fragment:
-                start: 22
-                end: 29
+                start: 30
+                end: 33
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -2031,8 +2031,8 @@ output:
             reason: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
             kind: included
             fragment:
-                start: 9
-                end: 11
+                start: 12
+                end: 15
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -2233,8 +2233,8 @@ output:
             reason: Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
             kind: excluded
             fragment:
-                start: 44
-                end: 51
+                start: 52
+                end: 60
         job:
             reason: Query will only return series where these labels are present.
             kind: guaranteed
@@ -2283,8 +2283,8 @@ output:
             reason: Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
             kind: excluded
             fragment:
-                start: 44
-                end: 51
+                start: 52
+                end: 60
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -2327,8 +2327,8 @@ output:
             reason: Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
             kind: excluded
             fragment:
-                start: 22
-                end: 29
+                start: 30
+                end: 38
         job:
             reason: Query will only return series where these labels are present.
             kind: guaranteed
@@ -2394,8 +2394,7 @@ output:
         - node: '[*parser.AggregateExpr] min(foo{job="myjob"})'
           op: min
       joins:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           addedlabels: []
           src:
             labels:
@@ -2444,6 +2443,7 @@ output:
             isconditional: false
           op: 57384
           depth: 0
+          ison: false
       unless: []
       returninfo:
         logicalexpr: ""
@@ -2494,8 +2494,7 @@ output:
         - node: '[*parser.AggregateExpr] max(foo{job="myjob"})'
           op: max
       joins:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           addedlabels: []
           src:
             labels:
@@ -2544,6 +2543,7 @@ output:
             isconditional: false
           op: 57384
           depth: 0
+          ison: false
       unless: []
       returninfo:
         logicalexpr: ""
@@ -2633,8 +2633,8 @@ output:
             reason: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
             kind: included
             fragment:
-                start: 11
-                end: 13
+                start: 14
+                end: 17
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -2933,8 +2933,8 @@ output:
             reason: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
             kind: excluded
             fragment:
-                start: 39
-                end: 46
+                start: 47
+                end: 50
         version:
             reason: This label will be added to the results by the count_values() call.
             kind: guaranteed
@@ -2985,8 +2985,8 @@ output:
             reason: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
             kind: excluded
             fragment:
-                start: 50
-                end: 57
+                start: 58
+                end: 61
         version:
             reason: This label will be added to the results by the count_values() call.
             kind: guaranteed
@@ -3043,8 +3043,8 @@ output:
             reason: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
             kind: included
             fragment:
-                start: 39
-                end: 41
+                start: 42
+                end: 45
         version:
             reason: This label will be added to the results by the count_values() call.
             kind: guaranteed
@@ -3229,8 +3229,8 @@ output:
             reason: Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
             kind: excluded
             fragment:
-                start: 20
-                end: 27
+                start: 28
+                end: 36
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -3284,8 +3284,7 @@ output:
         - node: '[*parser.VectorSelector] foo{job="foo"}'
           op: ""
       joins:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           addedlabels: []
           src:
             labels: {}
@@ -3314,6 +3313,7 @@ output:
             isconditional: false
           op: 57384
           depth: 0
+          ison: false
       unless: []
       returninfo:
         logicalexpr: ""
@@ -3342,7 +3342,7 @@ output:
             kind: excluded
             fragment:
                 start: 17
-                end: 19
+                end: 29
         __name__:
             reason: Binary operation between two vectors removes metric names.
             kind: excluded
@@ -3353,14 +3353,14 @@ output:
             reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
             kind: included
             fragment:
-                start: 17
-                end: 19
+                start: 20
+                end: 28
         job:
             reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
             kind: excluded
             fragment:
                 start: 17
-                end: 19
+                end: 29
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -3368,9 +3368,8 @@ output:
         - node: '[*parser.VectorSelector] foo{job="foo"}'
           op: ""
       joins:
-        - "on":
+        - matchinglabels:
             - instance
-          ignoring: []
           addedlabels: []
           src:
             labels: {}
@@ -3399,6 +3398,7 @@ output:
             isconditional: false
           op: 57395
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -3429,17 +3429,17 @@ output:
                 start: 0
                 end: 49
         bar:
-            reason: Query is using many-to-one vector matching with `group_left(bar)`, all labels included inside `group_left(...)` will be include on the results.
+            reason: Query is using `group_left(bar)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
             kind: included
             fragment:
-                start: 30
-                end: 40
+                start: 41
+                end: 44
         instance:
             reason: Query is using many-to-one vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
             kind: included
             fragment:
-                start: 17
-                end: 19
+                start: 20
+                end: 28
         job:
             reason: Query will only return series where these labels are present.
             kind: guaranteed
@@ -3453,9 +3453,8 @@ output:
         - node: '[*parser.VectorSelector] foo{job="foo"}'
           op: ""
       joins:
-        - "on":
+        - matchinglabels:
             - instance
-          ignoring: []
           addedlabels:
             - bar
           src:
@@ -3485,6 +3484,7 @@ output:
             isconditional: false
           op: 57395
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -3515,17 +3515,17 @@ output:
                 start: 0
                 end: 84
         cluster:
-            reason: Query is using many-to-one vector matching with `group_left(cluster)`, all labels included inside `group_left(...)` will be include on the results.
+            reason: Query is using `group_left(cluster)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
             kind: included
             fragment:
-                start: 30
-                end: 40
+                start: 41
+                end: 48
         instance:
             reason: Query is using many-to-one vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
             kind: included
             fragment:
-                start: 17
-                end: 19
+                start: 20
+                end: 28
         job:
             reason: Query will only return series where these labels are present.
             kind: guaranteed
@@ -3539,9 +3539,8 @@ output:
         - node: '[*parser.VectorSelector] foo{job="foo"}'
           op: ""
       joins:
-        - "on":
+        - matchinglabels:
             - instance
-          ignoring: []
           addedlabels:
             - cluster
           src:
@@ -3583,6 +3582,7 @@ output:
             isconditional: false
           op: 57395
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -3622,14 +3622,14 @@ output:
             reason: Query is using one-to-many vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
             kind: included
             fragment:
-                start: 33
-                end: 35
+                start: 36
+                end: 44
         job:
-            reason: Query is using one-to-many vector matching with `group_right(job)`, all labels included inside `group_right(...)` will be include on the results.
+            reason: Query is using `group_right(job)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
             kind: included
             fragment:
-                start: 46
-                end: 57
+                start: 58
+                end: 61
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -3637,9 +3637,8 @@ output:
         - node: '[*parser.VectorSelector] bar{cluster="bar"}'
           op: ""
       joins:
-        - "on":
+        - matchinglabels:
             - instance
-          ignoring: []
           addedlabels:
             - job
           src:
@@ -3681,6 +3680,7 @@ output:
             isconditional: false
           op: 57395
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -3725,8 +3725,7 @@ output:
         - node: '[*parser.AggregateExpr] count(foo / bar)'
           op: count
       joins:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           addedlabels: []
           src:
             labels: {}
@@ -3755,6 +3754,7 @@ output:
             isconditional: false
           op: 57384
           depth: 1
+          ison: false
       unless: []
       returninfo:
         logicalexpr: ""
@@ -3795,7 +3795,7 @@ output:
             kind: excluded
             fragment:
                 start: 20
-                end: 23
+                end: 25
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -3805,8 +3805,7 @@ output:
         - node: '[*parser.AggregateExpr] count(up{job="a"} / on () up{job="b"})'
           op: count
       joins:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           addedlabels: []
           src:
             labels:
@@ -3841,6 +3840,7 @@ output:
             isconditional: false
           op: 57384
           depth: 1
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -3887,7 +3887,7 @@ output:
             kind: excluded
             fragment:
                 start: 20
-                end: 23
+                end: 28
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -3897,9 +3897,8 @@ output:
         - node: '[*parser.AggregateExpr] count(up{job="a"} / on (env) up{job="b"})'
           op: count
       joins:
-        - "on":
+        - matchinglabels:
             - env
-          ignoring: []
           addedlabels: []
           src:
             labels:
@@ -3934,6 +3933,7 @@ output:
             isconditional: false
           op: 57384
           depth: 1
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -3976,8 +3976,7 @@ output:
         - node: '[*parser.VectorSelector] foo{instance="1",job="foo"}'
           op: ""
       joins:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           addedlabels: []
           src:
             labels: {}
@@ -4006,6 +4005,7 @@ output:
             isconditional: false
           op: 57389
           depth: 0
+          ison: false
       unless: []
       returninfo:
         logicalexpr: ""
@@ -4033,8 +4033,8 @@ output:
             reason: Query is using many-to-many vector matching with `on(cluster)`, labels included inside `on(...)` will be present on the results.
             kind: included
             fragment:
-                start: 33
-                end: 35
+                start: 36
+                end: 43
         instance:
             reason: Query will only return series where these labels are present.
             kind: guaranteed
@@ -4054,9 +4054,8 @@ output:
         - node: '[*parser.VectorSelector] foo{instance="1",job="foo"}'
           op: ""
       joins:
-        - "on":
+        - matchinglabels:
             - cluster
-          ignoring: []
           addedlabels: []
           src:
             labels: {}
@@ -4085,6 +4084,7 @@ output:
             isconditional: false
           op: 57389
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -4220,8 +4220,8 @@ output:
             reason: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
             kind: excluded
             fragment:
-                start: 31
-                end: 38
+                start: 39
+                end: 42
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -4478,8 +4478,7 @@ output:
           op: ""
       joins: []
       unless:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           src:
             labels: {}
             deadinfo: null
@@ -4505,6 +4504,7 @@ output:
             type: selector
             fixedlabels: false
             isconditional: false
+          ison: false
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -4535,8 +4535,7 @@ output:
           op: ""
       joins: []
       unless:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           src:
             labels: {}
             deadinfo: null
@@ -4562,6 +4561,7 @@ output:
             type: selector
             fixedlabels: false
             isconditional: true
+          ison: false
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -4592,8 +4592,7 @@ output:
           op: ""
       joins: []
       unless:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           src:
             labels: {}
             deadinfo: null
@@ -4619,8 +4618,8 @@ output:
             type: selector
             fixedlabels: false
             isconditional: false
-        - "on": []
-          ignoring: []
+          ison: false
+        - matchinglabels: []
           src:
             labels: {}
             deadinfo: null
@@ -4646,6 +4645,7 @@ output:
             type: selector
             fixedlabels: false
             isconditional: false
+          ison: false
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -4684,14 +4684,14 @@ output:
             reason: Query is using aggregation with `without(job, cluster)`, all labels included inside `without(...)` will be removed from the results.
             kind: excluded
             fragment:
-                start: 63
-                end: 70
+                start: 76
+                end: 83
         job:
             reason: Query is using aggregation with `without(job, cluster)`, all labels included inside `without(...)` will be removed from the results.
             kind: excluded
             fragment:
-                start: 63
-                end: 70
+                start: 71
+                end: 74
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -4880,14 +4880,14 @@ output:
             reason: Query is using many-to-many vector matching with `on(job)`, labels included inside `on(...)` will be present on the results.
             kind: included
             fragment:
-                start: 40
-                end: 42
+                start: 111
+                end: 114
         notify:
-            reason: Query is using many-to-one vector matching with `group_left(notify)`, all labels included inside `group_left(...)` will be include on the results.
+            reason: Query is using `group_left(notify)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
             kind: included
             fragment:
-                start: 48
-                end: 58
+                start: 59
+                end: 65
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -4897,9 +4897,8 @@ output:
         - node: '[*parser.AggregateExpr] sum without (notify) (foo:sum > 0)'
           op: sum
       joins:
-        - "on":
+        - matchinglabels:
             - job
-          ignoring: []
           addedlabels:
             - notify
           src:
@@ -4929,9 +4928,9 @@ output:
             isconditional: false
           op: 57395
           depth: 0
-        - "on":
+          ison: true
+        - matchinglabels:
             - job
-          ignoring: []
           addedlabels: []
           src:
             labels:
@@ -4951,8 +4950,8 @@ output:
                     reason: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
                     kind: included
                     fragment:
-                        start: 108
-                        end: 110
+                        start: 111
+                        end: 114
             deadinfo: null
             deadlabels: []
             returns: vector
@@ -4980,6 +4979,7 @@ output:
             isconditional: true
           op: 57389
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -5008,7 +5008,7 @@ output:
             kind: excluded
             fragment:
                 start: 29
-                end: 32
+                end: 52
         __name__:
             reason: Binary operation between two vectors removes metric names.
             kind: excluded
@@ -5019,14 +5019,14 @@ output:
             reason: Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.
             kind: included
             fragment:
-                start: 29
-                end: 32
+                start: 43
+                end: 51
         instance:
             reason: Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.
             kind: included
             fragment:
-                start: 29
-                end: 32
+                start: 33
+                end: 41
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -5034,10 +5034,9 @@ output:
         - node: '[*parser.VectorSelector] container_file_descriptors'
           op: ""
       joins:
-        - "on":
+        - matchinglabels:
             - instance
             - app_name
-          ignoring: []
           addedlabels: []
           src:
             labels:
@@ -5072,6 +5071,7 @@ output:
             isconditional: false
           op: 57384
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -5105,14 +5105,14 @@ output:
             reason: Query is using many-to-one vector matching with `on(instance, app_name)`, labels included inside `on(...)` will be present on the results.
             kind: included
             fragment:
-                start: 29
-                end: 32
+                start: 43
+                end: 51
         instance:
             reason: Query is using many-to-one vector matching with `on(instance, app_name)`, labels included inside `on(...)` will be present on the results.
             kind: included
             fragment:
-                start: 29
-                end: 32
+                start: 33
+                end: 41
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -5120,10 +5120,9 @@ output:
         - node: '[*parser.VectorSelector] container_file_descriptors'
           op: ""
       joins:
-        - "on":
+        - matchinglabels:
             - instance
             - app_name
-          ignoring: []
           addedlabels: []
           src:
             labels:
@@ -5158,6 +5157,7 @@ output:
             isconditional: false
           op: 57384
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -5401,9 +5401,8 @@ output:
         - node: '[*parser.Call] absent(foo{job="prometheus",xxx="1"})'
           op: absent
       joins:
-        - "on":
+        - matchinglabels:
             - job
-          ignoring: []
           addedlabels: []
           src:
             labels: {}
@@ -5432,6 +5431,7 @@ output:
             isconditional: false
           op: 57389
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -5471,8 +5471,8 @@ output:
             reason: Query is using aggregation with `by(notjob)`, only labels included inside `by(...)` will be present on the results.
             kind: included
             fragment:
-                start: 13
-                end: 15
+                start: 16
+                end: 22
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -5518,23 +5518,23 @@ output:
                 start: 0
                 end: 158
         foo:
-            reason: Query is using many-to-one vector matching with `group_left(foo)`, all labels included inside `group_left(...)` will be include on the results.
+            reason: Query is using `group_left(foo)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
             kind: included
             fragment:
-                start: 84
-                end: 94
+                start: 95
+                end: 98
         instance:
             reason: Query is using aggregation with `by(instance, version)`, only labels included inside `by(...)` will be present on the results.
             kind: included
             fragment:
-                start: 32
-                end: 35
+                start: 36
+                end: 44
         version:
             reason: Query is using aggregation with `by(instance, version)`, only labels included inside `by(...)` will be present on the results.
             kind: included
             fragment:
-                start: 32
-                end: 35
+                start: 46
+                end: 53
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -5544,8 +5544,7 @@ output:
         - node: '[*parser.AggregateExpr] count by (instance, version) (node_exporter_build_info)'
           op: count
       joins:
-        - "on": []
-          ignoring:
+        - matchinglabels:
             - package
             - version
           addedlabels:
@@ -5568,22 +5567,32 @@ output:
                     reason: Query is using aggregation with `by(instance, version, package)`, only labels included inside `by(...)` will be present on the results.
                     kind: included
                     fragment:
-                        start: 127
-                        end: 130
+                        start: 131
+                        end: 139
                 package:
                     reason: Query is using aggregation with `by(instance, version, package)`, only labels included inside `by(...)` will be present on the results.
                     kind: included
                     fragment:
-                        start: 127
-                        end: 130
+                        start: 150
+                        end: 157
                 version:
                     reason: Query is using aggregation with `by(instance, version, package)`, only labels included inside `by(...)` will be present on the results.
                     kind: included
                     fragment:
-                        start: 127
-                        end: 130
+                        start: 141
+                        end: 148
             deadinfo: null
-            deadlabels: []
+            deadlabels:
+                - name: foo
+                  reason: You can't use `foo` because this label is not possible here.
+                  labelreason: Query is using aggregation with `by(instance, version, package)`, only labels included inside `by(...)` will be present on the results.
+                  usagefragment:
+                    start: 95
+                    end: 98
+                  labelfragment:
+                    start: 127
+                    end: 130
+                  kind: 0
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] deb_package_version'
@@ -5609,6 +5618,7 @@ output:
             isconditional: false
           op: 57396
           depth: 0
+          ison: false
       unless: []
       returninfo:
         logicalexpr: ""
@@ -5810,17 +5820,17 @@ output:
                 start: 0
                 end: 59
         cluster:
-            reason: Query is using one-to-many vector matching with `group_right(cluster, env)`, all labels included inside `group_right(...)` will be include on the results.
+            reason: Query is using `group_right(cluster, env)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
             kind: included
             fragment:
-                start: 11
-                end: 22
+                start: 23
+                end: 30
         env:
-            reason: Query is using one-to-many vector matching with `group_right(cluster, env)`, all labels included inside `group_right(...)` will be include on the results.
+            reason: Query is using `group_right(cluster, env)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
             kind: included
             fragment:
-                start: 11
-                end: 22
+                start: 32
+                end: 35
         job:
             reason: All labels passed to absent() call will be present on the results if the query doesn't match anything.
             kind: guaranteed
@@ -5836,8 +5846,7 @@ output:
         - node: '[*parser.Call] absent(foo{job="xxx"})'
           op: absent
       joins:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           addedlabels:
             - cluster
             - env
@@ -5868,6 +5877,7 @@ output:
             isconditional: false
           op: 57395
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -5923,8 +5933,7 @@ output:
         - node: '[*parser.Call] absent(foo{job="xxx"})'
           op: absent
       joins:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           addedlabels: []
           src:
             labels: {}
@@ -5953,6 +5962,7 @@ output:
             isconditional: false
           op: 57395
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -6283,8 +6293,8 @@ output:
             reason: Query is using aggregation with `by(pod)`, only labels included inside `by(...)` will be present on the results.
             kind: included
             fragment:
-                start: 18
-                end: 21
+                start: 22
+                end: 25
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -6370,8 +6380,8 @@ output:
             reason: Query is using one-to-one vector matching with `ignoring(job)`, all labels included inside `ignoring(...)` will be removed on the results.
             kind: excluded
             fragment:
-                start: 37
-                end: 45
+                start: 46
+                end: 49
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -6379,8 +6389,7 @@ output:
         - node: '[*parser.VectorSelector] up{instance="a",job="prometheus"}'
           op: ""
       joins:
-        - "on": []
-          ignoring:
+        - matchinglabels:
             - job
           addedlabels: []
           src:
@@ -6422,6 +6431,7 @@ output:
             isconditional: false
           op: 57395
           depth: 0
+          ison: false
       unless: []
       returninfo:
         logicalexpr: ""
@@ -6462,20 +6472,20 @@ output:
             reason: Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.
             kind: excluded
             fragment:
-                start: 5
-                end: 12
+                start: 21
+                end: 28
         instance:
             reason: Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.
             kind: excluded
             fragment:
-                start: 5
-                end: 12
+                start: 30
+                end: 38
         router:
             reason: Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.
             kind: excluded
             fragment:
-                start: 5
-                end: 12
+                start: 13
+                end: 19
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -6507,7 +6517,7 @@ output:
             kind: excluded
             fragment:
                 start: 216
-                end: 218
+                end: 220
         __name__:
             reason: Binary operation between two vectors removes metric names.
             kind: excluded
@@ -6519,25 +6529,25 @@ output:
             kind: excluded
             fragment:
                 start: 216
-                end: 218
+                end: 220
         colo_id:
             reason: Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.
             kind: excluded
             fragment:
-                start: 119
-                end: 126
+                start: 135
+                end: 142
         instance:
             reason: Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.
             kind: excluded
             fragment:
-                start: 119
-                end: 126
+                start: 144
+                end: 152
         router:
             reason: Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.
             kind: excluded
             fragment:
-                start: 119
-                end: 126
+                start: 127
+                end: 133
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -6547,8 +6557,7 @@ output:
         - node: '[*parser.AggregateExpr] sum without (router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"})'
           op: sum
       joins:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           addedlabels: []
           src:
             labels:
@@ -6603,6 +6612,7 @@ output:
             isconditional: false
           op: 57391
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -6636,20 +6646,20 @@ output:
             reason: Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.
             kind: excluded
             fragment:
-                start: 307
-                end: 314
+                start: 323
+                end: 330
         instance:
             reason: Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.
             kind: excluded
             fragment:
-                start: 307
-                end: 314
+                start: 332
+                end: 340
         router:
             reason: Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.
             kind: excluded
             fragment:
-                start: 307
-                end: 314
+                start: 315
+                end: 321
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -6755,26 +6765,26 @@ output:
             reason: Query is using aggregation with `by(region, target, colo_name)`, only labels included inside `by(...)` will be present on the results.
             kind: included
             fragment:
-                start: 5
-                end: 8
+                start: 25
+                end: 34
         job:
             reason: Query is using aggregation with `by(region, target, colo_name)`, only labels included inside `by(...)` will be present on the results.
             kind: excluded
             fragment:
                 start: 5
-                end: 8
+                end: 35
         region:
             reason: Query is using aggregation with `by(region, target, colo_name)`, only labels included inside `by(...)` will be present on the results.
             kind: included
             fragment:
-                start: 5
-                end: 8
+                start: 9
+                end: 15
         target:
             reason: Query is using aggregation with `by(region, target, colo_name)`, only labels included inside `by(...)` will be present on the results.
             kind: included
             fragment:
-                start: 5
-                end: 8
+                start: 17
+                end: 23
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -6840,29 +6850,35 @@ output:
             end: 100
       deadlabels:
         - name: region
-          reason: Calling `vector()` will return a vector value with no labels.
-          namepos:
+          reason: You can't use `region` because this label is not possible here.
+          labelreason: Calling `vector()` will return a vector value with no labels.
+          usagefragment:
             start: 9
             end: 15
-          fragment:
+          labelfragment:
             start: 91
             end: 97
+          kind: 0
         - name: target
-          reason: Calling `vector()` will return a vector value with no labels.
-          namepos:
+          reason: You can't use `target` because this label is not possible here.
+          labelreason: Calling `vector()` will return a vector value with no labels.
+          usagefragment:
             start: 17
             end: 23
-          fragment:
+          labelfragment:
             start: 91
             end: 97
+          kind: 0
         - name: colo_name
-          reason: Calling `vector()` will return a vector value with no labels.
-          namepos:
+          reason: You can't use `colo_name` because this label is not possible here.
+          labelreason: Calling `vector()` will return a vector value with no labels.
+          usagefragment:
             start: 25
             end: 34
-          fragment:
+          labelfragment:
             start: 91
             end: 97
+          kind: 0
       returns: vector
       operations:
         - args:
@@ -7028,8 +7044,7 @@ output:
           node: '[*parser.Call] vector(0)'
           op: vector
       joins:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           addedlabels: []
           src:
             labels:
@@ -7066,6 +7081,7 @@ output:
             isconditional: false
           op: 57388
           depth: 0
+          ison: false
       unless: []
       returninfo:
         logicalexpr: ""
@@ -7649,8 +7665,7 @@ output:
         - node: '[*parser.AggregateExpr] sum(sometimes{foo!="bar"})'
           op: sum
       joins:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           addedlabels: []
           src:
             labels: {}
@@ -7679,8 +7694,8 @@ output:
             isconditional: true
           op: 57389
           depth: 0
-        - "on": []
-          ignoring: []
+          ison: false
+        - matchinglabels: []
           addedlabels: []
           src:
             labels:
@@ -7723,8 +7738,8 @@ output:
             isconditional: false
           op: 57389
           depth: 0
-        - "on": []
-          ignoring: []
+          ison: false
+        - matchinglabels: []
           addedlabels: []
           src:
             labels: {}
@@ -7753,6 +7768,7 @@ output:
             isconditional: true
           op: 57389
           depth: 0
+          ison: false
       unless: []
       returninfo:
         logicalexpr: ""
@@ -7785,8 +7801,7 @@ output:
           node: '[*parser.Call] vector(1)'
           op: vector
       joins:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           addedlabels: []
           src:
             labels: {}
@@ -7815,8 +7830,8 @@ output:
             isconditional: true
           op: 57389
           depth: 0
-        - "on": []
-          ignoring: []
+          ison: false
+        - matchinglabels: []
           addedlabels: []
           src:
             labels:
@@ -7859,8 +7874,8 @@ output:
             isconditional: false
           op: 57389
           depth: 0
-        - "on": []
-          ignoring: []
+          ison: false
+        - matchinglabels: []
           addedlabels: []
           src:
             labels: {}
@@ -7889,6 +7904,7 @@ output:
             isconditional: true
           op: 57389
           depth: 0
+          ison: false
       unless: []
       returninfo:
         logicalexpr: ""
@@ -7961,8 +7977,7 @@ output:
         - node: '[*parser.Call] rate(metric2[5m])'
           op: rate
       joins:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           addedlabels: []
           src:
             labels: {}
@@ -7993,8 +8008,8 @@ output:
             isconditional: false
           op: 57383
           depth: 0
-        - "on": []
-          ignoring: []
+          ison: false
+        - matchinglabels: []
           addedlabels: []
           src:
             labels:
@@ -8031,8 +8046,8 @@ output:
             isconditional: false
           op: 57383
           depth: 0
-        - "on": []
-          ignoring: []
+          ison: false
+        - matchinglabels: []
           addedlabels: []
           src:
             labels:
@@ -8069,8 +8084,8 @@ output:
             isconditional: false
           op: 57383
           depth: 0
-        - "on": []
-          ignoring: []
+          ison: false
+        - matchinglabels: []
           addedlabels: []
           src:
             labels:
@@ -8107,6 +8122,7 @@ output:
             isconditional: false
           op: 57383
           depth: 0
+          ison: false
       unless: []
       returninfo:
         logicalexpr: ""
@@ -8145,8 +8161,7 @@ output:
           node: '[*parser.Call] vector(0)'
           op: vector
       joins:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           addedlabels: []
           src:
             labels: {}
@@ -8177,8 +8192,8 @@ output:
             isconditional: false
           op: 57383
           depth: 0
-        - "on": []
-          ignoring: []
+          ison: false
+        - matchinglabels: []
           addedlabels: []
           src:
             labels:
@@ -8215,8 +8230,8 @@ output:
             isconditional: false
           op: 57383
           depth: 0
-        - "on": []
-          ignoring: []
+          ison: false
+        - matchinglabels: []
           addedlabels: []
           src:
             labels:
@@ -8253,8 +8268,8 @@ output:
             isconditional: false
           op: 57383
           depth: 0
-        - "on": []
-          ignoring: []
+          ison: false
+        - matchinglabels: []
           addedlabels: []
           src:
             labels:
@@ -8291,6 +8306,7 @@ output:
             isconditional: false
           op: 57383
           depth: 0
+          ison: false
       unless: []
       returninfo:
         logicalexpr: vector(0) + vector(1) + vector(2)
@@ -8555,8 +8571,7 @@ output:
           op: ""
       joins: []
       unless:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           src:
             labels:
                 "":
@@ -8594,6 +8609,7 @@ output:
             type: function
             fixedlabels: true
             isconditional: false
+          ison: false
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -8634,8 +8650,7 @@ output:
           op: ""
       joins: []
       unless:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           src:
             labels:
                 "":
@@ -8669,6 +8684,7 @@ output:
             type: function
             fixedlabels: true
             isconditional: false
+          ison: true
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -8705,9 +8721,8 @@ output:
           op: ""
       joins: []
       unless:
-        - "on":
+        - matchinglabels:
             - job
-          ignoring: []
           src:
             labels:
                 "":
@@ -8745,6 +8760,7 @@ output:
             type: function
             fixedlabels: true
             isconditional: false
+          ison: true
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -8789,26 +8805,26 @@ output:
             reason: Query is using aggregation with `by(instance, cluster)`, only labels included inside `by(...)` will be present on the results.
             kind: included
             fragment:
-                start: 5
-                end: 8
+                start: 19
+                end: 26
         instance:
             reason: Query is using aggregation with `by(instance, cluster)`, only labels included inside `by(...)` will be present on the results.
             kind: included
             fragment:
-                start: 5
-                end: 8
+                start: 9
+                end: 17
         kubernetes_role:
             reason: Query is using aggregation with `by(instance, cluster)`, only labels included inside `by(...)` will be present on the results.
             kind: excluded
             fragment:
                 start: 5
-                end: 8
+                end: 27
         role:
             reason: Query is using aggregation with `by(instance, cluster)`, only labels included inside `by(...)` will be present on the results.
             kind: excluded
             fragment:
                 start: 5
-                end: 8
+                end: 27
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -8819,8 +8835,7 @@ output:
           op: max
       joins: []
       unless:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           src:
             labels:
                 "":
@@ -8836,23 +8851,23 @@ output:
                         start: 95
                         end: 303
                 cluster:
-                    reason: Query is using many-to-one vector matching with `group_left(cluster)`, all labels included inside `group_left(...)` will be include on the results.
+                    reason: Query is using `group_left(cluster)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
                     kind: included
                     fragment:
-                        start: 222
-                        end: 233
+                        start: 234
+                        end: 241
                 instance:
                     reason: Query is using many-to-one vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
                     kind: included
                     fragment:
-                        start: 208
-                        end: 211
+                        start: 212
+                        end: 220
                 name:
                     reason: Query is using aggregation with `by(instance, cluster)`, only labels included inside `by(...)` will be present on the results.
                     kind: excluded
                     fragment:
                         start: 99
-                        end: 102
+                        end: 121
             deadinfo: null
             deadlabels: []
             returns: vector
@@ -8862,9 +8877,8 @@ output:
                 - node: '[*parser.AggregateExpr] sum by (instance, cluster) (time() - node_systemd_timer_last_trigger_seconds{name=~"etcd-defrag-.*.timer"})'
                   op: sum
             joins:
-                - "on":
+                - matchinglabels:
                     - instance
-                  ignoring: []
                   addedlabels:
                     - cluster
                   src:
@@ -8906,6 +8920,7 @@ output:
                     isconditional: false
                   op: 57395
                   depth: 0
+                  ison: true
             unless: []
             returninfo:
                 logicalexpr: ""
@@ -8922,6 +8937,7 @@ output:
             type: aggregation
             fixedlabels: true
             isconditional: false
+          ison: false
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -8949,7 +8965,7 @@ output:
             kind: excluded
             fragment:
                 start: 13
-                end: 15
+                end: 17
         __name__:
             reason: Binary operation between two vectors removes metric names.
             kind: excluded
@@ -8961,7 +8977,7 @@ output:
             kind: excluded
             fragment:
                 start: 13
-                end: 15
+                end: 17
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -8969,8 +8985,7 @@ output:
         - node: '[*parser.VectorSelector] foo{a="1"}'
           op: ""
       joins:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           addedlabels: []
           src:
             labels:
@@ -9005,6 +9020,7 @@ output:
             isconditional: false
           op: 57395
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -9041,23 +9057,23 @@ output:
                 start: 0
                 end: 10
         c:
-            reason: Query is using many-to-one vector matching with `group_left(c, d)`, all labels included inside `group_left(...)` will be include on the results.
+            reason: Query is using `group_left(c, d)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
             kind: included
             fragment:
-                start: 26
-                end: 36
+                start: 37
+                end: 38
         d:
-            reason: Query is using many-to-one vector matching with `group_left(c, d)`, all labels included inside `group_left(...)` will be include on the results.
+            reason: Query is using `group_left(c, d)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
             kind: included
             fragment:
-                start: 26
-                end: 36
+                start: 39
+                end: 40
         instance:
             reason: Query is using many-to-one vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
             kind: included
             fragment:
-                start: 13
-                end: 15
+                start: 16
+                end: 24
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -9065,9 +9081,8 @@ output:
         - node: '[*parser.VectorSelector] foo{a="1"}'
           op: ""
       joins:
-        - "on":
+        - matchinglabels:
             - instance
-          ignoring: []
           addedlabels:
             - c
             - d
@@ -9104,6 +9119,7 @@ output:
             isconditional: false
           op: 57395
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -9140,23 +9156,23 @@ output:
                 start: 43
                 end: 53
         c:
-            reason: Query is using one-to-many vector matching with `group_right(c, d)`, all labels included inside `group_right(...)` will be include on the results.
+            reason: Query is using `group_right(c, d)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
             kind: included
             fragment:
-                start: 26
-                end: 37
+                start: 38
+                end: 39
         d:
-            reason: Query is using one-to-many vector matching with `group_right(c, d)`, all labels included inside `group_right(...)` will be include on the results.
+            reason: Query is using `group_right(c, d)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
             kind: included
             fragment:
-                start: 26
-                end: 37
+                start: 40
+                end: 41
         instance:
             reason: Query is using one-to-many vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
             kind: included
             fragment:
-                start: 13
-                end: 15
+                start: 16
+                end: 24
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -9164,9 +9180,8 @@ output:
         - node: '[*parser.VectorSelector] bar{b="2"}'
           op: ""
       joins:
-        - "on":
+        - matchinglabels:
             - instance
-          ignoring: []
           addedlabels:
             - c
             - d
@@ -9203,6 +9218,7 @@ output:
             isconditional: false
           op: 57395
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -9231,7 +9247,7 @@ output:
             kind: excluded
             fragment:
                 start: 13
-                end: 15
+                end: 25
         __name__:
             reason: Binary operation between two vectors removes metric names.
             kind: excluded
@@ -9243,13 +9259,13 @@ output:
             kind: excluded
             fragment:
                 start: 13
-                end: 15
+                end: 25
         instance:
             reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
             kind: included
             fragment:
-                start: 13
-                end: 15
+                start: 16
+                end: 24
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -9257,9 +9273,8 @@ output:
         - node: '[*parser.VectorSelector] foo{a="1"}'
           op: ""
       joins:
-        - "on":
+        - matchinglabels:
             - instance
-          ignoring: []
           addedlabels: []
           src:
             labels:
@@ -9312,6 +9327,7 @@ output:
             isconditional: false
           op: 57395
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -9348,23 +9364,23 @@ output:
                 start: 0
                 end: 10
         c:
-            reason: Query is using many-to-one vector matching with `group_left(c, d)`, all labels included inside `group_left(...)` will be include on the results.
+            reason: Query is using `group_left(c, d)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
             kind: included
             fragment:
-                start: 26
-                end: 36
+                start: 37
+                end: 38
         d:
-            reason: Query is using many-to-one vector matching with `group_left(c, d)`, all labels included inside `group_left(...)` will be include on the results.
+            reason: Query is using `group_left(c, d)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
             kind: included
             fragment:
-                start: 26
-                end: 36
+                start: 39
+                end: 40
         instance:
             reason: Query is using many-to-one vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
             kind: included
             fragment:
-                start: 13
-                end: 15
+                start: 16
+                end: 24
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -9372,9 +9388,8 @@ output:
         - node: '[*parser.VectorSelector] foo{a="1"}'
           op: ""
       joins:
-        - "on":
+        - matchinglabels:
             - instance
-          ignoring: []
           addedlabels:
             - c
             - d
@@ -9403,7 +9418,27 @@ output:
                 fragment:
                     start: 42
                     end: 45
-            deadlabels: []
+            deadlabels:
+                - name: c
+                  reason: You can't use `c` because this label is not possible here.
+                  labelreason: Query is using aggregation that removes all labels.
+                  usagefragment:
+                    start: 37
+                    end: 38
+                  labelfragment:
+                    start: 42
+                    end: 45
+                  kind: 0
+                - name: d
+                  reason: You can't use `d` because this label is not possible here.
+                  labelreason: Query is using aggregation that removes all labels.
+                  usagefragment:
+                    start: 39
+                    end: 40
+                  labelfragment:
+                    start: 42
+                    end: 45
+                  kind: 0
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar{b="2"}'
@@ -9429,6 +9464,7 @@ output:
             isconditional: false
           op: 57395
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -9465,23 +9501,23 @@ output:
                 start: 48
                 end: 58
         c:
-            reason: Query is using one-to-many vector matching with `group_right(c, d)`, all labels included inside `group_right(...)` will be include on the results.
+            reason: Query is using `group_right(c, d)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
             kind: included
             fragment:
-                start: 31
-                end: 42
+                start: 43
+                end: 44
         d:
-            reason: Query is using one-to-many vector matching with `group_right(c, d)`, all labels included inside `group_right(...)` will be include on the results.
+            reason: Query is using `group_right(c, d)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
             kind: included
             fragment:
-                start: 31
-                end: 42
+                start: 45
+                end: 46
         instance:
             reason: Query is using one-to-many vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
             kind: included
             fragment:
-                start: 18
-                end: 20
+                start: 21
+                end: 29
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -9489,9 +9525,8 @@ output:
         - node: '[*parser.VectorSelector] bar{b="2"}'
           op: ""
       joins:
-        - "on":
+        - matchinglabels:
             - instance
-          ignoring: []
           addedlabels:
             - c
             - d
@@ -9520,7 +9555,27 @@ output:
                 fragment:
                     start: 0
                     end: 3
-            deadlabels: []
+            deadlabels:
+                - name: c
+                  reason: You can't use `c` because this label is not possible here.
+                  labelreason: Query is using aggregation that removes all labels.
+                  usagefragment:
+                    start: 43
+                    end: 44
+                  labelfragment:
+                    start: 0
+                    end: 3
+                  kind: 0
+                - name: d
+                  reason: You can't use `d` because this label is not possible here.
+                  labelreason: Query is using aggregation that removes all labels.
+                  usagefragment:
+                    start: 45
+                    end: 46
+                  labelfragment:
+                    start: 0
+                    end: 3
+                  kind: 0
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] foo{a="1"}'
@@ -9546,6 +9601,7 @@ output:
             isconditional: false
           op: 57395
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -9582,23 +9638,23 @@ output:
                 start: 0
                 end: 10
         c:
-            reason: Query is using many-to-one vector matching with `group_left(c, d)`, all labels included inside `group_left(...)` will be include on the results.
+            reason: Query is using `group_left(c, d)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
             kind: included
             fragment:
-                start: 26
-                end: 36
+                start: 37
+                end: 38
         d:
-            reason: Query is using many-to-one vector matching with `group_left(c, d)`, all labels included inside `group_left(...)` will be include on the results.
+            reason: Query is using `group_left(c, d)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
             kind: included
             fragment:
-                start: 26
-                end: 36
+                start: 39
+                end: 40
         instance:
             reason: Query is using many-to-one vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
             kind: included
             fragment:
-                start: 13
-                end: 15
+                start: 16
+                end: 24
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -9606,9 +9662,8 @@ output:
         - node: '[*parser.VectorSelector] foo{a="1"}'
           op: ""
       joins:
-        - "on":
+        - matchinglabels:
             - instance
-          ignoring: []
           addedlabels:
             - c
             - d
@@ -9630,13 +9685,13 @@ output:
                     reason: Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
                     kind: excluded
                     fragment:
-                        start: 58
-                        end: 65
+                        start: 66
+                        end: 74
             deadinfo:
                 reason: The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
                 fragment:
-                    start: 58
-                    end: 65
+                    start: 66
+                    end: 74
             deadlabels: []
             returns: vector
             operations:
@@ -9663,6 +9718,7 @@ output:
             isconditional: false
           op: 57395
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -9699,23 +9755,23 @@ output:
                 start: 66
                 end: 76
         c:
-            reason: Query is using one-to-many vector matching with `group_right(c, d)`, all labels included inside `group_right(...)` will be include on the results.
+            reason: Query is using `group_right(c, d)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
             kind: included
             fragment:
-                start: 49
-                end: 60
+                start: 61
+                end: 62
         d:
-            reason: Query is using one-to-many vector matching with `group_right(c, d)`, all labels included inside `group_right(...)` will be include on the results.
+            reason: Query is using `group_right(c, d)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
             kind: included
             fragment:
-                start: 49
-                end: 60
+                start: 63
+                end: 64
         instance:
             reason: Query is using one-to-many vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
             kind: included
             fragment:
-                start: 36
-                end: 38
+                start: 39
+                end: 47
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -9723,9 +9779,8 @@ output:
         - node: '[*parser.VectorSelector] bar{b="2"}'
           op: ""
       joins:
-        - "on":
+        - matchinglabels:
             - instance
-          ignoring: []
           addedlabels:
             - c
             - d
@@ -9747,13 +9802,13 @@ output:
                     reason: Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
                     kind: excluded
                     fragment:
-                        start: 16
-                        end: 23
+                        start: 24
+                        end: 32
             deadinfo:
                 reason: The left hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
                 fragment:
-                    start: 16
-                    end: 23
+                    start: 24
+                    end: 32
             deadlabels: []
             returns: vector
             operations:
@@ -9780,6 +9835,7 @@ output:
             isconditional: false
           op: 57395
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -9820,26 +9876,26 @@ output:
             reason: Query is using many-to-many vector matching with `on(device, instance)`, labels included inside `on(...)` will be present on the results.
             kind: included
             fragment:
-                start: 112
-                end: 114
+                start: 274
+                end: 280
         group:
-            reason: Query is using many-to-one vector matching with `group_left(group)`, all labels included inside `group_left(...)` will be include on the results.
+            reason: Query is using `group_left(group)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
             kind: included
             fragment:
-                start: 333
-                end: 343
+                start: 344
+                end: 349
         instance:
             reason: Query is using many-to-one vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
             kind: included
             fragment:
-                start: 112
-                end: 114
+                start: 323
+                end: 331
         source_instance:
             reason: Query is using aggregation with `without(source_instance)`, all labels included inside `without(...)` will be removed from the results.
             kind: excluded
             fragment:
-                start: 6
-                end: 14
+                start: 15
+                end: 30
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -9851,10 +9907,9 @@ output:
         - node: '[*parser.AggregateExpr] max without (source_instance) (increase(kernel_device_io_errors_total{device!~"loop.+"}[2h]) > 3 unless on (instance, device) (increase(kernel_device_io_soft_errors_total{device!~"loop.+"}[2h5m]) * 2 > increase(kernel_device_io_errors_total[2h])) and on (device, instance) absent(node_disk_info))'
           op: max
       joins:
-        - "on":
+        - matchinglabels:
             - device
             - instance
-          ignoring: []
           addedlabels: []
           src:
             labels:
@@ -9905,9 +9960,9 @@ output:
             isconditional: false
           op: 57389
           depth: 1
-        - "on":
+          ison: true
+        - matchinglabels:
             - instance
-          ignoring: []
           addedlabels:
             - group
           src:
@@ -9950,11 +10005,11 @@ output:
             isconditional: false
           op: 57395
           depth: 0
+          ison: true
       unless:
-        - "on":
+        - matchinglabels:
             - instance
             - device
-          ignoring: []
           src:
             labels:
                 __name__:
@@ -9972,8 +10027,7 @@ output:
                 - node: '[*parser.Call] increase(kernel_device_io_soft_errors_total{device!~"loop.+"}[2h5m])'
                   op: increase
             joins:
-                - "on": []
-                  ignoring: []
+                - matchinglabels: []
                   addedlabels: []
                   src:
                     labels: {}
@@ -10004,6 +10058,7 @@ output:
                     isconditional: false
                   op: 57388
                   depth: 0
+                  ison: false
             unless: []
             returninfo:
                 logicalexpr: ""
@@ -10020,6 +10075,7 @@ output:
             type: function
             fixedlabels: false
             isconditional: true
+          ison: true
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -10047,7 +10103,7 @@ output:
             kind: excluded
             fragment:
                 start: 26
-                end: 28
+                end: 30
         __name__:
             reason: Binary operation between two vectors removes metric names.
             kind: excluded
@@ -10059,13 +10115,13 @@ output:
             kind: excluded
             fragment:
                 start: 16
-                end: 18
+                end: 23
         job:
             reason: Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.
             kind: excluded
             fragment:
                 start: 26
-                end: 28
+                end: 30
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -10075,8 +10131,7 @@ output:
         - node: '[*parser.AggregateExpr] sum by (job) (foo{a="1"})'
           op: sum
       joins:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           addedlabels: []
           src:
             labels:
@@ -10111,6 +10166,7 @@ output:
             isconditional: false
           op: 57395
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -10150,18 +10206,20 @@ output:
             reason: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
             kind: excluded
             fragment:
-                start: 13
-                end: 20
+                start: 21
+                end: 24
       deadinfo: null
       deadlabels:
         - name: job
-          reason: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
-          namepos:
+          reason: You can't use `job` because this label is not possible here.
+          labelreason: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
+          usagefragment:
             start: 30
             end: 33
-          fragment:
-            start: 13
-            end: 20
+          labelfragment:
+            start: 21
+            end: 24
+          kind: 0
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo'
@@ -10214,8 +10272,8 @@ output:
             reason: Query is using many-to-one vector matching with `on(prometheus)`, labels included inside `on(...)` will be present on the results.
             kind: included
             fragment:
-                start: 47
-                end: 49
+                start: 50
+                end: 60
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -10223,9 +10281,8 @@ output:
         - node: '[*parser.VectorSelector] prometheus:scrape_series_added:since_gc:sum'
           op: ""
       joins:
-        - "on":
+        - matchinglabels:
             - prometheus
-          ignoring: []
           addedlabels: []
           src:
             labels:
@@ -10245,14 +10302,14 @@ output:
                     reason: Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
                     kind: included
                     fragment:
-                        start: 158
-                        end: 160
+                        start: 161
+                        end: 169
                 job:
                     reason: Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
                     kind: excluded
                     fragment:
                         start: 158
-                        end: 160
+                        end: 170
                 prometheus:
                     reason: This label will be added to the result by label_replace() call.
                     kind: guaranteed
@@ -10277,8 +10334,7 @@ output:
                   node: '[*parser.Call] label_replace(max by (instance) (max_over_time(go_memstats_alloc_bytes{job="prometheus"}[2h])) / max by (instance) (max_over_time(prometheus_tsdb_head_series[2h])), "prometheus", "$1", "instance", "(.+)")'
                   op: label_replace
             joins:
-                - "on": []
-                  ignoring: []
+                - matchinglabels: []
                   addedlabels: []
                   src:
                     labels:
@@ -10298,8 +10354,8 @@ output:
                             reason: Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
                             kind: included
                             fragment:
-                                start: 229
-                                end: 231
+                                start: 232
+                                end: 240
                     deadinfo: null
                     deadlabels: []
                     returns: vector
@@ -10329,6 +10385,7 @@ output:
                     isconditional: false
                   op: 57384
                   depth: 0
+                  ison: false
             unless: []
             returninfo:
                 logicalexpr: ""
@@ -10347,6 +10404,7 @@ output:
             isconditional: false
           op: 57395
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -10383,8 +10441,7 @@ output:
         - node: '[*parser.Call] day_of_week()'
           op: day_of_week
       joins:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           addedlabels: []
           src:
             labels:
@@ -10419,6 +10476,7 @@ output:
             isconditional: true
           op: 57389
           depth: 0
+          ison: false
       unless: []
       returninfo:
         logicalexpr: ""
@@ -10497,33 +10555,53 @@ output:
             kind: excluded
             fragment:
                 start: 5
-                end: 8
+                end: 18
         bar:
             reason: Query is using aggregation with `by(foo, bar)`, only labels included inside `by(...)` will be present on the results.
             kind: included
             fragment:
-                start: 5
-                end: 8
+                start: 14
+                end: 17
         bob:
             reason: Query is using aggregation with `by(foo, bar)`, only labels included inside `by(...)` will be present on the results.
             kind: excluded
             fragment:
                 start: 5
-                end: 8
+                end: 18
         foo:
             reason: Query is using aggregation with `by(foo, bar)`, only labels included inside `by(...)` will be present on the results.
             kind: included
             fragment:
-                start: 5
-                end: 8
+                start: 9
+                end: 12
         instance:
             reason: Query is using aggregation with `by(foo, bar)`, only labels included inside `by(...)` will be present on the results.
             kind: excluded
             fragment:
                 start: 5
-                end: 8
+                end: 18
       deadinfo: null
-      deadlabels: []
+      deadlabels:
+        - name: bob
+          reason: Previously joined label `bob` is being removed from the results.
+          labelreason: Query is using `group_left(bob, alice)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          usagefragment:
+            start: 5
+            end: 18
+          labelfragment:
+            start: 78
+            end: 81
+          kind: 3
+        - name: alice
+          reason: Previously joined label `alice` is being removed from the results.
+          labelreason: Query is using `group_left(bob, alice)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          usagefragment:
+            start: 5
+            end: 18
+          labelfragment:
+            start: 83
+            end: 88
+          kind: 3
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] errors_total'
@@ -10533,9 +10611,8 @@ output:
         - node: '[*parser.AggregateExpr] sum by (foo, bar) (rate(errors_total[5m]) * on (instance) group_left (bob, alice) server_errors_total)'
           op: sum
       joins:
-        - "on":
+        - matchinglabels:
             - instance
-          ignoring: []
           addedlabels:
             - bob
             - alice
@@ -10566,6 +10643,7 @@ output:
             isconditional: false
           op: 57395
           depth: 1
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -10674,8 +10752,7 @@ output:
           node: '[*parser.Call] vector(1)'
           op: vector
       joins:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           addedlabels: []
           src:
             labels:
@@ -10710,6 +10787,7 @@ output:
             isconditional: true
           op: 57389
           depth: 0
+          ison: false
       unless: []
       returninfo:
         logicalexpr: ""
@@ -10782,13 +10860,13 @@ output:
             kind: excluded
             fragment:
                 start: 6
-                end: 9
+                end: 17
         region:
             reason: Query is using aggregation with `by(region)`, only labels included inside `by(...)` will be present on the results.
             kind: included
             fragment:
-                start: 6
-                end: 9
+                start: 10
+                end: 16
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -10870,8 +10948,8 @@ output:
             reason: Query is using many-to-many vector matching with `on(colo_name)`, labels included inside `on(...)` will be present on the results.
             kind: included
             fragment:
-                start: 341
-                end: 344
+                start: 412
+                end: 421
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -10883,8 +10961,7 @@ output:
         - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h]) or vector(0))'
           op: avg
       joins:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           addedlabels: []
           src:
             labels:
@@ -10904,8 +10981,8 @@ output:
                     reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
                     kind: included
                     fragment:
-                        start: 147
-                        end: 150
+                        start: 151
+                        end: 160
             deadinfo: null
             deadlabels: []
             returns: vector
@@ -10935,8 +11012,8 @@ output:
             isconditional: false
           op: 57384
           depth: 0
-        - "on": []
-          ignoring: []
+          ison: false
+        - matchinglabels: []
           addedlabels: []
           src:
             labels:
@@ -10961,13 +11038,15 @@ output:
             deadinfo: null
             deadlabels:
                 - name: colo_name
-                  reason: Calling `vector()` will return a vector value with no labels.
-                  namepos:
+                  reason: You can't use `colo_name` because this label is not possible here.
+                  labelreason: Calling `vector()` will return a vector value with no labels.
+                  usagefragment:
                     start: 151
                     end: 160
-                  fragment:
+                  labelfragment:
                     start: 131
                     end: 137
+                  kind: 0
             returns: vector
             operations:
                 - args:
@@ -10995,8 +11074,8 @@ output:
             isconditional: false
           op: 57384
           depth: 0
-        - "on": []
-          ignoring: []
+          ison: false
+        - matchinglabels: []
           addedlabels: []
           src:
             labels:
@@ -11016,8 +11095,8 @@ output:
                     reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
                     kind: included
                     fragment:
-                        start: 241
-                        end: 244
+                        start: 245
+                        end: 254
             deadinfo: null
             deadlabels: []
             returns: vector
@@ -11029,8 +11108,7 @@ output:
                 - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h] offset 1d) or vector(0))'
                   op: avg
             joins:
-                - "on": []
-                  ignoring: []
+                - matchinglabels: []
                   addedlabels: []
                   src:
                     labels:
@@ -11050,8 +11128,8 @@ output:
                             reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
                             kind: included
                             fragment:
-                                start: 320
-                                end: 323
+                                start: 324
+                                end: 333
                     deadinfo: null
                     deadlabels: []
                     returns: vector
@@ -11081,8 +11159,8 @@ output:
                     isconditional: false
                   op: 57384
                   depth: 0
-                - "on": []
-                  ignoring: []
+                  ison: false
+                - matchinglabels: []
                   addedlabels: []
                   src:
                     labels:
@@ -11107,13 +11185,15 @@ output:
                     deadinfo: null
                     deadlabels:
                         - name: colo_name
-                          reason: Calling `vector()` will return a vector value with no labels.
-                          namepos:
+                          reason: You can't use `colo_name` because this label is not possible here.
+                          labelreason: Calling `vector()` will return a vector value with no labels.
+                          usagefragment:
                             start: 324
                             end: 333
-                          fragment:
+                          labelfragment:
                             start: 306
                             end: 312
+                          kind: 0
                     returns: vector
                     operations:
                         - args:
@@ -11141,6 +11221,7 @@ output:
                     isconditional: false
                   op: 57384
                   depth: 0
+                  ison: false
             unless: []
             returninfo:
                 logicalexpr: ""
@@ -11159,8 +11240,8 @@ output:
             isconditional: false
           op: 57388
           depth: 0
-        - "on": []
-          ignoring: []
+          ison: false
+        - matchinglabels: []
           addedlabels: []
           src:
             labels:
@@ -11185,13 +11266,15 @@ output:
             deadinfo: null
             deadlabels:
                 - name: colo_name
-                  reason: Calling `vector()` will return a vector value with no labels.
-                  namepos:
+                  reason: You can't use `colo_name` because this label is not possible here.
+                  labelreason: Calling `vector()` will return a vector value with no labels.
+                  usagefragment:
                     start: 245
                     end: 254
-                  fragment:
+                  labelfragment:
                     start: 227
                     end: 233
+                  kind: 0
             returns: vector
             operations:
                 - args:
@@ -11201,8 +11284,7 @@ output:
                 - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h] offset 1d) or vector(0))'
                   op: avg
             joins:
-                - "on": []
-                  ignoring: []
+                - matchinglabels: []
                   addedlabels: []
                   src:
                     labels:
@@ -11222,8 +11304,8 @@ output:
                             reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
                             kind: included
                             fragment:
-                                start: 320
-                                end: 323
+                                start: 324
+                                end: 333
                     deadinfo: null
                     deadlabels: []
                     returns: vector
@@ -11253,8 +11335,8 @@ output:
                     isconditional: false
                   op: 57384
                   depth: 0
-                - "on": []
-                  ignoring: []
+                  ison: false
+                - matchinglabels: []
                   addedlabels: []
                   src:
                     labels:
@@ -11279,13 +11361,15 @@ output:
                     deadinfo: null
                     deadlabels:
                         - name: colo_name
-                          reason: Calling `vector()` will return a vector value with no labels.
-                          namepos:
+                          reason: You can't use `colo_name` because this label is not possible here.
+                          labelreason: Calling `vector()` will return a vector value with no labels.
+                          usagefragment:
                             start: 324
                             end: 333
-                          fragment:
+                          labelfragment:
                             start: 306
                             end: 312
+                          kind: 0
                     returns: vector
                     operations:
                         - args:
@@ -11313,6 +11397,7 @@ output:
                     isconditional: false
                   op: 57384
                   depth: 0
+                  ison: false
             unless: []
             returninfo:
                 logicalexpr: 5 * vector(0) / vector(1)
@@ -11331,9 +11416,9 @@ output:
             isconditional: false
           op: 57388
           depth: 0
-        - "on":
+          ison: false
+        - matchinglabels:
             - colo_name
-          ignoring: []
           addedlabels: []
           src:
             labels: {}
@@ -11362,9 +11447,9 @@ output:
             isconditional: true
           op: 57389
           depth: 0
-        - "on":
+          ison: true
+        - matchinglabels:
             - colo_name
-          ignoring: []
           addedlabels: []
           src:
             labels:
@@ -11405,9 +11490,9 @@ output:
             isconditional: true
           op: 57389
           depth: 0
-        - "on":
+          ison: true
+        - matchinglabels:
             - colo_name
-          ignoring: []
           addedlabels: []
           src:
             labels: {}
@@ -11436,9 +11521,9 @@ output:
             isconditional: true
           op: 57389
           depth: 0
-        - "on":
+          ison: true
+        - matchinglabels:
             - colo_name
-          ignoring: []
           addedlabels: []
           src:
             labels:
@@ -11479,6 +11564,7 @@ output:
             isconditional: true
           op: 57389
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -11512,8 +11598,8 @@ output:
             reason: Query is using many-to-many vector matching with `on(colo_name)`, labels included inside `on(...)` will be present on the results.
             kind: included
             fragment:
-                start: 341
-                end: 344
+                start: 412
+                end: 421
       deadinfo:
         reason: '`vector(0) / vector(1) > 5 * vector(0) / vector(1)` always evaluates to `0 > 0` which is not possible, so it will never return anything.'
         fragment:
@@ -11521,21 +11607,25 @@ output:
             end: 59
       deadlabels:
         - name: colo_name
-          reason: Calling `vector()` will return a vector value with no labels.
-          namepos:
+          reason: You can't use `colo_name` because this label is not possible here.
+          labelreason: Calling `vector()` will return a vector value with no labels.
+          usagefragment:
             start: 68
             end: 77
-          fragment:
+          labelfragment:
             start: 50
             end: 56
+          kind: 0
         - name: colo_name
-          reason: Calling `vector()` will return a vector value with no labels.
-          namepos:
+          reason: You can't use `colo_name` because this label is not possible here.
+          labelreason: Calling `vector()` will return a vector value with no labels.
+          usagefragment:
             start: 345
             end: 354
-          fragment:
+          labelfragment:
             start: 50
             end: 56
+          kind: 0
       returns: vector
       operations:
         - args:
@@ -11545,8 +11635,7 @@ output:
         - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h]) or vector(0))'
           op: avg
       joins:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           addedlabels: []
           src:
             labels:
@@ -11566,8 +11655,8 @@ output:
                     reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
                     kind: included
                     fragment:
-                        start: 147
-                        end: 150
+                        start: 151
+                        end: 160
             deadinfo: null
             deadlabels: []
             returns: vector
@@ -11597,8 +11686,8 @@ output:
             isconditional: false
           op: 57384
           depth: 0
-        - "on": []
-          ignoring: []
+          ison: false
+        - matchinglabels: []
           addedlabels: []
           src:
             labels:
@@ -11623,13 +11712,15 @@ output:
             deadinfo: null
             deadlabels:
                 - name: colo_name
-                  reason: Calling `vector()` will return a vector value with no labels.
-                  namepos:
+                  reason: You can't use `colo_name` because this label is not possible here.
+                  labelreason: Calling `vector()` will return a vector value with no labels.
+                  usagefragment:
                     start: 151
                     end: 160
-                  fragment:
+                  labelfragment:
                     start: 131
                     end: 137
+                  kind: 0
             returns: vector
             operations:
                 - args:
@@ -11657,8 +11748,8 @@ output:
             isconditional: false
           op: 57384
           depth: 0
-        - "on": []
-          ignoring: []
+          ison: false
+        - matchinglabels: []
           addedlabels: []
           src:
             labels:
@@ -11678,8 +11769,8 @@ output:
                     reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
                     kind: included
                     fragment:
-                        start: 241
-                        end: 244
+                        start: 245
+                        end: 254
             deadinfo: null
             deadlabels: []
             returns: vector
@@ -11691,8 +11782,7 @@ output:
                 - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h] offset 1d) or vector(0))'
                   op: avg
             joins:
-                - "on": []
-                  ignoring: []
+                - matchinglabels: []
                   addedlabels: []
                   src:
                     labels:
@@ -11712,8 +11802,8 @@ output:
                             reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
                             kind: included
                             fragment:
-                                start: 320
-                                end: 323
+                                start: 324
+                                end: 333
                     deadinfo: null
                     deadlabels: []
                     returns: vector
@@ -11743,8 +11833,8 @@ output:
                     isconditional: false
                   op: 57384
                   depth: 0
-                - "on": []
-                  ignoring: []
+                  ison: false
+                - matchinglabels: []
                   addedlabels: []
                   src:
                     labels:
@@ -11769,13 +11859,15 @@ output:
                     deadinfo: null
                     deadlabels:
                         - name: colo_name
-                          reason: Calling `vector()` will return a vector value with no labels.
-                          namepos:
+                          reason: You can't use `colo_name` because this label is not possible here.
+                          labelreason: Calling `vector()` will return a vector value with no labels.
+                          usagefragment:
                             start: 324
                             end: 333
-                          fragment:
+                          labelfragment:
                             start: 306
                             end: 312
+                          kind: 0
                     returns: vector
                     operations:
                         - args:
@@ -11803,6 +11895,7 @@ output:
                     isconditional: false
                   op: 57384
                   depth: 0
+                  ison: false
             unless: []
             returninfo:
                 logicalexpr: ""
@@ -11821,8 +11914,8 @@ output:
             isconditional: false
           op: 57388
           depth: 0
-        - "on": []
-          ignoring: []
+          ison: false
+        - matchinglabels: []
           addedlabels: []
           src:
             labels:
@@ -11847,13 +11940,15 @@ output:
             deadinfo: null
             deadlabels:
                 - name: colo_name
-                  reason: Calling `vector()` will return a vector value with no labels.
-                  namepos:
+                  reason: You can't use `colo_name` because this label is not possible here.
+                  labelreason: Calling `vector()` will return a vector value with no labels.
+                  usagefragment:
                     start: 245
                     end: 254
-                  fragment:
+                  labelfragment:
                     start: 227
                     end: 233
+                  kind: 0
             returns: vector
             operations:
                 - args:
@@ -11863,8 +11958,7 @@ output:
                 - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h] offset 1d) or vector(0))'
                   op: avg
             joins:
-                - "on": []
-                  ignoring: []
+                - matchinglabels: []
                   addedlabels: []
                   src:
                     labels:
@@ -11884,8 +11978,8 @@ output:
                             reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
                             kind: included
                             fragment:
-                                start: 320
-                                end: 323
+                                start: 324
+                                end: 333
                     deadinfo: null
                     deadlabels: []
                     returns: vector
@@ -11915,8 +12009,8 @@ output:
                     isconditional: false
                   op: 57384
                   depth: 0
-                - "on": []
-                  ignoring: []
+                  ison: false
+                - matchinglabels: []
                   addedlabels: []
                   src:
                     labels:
@@ -11941,13 +12035,15 @@ output:
                     deadinfo: null
                     deadlabels:
                         - name: colo_name
-                          reason: Calling `vector()` will return a vector value with no labels.
-                          namepos:
+                          reason: You can't use `colo_name` because this label is not possible here.
+                          labelreason: Calling `vector()` will return a vector value with no labels.
+                          usagefragment:
                             start: 324
                             end: 333
-                          fragment:
+                          labelfragment:
                             start: 306
                             end: 312
+                          kind: 0
                     returns: vector
                     operations:
                         - args:
@@ -11975,6 +12071,7 @@ output:
                     isconditional: false
                   op: 57384
                   depth: 0
+                  ison: false
             unless: []
             returninfo:
                 logicalexpr: 5 * vector(0) / vector(1)
@@ -11993,9 +12090,9 @@ output:
             isconditional: false
           op: 57388
           depth: 0
-        - "on":
+          ison: false
+        - matchinglabels:
             - colo_name
-          ignoring: []
           addedlabels: []
           src:
             labels: {}
@@ -12024,9 +12121,9 @@ output:
             isconditional: true
           op: 57389
           depth: 0
-        - "on":
+          ison: true
+        - matchinglabels:
             - colo_name
-          ignoring: []
           addedlabels: []
           src:
             labels:
@@ -12067,9 +12164,9 @@ output:
             isconditional: true
           op: 57389
           depth: 0
-        - "on":
+          ison: true
+        - matchinglabels:
             - colo_name
-          ignoring: []
           addedlabels: []
           src:
             labels: {}
@@ -12098,9 +12195,9 @@ output:
             isconditional: true
           op: 57389
           depth: 0
-        - "on":
+          ison: true
+        - matchinglabels:
             - colo_name
-          ignoring: []
           addedlabels: []
           src:
             labels:
@@ -12141,6 +12238,7 @@ output:
             isconditional: true
           op: 57389
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: vector(0) / vector(1)
@@ -12185,8 +12283,7 @@ output:
         - node: '[*parser.AggregateExpr] sum(selector)'
           op: sum
       joins:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           addedlabels: []
           src:
             labels:
@@ -12229,6 +12326,7 @@ output:
             isconditional: false
           op: 57384
           depth: 0
+          ison: false
       unless: []
       returninfo:
         logicalexpr: ""
@@ -12274,14 +12372,14 @@ output:
             reason: Query is using aggregation with `by(dc)`, only labels included inside `by(...)` will be present on the results.
             kind: included
             fragment:
-                start: 7
-                end: 10
+                start: 11
+                end: 13
         instance:
             reason: Query is using aggregation with `by(dc)`, only labels included inside `by(...)` will be present on the results.
             kind: excluded
             fragment:
                 start: 7
-                end: 10
+                end: 14
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -12298,9 +12396,8 @@ output:
         - node: '[*parser.AggregateExpr] count by (dc) (max by (instance) (0 < (token_expiration - time()) < (6 * 60 * 60)) * on (instance) group_right () label_replace(configured_minions, "instance", "$1", "minion", "(.+)"))'
           op: count
       joins:
-        - "on":
+        - matchinglabels:
             - instance
-          ignoring: []
           addedlabels: []
           src:
             labels:
@@ -12320,8 +12417,8 @@ output:
                     reason: Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
                     kind: included
                     fragment:
-                        start: 68
-                        end: 71
+                        start: 72
+                        end: 80
             deadinfo: null
             deadlabels: []
             returns: vector
@@ -12349,6 +12446,7 @@ output:
             isconditional: true
           op: 57395
           depth: 1
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -12389,8 +12487,7 @@ output:
           node: '[*parser.AggregateExpr] topk(10, prometheus_build_info * prometheus_ready)'
           op: topk
       joins:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           addedlabels: []
           src:
             labels: {}
@@ -12419,6 +12516,7 @@ output:
             isconditional: false
           op: 57395
           depth: 1
+          ison: false
       unless: []
       returninfo:
         logicalexpr: ""
@@ -12459,8 +12557,7 @@ output:
           node: '[*parser.AggregateExpr] bottomk(10, prometheus_build_info * prometheus_ready)'
           op: bottomk
       joins:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           addedlabels: []
           src:
             labels: {}
@@ -12489,6 +12586,7 @@ output:
             isconditional: false
           op: 57395
           depth: 1
+          ison: false
       unless: []
       returninfo:
         logicalexpr: ""
@@ -12560,8 +12658,7 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - "on": []
-          ignoring: []
+        - matchinglabels: []
           addedlabels: []
           src:
             labels: {}
@@ -12590,6 +12687,7 @@ output:
             isconditional: false
           op: 57395
           depth: 0
+          ison: false
       unless: []
       returninfo:
         logicalexpr: ""
@@ -12618,7 +12716,7 @@ output:
             kind: excluded
             fragment:
                 start: 6
-                end: 8
+                end: 23
         __name__:
             reason: Binary operation between two vectors removes metric names.
             kind: excluded
@@ -12629,8 +12727,8 @@ output:
             reason: Query is using one-to-one vector matching with `on(__name__, job)`, only labels included inside `on(...)` will be present on the results.
             kind: included
             fragment:
-                start: 6
-                end: 8
+                start: 19
+                end: 22
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -12638,10 +12736,9 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - "on":
+        - matchinglabels:
             - __name__
             - job
-          ignoring: []
           addedlabels: []
           src:
             labels: {}
@@ -12670,6 +12767,7 @@ output:
             isconditional: false
           op: 57383
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -12703,8 +12801,8 @@ output:
             reason: Query is using many-to-one vector matching with `on(__name__, job)`, labels included inside `on(...)` will be present on the results.
             kind: included
             fragment:
-                start: 6
-                end: 8
+                start: 19
+                end: 22
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -12712,10 +12810,9 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - "on":
+        - matchinglabels:
             - __name__
             - job
-          ignoring: []
           addedlabels: []
           src:
             labels: {}
@@ -12744,6 +12841,7 @@ output:
             isconditional: false
           op: 57383
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -12777,8 +12875,8 @@ output:
             reason: Query is using one-to-many vector matching with `on(__name__, job)`, labels included inside `on(...)` will be present on the results.
             kind: included
             fragment:
-                start: 6
-                end: 8
+                start: 19
+                end: 22
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -12786,10 +12884,9 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - "on":
+        - matchinglabels:
             - __name__
             - job
-          ignoring: []
           addedlabels: []
           src:
             labels: {}
@@ -12818,6 +12915,7 @@ output:
             isconditional: false
           op: 57383
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -12860,8 +12958,8 @@ output:
             reason: Query is using aggregation with `by(env, cluster)`, only labels included inside `by(...)` will be present on the results.
             kind: included
             fragment:
-                start: 6
-                end: 9
+                start: 15
+                end: 22
         env:
             reason: Query will only return series where these labels are present.
             kind: guaranteed
@@ -12873,13 +12971,13 @@ output:
             kind: excluded
             fragment:
                 start: 6
-                end: 9
+                end: 23
         job:
             reason: Query is using aggregation with `by(env, cluster)`, only labels included inside `by(...)` will be present on the results.
             kind: excluded
             fragment:
                 start: 6
-                end: 9
+                end: 23
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -12889,9 +12987,8 @@ output:
         - node: '[*parser.AggregateExpr] group by (env, cluster) (up{env="prod",job="foo"} and on (instance) (services_enabled == 999))'
           op: group
       joins:
-        - "on":
+        - matchinglabels:
             - instance
-          ignoring: []
           addedlabels: []
           src:
             labels: {}
@@ -12920,6 +13017,7 @@ output:
             isconditional: true
           op: 57389
           depth: 1
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -12963,43 +13061,47 @@ output:
             kind: excluded
             fragment:
                 start: 60
-                end: 63
+                end: 73
         env:
             reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
             kind: excluded
             fragment:
                 start: 60
-                end: 63
+                end: 73
         instance:
             reason: Query is using aggregation with `by(env, cluster)`, only labels included inside `by(...)` will be present on the results.
             kind: excluded
             fragment:
                 start: 6
-                end: 9
+                end: 23
         job:
             reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
             kind: excluded
             fragment:
                 start: 60
-                end: 63
+                end: 73
       deadinfo: null
       deadlabels:
         - name: env
-          reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
-          namepos:
+          reason: You can't use `env` because this label is not possible here.
+          labelreason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+          usagefragment:
             start: 10
             end: 13
-          fragment:
+          labelfragment:
             start: 60
-            end: 63
+            end: 73
+          kind: 0
         - name: cluster
-          reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
-          namepos:
+          reason: You can't use `cluster` because this label is not possible here.
+          labelreason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+          usagefragment:
             start: 15
             end: 22
-          fragment:
+          labelfragment:
             start: 60
-            end: 63
+            end: 73
+          kind: 0
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] up{env="prod",job="foo"}'
@@ -13007,9 +13109,8 @@ output:
         - node: '[*parser.AggregateExpr] group by (env, cluster) (up{env="prod",job="foo"} * on (instance) (services_enabled == 999))'
           op: group
       joins:
-        - "on":
+        - matchinglabels:
             - instance
-          ignoring: []
           addedlabels: []
           src:
             labels: {}
@@ -13038,6 +13139,7 @@ output:
             isconditional: true
           op: 57395
           depth: 1
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -13066,7 +13168,7 @@ output:
             kind: excluded
             fragment:
                 start: 6
-                end: 8
+                end: 18
         __name__:
             reason: Binary operation between two vectors removes metric names.
             kind: excluded
@@ -13077,8 +13179,8 @@ output:
             reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
             kind: included
             fragment:
-                start: 6
-                end: 8
+                start: 9
+                end: 17
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -13086,9 +13188,8 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - "on":
+        - matchinglabels:
             - instance
-          ignoring: []
           addedlabels: []
           src:
             labels:
@@ -13135,6 +13236,7 @@ output:
             isconditional: false
           op: 57384
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -13165,17 +13267,17 @@ output:
                 start: 0
                 end: 47
         cluster:
-            reason: Query is using many-to-one vector matching with `group_left(cluster)`, all labels included inside `group_left(...)` will be include on the results.
+            reason: Query is using `group_left(cluster)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
             kind: included
             fragment:
-                start: 19
-                end: 29
+                start: 30
+                end: 37
         instance:
             reason: Query is using many-to-one vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
             kind: included
             fragment:
-                start: 6
-                end: 8
+                start: 9
+                end: 17
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -13183,9 +13285,8 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - "on":
+        - matchinglabels:
             - instance
-          ignoring: []
           addedlabels:
             - cluster
           src:
@@ -13207,7 +13308,17 @@ output:
                 fragment:
                     start: 39
                     end: 42
-            deadlabels: []
+            deadlabels:
+                - name: cluster
+                  reason: You can't use `cluster` because this label is not possible here.
+                  labelreason: Query is using aggregation that removes all labels.
+                  usagefragment:
+                    start: 30
+                    end: 37
+                  labelfragment:
+                    start: 39
+                    end: 42
+                  kind: 0
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar'
@@ -13233,6 +13344,7 @@ output:
             isconditional: false
           op: 57384
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -13263,17 +13375,17 @@ output:
                 start: 0
                 end: 48
         cluster:
-            reason: Query is using one-to-many vector matching with `group_right(cluster)`, all labels included inside `group_right(...)` will be include on the results.
+            reason: Query is using `group_right(cluster)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
             kind: included
             fragment:
-                start: 24
-                end: 35
+                start: 36
+                end: 43
         instance:
             reason: Query is using one-to-many vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
             kind: included
             fragment:
-                start: 11
-                end: 13
+                start: 14
+                end: 22
       deadinfo: null
       deadlabels: []
       returns: vector
@@ -13281,9 +13393,8 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - "on":
+        - matchinglabels:
             - instance
-          ignoring: []
           addedlabels:
             - cluster
           src:
@@ -13305,7 +13416,17 @@ output:
                 fragment:
                     start: 0
                     end: 3
-            deadlabels: []
+            deadlabels:
+                - name: cluster
+                  reason: You can't use `cluster` because this label is not possible here.
+                  labelreason: Query is using aggregation that removes all labels.
+                  usagefragment:
+                    start: 36
+                    end: 43
+                  labelfragment:
+                    start: 0
+                    end: 3
+                  kind: 0
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar'
@@ -13331,6 +13452,7 @@ output:
             isconditional: false
           op: 57384
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -13359,7 +13481,7 @@ output:
             kind: excluded
             fragment:
                 start: 11
-                end: 13
+                end: 22
         __name__:
             reason: Binary operation between two vectors removes metric names.
             kind: excluded
@@ -13375,13 +13497,15 @@ output:
       deadinfo: null
       deadlabels:
         - name: cluster
-          reason: Query is using aggregation that removes all labels.
-          namepos:
+          reason: You can't use `cluster` because this label is not possible here.
+          labelreason: Query is using aggregation that removes all labels.
+          usagefragment:
             start: 14
             end: 21
-          fragment:
+          labelfragment:
             start: 0
             end: 3
+          kind: 0
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] bar'
@@ -13389,9 +13513,8 @@ output:
         - node: '[*parser.AggregateExpr] sum(bar)'
           op: sum
       joins:
-        - "on":
+        - matchinglabels:
             - cluster
-          ignoring: []
           addedlabels: []
           src:
             labels:
@@ -13434,6 +13557,7 @@ output:
             isconditional: false
           op: 57395
           depth: 0
+          ison: true
       unless: []
       returninfo:
         logicalexpr: ""
@@ -13449,6 +13573,1808 @@ output:
         end: 7
       type: aggregation
       fixedlabels: true
+      isconditional: false
+
+---
+
+[TestLabelsSource/168 - 1]
+expr: |4-
+
+    group by (colo_name, instance, tier, animal, brand, sliver, pop_name) (
+      up{node_status="v", job="node_exporter"}
+      and on (instance) (metal_services_enabled == 999)
+      * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+      * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+    )
+output:
+    - labels:
+        "":
+            reason: Query is using aggregation with `by(colo_name, instance, tier, animal, brand, sliver, pop_name)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 7
+                end: 10
+        __name__:
+            reason: Aggregation removes metric name.
+            kind: excluded
+            fragment:
+                start: 1
+                end: 332
+        animal:
+            reason: Query is using aggregation with `by(colo_name, instance, tier, animal, brand, sliver, pop_name)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 38
+                end: 44
+        brand:
+            reason: Query is using aggregation with `by(colo_name, instance, tier, animal, brand, sliver, pop_name)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 46
+                end: 51
+        colo_name:
+            reason: Query is using aggregation with `by(colo_name, instance, tier, animal, brand, sliver, pop_name)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 11
+                end: 20
+        instance:
+            reason: Query is using aggregation with `by(colo_name, instance, tier, animal, brand, sliver, pop_name)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 22
+                end: 30
+        job:
+            reason: Query is using aggregation with `by(colo_name, instance, tier, animal, brand, sliver, pop_name)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 7
+                end: 70
+        node_status:
+            reason: Query is using aggregation with `by(colo_name, instance, tier, animal, brand, sliver, pop_name)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 7
+                end: 70
+        pop_name:
+            reason: Query is using aggregation with `by(colo_name, instance, tier, animal, brand, sliver, pop_name)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 61
+                end: 69
+        sliver:
+            reason: Query is using aggregation with `by(colo_name, instance, tier, animal, brand, sliver, pop_name)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 53
+                end: 59
+        tier:
+            reason: Query is using aggregation with `by(colo_name, instance, tier, animal, brand, sliver, pop_name)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 32
+                end: 36
+      deadinfo: null
+      deadlabels:
+        - name: tier
+          reason: This binary operation prevents previously joined label `tier` from being added to the results.
+          labelreason: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          usagefragment:
+            start: 118
+            end: 121
+          labelfragment:
+            start: 198
+            end: 202
+          kind: 1
+        - name: animal
+          reason: This binary operation prevents previously joined label `animal` from being added to the results.
+          labelreason: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          usagefragment:
+            start: 118
+            end: 121
+          labelfragment:
+            start: 204
+            end: 210
+          kind: 1
+        - name: brand
+          reason: This binary operation prevents previously joined label `brand` from being added to the results.
+          labelreason: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          usagefragment:
+            start: 118
+            end: 121
+          labelfragment:
+            start: 212
+            end: 217
+          kind: 1
+        - name: pop_name
+          reason: This binary operation prevents previously joined label `pop_name` from being added to the results.
+          labelreason: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          usagefragment:
+            start: 118
+            end: 121
+          labelfragment:
+            start: 219
+            end: 227
+          kind: 1
+        - name: sliver
+          reason: This binary operation prevents previously joined label `sliver` from being added to the results.
+          labelreason: Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          usagefragment:
+            start: 118
+            end: 121
+          labelfragment:
+            start: 290
+            end: 296
+          kind: 1
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] up{job="node_exporter",node_status="v"}'
+          op: ""
+        - node: '[*parser.AggregateExpr] group by (colo_name, instance, tier, animal, brand, sliver, pop_name) (up{job="node_exporter",node_status="v"} and on (instance) (metal_services_enabled == 999) * on (colo_name) group_left (tier, animal, brand, pop_name) colo_metadata{colo_status="v"} * on (instance) group_left (sliver) sliver_metadata{node_status="v"})'
+          op: group
+      joins:
+        - matchinglabels:
+            - instance
+          addedlabels: []
+          src:
+            labels:
+                __name__:
+                    reason: Binary operation between two vectors removes metric names.
+                    kind: excluded
+                    fragment:
+                        start: 136
+                        end: 330
+                animal:
+                    reason: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                    kind: included
+                    fragment:
+                        start: 204
+                        end: 210
+                brand:
+                    reason: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                    kind: included
+                    fragment:
+                        start: 212
+                        end: 217
+                colo_name:
+                    reason: Query is using many-to-one vector matching with `on(colo_name)`, labels included inside `on(...)` will be present on the results.
+                    kind: included
+                    fragment:
+                        start: 176
+                        end: 185
+                instance:
+                    reason: Query is using many-to-one vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
+                    kind: included
+                    fragment:
+                        start: 268
+                        end: 276
+                pop_name:
+                    reason: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                    kind: included
+                    fragment:
+                        start: 219
+                        end: 227
+                sliver:
+                    reason: Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                    kind: included
+                    fragment:
+                        start: 290
+                        end: 296
+                tier:
+                    reason: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                    kind: included
+                    fragment:
+                        start: 198
+                        end: 202
+            deadinfo: null
+            deadlabels: []
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] metal_services_enabled'
+                  op: ""
+            joins:
+                - matchinglabels:
+                    - colo_name
+                  addedlabels:
+                    - tier
+                    - animal
+                    - brand
+                    - pop_name
+                  src:
+                    labels:
+                        colo_status:
+                            reason: Query will only return series where these labels are present.
+                            kind: guaranteed
+                            fragment:
+                                start: 229
+                                end: 259
+                    deadinfo: null
+                    deadlabels: []
+                    returns: vector
+                    operations:
+                        - node: '[*parser.VectorSelector] colo_metadata{colo_status="v"}'
+                          op: ""
+                    joins: []
+                    unless: []
+                    returninfo:
+                        logicalexpr: ""
+                        valueposition:
+                            start: 0
+                            end: 0
+                        returnednumber: 0
+                        alwaysreturns: false
+                        knownreturn: false
+                        isreturnbool: false
+                    position:
+                        start: 229
+                        end: 259
+                    type: selector
+                    fixedlabels: false
+                    isconditional: false
+                  op: 57395
+                  depth: 0
+                  ison: true
+                - matchinglabels:
+                    - instance
+                  addedlabels:
+                    - sliver
+                  src:
+                    labels:
+                        node_status:
+                            reason: Query will only return series where these labels are present.
+                            kind: guaranteed
+                            fragment:
+                                start: 298
+                                end: 330
+                    deadinfo: null
+                    deadlabels: []
+                    returns: vector
+                    operations:
+                        - node: '[*parser.VectorSelector] sliver_metadata{node_status="v"}'
+                          op: ""
+                    joins: []
+                    unless: []
+                    returninfo:
+                        logicalexpr: ""
+                        valueposition:
+                            start: 0
+                            end: 0
+                        returnednumber: 0
+                        alwaysreturns: false
+                        knownreturn: false
+                        isreturnbool: false
+                    position:
+                        start: 298
+                        end: 330
+                    type: selector
+                    fixedlabels: false
+                    isconditional: false
+                  op: 57395
+                  depth: 0
+                  ison: true
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+            position:
+                start: 137
+                end: 159
+            type: selector
+            fixedlabels: false
+            isconditional: true
+          op: 57389
+          depth: 1
+          ison: true
+      unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
+      position:
+        start: 75
+        end: 115
+      type: aggregation
+      fixedlabels: true
+      isconditional: true
+
+---
+
+[TestLabelsSource/169 - 1]
+expr: |4
+
+    up{node_status="v", job="node_exporter"}
+    * on (colo_name) group_left(tier) colo_metadata{colo_status="v"}
+    * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+output:
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 1
+                end: 175
+        colo_name:
+            reason: Query is using many-to-one vector matching with `on(colo_name)`, labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 48
+                end: 57
+        instance:
+            reason: Query is using many-to-one vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 113
+                end: 121
+        job:
+            reason: Query will only return series where these labels are present.
+            kind: guaranteed
+            fragment:
+                start: 1
+                end: 41
+        node_status:
+            reason: Query will only return series where these labels are present.
+            kind: guaranteed
+            fragment:
+                start: 1
+                end: 41
+        sliver:
+            reason: Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+            kind: included
+            fragment:
+                start: 135
+                end: 141
+        tier:
+            reason: Query is using `group_left(tier)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+            kind: included
+            fragment:
+                start: 70
+                end: 74
+      deadinfo: null
+      deadlabels: []
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] up{job="node_exporter",node_status="v"}'
+          op: ""
+      joins:
+        - matchinglabels:
+            - colo_name
+          addedlabels:
+            - tier
+          src:
+            labels:
+                colo_status:
+                    reason: Query will only return series where these labels are present.
+                    kind: guaranteed
+                    fragment:
+                        start: 76
+                        end: 106
+            deadinfo: null
+            deadlabels: []
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] colo_metadata{colo_status="v"}'
+                  op: ""
+            joins: []
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+            position:
+                start: 76
+                end: 106
+            type: selector
+            fixedlabels: false
+            isconditional: false
+          op: 57395
+          depth: 0
+          ison: true
+        - matchinglabels:
+            - instance
+          addedlabels:
+            - sliver
+          src:
+            labels:
+                node_status:
+                    reason: Query will only return series where these labels are present.
+                    kind: guaranteed
+                    fragment:
+                        start: 143
+                        end: 175
+            deadinfo: null
+            deadlabels: []
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] sliver_metadata{node_status="v"}'
+                  op: ""
+            joins: []
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+            position:
+                start: 143
+                end: 175
+            type: selector
+            fixedlabels: false
+            isconditional: false
+          op: 57395
+          depth: 0
+          ison: true
+      unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
+      position:
+        start: 1
+        end: 41
+      type: selector
+      fixedlabels: false
+      isconditional: false
+
+---
+
+[TestLabelsSource/170 - 1]
+expr: |4
+
+    up{node_status="v", job="node_exporter"}
+    and on (colo_name) colo_metadata{colo_status="v"}
+    * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+output:
+    - labels:
+        colo_name:
+            reason: Query is using many-to-many vector matching with `on(colo_name)`, labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 50
+                end: 59
+        job:
+            reason: Query will only return series where these labels are present.
+            kind: guaranteed
+            fragment:
+                start: 1
+                end: 41
+        node_status:
+            reason: Query will only return series where these labels are present.
+            kind: guaranteed
+            fragment:
+                start: 1
+                end: 41
+      deadinfo: null
+      deadlabels:
+        - name: sliver
+          reason: This binary operation prevents previously joined label `sliver` from being added to the results.
+          labelreason: Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          usagefragment:
+            start: 42
+            end: 45
+          labelfragment:
+            start: 120
+            end: 126
+          kind: 1
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] up{job="node_exporter",node_status="v"}'
+          op: ""
+      joins:
+        - matchinglabels:
+            - colo_name
+          addedlabels: []
+          src:
+            labels:
+                __name__:
+                    reason: Binary operation between two vectors removes metric names.
+                    kind: excluded
+                    fragment:
+                        start: 61
+                        end: 160
+                colo_status:
+                    reason: Query will only return series where these labels are present.
+                    kind: guaranteed
+                    fragment:
+                        start: 61
+                        end: 91
+                instance:
+                    reason: Query is using many-to-one vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
+                    kind: included
+                    fragment:
+                        start: 98
+                        end: 106
+                sliver:
+                    reason: Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                    kind: included
+                    fragment:
+                        start: 120
+                        end: 126
+            deadinfo: null
+            deadlabels: []
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] colo_metadata{colo_status="v"}'
+                  op: ""
+            joins:
+                - matchinglabels:
+                    - instance
+                  addedlabels:
+                    - sliver
+                  src:
+                    labels:
+                        node_status:
+                            reason: Query will only return series where these labels are present.
+                            kind: guaranteed
+                            fragment:
+                                start: 128
+                                end: 160
+                    deadinfo: null
+                    deadlabels: []
+                    returns: vector
+                    operations:
+                        - node: '[*parser.VectorSelector] sliver_metadata{node_status="v"}'
+                          op: ""
+                    joins: []
+                    unless: []
+                    returninfo:
+                        logicalexpr: ""
+                        valueposition:
+                            start: 0
+                            end: 0
+                        returnednumber: 0
+                        alwaysreturns: false
+                        knownreturn: false
+                        isreturnbool: false
+                    position:
+                        start: 128
+                        end: 160
+                    type: selector
+                    fixedlabels: false
+                    isconditional: false
+                  op: 57395
+                  depth: 0
+                  ison: true
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+            position:
+                start: 61
+                end: 91
+            type: selector
+            fixedlabels: false
+            isconditional: false
+          op: 57389
+          depth: 0
+          ison: true
+      unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
+      position:
+        start: 1
+        end: 41
+      type: selector
+      fixedlabels: false
+      isconditional: false
+
+---
+
+[TestLabelsSource/171 - 1]
+expr: |4
+
+    colo_metadata{colo_status="v"} * on (colo_name) group_right(tier, animal, brand, pop_name)
+    sliver_metadata{node_status="v"} * on (instance) group_right (sliver)
+    (metal_services_enabled == 999) * on (instance)
+    up{node_status="v", job="node_exporter"}
+output:
+    - labels:
+        "":
+            reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 1
+                end: 250
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 1
+                end: 250
+        instance:
+            reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 200
+                end: 208
+        sliver:
+            reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 1
+                end: 250
+      deadinfo: null
+      deadlabels:
+        - name: tier
+          reason: This binary operation prevents previously joined label `tier` from being added to the results.
+          labelreason: ""
+          usagefragment:
+            start: 125
+            end: 126
+          labelfragment:
+            start: 125
+            end: 126
+          kind: 1
+        - name: animal
+          reason: This binary operation prevents previously joined label `animal` from being added to the results.
+          labelreason: ""
+          usagefragment:
+            start: 125
+            end: 126
+          labelfragment:
+            start: 125
+            end: 126
+          kind: 1
+        - name: brand
+          reason: This binary operation prevents previously joined label `brand` from being added to the results.
+          labelreason: ""
+          usagefragment:
+            start: 125
+            end: 126
+          labelfragment:
+            start: 125
+            end: 126
+          kind: 1
+        - name: pop_name
+          reason: This binary operation prevents previously joined label `pop_name` from being added to the results.
+          labelreason: ""
+          usagefragment:
+            start: 125
+            end: 126
+          labelfragment:
+            start: 125
+            end: 126
+          kind: 1
+        - name: sliver
+          reason: This binary operation prevents previously joined label `sliver` from being added to the results.
+          labelreason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+          usagefragment:
+            start: 194
+            end: 195
+          labelfragment:
+            start: 1
+            end: 250
+          kind: 1
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] metal_services_enabled'
+          op: ""
+      joins:
+        - matchinglabels:
+            - instance
+          addedlabels:
+            - sliver
+          src:
+            labels:
+                __name__:
+                    reason: Binary operation between two vectors removes metric names.
+                    kind: excluded
+                    fragment:
+                        start: 1
+                        end: 124
+                animal:
+                    reason: Query is using `group_right(tier, animal, brand, pop_name)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
+                    kind: included
+                    fragment:
+                        start: 67
+                        end: 73
+                brand:
+                    reason: Query is using `group_right(tier, animal, brand, pop_name)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
+                    kind: included
+                    fragment:
+                        start: 75
+                        end: 80
+                colo_name:
+                    reason: Query is using one-to-many vector matching with `on(colo_name)`, labels included inside `on(...)` will be present on the results.
+                    kind: included
+                    fragment:
+                        start: 38
+                        end: 47
+                node_status:
+                    reason: Query will only return series where these labels are present.
+                    kind: guaranteed
+                    fragment:
+                        start: 92
+                        end: 124
+                pop_name:
+                    reason: Query is using `group_right(tier, animal, brand, pop_name)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
+                    kind: included
+                    fragment:
+                        start: 82
+                        end: 90
+                tier:
+                    reason: Query is using `group_right(tier, animal, brand, pop_name)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
+                    kind: included
+                    fragment:
+                        start: 61
+                        end: 65
+            deadinfo: null
+            deadlabels: []
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] sliver_metadata{node_status="v"}'
+                  op: ""
+            joins:
+                - matchinglabels:
+                    - colo_name
+                  addedlabels:
+                    - tier
+                    - animal
+                    - brand
+                    - pop_name
+                  src:
+                    labels:
+                        colo_status:
+                            reason: Query will only return series where these labels are present.
+                            kind: guaranteed
+                            fragment:
+                                start: 1
+                                end: 31
+                    deadinfo: null
+                    deadlabels: []
+                    returns: vector
+                    operations:
+                        - node: '[*parser.VectorSelector] colo_metadata{colo_status="v"}'
+                          op: ""
+                    joins: []
+                    unless: []
+                    returninfo:
+                        logicalexpr: ""
+                        valueposition:
+                            start: 0
+                            end: 0
+                        returnednumber: 0
+                        alwaysreturns: false
+                        knownreturn: false
+                        isreturnbool: false
+                    position:
+                        start: 1
+                        end: 31
+                    type: selector
+                    fixedlabels: false
+                    isconditional: false
+                  op: 57395
+                  depth: 0
+                  ison: true
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+            position:
+                start: 92
+                end: 124
+            type: selector
+            fixedlabels: false
+            isconditional: false
+          op: 57395
+          depth: 0
+          ison: true
+        - matchinglabels:
+            - instance
+          addedlabels: []
+          src:
+            labels:
+                job:
+                    reason: Query will only return series where these labels are present.
+                    kind: guaranteed
+                    fragment:
+                        start: 210
+                        end: 250
+                node_status:
+                    reason: Query will only return series where these labels are present.
+                    kind: guaranteed
+                    fragment:
+                        start: 210
+                        end: 250
+            deadinfo: null
+            deadlabels: []
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] up{job="node_exporter",node_status="v"}'
+                  op: ""
+            joins: []
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+            position:
+                start: 210
+                end: 250
+            type: selector
+            fixedlabels: false
+            isconditional: false
+          op: 57395
+          depth: 0
+          ison: true
+      unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
+      position:
+        start: 163
+        end: 185
+      type: selector
+      fixedlabels: true
+      isconditional: true
+
+---
+
+[TestLabelsSource/172 - 1]
+expr: |4
+
+    colo_metadata{colo_status="v"} * on (colo_name) group_right(tier, animal, brand, pop_name)
+    sliver_metadata{node_status="v"} * on (instance) group_right (sliver)
+    (metal_services_enabled == 999) * on (instance) group_right()
+    up{node_status="v", job="node_exporter"}
+output:
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 1
+                end: 264
+        instance:
+            reason: Query is using one-to-many vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 200
+                end: 208
+        job:
+            reason: Query will only return series where these labels are present.
+            kind: guaranteed
+            fragment:
+                start: 224
+                end: 264
+        node_status:
+            reason: Query will only return series where these labels are present.
+            kind: guaranteed
+            fragment:
+                start: 224
+                end: 264
+      deadinfo: null
+      deadlabels:
+        - name: sliver
+          reason: This binary operation prevents previously joined label `sliver` from being added to the results.
+          labelreason: ""
+          usagefragment:
+            start: 194
+            end: 195
+          labelfragment:
+            start: 194
+            end: 195
+          kind: 1
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] up{job="node_exporter",node_status="v"}'
+          op: ""
+      joins:
+        - matchinglabels:
+            - instance
+          addedlabels: []
+          src:
+            labels:
+                __name__:
+                    reason: Binary operation between two vectors removes metric names.
+                    kind: excluded
+                    fragment:
+                        start: 1
+                        end: 193
+                instance:
+                    reason: Query is using one-to-many vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
+                    kind: included
+                    fragment:
+                        start: 131
+                        end: 139
+                sliver:
+                    reason: Query is using `group_right(sliver)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
+                    kind: included
+                    fragment:
+                        start: 154
+                        end: 160
+            deadinfo: null
+            deadlabels:
+                - name: tier
+                  reason: This binary operation prevents previously joined label `tier` from being added to the results.
+                  labelreason: ""
+                  usagefragment:
+                    start: 125
+                    end: 126
+                  labelfragment:
+                    start: 125
+                    end: 126
+                  kind: 1
+                - name: animal
+                  reason: This binary operation prevents previously joined label `animal` from being added to the results.
+                  labelreason: ""
+                  usagefragment:
+                    start: 125
+                    end: 126
+                  labelfragment:
+                    start: 125
+                    end: 126
+                  kind: 1
+                - name: brand
+                  reason: This binary operation prevents previously joined label `brand` from being added to the results.
+                  labelreason: ""
+                  usagefragment:
+                    start: 125
+                    end: 126
+                  labelfragment:
+                    start: 125
+                    end: 126
+                  kind: 1
+                - name: pop_name
+                  reason: This binary operation prevents previously joined label `pop_name` from being added to the results.
+                  labelreason: ""
+                  usagefragment:
+                    start: 125
+                    end: 126
+                  labelfragment:
+                    start: 125
+                    end: 126
+                  kind: 1
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] metal_services_enabled'
+                  op: ""
+            joins:
+                - matchinglabels:
+                    - instance
+                  addedlabels:
+                    - sliver
+                  src:
+                    labels:
+                        __name__:
+                            reason: Binary operation between two vectors removes metric names.
+                            kind: excluded
+                            fragment:
+                                start: 1
+                                end: 124
+                        animal:
+                            reason: Query is using `group_right(tier, animal, brand, pop_name)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
+                            kind: included
+                            fragment:
+                                start: 67
+                                end: 73
+                        brand:
+                            reason: Query is using `group_right(tier, animal, brand, pop_name)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
+                            kind: included
+                            fragment:
+                                start: 75
+                                end: 80
+                        colo_name:
+                            reason: Query is using one-to-many vector matching with `on(colo_name)`, labels included inside `on(...)` will be present on the results.
+                            kind: included
+                            fragment:
+                                start: 38
+                                end: 47
+                        node_status:
+                            reason: Query will only return series where these labels are present.
+                            kind: guaranteed
+                            fragment:
+                                start: 92
+                                end: 124
+                        pop_name:
+                            reason: Query is using `group_right(tier, animal, brand, pop_name)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
+                            kind: included
+                            fragment:
+                                start: 82
+                                end: 90
+                        tier:
+                            reason: Query is using `group_right(tier, animal, brand, pop_name)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
+                            kind: included
+                            fragment:
+                                start: 61
+                                end: 65
+                    deadinfo: null
+                    deadlabels: []
+                    returns: vector
+                    operations:
+                        - node: '[*parser.VectorSelector] sliver_metadata{node_status="v"}'
+                          op: ""
+                    joins:
+                        - matchinglabels:
+                            - colo_name
+                          addedlabels:
+                            - tier
+                            - animal
+                            - brand
+                            - pop_name
+                          src:
+                            labels:
+                                colo_status:
+                                    reason: Query will only return series where these labels are present.
+                                    kind: guaranteed
+                                    fragment:
+                                        start: 1
+                                        end: 31
+                            deadinfo: null
+                            deadlabels: []
+                            returns: vector
+                            operations:
+                                - node: '[*parser.VectorSelector] colo_metadata{colo_status="v"}'
+                                  op: ""
+                            joins: []
+                            unless: []
+                            returninfo:
+                                logicalexpr: ""
+                                valueposition:
+                                    start: 0
+                                    end: 0
+                                returnednumber: 0
+                                alwaysreturns: false
+                                knownreturn: false
+                                isreturnbool: false
+                            position:
+                                start: 1
+                                end: 31
+                            type: selector
+                            fixedlabels: false
+                            isconditional: false
+                          op: 57395
+                          depth: 0
+                          ison: true
+                    unless: []
+                    returninfo:
+                        logicalexpr: ""
+                        valueposition:
+                            start: 0
+                            end: 0
+                        returnednumber: 0
+                        alwaysreturns: false
+                        knownreturn: false
+                        isreturnbool: false
+                    position:
+                        start: 92
+                        end: 124
+                    type: selector
+                    fixedlabels: false
+                    isconditional: false
+                  op: 57395
+                  depth: 0
+                  ison: true
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+            position:
+                start: 163
+                end: 185
+            type: selector
+            fixedlabels: false
+            isconditional: true
+          op: 57395
+          depth: 0
+          ison: true
+      unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
+      position:
+        start: 224
+        end: 264
+      type: selector
+      fixedlabels: false
+      isconditional: false
+
+---
+
+[TestLabelsSource/173 - 1]
+expr: |4
+
+    sliver_metadata{node_status="v"} * on (instance) group_right (sliver)
+    (metal_services_enabled == 999) * on (colo_name) group_left(tier, animal, brand, pop_name)
+    colo_metadata{colo_status="v"}
+output:
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 1
+                end: 192
+        animal:
+            reason: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+            kind: included
+            fragment:
+                start: 137
+                end: 143
+        brand:
+            reason: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+            kind: included
+            fragment:
+                start: 145
+                end: 150
+        colo_name:
+            reason: Query is using many-to-one vector matching with `on(colo_name)`, labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 109
+                end: 118
+        instance:
+            reason: Query is using one-to-many vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 40
+                end: 48
+        pop_name:
+            reason: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+            kind: included
+            fragment:
+                start: 152
+                end: 160
+        sliver:
+            reason: Query is using `group_right(sliver)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
+            kind: included
+            fragment:
+                start: 63
+                end: 69
+        tier:
+            reason: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+            kind: included
+            fragment:
+                start: 131
+                end: 135
+      deadinfo: null
+      deadlabels: []
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] metal_services_enabled'
+          op: ""
+      joins:
+        - matchinglabels:
+            - instance
+          addedlabels:
+            - sliver
+          src:
+            labels:
+                node_status:
+                    reason: Query will only return series where these labels are present.
+                    kind: guaranteed
+                    fragment:
+                        start: 1
+                        end: 33
+            deadinfo: null
+            deadlabels: []
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] sliver_metadata{node_status="v"}'
+                  op: ""
+            joins: []
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+            position:
+                start: 1
+                end: 33
+            type: selector
+            fixedlabels: false
+            isconditional: false
+          op: 57395
+          depth: 0
+          ison: true
+        - matchinglabels:
+            - colo_name
+          addedlabels:
+            - tier
+            - animal
+            - brand
+            - pop_name
+          src:
+            labels:
+                colo_status:
+                    reason: Query will only return series where these labels are present.
+                    kind: guaranteed
+                    fragment:
+                        start: 162
+                        end: 192
+            deadinfo: null
+            deadlabels: []
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] colo_metadata{colo_status="v"}'
+                  op: ""
+            joins: []
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+            position:
+                start: 162
+                end: 192
+            type: selector
+            fixedlabels: false
+            isconditional: false
+          op: 57395
+          depth: 0
+          ison: true
+      unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
+      position:
+        start: 72
+        end: 94
+      type: selector
+      fixedlabels: false
+      isconditional: true
+
+---
+
+[TestLabelsSource/174 - 1]
+expr: |4
+
+    colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
+    sliver_metadata * on (instance) group_right (sliver)
+    metal_services_enabled
+output:
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 1
+                end: 150
+        instance:
+            reason: Query is using one-to-many vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 97
+                end: 105
+        sliver:
+            reason: Query is using `group_right(sliver)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
+            kind: included
+            fragment:
+                start: 120
+                end: 126
+      deadinfo: null
+      deadlabels:
+        - name: tier
+          reason: This binary operation prevents previously joined label `tier` from being added to the results.
+          labelreason: ""
+          usagefragment:
+            start: 91
+            end: 92
+          labelfragment:
+            start: 91
+            end: 92
+          kind: 1
+        - name: animal
+          reason: This binary operation prevents previously joined label `animal` from being added to the results.
+          labelreason: ""
+          usagefragment:
+            start: 91
+            end: 92
+          labelfragment:
+            start: 91
+            end: 92
+          kind: 1
+        - name: brand
+          reason: This binary operation prevents previously joined label `brand` from being added to the results.
+          labelreason: ""
+          usagefragment:
+            start: 91
+            end: 92
+          labelfragment:
+            start: 91
+            end: 92
+          kind: 1
+        - name: pop_name
+          reason: This binary operation prevents previously joined label `pop_name` from being added to the results.
+          labelreason: ""
+          usagefragment:
+            start: 91
+            end: 92
+          labelfragment:
+            start: 91
+            end: 92
+          kind: 1
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] metal_services_enabled'
+          op: ""
+      joins:
+        - matchinglabels:
+            - instance
+          addedlabels:
+            - sliver
+          src:
+            labels:
+                __name__:
+                    reason: Binary operation between two vectors removes metric names.
+                    kind: excluded
+                    fragment:
+                        start: 1
+                        end: 90
+                animal:
+                    reason: Query is using `group_right(tier, animal, brand, pop_name)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
+                    kind: included
+                    fragment:
+                        start: 50
+                        end: 56
+                brand:
+                    reason: Query is using `group_right(tier, animal, brand, pop_name)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
+                    kind: included
+                    fragment:
+                        start: 58
+                        end: 63
+                colo_name:
+                    reason: Query is using one-to-many vector matching with `on(colo_name)`, labels included inside `on(...)` will be present on the results.
+                    kind: included
+                    fragment:
+                        start: 21
+                        end: 30
+                pop_name:
+                    reason: Query is using `group_right(tier, animal, brand, pop_name)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
+                    kind: included
+                    fragment:
+                        start: 65
+                        end: 73
+                tier:
+                    reason: Query is using `group_right(tier, animal, brand, pop_name)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
+                    kind: included
+                    fragment:
+                        start: 44
+                        end: 48
+            deadinfo: null
+            deadlabels: []
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] sliver_metadata'
+                  op: ""
+            joins:
+                - matchinglabels:
+                    - colo_name
+                  addedlabels:
+                    - tier
+                    - animal
+                    - brand
+                    - pop_name
+                  src:
+                    labels: {}
+                    deadinfo: null
+                    deadlabels: []
+                    returns: vector
+                    operations:
+                        - node: '[*parser.VectorSelector] colo_metadata'
+                          op: ""
+                    joins: []
+                    unless: []
+                    returninfo:
+                        logicalexpr: ""
+                        valueposition:
+                            start: 0
+                            end: 0
+                        returnednumber: 0
+                        alwaysreturns: false
+                        knownreturn: false
+                        isreturnbool: false
+                    position:
+                        start: 1
+                        end: 14
+                    type: selector
+                    fixedlabels: false
+                    isconditional: false
+                  op: 57395
+                  depth: 0
+                  ison: true
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+            position:
+                start: 75
+                end: 90
+            type: selector
+            fixedlabels: false
+            isconditional: false
+          op: 57395
+          depth: 0
+          ison: true
+      unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
+      position:
+        start: 128
+        end: 150
+      type: selector
+      fixedlabels: false
+      isconditional: false
+
+---
+
+[TestLabelsSource/175 - 1]
+expr: |4
+
+    colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
+    (
+        sliver_metadata * on (instance) group_right (sliver)
+        metal_services_enabled
+    )
+output:
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 1
+                end: 162
+        animal:
+            reason: Query is using `group_right(tier, animal, brand, pop_name)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
+            kind: included
+            fragment:
+                start: 50
+                end: 56
+        brand:
+            reason: Query is using `group_right(tier, animal, brand, pop_name)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
+            kind: included
+            fragment:
+                start: 58
+                end: 63
+        colo_name:
+            reason: Query is using one-to-many vector matching with `on(colo_name)`, labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 21
+                end: 30
+        instance:
+            reason: Query is using one-to-many vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 103
+                end: 111
+        pop_name:
+            reason: Query is using `group_right(tier, animal, brand, pop_name)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
+            kind: included
+            fragment:
+                start: 65
+                end: 73
+        sliver:
+            reason: Query is using `group_right(sliver)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
+            kind: included
+            fragment:
+                start: 126
+                end: 132
+        tier:
+            reason: Query is using `group_right(tier, animal, brand, pop_name)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
+            kind: included
+            fragment:
+                start: 44
+                end: 48
+      deadinfo: null
+      deadlabels: []
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] metal_services_enabled'
+          op: ""
+      joins:
+        - matchinglabels:
+            - instance
+          addedlabels:
+            - sliver
+          src:
+            labels: {}
+            deadinfo: null
+            deadlabels: []
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] sliver_metadata'
+                  op: ""
+            joins: []
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+            position:
+                start: 81
+                end: 96
+            type: selector
+            fixedlabels: false
+            isconditional: false
+          op: 57395
+          depth: 0
+          ison: true
+        - matchinglabels:
+            - colo_name
+          addedlabels:
+            - tier
+            - animal
+            - brand
+            - pop_name
+          src:
+            labels: {}
+            deadinfo: null
+            deadlabels: []
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] colo_metadata'
+                  op: ""
+            joins: []
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+            position:
+                start: 1
+                end: 14
+            type: selector
+            fixedlabels: false
+            isconditional: false
+          op: 57395
+          depth: 0
+          ison: true
+      unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
+      position:
+        start: 138
+        end: 160
+      type: selector
+      fixedlabels: false
+      isconditional: false
+
+---
+
+[TestLabelsSource/176 - 1]
+expr: |4
+
+    up{node_status="v", job="node_exporter"}
+    * on(instance) group_left(node_status) sliver_metadata
+output:
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 1
+                end: 96
+        instance:
+            reason: Query is using many-to-one vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 47
+                end: 55
+        job:
+            reason: Query will only return series where these labels are present.
+            kind: guaranteed
+            fragment:
+                start: 1
+                end: 41
+        node_status:
+            reason: Query will only return series where these labels are present.
+            kind: guaranteed
+            fragment:
+                start: 1
+                end: 41
+      deadinfo: null
+      deadlabels:
+        - name: node_status
+          reason: Query is trying to join the `node_status` label that is already present on the other side of the query.
+          labelreason: Query will only return series where these labels are present.
+          usagefragment:
+            start: 68
+            end: 79
+          labelfragment:
+            start: 1
+            end: 41
+          kind: 2
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] up{job="node_exporter",node_status="v"}'
+          op: ""
+      joins:
+        - matchinglabels:
+            - instance
+          addedlabels:
+            - node_status
+          src:
+            labels: {}
+            deadinfo: null
+            deadlabels: []
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] sliver_metadata'
+                  op: ""
+            joins: []
+            unless: []
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+            position:
+                start: 81
+                end: 96
+            type: selector
+            fixedlabels: false
+            isconditional: false
+          op: 57395
+          depth: 0
+          ison: true
+      unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
+      position:
+        start: 1
+        end: 41
+      type: selector
+      fixedlabels: false
+      isconditional: false
+
+---
+
+[TestLabelsSource/177 - 1]
+expr: services_enabled{job=""}
+output:
+    - labels:
+        job:
+            reason: Query uses `{job=""}` selector which will filter out any time series with the `job` label set.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 24
+      deadinfo: null
+      deadlabels: []
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] services_enabled{job=""}'
+          op: ""
+      joins: []
+      unless: []
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
+      position:
+        start: 0
+        end: 24
+      type: selector
+      fixedlabels: false
       isconditional: false
 
 ---

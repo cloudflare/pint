@@ -1,6 +1,7 @@
 package diags
 
 import (
+	"cmp"
 	"fmt"
 	"slices"
 	"strings"
@@ -43,9 +44,16 @@ func lineCoverage(diags []Diagnostic) (lines []int) {
 	return lines
 }
 
-func InjectDiagnostics(content string, diags []Diagnostic, color output.Color) string {
+func InjectDiagnostics(content string, d []Diagnostic, color output.Color) string {
+	diags := make([]Diagnostic, len(d))
+	copy(diags, d)
+
 	lines := lineCoverage(diags)
 	lastLine := slices.Max(lines)
+
+	slices.SortStableFunc(diags, func(a, b Diagnostic) int {
+		return cmp.Compare(b.FirstColumn, a.FirstColumn)
+	})
 
 	diagPositions := make([]PositionRanges, len(diags))
 	for i, diag := range diags {

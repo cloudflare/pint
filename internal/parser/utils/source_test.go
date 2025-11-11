@@ -302,6 +302,57 @@ count by (dc) (
 	`foo / on(instance) group_left(cluster) sum(bar)`,
 	`sum(bar) / on(instance) group_right(cluster) foo`,
 	`sum(bar) * on(cluster) sum(foo)`,
+	`
+group by (colo_name, instance, tier, animal, brand, sliver, pop_name) (
+  up{node_status="v", job="node_exporter"}
+  and on (instance) (metal_services_enabled == 999)
+  * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+  * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+)`,
+	`
+up{node_status="v", job="node_exporter"}
+* on (colo_name) group_left(tier) colo_metadata{colo_status="v"}
+* on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+`, // all group_left() labels are joined to the left
+	`
+up{node_status="v", job="node_exporter"}
+and on (colo_name) colo_metadata{colo_status="v"}
+* on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+`, // all group_left() labels are NOT joined to the left
+	`
+colo_metadata{colo_status="v"} * on (colo_name) group_right(tier, animal, brand, pop_name)
+sliver_metadata{node_status="v"} * on (instance) group_right (sliver)
+(metal_services_enabled == 999) * on (instance)
+up{node_status="v", job="node_exporter"}
+`, // only instance label will be present
+	`
+colo_metadata{colo_status="v"} * on (colo_name) group_right(tier, animal, brand, pop_name)
+sliver_metadata{node_status="v"} * on (instance) group_right (sliver)
+(metal_services_enabled == 999) * on (instance) group_right()
+up{node_status="v", job="node_exporter"}
+`, // no labels are joined to the right
+	`
+sliver_metadata{node_status="v"} * on (instance) group_right (sliver)
+(metal_services_enabled == 999) * on (colo_name) group_left(tier, animal, brand, pop_name)
+colo_metadata{colo_status="v"}
+`, // labels from both group_left and group_right are joined
+	`
+colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
+sliver_metadata * on (instance) group_right (sliver)
+metal_services_enabled
+`, // only sliver and tier are joined to the right
+	`
+colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
+(
+    sliver_metadata * on (instance) group_right (sliver)
+    metal_services_enabled
+)
+`, // all labels are joined to the right
+	`
+up{node_status="v", job="node_exporter"}
+* on(instance) group_left(node_status) sliver_metadata
+`, // group_left on a label already guaranteed on the left
+	`services_enabled{job=""}`,
 }
 
 func TestLabelsSource(t *testing.T) {
@@ -418,6 +469,11 @@ func TestVectorOperation(t *testing.T) {
 	output := utils.LabelsSource("1", n.Expr)
 	require.Len(t, output, 1)
 	require.Empty(t, output[0].Operation())
+}
+
+func TestDeadLabelKindUnknownString(t *testing.T) {
+	var dl utils.DeadLabelKind = 100
+	require.Equal(t, "unknown", dl.String())
 }
 
 func BenchmarkLabelsSource(b *testing.B) {

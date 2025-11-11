@@ -828,6 +828,11 @@
 
 ---
 
+[TestImpossibleCheck/correctly_passed_group_right_labels - 1]
+[]
+
+---
+
 [TestImpossibleCheck/foo{job=bar}_unless_sum(foo) - 1]
 - description: foo{job=bar} unless sum(foo)
   content: |4
@@ -885,6 +890,695 @@
 
 ---
 
+[TestImpossibleCheck/group_left_inside_without - 1]
+- description: group_left inside without
+  content: |4
+
+    - record: foo
+      expr: |
+        group without(animal, brand) (
+          up{node_status="v", job="node_exporter"}
+          * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+          * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+        )
+  output: |
+    4 |     group without(animal, brand) (
+                          ^^^^^^ Previously joined label `animal` is being removed from the results.
+    5 |       up{node_status="v", job="node_exporter"}
+    6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+                                                ^^^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+    7 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+    8 |     )
+  problem:
+    reporter: promql/impossible
+    summary: unused label
+    details: ""
+    diagnostics:
+        - message: Previously joined label `animal` is being removed from the results.
+          firstcolumn: 15
+          lastcolumn: 20
+          kind: 0
+        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          firstcolumn: 111
+          lastcolumn: 116
+          kind: 1
+    lines:
+        first: 4
+        last: 8
+    severity: 1
+    anchor: 0
+- description: group_left inside without
+  content: |4
+
+    - record: foo
+      expr: |
+        group without(animal, brand) (
+          up{node_status="v", job="node_exporter"}
+          * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+          * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+        )
+  output: |
+    4 |     group without(animal, brand) (
+                                  ^^^^^ Previously joined label `brand` is being removed from the results.
+    5 |       up{node_status="v", job="node_exporter"}
+    6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+                                                        ^^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+    7 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+    8 |     )
+  problem:
+    reporter: promql/impossible
+    summary: unused label
+    details: ""
+    diagnostics:
+        - message: Previously joined label `brand` is being removed from the results.
+          firstcolumn: 23
+          lastcolumn: 27
+          kind: 0
+        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          firstcolumn: 119
+          lastcolumn: 123
+          kind: 1
+    lines:
+        first: 4
+        last: 8
+    severity: 1
+    anchor: 0
+
+---
+
+[TestImpossibleCheck/group_left_inside_without_but_used_for_inner_join - 1]
+[]
+
+---
+
+[TestImpossibleCheck/group_left_inside_without_but_used_for_inner_join_but_not_fully - 1]
+- description: group_left inside without but used for inner join but not fully
+  content: |4
+
+    - record: foo
+      expr: |
+        group without(animal) (
+          (
+            up{node_status="v", job="node_exporter"}
+            * on (colo_name) group_left(animal)
+            colo_metadata{colo_status="v"}
+          )
+          * on(animal, instance)
+          (
+            up{node_status="v", job="blackholebird"}
+            * on (colo_name) group_left(animal, brand)
+            colo_metadata{colo_status="v"}
+          )
+        )
+  output: |4
+     4 |     group without(animal) (
+     5 |       (
+     6 |         up{node_status="v", job="node_exporter"}
+     7 |         * on (colo_name) group_left(animal)
+     8 |         colo_metadata{colo_status="v"}
+     9 |       )
+    10 |       * on(animal, instance)
+               ^ This binary operation prevents previously joined label `brand` from being added to the results.
+    11 |       (
+    12 |         up{node_status="v", job="blackholebird"}
+    13 |         * on (colo_name) group_left(animal, brand)
+                                                     ^^^^^ Query is using `group_left(animal, brand)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+    14 |         colo_metadata{colo_status="v"}
+    15 |       )
+    16 |     )
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `brand` from being added to the results.
+          firstcolumn: 155
+          lastcolumn: 155
+          kind: 0
+        - message: Query is using `group_left(animal, brand)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          firstcolumn: 267
+          lastcolumn: 271
+          kind: 1
+    lines:
+        first: 4
+        last: 16
+    severity: 1
+    anchor: 0
+
+---
+
+[TestImpossibleCheck/group_left_inside_without_but_used_for_inner_without_join - 1]
+[]
+
+---
+
+[TestImpossibleCheck/group_left_labels_not_used_in_outer_join - 1]
+- description: group_left labels not used in outer join
+  content: |4
+
+    - record: foo
+      expr: |
+        up{node_status="v", job="node_exporter"}
+        * on(instance) metal_services_enabled
+        * on(instance) (
+          metal_services_enabled
+          * on(instance) group_left (sliver)
+          sliver_metadata{node_status="v"}
+        )
+  output: |4
+     4 |     up{node_status="v", job="node_exporter"}
+     5 |     * on(instance) metal_services_enabled
+     6 |     * on(instance) (
+             ^ This binary operation prevents previously joined label `sliver` from being added to the results.
+     7 |       metal_services_enabled
+     8 |       * on(instance) group_left (sliver)
+                                          ^^^^^^ Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+     9 |       sliver_metadata{node_status="v"}
+    10 |     )
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `sliver` from being added to the results.
+          firstcolumn: 80
+          lastcolumn: 80
+          kind: 0
+        - message: Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          firstcolumn: 151
+          lastcolumn: 156
+          kind: 1
+    lines:
+        first: 4
+        last: 10
+    severity: 1
+    anchor: 0
+
+---
+
+[TestImpossibleCheck/group_left_labels_not_used_in_outer_join_with_another_group_left - 1]
+- description: group_left labels not used in outer join with another group_left
+  content: |4
+
+    - record: foo
+      expr: |
+        up{node_status="v", job="node_exporter"}
+        * on(instance) group_left metal_services_enabled
+        * on(instance, colo_name) (
+          metal_services_enabled
+          * on(instance) group_left (sliver)
+          sliver_metadata{node_status="v"}
+        )
+  output: |4
+     4 |     up{node_status="v", job="node_exporter"}
+     5 |     * on(instance) group_left metal_services_enabled
+     6 |     * on(instance, colo_name) (
+             ^ This binary operation prevents previously joined label `sliver` from being added to the results.
+     7 |       metal_services_enabled
+     8 |       * on(instance) group_left (sliver)
+                                          ^^^^^^ Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+     9 |       sliver_metadata{node_status="v"}
+    10 |     )
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `sliver` from being added to the results.
+          firstcolumn: 91
+          lastcolumn: 91
+          kind: 0
+        - message: Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          firstcolumn: 173
+          lastcolumn: 178
+          kind: 1
+    lines:
+        first: 4
+        last: 10
+    severity: 1
+    anchor: 0
+
+---
+
+[TestImpossibleCheck/group_left_labels_not_used_in_outer_join_with_another_group_right - 1]
+- description: group_left labels not used in outer join with another group_right
+  content: |4
+
+    - record: foo
+      expr: |
+        up{node_status="v", job="node_exporter"}
+        * on(instance) group_right metal_services_enabled
+        * on(instance, colo_name) (
+          metal_services_enabled
+          * on(instance) group_left (sliver)
+          sliver_metadata{node_status="v"}
+        )
+  output: |4
+     4 |     up{node_status="v", job="node_exporter"}
+     5 |     * on(instance) group_right metal_services_enabled
+     6 |     * on(instance, colo_name) (
+             ^ This binary operation prevents previously joined label `sliver` from being added to the results.
+     7 |       metal_services_enabled
+     8 |       * on(instance) group_left (sliver)
+                                          ^^^^^^ Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+     9 |       sliver_metadata{node_status="v"}
+    10 |     )
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `sliver` from being added to the results.
+          firstcolumn: 92
+          lastcolumn: 92
+          kind: 0
+        - message: Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          firstcolumn: 174
+          lastcolumn: 179
+          kind: 1
+    lines:
+        first: 4
+        last: 10
+    severity: 1
+    anchor: 0
+
+---
+
+[TestImpossibleCheck/group_left_labels_promoted_correctly - 1]
+[]
+
+---
+
+[TestImpossibleCheck/group_left_not_included_in_by - 1]
+- description: group_left not included in by
+  content: |4
+
+    - record: foo
+      expr: |
+        group by(brand) (
+          up{node_status="v", job="node_exporter"}
+          * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+          * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+        )
+  output: |
+    4 |     group by(brand) (
+                  ^^^^^^^^^ Previously joined label `tier` is being removed from the results.
+    5 |       up{node_status="v", job="node_exporter"}
+    6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+                                          ^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+    7 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+    8 |     )
+  problem:
+    reporter: promql/impossible
+    summary: unused label
+    details: ""
+    diagnostics:
+        - message: Previously joined label `tier` is being removed from the results.
+          firstcolumn: 7
+          lastcolumn: 15
+          kind: 0
+        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          firstcolumn: 92
+          lastcolumn: 95
+          kind: 1
+    lines:
+        first: 4
+        last: 8
+    severity: 1
+    anchor: 0
+- description: group_left not included in by
+  content: |4
+
+    - record: foo
+      expr: |
+        group by(brand) (
+          up{node_status="v", job="node_exporter"}
+          * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+          * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+        )
+  output: |
+    4 |     group by(brand) (
+                  ^^^^^^^^^ Previously joined label `animal` is being removed from the results.
+    5 |       up{node_status="v", job="node_exporter"}
+    6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+                                                ^^^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+    7 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+    8 |     )
+  problem:
+    reporter: promql/impossible
+    summary: unused label
+    details: ""
+    diagnostics:
+        - message: Previously joined label `animal` is being removed from the results.
+          firstcolumn: 7
+          lastcolumn: 15
+          kind: 0
+        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          firstcolumn: 98
+          lastcolumn: 103
+          kind: 1
+    lines:
+        first: 4
+        last: 8
+    severity: 1
+    anchor: 0
+- description: group_left not included in by
+  content: |4
+
+    - record: foo
+      expr: |
+        group by(brand) (
+          up{node_status="v", job="node_exporter"}
+          * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+          * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+        )
+  output: |
+    4 |     group by(brand) (
+                  ^^^^^^^^^ Previously joined label `pop_name` is being removed from the results.
+    5 |       up{node_status="v", job="node_exporter"}
+    6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+                                                               ^^^^^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+    7 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+    8 |     )
+  problem:
+    reporter: promql/impossible
+    summary: unused label
+    details: ""
+    diagnostics:
+        - message: Previously joined label `pop_name` is being removed from the results.
+          firstcolumn: 7
+          lastcolumn: 15
+          kind: 0
+        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          firstcolumn: 113
+          lastcolumn: 120
+          kind: 1
+    lines:
+        first: 4
+        last: 8
+    severity: 1
+    anchor: 0
+- description: group_left not included in by
+  content: |4
+
+    - record: foo
+      expr: |
+        group by(brand) (
+          up{node_status="v", job="node_exporter"}
+          * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+          * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+        )
+  output: |
+    4 |     group by(brand) (
+                  ^^^^^^^^^ Previously joined label `sliver` is being removed from the results.
+    5 |       up{node_status="v", job="node_exporter"}
+    6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+    7 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+                                          ^^^^^^ Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+    8 |     )
+  problem:
+    reporter: promql/impossible
+    summary: unused label
+    details: ""
+    diagnostics:
+        - message: Previously joined label `sliver` is being removed from the results.
+          firstcolumn: 7
+          lastcolumn: 15
+          kind: 0
+        - message: Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          firstcolumn: 184
+          lastcolumn: 189
+          kind: 1
+    lines:
+        first: 4
+        last: 8
+    severity: 1
+    anchor: 0
+
+---
+
+[TestImpossibleCheck/group_left_on_a_label_already_guaranteed_on_the_left - 1]
+- description: group_left on a label already guaranteed on the left
+  content: |4
+
+    - record: foo
+      expr: |
+        up{node_status="v", job="node_exporter"}
+        * on(instance) group_left(node_status) sliver_metadata
+  output: |
+    4 |     up{node_status="v", job="node_exporter"}
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Query will only return series where these labels are present.
+    5 |     * on(instance) group_left(node_status) sliver_metadata
+                                      ^^^^^^^^^^^ Query is trying to join the `node_status` label that is already present on the other side of the query.
+  problem:
+    reporter: promql/impossible
+    summary: redundant label
+    details: ""
+    diagnostics:
+        - message: Query is trying to join the `node_status` label that is already present on the other side of the query.
+          firstcolumn: 68
+          lastcolumn: 78
+          kind: 0
+        - message: Query will only return series where these labels are present.
+          firstcolumn: 1
+          lastcolumn: 40
+          kind: 1
+    lines:
+        first: 4
+        last: 5
+    severity: 1
+    anchor: 0
+
+---
+
+[TestImpossibleCheck/group_left_with_empty_by - 1]
+- description: group_left with empty by
+  content: |4
+
+    - record: foo
+      expr: |
+        group (
+          up{node_status="v", job="node_exporter"}
+          * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+          * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+        )
+  output: |
+    4 |     group (
+            ^^^^^^ Previously joined label `tier` is being removed from the results.
+    5 |       up{node_status="v", job="node_exporter"}
+    6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+                                          ^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+    7 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+    8 |     )
+  problem:
+    reporter: promql/impossible
+    summary: unused label
+    details: ""
+    diagnostics:
+        - message: Previously joined label `tier` is being removed from the results.
+          firstcolumn: 1
+          lastcolumn: 6
+          kind: 0
+        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          firstcolumn: 82
+          lastcolumn: 85
+          kind: 1
+    lines:
+        first: 4
+        last: 8
+    severity: 1
+    anchor: 0
+- description: group_left with empty by
+  content: |4
+
+    - record: foo
+      expr: |
+        group (
+          up{node_status="v", job="node_exporter"}
+          * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+          * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+        )
+  output: |
+    4 |     group (
+            ^^^^^^ Previously joined label `animal` is being removed from the results.
+    5 |       up{node_status="v", job="node_exporter"}
+    6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+                                                ^^^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+    7 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+    8 |     )
+  problem:
+    reporter: promql/impossible
+    summary: unused label
+    details: ""
+    diagnostics:
+        - message: Previously joined label `animal` is being removed from the results.
+          firstcolumn: 1
+          lastcolumn: 6
+          kind: 0
+        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          firstcolumn: 88
+          lastcolumn: 93
+          kind: 1
+    lines:
+        first: 4
+        last: 8
+    severity: 1
+    anchor: 0
+- description: group_left with empty by
+  content: |4
+
+    - record: foo
+      expr: |
+        group (
+          up{node_status="v", job="node_exporter"}
+          * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+          * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+        )
+  output: |
+    4 |     group (
+            ^^^^^^ Previously joined label `brand` is being removed from the results.
+    5 |       up{node_status="v", job="node_exporter"}
+    6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+                                                        ^^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+    7 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+    8 |     )
+  problem:
+    reporter: promql/impossible
+    summary: unused label
+    details: ""
+    diagnostics:
+        - message: Previously joined label `brand` is being removed from the results.
+          firstcolumn: 1
+          lastcolumn: 6
+          kind: 0
+        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          firstcolumn: 96
+          lastcolumn: 100
+          kind: 1
+    lines:
+        first: 4
+        last: 8
+    severity: 1
+    anchor: 0
+- description: group_left with empty by
+  content: |4
+
+    - record: foo
+      expr: |
+        group (
+          up{node_status="v", job="node_exporter"}
+          * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+          * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+        )
+  output: |
+    4 |     group (
+            ^^^^^^ Previously joined label `pop_name` is being removed from the results.
+    5 |       up{node_status="v", job="node_exporter"}
+    6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+                                                               ^^^^^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+    7 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+    8 |     )
+  problem:
+    reporter: promql/impossible
+    summary: unused label
+    details: ""
+    diagnostics:
+        - message: Previously joined label `pop_name` is being removed from the results.
+          firstcolumn: 1
+          lastcolumn: 6
+          kind: 0
+        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          firstcolumn: 103
+          lastcolumn: 110
+          kind: 1
+    lines:
+        first: 4
+        last: 8
+    severity: 1
+    anchor: 0
+- description: group_left with empty by
+  content: |4
+
+    - record: foo
+      expr: |
+        group (
+          up{node_status="v", job="node_exporter"}
+          * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+          * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+        )
+  output: |
+    4 |     group (
+            ^^^^^^ Previously joined label `sliver` is being removed from the results.
+    5 |       up{node_status="v", job="node_exporter"}
+    6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+    7 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+                                          ^^^^^^ Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+    8 |     )
+  problem:
+    reporter: promql/impossible
+    summary: unused label
+    details: ""
+    diagnostics:
+        - message: Previously joined label `sliver` is being removed from the results.
+          firstcolumn: 1
+          lastcolumn: 6
+          kind: 0
+        - message: Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          firstcolumn: 174
+          lastcolumn: 179
+          kind: 1
+    lines:
+        first: 4
+        last: 8
+    severity: 1
+    anchor: 0
+
+---
+
+[TestImpossibleCheck/group_right_labels_not_used_in_outer_join - 1]
+- description: group_right labels not used in outer join
+  content: |4
+
+    - record: foo
+      expr: |
+        up{node_status="v", job="node_exporter"}
+        * on(instance) metal_services_enabled
+        * on(instance) (
+          sliver_metadata{node_status="v"}
+          * on(instance) group_right (sliver)
+          metal_services_enabled
+        )
+  output: |4
+     4 |     up{node_status="v", job="node_exporter"}
+     5 |     * on(instance) metal_services_enabled
+     6 |     * on(instance) (
+             ^ This binary operation prevents previously joined label `sliver` from being added to the results.
+     7 |       sliver_metadata{node_status="v"}
+     8 |       * on(instance) group_right (sliver)
+                                           ^^^^^^ Query is using `group_right(sliver)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
+     9 |       metal_services_enabled
+    10 |     )
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `sliver` from being added to the results.
+          firstcolumn: 80
+          lastcolumn: 80
+          kind: 0
+        - message: Query is using `group_right(sliver)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
+          firstcolumn: 162
+          lastcolumn: 167
+          kind: 1
+    lines:
+        first: 4
+        last: 10
+    severity: 1
+    anchor: 0
+
+---
+
 [TestImpossibleCheck/ignores_rules_with_syntax_errors - 1]
 []
 
@@ -939,6 +1633,33 @@
         last: 3
     severity: 1
     anchor: 0
+- description: 'impossible / on group_left '
+  content: |4
+
+    - record: foo
+      expr: foo / on(instance) group_left(cluster) sum(bar)
+  output: |
+    3 |   expr: foo / on(instance) group_left(cluster) sum(bar)
+                                                       ^^^ Query is using aggregation that removes all labels.
+                                              ^^^^^^^ You can't use `cluster` because this label is not possible here.
+  problem:
+    reporter: promql/impossible
+    summary: impossible label
+    details: ""
+    diagnostics:
+        - message: You can't use `cluster` because this label is not possible here.
+          firstcolumn: 31
+          lastcolumn: 37
+          kind: 0
+        - message: Query is using aggregation that removes all labels.
+          firstcolumn: 40
+          lastcolumn: 42
+          kind: 1
+    lines:
+        first: 3
+        last: 3
+    severity: 1
+    anchor: 0
 
 ---
 
@@ -965,6 +1686,297 @@
         last: 3
     severity: 1
     anchor: 0
+- description: impossible / on group_right
+  content: |4
+
+    - record: foo
+      expr: sum(bar) / on(instance) group_right(cluster) foo
+  output: |
+    3 |   expr: sum(bar) / on(instance) group_right(cluster) foo
+                                                    ^^^^^^^ You can't use `cluster` because this label is not possible here.
+                ^^^ Query is using aggregation that removes all labels.
+  problem:
+    reporter: promql/impossible
+    summary: impossible label
+    details: ""
+    diagnostics:
+        - message: You can't use `cluster` because this label is not possible here.
+          firstcolumn: 37
+          lastcolumn: 43
+          kind: 0
+        - message: Query is using aggregation that removes all labels.
+          firstcolumn: 1
+          lastcolumn: 3
+          kind: 1
+    lines:
+        first: 3
+        last: 3
+    severity: 1
+    anchor: 0
+
+---
+
+[TestImpossibleCheck/impossible_group_by - 1]
+- description: impossible group_by
+  content: |4
+
+    - record: foo
+      expr: |
+        group by (colo_name, instance, tier, animal, brand, sliver, pop_name) (
+          up{node_status="v", job="node_exporter"}
+          and on (instance) (metal_services_enabled == 999)
+          * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+          * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+          unless on (instance) label_join(
+            max by (boring_instance) (boring_reboot_in_maintenance) == 1,
+                "instance",
+                "$1",
+                "boring_instance"
+              )
+          unless on (colo_name) (colostat_disabled_pops == 1)
+        )
+  output: |4
+     4 |     group by (colo_name, instance, tier, animal, brand, sliver, pop_name) (
+     5 |       up{node_status="v", job="node_exporter"}
+     6 |       and on (instance) (metal_services_enabled == 999)
+               ^^^ This binary operation prevents previously joined label `tier` from being added to the results.
+     7 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+                                           ^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+     8 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+     9 |       unless on (instance) label_join(
+    10 |         max by (boring_instance) (boring_reboot_in_maintenance) == 1,
+    11 |             "instance",
+    12 |             "$1",
+    13 |             "boring_instance"
+    14 |           )
+    15 |       unless on (colo_name) (colostat_disabled_pops == 1)
+    16 |     )
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `tier` from being added to the results.
+          firstcolumn: 118
+          lastcolumn: 120
+          kind: 0
+        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          firstcolumn: 198
+          lastcolumn: 201
+          kind: 1
+    lines:
+        first: 4
+        last: 16
+    severity: 1
+    anchor: 0
+- description: impossible group_by
+  content: |4
+
+    - record: foo
+      expr: |
+        group by (colo_name, instance, tier, animal, brand, sliver, pop_name) (
+          up{node_status="v", job="node_exporter"}
+          and on (instance) (metal_services_enabled == 999)
+          * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+          * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+          unless on (instance) label_join(
+            max by (boring_instance) (boring_reboot_in_maintenance) == 1,
+                "instance",
+                "$1",
+                "boring_instance"
+              )
+          unless on (colo_name) (colostat_disabled_pops == 1)
+        )
+  output: |4
+     4 |     group by (colo_name, instance, tier, animal, brand, sliver, pop_name) (
+     5 |       up{node_status="v", job="node_exporter"}
+     6 |       and on (instance) (metal_services_enabled == 999)
+               ^^^ This binary operation prevents previously joined label `animal` from being added to the results.
+     7 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+                                                 ^^^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+     8 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+     9 |       unless on (instance) label_join(
+    10 |         max by (boring_instance) (boring_reboot_in_maintenance) == 1,
+    11 |             "instance",
+    12 |             "$1",
+    13 |             "boring_instance"
+    14 |           )
+    15 |       unless on (colo_name) (colostat_disabled_pops == 1)
+    16 |     )
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `animal` from being added to the results.
+          firstcolumn: 118
+          lastcolumn: 120
+          kind: 0
+        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          firstcolumn: 204
+          lastcolumn: 209
+          kind: 1
+    lines:
+        first: 4
+        last: 16
+    severity: 1
+    anchor: 0
+- description: impossible group_by
+  content: |4
+
+    - record: foo
+      expr: |
+        group by (colo_name, instance, tier, animal, brand, sliver, pop_name) (
+          up{node_status="v", job="node_exporter"}
+          and on (instance) (metal_services_enabled == 999)
+          * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+          * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+          unless on (instance) label_join(
+            max by (boring_instance) (boring_reboot_in_maintenance) == 1,
+                "instance",
+                "$1",
+                "boring_instance"
+              )
+          unless on (colo_name) (colostat_disabled_pops == 1)
+        )
+  output: |4
+     4 |     group by (colo_name, instance, tier, animal, brand, sliver, pop_name) (
+     5 |       up{node_status="v", job="node_exporter"}
+     6 |       and on (instance) (metal_services_enabled == 999)
+               ^^^ This binary operation prevents previously joined label `brand` from being added to the results.
+     7 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+                                                         ^^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+     8 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+     9 |       unless on (instance) label_join(
+    10 |         max by (boring_instance) (boring_reboot_in_maintenance) == 1,
+    11 |             "instance",
+    12 |             "$1",
+    13 |             "boring_instance"
+    14 |           )
+    15 |       unless on (colo_name) (colostat_disabled_pops == 1)
+    16 |     )
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `brand` from being added to the results.
+          firstcolumn: 118
+          lastcolumn: 120
+          kind: 0
+        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          firstcolumn: 212
+          lastcolumn: 216
+          kind: 1
+    lines:
+        first: 4
+        last: 16
+    severity: 1
+    anchor: 0
+- description: impossible group_by
+  content: |4
+
+    - record: foo
+      expr: |
+        group by (colo_name, instance, tier, animal, brand, sliver, pop_name) (
+          up{node_status="v", job="node_exporter"}
+          and on (instance) (metal_services_enabled == 999)
+          * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+          * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+          unless on (instance) label_join(
+            max by (boring_instance) (boring_reboot_in_maintenance) == 1,
+                "instance",
+                "$1",
+                "boring_instance"
+              )
+          unless on (colo_name) (colostat_disabled_pops == 1)
+        )
+  output: |4
+     4 |     group by (colo_name, instance, tier, animal, brand, sliver, pop_name) (
+     5 |       up{node_status="v", job="node_exporter"}
+     6 |       and on (instance) (metal_services_enabled == 999)
+               ^^^ This binary operation prevents previously joined label `pop_name` from being added to the results.
+     7 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+                                                                ^^^^^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+     8 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+     9 |       unless on (instance) label_join(
+    10 |         max by (boring_instance) (boring_reboot_in_maintenance) == 1,
+    11 |             "instance",
+    12 |             "$1",
+    13 |             "boring_instance"
+    14 |           )
+    15 |       unless on (colo_name) (colostat_disabled_pops == 1)
+    16 |     )
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `pop_name` from being added to the results.
+          firstcolumn: 118
+          lastcolumn: 120
+          kind: 0
+        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          firstcolumn: 219
+          lastcolumn: 226
+          kind: 1
+    lines:
+        first: 4
+        last: 16
+    severity: 1
+    anchor: 0
+- description: impossible group_by
+  content: |4
+
+    - record: foo
+      expr: |
+        group by (colo_name, instance, tier, animal, brand, sliver, pop_name) (
+          up{node_status="v", job="node_exporter"}
+          and on (instance) (metal_services_enabled == 999)
+          * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+          * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+          unless on (instance) label_join(
+            max by (boring_instance) (boring_reboot_in_maintenance) == 1,
+                "instance",
+                "$1",
+                "boring_instance"
+              )
+          unless on (colo_name) (colostat_disabled_pops == 1)
+        )
+  output: |4
+     4 |     group by (colo_name, instance, tier, animal, brand, sliver, pop_name) (
+     5 |       up{node_status="v", job="node_exporter"}
+     6 |       and on (instance) (metal_services_enabled == 999)
+               ^^^ This binary operation prevents previously joined label `sliver` from being added to the results.
+     7 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+     8 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+                                           ^^^^^^ Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+     9 |       unless on (instance) label_join(
+    10 |         max by (boring_instance) (boring_reboot_in_maintenance) == 1,
+    11 |             "instance",
+    12 |             "$1",
+    13 |             "boring_instance"
+    14 |           )
+    15 |       unless on (colo_name) (colostat_disabled_pops == 1)
+    16 |     )
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `sliver` from being added to the results.
+          firstcolumn: 118
+          lastcolumn: 120
+          kind: 0
+        - message: Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          firstcolumn: 290
+          lastcolumn: 295
+          kind: 1
+    lines:
+        first: 4
+        last: 16
+    severity: 1
+    anchor: 0
 
 ---
 
@@ -981,7 +1993,7 @@
     4 |     group by (env, cluster, status, instance, dc, port) (
                       ^^^ You can't use `env` because this label is not possible here.
     5 |         up{env="prod", job="foo"} * on (instance) (services_enabled == 999)
-                                            ^^^ Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+                                            ^^^^^^^^^^^^^ Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
     6 |     )
   problem:
     reporter: promql/impossible
@@ -994,7 +2006,7 @@
           kind: 0
         - message: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
           firstcolumn: 87
-          lastcolumn: 89
+          lastcolumn: 99
           kind: 1
     lines:
         first: 4
@@ -1013,7 +2025,7 @@
     4 |     group by (env, cluster, status, instance, dc, port) (
                            ^^^^^^^ You can't use `cluster` because this label is not possible here.
     5 |         up{env="prod", job="foo"} * on (instance) (services_enabled == 999)
-                                            ^^^ Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+                                            ^^^^^^^^^^^^^ Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
     6 |     )
   problem:
     reporter: promql/impossible
@@ -1026,7 +2038,7 @@
           kind: 0
         - message: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
           firstcolumn: 87
-          lastcolumn: 89
+          lastcolumn: 99
           kind: 1
     lines:
         first: 4
@@ -1045,7 +2057,7 @@
     4 |     group by (env, cluster, status, instance, dc, port) (
                                     ^^^^^^ You can't use `status` because this label is not possible here.
     5 |         up{env="prod", job="foo"} * on (instance) (services_enabled == 999)
-                                            ^^^ Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+                                            ^^^^^^^^^^^^^ Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
     6 |     )
   problem:
     reporter: promql/impossible
@@ -1058,7 +2070,7 @@
           kind: 0
         - message: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
           firstcolumn: 87
-          lastcolumn: 89
+          lastcolumn: 99
           kind: 1
     lines:
         first: 4
@@ -1077,7 +2089,7 @@
     4 |     group by (env, cluster, status, instance, dc, port) (
                                                       ^^ You can't use `dc` because this label is not possible here.
     5 |         up{env="prod", job="foo"} * on (instance) (services_enabled == 999)
-                                            ^^^ Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+                                            ^^^^^^^^^^^^^ Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
     6 |     )
   problem:
     reporter: promql/impossible
@@ -1090,7 +2102,7 @@
           kind: 0
         - message: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
           firstcolumn: 87
-          lastcolumn: 89
+          lastcolumn: 99
           kind: 1
     lines:
         first: 4
@@ -1109,7 +2121,7 @@
     4 |     group by (env, cluster, status, instance, dc, port) (
                                                           ^^^^ You can't use `port` because this label is not possible here.
     5 |         up{env="prod", job="foo"} * on (instance) (services_enabled == 999)
-                                            ^^^ Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+                                            ^^^^^^^^^^^^^ Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
     6 |     )
   problem:
     reporter: promql/impossible
@@ -1122,11 +2134,117 @@
           kind: 0
         - message: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
           firstcolumn: 87
-          lastcolumn: 89
+          lastcolumn: 99
           kind: 1
     lines:
         first: 4
         last: 6
+    severity: 1
+    anchor: 0
+
+---
+
+[TestImpossibleCheck/impossible_match_due_to_orphaned_group_left - 1]
+- description: impossible match due to orphaned group_left
+  content: |4
+
+    - record: foo
+      expr: |
+        up{node_status="v", job="node_exporter"}
+        and on (instance, animal, brand) (metal_services_enabled == 999)
+        * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+        * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+  output: |
+    4 |     up{node_status="v", job="node_exporter"}
+    5 |     and on (instance, animal, brand) (metal_services_enabled == 999)
+            ^^^ This binary operation prevents previously joined label `tier` from being added to the results.
+    6 |     * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+                                        ^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+    7 |     * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `tier` from being added to the results.
+          firstcolumn: 42
+          lastcolumn: 44
+          kind: 0
+        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          firstcolumn: 135
+          lastcolumn: 138
+          kind: 1
+    lines:
+        first: 4
+        last: 7
+    severity: 1
+    anchor: 0
+- description: impossible match due to orphaned group_left
+  content: |4
+
+    - record: foo
+      expr: |
+        up{node_status="v", job="node_exporter"}
+        and on (instance, animal, brand) (metal_services_enabled == 999)
+        * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+        * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+  output: |
+    4 |     up{node_status="v", job="node_exporter"}
+    5 |     and on (instance, animal, brand) (metal_services_enabled == 999)
+            ^^^ This binary operation prevents previously joined label `pop_name` from being added to the results.
+    6 |     * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+                                                             ^^^^^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+    7 |     * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `pop_name` from being added to the results.
+          firstcolumn: 42
+          lastcolumn: 44
+          kind: 0
+        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          firstcolumn: 156
+          lastcolumn: 163
+          kind: 1
+    lines:
+        first: 4
+        last: 7
+    severity: 1
+    anchor: 0
+- description: impossible match due to orphaned group_left
+  content: |4
+
+    - record: foo
+      expr: |
+        up{node_status="v", job="node_exporter"}
+        and on (instance, animal, brand) (metal_services_enabled == 999)
+        * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+        * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+  output: |
+    4 |     up{node_status="v", job="node_exporter"}
+    5 |     and on (instance, animal, brand) (metal_services_enabled == 999)
+            ^^^ This binary operation prevents previously joined label `sliver` from being added to the results.
+    6 |     * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+    7 |     * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+                                        ^^^^^^ Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `sliver` from being added to the results.
+          firstcolumn: 42
+          lastcolumn: 44
+          kind: 0
+        - message: Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          firstcolumn: 225
+          lastcolumn: 230
+          kind: 1
+    lines:
+        first: 4
+        last: 7
     severity: 1
     anchor: 0
 
@@ -1198,6 +2316,169 @@
         last: 7
     severity: 1
     anchor: 0
+
+---
+
+[TestImpossibleCheck/join_on_impossible_label - 1]
+- description: join on impossible label
+  content: |4
+
+    - record: foo
+      expr: |
+        sum by (job) (
+          up{env="prod", job="foo"} * on () group_left(job) services_enabled{job=""}
+        )
+  output: |
+    4 |     sum by (job) (
+    5 |       up{env="prod", job="foo"} * on () group_left(job) services_enabled{job=""}
+                                                           ^^^ Query is trying to join the `job` label that is already present on the other side of the query.
+              ^^^^^^^^^^^^^^^^^^^^^^^^^ Query will only return series where these labels are present.
+    6 |     )
+  problem:
+    reporter: promql/impossible
+    summary: redundant label
+    details: ""
+    diagnostics:
+        - message: Query is trying to join the `job` label that is already present on the other side of the query.
+          firstcolumn: 63
+          lastcolumn: 65
+          kind: 0
+        - message: Query will only return series where these labels are present.
+          firstcolumn: 18
+          lastcolumn: 42
+          kind: 1
+    lines:
+        first: 4
+        last: 6
+    severity: 1
+    anchor: 0
+- description: join on impossible label
+  content: |4
+
+    - record: foo
+      expr: |
+        sum by (job) (
+          up{env="prod", job="foo"} * on () group_left(job) services_enabled{job=""}
+        )
+  output: |
+    4 |     sum by (job) (
+    5 |       up{env="prod", job="foo"} * on () group_left(job) services_enabled{job=""}
+                                                                ^^^^^^^^^^^^^^^^^^^^^^^^ Query uses `{job=""}` selector which will filter out any time series with the `job` label set.
+                                                           ^^^ You can't use `job` because this label is not possible here.
+    6 |     )
+  problem:
+    reporter: promql/impossible
+    summary: impossible label
+    details: ""
+    diagnostics:
+        - message: You can't use `job` because this label is not possible here.
+          firstcolumn: 63
+          lastcolumn: 65
+          kind: 0
+        - message: Query uses `{job=""}` selector which will filter out any time series with the `job` label set.
+          firstcolumn: 68
+          lastcolumn: 91
+          kind: 1
+    lines:
+        first: 4
+        last: 6
+    severity: 1
+    anchor: 0
+
+---
+
+[TestImpossibleCheck/join_on_possible_but_redundant_label - 1]
+- description: join on possible but redundant label
+  content: |4
+
+    - record: foo
+      expr: |
+        sum by (job) (
+          up{env="prod", job="foo"} * on () group_left(job) services_enabled{job!=""}
+        )
+  output: |
+    4 |     sum by (job) (
+    5 |       up{env="prod", job="foo"} * on () group_left(job) services_enabled{job!=""}
+                                                           ^^^ Query is trying to join the `job` label that is already present on the other side of the query.
+              ^^^^^^^^^^^^^^^^^^^^^^^^^ Query will only return series where these labels are present.
+    6 |     )
+  problem:
+    reporter: promql/impossible
+    summary: redundant label
+    details: ""
+    diagnostics:
+        - message: Query is trying to join the `job` label that is already present on the other side of the query.
+          firstcolumn: 63
+          lastcolumn: 65
+          kind: 0
+        - message: Query will only return series where these labels are present.
+          firstcolumn: 18
+          lastcolumn: 42
+          kind: 1
+    lines:
+        first: 4
+        last: 6
+    severity: 1
+    anchor: 0
+
+---
+
+[TestImpossibleCheck/join_on_possible_label - 1]
+[]
+
+---
+
+[TestImpossibleCheck/joined_label_NOT_ignored_via_ignoring() - 1]
+[]
+
+---
+
+[TestImpossibleCheck/joined_label_ignored_via_ignoring() - 1]
+- description: joined label ignored via ignoring()
+  content: |4
+
+    - record: foo
+      expr: |
+        (prometheus_ready * on(instance) group_left(version) prometheus_build_info)
+        * ignoring(version) prometheus_config_last_reload_successful
+  output: |
+    4 |     (prometheus_ready * on(instance) group_left(version) prometheus_build_info)
+    5 |     * ignoring(version) prometheus_config_last_reload_successful
+                       ^^^^^^^ Query is using one-to-one vector matching with `ignoring(version)`, all labels included inside `ignoring(...)` will be removed on the results.
+            ^ This binary operation prevents previously joined label `version` from being added to the results.
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `version` from being added to the results.
+          firstcolumn: 77
+          lastcolumn: 77
+          kind: 0
+        - message: Query is using one-to-one vector matching with `ignoring(version)`, all labels included inside `ignoring(...)` will be removed on the results.
+          firstcolumn: 88
+          lastcolumn: 94
+          kind: 1
+    lines:
+        first: 4
+        last: 5
+    severity: 1
+    anchor: 0
+
+---
+
+[TestImpossibleCheck/match_on_group_right_label - 1]
+[]
+
+---
+
+[TestImpossibleCheck/match_on_group_right_label - 1]
+[]
+
+---
+
+[TestImpossibleCheck/max_by()_unless - 1]
+[]
 
 ---
 
@@ -1352,6 +2633,592 @@
 
 ---
 
+[TestImpossibleCheck/orphaned_group_left_labels - 1]
+- description: orphaned group_left labels
+  content: |4
+
+    - record: foo
+      expr: |
+        up{node_status="v", job="node_exporter"}
+        and on (instance) (metal_services_enabled == 999)
+        * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+        * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+  output: |
+    4 |     up{node_status="v", job="node_exporter"}
+    5 |     and on (instance) (metal_services_enabled == 999)
+            ^^^ This binary operation prevents previously joined label `tier` from being added to the results.
+    6 |     * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+                                        ^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+    7 |     * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `tier` from being added to the results.
+          firstcolumn: 42
+          lastcolumn: 44
+          kind: 0
+        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          firstcolumn: 120
+          lastcolumn: 123
+          kind: 1
+    lines:
+        first: 4
+        last: 7
+    severity: 1
+    anchor: 0
+- description: orphaned group_left labels
+  content: |4
+
+    - record: foo
+      expr: |
+        up{node_status="v", job="node_exporter"}
+        and on (instance) (metal_services_enabled == 999)
+        * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+        * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+  output: |
+    4 |     up{node_status="v", job="node_exporter"}
+    5 |     and on (instance) (metal_services_enabled == 999)
+            ^^^ This binary operation prevents previously joined label `animal` from being added to the results.
+    6 |     * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+                                              ^^^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+    7 |     * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `animal` from being added to the results.
+          firstcolumn: 42
+          lastcolumn: 44
+          kind: 0
+        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          firstcolumn: 126
+          lastcolumn: 131
+          kind: 1
+    lines:
+        first: 4
+        last: 7
+    severity: 1
+    anchor: 0
+- description: orphaned group_left labels
+  content: |4
+
+    - record: foo
+      expr: |
+        up{node_status="v", job="node_exporter"}
+        and on (instance) (metal_services_enabled == 999)
+        * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+        * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+  output: |
+    4 |     up{node_status="v", job="node_exporter"}
+    5 |     and on (instance) (metal_services_enabled == 999)
+            ^^^ This binary operation prevents previously joined label `brand` from being added to the results.
+    6 |     * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+                                                      ^^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+    7 |     * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `brand` from being added to the results.
+          firstcolumn: 42
+          lastcolumn: 44
+          kind: 0
+        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          firstcolumn: 134
+          lastcolumn: 138
+          kind: 1
+    lines:
+        first: 4
+        last: 7
+    severity: 1
+    anchor: 0
+- description: orphaned group_left labels
+  content: |4
+
+    - record: foo
+      expr: |
+        up{node_status="v", job="node_exporter"}
+        and on (instance) (metal_services_enabled == 999)
+        * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+        * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+  output: |
+    4 |     up{node_status="v", job="node_exporter"}
+    5 |     and on (instance) (metal_services_enabled == 999)
+            ^^^ This binary operation prevents previously joined label `pop_name` from being added to the results.
+    6 |     * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+                                                             ^^^^^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+    7 |     * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `pop_name` from being added to the results.
+          firstcolumn: 42
+          lastcolumn: 44
+          kind: 0
+        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          firstcolumn: 141
+          lastcolumn: 148
+          kind: 1
+    lines:
+        first: 4
+        last: 7
+    severity: 1
+    anchor: 0
+- description: orphaned group_left labels
+  content: |4
+
+    - record: foo
+      expr: |
+        up{node_status="v", job="node_exporter"}
+        and on (instance) (metal_services_enabled == 999)
+        * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+        * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+  output: |
+    4 |     up{node_status="v", job="node_exporter"}
+    5 |     and on (instance) (metal_services_enabled == 999)
+            ^^^ This binary operation prevents previously joined label `sliver` from being added to the results.
+    6 |     * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
+    7 |     * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+                                        ^^^^^^ Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `sliver` from being added to the results.
+          firstcolumn: 42
+          lastcolumn: 44
+          kind: 0
+        - message: Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          firstcolumn: 210
+          lastcolumn: 215
+          kind: 1
+    lines:
+        first: 4
+        last: 7
+    severity: 1
+    anchor: 0
+
+---
+
+[TestImpossibleCheck/orphaned_group_right_labels_(all) - 1]
+- description: orphaned group_right labels (all)
+  content: |4
+
+    - record: foo
+      expr: |
+        colo_metadata{colo_status="v"} * on (colo_name) group_right(tier, animal, brand, pop_name)
+        sliver_metadata{node_status="v"} * on (instance) group_right (sliver)
+        (metal_services_enabled == 999) * on (instance) group_right()
+        up{node_status="v", job="node_exporter"}
+  output: "4 |     colo_metadata{colo_status=\"v\"} * on (colo_name) group_right(tier, animal, brand, pop_name)\n5 |     sliver_metadata{node_status=\"v\"} * on (instance) group_right (sliver)\n6 |     (metal_services_enabled == 999) * on (instance) group_right()\n                                        ^ This binary operation prevents previously joined label `sliver` from being added to the results.\n                                          \n7 |     up{node_status=\"v\", job=\"node_exporter\"}\n"
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `sliver` from being added to the results.
+          firstcolumn: 194
+          lastcolumn: 194
+          kind: 0
+        - message: ""
+          firstcolumn: 194
+          lastcolumn: 194
+          kind: 1
+    lines:
+        first: 4
+        last: 7
+    severity: 1
+    anchor: 0
+- description: orphaned group_right labels (all)
+  content: |4
+
+    - record: foo
+      expr: |
+        colo_metadata{colo_status="v"} * on (colo_name) group_right(tier, animal, brand, pop_name)
+        sliver_metadata{node_status="v"} * on (instance) group_right (sliver)
+        (metal_services_enabled == 999) * on (instance) group_right()
+        up{node_status="v", job="node_exporter"}
+  output: "4 |     colo_metadata{colo_status=\"v\"} * on (colo_name) group_right(tier, animal, brand, pop_name)\n5 |     sliver_metadata{node_status=\"v\"} * on (instance) group_right (sliver)\n                                         ^ This binary operation prevents previously joined label `tier` from being added to the results.\n                                           \n6 |     (metal_services_enabled == 999) * on (instance) group_right()\n7 |     up{node_status=\"v\", job=\"node_exporter\"}\n"
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `tier` from being added to the results.
+          firstcolumn: 125
+          lastcolumn: 125
+          kind: 0
+        - message: ""
+          firstcolumn: 125
+          lastcolumn: 125
+          kind: 1
+    lines:
+        first: 4
+        last: 7
+    severity: 1
+    anchor: 0
+- description: orphaned group_right labels (all)
+  content: |4
+
+    - record: foo
+      expr: |
+        colo_metadata{colo_status="v"} * on (colo_name) group_right(tier, animal, brand, pop_name)
+        sliver_metadata{node_status="v"} * on (instance) group_right (sliver)
+        (metal_services_enabled == 999) * on (instance) group_right()
+        up{node_status="v", job="node_exporter"}
+  output: "4 |     colo_metadata{colo_status=\"v\"} * on (colo_name) group_right(tier, animal, brand, pop_name)\n5 |     sliver_metadata{node_status=\"v\"} * on (instance) group_right (sliver)\n                                         ^ This binary operation prevents previously joined label `animal` from being added to the results.\n                                           \n6 |     (metal_services_enabled == 999) * on (instance) group_right()\n7 |     up{node_status=\"v\", job=\"node_exporter\"}\n"
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `animal` from being added to the results.
+          firstcolumn: 125
+          lastcolumn: 125
+          kind: 0
+        - message: ""
+          firstcolumn: 125
+          lastcolumn: 125
+          kind: 1
+    lines:
+        first: 4
+        last: 7
+    severity: 1
+    anchor: 0
+- description: orphaned group_right labels (all)
+  content: |4
+
+    - record: foo
+      expr: |
+        colo_metadata{colo_status="v"} * on (colo_name) group_right(tier, animal, brand, pop_name)
+        sliver_metadata{node_status="v"} * on (instance) group_right (sliver)
+        (metal_services_enabled == 999) * on (instance) group_right()
+        up{node_status="v", job="node_exporter"}
+  output: "4 |     colo_metadata{colo_status=\"v\"} * on (colo_name) group_right(tier, animal, brand, pop_name)\n5 |     sliver_metadata{node_status=\"v\"} * on (instance) group_right (sliver)\n                                         ^ This binary operation prevents previously joined label `brand` from being added to the results.\n                                           \n6 |     (metal_services_enabled == 999) * on (instance) group_right()\n7 |     up{node_status=\"v\", job=\"node_exporter\"}\n"
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `brand` from being added to the results.
+          firstcolumn: 125
+          lastcolumn: 125
+          kind: 0
+        - message: ""
+          firstcolumn: 125
+          lastcolumn: 125
+          kind: 1
+    lines:
+        first: 4
+        last: 7
+    severity: 1
+    anchor: 0
+- description: orphaned group_right labels (all)
+  content: |4
+
+    - record: foo
+      expr: |
+        colo_metadata{colo_status="v"} * on (colo_name) group_right(tier, animal, brand, pop_name)
+        sliver_metadata{node_status="v"} * on (instance) group_right (sliver)
+        (metal_services_enabled == 999) * on (instance) group_right()
+        up{node_status="v", job="node_exporter"}
+  output: "4 |     colo_metadata{colo_status=\"v\"} * on (colo_name) group_right(tier, animal, brand, pop_name)\n5 |     sliver_metadata{node_status=\"v\"} * on (instance) group_right (sliver)\n                                         ^ This binary operation prevents previously joined label `pop_name` from being added to the results.\n                                           \n6 |     (metal_services_enabled == 999) * on (instance) group_right()\n7 |     up{node_status=\"v\", job=\"node_exporter\"}\n"
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `pop_name` from being added to the results.
+          firstcolumn: 125
+          lastcolumn: 125
+          kind: 0
+        - message: ""
+          firstcolumn: 125
+          lastcolumn: 125
+          kind: 1
+    lines:
+        first: 4
+        last: 7
+    severity: 1
+    anchor: 0
+
+---
+
+[TestImpossibleCheck/orphaned_group_right_labels_(except_animal) - 1]
+- description: orphaned group_right labels (except animal)
+  content: |4
+
+    - record: foo
+      expr: |
+        colo_metadata{colo_status="v"} * on (colo_name) group_right(tier, animal, brand, pop_name)
+        sliver_metadata{node_status="v"} * on (instance) group_right (sliver, animal)
+        (metal_services_enabled == 999) * on (instance)
+        up{node_status="v", job="node_exporter"}
+  output: "4 |     colo_metadata{colo_status=\"v\"} * on (colo_name) group_right(tier, animal, brand, pop_name)\n5 |     sliver_metadata{node_status=\"v\"} * on (instance) group_right (sliver, animal)\n                                         ^ This binary operation prevents previously joined label `tier` from being added to the results.\n                                           \n6 |     (metal_services_enabled == 999) * on (instance)\n7 |     up{node_status=\"v\", job=\"node_exporter\"}\n"
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `tier` from being added to the results.
+          firstcolumn: 125
+          lastcolumn: 125
+          kind: 0
+        - message: ""
+          firstcolumn: 125
+          lastcolumn: 125
+          kind: 1
+    lines:
+        first: 4
+        last: 7
+    severity: 1
+    anchor: 0
+- description: orphaned group_right labels (except animal)
+  content: |4
+
+    - record: foo
+      expr: |
+        colo_metadata{colo_status="v"} * on (colo_name) group_right(tier, animal, brand, pop_name)
+        sliver_metadata{node_status="v"} * on (instance) group_right (sliver, animal)
+        (metal_services_enabled == 999) * on (instance)
+        up{node_status="v", job="node_exporter"}
+  output: "4 |     colo_metadata{colo_status=\"v\"} * on (colo_name) group_right(tier, animal, brand, pop_name)\n5 |     sliver_metadata{node_status=\"v\"} * on (instance) group_right (sliver, animal)\n                                         ^ This binary operation prevents previously joined label `brand` from being added to the results.\n                                           \n6 |     (metal_services_enabled == 999) * on (instance)\n7 |     up{node_status=\"v\", job=\"node_exporter\"}\n"
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `brand` from being added to the results.
+          firstcolumn: 125
+          lastcolumn: 125
+          kind: 0
+        - message: ""
+          firstcolumn: 125
+          lastcolumn: 125
+          kind: 1
+    lines:
+        first: 4
+        last: 7
+    severity: 1
+    anchor: 0
+- description: orphaned group_right labels (except animal)
+  content: |4
+
+    - record: foo
+      expr: |
+        colo_metadata{colo_status="v"} * on (colo_name) group_right(tier, animal, brand, pop_name)
+        sliver_metadata{node_status="v"} * on (instance) group_right (sliver, animal)
+        (metal_services_enabled == 999) * on (instance)
+        up{node_status="v", job="node_exporter"}
+  output: "4 |     colo_metadata{colo_status=\"v\"} * on (colo_name) group_right(tier, animal, brand, pop_name)\n5 |     sliver_metadata{node_status=\"v\"} * on (instance) group_right (sliver, animal)\n                                         ^ This binary operation prevents previously joined label `pop_name` from being added to the results.\n                                           \n6 |     (metal_services_enabled == 999) * on (instance)\n7 |     up{node_status=\"v\", job=\"node_exporter\"}\n"
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `pop_name` from being added to the results.
+          firstcolumn: 125
+          lastcolumn: 125
+          kind: 0
+        - message: ""
+          firstcolumn: 125
+          lastcolumn: 125
+          kind: 1
+    lines:
+        first: 4
+        last: 7
+    severity: 1
+    anchor: 0
+- description: orphaned group_right labels (except animal)
+  content: |4
+
+    - record: foo
+      expr: |
+        colo_metadata{colo_status="v"} * on (colo_name) group_right(tier, animal, brand, pop_name)
+        sliver_metadata{node_status="v"} * on (instance) group_right (sliver, animal)
+        (metal_services_enabled == 999) * on (instance)
+        up{node_status="v", job="node_exporter"}
+  output: |
+    4 |     colo_metadata{colo_status="v"} * on (colo_name) group_right(tier, animal, brand, pop_name)
+    5 |     sliver_metadata{node_status="v"} * on (instance) group_right (sliver, animal)
+    6 |     (metal_services_enabled == 999) * on (instance)
+                                            ^ This binary operation prevents previously joined label `sliver` from being added to the results.
+    7 |     up{node_status="v", job="node_exporter"}
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `sliver` from being added to the results.
+          firstcolumn: 202
+          lastcolumn: 202
+          kind: 0
+        - message: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+          firstcolumn: 1
+          lastcolumn: 257
+          kind: 1
+    lines:
+        first: 4
+        last: 7
+    severity: 1
+    anchor: 0
+- description: orphaned group_right labels (except animal)
+  content: |4
+
+    - record: foo
+      expr: |
+        colo_metadata{colo_status="v"} * on (colo_name) group_right(tier, animal, brand, pop_name)
+        sliver_metadata{node_status="v"} * on (instance) group_right (sliver, animal)
+        (metal_services_enabled == 999) * on (instance)
+        up{node_status="v", job="node_exporter"}
+  output: |
+    4 |     colo_metadata{colo_status="v"} * on (colo_name) group_right(tier, animal, brand, pop_name)
+    5 |     sliver_metadata{node_status="v"} * on (instance) group_right (sliver, animal)
+    6 |     (metal_services_enabled == 999) * on (instance)
+                                            ^ This binary operation prevents previously joined label `animal` from being added to the results.
+    7 |     up{node_status="v", job="node_exporter"}
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `animal` from being added to the results.
+          firstcolumn: 202
+          lastcolumn: 202
+          kind: 0
+        - message: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+          firstcolumn: 1
+          lastcolumn: 257
+          kind: 1
+    lines:
+        first: 4
+        last: 7
+    severity: 1
+    anchor: 0
+
+---
+
+[TestImpossibleCheck/orphaned_group_right_labels_(except_sliver) - 1]
+- description: orphaned group_right labels (except sliver)
+  content: |4
+
+    - record: foo
+      expr: |
+        colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
+        sliver_metadata * on (instance) group_right (sliver)
+        metal_services_enabled
+  output: "4 |     colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)\n5 |     sliver_metadata * on (instance) group_right (sliver)\n                        ^ This binary operation prevents previously joined label `tier` from being added to the results.\n                          \n6 |     metal_services_enabled\n"
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `tier` from being added to the results.
+          firstcolumn: 91
+          lastcolumn: 91
+          kind: 0
+        - message: ""
+          firstcolumn: 91
+          lastcolumn: 91
+          kind: 1
+    lines:
+        first: 4
+        last: 6
+    severity: 1
+    anchor: 0
+- description: orphaned group_right labels (except sliver)
+  content: |4
+
+    - record: foo
+      expr: |
+        colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
+        sliver_metadata * on (instance) group_right (sliver)
+        metal_services_enabled
+  output: "4 |     colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)\n5 |     sliver_metadata * on (instance) group_right (sliver)\n                        ^ This binary operation prevents previously joined label `animal` from being added to the results.\n                          \n6 |     metal_services_enabled\n"
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `animal` from being added to the results.
+          firstcolumn: 91
+          lastcolumn: 91
+          kind: 0
+        - message: ""
+          firstcolumn: 91
+          lastcolumn: 91
+          kind: 1
+    lines:
+        first: 4
+        last: 6
+    severity: 1
+    anchor: 0
+- description: orphaned group_right labels (except sliver)
+  content: |4
+
+    - record: foo
+      expr: |
+        colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
+        sliver_metadata * on (instance) group_right (sliver)
+        metal_services_enabled
+  output: "4 |     colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)\n5 |     sliver_metadata * on (instance) group_right (sliver)\n                        ^ This binary operation prevents previously joined label `brand` from being added to the results.\n                          \n6 |     metal_services_enabled\n"
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `brand` from being added to the results.
+          firstcolumn: 91
+          lastcolumn: 91
+          kind: 0
+        - message: ""
+          firstcolumn: 91
+          lastcolumn: 91
+          kind: 1
+    lines:
+        first: 4
+        last: 6
+    severity: 1
+    anchor: 0
+- description: orphaned group_right labels (except sliver)
+  content: |4
+
+    - record: foo
+      expr: |
+        colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
+        sliver_metadata * on (instance) group_right (sliver)
+        metal_services_enabled
+  output: "4 |     colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)\n5 |     sliver_metadata * on (instance) group_right (sliver)\n                        ^ This binary operation prevents previously joined label `pop_name` from being added to the results.\n                          \n6 |     metal_services_enabled\n"
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `pop_name` from being added to the results.
+          firstcolumn: 91
+          lastcolumn: 91
+          kind: 0
+        - message: ""
+          firstcolumn: 91
+          lastcolumn: 91
+          kind: 1
+    lines:
+        first: 4
+        last: 6
+    severity: 1
+    anchor: 0
+
+---
+
 [TestImpossibleCheck/sum(foo_or_vector(0))_>_0 - 1]
 - description: sum(foo or vector(0)) > 0
   content: |4
@@ -1373,6 +3240,156 @@
     lines:
         first: 3
         last: 3
+    severity: 1
+    anchor: 0
+
+---
+
+[TestImpossibleCheck/unused_&_impossible_group_right_labels - 1]
+- description: unused & impossible group_right labels
+  content: |4
+
+    - record: foo
+      expr: |
+        colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
+        group by (animal) (
+            sliver_metadata * on (instance) group_right (sliver)
+            metal_services_enabled
+        )
+  output: |
+    4 |     colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
+    5 |     group by (animal) (
+                  ^^^^^^^^^^^ Previously joined label `sliver` is being removed from the results.
+    6 |         sliver_metadata * on (instance) group_right (sliver)
+                                                             ^^^^^^ Query is using `group_right(sliver)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
+    7 |         metal_services_enabled
+    8 |     )
+  problem:
+    reporter: promql/impossible
+    summary: unused label
+    details: ""
+    diagnostics:
+        - message: Previously joined label `sliver` is being removed from the results.
+          firstcolumn: 81
+          lastcolumn: 91
+          kind: 0
+        - message: Query is using `group_right(sliver)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
+          firstcolumn: 144
+          lastcolumn: 149
+          kind: 1
+    lines:
+        first: 4
+        last: 8
+    severity: 1
+    anchor: 0
+- description: unused & impossible group_right labels
+  content: |4
+
+    - record: foo
+      expr: |
+        colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
+        group by (animal) (
+            sliver_metadata * on (instance) group_right (sliver)
+            metal_services_enabled
+        )
+  output: |
+    4 |     colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
+                                ^^^^^^^^^ You can't use `colo_name` because this label is not possible here.
+    5 |     group by (animal) (
+                  ^^^ Query is using aggregation with `by(animal)`, only labels included inside `by(...)` will be present on the results.
+    6 |         sliver_metadata * on (instance) group_right (sliver)
+    7 |         metal_services_enabled
+    8 |     )
+  problem:
+    reporter: promql/impossible
+    summary: impossible label
+    details: ""
+    diagnostics:
+        - message: You can't use `colo_name` because this label is not possible here.
+          firstcolumn: 21
+          lastcolumn: 29
+          kind: 0
+        - message: Query is using aggregation with `by(animal)`, only labels included inside `by(...)` will be present on the results.
+          firstcolumn: 81
+          lastcolumn: 83
+          kind: 1
+    lines:
+        first: 4
+        last: 8
+    severity: 1
+    anchor: 0
+
+---
+
+[TestImpossibleCheck/unused_group_right_labels - 1]
+- description: unused group_right labels
+  content: |4
+
+    - record: foo
+      expr: |
+        colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
+        group by (colo_name, animal) (
+            sliver_metadata * on (instance) group_right (sliver)
+            metal_services_enabled
+        )
+  output: |
+    4 |     colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
+    5 |     group by (colo_name, animal) (
+                  ^^^^^^^^^^^^^^^^^^^^^^ Previously joined label `sliver` is being removed from the results.
+    6 |         sliver_metadata * on (instance) group_right (sliver)
+                                                             ^^^^^^ Query is using `group_right(sliver)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
+    7 |         metal_services_enabled
+    8 |     )
+  problem:
+    reporter: promql/impossible
+    summary: unused label
+    details: ""
+    diagnostics:
+        - message: Previously joined label `sliver` is being removed from the results.
+          firstcolumn: 81
+          lastcolumn: 102
+          kind: 0
+        - message: Query is using `group_right(sliver)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
+          firstcolumn: 155
+          lastcolumn: 160
+          kind: 1
+    lines:
+        first: 4
+        last: 8
+    severity: 1
+    anchor: 0
+
+---
+
+[TestImpossibleCheck/unused_joined_label - 1]
+- description: unused joined label
+  content: |4
+
+    - record: foo
+      expr: |
+        (prometheus_ready * on(instance) group_left(version) prometheus_build_info)
+        * on(instance) prometheus_config_last_reload_successful
+  output: |
+    4 |     (prometheus_ready * on(instance) group_left(version) prometheus_build_info)
+    5 |     * on(instance) prometheus_config_last_reload_successful
+            ^ This binary operation prevents previously joined label `version` from being added to the results.
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `version` from being added to the results.
+          firstcolumn: 77
+          lastcolumn: 77
+          kind: 0
+        - message: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+          firstcolumn: 1
+          lastcolumn: 131
+          kind: 1
+    lines:
+        first: 4
+        last: 5
     severity: 1
     anchor: 0
 

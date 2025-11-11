@@ -126,11 +126,14 @@ func (c AggregationCheck) Check(_ context.Context, entry discovery.Entry, _ []di
 				posrange = aggr.PosRange
 				if len(aggr.Grouping) != 0 {
 					if aggr.Without {
-						posrange = utils.FindFuncPosition(expr.Value.Value, aggr.PosRange, "without")
+						posrange = utils.FindFuncNamePosition(expr.Value.Value, aggr.PosRange, "without")
 					} else {
-						posrange = utils.FindFuncPosition(expr.Value.Value, aggr.PosRange, "by")
+						posrange = utils.FindFuncNamePosition(expr.Value.Value, aggr.PosRange, "by")
 					}
 				}
+			}
+			if l, ok := src.Labels[c.label]; ok {
+				posrange = l.Fragment
 			}
 			problems = append(problems, Problem{
 				Anchor:   AnchorAfter,
