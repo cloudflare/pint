@@ -423,6 +423,31 @@ func TestImpossibleCheck(t *testing.T) {
 			problems:   true,
 		},
 		{
+			description: "join on possible label",
+			content: `
+- record: foo
+  expr: |
+    sum by (job) (
+      up{env="prod"} * on () group_left(job) services_enabled{job!=""}
+    )
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+		},
+		{
+			description: "join on possible but redundant label",
+			content: `
+- record: foo
+  expr: |
+    sum by (job) (
+      up{env="prod", job="foo"} * on () group_left(job) services_enabled{job!=""}
+    )
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
+		{
 			description: "group_left inside without",
 			content: `
 - record: foo

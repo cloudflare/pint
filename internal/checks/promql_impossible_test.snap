@@ -1640,8 +1640,8 @@
       expr: foo / on(instance) group_left(cluster) sum(bar)
   output: |
     3 |   expr: foo / on(instance) group_left(cluster) sum(bar)
-                                              ^^^^^^^ You can't use `cluster` because this label is not possible here.
                                                        ^^^ Query is using aggregation that removes all labels.
+                                              ^^^^^^^ You can't use `cluster` because this label is not possible here.
   problem:
     reporter: promql/impossible
     summary: impossible label
@@ -2363,8 +2363,8 @@
   output: |
     4 |     sum by (job) (
     5 |       up{env="prod", job="foo"} * on () group_left(job) services_enabled{job=""}
-                                                           ^^^ You can't use `job` because this label is not possible here.
                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^ Query uses `{job=""}` selector which will filter out any time series with the `job` label set.
+                                                           ^^^ You can't use `job` because this label is not possible here.
     6 |     )
   problem:
     reporter: promql/impossible
@@ -2387,6 +2387,47 @@
 
 ---
 
+[TestImpossibleCheck/join_on_possible_but_redundant_label - 1]
+- description: join on possible but redundant label
+  content: |4
+
+    - record: foo
+      expr: |
+        sum by (job) (
+          up{env="prod", job="foo"} * on () group_left(job) services_enabled{job!=""}
+        )
+  output: |
+    4 |     sum by (job) (
+    5 |       up{env="prod", job="foo"} * on () group_left(job) services_enabled{job!=""}
+                                                           ^^^ Query is trying to join the `job` label that is already present on the other side of the query.
+              ^^^^^^^^^^^^^^^^^^^^^^^^^ Query will only return series where these labels are present.
+    6 |     )
+  problem:
+    reporter: promql/impossible
+    summary: redundant label
+    details: ""
+    diagnostics:
+        - message: Query is trying to join the `job` label that is already present on the other side of the query.
+          firstcolumn: 63
+          lastcolumn: 65
+          kind: 0
+        - message: Query will only return series where these labels are present.
+          firstcolumn: 18
+          lastcolumn: 42
+          kind: 1
+    lines:
+        first: 4
+        last: 6
+    severity: 1
+    anchor: 0
+
+---
+
+[TestImpossibleCheck/join_on_possible_label - 1]
+[]
+
+---
+
 [TestImpossibleCheck/joined_label_NOT_ignored_via_ignoring() - 1]
 []
 
@@ -2403,8 +2444,8 @@
   output: |
     4 |     (prometheus_ready * on(instance) group_left(version) prometheus_build_info)
     5 |     * ignoring(version) prometheus_config_last_reload_successful
-            ^ This binary operation prevents previously joined label `version` from being added to the results.
                        ^^^^^^^ Query is using one-to-one vector matching with `ignoring(version)`, all labels included inside `ignoring(...)` will be removed on the results.
+            ^ This binary operation prevents previously joined label `version` from being added to the results.
   problem:
     reporter: promql/impossible
     summary: orphaned label
