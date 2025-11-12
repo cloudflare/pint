@@ -14,6 +14,7 @@ linters:
     - importas
     - iotamixing
     - misspell
+    - modernize
     - nakedret
     - nilnesserr
     - perfsprint
