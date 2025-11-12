@@ -330,7 +330,7 @@ func parseComment(s string, line int) (parsed []Comment) {
 
 func Parse(lineno int, text string) (comments []Comment) {
 	var index int
-	for _, line := range strings.Split(text, "\n") {
+	for line := range strings.SplitSeq(text, "\n") {
 		comments = append(comments, parseComment(line, lineno+index)...)
 		index++
 	}
