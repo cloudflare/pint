@@ -44,7 +44,7 @@ func (c ComparisonCheck) Reporter() string {
 	return ComparisonCheckName
 }
 
-func (c ComparisonCheck) Check(_ context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+func (c ComparisonCheck) Check(_ context.Context, entry *discovery.Entry, _ []*discovery.Entry) (problems []Problem) {
 	if entry.Rule.AlertingRule == nil {
 		return problems
 	}

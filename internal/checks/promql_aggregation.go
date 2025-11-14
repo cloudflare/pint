@@ -56,7 +56,7 @@ func (c AggregationCheck) Reporter() string {
 	return AggregationCheckName
 }
 
-func (c AggregationCheck) Check(_ context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+func (c AggregationCheck) Check(_ context.Context, entry *discovery.Entry, _ []*discovery.Entry) (problems []Problem) {
 	expr := entry.Rule.Expr()
 	if expr.SyntaxError != nil {
 		return nil

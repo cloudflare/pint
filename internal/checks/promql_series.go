@@ -134,7 +134,7 @@ func (c SeriesCheck) Reporter() string {
 	return SeriesCheckName
 }
 
-func (c SeriesCheck) Check(ctx context.Context, entry discovery.Entry, entries []discovery.Entry) (problems []Problem) {
+func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries []*discovery.Entry) (problems []Problem) {
 	var settings *PromqlSeriesSettings
 	if s := ctx.Value(SettingsKey(c.Reporter())); s != nil {
 		settings = s.(*PromqlSeriesSettings)
@@ -196,7 +196,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry discovery.Entry, entries [
 					if entry.Rule.AlertingRule != nil &&
 						entry.Rule.Error.Err == nil &&
 						entry.Rule.AlertingRule.Alert.Value == alertname {
-						arEntry = &entry
+						arEntry = entry
 						break
 					}
 				}
@@ -314,7 +314,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry discovery.Entry, entries [
 				if entries[ei].Rule.RecordingRule != nil &&
 					entries[ei].Rule.Error.Err == nil &&
 					entries[ei].Rule.RecordingRule.Record.Value == bareSelectorString {
-					rrEntry = &entries[ei]
+					rrEntry = entries[ei]
 					break
 				}
 			}

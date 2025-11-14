@@ -64,7 +64,7 @@ func (c RuleForCheck) Reporter() string {
 	return RuleForCheckName
 }
 
-func (c RuleForCheck) Check(_ context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+func (c RuleForCheck) Check(_ context.Context, entry *discovery.Entry, _ []*discovery.Entry) (problems []Problem) {
 	if entry.Rule.AlertingRule == nil {
 		return nil
 	}

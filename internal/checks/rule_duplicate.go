@@ -47,7 +47,7 @@ func (c RuleDuplicateCheck) Reporter() string {
 	return RuleDuplicateCheckName
 }
 
-func (c RuleDuplicateCheck) Check(ctx context.Context, entry discovery.Entry, entries []discovery.Entry) (problems []Problem) {
+func (c RuleDuplicateCheck) Check(ctx context.Context, entry *discovery.Entry, entries []*discovery.Entry) (problems []Problem) {
 	expr := entry.Rule.Expr()
 	if expr.SyntaxError != nil {
 		return problems
@@ -69,7 +69,7 @@ func (c RuleDuplicateCheck) Check(ctx context.Context, entry discovery.Entry, en
 	return problems
 }
 
-func (c RuleDuplicateCheck) compareRules(_ context.Context, rule *parser.RecordingRule, entry discovery.Entry, lines diags.LineRange) (problems []Problem) {
+func (c RuleDuplicateCheck) compareRules(_ context.Context, rule *parser.RecordingRule, entry *discovery.Entry, lines diags.LineRange) (problems []Problem) {
 	if !rule.Labels.IsIdentical(entry.Rule.RecordingRule.Labels) {
 		return nil
 	}
@@ -97,7 +97,7 @@ func (c RuleDuplicateCheck) compareRules(_ context.Context, rule *parser.Recordi
 	return problems
 }
 
-func ignoreOtherEntry(entry, other discovery.Entry, prom *promapi.FailoverGroup) bool {
+func ignoreOtherEntry(entry, other *discovery.Entry, prom *promapi.FailoverGroup) bool {
 	if other.State == discovery.Removed {
 		return true
 	}

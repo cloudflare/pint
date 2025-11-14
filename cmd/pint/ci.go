@@ -106,7 +106,7 @@ func actionCI(ctx context.Context, c *cli.Command) error {
 	schema := parseSchema(meta.cfg.Parser.Schema)
 	names := parseNames(meta.cfg.Parser.Names)
 	allowedOwners := meta.cfg.Owners.CompileAllowed()
-	var entries []discovery.Entry
+	var entries []*discovery.Entry
 	entries, err = discovery.NewGlobFinder([]string{"*"}, filter, schema, names, allowedOwners).Find()
 	if err != nil {
 		return err

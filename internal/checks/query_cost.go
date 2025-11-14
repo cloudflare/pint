@@ -80,7 +80,7 @@ func (c CostCheck) Reporter() string {
 	return CostCheckName
 }
 
-func (c CostCheck) Check(ctx context.Context, entry discovery.Entry, entries []discovery.Entry) (problems []Problem) {
+func (c CostCheck) Check(ctx context.Context, entry *discovery.Entry, entries []*discovery.Entry) (problems []Problem) {
 	expr := entry.Rule.Expr()
 
 	if expr.SyntaxError != nil {
@@ -235,7 +235,7 @@ func (c CostCheck) getQueryCost(ctx context.Context, expr string) (*promapi.Quer
 func (c CostCheck) suggestRecordingRules(
 	ctx context.Context,
 	expr parser.PromQLExpr,
-	entry discovery.Entry, entries []discovery.Entry,
+	entry *discovery.Entry, entries []*discovery.Entry,
 	beforeStats promapi.QueryStats, beforeSeries int,
 ) (problems []Problem) {
 	src := utils.LabelsSource(expr.Value.Value, expr.Query.Expr)

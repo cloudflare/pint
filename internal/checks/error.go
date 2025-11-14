@@ -21,7 +21,7 @@ const (
 This usually means that it's missing some required fields.`
 )
 
-func NewErrorCheck(entry discovery.Entry) ErrorCheck {
+func NewErrorCheck(entry *discovery.Entry) ErrorCheck {
 	return ErrorCheck{
 		problem: parseRuleError(entry.Rule, entry.PathError),
 	}
@@ -53,7 +53,7 @@ func (c ErrorCheck) Reporter() string {
 	return c.problem.Reporter
 }
 
-func (c ErrorCheck) Check(_ context.Context, _ discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+func (c ErrorCheck) Check(_ context.Context, _ *discovery.Entry, _ []*discovery.Entry) (problems []Problem) {
 	problems = append(problems, c.problem)
 	return problems
 }

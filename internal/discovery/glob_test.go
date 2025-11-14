@@ -23,7 +23,7 @@ func TestGlobPathFinder(t *testing.T) {
 		files    map[string]string
 		symlinks map[string]string
 		err      string
-		entries  []discovery.Entry
+		entries  []*discovery.Entry
 		finder   discovery.GlobFinder
 	}
 
@@ -61,7 +61,7 @@ func TestGlobPathFinder(t *testing.T) {
 		{
 			files:  map[string]string{"bar.yml": testRuleBody},
 			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, []*regexp.Regexp{regexp.MustCompile(".*")}), parser.PrometheusSchema, model.UTF8Validation, nil),
-			entries: []discovery.Entry{
+			entries: []*discovery.Entry{
 				{
 					State: discovery.Noop,
 					Path: discovery.Path{
@@ -77,7 +77,7 @@ func TestGlobPathFinder(t *testing.T) {
 		{
 			files:  map[string]string{"foo/bar.yml": testRuleBody + "\n\n# pint file/owner alice\n"},
 			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, []*regexp.Regexp{regexp.MustCompile(".*")}), parser.PrometheusSchema, model.UTF8Validation, nil),
-			entries: []discovery.Entry{
+			entries: []*discovery.Entry{
 				{
 					State: discovery.Noop,
 					Path: discovery.Path{
@@ -93,7 +93,7 @@ func TestGlobPathFinder(t *testing.T) {
 		{
 			files:  map[string]string{"bar.yml": testRuleBody},
 			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, model.UTF8Validation, nil),
-			entries: []discovery.Entry{
+			entries: []*discovery.Entry{
 				{
 					State: discovery.Noop,
 					Path: discovery.Path{
@@ -112,7 +112,7 @@ func TestGlobPathFinder(t *testing.T) {
 		{
 			files:  map[string]string{"bar.yml": "record:::{}\n  expr: sum(foo)\n\n# pint file/owner bob\n"},
 			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, []*regexp.Regexp{regexp.MustCompile(".*")}), parser.PrometheusSchema, model.UTF8Validation, nil),
-			entries: []discovery.Entry{
+			entries: []*discovery.Entry{
 				{
 					State: discovery.Noop,
 					Path: discovery.Path{
@@ -132,7 +132,7 @@ func TestGlobPathFinder(t *testing.T) {
 			files:    map[string]string{"bar.yml": testRuleBody},
 			symlinks: map[string]string{"link.yml": "bar.yml"},
 			finder:   discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, model.UTF8Validation, nil),
-			entries: []discovery.Entry{
+			entries: []*discovery.Entry{
 				{
 					State: discovery.Noop,
 					Path: discovery.Path{
@@ -168,7 +168,7 @@ func TestGlobPathFinder(t *testing.T) {
 				"b/c/link.yml": "../../a/bar.yml",
 			},
 			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, model.UTF8Validation, nil),
-			entries: []discovery.Entry{
+			entries: []*discovery.Entry{
 				{
 					State: discovery.Noop,
 					Path: discovery.Path{
@@ -232,7 +232,7 @@ func TestGlobPathFinder(t *testing.T) {
 				"b/c/link.yml": "../../a/bar.yml",
 			},
 			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, model.UTF8Validation, nil),
-			entries: []discovery.Entry{
+			entries: []*discovery.Entry{
 				{
 					State: discovery.Noop,
 					Path: discovery.Path{
@@ -281,7 +281,7 @@ func TestGlobPathFinder(t *testing.T) {
 				"b/c/link.yml": "../../a/bar.yml",
 			},
 			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, model.UTF8Validation, nil),
-			entries: []discovery.Entry{
+			entries: []*discovery.Entry{
 				{
 					State: discovery.Noop,
 					Path: discovery.Path{

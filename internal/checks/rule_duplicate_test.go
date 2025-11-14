@@ -33,7 +33,7 @@ func TestRuleDuplicateCheck(t *testing.T) {
 				return checks.NewRuleDuplicateCheck(prom)
 			},
 			prometheus: newSimpleProm,
-			entries: []discovery.Entry{
+			entries: []*discovery.Entry{
 				{PathError: errors.New("Mock error")},
 			},
 		},

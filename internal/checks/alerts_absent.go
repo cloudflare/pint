@@ -54,7 +54,7 @@ func (c AlertsAbsentCheck) Reporter() string {
 	return AlertsAbsentCheckName
 }
 
-func (c AlertsAbsentCheck) Check(ctx context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+func (c AlertsAbsentCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*discovery.Entry) (problems []Problem) {
 	if entry.Rule.AlertingRule == nil {
 		return problems
 	}

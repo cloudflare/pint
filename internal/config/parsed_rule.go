@@ -41,7 +41,7 @@ func baseParsedRule(match []Match, name string, check checks.RuleChecker, tags [
 	}
 }
 
-func isMatch(ctx context.Context, e discovery.Entry, ignore, match []Match) bool {
+func isMatch(ctx context.Context, e *discovery.Entry, ignore, match []Match) bool {
 	for _, ignore := range ignore {
 		if ignore.IsMatch(ctx, e.Path.Name, e) {
 			return false
@@ -64,7 +64,7 @@ func isMatch(ctx context.Context, e discovery.Entry, ignore, match []Match) bool
 	return true
 }
 
-func (rule parsedRule) isEnabled(ctx context.Context, enabled, disabled []string, checks []checks.RuleChecker, e discovery.Entry, cfgRules []Rule, locked bool) bool {
+func (rule parsedRule) isEnabled(ctx context.Context, enabled, disabled []string, checks []checks.RuleChecker, e *discovery.Entry, cfgRules []Rule, locked bool) bool {
 	// Entry state is not what the check is for.
 	if !slices.Contains(rule.check.Meta().States, e.State) {
 		return false

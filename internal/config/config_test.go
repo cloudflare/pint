@@ -182,9 +182,9 @@ func newRule(t *testing.T, content string) parser.Rule {
 
 func TestGetChecksForRule(t *testing.T) {
 	type testCaseT struct {
+		entry  *discovery.Entry
 		title  string
 		config string
-		entry  discovery.Entry
 	}
 
 	type SnapEntry struct {
@@ -204,7 +204,7 @@ func TestGetChecksForRule(t *testing.T) {
 		{
 			title:  "defaults",
 			config: "",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -221,7 +221,7 @@ prometheus "prom" {
   timeout = "1s"
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -239,7 +239,7 @@ prometheus "prom" {
   timeout  = "1s"
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -263,7 +263,7 @@ checks {
   disabled = [ "alerts/template", "alerts/external_labels" ]
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -292,7 +292,7 @@ prometheus "prom" {
   include = [ "foo.yml" ]
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -311,7 +311,7 @@ prometheus "prom" {
   exclude = [ "rules.yml" ]
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -329,7 +329,7 @@ prometheus "prom" {
   exclude = [ "rules.yml" ]
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -347,7 +347,7 @@ prometheus "prom" {
   include = [ "rules.yml" ]
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -370,7 +370,7 @@ prometheus "ignore" {
   include =[ "foo.+" ]
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -382,7 +382,7 @@ prometheus "ignore" {
 		{
 			title:  "single empty rule",
 			config: "rule{}\n",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -404,7 +404,7 @@ rule {
 	strip    = ["instance", "rack"]
   }
 }`,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -427,7 +427,7 @@ rule {
 	strip    = ["instance", "rack"]
   }
 }`,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -452,7 +452,7 @@ rule {
   }
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -478,7 +478,7 @@ prometheus "prom2" {
   include =[ "rules.yml" ]
 }  
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -541,7 +541,7 @@ rule {
 	}
   }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -582,7 +582,7 @@ rule {
   }
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -626,7 +626,7 @@ rule {
   }
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -652,7 +652,7 @@ rule {
   }
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -678,7 +678,7 @@ rule {
   }
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -704,7 +704,7 @@ rule {
   }
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -730,7 +730,7 @@ rule {
   }
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -756,7 +756,7 @@ rule {
   }
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -782,7 +782,7 @@ rule {
   }
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -810,7 +810,7 @@ rule {
   }
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -846,7 +846,7 @@ prometheus "prom1" {
   include =[ "rules.yml" ]
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -878,7 +878,7 @@ prometheus "prom1" {
   include =[ "rules.yml" ]
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -912,7 +912,7 @@ prometheus "prom1" {
   include =[ "rules.yml" ]
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -949,7 +949,7 @@ checks {
   ]
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -986,7 +986,7 @@ checks {
   ]
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -1010,7 +1010,7 @@ rule {
   }
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -1032,7 +1032,7 @@ rule {
   }
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -1053,7 +1053,7 @@ rule {
   }
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -1074,7 +1074,7 @@ rule {
   }
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -1095,7 +1095,7 @@ rule {
   }
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -1116,7 +1116,7 @@ rule {
   }
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -1137,7 +1137,7 @@ rule {
   }
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -1159,7 +1159,7 @@ rule {
   }
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -1180,7 +1180,7 @@ rule {
   }
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -1204,7 +1204,7 @@ rule {
   }
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -1220,7 +1220,7 @@ rule {
   name "total:.+" {}
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -1244,7 +1244,7 @@ checks {
   disabled = [ "alerts/template", "alerts/external_labels", "alerts/absent" ]
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -1276,7 +1276,7 @@ checks {
   disabled = [ "alerts/template", "promql/regexp" ]
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -1313,7 +1313,7 @@ checks {
   disabled = [ "alerts/template", "promql/regexp" ]
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -1347,7 +1347,7 @@ prometheus "prom3" {
   tags = ["foo"]
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -1386,7 +1386,7 @@ prometheus "prom3" {
   tags = ["foo"]
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -1425,7 +1425,7 @@ rule {
   }
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -1453,7 +1453,7 @@ rule {
   }
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -1470,7 +1470,7 @@ rule {
 	severity = "bug"
   }
 }`,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -1500,7 +1500,7 @@ rule {
 	strip    = ["instance", "rack"]
   }
 }`,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -1533,7 +1533,7 @@ rule {
 	strip    = ["instance", "rack"]
   }
 }`,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Moved,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -1566,7 +1566,7 @@ rule {
   enable = [ "promql/series" ]
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -1589,7 +1589,7 @@ rule {
   disable = ["rule/duplicate"]
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -1623,7 +1623,7 @@ rule {
   disable = ["promql/series", "promql/range_query", "rule/duplicate", "promql/vector_matching", "promql/counter"]
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -1650,7 +1650,7 @@ rule {
   }
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -1677,7 +1677,7 @@ rule {
 	strip    = ["instance", "rack"]
   }
 }`,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -1708,7 +1708,7 @@ rule {
 	strip    = ["instance", "rack"]
   }
 }`,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -1732,7 +1732,7 @@ rule {
   }
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",
@@ -1754,7 +1754,7 @@ rule {
   }
 }
 `,
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				State: discovery.Modified,
 				Path: discovery.Path{
 					Name:          "rules.yml",

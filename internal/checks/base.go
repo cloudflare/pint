@@ -132,7 +132,7 @@ type RuleChecker interface {
 	String() string
 	Reporter() string
 	Meta() CheckMeta
-	Check(_ context.Context, entry discovery.Entry, _ []discovery.Entry) []Problem
+	Check(_ context.Context, entry *discovery.Entry, _ []*discovery.Entry) []Problem
 }
 
 func problemFromError(err error, rule parser.Rule, reporter, prom string, s Severity) Problem {

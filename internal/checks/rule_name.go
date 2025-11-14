@@ -49,7 +49,7 @@ func (c RuleNameCheck) Reporter() string {
 	return RuleNameCheckName
 }
 
-func (c RuleNameCheck) Check(_ context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+func (c RuleNameCheck) Check(_ context.Context, entry *discovery.Entry, _ []*discovery.Entry) (problems []Problem) {
 	if entry.Rule.AlertingRule != nil && !c.re.MustExpand(entry.Rule).MatchString(entry.Rule.AlertingRule.Alert.Value) {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,

@@ -64,7 +64,7 @@ func (c AlertsCheck) Reporter() string {
 	return AlertsCheckName
 }
 
-func (c AlertsCheck) Check(ctx context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+func (c AlertsCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*discovery.Entry) (problems []Problem) {
 	if entry.Rule.AlertingRule == nil {
 		return problems
 	}
