@@ -374,16 +374,12 @@ func (p Parser) parseRule(node *yaml.Node, offsetLine, offsetColumn int, content
 		}
 	}
 
-	for _, entry := range []struct {
-		part *yaml.Node
-		key  string
-	}{
-		{key: labelsKey, part: labelsNode},
-		{key: annotationsKey, part: annotationsNode},
-	} {
-		if entry.part != nil && !isTag(entry.part.ShortTag(), mapTag) {
-			return invalidValueError(lines, entry.part.Line+offsetLine, entry.key, describeTag(mapTag), describeTag(entry.part.ShortTag()))
-		}
+	if (recordPart != nil || alertPart != nil) && exprPart != nil && labelsNode != nil && !isTag(labelsNode.ShortTag(), mapTag) {
+		return invalidValueError(lines, labelsNode.Line+offsetLine, labelsKey, describeTag(mapTag), describeTag(labelsNode.ShortTag()))
+	}
+
+	if alertPart != nil && exprPart != nil && annotationsNode != nil && !isTag(annotationsNode.ShortTag(), mapTag) {
+		return invalidValueError(lines, annotationsNode.Line+offsetLine, annotationsKey, describeTag(mapTag), describeTag(annotationsNode.ShortTag()))
 	}
 
 	if ok, perr, plines := validateStringMap(labelsKey, labelsNodes, offsetLine, lines); !ok {
@@ -631,6 +627,9 @@ type yamlMap struct {
 }
 
 func mappingNodes(node *yaml.Node) []yamlMap {
+	if node.Kind != yaml.MappingNode {
+		return nil
+	}
 	m := make([]yamlMap, 0, len(node.Content)/2)
 	for i := 0; i < len(node.Content); i += 2 {
 		m = append(m, yamlMap{key: node.Content[i], val: node.Content[i+1]})
