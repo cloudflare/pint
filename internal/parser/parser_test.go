@@ -2942,6 +2942,8 @@ groups:
 - name: foo
   rules:
     - labels: !!binary "SGVsbG8sIFdvcmxkIQ=="
+      record: foo
+      expr: foo
 `),
 			strict: true,
 			output: parser.File{
@@ -2950,7 +2952,7 @@ groups:
 						Name: "foo",
 						Rules: []parser.Rule{
 							{
-								Lines: diags.LineRange{First: 8, Last: 8},
+								Lines: diags.LineRange{First: 8, Last: 10},
 								Error: parser.ParseError{
 									Line: 8,
 									Err:  errors.New("labels value must be a mapping, got binary data instead"),
@@ -3564,6 +3566,8 @@ groups:
 - name: foo
   rules:
     - labels: !!binary "SGVsbG8sIFdvcmxkIQ=="
+      record: foo
+      expr: foo
 `),
 			strict: true,
 			output: parser.File{
@@ -3572,7 +3576,7 @@ groups:
 						Name: "foo",
 						Rules: []parser.Rule{
 							{
-								Lines: diags.LineRange{First: 5, Last: 5},
+								Lines: diags.LineRange{First: 5, Last: 7},
 								Error: parser.ParseError{
 									Line: 5,
 									Err:  errors.New("labels value must be a mapping, got binary data instead"),
@@ -5129,6 +5133,37 @@ groups:
 						},
 					},
 				},
+			},
+		},
+		{
+			input: []byte(`
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    shard: "0"
+    total-shards: "1"
+  name: shard-jobs
+  namespace: foo
+data:
+  jobs.yaml: |
+    jobs:
+      - name: foo
+        interval: 1m
+        queries:
+          - name: xxx
+            help: ''
+            labels:
+              - account_id
+              - bucket
+              - cache_status
+        mtls_identity:
+          cert_path: /etc/identity/tls.crt
+          key_path: /etc/identity/tls.key
+`),
+			output: parser.File{
+				Groups:    nil,
+				IsRelaxed: true,
 			},
 		},
 	}

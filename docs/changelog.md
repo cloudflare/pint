@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.77.1
+
+### Fixed
+
+- Fixed a panic when parsing incomplete rules using relaxed mode.
+
 ## v0.77.0
 
 ### Added
