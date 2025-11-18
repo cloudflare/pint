@@ -67,7 +67,7 @@ func (c AnnotationCheck) Reporter() string {
 	return AnnotationCheckName
 }
 
-func (c AnnotationCheck) Check(_ context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+func (c AnnotationCheck) Check(_ context.Context, entry *discovery.Entry, _ []*discovery.Entry) (problems []Problem) {
 	if entry.Rule.AlertingRule == nil {
 		return nil
 	}

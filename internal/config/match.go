@@ -104,7 +104,7 @@ func (m Match) validate(allowEmpty bool) error {
 	return nil
 }
 
-func (m Match) IsMatch(ctx context.Context, path string, e discovery.Entry) bool {
+func (m Match) IsMatch(ctx context.Context, path string, e *discovery.Entry) bool {
 	cmd := commandFromContext(ctx)
 
 	if m.Command != nil {
@@ -199,7 +199,7 @@ func (ml MatchLabel) validate() error {
 	return nil
 }
 
-func (ml MatchLabel) isMatching(entry discovery.Entry) bool {
+func (ml MatchLabel) isMatching(entry *discovery.Entry) bool {
 	keyRe := strictRegex(ml.Key)
 	valRe := strictRegex(ml.Value)
 

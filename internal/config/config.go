@@ -80,7 +80,7 @@ func (cfg Config) String() string {
 	return string(content)
 }
 
-func (cfg *Config) GetChecksForEntry(ctx context.Context, gen *PrometheusGenerator, entry discovery.Entry) []checks.RuleChecker {
+func (cfg *Config) GetChecksForEntry(ctx context.Context, gen *PrometheusGenerator, entry *discovery.Entry) []checks.RuleChecker {
 	enabled := []checks.RuleChecker{}
 
 	defaultStates := defaultMatchStates(commandFromContext(ctx))

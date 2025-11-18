@@ -585,7 +585,7 @@ func TestRateCheck(t *testing.T) {
 		{
 			description: "sum_over_rate / ignore entry with PathError",
 			content:     "- alert: my alert\n  expr: rate(my:sum[5m])\n",
-			entries:     []discovery.Entry{{PathError: errors.New("mock error")}},
+			entries:     []*discovery.Entry{{PathError: errors.New("mock error")}},
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
 			mocks: []*prometheusMock{
@@ -605,7 +605,7 @@ func TestRateCheck(t *testing.T) {
 		{
 			description: "sum_over_rate / ignore entry with rule error",
 			content:     "- alert: my alert\n  expr: rate(my:sum[5m])\n",
-			entries: []discovery.Entry{
+			entries: []*discovery.Entry{
 				{
 					Rule: parser.Rule{
 						Error: parser.ParseError{

@@ -43,7 +43,7 @@ func (c RuleDependencyCheck) Reporter() string {
 	return RuleDependencyCheckName
 }
 
-func (c RuleDependencyCheck) Check(_ context.Context, entry discovery.Entry, entries []discovery.Entry) (problems []Problem) {
+func (c RuleDependencyCheck) Check(_ context.Context, entry *discovery.Entry, entries []*discovery.Entry) (problems []Problem) {
 	if entry.Path.Name != entry.Path.SymlinkTarget {
 		// Don't reported symlinks that are being removed.
 		return problems
@@ -134,7 +134,7 @@ func (c RuleDependencyCheck) Check(_ context.Context, entry discovery.Entry, ent
 	return problems
 }
 
-func (c RuleDependencyCheck) usesVector(entry discovery.Entry, name string) *brokenDependency {
+func (c RuleDependencyCheck) usesVector(entry *discovery.Entry, name string) *brokenDependency {
 	expr := entry.Rule.Expr()
 	if expr.SyntaxError != nil {
 		return nil
@@ -155,7 +155,7 @@ func (c RuleDependencyCheck) usesVector(entry discovery.Entry, name string) *bro
 	return nil
 }
 
-func (c RuleDependencyCheck) usesAlert(entry discovery.Entry, name string) *brokenDependency {
+func (c RuleDependencyCheck) usesAlert(entry *discovery.Entry, name string) *brokenDependency {
 	expr := entry.Rule.Expr()
 	if expr.SyntaxError != nil {
 		return nil
@@ -189,7 +189,7 @@ type brokenDependency struct {
 	line   int
 }
 
-func nonRemovedEntries(src []discovery.Entry) (dst []discovery.Entry) {
+func nonRemovedEntries(src []*discovery.Entry) (dst []*discovery.Entry) {
 	for _, entry := range src {
 		if entry.State == discovery.Removed {
 			continue

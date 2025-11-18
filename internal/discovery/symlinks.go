@@ -45,13 +45,13 @@ func findSymlinks() (slinks []symlink, err error) {
 	return slinks, err
 }
 
-func addSymlinkedEntries(entries []Entry) ([]Entry, error) {
+func addSymlinkedEntries(entries []*Entry) ([]*Entry, error) {
 	slinks, err := findSymlinks()
 	if err != nil {
 		return nil, err
 	}
 
-	nentries := []Entry{}
+	nentries := []*Entry{}
 	for _, entry := range entries {
 		if entry.State == Removed {
 			continue
@@ -69,7 +69,7 @@ func addSymlinkedEntries(entries []Entry) ([]Entry, error) {
 		for _, sl := range slinks {
 			if sl.to == entry.Path.Name {
 				slog.LogAttrs(context.Background(), slog.LevelDebug, "Found a symlink", slog.String("to", sl.to), slog.String("from", sl.from))
-				nentries = append(nentries, Entry{
+				nentries = append(nentries, &Entry{
 					State: entry.State,
 					Path: Path{
 						Name:          sl.from,

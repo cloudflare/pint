@@ -67,7 +67,7 @@ func (c LabelCheck) Reporter() string {
 	return LabelCheckName
 }
 
-func (c LabelCheck) Check(_ context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+func (c LabelCheck) Check(_ context.Context, entry *discovery.Entry, _ []*discovery.Entry) (problems []Problem) {
 	if entry.Rule.RecordingRule != nil {
 		problems = append(problems, c.checkRecordingRule(entry)...)
 	}
@@ -79,7 +79,7 @@ func (c LabelCheck) Check(_ context.Context, entry discovery.Entry, _ []discover
 	return problems
 }
 
-func (c LabelCheck) checkRecordingRule(entry discovery.Entry) (problems []Problem) {
+func (c LabelCheck) checkRecordingRule(entry *discovery.Entry) (problems []Problem) {
 	entryLabels := entry.Labels()
 
 	if len(entryLabels.Items) == 0 {
@@ -134,7 +134,7 @@ func (c LabelCheck) checkRecordingRule(entry discovery.Entry) (problems []Proble
 	return problems
 }
 
-func (c LabelCheck) checkAlertingRule(entry discovery.Entry) (problems []Problem) {
+func (c LabelCheck) checkAlertingRule(entry *discovery.Entry) (problems []Problem) {
 	entryLabels := entry.Labels()
 
 	if len(entryLabels.Items) == 0 {

@@ -88,7 +88,7 @@ type Entry struct {
 	State          ChangeType
 }
 
-func (e Entry) Labels() (ym parser.YamlMap) {
+func (e *Entry) Labels() (ym parser.YamlMap) {
 	switch {
 	case e.Rule.AlertingRule != nil && e.Rule.AlertingRule.Labels != nil:
 		ym.Key = e.Rule.AlertingRule.Labels.Key
@@ -111,7 +111,7 @@ func (e Entry) Labels() (ym parser.YamlMap) {
 	return ym
 }
 
-func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, allowedOwners []*regexp.Regexp) (entries []Entry, _ error) {
+func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, allowedOwners []*regexp.Regexp) (entries []*Entry, _ error) {
 	file := p.Parse(r)
 
 	contentLines := diags.LineRange{
@@ -152,7 +152,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 				slog.Time("until", snooze.Until),
 			)
 		case comments.InvalidComment:
-			entries = append(entries, Entry{
+			entries = append(entries, &Entry{
 				Path: Path{
 					Name:          sourcePath,
 					SymlinkTarget: reportedPath,
@@ -165,7 +165,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 	}
 
 	for _, d := range file.Diagnostics {
-		entries = append(entries, Entry{
+		entries = append(entries, &Entry{
 			Path: Path{
 				Name:          sourcePath,
 				SymlinkTarget: reportedPath,
@@ -186,7 +186,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 			slog.String("path", sourcePath),
 			slog.Int("line", file.Error.Line),
 		)
-		entries = append(entries, Entry{
+		entries = append(entries, &Entry{
 			Path: Path{
 				Name:          sourcePath,
 				SymlinkTarget: reportedPath,
@@ -206,7 +206,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 				slog.String("path", sourcePath),
 				slog.Int("line", group.Error.Line),
 			)
-			entries = append(entries, Entry{
+			entries = append(entries, &Entry{
 				Path: Path{
 					Name:          sourcePath,
 					SymlinkTarget: reportedPath,
@@ -221,7 +221,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 			for _, owner := range comments.Only[comments.Owner](rule.Comments, comments.RuleOwnerType) {
 				ruleOwner = owner.Name
 			}
-			entries = append(entries, Entry{
+			entries = append(entries, &Entry{
 				Path: Path{
 					Name:          sourcePath,
 					SymlinkTarget: reportedPath,
@@ -239,7 +239,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 	if len(entries) == 0 && len(badOwners) > 0 {
 		for _, comment := range badOwners {
 			owner := comment.Value.(comments.Owner)
-			entries = append(entries, Entry{
+			entries = append(entries, &Entry{
 				Path: Path{
 					Name:          sourcePath,
 					SymlinkTarget: reportedPath,

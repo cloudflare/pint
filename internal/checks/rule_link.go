@@ -64,7 +64,7 @@ func (c RuleLinkCheck) Reporter() string {
 	return RuleLinkCheckName
 }
 
-func (c RuleLinkCheck) Check(ctx context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+func (c RuleLinkCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*discovery.Entry) (problems []Problem) {
 	if entry.Rule.AlertingRule == nil || entry.Rule.AlertingRule.Annotations == nil {
 		return nil
 	}

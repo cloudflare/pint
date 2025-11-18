@@ -60,7 +60,7 @@ func (c SelectorCheck) Reporter() string {
 	return SelectorCheckName
 }
 
-func (c SelectorCheck) Check(_ context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+func (c SelectorCheck) Check(_ context.Context, entry *discovery.Entry, _ []*discovery.Entry) (problems []Problem) {
 	expr := entry.Rule.Expr()
 	if expr.SyntaxError != nil {
 		return problems

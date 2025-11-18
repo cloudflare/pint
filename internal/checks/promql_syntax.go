@@ -42,7 +42,7 @@ func (c SyntaxCheck) Reporter() string {
 	return SyntaxCheckName
 }
 
-func (c SyntaxCheck) Check(_ context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+func (c SyntaxCheck) Check(_ context.Context, entry *discovery.Entry, _ []*discovery.Entry) (problems []Problem) {
 	expr := entry.Rule.Expr()
 	if expr.SyntaxError != nil {
 		diag := diags.Diagnostic{

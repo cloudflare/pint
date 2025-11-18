@@ -114,7 +114,7 @@ type checkTest struct {
 	snapshot      snapshotFn
 	description   string
 	content       string
-	entries       []discovery.Entry
+	entries       []*discovery.Entry
 	mocks         []*prometheusMock
 	problems      bool
 	contentStrict bool
@@ -253,7 +253,7 @@ func runTests(t *testing.T, testCases []checkTest) {
 	}
 }
 
-func parseContent(content string, isStrict bool) (entries []discovery.Entry, _ error) {
+func parseContent(content string, isStrict bool) (entries []*discovery.Entry, _ error) {
 	p := parser.NewParser(isStrict, parser.PrometheusSchema, model.UTF8Validation)
 	file := p.Parse(strings.NewReader(content))
 	if file.Error.Err != nil {
@@ -262,7 +262,7 @@ func parseContent(content string, isStrict bool) (entries []discovery.Entry, _ e
 
 	for _, group := range file.Groups {
 		for _, rule := range group.Rules {
-			entries = append(entries, discovery.Entry{
+			entries = append(entries, &discovery.Entry{
 				Path: discovery.Path{
 					Name:          "fake.yml",
 					SymlinkTarget: "fake.yml",
@@ -278,7 +278,7 @@ func parseContent(content string, isStrict bool) (entries []discovery.Entry, _ e
 	return entries, nil
 }
 
-func mustParseContent(content string) (entries []discovery.Entry) {
+func mustParseContent(content string) (entries []*discovery.Entry) {
 	entries, err := parseContent(content, false)
 	if err != nil {
 		panic(err)

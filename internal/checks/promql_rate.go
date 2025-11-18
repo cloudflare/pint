@@ -74,7 +74,7 @@ func (c RateCheck) Reporter() string {
 	return RateCheckName
 }
 
-func (c RateCheck) Check(ctx context.Context, entry discovery.Entry, entries []discovery.Entry) (problems []Problem) {
+func (c RateCheck) Check(ctx context.Context, entry *discovery.Entry, entries []*discovery.Entry) (problems []Problem) {
 	expr := entry.Rule.Expr()
 
 	if expr.SyntaxError != nil {
@@ -95,7 +95,7 @@ func (c RateCheck) Check(ctx context.Context, entry discovery.Entry, entries []d
 	return problems
 }
 
-func (c RateCheck) checkNode(ctx context.Context, rule parser.Rule, expr parser.PromQLExpr, node *parser.PromQLNode, entries []discovery.Entry, cfg *promapi.ConfigResult, done *completedList) (problems []Problem) {
+func (c RateCheck) checkNode(ctx context.Context, rule parser.Rule, expr parser.PromQLExpr, node *parser.PromQLNode, entries []*discovery.Entry, cfg *promapi.ConfigResult, done *completedList) (problems []Problem) {
 	if n, ok := node.Expr.(*promParser.Call); ok && (n.Func.Name == "rate" || n.Func.Name == "irate" || n.Func.Name == "deriv") {
 		for _, arg := range n.Args {
 			m, ok := arg.(*promParser.MatrixSelector)

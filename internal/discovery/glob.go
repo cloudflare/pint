@@ -34,7 +34,7 @@ type GlobFinder struct {
 	names         model.ValidationScheme
 }
 
-func (f GlobFinder) Find() (entries []Entry, err error) {
+func (f GlobFinder) Find() (entries []*Entry, err error) {
 	paths := filePaths{}
 	for _, p := range f.patterns {
 		matches, err := filepath.Glob(p)

@@ -17,10 +17,10 @@ import (
 
 func TestMatch(t *testing.T) {
 	type testCaseT struct {
+		entry   *discovery.Entry
 		cmd     config.ContextCommandVal
 		path    string
 		match   config.Match
-		entry   discovery.Entry
 		isMatch bool
 	}
 
@@ -28,7 +28,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule:  parser.Rule{},
 				State: discovery.Noop,
 			},
@@ -38,7 +38,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule:  parser.Rule{},
 				State: discovery.Noop,
 			},
@@ -50,7 +50,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule:  parser.Rule{},
 				State: discovery.Noop,
 			},
@@ -62,7 +62,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule:  parser.Rule{},
 				State: discovery.Noop,
 			},
@@ -74,7 +74,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule:  parser.Rule{},
 				State: discovery.Noop,
 			},
@@ -86,7 +86,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule: parser.Rule{
 					AlertingRule: &parser.AlertingRule{
 						Alert: parser.YamlNode{Value: "Foo"},
@@ -102,7 +102,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule: parser.Rule{
 					AlertingRule: &parser.AlertingRule{
 						Alert: parser.YamlNode{Value: "Foo"},
@@ -119,7 +119,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule: parser.Rule{
 					AlertingRule: &parser.AlertingRule{
 						Alert: parser.YamlNode{Value: "Foo"},
@@ -135,7 +135,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule: parser.Rule{
 					RecordingRule: &parser.RecordingRule{
 						Record: parser.YamlNode{Value: "Foo"},
@@ -151,7 +151,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule: parser.Rule{
 					RecordingRule: &parser.RecordingRule{
 						Labels: &parser.YamlMap{
@@ -174,7 +174,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule: parser.Rule{
 					RecordingRule: &parser.RecordingRule{
 						Labels: &parser.YamlMap{
@@ -197,7 +197,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule: parser.Rule{
 					RecordingRule: &parser.RecordingRule{
 						Labels: &parser.YamlMap{
@@ -220,7 +220,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule: parser.Rule{
 					RecordingRule: &parser.RecordingRule{
 						Labels: &parser.YamlMap{
@@ -243,7 +243,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule: parser.Rule{
 					RecordingRule: &parser.RecordingRule{
 						Labels: &parser.YamlMap{
@@ -266,7 +266,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule: parser.Rule{
 					RecordingRule: &parser.RecordingRule{
 						Labels: &parser.YamlMap{
@@ -289,7 +289,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule: parser.Rule{
 					AlertingRule: &parser.AlertingRule{},
 				},
@@ -303,7 +303,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule: parser.Rule{
 					AlertingRule: &parser.AlertingRule{},
 				},
@@ -315,7 +315,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule: parser.Rule{
 					AlertingRule: &parser.AlertingRule{},
 				},
@@ -329,7 +329,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule: parser.Rule{
 					RecordingRule: &parser.RecordingRule{},
 				},
@@ -343,7 +343,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule: parser.Rule{
 					RecordingRule: &parser.RecordingRule{},
 				},
@@ -357,7 +357,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule: parser.Rule{
 					AlertingRule: &parser.AlertingRule{
 						Annotations: &parser.YamlMap{
@@ -380,7 +380,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule: parser.Rule{
 					AlertingRule: &parser.AlertingRule{
 						Annotations: &parser.YamlMap{
@@ -403,7 +403,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule: parser.Rule{
 					AlertingRule: &parser.AlertingRule{
 						Annotations: &parser.YamlMap{
@@ -426,7 +426,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule: parser.Rule{
 					AlertingRule: &parser.AlertingRule{
 						Annotations: &parser.YamlMap{
@@ -449,7 +449,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule:  parser.Rule{},
 				State: discovery.Noop,
 			},
@@ -461,7 +461,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule:  parser.Rule{},
 				State: discovery.Noop,
 			},
@@ -473,7 +473,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule:  parser.Rule{},
 				State: discovery.Noop,
 			},
@@ -485,7 +485,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule:  parser.Rule{},
 				State: discovery.Noop,
 			},
@@ -497,7 +497,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.CICommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule:  parser.Rule{},
 				State: discovery.Noop,
 			},
@@ -510,7 +510,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.CICommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule:  parser.Rule{},
 				State: discovery.Noop,
 			},
@@ -523,7 +523,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.CICommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule:  parser.Rule{},
 				State: discovery.Added,
 			},
@@ -535,7 +535,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.CICommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule:  parser.Rule{},
 				State: discovery.Noop,
 			},
@@ -548,7 +548,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.CICommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule:  parser.Rule{},
 				State: discovery.Noop,
 			},
@@ -561,7 +561,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.CICommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule:  parser.Rule{},
 				State: discovery.Noop,
 			},
@@ -574,7 +574,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.CICommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule:  parser.Rule{},
 				State: discovery.Moved,
 			},
@@ -587,7 +587,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.CICommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule:  parser.Rule{},
 				State: discovery.Modified,
 			},
@@ -600,7 +600,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.CICommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule:  parser.Rule{},
 				State: discovery.Removed,
 			},
@@ -612,7 +612,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.CICommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule:  parser.Rule{},
 				State: discovery.Moved,
 			},
@@ -624,7 +624,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.CICommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule:  parser.Rule{},
 				State: discovery.Unknown,
 			},
@@ -636,7 +636,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule:  parser.Rule{},
 				State: discovery.Noop,
 			},
@@ -646,7 +646,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.WatchCommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule:  parser.Rule{},
 				State: discovery.Noop,
 			},
@@ -656,7 +656,7 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.WatchCommand,
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule:  parser.Rule{},
 				State: discovery.Noop,
 			},
@@ -667,7 +667,7 @@ func TestMatch(t *testing.T) {
 		},
 		{
 			path: "foo.yaml",
-			entry: discovery.Entry{
+			entry: &discovery.Entry{
 				Rule:  parser.Rule{},
 				State: discovery.Noop,
 			},

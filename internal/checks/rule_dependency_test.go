@@ -12,7 +12,7 @@ import (
 )
 
 func TestRuleDependencyCheck(t *testing.T) {
-	parseWithState := func(input string, state discovery.ChangeType, sp, rp string) []discovery.Entry {
+	parseWithState := func(input string, state discovery.ChangeType, sp, rp string) []*discovery.Entry {
 		entries := mustParseContent(input)
 		for i := range entries {
 			entries[i].State = state
@@ -47,7 +47,7 @@ func TestRuleDependencyCheck(t *testing.T) {
 				return checks.NewRuleDependencyCheck()
 			},
 			prometheus: newSimpleProm,
-			entries: []discovery.Entry{
+			entries: []*discovery.Entry{
 				parseWithState("- record: foo\n  expr: sum(foo)\n", discovery.Removed, "foo.yaml", "foo.yaml")[0],
 				parseWithState("- alert: foo\n  expr: foo ==\n", discovery.Noop, "foo.yaml", "foo.yaml")[0],
 			},
@@ -59,7 +59,7 @@ func TestRuleDependencyCheck(t *testing.T) {
 				return checks.NewRuleDependencyCheck()
 			},
 			prometheus: newSimpleProm,
-			entries: []discovery.Entry{
+			entries: []*discovery.Entry{
 				parseWithState("- record: foo\n  expr: sum(foo)\n", discovery.Removed, "foo.yaml", "foo.yaml")[0],
 				parseWithState("- alert: foo\n  expr: up == 0\n", discovery.Noop, "foo.yaml", "foo.yaml")[0],
 			},
@@ -85,7 +85,7 @@ func TestRuleDependencyCheck(t *testing.T) {
 				)
 			},
 			problems: true,
-			entries: []discovery.Entry{
+			entries: []*discovery.Entry{
 				parseWithState("- record: foo\n  expr: sum(foo)\n", discovery.Removed, "foo.yaml", "foo.yaml")[0],
 				parseWithState("- alert: alert\n  expr: foo == 0\n", discovery.Noop, "excluded.yaml", "excluded.yaml")[0],
 			},
@@ -98,7 +98,7 @@ func TestRuleDependencyCheck(t *testing.T) {
 			},
 			prometheus: newSimpleProm,
 			problems:   true,
-			entries: []discovery.Entry{
+			entries: []*discovery.Entry{
 				parseWithState("- record: foo\n  expr: sum(foo)\n", discovery.Removed, "foo.yaml", "foo.yaml")[0],
 				parseWithState("- alert: alert\n  expr: foo == 0\n", discovery.Noop, "foo.yaml", "foo.yaml")[0],
 			},
@@ -110,7 +110,7 @@ func TestRuleDependencyCheck(t *testing.T) {
 				return checks.NewRuleDependencyCheck()
 			},
 			prometheus: newSimpleProm,
-			entries: []discovery.Entry{
+			entries: []*discovery.Entry{
 				{
 					Path: discovery.Path{
 						Name:          "broken.yaml",
@@ -128,7 +128,7 @@ func TestRuleDependencyCheck(t *testing.T) {
 				return checks.NewRuleDependencyCheck()
 			},
 			prometheus: newSimpleProm,
-			entries: []discovery.Entry{
+			entries: []*discovery.Entry{
 				parseWithState("- recordx: foo\n  expr: sum(foo)\n", discovery.Noop, "foo.yaml", "foo.yaml")[0],
 				parseWithState("- alert: foo\n  expr: up == 0\n", discovery.Noop, "foo.yaml", "foo.yaml")[0],
 			},
@@ -141,7 +141,7 @@ func TestRuleDependencyCheck(t *testing.T) {
 			},
 			prometheus: newSimpleProm,
 			problems:   true,
-			entries: []discovery.Entry{
+			entries: []*discovery.Entry{
 				parseWithState("\n\n- alert: alert\n  expr: (foo / foo) == 0\n- alert: alert\n  expr: (foo / foo) == 0\n", discovery.Noop, "alice.yaml", "alice.yaml")[1],
 				parseWithState("\n\n- alert: alert\n  expr: (foo / foo) == 0\n- alert: alert\n  expr: (foo / foo) == 0\n", discovery.Noop, "alice.yaml", "alice.yaml")[0],
 				parseWithState("- alert: alert\n  expr: (foo / foo) == 0\n", discovery.Noop, "symlink3.yaml", "bar.yaml")[0],
@@ -161,7 +161,7 @@ func TestRuleDependencyCheck(t *testing.T) {
 			},
 			prometheus: newSimpleProm,
 			problems:   true,
-			entries: []discovery.Entry{
+			entries: []*discovery.Entry{
 				parseWithState(`
 - record: alert:count
   expr: count(ALERTS{alertname="TargetIsDown"})
@@ -176,7 +176,7 @@ func TestRuleDependencyCheck(t *testing.T) {
 			},
 			prometheus: newSimpleProm,
 			problems:   true,
-			entries: []discovery.Entry{
+			entries: []*discovery.Entry{
 				parseWithState(`
 - record: alert:count
   expr: count(ALERTS_FOR_STATE{alertname="TargetIsDown"})
@@ -190,7 +190,7 @@ func TestRuleDependencyCheck(t *testing.T) {
 				return checks.NewRuleDependencyCheck()
 			},
 			prometheus: newSimpleProm,
-			entries: []discovery.Entry{
+			entries: []*discovery.Entry{
 				parseWithState(`
 - record: alert:count
   expr: count(ALERTS{alertname!="TargetIsDown"})
@@ -205,7 +205,7 @@ func TestRuleDependencyCheck(t *testing.T) {
 			},
 			prometheus: newSimpleProm,
 			problems:   true,
-			entries: []discovery.Entry{
+			entries: []*discovery.Entry{
 				parseWithState("- record: foo\n  expr: sum(foo)\n", discovery.Removed, "foo.yaml", "foo.yaml")[0],
 				parseWithState("- alert: alert\n  expr: foo == 0\n", discovery.Noop, "foo.yaml", "foo.yaml")[0],
 				parseWithState("- record: bar\n  expr: vector(0)\n", discovery.Noop, "foo.yaml", "foo.yaml")[0],
@@ -218,7 +218,7 @@ func TestRuleDependencyCheck(t *testing.T) {
 				return checks.NewRuleDependencyCheck()
 			},
 			prometheus: newSimpleProm,
-			entries: []discovery.Entry{
+			entries: []*discovery.Entry{
 				parseWithState("- record: foo\n  expr: sum(foo)\n", discovery.Removed, "foo.yaml", "foo.yaml")[0],
 				parseWithState("- alert: alert\n  expr: foo == 0\n", discovery.Noop, "foo.yaml", "foo.yaml")[0],
 				parseWithState("- record: foo\n  expr: sum(foo)\n", discovery.Added, "bar.yaml", "foo.yaml")[0],

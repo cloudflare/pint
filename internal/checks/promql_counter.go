@@ -55,7 +55,7 @@ func (c CounterCheck) Reporter() string {
 	return CounterCheckName
 }
 
-func (c CounterCheck) Check(ctx context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+func (c CounterCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*discovery.Entry) (problems []Problem) {
 	expr := entry.Rule.Expr()
 
 	if expr.SyntaxError != nil {

@@ -197,7 +197,7 @@ func actionLint(ctx context.Context, c *cli.Command) error {
 	return nil
 }
 
-func verifyOwners(entries []discovery.Entry, allowedOwners []*regexp.Regexp) (reports []reporter.Report) {
+func verifyOwners(entries []*discovery.Entry, allowedOwners []*regexp.Regexp) (reports []reporter.Report) {
 	for _, entry := range entries {
 		if entry.State == discovery.Removed {
 			continue

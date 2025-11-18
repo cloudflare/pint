@@ -43,7 +43,7 @@ func (c AlertsForChecksFor) Reporter() string {
 	return AlertForCheckName
 }
 
-func (c AlertsForChecksFor) Check(_ context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+func (c AlertsForChecksFor) Check(_ context.Context, entry *discovery.Entry, _ []*discovery.Entry) (problems []Problem) {
 	if entry.Rule.AlertingRule == nil {
 		return problems
 	}

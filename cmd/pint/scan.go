@@ -14,7 +14,7 @@ import (
 	"github.com/cloudflare/pint/internal/reporter"
 )
 
-func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.PrometheusGenerator, cfg config.Config, entries []discovery.Entry) (summary reporter.Summary, err error) {
+func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.PrometheusGenerator, cfg config.Config, entries []*discovery.Entry) (summary reporter.Summary, err error) {
 	slog.LogAttrs(ctx, slog.LevelInfo, "Checking Prometheus rules", slog.Int("entries", len(entries)), slog.Int("workers", workers), slog.Bool("online", !isOffline))
 	if isOffline {
 		slog.LogAttrs(ctx, slog.LevelInfo, "Offline mode, skipping Prometheus discovery")
@@ -143,8 +143,8 @@ func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 
 type scanJob struct {
 	check      checks.RuleChecker
-	allEntries []discovery.Entry
-	entry      discovery.Entry
+	entry      *discovery.Entry
+	allEntries []*discovery.Entry
 }
 
 func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporter.Report) {

@@ -55,7 +55,7 @@ func (c FragileCheck) Reporter() string {
 	return FragileCheckName
 }
 
-func (c FragileCheck) Check(_ context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+func (c FragileCheck) Check(_ context.Context, entry *discovery.Entry, _ []*discovery.Entry) (problems []Problem) {
 	expr := entry.Rule.Expr()
 	if expr.SyntaxError != nil {
 		return nil

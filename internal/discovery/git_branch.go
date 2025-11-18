@@ -47,7 +47,7 @@ type GitBranchFinder struct {
 	names         model.ValidationScheme
 }
 
-func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
+func (f GitBranchFinder) Find(allEntries []*Entry) (entries []*Entry, err error) {
 	changes, err := git.Changes(f.gitCmd, f.baseBranch, f.filter)
 	if err != nil {
 		return nil, err
@@ -67,7 +67,7 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 
 	for _, change := range changes {
 		p := parser.NewParser(!f.filter.IsRelaxed(change.Path.Before.Name), f.schema, f.names)
-		var entriesBefore, entriesAfter []Entry
+		var entriesBefore, entriesAfter []*Entry
 		entriesBefore, err = readRules(
 			change.Path.Before.EffectivePath(),
 			change.Path.Before.Name,
@@ -261,15 +261,15 @@ func commonLines(a, b []int) (common []int) {
 }
 
 type matchedEntry struct {
-	before      Entry
-	after       Entry
+	before      *Entry
+	after       *Entry
 	hasBefore   bool
 	hasAfter    bool
 	isIdentical bool
 	wasMoved    bool
 }
 
-func matchEntries(before, after []Entry) (ml []matchedEntry) {
+func matchEntries(before, after []*Entry) (ml []matchedEntry) {
 	for _, a := range after {
 		slog.LogAttrs(context.Background(), slog.LevelDebug,
 			"Matching HEAD rule",
@@ -279,8 +279,8 @@ func matchEntries(before, after []Entry) (ml []matchedEntry) {
 		)
 
 		m := matchedEntry{after: a, hasAfter: true} // nolint: exhaustruct
-		beforeSwap := make([]Entry, 0, len(before))
-		var matches []Entry
+		beforeSwap := make([]*Entry, 0, len(before))
+		var matches []*Entry
 		var matched bool
 
 		for _, b := range before {
@@ -329,7 +329,7 @@ func matchEntries(before, after []Entry) (ml []matchedEntry) {
 	return ml
 }
 
-func isEntryIdentical(b, a Entry) bool {
+func isEntryIdentical(b, a *Entry) bool {
 	if !slices.Equal(sort.StringSlice(b.DisabledChecks), sort.StringSlice(a.DisabledChecks)) {
 		slog.LogAttrs(context.Background(), slog.LevelDebug, "List of disabled checks was modified",
 			slog.Any("before", sort.StringSlice(b.DisabledChecks)),
@@ -339,7 +339,7 @@ func isEntryIdentical(b, a Entry) bool {
 	return true
 }
 
-func findRulesByName(entries []Entry, name string, typ parser.RuleType) (nomatch, match []Entry) {
+func findRulesByName(entries []*Entry, name string, typ parser.RuleType) (nomatch, match []*Entry) {
 	for _, entry := range entries {
 		if entry.PathError == nil && entry.Rule.Type() == typ && entry.Rule.Name() == name {
 			match = append(match, entry)
@@ -360,7 +360,7 @@ func countCommits(changes []*git.FileChange) int {
 	return len(commits)
 }
 
-func entriesWithPathErrors(entries []Entry) (match []Entry) {
+func entriesWithPathErrors(entries []*Entry) (match []*Entry) {
 	for _, entry := range entries {
 		if entry.PathError != nil {
 			match = append(match, entry)

@@ -65,7 +65,7 @@ func (c Reject) Reporter() string {
 	return RejectCheckName
 }
 
-func (c Reject) Check(_ context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+func (c Reject) Check(_ context.Context, entry *discovery.Entry, _ []*discovery.Entry) (problems []Problem) {
 	if c.checkLabels {
 		for _, label := range entry.Labels().Items {
 			problems = append(problems, c.reject(entry.Rule, label)...)
