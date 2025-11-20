@@ -44,6 +44,26 @@ func TestFormatLineRangeString(t *testing.T) {
 			lines:  []int{-1, 0, 1},
 			output: "",
 		},
+		{
+			lines:  []int{1, 2, 4, 5, 6, 8, 10, 11, 12},
+			output: "1-2 4-6 8 10-12",
+		},
+		{
+			lines:  []int{100, 101, 102, 200},
+			output: "100-102 200",
+		},
+		{
+			lines:  []int{5, 5, 5},
+			output: "5 5 5",
+		},
+		{
+			lines:  []int{10, 1, 5, 3, 2},
+			output: "1-3 5 10",
+		},
+		{
+			lines:  []int{1, 3, 2, 5, 4},
+			output: "1-5",
+		},
 	}
 
 	for i, tc := range testCases {

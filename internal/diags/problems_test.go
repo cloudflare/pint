@@ -160,17 +160,77 @@ expr: |
 }
 
 func TestCountDigits(t *testing.T) {
-	require.Equal(t, 1, countDigits(1))
-	require.Equal(t, 2, countDigits(10))
-	require.Equal(t, 3, countDigits(100))
+	type testCaseT struct {
+		name     string
+		input    int
+		expected int
+	}
+
+	testCases := []testCaseT{
+		{name: "single digit", input: 1, expected: 1},
+		{name: "two digits", input: 10, expected: 2},
+		{name: "three digits", input: 100, expected: 3},
+		{name: "zero", input: 0, expected: 0},
+		{name: "four digits", input: 1000, expected: 4},
+		{name: "five digits", input: 99999, expected: 5},
+		{name: "six digits", input: 123456, expected: 6},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			require.Equal(t, tc.expected, countDigits(tc.input))
+		})
+	}
 }
 
 func TestLineCoverage(t *testing.T) {
-	diags := []Diagnostic{
-		{Pos: PositionRanges{{Line: 1}, {Line: 2}}},
-		{Pos: PositionRanges{{Line: 2}, {Line: 3}}},
+	type testCaseT struct {
+		name     string
+		diags    []Diagnostic
+		expected []int
 	}
-	require.Equal(t, []int{1, 2, 3}, lineCoverage(diags))
+
+	testCases := []testCaseT{
+		{
+			name: "multiple lines",
+			diags: []Diagnostic{
+				{Pos: PositionRanges{{Line: 1}, {Line: 2}}},
+				{Pos: PositionRanges{{Line: 2}, {Line: 3}}},
+			},
+			expected: []int{1, 2, 3},
+		},
+		{
+			name:     "empty",
+			diags:    []Diagnostic{},
+			expected: nil,
+		},
+		{
+			name: "single line",
+			diags: []Diagnostic{
+				{Pos: PositionRanges{{Line: 5}}},
+			},
+			expected: []int{5},
+		},
+		{
+			name: "duplicates",
+			diags: []Diagnostic{
+				{Pos: PositionRanges{{Line: 3}, {Line: 3}}},
+				{Pos: PositionRanges{{Line: 3}, {Line: 5}}},
+			},
+			expected: []int{3, 5},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result := lineCoverage(tc.diags)
+			if tc.expected == nil {
+				require.Empty(t, result)
+			} else {
+				require.Equal(t, tc.expected, result)
+			}
+		})
+	}
 }
 
 func TestInjectDiagnosticsKind(t *testing.T) {

@@ -205,6 +205,7 @@ func TestLineRangeString(t *testing.T) {
 	testCases := []testCaseT{
 		{lr: LineRange{First: 1, Last: 1}, expected: "1"},
 		{lr: LineRange{First: 1, Last: 2}, expected: "1-2"},
+		{lr: LineRange{First: 5, Last: 10}, expected: "5-10"},
 	}
 
 	for _, tc := range testCases {
@@ -215,31 +216,138 @@ func TestLineRangeString(t *testing.T) {
 }
 
 func TestLineRangeExpand(t *testing.T) {
-	lr := LineRange{First: 1, Last: 3}
-	require.Equal(t, []int{1, 2, 3}, lr.Expand())
+	type testCaseT struct {
+		name     string
+		expected []int
+		lr       LineRange
+	}
+
+	testCases := []testCaseT{
+		{name: "basic range", lr: LineRange{First: 1, Last: 3}, expected: []int{1, 2, 3}},
+		{name: "single line", lr: LineRange{First: 5, Last: 5}, expected: []int{5}},
+		{name: "large range", lr: LineRange{First: 10, Last: 15}, expected: []int{10, 11, 12, 13, 14, 15}},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			require.Equal(t, tc.expected, tc.lr.Expand())
+		})
+	}
 }
 
 func TestPositionRangesLines(t *testing.T) {
-	prs := PositionRanges{
-		{Line: 2},
-		{Line: 5},
-		{Line: 3},
+	type testCaseT struct {
+		name        string
+		prs         PositionRanges
+		expectFirst int
+		expectLast  int
 	}
-	lr := prs.Lines()
-	require.Equal(t, 2, lr.First)
-	require.Equal(t, 5, lr.Last)
+
+	testCases := []testCaseT{
+		{
+			name:        "multiple positions",
+			prs:         PositionRanges{{Line: 2}, {Line: 5}, {Line: 3}},
+			expectFirst: 2,
+			expectLast:  5,
+		},
+		{
+			name:        "single position",
+			prs:         PositionRanges{{Line: 42}},
+			expectFirst: 42,
+			expectLast:  42,
+		},
+		{
+			name:        "empty",
+			prs:         PositionRanges{},
+			expectFirst: 0,
+			expectLast:  0,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			lr := tc.prs.Lines()
+			require.Equal(t, tc.expectFirst, lr.First)
+			require.Equal(t, tc.expectLast, lr.Last)
+		})
+	}
 }
 
 func TestPositionRangesAddOffset(t *testing.T) {
-	prs := PositionRanges{
-		{Line: 1, FirstColumn: 2, LastColumn: 3},
-		{Line: 2, FirstColumn: 3, LastColumn: 4},
+	type testCaseT struct {
+		name         string
+		prs          PositionRanges
+		expected     PositionRanges
+		lineOffset   int
+		columnOffset int
 	}
-	prs.AddOffset(10, 20)
-	require.Equal(t, 11, prs[0].Line)
-	require.Equal(t, 22, prs[0].FirstColumn)
-	require.Equal(t, 23, prs[0].LastColumn)
-	require.Equal(t, 12, prs[1].Line)
-	require.Equal(t, 23, prs[1].FirstColumn)
-	require.Equal(t, 24, prs[1].LastColumn)
+
+	testCases := []testCaseT{
+		{
+			name: "multiple positions with offset",
+			prs: PositionRanges{
+				{Line: 1, FirstColumn: 2, LastColumn: 3},
+				{Line: 2, FirstColumn: 3, LastColumn: 4},
+			},
+			lineOffset:   10,
+			columnOffset: 20,
+			expected: PositionRanges{
+				{Line: 11, FirstColumn: 22, LastColumn: 23},
+				{Line: 12, FirstColumn: 23, LastColumn: 24},
+			},
+		},
+		{
+			name: "zero offset",
+			prs: PositionRanges{
+				{Line: 5, FirstColumn: 10, LastColumn: 20},
+			},
+			lineOffset:   0,
+			columnOffset: 0,
+			expected: PositionRanges{
+				{Line: 5, FirstColumn: 10, LastColumn: 20},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.prs.AddOffset(tc.lineOffset, tc.columnOffset)
+			require.Equal(t, tc.expected, tc.prs)
+		})
+	}
+}
+
+func TestPositionRangesLen(t *testing.T) {
+	type testCaseT struct {
+		name     string
+		prs      PositionRanges
+		expected int
+	}
+
+	testCases := []testCaseT{
+		{
+			name: "multiple ranges",
+			prs: PositionRanges{
+				{Line: 1, FirstColumn: 1, LastColumn: 5},
+				{Line: 2, FirstColumn: 1, LastColumn: 3},
+			},
+			expected: 8,
+		},
+		{
+			name:     "empty",
+			prs:      PositionRanges{},
+			expected: 0,
+		},
+		{
+			name:     "single column",
+			prs:      PositionRanges{{Line: 1, FirstColumn: 5, LastColumn: 5}},
+			expected: 1,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			require.Equal(t, tc.expected, tc.prs.Len())
+		})
+	}
 }
