@@ -1,17 +1,53 @@
 package parser
 
 import (
-	"encoding/json"
 	"errors"
 	"slices"
+	"sync"
 
 	promParser "github.com/prometheus/prometheus/promql/parser"
+
+	"github.com/cloudflare/pint/internal/parser/source"
 )
 
 type PromQLExpr struct {
+	syntaxError error
 	Value       *YamlNode
-	SyntaxError error
-	Query       *PromQLNode
+	query       *PromQLNode
+	mu          *sync.Mutex
+	source      []source.Source
+	hasSource   bool
+}
+
+func (pn *PromQLExpr) parse() {
+	if pn.query == nil {
+		pn.query, pn.syntaxError = DecodeExpr(pn.Value.Value)
+	}
+}
+
+func (pn *PromQLExpr) Source() []source.Source {
+	pn.mu.Lock()
+	defer pn.mu.Unlock()
+	pn.parse()
+	if !pn.hasSource {
+		pn.source = source.LabelsSource(pn.Value.Value, pn.query.Expr)
+		pn.hasSource = true
+	}
+	return pn.source
+}
+
+func (pn *PromQLExpr) Query() *PromQLNode {
+	pn.mu.Lock()
+	defer pn.mu.Unlock()
+	pn.parse()
+	return pn.query
+}
+
+func (pn *PromQLExpr) SyntaxError() error {
+	pn.mu.Lock()
+	defer pn.mu.Unlock()
+	pn.parse()
+	return pn.syntaxError
 }
 
 // PromQLNode is used to turn the parsed PromQL query expression into a tree.
@@ -23,10 +59,6 @@ type PromQLNode struct {
 	Parent   *PromQLNode
 	Expr     promParser.Node
 	Children []*PromQLNode
-}
-
-func (pn PromQLNode) MarshalJSON() ([]byte, error) {
-	return json.Marshal(pn.Expr.String())
 }
 
 // Tree takes a parsed PromQL node and turns it into a Node

@@ -44,9 +44,9 @@ func (c SyntaxCheck) Reporter() string {
 
 func (c SyntaxCheck) Check(_ context.Context, entry *discovery.Entry, _ []*discovery.Entry) (problems []Problem) {
 	expr := entry.Rule.Expr()
-	if expr.SyntaxError != nil {
+	if expr.SyntaxError() != nil {
 		diag := diags.Diagnostic{
-			Message:     expr.SyntaxError.Error(),
+			Message:     expr.SyntaxError().Error(),
 			Pos:         expr.Value.Pos,
 			FirstColumn: 1,
 			LastColumn:  len(expr.Value.Value) - 1,
@@ -54,7 +54,7 @@ func (c SyntaxCheck) Check(_ context.Context, entry *discovery.Entry, _ []*disco
 		}
 
 		var perrs promParser.ParseErrors
-		ok := errors.As(expr.SyntaxError, &perrs)
+		ok := errors.As(expr.SyntaxError(), &perrs)
 		if ok {
 			for _, perr := range perrs { // Use only the last error.
 				diag = diags.Diagnostic{

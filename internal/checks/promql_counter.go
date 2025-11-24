@@ -58,14 +58,14 @@ func (c CounterCheck) Reporter() string {
 func (c CounterCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*discovery.Entry) (problems []Problem) {
 	expr := entry.Rule.Expr()
 
-	if expr.SyntaxError != nil {
+	if expr.SyntaxError() != nil {
 		return problems
 	}
 
 	done := map[string]struct{}{}
 
 LOOP:
-	for _, vs := range parser.WalkDownExpr[*promParser.VectorSelector](expr.Query) {
+	for _, vs := range parser.WalkDownExpr[*promParser.VectorSelector](expr.Query()) {
 		if vs.Parent == nil {
 			// This might be a counter but there's no parent so we have something like `expr: foo`.
 			// We're only testing for the existence of foo in alerts OR copying it via recording rules.

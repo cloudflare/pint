@@ -50,10 +50,10 @@ func (c LabelsConflictCheck) Reporter() string {
 
 func (c LabelsConflictCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*discovery.Entry) (problems []Problem) {
 	var labels *parser.YamlMap
-	if entry.Rule.AlertingRule != nil && entry.Rule.AlertingRule.Expr.SyntaxError == nil && entry.Rule.AlertingRule.Labels != nil {
+	if entry.Rule.AlertingRule != nil && entry.Rule.AlertingRule.Expr.SyntaxError() == nil && entry.Rule.AlertingRule.Labels != nil {
 		labels = entry.Rule.AlertingRule.Labels
 	}
-	if entry.Rule.RecordingRule != nil && entry.Rule.RecordingRule.Expr.SyntaxError == nil && entry.Rule.RecordingRule.Labels != nil {
+	if entry.Rule.RecordingRule != nil && entry.Rule.RecordingRule.Expr.SyntaxError() == nil && entry.Rule.RecordingRule.Labels != nil {
 		labels = entry.Rule.RecordingRule.Labels
 	}
 	if labels == nil {

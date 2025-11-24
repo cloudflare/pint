@@ -11,7 +11,7 @@ import (
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
-	"github.com/cloudflare/pint/internal/parser/utils"
+	"github.com/cloudflare/pint/internal/parser/source"
 	"github.com/cloudflare/pint/internal/promapi"
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
@@ -77,7 +77,7 @@ func (c RateCheck) Reporter() string {
 func (c RateCheck) Check(ctx context.Context, entry *discovery.Entry, entries []*discovery.Entry) (problems []Problem) {
 	expr := entry.Rule.Expr()
 
-	if expr.SyntaxError != nil {
+	if expr.SyntaxError() != nil {
 		return problems
 	}
 
@@ -91,11 +91,11 @@ func (c RateCheck) Check(ctx context.Context, entry *discovery.Entry, entries []
 		return problems
 	}
 
-	problems = append(problems, c.checkNode(ctx, entry.Rule, expr, expr.Query, entries, cfg, &completedList{values: nil})...)
+	problems = append(problems, c.checkNode(ctx, entry.Rule, expr, expr.Query(), entries, cfg, &completedList{values: nil})...)
 	return problems
 }
 
-func (c RateCheck) checkNode(ctx context.Context, rule parser.Rule, expr parser.PromQLExpr, node *parser.PromQLNode, entries []*discovery.Entry, cfg *promapi.ConfigResult, done *completedList) (problems []Problem) {
+func (c RateCheck) checkNode(ctx context.Context, rule parser.Rule, expr *parser.PromQLExpr, node *parser.PromQLNode, entries []*discovery.Entry, cfg *promapi.ConfigResult, done *completedList) (problems []Problem) {
 	if n, ok := node.Expr.(*promParser.Call); ok && (n.Func.Name == "rate" || n.Func.Name == "irate" || n.Func.Name == "deriv") {
 		for _, arg := range n.Args {
 			m, ok := arg.(*promParser.MatrixSelector)
@@ -168,12 +168,12 @@ func (c RateCheck) checkNode(ctx context.Context, rule parser.Rule, expr parser.
 					if e.Rule.Error.Err != nil {
 						continue
 					}
-					if e.Rule.RecordingRule != nil && e.Rule.RecordingRule.Expr.SyntaxError == nil && e.Rule.RecordingRule.Record.Value == s.Name {
-						for _, src := range utils.LabelsSource(e.Rule.RecordingRule.Expr.Value.Value, e.Rule.RecordingRule.Expr.Query.Expr) {
-							if src.Type != utils.AggregateSource {
+					if e.Rule.RecordingRule != nil && e.Rule.RecordingRule.Expr.SyntaxError() == nil && e.Rule.RecordingRule.Record.Value == s.Name {
+						for _, src := range e.Rule.RecordingRule.Expr.Source() {
+							if src.Type != source.AggregateSource {
 								continue
 							}
-							if vs, ok := utils.MostOuterOperation[*promParser.VectorSelector](src); ok {
+							if vs, ok := source.MostOuterOperation[*promParser.VectorSelector](src); ok {
 								metadata, err := c.prom.Metadata(ctx, vs.Name)
 								if err != nil {
 									if errors.Is(err, promapi.ErrUnsupported) {

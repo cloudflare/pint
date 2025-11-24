@@ -49,7 +49,7 @@ func (c RuleDuplicateCheck) Reporter() string {
 
 func (c RuleDuplicateCheck) Check(ctx context.Context, entry *discovery.Entry, entries []*discovery.Entry) (problems []Problem) {
 	expr := entry.Rule.Expr()
-	if expr.SyntaxError != nil {
+	if expr.SyntaxError() != nil {
 		return problems
 	}
 
@@ -74,7 +74,7 @@ func (c RuleDuplicateCheck) compareRules(_ context.Context, rule *parser.Recordi
 		return nil
 	}
 
-	if rule.Expr.Query.Expr.String() == entry.Rule.RecordingRule.Expr.Query.Expr.String() {
+	if rule.Expr.Query().Expr.String() == entry.Rule.RecordingRule.Expr.Query().Expr.String() {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
 			Lines:    lines,
@@ -107,7 +107,7 @@ func ignoreOtherEntry(entry, other *discovery.Entry, prom *promapi.FailoverGroup
 	if other.Rule.Error.Err != nil {
 		return true
 	}
-	if other.Rule.Expr().SyntaxError != nil {
+	if other.Rule.Expr().SyntaxError() != nil {
 		return true
 	}
 	if other.Path.Name == entry.Path.Name && other.Rule.Lines.First == entry.Rule.Lines.First {

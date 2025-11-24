@@ -69,7 +69,7 @@ func (c AlertsCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*dis
 		return problems
 	}
 
-	if entry.Rule.AlertingRule.Expr.SyntaxError != nil {
+	if entry.Rule.AlertingRule.Expr.SyntaxError() != nil {
 		return problems
 	}
 

@@ -15,6 +15,7 @@ import (
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
+	"github.com/cloudflare/pint/internal/parser/source"
 	"github.com/cloudflare/pint/internal/parser/utils"
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -61,14 +62,14 @@ func (c VectorMatchingCheck) Reporter() string {
 
 func (c VectorMatchingCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*discovery.Entry) (problems []Problem) {
 	expr := entry.Rule.Expr()
-	if expr.SyntaxError != nil {
+	if expr.SyntaxError() != nil {
 		return nil
 	}
-	problems = append(problems, c.checkNode(ctx, entry.Rule, expr, expr.Query)...)
+	problems = append(problems, c.checkNode(ctx, entry.Rule, expr, expr.Query())...)
 	return problems
 }
 
-func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, expr parser.PromQLExpr, node *parser.PromQLNode) (problems []Problem) {
+func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, expr *parser.PromQLExpr, node *parser.PromQLNode) (problems []Problem) {
 	if n, ok := utils.RemoveConditions(node.Expr.String()).(*promParser.BinaryExpr); ok &&
 		n.VectorMatching != nil &&
 		n.Op != promParser.LOR &&
@@ -204,7 +205,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 					})
 				}
 				if !leftLabels.hasName(name) && !rightLabels.hasName(name) {
-					pos := utils.FindFuncPosition(expr.Value.Value, node.Expr.PositionRange(), "on", []posrange.PositionRange{
+					pos := source.FindFuncPosition(expr.Value.Value, node.Expr.PositionRange(), "on", []posrange.PositionRange{
 						n.LHS.PositionRange(), n.RHS.PositionRange(),
 					})
 					link := fmt.Sprintf("%s/query?g0.expr=%s&&g0.tab=table", leftURI, url.QueryEscape(n.String()))
@@ -250,7 +251,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 					},
 				})
 			} else {
-				pos := utils.FindFuncPosition(expr.Value.Value, n.PositionRange(), "ignoring", []posrange.PositionRange{
+				pos := source.FindFuncPosition(expr.Value.Value, n.PositionRange(), "ignoring", []posrange.PositionRange{
 					n.LHS.PositionRange(), n.RHS.PositionRange(),
 				})
 				problems = append(problems, Problem{

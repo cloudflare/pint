@@ -1,4 +1,4 @@
-package utils_test
+package source_test
 
 import (
 	"fmt"
@@ -14,7 +14,7 @@ import (
 	"go.yaml.in/yaml/v3"
 
 	"github.com/cloudflare/pint/internal/parser"
-	"github.com/cloudflare/pint/internal/parser/utils"
+	"github.com/cloudflare/pint/internal/parser/source"
 
 	promParser "github.com/prometheus/prometheus/promql/parser"
 )
@@ -358,7 +358,7 @@ up{node_status="v", job="node_exporter"}
 func TestLabelsSource(t *testing.T) {
 	type Snapshot struct {
 		Expr   string
-		Output []utils.Source
+		Output []source.Source
 	}
 
 	_, file, _, ok := runtime.Caller(0)
@@ -378,10 +378,10 @@ func TestLabelsSource(t *testing.T) {
 				t.Error(err)
 				t.FailNow()
 			}
-			output := utils.LabelsSource(expr, n.Expr)
+			output := source.LabelsSource(expr, n.Expr)
 
 			for _, src := range output {
-				src.WalkSources(func(s utils.Source, _ *utils.Join, _ *utils.Unless) {
+				src.WalkSources(func(s source.Source, _ *source.Join, _ *source.Unless) {
 					require.Positive(t, s.Position.End, "empty position %+v", s)
 					if s.DeadInfo != nil {
 						require.Positive(t, s.DeadInfo.Fragment.End, "empty dead position %+v", s)
@@ -433,10 +433,10 @@ func TestLabelsSourceCallCoverage(t *testing.T) {
 				t.Error(err)
 				t.FailNow()
 			}
-			output := utils.LabelsSource(b.String(), n.Expr)
+			output := source.LabelsSource(b.String(), n.Expr)
 			require.Len(t, output, 1)
 			require.NotEmpty(t, output[0].Operations)
-			call, ok := utils.MostOuterOperation[*promParser.Call](output[0])
+			call, ok := source.MostOuterOperation[*promParser.Call](output[0])
 			require.True(t, ok, "no call found in operations for: %q ~> %+v", b.String(), output)
 			require.NotNil(t, call, "no call detected in: %q ~> %+v", b.String(), output)
 			require.Equal(t, name, output[0].Operation())
@@ -453,9 +453,9 @@ func TestLabelsSourceCallCoverageFail(t *testing.T) {
 			},
 		},
 	}
-	output := utils.LabelsSource("fake_call()", n.Expr)
+	output := source.LabelsSource("fake_call()", n.Expr)
 	require.Len(t, output, 1)
-	call, ok := utils.MostOuterOperation[*promParser.Call](output[0])
+	call, ok := source.MostOuterOperation[*promParser.Call](output[0])
 	require.False(t, ok, "no call should have been detected in fake function, got: %v", ok)
 	require.Nil(t, call, "no call should have been detected in fake function, got: %+v", call)
 }
@@ -466,13 +466,13 @@ func TestVectorOperation(t *testing.T) {
 			Val: 1,
 		},
 	}
-	output := utils.LabelsSource("1", n.Expr)
+	output := source.LabelsSource("1", n.Expr)
 	require.Len(t, output, 1)
 	require.Empty(t, output[0].Operation())
 }
 
 func TestDeadLabelKindUnknownString(t *testing.T) {
-	var dl utils.DeadLabelKind = 100
+	var dl source.DeadLabelKind = 100
 	require.Equal(t, "unknown", dl.String())
 }
 
@@ -493,7 +493,7 @@ func BenchmarkLabelsSource(b *testing.B) {
 
 	for b.Loop() {
 		for _, tc := range queries {
-			utils.LabelsSource(tc.expr, tc.node)
+			source.LabelsSource(tc.expr, tc.node)
 		}
 	}
 }

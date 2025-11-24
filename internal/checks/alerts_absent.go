@@ -9,7 +9,7 @@ import (
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/output"
-	"github.com/cloudflare/pint/internal/parser/utils"
+	"github.com/cloudflare/pint/internal/parser/source"
 	"github.com/cloudflare/pint/internal/promapi"
 
 	"github.com/prometheus/common/model"
@@ -59,12 +59,12 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, entry *discovery.Entry, _ 
 		return problems
 	}
 
-	if entry.Rule.AlertingRule.Expr.SyntaxError != nil {
+	if entry.Rule.AlertingRule.Expr.SyntaxError() != nil {
 		return problems
 	}
 
-	src := utils.LabelsSource(entry.Rule.AlertingRule.Expr.Value.Value, entry.Rule.AlertingRule.Expr.Query.Expr)
-	absentSources := make([]utils.Source, 0, len(src))
+	src := entry.Rule.AlertingRule.Expr.Source()
+	absentSources := make([]source.Source, 0, len(src))
 	for _, s := range src {
 		if s.Operation() != "absent" {
 			continue
@@ -101,7 +101,7 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, entry *discovery.Entry, _ 
 	for _, s := range absentSources {
 		var summary string
 
-		call, _ := utils.MostOuterOperation[*promParser.Call](s)
+		call, _ := source.MostOuterOperation[*promParser.Call](s)
 		dgs := []diags.Diagnostic{
 			{
 				Message:     "Using `absent()` might cause false positive alerts when Prometheus restarts.",

@@ -52,7 +52,7 @@ func (c AlertsExternalLabelsCheck) Check(ctx context.Context, entry *discovery.E
 		return problems
 	}
 
-	if entry.Rule.AlertingRule.Expr.SyntaxError != nil {
+	if entry.Rule.AlertingRule.Expr.SyntaxError() != nil {
 		return problems
 	}
 

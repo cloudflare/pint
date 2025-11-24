@@ -216,3 +216,8 @@
     anchor: 1
 
 ---
+
+[TestRuleDependencyCheck/ignores_rules_with_invalid_queries - 1]
+[]
+
+---

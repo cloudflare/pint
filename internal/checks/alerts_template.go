@@ -20,7 +20,7 @@ import (
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
-	"github.com/cloudflare/pint/internal/parser/utils"
+	"github.com/cloudflare/pint/internal/parser/source"
 )
 
 const (
@@ -117,11 +117,11 @@ func (c TemplateCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*d
 		return nil
 	}
 
-	if entry.Rule.AlertingRule.Expr.SyntaxError != nil {
+	if entry.Rule.AlertingRule.Expr.SyntaxError() != nil {
 		return nil
 	}
 
-	src := utils.LabelsSource(entry.Rule.AlertingRule.Expr.Value.Value, entry.Rule.AlertingRule.Expr.Query.Expr)
+	src := entry.Rule.AlertingRule.Expr.Source()
 	data := promTemplate.AlertTemplateData(map[string]string{}, map[string]string{}, "", promql.Sample{})
 
 	for _, label := range entry.Labels().Items {
@@ -216,7 +216,7 @@ func (c TemplateCheck) checkHumanizeIsNeeded(expr parser.PromQLExpr, ann *parser
 	if !ok {
 		return problems
 	}
-	for _, src := range utils.LabelsSource(expr.Value.Value, expr.Query.Expr) {
+	for _, src := range expr.Source() {
 		call := isRateResult(src)
 		if call != nil {
 			dgs := []diags.Diagnostic{
@@ -260,15 +260,15 @@ func (c TemplateCheck) checkHumanizeIsNeeded(expr parser.PromQLExpr, ann *parser
 	return problems
 }
 
-func isRateResult(src utils.Source) *promParser.Call {
-	if src.Type == utils.AggregateSource {
+func isRateResult(src source.Source) *promParser.Call {
+	if src.Type == source.AggregateSource {
 		switch src.Operation() {
 		case "count", "count_values", "group":
 			return nil
 		}
 	}
 
-	call, ok := utils.MostOuterOperation[*promParser.Call](src)
+	call, ok := source.MostOuterOperation[*promParser.Call](src)
 	if !ok {
 		return nil
 	}
@@ -502,7 +502,7 @@ func findTemplateVariables(_, text string) (vars []tmplVar, aliases aliasMap, ok
 	return vars, aliases, true
 }
 
-func (c TemplateCheck) checkQueryLabels(group *parser.Group, rule parser.Rule, label *parser.YamlKeyValue, src []utils.Source) (problems []Problem) {
+func (c TemplateCheck) checkQueryLabels(group *parser.Group, rule parser.Rule, label *parser.YamlKeyValue, src []source.Source) (problems []Problem) {
 	vars, aliases, ok := findTemplateVariables(label.Key.Value, label.Value.Value)
 	if !ok {
 		return nil

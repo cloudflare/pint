@@ -3,6 +3,7 @@ package parser
 import (
 	"fmt"
 	"slices"
+	"sync"
 	"time"
 
 	"go.yaml.in/yaml/v3"
@@ -153,34 +154,28 @@ func newYamlMap(key, value *yaml.Node, offsetLine, offsetColumn int, contentLine
 	return &ym
 }
 
-func (pqle PromQLExpr) IsIdentical(b PromQLExpr) bool {
+func (pqle *PromQLExpr) IsIdentical(b PromQLExpr) bool {
 	return pqle.Value.Value == b.Value.Value
 }
 
 func newPromQLExpr(node *yaml.Node, offsetLine, offsetColumn int, contentLines []string, minColumn int) *PromQLExpr {
-	expr := PromQLExpr{
+	return &PromQLExpr{
 		Value:       newYamlNode(node, offsetLine, offsetColumn, contentLines, minColumn),
-		SyntaxError: nil,
-		Query:       nil,
+		syntaxError: nil,
+		query:       nil,
+		mu:          &sync.Mutex{},
+		source:      nil,
+		hasSource:   false,
 	}
-
-	qlNode, err := DecodeExpr(expr.Value.Value)
-	if err != nil {
-		expr.SyntaxError = err
-		return &expr
-
-	}
-	expr.Query = qlNode
-	return &expr
 }
 
 type AlertingRule struct {
-	Expr          PromQLExpr
 	For           *YamlNode
 	KeepFiringFor *YamlNode
 	Labels        *YamlMap
 	Annotations   *YamlMap
 	Alert         YamlNode
+	Expr          PromQLExpr
 }
 
 func (ar *AlertingRule) IsIdentical(b *AlertingRule) bool {
@@ -212,9 +207,9 @@ func (ar *AlertingRule) IsIdentical(b *AlertingRule) bool {
 }
 
 type RecordingRule struct {
-	Expr   PromQLExpr
 	Labels *YamlMap
 	Record YamlNode
+	Expr   PromQLExpr
 }
 
 func (rr *RecordingRule) IsIdentical(b *RecordingRule) bool {
@@ -347,11 +342,11 @@ func (r Rule) NameNode() YamlNode {
 	return r.AlertingRule.Alert
 }
 
-func (r Rule) Expr() PromQLExpr {
+func (r Rule) Expr() *PromQLExpr {
 	if r.RecordingRule != nil {
-		return r.RecordingRule.Expr
+		return &r.RecordingRule.Expr
 	}
-	return r.AlertingRule.Expr
+	return &r.AlertingRule.Expr
 }
 
 func (r Rule) LastKey() (node *YamlNode) {

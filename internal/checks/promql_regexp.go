@@ -15,6 +15,7 @@ import (
 
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/parser/source"
 	"github.com/cloudflare/pint/internal/parser/utils"
 )
 
@@ -66,7 +67,7 @@ func (c RegexpCheck) Reporter() string {
 
 func (c RegexpCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*discovery.Entry) (problems []Problem) {
 	expr := entry.Rule.Expr()
-	if expr.SyntaxError != nil {
+	if expr.SyntaxError() != nil {
 		return nil
 	}
 
@@ -80,7 +81,7 @@ func (c RegexpCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*dis
 	}
 
 	done := map[string]struct{}{}
-	for _, selector := range utils.HasVectorSelector(expr.Query) {
+	for _, selector := range utils.HasVectorSelector(expr.Query()) {
 		if _, ok := done[selector.String()]; ok {
 			continue
 		}
@@ -274,7 +275,7 @@ func isOpSmelly(a, b syntax.Op) bool {
 
 func findMatcherPos(expr string, within posrange.PositionRange, m *labels.Matcher) posrange.PositionRange {
 	re := regexp.MustCompile("(" + m.Name + ")(?: *)" + m.Type.String() + "(?: *)" + `"` + regexp.QuoteMeta(m.Value) + `"`)
-	idx := re.FindStringSubmatchIndex(utils.GetQueryFragment(expr, within))
+	idx := re.FindStringSubmatchIndex(source.GetQueryFragment(expr, within))
 	if idx == nil {
 		return within
 	}

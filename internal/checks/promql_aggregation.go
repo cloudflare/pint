@@ -8,7 +8,7 @@ import (
 
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/parser/utils"
+	"github.com/cloudflare/pint/internal/parser/source"
 )
 
 const (
@@ -58,7 +58,7 @@ func (c AggregationCheck) Reporter() string {
 
 func (c AggregationCheck) Check(_ context.Context, entry *discovery.Entry, _ []*discovery.Entry) (problems []Problem) {
 	expr := entry.Rule.Expr()
-	if expr.SyntaxError != nil {
+	if expr.SyntaxError() != nil {
 		return nil
 	}
 
@@ -88,8 +88,8 @@ func (c AggregationCheck) Check(_ context.Context, entry *discovery.Entry, _ []*
 		nameDesc = "all"
 	}
 
-	for _, src := range utils.LabelsSource(expr.Value.Value, expr.Query.Expr) {
-		if src.Type != utils.AggregateSource {
+	for _, src := range expr.Source() {
+		if src.Type != source.AggregateSource {
 			continue
 		}
 		if c.keep && !src.CanHaveLabel(c.label) {
@@ -122,13 +122,13 @@ func (c AggregationCheck) Check(_ context.Context, entry *discovery.Entry, _ []*
 		}
 		if !c.keep && src.CanHaveLabel(c.label) {
 			posrange := src.Position
-			if aggr, ok := utils.MostOuterOperation[*promParser.AggregateExpr](src); ok {
+			if aggr, ok := source.MostOuterOperation[*promParser.AggregateExpr](src); ok {
 				posrange = aggr.PosRange
 				if len(aggr.Grouping) != 0 {
 					if aggr.Without {
-						posrange = utils.FindFuncNamePosition(expr.Value.Value, aggr.PosRange, "without")
+						posrange = source.FindFuncNamePosition(expr.Value.Value, aggr.PosRange, "without")
 					} else {
-						posrange = utils.FindFuncNamePosition(expr.Value.Value, aggr.PosRange, "by")
+						posrange = source.FindFuncNamePosition(expr.Value.Value, aggr.PosRange, "by")
 					}
 				}
 			}

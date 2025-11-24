@@ -4194,46 +4194,6 @@ groups:
 		{
 			input: []byte(`
 groups:
-- name: foo
-  rules:
-  - record: foo
-    expr: |
-      {'up' == 1}
-`),
-			output: parser.File{
-				IsRelaxed: true,
-				Groups: []parser.Group{
-					{
-						Name: "foo",
-						Rules: []parser.Rule{
-							{
-								Lines: diags.LineRange{First: 5, Last: 7},
-								RecordingRule: &parser.RecordingRule{
-									Record: parser.YamlNode{
-										Value: "foo",
-										Pos: diags.PositionRanges{
-											{Line: 5, FirstColumn: 13, LastColumn: 15},
-										},
-									},
-									Expr: parser.PromQLExpr{
-										Value: &parser.YamlNode{
-											Value: "{'up' == 1}\n",
-											Pos: diags.PositionRanges{
-												{Line: 7, FirstColumn: 7, LastColumn: 17},
-											},
-										},
-										SyntaxError: errors.New(`1:8: parse error: unexpected "=" in label matching, expected string`),
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			input: []byte(`
-groups:
 - name: mygroup
   partial_response_strategy: bob
   rules:
@@ -5202,9 +5162,213 @@ data:
 				ignorePrometheusExpr,
 				sameErrorText,
 				cmpopts.IgnoreFields(parser.YamlNode{}, "Pos"), // FIXME remove?
+				cmpopts.IgnoreUnexported(parser.PromQLExpr{}),
 			); diff != "" {
 				t.Errorf("Parse() returned wrong output (-want +got):\n%s", diff)
 				return
+			}
+		})
+	}
+}
+
+func TestPromQLExprSyntaxError(t *testing.T) {
+	type testCaseT struct {
+		name          string
+		expectedError string
+		input         []byte
+		schema        parser.Schema
+		names         model.ValidationScheme
+	}
+
+	testCases := []testCaseT{
+		{
+			name: "invalid label matching operator",
+			input: []byte(`
+groups:
+- name: foo
+  rules:
+  - record: foo
+    expr: |
+      {'up' == 1}
+`),
+			expectedError: `1:8: parse error: unexpected "=" in label matching, expected string`,
+			schema:        parser.PrometheusSchema,
+			names:         model.LegacyValidation,
+		},
+		{
+			name: "unclosed parenthesis",
+			input: []byte(`
+groups:
+- name: foo
+  rules:
+  - record: foo
+    expr: sum(up
+`),
+			expectedError: `1:7: parse error: unclosed left parenthesis`,
+			schema:        parser.PrometheusSchema,
+			names:         model.LegacyValidation,
+		},
+		{
+			name: "unclosed brace",
+			input: []byte(`
+groups:
+- name: foo
+  rules:
+  - record: foo
+    expr: up{job="test"
+`),
+			expectedError: `1:14: parse error: unexpected end of input inside braces`,
+			schema:        parser.PrometheusSchema,
+			names:         model.LegacyValidation,
+		},
+		{
+			name: "invalid aggregation without grouping",
+			input: []byte(`
+groups:
+- name: foo
+  rules:
+  - record: foo
+    expr: sum without (up)
+`),
+			expectedError: `1:17: parse error: unexpected end of input in aggregation`,
+			schema:        parser.PrometheusSchema,
+			names:         model.LegacyValidation,
+		},
+		{
+			name: "bad regex syntax",
+			input: []byte(`
+groups:
+- name: foo
+  rules:
+  - record: foo
+    expr: up{job=~"["}
+`),
+			expectedError: `1:4: parse error: error parsing regexp: missing closing ]: ` + "`[`",
+			schema:        parser.PrometheusSchema,
+			names:         model.LegacyValidation,
+		},
+		{
+			name: "invalid binary operator position",
+			input: []byte(`
+groups:
+- name: foo
+  rules:
+  - record: foo
+    expr: up +
+`),
+			expectedError: `1:5: parse error: unexpected end of input`,
+			schema:        parser.PrometheusSchema,
+			names:         model.LegacyValidation,
+		},
+		{
+			name: "multiple binary operators",
+			input: []byte(`
+groups:
+- name: foo
+  rules:
+  - record: foo
+    expr: up + * down
+`),
+			expectedError: `1:6: parse error: unexpected <op:*>`,
+			schema:        parser.PrometheusSchema,
+			names:         model.LegacyValidation,
+		},
+		{
+			name: "invalid duration syntax",
+			input: []byte(`
+groups:
+- name: foo
+  rules:
+  - record: foo
+    expr: rate(up[5x])
+`),
+			expectedError: `1:9: parse error: bad number or duration syntax: "5"`,
+			schema:        parser.PrometheusSchema,
+			names:         model.LegacyValidation,
+		},
+		{
+			name: "missing range selector",
+			input: []byte(`
+groups:
+- name: foo
+  rules:
+  - record: foo
+    expr: rate(up)
+`),
+			expectedError: `1:6: parse error: expected type range vector in call to function "rate", got instant vector`,
+			schema:        parser.PrometheusSchema,
+			names:         model.LegacyValidation,
+		},
+		{
+			name: "invalid label name in matcher",
+			input: []byte(`
+groups:
+- name: foo
+  rules:
+  - record: foo
+    expr: up{123="test"}
+`),
+			expectedError: `1:4: parse error: unexpected character inside braces: '1'`,
+			schema:        parser.PrometheusSchema,
+			names:         model.LegacyValidation,
+		},
+		{
+			name: "unclosed parenthesis with Thanos schema",
+			input: []byte(`
+groups:
+- name: foo
+  rules:
+  - record: foo
+    expr: sum(up
+`),
+			expectedError: `1:7: parse error: unclosed left parenthesis`,
+			schema:        parser.ThanosSchema,
+			names:         model.LegacyValidation,
+		},
+		{
+			name: "invalid binary operator with UTF8 validation",
+			input: []byte(`
+groups:
+- name: foo
+  rules:
+  - record: foo
+    expr: up +
+`),
+			expectedError: `1:5: parse error: unexpected end of input`,
+			schema:        parser.PrometheusSchema,
+			names:         model.UTF8Validation,
+		},
+		{
+			name: "bad regex with Thanos schema and UTF8 validation",
+			input: []byte(`
+groups:
+- name: foo
+  rules:
+  - record: foo
+    expr: up{job=~"["}
+`),
+			expectedError: `1:4: parse error: error parsing regexp: missing closing ]: ` + "`[`",
+			schema:        parser.ThanosSchema,
+			names:         model.UTF8Validation,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			p := parser.NewParser(false, tc.schema, tc.names)
+			r := bytes.NewReader(tc.input)
+			file := p.Parse(r)
+
+			require.NoError(t, file.Error.Err)
+			require.NotEmpty(t, file.Groups)
+			for _, group := range file.Groups {
+				for _, rule := range group.Rules {
+					require.NoError(t, rule.Error.Err)
+					expr := rule.Expr()
+					err := expr.SyntaxError()
+					require.Error(t, err)
+					require.Equal(t, tc.expectedError, err.Error())
+				}
 			}
 		})
 	}
