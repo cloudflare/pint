@@ -15,7 +15,7 @@ import (
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
-	"github.com/cloudflare/pint/internal/parser/utils"
+	"github.com/cloudflare/pint/internal/parser/source"
 	"github.com/cloudflare/pint/internal/promapi"
 
 	"github.com/prometheus/common/model"
@@ -146,7 +146,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 
 	expr := entry.Rule.Expr()
 
-	if expr.SyntaxError != nil {
+	if expr.SyntaxError() != nil {
 		return problems
 	}
 
@@ -941,7 +941,7 @@ func selectorWithoutOffset(vs *promParser.VectorSelector) *promParser.VectorSele
 	return s
 }
 
-func sourceHasFallback(src []utils.Source) bool {
+func sourceHasFallback(src []source.Source) bool {
 	for _, ls := range src {
 		if ls.ReturnInfo.AlwaysReturns {
 			return true
@@ -950,7 +950,7 @@ func sourceHasFallback(src []utils.Source) bool {
 	return false
 }
 
-func joinHasFallback(src []utils.Join) bool {
+func joinHasFallback(src []source.Join) bool {
 	for _, ls := range src {
 		if ls.Src.ReturnInfo.AlwaysReturns {
 			return true
@@ -959,18 +959,18 @@ func joinHasFallback(src []utils.Join) bool {
 	return false
 }
 
-func getNonFallbackSelectors(n parser.PromQLExpr) (selectors []*promParser.VectorSelector) {
-	sources := utils.LabelsSource(n.Value.Value, n.Query.Expr)
+func getNonFallbackSelectors(n *parser.PromQLExpr) (selectors []*promParser.VectorSelector) {
+	sources := n.Source()
 	hasVectorFallback := sourceHasFallback(sources)
 	for _, ls := range sources {
 		if !hasVectorFallback {
-			if vs, ok := utils.MostOuterOperation[*promParser.VectorSelector](ls); ok {
+			if vs, ok := source.MostOuterOperation[*promParser.VectorSelector](ls); ok {
 				selectors = append(selectors, selectorWithoutOffset(vs))
 			}
 		}
 		if !joinHasFallback(ls.Joins) {
 			for _, js := range ls.Joins {
-				if vs, ok := utils.MostOuterOperation[*promParser.VectorSelector](js.Src); ok {
+				if vs, ok := source.MostOuterOperation[*promParser.VectorSelector](js.Src); ok {
 					selectors = append(selectors, selectorWithoutOffset(vs))
 				}
 			}
@@ -979,7 +979,7 @@ func getNonFallbackSelectors(n parser.PromQLExpr) (selectors []*promParser.Vecto
 			if !us.Src.IsConditional {
 				continue
 			}
-			if vs, ok := utils.MostOuterOperation[*promParser.VectorSelector](us.Src); ok {
+			if vs, ok := source.MostOuterOperation[*promParser.VectorSelector](us.Src); ok {
 				selectors = append(selectors, selectorWithoutOffset(vs))
 			}
 		}

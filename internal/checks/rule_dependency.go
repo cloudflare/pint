@@ -136,11 +136,11 @@ func (c RuleDependencyCheck) Check(_ context.Context, entry *discovery.Entry, en
 
 func (c RuleDependencyCheck) usesVector(entry *discovery.Entry, name string) *brokenDependency {
 	expr := entry.Rule.Expr()
-	if expr.SyntaxError != nil {
+	if expr.SyntaxError() != nil {
 		return nil
 	}
 
-	for _, vs := range utils.HasVectorSelector(expr.Query) {
+	for _, vs := range utils.HasVectorSelector(expr.Query()) {
 		if vs.Name == name {
 			return &brokenDependency{
 				kind:   "recording",
@@ -157,11 +157,11 @@ func (c RuleDependencyCheck) usesVector(entry *discovery.Entry, name string) *br
 
 func (c RuleDependencyCheck) usesAlert(entry *discovery.Entry, name string) *brokenDependency {
 	expr := entry.Rule.Expr()
-	if expr.SyntaxError != nil {
+	if expr.SyntaxError() != nil {
 		return nil
 	}
 
-	for _, vs := range utils.HasVectorSelector(expr.Query) {
+	for _, vs := range utils.HasVectorSelector(expr.Query()) {
 		if vs.Name != "ALERTS" && vs.Name != "ALERTS_FOR_STATE" {
 			continue
 		}

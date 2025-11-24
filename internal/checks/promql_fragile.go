@@ -11,7 +11,7 @@ import (
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
-	"github.com/cloudflare/pint/internal/parser/utils"
+	"github.com/cloudflare/pint/internal/parser/source"
 )
 
 const (
@@ -57,12 +57,12 @@ func (c FragileCheck) Reporter() string {
 
 func (c FragileCheck) Check(_ context.Context, entry *discovery.Entry, _ []*discovery.Entry) (problems []Problem) {
 	expr := entry.Rule.Expr()
-	if expr.SyntaxError != nil {
+	if expr.SyntaxError() != nil {
 		return nil
 	}
 
 	if entry.Rule.AlertingRule != nil {
-		for _, src := range utils.LabelsSource(expr.Value.Value, expr.Query.Expr) {
+		for _, src := range expr.Source() {
 			problems = append(problems, c.checkTopK(expr, src)...)
 			problems = append(problems, c.checkPartialData(expr, src, entry.Rule.AlertingRule.For)...)
 		}
@@ -71,11 +71,11 @@ func (c FragileCheck) Check(_ context.Context, entry *discovery.Entry, _ []*disc
 	return problems
 }
 
-func (c FragileCheck) checkTopK(expr parser.PromQLExpr, src utils.Source) (problems []Problem) {
-	if src.Type != utils.AggregateSource {
+func (c FragileCheck) checkTopK(expr *parser.PromQLExpr, src source.Source) (problems []Problem) {
+	if src.Type != source.AggregateSource {
 		return problems
 	}
-	if src.FixedLabels && len(src.TransformedLabels(utils.PossibleLabel)) == 0 {
+	if src.FixedLabels && len(src.TransformedLabels(source.PossibleLabel)) == 0 {
 		return problems
 	}
 	if !slices.Contains([]string{"topk", "bottomk", "limit", "limit_ratio"}, src.Operation()) {
@@ -101,8 +101,8 @@ func (c FragileCheck) checkTopK(expr parser.PromQLExpr, src utils.Source) (probl
 	return problems
 }
 
-func (c FragileCheck) checkPartialData(expr parser.PromQLExpr, src utils.Source, forVal *parser.YamlNode) (problems []Problem) {
-	if src.Type != utils.AggregateSource {
+func (c FragileCheck) checkPartialData(expr *parser.PromQLExpr, src source.Source, forVal *parser.YamlNode) (problems []Problem) {
+	if src.Type != source.AggregateSource {
 		return problems
 	}
 	if !src.IsConditional {
@@ -118,7 +118,7 @@ func (c FragileCheck) checkPartialData(expr parser.PromQLExpr, src utils.Source,
 
 	for _, j := range src.Joins {
 		// Only look for joins that are aggregations.
-		if j.Src.Type != utils.AggregateSource {
+		if j.Src.Type != source.AggregateSource {
 			continue
 		}
 		// Ignore joins that are not conditional and instead are used to add labels.

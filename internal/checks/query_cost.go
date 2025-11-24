@@ -19,7 +19,7 @@ import (
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
-	"github.com/cloudflare/pint/internal/parser/utils"
+	"github.com/cloudflare/pint/internal/parser/source"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -83,7 +83,7 @@ func (c CostCheck) Reporter() string {
 func (c CostCheck) Check(ctx context.Context, entry *discovery.Entry, entries []*discovery.Entry) (problems []Problem) {
 	expr := entry.Rule.Expr()
 
-	if expr.SyntaxError != nil {
+	if expr.SyntaxError() != nil {
 		return problems
 	}
 
@@ -234,11 +234,11 @@ func (c CostCheck) getQueryCost(ctx context.Context, expr string) (*promapi.Quer
 
 func (c CostCheck) suggestRecordingRules(
 	ctx context.Context,
-	expr parser.PromQLExpr,
+	expr *parser.PromQLExpr,
 	entry *discovery.Entry, entries []*discovery.Entry,
 	beforeStats promapi.QueryStats, beforeSeries int,
 ) (problems []Problem) {
-	src := utils.LabelsSource(expr.Value.Value, expr.Query.Expr)
+	src := expr.Source()
 
 	for _, other := range entries {
 		if ignoreOtherEntry(entry, other, c.prom) {
@@ -248,12 +248,12 @@ func (c CostCheck) suggestRecordingRules(
 			continue
 		}
 
-		otherSrc := utils.LabelsSource(other.Rule.RecordingRule.Expr.Value.Value, other.Rule.RecordingRule.Expr.Query.Expr)
+		otherSrc := other.Rule.RecordingRule.Expr.Source()
 		if len(otherSrc) > 1 {
 			continue
 		}
 		for _, s := range src {
-			s.WalkSources(func(s utils.Source, j *utils.Join, u *utils.Unless) {
+			s.WalkSources(func(s source.Source, j *source.Join, u *source.Unless) {
 				for _, os := range otherSrc {
 					op, extra, exact, ok := c.isSuggestionFor(s, os, j, u)
 					if !ok {
@@ -262,14 +262,14 @@ func (c CostCheck) suggestRecordingRules(
 
 					// Don't replace the whole rule, that's usually not what we want.
 					// Useful suggestions should find parts of the query that can be improved.
-					if op.PositionRange().Start == expr.Query.Expr.PositionRange().Start &&
-						op.PositionRange().End == expr.Query.Expr.PositionRange().End {
+					if op.PositionRange().Start == expr.Query().Expr.PositionRange().Start &&
+						op.PositionRange().End == expr.Query().Expr.PositionRange().End {
 						continue
 					}
 
 					sq := c.rewriteRuleFragment(expr.Value.Value, op.PositionRange(), other.Rule.RecordingRule.Record.Value+extra)
 					slog.LogAttrs(ctx, slog.LevelDebug, "Found a possible replacement",
-						slog.String("original", utils.GetQueryFragment(expr.Value.Value, s.Position)),
+						slog.String("original", source.GetQueryFragment(expr.Value.Value, s.Position)),
 						slog.String("replacement", other.Rule.RecordingRule.Record.Value+extra),
 					)
 					var details strings.Builder
@@ -383,8 +383,8 @@ func formatDelta(delta float64) string {
 	return fmt.Sprintf("+%0.2f", delta)
 }
 
-func (c CostCheck) isSuggestionFor(src, potential utils.Source, join *utils.Join, unless *utils.Unless) (promParser.Node, string, bool, bool) {
-	if potential.Type != utils.FuncSource && potential.Type != utils.AggregateSource {
+func (c CostCheck) isSuggestionFor(src, potential source.Source, join *source.Join, unless *source.Unless) (promParser.Node, string, bool, bool) {
+	if potential.Type != source.FuncSource && potential.Type != source.AggregateSource {
 		return nil, "", false, false
 	}
 
@@ -397,7 +397,7 @@ func (c CostCheck) isSuggestionFor(src, potential utils.Source, join *utils.Join
 	}
 
 	// We're only looking at potential source that have a vector selector.
-	if _, ok := utils.MostOuterOperation[*promParser.VectorSelector](potential); !ok {
+	if _, ok := source.MostOuterOperation[*promParser.VectorSelector](potential); !ok {
 		return nil, "", false, false
 	}
 
@@ -506,7 +506,7 @@ func (c CostCheck) isSuggestionFor(src, potential utils.Source, join *utils.Join
 	return nil, "", false, false
 }
 
-func (c CostCheck) equalOperations(a, b utils.SourceOperations) bool {
+func (c CostCheck) equalOperations(a, b source.Operations) bool {
 	if len(a) != len(b) {
 		return false
 	}
@@ -531,7 +531,7 @@ func (c CostCheck) normalizeFuncName(s string) string {
 	}
 }
 
-func (c CostCheck) metricName(ops utils.SourceOperations) string {
+func (c CostCheck) metricName(ops source.Operations) string {
 	for _, op := range ops {
 		if vs, ok := op.Node.(*promParser.VectorSelector); ok {
 			for _, lm := range vs.LabelMatchers {
@@ -544,7 +544,7 @@ func (c CostCheck) metricName(ops utils.SourceOperations) string {
 	return ""
 }
 
-func (c CostCheck) selectorLabels(ops utils.SourceOperations) (lms []*labels.Matcher) {
+func (c CostCheck) selectorLabels(ops source.Operations) (lms []*labels.Matcher) {
 	for i := len(ops) - 1; i >= 0; i-- {
 		if vs, ok := ops[i].Node.(*promParser.VectorSelector); ok {
 			lms = vs.LabelMatchers

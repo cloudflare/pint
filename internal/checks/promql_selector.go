@@ -11,7 +11,7 @@ import (
 
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/parser/utils"
+	"github.com/cloudflare/pint/internal/parser/source"
 )
 
 const (
@@ -62,7 +62,7 @@ func (c SelectorCheck) Reporter() string {
 
 func (c SelectorCheck) Check(_ context.Context, entry *discovery.Entry, _ []*discovery.Entry) (problems []Problem) {
 	expr := entry.Rule.Expr()
-	if expr.SyntaxError != nil {
+	if expr.SyntaxError() != nil {
 		return problems
 	}
 
@@ -73,8 +73,8 @@ func (c SelectorCheck) Check(_ context.Context, entry *discovery.Entry, _ []*dis
 		callRe = c.callRe.MustExpand(entry.Rule)
 	}
 
-	for _, src := range utils.LabelsSource(expr.Value.Value, expr.Query.Expr) {
-		src.WalkSources(func(s utils.Source, _ *utils.Join, _ *utils.Unless) {
+	for _, src := range expr.Source() {
+		src.WalkSources(func(s source.Source, _ *source.Join, _ *source.Unless) {
 			problems = append(problems, c.checkSource(keyRe, callRe, s, expr.Value.Pos)...)
 		})
 	}
@@ -82,7 +82,7 @@ func (c SelectorCheck) Check(_ context.Context, entry *discovery.Entry, _ []*dis
 	return problems
 }
 
-func (c SelectorCheck) findSelector(callRe *regexp.Regexp, s utils.Source) (*promParser.VectorSelector, *promParser.Call) {
+func (c SelectorCheck) findSelector(callRe *regexp.Regexp, s source.Source) (*promParser.VectorSelector, *promParser.Call) {
 	var call *promParser.Call
 	for i := len(s.Operations) - 1; i >= 0; i-- {
 		op := s.Operations[i]
@@ -103,7 +103,7 @@ func (c SelectorCheck) findSelector(callRe *regexp.Regexp, s utils.Source) (*pro
 	return nil, nil
 }
 
-func (c SelectorCheck) checkSource(keyRe, callRe *regexp.Regexp, s utils.Source, pos diags.PositionRanges) (problems []Problem) {
+func (c SelectorCheck) checkSource(keyRe, callRe *regexp.Regexp, s source.Source, pos diags.PositionRanges) (problems []Problem) {
 	vs, call := c.findSelector(callRe, s)
 	if vs == nil {
 		return problems

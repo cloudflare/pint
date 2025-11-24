@@ -1,4 +1,4 @@
-package utils
+package source
 
 import (
 	"fmt"
@@ -15,10 +15,10 @@ import (
 
 var guaranteedLabelsMatches = []labels.MatchType{labels.MatchEqual, labels.MatchRegexp}
 
-type SourceType uint8
+type Type uint8
 
 const (
-	UnknownSource SourceType = iota
+	UnknownSource Type = iota
 	NumberSource
 	StringSource
 	SelectorSource
@@ -27,7 +27,7 @@ const (
 )
 
 // Used for test snapshots.
-func (st SourceType) MarshalYAML() (any, error) {
+func (st Type) MarshalYAML() (any, error) {
 	var name string
 	switch st { // nolint: exhaustive
 	case NumberSource:
@@ -118,14 +118,14 @@ type ReturnInfo struct {
 	IsReturnBool   bool    // True if this source uses the 'bool' modifier.
 }
 
-type SourceOperation struct {
+type Operation struct {
 	Node      promParser.Node
 	Operation string
 	Arguments []string
 }
 
 // Used for test snapshots.
-func (so SourceOperation) MarshalYAML() (any, error) {
+func (so Operation) MarshalYAML() (any, error) {
 	y := map[string]any{
 		"op":   so.Operation,
 		"node": fmt.Sprintf("[%T] %s", so.Node, so.Node.String()),
@@ -136,7 +136,7 @@ func (so SourceOperation) MarshalYAML() (any, error) {
 	return y, nil
 }
 
-type SourceOperations []SourceOperation
+type Operations []Operation
 
 func MostOuterOperation[T promParser.Node](s Source) (T, bool) {
 	for i := len(s.Operations) - 1; i >= 0; i-- {
@@ -168,12 +168,12 @@ type Source struct {
 	DeadInfo      *DeadInfo
 	DeadLabels    []DeadLabel
 	Returns       promParser.ValueType
-	Operations    SourceOperations
+	Operations    Operations
 	Joins         []Join   // Any other sources this source joins with.
 	Unless        []Unless // Any other sources this source is suppressed by.
 	ReturnInfo    ReturnInfo
 	Position      posrange.PositionRange
-	Type          SourceType
+	Type          Type
 	FixedLabels   bool // Labels are fixed and only allowed labels can be present.
 	IsConditional bool // True if this source is guarded by 'foo > 5' or other condition.
 }
@@ -527,7 +527,7 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 		s.Labels = map[string]LabelTransform{}
 		s.Type = SelectorSource
 		s.Returns = promParser.ValueTypeVector
-		s.Operations = append(s.Operations, SourceOperation{
+		s.Operations = append(s.Operations, Operation{
 			Operation: "",
 			Node:      n,
 			Arguments: nil,
@@ -606,7 +606,7 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 	switch n.Op {
 	case promParser.COUNT_VALUES:
 		for _, s = range parseAggregation(expr, n) {
-			s.Operations = append(s.Operations, SourceOperation{
+			s.Operations = append(s.Operations, Operation{
 				Operation: promParser.ItemTypeStr[n.Op],
 				Node:      n,
 				Arguments: args,
@@ -628,7 +628,7 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 				s.Joins[i].Depth++
 			}
 			s.Type = AggregateSource
-			s.Operations = append(s.Operations, SourceOperation{
+			s.Operations = append(s.Operations, Operation{
 				Operation: promParser.ItemTypeStr[n.Op],
 				Node:      n,
 				Arguments: args,
@@ -637,7 +637,7 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 		}
 	default:
 		for _, s = range parseAggregation(expr, n) {
-			s.Operations = append(s.Operations, SourceOperation{
+			s.Operations = append(s.Operations, Operation{
 				Operation: promParser.ItemTypeStr[n.Op],
 				Node:      n,
 				Arguments: args,
@@ -969,7 +969,7 @@ func parseCall(expr string, n *promParser.Call) (src []Source) {
 	for _, e := range exprs {
 		for _, es := range walkNode(expr, e) {
 			es.Type = FuncSource
-			es.Operations = append(es.Operations, SourceOperation{
+			es.Operations = append(es.Operations, Operation{
 				Operation: n.Func.Name,
 				Node:      n,
 				Arguments: args,
@@ -983,7 +983,7 @@ func parseCall(expr string, n *promParser.Call) (src []Source) {
 		s := Source{ // nolint: exhaustruct
 			Labels: map[string]LabelTransform{},
 			Type:   FuncSource,
-			Operations: SourceOperations{
+			Operations: Operations{
 				{
 					Operation: n.Func.Name,
 					Node:      n,

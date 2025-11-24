@@ -68,14 +68,15 @@ func (c RangeQueryCheck) Reporter() string {
 
 func (c RangeQueryCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*discovery.Entry) (problems []Problem) {
 	expr := entry.Rule.Expr()
-	if expr.SyntaxError != nil {
+	if expr.SyntaxError() != nil {
 		return problems
 	}
 
 	if c.limit > 0 {
 		problems = append(problems, c.checkNode(
 			ctx,
-			expr, expr.Query,
+			expr,
+			expr.Query(),
 			c.limit,
 			fmt.Sprintf("%s is the maximum allowed range query.", model.Duration(c.limit)),
 			c.severity,
@@ -130,7 +131,8 @@ func (c RangeQueryCheck) Check(ctx context.Context, entry *discovery.Entry, _ []
 
 	problems = append(problems, c.checkNode(
 		ctx,
-		expr, expr.Query,
+		expr,
+		expr.Query(),
 		retention,
 		fmt.Sprintf("%s is configured to only keep %s of metrics history.", promText(c.prom.Name(), flags.URI),
 			model.Duration(retention)),
@@ -141,7 +143,7 @@ func (c RangeQueryCheck) Check(ctx context.Context, entry *discovery.Entry, _ []
 	return problems
 }
 
-func (c RangeQueryCheck) checkNode(ctx context.Context, expr parser.PromQLExpr, node *parser.PromQLNode, retention time.Duration, reason string, s Severity) (problems []Problem) {
+func (c RangeQueryCheck) checkNode(ctx context.Context, expr *parser.PromQLExpr, node *parser.PromQLNode, retention time.Duration, reason string, s Severity) (problems []Problem) {
 	if n, ok := node.Expr.(*promParser.MatrixSelector); ok {
 		if n.Range > retention {
 			problems = append(problems, Problem{

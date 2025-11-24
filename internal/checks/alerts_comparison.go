@@ -5,7 +5,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/parser/utils"
 )
 
 const (
@@ -49,12 +48,12 @@ func (c ComparisonCheck) Check(_ context.Context, entry *discovery.Entry, _ []*d
 		return problems
 	}
 
-	if entry.Rule.AlertingRule.Expr.SyntaxError != nil {
+	if entry.Rule.AlertingRule.Expr.SyntaxError() != nil {
 		return problems
 	}
 
 	expr := entry.Rule.Expr()
-	srcs := utils.LabelsSource(expr.Value.Value, expr.Query.Expr)
+	srcs := expr.Source()
 	var msg string
 	for _, src := range srcs {
 		if src.DeadInfo != nil {

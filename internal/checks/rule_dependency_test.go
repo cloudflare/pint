@@ -134,6 +134,18 @@ func TestRuleDependencyCheck(t *testing.T) {
 			},
 		},
 		{
+			description: "ignores rules with invalid queries",
+			content:     "- alert: myalert\n  expr: sum(foo)\n",
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewRuleDependencyCheck()
+			},
+			prometheus: newSimpleProm,
+			entries: []*discovery.Entry{
+				parseWithState("- record: foo\n  expr: sum()\n", discovery.Noop, "foo.yaml", "foo.yaml")[0],
+				parseWithState("- alert: foo\n  expr: up +\n", discovery.Noop, "foo.yaml", "foo.yaml")[0],
+			},
+		},
+		{
 			description: "deduplicates affected files",
 			content:     "- record: foo\n  expr: sum(foo)\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
