@@ -2269,6 +2269,8 @@ output:
           op: 57384
           depth: 0
           ison: false
+      usedLabels:
+        - job
       position:
         start: 0
         end: 14
@@ -2737,6 +2739,9 @@ output:
           op: 57389
           depth: 0
           ison: false
+      usedLabels:
+        - job
+        - instance
       position:
         start: 0
         end: 28
@@ -3794,6 +3799,7 @@ output:
       usedLabels:
         - instance
         - version
+        - foo
       position:
         start: 6
         end: 30
@@ -4383,6 +4389,8 @@ output:
           op: 57395
           depth: 0
           ison: false
+      usedLabels:
+        - instance
       position:
         start: 0
         end: 34
@@ -6065,6 +6073,8 @@ output:
             type: function
             fixedLabels: true
           ison: false
+      usedLabels:
+        - job
       position:
         start: 0
         end: 34

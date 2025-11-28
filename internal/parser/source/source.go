@@ -348,18 +348,6 @@ func (s *Source) checkIncludedLabels(expr string, pos posrange.PositionRange, na
 	}
 }
 
-func (s *Source) hasJoinUsingLabel(name string) bool {
-	for _, j := range s.Joins {
-		if j.IsOn && slices.Contains(j.MatchingLabels, name) {
-			return true
-		}
-		if !j.IsOn && !slices.Contains(j.MatchingLabels, name) {
-			return true
-		}
-	}
-	return false
-}
-
 func (s *Source) checkAggregationLabels(expr string, n *promParser.AggregateExpr) {
 	var pos posrange.PositionRange
 	switch {
@@ -374,10 +362,6 @@ func (s *Source) checkAggregationLabels(expr string, n *promParser.AggregateExpr
 	for _, j := range s.Joins {
 		for _, name := range j.AddedLabels {
 			if slices.Contains(s.UsedLabels, name) {
-				continue
-			}
-			if s.hasJoinUsingLabel(name) {
-				// This label is used for some other join for our source.
 				continue
 			}
 			if !n.Without && slices.Contains(n.Grouping, name) {
@@ -453,6 +437,17 @@ func (s *Source) checkJoinedLabels(expr string, n *promParser.BinaryExpr, dst So
 		}
 	}
 	return dead
+}
+
+func (s *Source) useLabelsNotExcluded(exluded []string) {
+	for name, lt := range s.Labels {
+		if lt.Kind == ImpossibleLabel {
+			continue
+		}
+		if !slices.Contains(exluded, name) {
+			s.UsedLabels = appendToSlice(s.UsedLabels, name)
+		}
+	}
 }
 
 type Visitor func(s Source, j *Join, u *Unless)
@@ -1086,6 +1081,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					n.VectorMatching.MatchingLabels,
 				)
 			} else {
+				ls.useLabelsNotExcluded(n.VectorMatching.MatchingLabels)
 				for _, name := range n.VectorMatching.MatchingLabels {
 					ls.excludeLabel(
 						fmt.Sprintf(
@@ -1164,6 +1160,8 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 						name,
 					)
 				}
+			} else {
+				rs.useLabelsNotExcluded(n.VectorMatching.MatchingLabels)
 			}
 			for _, ls := range lhs {
 				ls.checkIncludedLabels(
@@ -1223,6 +1221,8 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 						name,
 					)
 				}
+			} else {
+				ls.useLabelsNotExcluded(n.VectorMatching.MatchingLabels)
 			}
 			for _, rs := range rhs {
 				rs.checkIncludedLabels(
@@ -1258,6 +1258,9 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 		// foo{} and ignoring(...) bar{}
 		// foo{} and bar{}
 		// foo{} unless bar{}
+		// foo{} or bar{}
+		// foo{} or on(...) bar{}
+		// foo{} or ignoring(...) bar{}
 	case n.VectorMatching.Card == promParser.CardManyToMany:
 		var lhsCanBeEmpty bool // true if any of the LHS query can produce empty results.
 		rhs := walkNode(expr, n.RHS)
@@ -1283,6 +1286,10 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 						name,
 					)
 				}
+			} else if n.Op != promParser.LOR {
+				// Mark labels not set inside ignoring(...) as used, but:
+				// - skip 'foo OR bar' - OR doesn't do label matching, it works on any results
+				ls.useLabelsNotExcluded(n.VectorMatching.MatchingLabels)
 			}
 			if !ls.ReturnInfo.AlwaysReturns || ls.IsConditional {
 				lhsCanBeEmpty = true
