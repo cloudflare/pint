@@ -370,6 +370,8 @@ group by (cluster, namespace, workload, workload_type, pod) (
   , "workload_type", "", "owner_kind")
 )
 `,
+	`foo{job="xxx"} + on(job) group_right(instance) bar{}`,
+	`foo{job="xxx"} + ignoring(job) group_right(instance) bar{job="zzz"}`,
 }
 
 func TestLabelsSource(t *testing.T) {
@@ -390,6 +392,7 @@ func TestLabelsSource(t *testing.T) {
 			}
 			done[expr] = struct{}{}
 
+			t.Log(expr)
 			n, err := parser.DecodeExpr(expr)
 			if err != nil {
 				t.Error(err)

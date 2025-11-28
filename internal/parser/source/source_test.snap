@@ -2740,8 +2740,8 @@ output:
           depth: 0
           ison: false
       usedLabels:
-        - job
         - instance
+        - job
       position:
         start: 0
         end: 28
@@ -11588,5 +11588,123 @@ output:
         end: 559
       type: aggregation
       fixedLabels: true
+
+---
+
+[TestLabelsSource/179 - 1]
+expr: foo{job="xxx"} + on(job) group_right(instance) bar{}
+output:
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 52
+        instance:
+            reason: Query is using `group_right(instance)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
+            kind: included
+            fragment:
+                start: 37
+                end: 45
+        job:
+            reason: Query is using one-to-many vector matching with `on(job)`, labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 20
+                end: 23
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] bar'
+          op: ""
+      joins:
+        - matchinglabels:
+            - job
+          addedlabels:
+            - instance
+          src:
+            labels:
+                job:
+                    reason: Query will only return series where these labels are present.
+                    kind: guaranteed
+                    fragment:
+                        start: 0
+                        end: 14
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] foo{job="xxx"}'
+                  op: ""
+            position:
+                start: 0
+                end: 14
+            type: selector
+          op: 57383
+          depth: 0
+          ison: true
+      usedLabels:
+        - job
+      position:
+        start: 47
+        end: 52
+      type: selector
+
+---
+
+[TestLabelsSource/180 - 1]
+expr: foo{job="xxx"} + ignoring(job) group_right(instance) bar{job="zzz"}
+output:
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 67
+        instance:
+            reason: Query is using `group_right(instance)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
+            kind: included
+            fragment:
+                start: 43
+                end: 51
+        job:
+            reason: Query will only return series where these labels are present.
+            kind: guaranteed
+            fragment:
+                start: 53
+                end: 67
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] bar{job="zzz"}'
+          op: ""
+      joins:
+        - matchinglabels:
+            - job
+          addedlabels:
+            - instance
+          src:
+            labels:
+                job:
+                    reason: Query will only return series where these labels are present.
+                    kind: guaranteed
+                    fragment:
+                        start: 0
+                        end: 14
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] foo{job="xxx"}'
+                  op: ""
+            position:
+                start: 0
+                end: 14
+            type: selector
+          op: 57383
+          depth: 0
+          ison: false
+      usedLabels:
+        - instance
+      position:
+        start: 53
+        end: 67
+      type: selector
 
 ---

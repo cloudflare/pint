@@ -440,14 +440,21 @@ func (s *Source) checkJoinedLabels(expr string, n *promParser.BinaryExpr, dst So
 }
 
 func (s *Source) useLabelsNotExcluded(exluded []string) {
+	// Iterating over a map can yield labels in different order each time
+	// so append labels to an extra slice, sort it, and then append the
+	// sorted reults to UsedLabels.
+	// Without this tests might show a diff sometimes.
+	toAdd := make([]string, 0, len(s.Labels))
 	for name, lt := range s.Labels {
 		if lt.Kind == ImpossibleLabel {
 			continue
 		}
 		if !slices.Contains(exluded, name) {
-			s.UsedLabels = appendToSlice(s.UsedLabels, name)
+			toAdd = appendToSlice(toAdd, name)
 		}
 	}
+	slices.Sort(toAdd)
+	s.UsedLabels = appendToSlice(s.UsedLabels, toAdd...)
 }
 
 type Visitor func(s Source, j *Join, u *Unless)
