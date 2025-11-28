@@ -657,6 +657,30 @@ func TestImpossibleCheck(t *testing.T) {
 			prometheus: newSimpleProm,
 			problems:   true,
 		},
+		{
+			description: "label_join",
+			content: `
+- record: foo
+  expr: |
+    group by (cluster, namespace, workload, workload_type, pod) (
+      label_join(
+        label_join(
+          group by (cluster, namespace, job_name, pod) (
+            label_join(
+              kube_pod_owner{job="kube-state-metrics", owner_kind="Job"}
+            , "job_name", "", "owner_name")
+          )
+          * on (cluster, namespace, job_name) group_left(owner_kind, owner_name)
+          group by (cluster, namespace, job_name, owner_kind, owner_name) (
+            kube_job_owner{job="kube-state-metrics", owner_kind!="Pod", owner_kind!=""}
+          )
+        , "workload", "", "owner_name")
+      , "workload_type", "", "owner_kind")
+    )
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+		},
 	}
 
 	runTests(t, testCases)

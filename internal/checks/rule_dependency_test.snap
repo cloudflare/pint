@@ -62,6 +62,11 @@
 
 ---
 
+[TestRuleDependencyCheck/ignores_rules_with_invalid_queries - 1]
+[]
+
+---
+
 [TestRuleDependencyCheck/ignores_rules_with_syntax_errors - 1]
 []
 
@@ -214,10 +219,5 @@
         last: 1
     severity: 1
     anchor: 1
-
----
-
-[TestRuleDependencyCheck/ignores_rules_with_invalid_queries - 1]
-[]
 
 ---

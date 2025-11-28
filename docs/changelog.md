@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.78.0
+
+### Fixed
+
+- Fixed false positive reports from [promql/impossible](checks/promql/impossible.md) when
+  `label_join` or `label_replace` is used - [#1631](https://github.com/cloudflare/pint/issues/1631).
+
 ## v0.77.1
 
 ### Fixed
