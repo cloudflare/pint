@@ -164,19 +164,23 @@ type Unless struct {
 }
 
 type Source struct {
-	Labels        map[string]LabelTransform // `yaml:"labels,omitempty"`
-	DeadInfo      *DeadInfo                 // `yaml:"deadInfo,omitempty"`
-	DeadLabels    []DeadLabel               // `yaml:"deadLabels,omitempty"`
-	Returns       promParser.ValueType      // `yaml:"returns"`
-	Operations    Operations                // `yaml:"operations,omitempty"`
-	Joins         []Join                    // `yaml:"joins,omitempty"`  // Any other sources this source joins with.
-	Unless        []Unless                  // `yaml:"unless,omitempty"` // Any other sources this source is suppressed by.
-	UsedLabels    []string                  `yaml:"usedLabels,omitempty"`
-	ReturnInfo    ReturnInfo                // `yaml:"returnInfo,omitempty"`
-	Position      posrange.PositionRange    // `yaml:"position"`
-	Type          Type                      // `yaml:"type"`
-	FixedLabels   bool                      // `yaml:"fixedLabels,omitempty"`   // Labels are fixed and only allowed labels can be present.
-	IsConditional bool                      // `yaml:"isConditional,omitempty"` // True if this source is guarded by 'foo > 5' or other condition.
+	Labels     map[string]LabelTransform `yaml:"labels,omitempty"`
+	DeadInfo   *DeadInfo                 `yaml:"deadInfo,omitempty"`
+	DeadLabels []DeadLabel               `yaml:"deadLabels,omitempty"`
+	Returns    promParser.ValueType      `yaml:"returns"`
+	Operations Operations                `yaml:"operations,omitempty"`
+	// Any other sources this source joins with.
+	Joins []Join `yaml:"joins,omitempty"`
+	// Any other sources this source is suppressed by.
+	Unless     []Unless               `yaml:"unless,omitempty"`
+	UsedLabels []string               `yaml:"usedLabels,omitempty"`
+	ReturnInfo ReturnInfo             `yaml:"returnInfo,omitempty"`
+	Position   posrange.PositionRange `yaml:"position"`
+	Type       Type                   `yaml:"type"`
+	// Labels are fixed and only allowed labels can be present.
+	FixedLabels bool `yaml:"fixedLabels,omitempty"`
+	// True if this source is guarded by 'foo > 5' or other condition.
+	IsConditional bool `yaml:"isConditional,omitempty"`
 }
 
 func (s Source) Operation() string {
