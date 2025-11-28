@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/go-github/v78/github"
+	"github.com/google/go-github/v79/github"
 	"golang.org/x/oauth2"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -428,14 +428,14 @@ func (gr GithubReporter) fixCommentLine(dst any, p PendingComment) (string, int)
 
 	line := p.line
 	diffs := parseDiffLines(file.GetPatch())
-	dl, ok := diffLineFor(diffs, p.line)
+	dl, ok := diffLineFor(diffs, int64(p.line))
 	switch {
 	case ok && dl.wasModified && p.anchor == checks.AnchorAfter:
 		// Comment on new or modified line.
-		line = dl.new
+		line = int(dl.new) // FIXME int64 -> int
 	case ok && dl.wasModified && p.anchor == checks.AnchorBefore:
 		// Comment on new or modified line.
-		line = dl.old
+		line = int(dl.old) // FIXME int64 -> int
 	default:
 		// Comment on unmodified line.
 		// Find first modified line and put it there.
@@ -443,7 +443,7 @@ func (gr GithubReporter) fixCommentLine(dst any, p PendingComment) (string, int)
 			if !d.wasModified {
 				continue
 			}
-			line = d.new
+			line = int(d.new) // FIXME int64 -> int
 			side = "RIGHT"
 			break
 		}

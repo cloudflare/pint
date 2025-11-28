@@ -1,10 +1,10 @@
-name: "Dependency Review"
+name: "Go Vulncheck"
 on: [pull_request]
 
 permissions: read-all
 
 jobs:
-  dependency-review:
+  govulncheck:
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout Repository"
@@ -12,5 +12,8 @@ jobs:
         with:
           show-progress: false
 
-      - name: "Dependency Review"
-        uses: actions/dependency-review-action@3c4e3dcb1aa7874d2c16be7d79418e9b7efd6261 # v4.8.2
+      - id: govulncheck
+        uses: golang/govulncheck-action@b625fbe08f3bccbe446d94fbf87fcc875a4f50ee # v1.0.4
+        with:
+          go-version-input: stable
+          check-latest: true

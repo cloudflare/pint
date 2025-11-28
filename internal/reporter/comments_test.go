@@ -773,7 +773,6 @@ func TestCommentsCommonPaths(t *testing.T) {
 
 		reports        []Report
 		timeout        time.Duration
-		project        int
 		maxComments    int
 		showDuplicates bool
 	}
@@ -809,7 +808,6 @@ func TestCommentsCommonPaths(t *testing.T) {
 			branch:      "fakeBranch",
 			token:       "fakeToken",
 			timeout:     time.Second,
-			project:     123,
 			maxComments: 50,
 			reports:     []Report{fooReport},
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
@@ -828,7 +826,6 @@ func TestCommentsCommonPaths(t *testing.T) {
 			branch:      "fakeBranch",
 			token:       "fakeToken",
 			timeout:     time.Second,
-			project:     123,
 			maxComments: 50,
 			reports:     []Report{fooReport},
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
@@ -848,7 +845,6 @@ func TestCommentsCommonPaths(t *testing.T) {
 			branch:      "fakeBranch",
 			token:       "fakeToken",
 			timeout:     time.Second,
-			project:     123,
 			maxComments: 50,
 			reports:     []Report{fooReport},
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
@@ -867,7 +863,6 @@ func TestCommentsCommonPaths(t *testing.T) {
 			branch:      "fakeBranch",
 			token:       "fakeToken",
 			timeout:     time.Second,
-			project:     123,
 			maxComments: 50,
 			reports:     []Report{fooReport},
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
@@ -892,7 +887,7 @@ func TestCommentsCommonPaths(t *testing.T) {
 					uri,
 					tc.timeout,
 					tc.token,
-					tc.project,
+					123,
 					tc.maxComments,
 				)
 				require.NoError(t, err, "can't create gitlab reporter")

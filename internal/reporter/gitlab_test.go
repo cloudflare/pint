@@ -185,7 +185,7 @@ func TestGitLabReporter(t *testing.T) {
 :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/a.html).
 `, reporter, summary, yml, diag, details))
 	}
-	discPosition := func(path string, line int) *gitlab.PositionOptions {
+	discPosition := func(path string, line int64) *gitlab.PositionOptions {
 		return gitlab.Ptr(gitlab.PositionOptions{
 			BaseSHA:      gitlab.Ptr("base"),
 			StartSHA:     gitlab.Ptr("start"),
@@ -197,7 +197,7 @@ func TestGitLabReporter(t *testing.T) {
 			OldLine:      gitlab.Ptr(line),
 		})
 	}
-	notePos := func(oldPath, newPath string, newLine, oldLine int) *gitlab.NotePosition {
+	notePos := func(oldPath, newPath string, newLine, oldLine int64) *gitlab.NotePosition {
 		return gitlab.Ptr(gitlab.NotePosition{
 			BaseSHA:      "base",
 			StartSHA:     "start",
@@ -209,7 +209,7 @@ func TestGitLabReporter(t *testing.T) {
 			OldLine:      oldLine,
 		})
 	}
-	discNote := func(id, authorID int, body string, pos *gitlab.NotePosition) *gitlab.Note {
+	discNote := func(id, authorID int64, body string, pos *gitlab.NotePosition) *gitlab.Note {
 		return gitlab.Ptr(gitlab.Note{
 			ID:       id,
 			Author:   gitlab.NoteAuthor{ID: authorID},
@@ -969,7 +969,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 						OldPath:      gitlab.Ptr("foo.old"),
 						NewPath:      gitlab.Ptr(mockPath),
 						PositionType: gitlab.Ptr("text"),
-						NewLine:      gitlab.Ptr(3),
+						NewLine:      gitlab.Ptr(int64(3)),
 						// Old file is gone so we don't have OldLine here at all
 					}),
 				}).ReturnJSON(gitlab.Response{})
@@ -1054,7 +1054,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 						OldPath:      gitlab.Ptr("foo.old"),
 						NewPath:      gitlab.Ptr(mockPath),
 						PositionType: gitlab.Ptr("text"),
-						NewLine:      gitlab.Ptr(3),
+						NewLine:      gitlab.Ptr(int64(3)),
 						// Old file is gone so we don't have OldLine here at all
 					}),
 				}).ReturnJSON(gitlab.Response{})
@@ -1112,7 +1112,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 						OldPath:      gitlab.Ptr(mockPath),
 						NewPath:      gitlab.Ptr(mockPath),
 						PositionType: gitlab.Ptr("text"),
-						OldLine:      gitlab.Ptr(3),
+						OldLine:      gitlab.Ptr(int64(3)),
 					}),
 				}).ReturnJSON(gitlab.Response{})
 			}),
@@ -1169,8 +1169,8 @@ Below is the list of checks that were disabled for each Prometheus server define
 						OldPath:      gitlab.Ptr(mockPath),
 						NewPath:      gitlab.Ptr(mockPath),
 						PositionType: gitlab.Ptr("text"),
-						OldLine:      gitlab.Ptr(3),
-						NewLine:      gitlab.Ptr(3),
+						OldLine:      gitlab.Ptr(int64(3)),
+						NewLine:      gitlab.Ptr(int64(3)),
 					}),
 				}).ReturnJSON(gitlab.Response{})
 			}),
