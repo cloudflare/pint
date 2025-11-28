@@ -54,12 +54,12 @@ type gitlabMR struct {
 	version     *gitlab.MergeRequestDiffVersion
 	diffs       []*gitlab.MergeRequestDiff
 	discussions []*gitlab.Discussion
-	userID      int
-	mrID        int
+	userID      int64
+	mrID        int64
 }
 
 func (glmr gitlabMR) String() string {
-	return strconv.Itoa(glmr.mrID)
+	return strconv.FormatInt(glmr.mrID, 10)
 }
 
 type gitlabComment struct {
@@ -67,7 +67,7 @@ type gitlabComment struct {
 	baseSHA      string
 	headSHA      string
 	startSHA     string
-	noteID       int
+	noteID       int64
 }
 
 type GitLabReporter struct {
@@ -75,17 +75,17 @@ type GitLabReporter struct {
 	version     string
 	branch      string
 	timeout     time.Duration
-	project     int
+	project     int64
 	maxComments int
 }
 
-func NewGitLabReporter(version, branch, uri string, timeout time.Duration, token string, project, maxComments int) (_ GitLabReporter, err error) {
+func NewGitLabReporter(version, branch, uri string, timeout time.Duration, token string, project int64, maxComments int) (_ GitLabReporter, err error) {
 	slog.LogAttrs(context.Background(), slog.LevelInfo,
 		"Will report problems to GitLab",
 		slog.String("uri", uri),
 		slog.String("timeout", output.HumanizeDuration(timeout)),
 		slog.String("branch", branch),
-		slog.Int("project", project),
+		slog.Int64("project", project),
 		slog.Int("maxComments", maxComments),
 	)
 	gl := GitLabReporter{
@@ -128,7 +128,7 @@ func (gl GitLabReporter) Destinations(ctx context.Context) ([]any, error) {
 
 	dsts := make([]any, 0, len(ids))
 	for _, id := range ids {
-		slog.LogAttrs(ctx, slog.LevelInfo, "Found open GitLab merge request", slog.String("branch", gl.branch), slog.Int("id", id))
+		slog.LogAttrs(ctx, slog.LevelInfo, "Found open GitLab merge request", slog.String("branch", gl.branch), slog.Int64("id", id))
 		dst := gitlabMR{
 			version:     nil,
 			diffs:       nil,
@@ -230,7 +230,7 @@ func (gl GitLabReporter) Delete(ctx context.Context, dst any, comment ExistingCo
 	c := comment.meta.(gitlabComment)
 	slog.LogAttrs(ctx, slog.LevelDebug, "Deleting stale merge request discussion note",
 		slog.String("discussion", c.discussionID),
-		slog.Int("note", c.noteID),
+		slog.Int64("note", c.noteID),
 	)
 	reqCtx, cancel := context.WithTimeout(ctx, gl.timeout)
 	defer cancel()
@@ -263,7 +263,7 @@ func (gl GitLabReporter) CanCreate(done int) bool {
 	return done < gl.maxComments
 }
 
-func (gl *GitLabReporter) getUserID(ctx context.Context) (int, error) {
+func (gl *GitLabReporter) getUserID(ctx context.Context) (int64, error) {
 	slog.LogAttrs(ctx, slog.LevelDebug, "Getting current GitLab user details")
 	ctx, cancel := context.WithTimeout(ctx, gl.timeout)
 	defer cancel()
@@ -274,9 +274,9 @@ func (gl *GitLabReporter) getUserID(ctx context.Context) (int, error) {
 	return user.ID, nil
 }
 
-func (gl *GitLabReporter) getMRs(ctx context.Context) (ids []int, err error) {
+func (gl *GitLabReporter) getMRs(ctx context.Context) (ids []int64, err error) {
 	slog.LogAttrs(ctx, slog.LevelDebug, "Finding merge requests for current branch", slog.String("branch", gl.branch))
-	mrs, err := getGitLabPaginated(func(pageNum int) ([]*gitlab.BasicMergeRequest, *gitlab.Response, error) {
+	mrs, err := getGitLabPaginated(func(pageNum int64) ([]*gitlab.BasicMergeRequest, *gitlab.Response, error) {
 		reqCtx, cancel := context.WithTimeout(ctx, gl.timeout)
 		defer cancel()
 		return gl.client.MergeRequests.ListProjectMergeRequests(gl.project, &gitlab.ListProjectMergeRequestsOptions{
@@ -294,9 +294,9 @@ func (gl *GitLabReporter) getMRs(ctx context.Context) (ids []int, err error) {
 	return ids, nil
 }
 
-func (gl *GitLabReporter) getDiffs(ctx context.Context, mrNum int) ([]*gitlab.MergeRequestDiff, error) {
-	slog.LogAttrs(ctx, slog.LevelDebug, "Getting the list of merge request diffs", slog.Int("mr", mrNum))
-	diffs, err := getGitLabPaginated(func(pageNum int) ([]*gitlab.MergeRequestDiff, *gitlab.Response, error) {
+func (gl *GitLabReporter) getDiffs(ctx context.Context, mrNum int64) ([]*gitlab.MergeRequestDiff, error) {
+	slog.LogAttrs(ctx, slog.LevelDebug, "Getting the list of merge request diffs", slog.Int64("mr", mrNum))
+	diffs, err := getGitLabPaginated(func(pageNum int64) ([]*gitlab.MergeRequestDiff, *gitlab.Response, error) {
 		reqCtx, cancel := context.WithTimeout(ctx, gl.timeout)
 		defer cancel()
 		return gl.client.MergeRequests.ListMergeRequestDiffs(gl.project, mrNum, &gitlab.ListMergeRequestDiffsOptions{
@@ -306,13 +306,15 @@ func (gl *GitLabReporter) getDiffs(ctx context.Context, mrNum int) ([]*gitlab.Me
 	return diffs, err
 }
 
-func (gl *GitLabReporter) getVersions(ctx context.Context, mrNum int) (*gitlab.MergeRequestDiffVersion, error) {
-	slog.LogAttrs(ctx, slog.LevelDebug, "Getting the list of merge request versions", slog.Int("mr", mrNum))
-	vers, err := getGitLabPaginated(func(pageNum int) ([]*gitlab.MergeRequestDiffVersion, *gitlab.Response, error) {
+func (gl *GitLabReporter) getVersions(ctx context.Context, mrNum int64) (*gitlab.MergeRequestDiffVersion, error) {
+	slog.LogAttrs(ctx, slog.LevelDebug, "Getting the list of merge request versions", slog.Int64("mr", mrNum))
+	vers, err := getGitLabPaginated(func(pageNum int64) ([]*gitlab.MergeRequestDiffVersion, *gitlab.Response, error) {
 		reqCtx, cancel := context.WithTimeout(ctx, gl.timeout)
 		defer cancel()
 		return gl.client.MergeRequests.GetMergeRequestDiffVersions(gl.project, mrNum, &gitlab.GetMergeRequestDiffVersionsOptions{
-			Page: pageNum,
+			ListOptions: gitlab.ListOptions{
+				Page: pageNum,
+			},
 		}, gitlab.WithContext(reqCtx))
 	})
 	if err != nil {
@@ -324,13 +326,15 @@ func (gl *GitLabReporter) getVersions(ctx context.Context, mrNum int) (*gitlab.M
 	return vers[0], nil
 }
 
-func (gl *GitLabReporter) getDiscussions(ctx context.Context, mrNum int) ([]*gitlab.Discussion, error) {
-	slog.LogAttrs(ctx, slog.LevelDebug, "Getting the list of merge request discussions", slog.Int("mr", mrNum))
-	discs, err := getGitLabPaginated(func(pageNum int) ([]*gitlab.Discussion, *gitlab.Response, error) {
+func (gl *GitLabReporter) getDiscussions(ctx context.Context, mrNum int64) ([]*gitlab.Discussion, error) {
+	slog.LogAttrs(ctx, slog.LevelDebug, "Getting the list of merge request discussions", slog.Int64("mr", mrNum))
+	discs, err := getGitLabPaginated(func(pageNum int64) ([]*gitlab.Discussion, *gitlab.Response, error) {
 		reqCtx, cancel := context.WithTimeout(ctx, gl.timeout)
 		defer cancel()
 		return gl.client.Discussions.ListMergeRequestDiscussions(gl.project, mrNum, &gitlab.ListMergeRequestDiscussionsOptions{
-			Page: pageNum,
+			ListOptions: gitlab.ListOptions{
+				Page: pageNum,
+			},
 		}, gitlab.WithContext(reqCtx))
 	})
 	return discs, err
@@ -371,9 +375,9 @@ func (gl GitLabReporter) noteToExisting(discID string, note *gitlab.Note) (c Exi
 		c.path = note.Position.OldPath
 	}
 	if note.Position.NewLine > 0 {
-		c.line = note.Position.NewLine
+		c.line = int(note.Position.NewLine) // FIXME int64 -> int
 	} else {
-		c.line = note.Position.OldLine
+		c.line = int(note.Position.OldLine) // FIXME int64 -> int
 	}
 	c.text = note.Body
 	c.meta = gitlabComment{
@@ -408,7 +412,7 @@ func (gl GitLabReporter) unresolveIfPresent(ctx context.Context, dst any, commen
 				meta := c.meta.(gitlabComment)
 				slog.LogAttrs(ctx, slog.LevelDebug, "Un-resolving merge request discussion note",
 					slog.String("discussion", meta.discussionID),
-					slog.Int("note", meta.noteID),
+					slog.Int64("note", meta.noteID),
 				)
 				reqCtx, cancel := context.WithTimeout(ctx, gl.timeout)
 				defer cancel()
@@ -460,26 +464,26 @@ func reportToGitLabDiscussion(ctx context.Context, pending PendingComment, diffs
 				slog.Bool("modified", pending.modifiedLine))
 			switch {
 			case pending.anchor == checks.AnchorBefore:
-				d.Position.OldLine = gitlab.Ptr(pending.line)
+				d.Position.OldLine = gitlab.Ptr(int64(pending.line))
 				d.Position.NewLine = nil
 			case pending.modifiedLine:
-				d.Position.NewLine = gitlab.Ptr(pending.line)
+				d.Position.NewLine = gitlab.Ptr(int64(pending.line))
 			case !pending.modifiedLine:
-				d.Position.NewLine = gitlab.Ptr(pending.line)
-				d.Position.OldLine = gitlab.Ptr(pending.line)
+				d.Position.NewLine = gitlab.Ptr(int64(pending.line))
+				d.Position.OldLine = gitlab.Ptr(int64(pending.line))
 			}
 			continue
 		}
 
-		dl, ok := diffLineFor(parseDiffLines(diff.Diff), pending.line)
+		dl, ok := diffLineFor(parseDiffLines(diff.Diff), int64(pending.line))
 		switch {
 		case !ok:
 			// No diffLine for this line, could be a file rename.
-			d.Position.NewLine = gitlab.Ptr(pending.line)
-			d.Position.OldLine = gitlab.Ptr(pending.line)
+			d.Position.NewLine = gitlab.Ptr(int64(pending.line))
+			d.Position.OldLine = gitlab.Ptr(int64(pending.line))
 		case pending.anchor == checks.AnchorBefore:
 			// Comment on removed line.
-			d.Position.OldLine = gitlab.Ptr(pending.line)
+			d.Position.OldLine = gitlab.Ptr(int64(pending.line))
 			d.Position.NewLine = nil
 		case ok && !dl.wasModified:
 			// Comment on unmodified line.
@@ -504,12 +508,12 @@ func getDiffsForPath(diffs []*gitlab.MergeRequestDiff, path string) (changes []*
 }
 
 type diffLine struct {
-	old         int
-	new         int
+	old         int64
+	new         int64
 	wasModified bool
 }
 
-func diffLineFor(lines []diffLine, line int) (diffLine, bool) {
+func diffLineFor(lines []diffLine, line int64) (diffLine, bool) {
 	if len(lines) == 0 {
 		return diffLine{old: 0, new: 0, wasModified: false}, false
 	}
@@ -548,7 +552,7 @@ func diffLineFor(lines []diffLine, line int) (diffLine, bool) {
 var diffRe = regexp.MustCompile(`@@ \-(\d+),(\d+) \+(\d+),(\d+) @@`)
 
 func parseDiffLines(diff string) (lines []diffLine) {
-	var oldLine, newLine int
+	var oldLine, newLine int64
 
 	sc := bufio.NewScanner(strings.NewReader(diff))
 	for sc.Scan() {
@@ -557,9 +561,9 @@ func parseDiffLines(diff string) (lines []diffLine) {
 		case strings.HasPrefix(line, "@@"):
 			matches := diffRe.FindStringSubmatch(line)
 			if len(matches) == 5 {
-				oldLine, _ = strconv.Atoi(matches[1])
+				oldLine, _ = strconv.ParseInt(matches[1], 10, 64)
 				oldLine--
-				newLine, _ = strconv.Atoi(matches[3])
+				newLine, _ = strconv.ParseInt(matches[3], 10, 64)
 				newLine--
 			}
 		case strings.HasPrefix(line, "--- "):
@@ -579,9 +583,9 @@ func parseDiffLines(diff string) (lines []diffLine) {
 	return lines
 }
 
-func getGitLabPaginated[T any](searchFunc func(pageNum int) ([]T, *gitlab.Response, error)) ([]T, error) {
+func getGitLabPaginated[T any](searchFunc func(pageNum int64) ([]T, *gitlab.Response, error)) ([]T, error) {
 	items := []T{}
-	pageNum := 1
+	var pageNum int64 = 1
 	for {
 		tempItems, response, err := searchFunc(pageNum)
 		if err != nil {
@@ -616,10 +620,10 @@ func loggifyDiscussion(opt *gitlab.CreateMergeRequestDiscussionOptions) (attrs [
 		attrs = append(attrs, slog.String("new_path", *opt.Position.NewPath))
 	}
 	if opt.Position.OldLine != nil {
-		attrs = append(attrs, slog.Int("old_line", *opt.Position.OldLine))
+		attrs = append(attrs, slog.Int64("old_line", *opt.Position.OldLine))
 	}
 	if opt.Position.NewLine != nil {
-		attrs = append(attrs, slog.Int("new_line", *opt.Position.NewLine))
+		attrs = append(attrs, slog.Int64("new_line", *opt.Position.NewLine))
 	}
 	return attrs
 }

@@ -89,7 +89,7 @@ func (gh GitHub) validate() error {
 type GitLab struct {
 	URI         string `hcl:"uri,optional"`
 	Timeout     string `hcl:"timeout,optional"`
-	Project     int    `hcl:"project"`
+	Project     int64  `hcl:"project"`
 	MaxComments int    `hcl:"maxComments,optional"`
 }
 
