@@ -353,6 +353,23 @@ up{node_status="v", job="node_exporter"}
 * on(instance) group_left(node_status) sliver_metadata
 `, // group_left on a label already guaranteed on the left
 	`services_enabled{job=""}`,
+	`
+group by (cluster, namespace, workload, workload_type, pod) (
+  label_join(
+    label_join(
+      group by (cluster, namespace, job_name, pod) (
+        label_join(
+          kube_pod_owner{job="kube-state-metrics", owner_kind="Job"}
+        , "job_name", "", "owner_name")
+      )
+      * on (cluster, namespace, job_name) group_left(owner_kind, owner_name)
+      group by (cluster, namespace, job_name, owner_kind, owner_name) (
+        kube_job_owner{job="kube-state-metrics", owner_kind!="Pod", owner_kind!=""}
+      )
+    , "workload", "", "owner_name")
+  , "workload_type", "", "owner_kind")
+)
+`,
 }
 
 func TestLabelsSource(t *testing.T) {

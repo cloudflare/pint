@@ -1074,6 +1074,8 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - instance
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -1153,6 +1155,8 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - instance
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -1233,6 +1237,8 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - instance
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -1313,6 +1319,8 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - instance
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -2043,6 +2051,8 @@ output:
           op: sum
       joins: []
       unless: []
+      usedLabels:
+        - job
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -2093,6 +2103,8 @@ output:
           op: sum
       joins: []
       unless: []
+      usedLabels:
+        - job
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -2595,6 +2607,8 @@ output:
           op: avg
       joins: []
       unless: []
+      usedLabels:
+        - job
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -2645,6 +2659,8 @@ output:
           op: group
       joins: []
       unless: []
+      usedLabels:
+        - job
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -3063,6 +3079,8 @@ output:
           op: count_values
       joins: []
       unless: []
+      usedLabels:
+        - job
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -3400,6 +3418,8 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - instance
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -3486,6 +3506,8 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - instance
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -3584,6 +3606,8 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - instance
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -3682,6 +3706,8 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - instance
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -4086,6 +4112,8 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - cluster
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -4840,6 +4868,10 @@ output:
           op: label_join
       joins: []
       unless: []
+      usedLabels:
+        - src1
+        - src2
+        - src3
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -4962,6 +4994,8 @@ output:
                   op: sum
             joins: []
             unless: []
+            usedLabels:
+                - job
             returninfo:
                 logicalexpr: ""
                 valueposition:
@@ -4981,6 +5015,8 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - job
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -5073,6 +5109,9 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - instance
+        - app_name
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -5159,6 +5198,9 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - instance
+        - app_name
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -5208,6 +5250,8 @@ output:
           op: absent
       joins: []
       unless: []
+      usedLabels:
+        - job
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -5274,6 +5318,9 @@ output:
           op: absent
       joins: []
       unless: []
+      usedLabels:
+        - job
+        - env
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -5433,6 +5480,9 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - job
+        - xxx
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -5483,6 +5533,8 @@ output:
           op: sum
       joins: []
       unless: []
+      usedLabels:
+        - notjob
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -5601,6 +5653,10 @@ output:
                   op: count
             joins: []
             unless: []
+            usedLabels:
+                - instance
+                - version
+                - package
             returninfo:
                 logicalexpr: ""
                 valueposition:
@@ -5620,6 +5676,9 @@ output:
           depth: 0
           ison: false
       unless: []
+      usedLabels:
+        - instance
+        - version
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -5879,6 +5938,8 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - job
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -5964,6 +6025,8 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - job
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -6249,6 +6312,8 @@ output:
           op: label_replace
       joins: []
       unless: []
+      usedLabels:
+        - service
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -6312,6 +6377,8 @@ output:
           op: label_replace
       joins: []
       unless: []
+      usedLabels:
+        - pod
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -6721,6 +6788,8 @@ output:
           op: label_replace
       joins: []
       unless: []
+      usedLabels:
+        - ""
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -6797,6 +6866,10 @@ output:
           op: sum
       joins: []
       unless: []
+      usedLabels:
+        - region
+        - target
+        - colo_name
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -6889,6 +6962,10 @@ output:
           op: sum
       joins: []
       unless: []
+      usedLabels:
+        - region
+        - target
+        - colo_name
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -8359,6 +8436,8 @@ output:
           op: label_replace
       joins: []
       unless: []
+      usedLabels:
+        - nexthop
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -8761,6 +8840,8 @@ output:
             fixedlabels: true
             isconditional: false
           ison: true
+      usedLabels:
+        - job
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -8922,6 +9003,9 @@ output:
                   depth: 0
                   ison: true
             unless: []
+            usedLabels:
+                - instance
+                - cluster
             returninfo:
                 logicalexpr: ""
                 valueposition:
@@ -8938,6 +9022,9 @@ output:
             fixedlabels: true
             isconditional: false
           ison: false
+      usedLabels:
+        - instance
+        - cluster
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -9121,6 +9208,8 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - instance
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -9220,6 +9309,8 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - instance
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -9329,6 +9420,8 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - instance
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -9466,6 +9559,8 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - instance
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -9603,6 +9698,8 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - instance
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -9720,6 +9817,8 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - instance
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -9837,6 +9936,8 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - instance
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -9988,6 +10089,8 @@ output:
                   op: label_replace
             joins: []
             unless: []
+            usedLabels:
+                - minion
             returninfo:
                 logicalexpr: ""
                 valueposition:
@@ -10076,6 +10179,9 @@ output:
             fixedlabels: false
             isconditional: true
           ison: true
+      usedLabels:
+        - instance
+        - device
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -10230,6 +10336,8 @@ output:
           op: sum
       joins: []
       unless: []
+      usedLabels:
+        - job
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -10368,6 +10476,8 @@ output:
                           op: max
                     joins: []
                     unless: []
+                    usedLabels:
+                        - instance
                     returninfo:
                         logicalexpr: ""
                         valueposition:
@@ -10387,6 +10497,8 @@ output:
                   depth: 0
                   ison: false
             unless: []
+            usedLabels:
+                - instance
             returninfo:
                 logicalexpr: ""
                 valueposition:
@@ -10406,6 +10518,8 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - prometheus
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -10645,6 +10759,9 @@ output:
           depth: 1
           ison: true
       unless: []
+      usedLabels:
+        - foo
+        - bar
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -10879,6 +10996,8 @@ output:
           op: count
       joins: []
       unless: []
+      usedLabels:
+        - region
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -10995,6 +11114,8 @@ output:
                   op: avg
             joins: []
             unless: []
+            usedLabels:
+                - colo_name
             returninfo:
                 logicalexpr: ""
                 valueposition:
@@ -11057,6 +11178,8 @@ output:
                   op: avg
             joins: []
             unless: []
+            usedLabels:
+                - colo_name
             returninfo:
                 logicalexpr: ""
                 valueposition:
@@ -11142,6 +11265,8 @@ output:
                           op: avg
                     joins: []
                     unless: []
+                    usedLabels:
+                        - colo_name
                     returninfo:
                         logicalexpr: ""
                         valueposition:
@@ -11204,6 +11329,8 @@ output:
                           op: avg
                     joins: []
                     unless: []
+                    usedLabels:
+                        - colo_name
                     returninfo:
                         logicalexpr: ""
                         valueposition:
@@ -11223,6 +11350,8 @@ output:
                   depth: 0
                   ison: false
             unless: []
+            usedLabels:
+                - colo_name
             returninfo:
                 logicalexpr: ""
                 valueposition:
@@ -11318,6 +11447,8 @@ output:
                           op: avg
                     joins: []
                     unless: []
+                    usedLabels:
+                        - colo_name
                     returninfo:
                         logicalexpr: ""
                         valueposition:
@@ -11380,6 +11511,8 @@ output:
                           op: avg
                     joins: []
                     unless: []
+                    usedLabels:
+                        - colo_name
                     returninfo:
                         logicalexpr: ""
                         valueposition:
@@ -11399,6 +11532,8 @@ output:
                   depth: 0
                   ison: false
             unless: []
+            usedLabels:
+                - colo_name
             returninfo:
                 logicalexpr: 5 * vector(0) / vector(1)
                 valueposition:
@@ -11566,6 +11701,8 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - colo_name
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -11669,6 +11806,8 @@ output:
                   op: avg
             joins: []
             unless: []
+            usedLabels:
+                - colo_name
             returninfo:
                 logicalexpr: ""
                 valueposition:
@@ -11731,6 +11870,8 @@ output:
                   op: avg
             joins: []
             unless: []
+            usedLabels:
+                - colo_name
             returninfo:
                 logicalexpr: ""
                 valueposition:
@@ -11816,6 +11957,8 @@ output:
                           op: avg
                     joins: []
                     unless: []
+                    usedLabels:
+                        - colo_name
                     returninfo:
                         logicalexpr: ""
                         valueposition:
@@ -11878,6 +12021,8 @@ output:
                           op: avg
                     joins: []
                     unless: []
+                    usedLabels:
+                        - colo_name
                     returninfo:
                         logicalexpr: ""
                         valueposition:
@@ -11897,6 +12042,8 @@ output:
                   depth: 0
                   ison: false
             unless: []
+            usedLabels:
+                - colo_name
             returninfo:
                 logicalexpr: ""
                 valueposition:
@@ -11992,6 +12139,8 @@ output:
                           op: avg
                     joins: []
                     unless: []
+                    usedLabels:
+                        - colo_name
                     returninfo:
                         logicalexpr: ""
                         valueposition:
@@ -12054,6 +12203,8 @@ output:
                           op: avg
                     joins: []
                     unless: []
+                    usedLabels:
+                        - colo_name
                     returninfo:
                         logicalexpr: ""
                         valueposition:
@@ -12073,6 +12224,8 @@ output:
                   depth: 0
                   ison: false
             unless: []
+            usedLabels:
+                - colo_name
             returninfo:
                 logicalexpr: 5 * vector(0) / vector(1)
                 valueposition:
@@ -12240,6 +12393,8 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - colo_name
       returninfo:
         logicalexpr: vector(0) / vector(1)
         valueposition:
@@ -12429,6 +12584,8 @@ output:
                   op: max
             joins: []
             unless: []
+            usedLabels:
+                - instance
             returninfo:
                 logicalexpr: ""
                 valueposition:
@@ -12448,6 +12605,8 @@ output:
           depth: 1
           ison: true
       unless: []
+      usedLabels:
+        - dc
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -12769,6 +12928,8 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - job
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -12843,6 +13004,8 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - job
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -12917,6 +13080,8 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - job
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -13019,6 +13184,9 @@ output:
           depth: 1
           ison: true
       unless: []
+      usedLabels:
+        - env
+        - cluster
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -13141,6 +13309,9 @@ output:
           depth: 1
           ison: true
       unless: []
+      usedLabels:
+        - env
+        - cluster
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -13238,6 +13409,8 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - instance
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -13346,6 +13519,8 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - instance
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -13454,6 +13629,8 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - instance
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -13559,6 +13736,8 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - cluster
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -13853,6 +14032,9 @@ output:
                   depth: 0
                   ison: true
             unless: []
+            usedLabels:
+                - colo_name
+                - instance
             returninfo:
                 logicalexpr: ""
                 valueposition:
@@ -13872,6 +14054,14 @@ output:
           depth: 1
           ison: true
       unless: []
+      usedLabels:
+        - instance
+        - colo_name
+        - tier
+        - animal
+        - brand
+        - sliver
+        - pop_name
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -14024,6 +14214,9 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - colo_name
+        - instance
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -14160,6 +14353,8 @@ output:
                   depth: 0
                   ison: true
             unless: []
+            usedLabels:
+                - instance
             returninfo:
                 logicalexpr: ""
                 valueposition:
@@ -14179,6 +14374,8 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - colo_name
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -14384,6 +14581,8 @@ output:
                   depth: 0
                   ison: true
             unless: []
+            usedLabels:
+                - colo_name
             returninfo:
                 logicalexpr: ""
                 valueposition:
@@ -14446,6 +14645,8 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - instance
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -14681,6 +14882,8 @@ output:
                           depth: 0
                           ison: true
                     unless: []
+                    usedLabels:
+                        - colo_name
                     returninfo:
                         logicalexpr: ""
                         valueposition:
@@ -14700,6 +14903,8 @@ output:
                   depth: 0
                   ison: true
             unless: []
+            usedLabels:
+                - instance
             returninfo:
                 logicalexpr: ""
                 valueposition:
@@ -14719,6 +14924,8 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - instance
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -14880,6 +15087,9 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - instance
+        - colo_name
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -15056,6 +15266,8 @@ output:
                   depth: 0
                   ison: true
             unless: []
+            usedLabels:
+                - colo_name
             returninfo:
                 logicalexpr: ""
                 valueposition:
@@ -15075,6 +15287,8 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - instance
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -15226,6 +15440,9 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - instance
+        - colo_name
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -15325,6 +15542,8 @@ output:
           depth: 0
           ison: true
       unless: []
+      usedLabels:
+        - instance
       returninfo:
         logicalexpr: ""
         valueposition:
@@ -15375,6 +15594,237 @@ output:
         end: 24
       type: selector
       fixedlabels: false
+      isconditional: false
+
+---
+
+[TestLabelsSource/178 - 1]
+expr: |4
+
+    group by (cluster, namespace, workload, workload_type, pod) (
+      label_join(
+        label_join(
+          group by (cluster, namespace, job_name, pod) (
+            label_join(
+              kube_pod_owner{job="kube-state-metrics", owner_kind="Job"}
+            , "job_name", "", "owner_name")
+          )
+          * on (cluster, namespace, job_name) group_left(owner_kind, owner_name)
+          group by (cluster, namespace, job_name, owner_kind, owner_name) (
+            kube_job_owner{job="kube-state-metrics", owner_kind!="Pod", owner_kind!=""}
+          )
+        , "workload", "", "owner_name")
+      , "workload_type", "", "owner_kind")
+    )
+output:
+    - labels:
+        "":
+            reason: Query is using aggregation with `by(cluster, namespace, workload, workload_type, pod)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 7
+                end: 10
+        __name__:
+            reason: Aggregation removes metric name.
+            kind: excluded
+            fragment:
+                start: 1
+                end: 600
+        cluster:
+            reason: Query is using aggregation with `by(cluster, namespace, workload, workload_type, pod)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 11
+                end: 18
+        job:
+            reason: Query is using aggregation with `by(cluster, namespace, job_name, pod)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 105
+                end: 143
+        job_name:
+            reason: Query is using aggregation with `by(cluster, namespace, workload, workload_type, pod)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 7
+                end: 60
+        namespace:
+            reason: Query is using aggregation with `by(cluster, namespace, workload, workload_type, pod)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 20
+                end: 29
+        owner_kind:
+            reason: Query is using aggregation with `by(cluster, namespace, workload, workload_type, pod)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 7
+                end: 60
+        owner_name:
+            reason: Query is using aggregation with `by(cluster, namespace, workload, workload_type, pod)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 7
+                end: 60
+        pod:
+            reason: Query is using aggregation with `by(cluster, namespace, workload, workload_type, pod)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 56
+                end: 59
+        workload:
+            reason: This label will be added to the result by label_join() call.
+            kind: guaranteed
+            fragment:
+                start: 81
+                end: 559
+        workload_type:
+            reason: This label will be added to the result by label_join() call.
+            kind: guaranteed
+            fragment:
+                start: 65
+                end: 598
+      deadinfo: null
+      deadlabels: []
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] kube_pod_owner{job="kube-state-metrics",owner_kind="Job"}'
+          op: ""
+        - args:
+            - '"job_name"'
+            - '""'
+            - '"owner_name"'
+          node: '[*parser.Call] label_join(kube_pod_owner{job="kube-state-metrics",owner_kind="Job"}, "job_name", "", "owner_name")'
+          op: label_join
+        - node: '[*parser.AggregateExpr] group by (cluster, namespace, job_name, pod) (label_join(kube_pod_owner{job="kube-state-metrics",owner_kind="Job"}, "job_name", "", "owner_name"))'
+          op: group
+        - args:
+            - '"workload"'
+            - '""'
+            - '"owner_name"'
+          node: '[*parser.Call] label_join(group by (cluster, namespace, job_name, pod) (label_join(kube_pod_owner{job="kube-state-metrics",owner_kind="Job"}, "job_name", "", "owner_name")) * on (cluster, namespace, job_name) group_left (owner_kind, owner_name) group by (cluster, namespace, job_name, owner_kind, owner_name) (kube_job_owner{job="kube-state-metrics",owner_kind!="",owner_kind!="Pod"}), "workload", "", "owner_name")'
+          op: label_join
+        - args:
+            - '"workload_type"'
+            - '""'
+            - '"owner_kind"'
+          node: '[*parser.Call] label_join(label_join(group by (cluster, namespace, job_name, pod) (label_join(kube_pod_owner{job="kube-state-metrics",owner_kind="Job"}, "job_name", "", "owner_name")) * on (cluster, namespace, job_name) group_left (owner_kind, owner_name) group by (cluster, namespace, job_name, owner_kind, owner_name) (kube_job_owner{job="kube-state-metrics",owner_kind!="",owner_kind!="Pod"}), "workload", "", "owner_name"), "workload_type", "", "owner_kind")'
+          op: label_join
+        - node: '[*parser.AggregateExpr] group by (cluster, namespace, workload, workload_type, pod) (label_join(label_join(group by (cluster, namespace, job_name, pod) (label_join(kube_pod_owner{job="kube-state-metrics",owner_kind="Job"}, "job_name", "", "owner_name")) * on (cluster, namespace, job_name) group_left (owner_kind, owner_name) group by (cluster, namespace, job_name, owner_kind, owner_name) (kube_job_owner{job="kube-state-metrics",owner_kind!="",owner_kind!="Pod"}), "workload", "", "owner_name"), "workload_type", "", "owner_kind"))'
+          op: group
+      joins:
+        - matchinglabels:
+            - cluster
+            - namespace
+            - job_name
+          addedlabels:
+            - owner_kind
+            - owner_name
+          src:
+            labels:
+                "":
+                    reason: Query is using aggregation with `by(cluster, namespace, job_name, owner_kind, owner_name)`, only labels included inside `by(...)` will be present on the results.
+                    kind: excluded
+                    fragment:
+                        start: 372
+                        end: 375
+                __name__:
+                    reason: Aggregation removes metric name.
+                    kind: excluded
+                    fragment:
+                        start: 366
+                        end: 523
+                cluster:
+                    reason: Query is using aggregation with `by(cluster, namespace, job_name, owner_kind, owner_name)`, only labels included inside `by(...)` will be present on the results.
+                    kind: included
+                    fragment:
+                        start: 376
+                        end: 383
+                job:
+                    reason: Query is using aggregation with `by(cluster, namespace, job_name, owner_kind, owner_name)`, only labels included inside `by(...)` will be present on the results.
+                    kind: excluded
+                    fragment:
+                        start: 372
+                        end: 429
+                job_name:
+                    reason: Query is using aggregation with `by(cluster, namespace, job_name, owner_kind, owner_name)`, only labels included inside `by(...)` will be present on the results.
+                    kind: included
+                    fragment:
+                        start: 396
+                        end: 404
+                namespace:
+                    reason: Query is using aggregation with `by(cluster, namespace, job_name, owner_kind, owner_name)`, only labels included inside `by(...)` will be present on the results.
+                    kind: included
+                    fragment:
+                        start: 385
+                        end: 394
+                owner_kind:
+                    reason: Query is using aggregation with `by(cluster, namespace, job_name, owner_kind, owner_name)`, only labels included inside `by(...)` will be present on the results.
+                    kind: included
+                    fragment:
+                        start: 406
+                        end: 416
+                owner_name:
+                    reason: Query is using aggregation with `by(cluster, namespace, job_name, owner_kind, owner_name)`, only labels included inside `by(...)` will be present on the results.
+                    kind: included
+                    fragment:
+                        start: 418
+                        end: 428
+            deadinfo: null
+            deadlabels: []
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] kube_job_owner{job="kube-state-metrics",owner_kind!="",owner_kind!="Pod"}'
+                  op: ""
+                - node: '[*parser.AggregateExpr] group by (cluster, namespace, job_name, owner_kind, owner_name) (kube_job_owner{job="kube-state-metrics",owner_kind!="",owner_kind!="Pod"})'
+                  op: group
+            joins: []
+            unless: []
+            usedLabels:
+                - cluster
+                - namespace
+                - job_name
+                - owner_kind
+                - owner_name
+            returninfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 0
+                    end: 0
+                returnednumber: 0
+                alwaysreturns: false
+                knownreturn: false
+                isreturnbool: false
+            position:
+                start: 440
+                end: 515
+            type: aggregation
+            fixedlabels: true
+            isconditional: false
+          op: 57395
+          depth: 1
+          ison: true
+      unless: []
+      usedLabels:
+        - cluster
+        - namespace
+        - pod
+        - workload
+        - workload_type
+      returninfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: false
+      position:
+        start: 81
+        end: 559
+      type: aggregation
+      fixedlabels: true
       isconditional: false
 
 ---

@@ -164,18 +164,19 @@ type Unless struct {
 }
 
 type Source struct {
-	Labels        map[string]LabelTransform
-	DeadInfo      *DeadInfo
-	DeadLabels    []DeadLabel
-	Returns       promParser.ValueType
-	Operations    Operations
-	Joins         []Join   // Any other sources this source joins with.
-	Unless        []Unless // Any other sources this source is suppressed by.
-	ReturnInfo    ReturnInfo
-	Position      posrange.PositionRange
-	Type          Type
-	FixedLabels   bool // Labels are fixed and only allowed labels can be present.
-	IsConditional bool // True if this source is guarded by 'foo > 5' or other condition.
+	Labels        map[string]LabelTransform // `yaml:"labels,omitempty"`
+	DeadInfo      *DeadInfo                 // `yaml:"deadInfo,omitempty"`
+	DeadLabels    []DeadLabel               // `yaml:"deadLabels,omitempty"`
+	Returns       promParser.ValueType      // `yaml:"returns"`
+	Operations    Operations                // `yaml:"operations,omitempty"`
+	Joins         []Join                    // `yaml:"joins,omitempty"`  // Any other sources this source joins with.
+	Unless        []Unless                  // `yaml:"unless,omitempty"` // Any other sources this source is suppressed by.
+	UsedLabels    []string                  `yaml:"usedLabels,omitempty"`
+	ReturnInfo    ReturnInfo                // `yaml:"returnInfo,omitempty"`
+	Position      posrange.PositionRange    // `yaml:"position"`
+	Type          Type                      // `yaml:"type"`
+	FixedLabels   bool                      // `yaml:"fixedLabels,omitempty"`   // Labels are fixed and only allowed labels can be present.
+	IsConditional bool                      // `yaml:"isConditional,omitempty"` // True if this source is guarded by 'foo > 5' or other condition.
 }
 
 func (s Source) Operation() string {
@@ -228,7 +229,11 @@ func (s *Source) excludeAllLabels(expr, reason string, fragment, allFragment pos
 			}
 		}
 	}
+	s.UsedLabels = slices.DeleteFunc(s.UsedLabels, func(name string) bool {
+		return !slices.Contains(except, name)
+	})
 	// Mark except labels as possible, unless they are already guaranteed.
+	s.UsedLabels = appendToSlice(s.UsedLabels, except...)
 	for _, name := range except {
 		if l, ok := s.Labels[name]; ok && l.Kind == GuaranteedLabel {
 			continue
@@ -265,6 +270,9 @@ func (s *Source) excludeLabel(reason string, fragment posrange.PositionRange, na
 		Reason:   reason,
 		Fragment: fragment,
 	}
+	s.UsedLabels = slices.DeleteFunc(s.UsedLabels, func(s string) bool {
+		return s == name
+	})
 }
 
 func (s *Source) joinLabels(expr string, within posrange.PositionRange, op promParser.ItemType, names []string, outside []posrange.PositionRange) {
@@ -361,6 +369,9 @@ func (s *Source) checkAggregationLabels(expr string, n *promParser.AggregateExpr
 
 	for _, j := range s.Joins {
 		for _, name := range j.AddedLabels {
+			if slices.Contains(s.UsedLabels, name) {
+				continue
+			}
 			if s.hasJoinUsingLabel(name) {
 				// This label is used for some other join for our source.
 				continue
@@ -701,6 +712,7 @@ func parseAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 					nil,
 				)
 			} else {
+				s.UsedLabels = appendToSlice(s.UsedLabels, n.Grouping...)
 				s.checkIncludedLabels(
 					expr,
 					FindFuncPosition(expr, n.PosRange, promParser.ItemTypeStr[promParser.BY], nil),
@@ -859,14 +871,28 @@ If you're hoping to get instance specific labels this way and alert when some ta
 			n.PosRange,
 			labelsFromSelectors(guaranteedLabelsMatches, vs)...,
 		)
-	case "label_replace", "label_join":
+	case "label_join":
 		// One label added to the results.
+		// label_join(v instant-vector, dst_label string, separator string, src_label_1 string, src_label_2 string, ...)
 		s.Returns = promParser.ValueTypeVector
 		s.guaranteeLabel(
 			fmt.Sprintf("This label will be added to the result by %s() call.", n.Func.Name),
 			n.PosRange,
 			n.Args[1].(*promParser.StringLiteral).Val,
 		)
+		for i := 3; i < len(n.Args); i++ {
+			s.UsedLabels = appendToSlice(s.UsedLabels, n.Args[i].(*promParser.StringLiteral).Val)
+		}
+	case "label_replace":
+		// One label added to the results.
+		// label_replace(v instant-vector, dst_label string, replacement string, src_label string, regex string)
+		s.Returns = promParser.ValueTypeVector
+		s.guaranteeLabel(
+			fmt.Sprintf("This label will be added to the result by %s() call.", n.Func.Name),
+			n.PosRange,
+			n.Args[1].(*promParser.StringLiteral).Val,
+		)
+		s.UsedLabels = appendToSlice(s.UsedLabels, n.Args[3].(*promParser.StringLiteral).Val)
 
 	case "pi":
 		s.Returns = promParser.ValueTypeScalar
@@ -1040,6 +1066,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 		rhs := walkNode(expr, n.RHS)
 		for _, ls := range walkNode(expr, n.LHS) {
 			if n.VectorMatching.On {
+				ls.UsedLabels = appendToSlice(ls.UsedLabels, n.VectorMatching.MatchingLabels...)
 				ls.checkIncludedLabels(expr, pos, n.VectorMatching.MatchingLabels)
 				funcPos := FindFuncPosition(expr, pos, promParser.ItemTypeStr[promParser.ON], []posrange.PositionRange{
 					n.LHS.PositionRange(), n.RHS.PositionRange(),
@@ -1114,6 +1141,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 			// foo * on(instance) group_left(a,b) bar{x="y"}
 			// then only group_left() labels will be included.
 			if n.VectorMatching.On {
+				rs.UsedLabels = appendToSlice(rs.UsedLabels, n.VectorMatching.MatchingLabels...)
 				rs.checkIncludedLabels(expr, pos, n.VectorMatching.MatchingLabels)
 				for _, name := range n.VectorMatching.MatchingLabels {
 					rs.includeLabel(
@@ -1172,6 +1200,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 				n.LHS.PositionRange(), n.RHS.PositionRange(),
 			})
 			if n.VectorMatching.On {
+				ls.UsedLabels = appendToSlice(ls.UsedLabels, n.VectorMatching.MatchingLabels...)
 				ls.checkIncludedLabels(expr, pos, n.VectorMatching.MatchingLabels)
 				for _, name := range n.VectorMatching.MatchingLabels {
 					ls.includeLabel(
@@ -1231,6 +1260,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 		for _, ls := range walkNode(expr, n.LHS) {
 			var rhsConditional bool
 			if n.VectorMatching.On {
+				ls.UsedLabels = appendToSlice(ls.UsedLabels, n.VectorMatching.MatchingLabels...)
 				ls.checkIncludedLabels(expr, pos, n.VectorMatching.MatchingLabels)
 				for _, name := range n.VectorMatching.MatchingLabels {
 					ls.includeLabel(
