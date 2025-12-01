@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.79.0
+
+### Changed
+
+- Removed [uber-go/automaxprocs](https://github.com/uber-go/automaxprocs) as it's
+  no longer needed with Go 1.25+.
+
 ## v0.78.0
 
 ### Fixed

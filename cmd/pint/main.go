@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"github.com/urfave/cli/v3"
-	"go.uber.org/automaxprocs/maxprocs"
 
 	"github.com/cloudflare/pint/internal/config"
 )
@@ -101,12 +100,6 @@ func actionSetup(c *cli.Command) (meta actionMeta, err error) {
 	err = initLogger(c.String(logLevelFlag), c.Bool(noColorFlag))
 	if err != nil {
 		return meta, fmt.Errorf("failed to set log level: %w", err)
-	}
-
-	undo, err := maxprocs.Set()
-	defer undo()
-	if err != nil {
-		slog.LogAttrs(context.Background(), slog.LevelError, "failed to set GOMAXPROCS", slog.Any("err", err))
 	}
 
 	meta.workers = c.Int(workersFlag)
