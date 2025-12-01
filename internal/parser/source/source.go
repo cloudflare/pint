@@ -1268,11 +1268,25 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 		// foo{} or bar{}
 		// foo{} or on(...) bar{}
 		// foo{} or ignoring(...) bar{}
+		//
+		// 'foo or bar' means:
+		// - take all foo{} results
+		// - take all bar{} results
+		// - remove any bar{} result if there's a foo{} result with same labels (except __name__)
+		//
+		// 'foo or on(a) bar' means we only compare 'a' label and remove any bar{} results with 'a' value
+		// already provided by foo{}
+		//
+		// 'foo or ignoring(a) bar' means we ignore the 'a' label when comparing foo{} and bar{} results,
+		// so (for example) bar{} results with 'a' labels present where foo{} doesn't have any 'a' label
+		// will still be excluded if all other labels match.
 	case n.VectorMatching.Card == promParser.CardManyToMany:
 		var lhsCanBeEmpty bool // true if any of the LHS query can produce empty results.
 		rhs := walkNode(expr, n.RHS)
 		for _, ls := range walkNode(expr, n.LHS) {
 			var rhsConditional bool
+			// With many-to-many on/ignore is only used for matching series, it doesn't impact
+			// returned labels.
 			if n.VectorMatching.On {
 				ls.UsedLabels = appendToSlice(ls.UsedLabels, n.VectorMatching.MatchingLabels...)
 				ls.checkIncludedLabels(expr, pos, n.VectorMatching.MatchingLabels)
@@ -1280,7 +1294,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					ls.includeLabel(
 						expr,
 						fmt.Sprintf(
-							"Query is using %s vector matching with `on(%s)`, labels included inside `on(...)` will be present on the results.",
+							"Query is using %s vector matching with `on(%s)`, labels included inside `on(...)` will be present on the results if matched time series have them.",
 							n.VectorMatching.Card, strings.Join(n.VectorMatching.MatchingLabels, ", "),
 						),
 						FindArgumentPosition(
@@ -1293,9 +1307,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 						name,
 					)
 				}
-			} else if n.Op != promParser.LOR {
-				// Mark labels not set inside ignoring(...) as used, but:
-				// - skip 'foo OR bar' - OR doesn't do label matching, it works on any results
+			} else {
 				ls.useLabelsNotExcluded(n.VectorMatching.MatchingLabels)
 			}
 			if !ls.ReturnInfo.AlwaysReturns || ls.IsConditional {

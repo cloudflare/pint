@@ -268,6 +268,32 @@ func TestImpossibleCheck(t *testing.T) {
 			problems:   true,
 		},
 		{
+			description: "impossible group_left and",
+			content: `
+- record: foo
+  expr: |
+    up{node_status="v", job="node_exporter"}
+    and on (colo_name) colo_metadata{colo_status="v"}
+    * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
+		{
+			description: "possible group_left and",
+			content: `
+- record: foo
+  expr: |
+    (
+      up{node_status="v", job="node_exporter"}
+      and on (colo_name) colo_metadata{colo_status="v"}
+    ) * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+		},
+		{
 			description: "orphaned group_left labels",
 			content: `
 - record: foo
