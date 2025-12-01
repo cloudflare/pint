@@ -1091,6 +1091,8 @@ output:
       operations:
         - node: '[*parser.VectorSelector] foo{job="bar"}'
           op: ""
+      usedLabels:
+        - job
       position:
         start: 0
         end: 14
@@ -1127,6 +1129,8 @@ output:
       operations:
         - node: '[*parser.VectorSelector] foo{a="bar"}'
           op: ""
+      usedLabels:
+        - a
       position:
         start: 0
         end: 12
@@ -1498,6 +1502,8 @@ output:
           op: ""
         - node: '[*parser.Call] abs(foo{job="myjob"} or bar{cluster="dev"})'
           op: abs
+      usedLabels:
+        - job
       position:
         start: 4
         end: 42
@@ -1550,6 +1556,8 @@ output:
           op: ""
         - node: '[*parser.AggregateExpr] sum without (instance) (foo{job="myjob"} or bar{cluster="dev"})'
           op: sum
+      usedLabels:
+        - job
       position:
         start: 4
         end: 20
@@ -2754,7 +2762,7 @@ expr: foo{job="foo", instance="1"} and on(cluster) bar
 output:
     - labels:
         cluster:
-            reason: Query is using many-to-many vector matching with `on(cluster)`, labels included inside `on(...)` will be present on the results.
+            reason: Query is using many-to-many vector matching with `on(cluster)`, labels included inside `on(...)` will be present on the results if matched time series have them.
             kind: included
             fragment:
                 start: 36
@@ -3229,7 +3237,7 @@ output:
                 start: 4
                 end: 78
         job:
-            reason: Query is using many-to-many vector matching with `on(job)`, labels included inside `on(...)` will be present on the results.
+            reason: Query is using many-to-many vector matching with `on(job)`, labels included inside `on(...)` will be present on the results if matched time series have them.
             kind: included
             fragment:
                 start: 111
@@ -5647,6 +5655,8 @@ output:
                   op: ""
                 - node: '[*parser.Call] rate(metric3{log_name="samplerd"}[5m])'
                   op: rate
+            usedLabels:
+                - log_name
             position:
                 start: 77
                 end: 109
@@ -5777,6 +5787,8 @@ output:
                   op: ""
                 - node: '[*parser.Call] rate(metric3{log_name="samplerd"}[5m])'
                   op: rate
+            usedLabels:
+                - log_name
             position:
                 start: 77
                 end: 109
@@ -7052,7 +7064,7 @@ output:
                 start: 2
                 end: 442
         device:
-            reason: Query is using many-to-many vector matching with `on(device, instance)`, labels included inside `on(...)` will be present on the results.
+            reason: Query is using many-to-many vector matching with `on(device, instance)`, labels included inside `on(...)` will be present on the results if matched time series have them.
             kind: included
             fragment:
                 start: 274
@@ -7907,7 +7919,7 @@ output:
                 start: 1
                 end: 336
         colo_name:
-            reason: Query is using many-to-many vector matching with `on(colo_name)`, labels included inside `on(...)` will be present on the results.
+            reason: Query is using many-to-many vector matching with `on(colo_name)`, labels included inside `on(...)` will be present on the results if matched time series have them.
             kind: included
             fragment:
                 start: 412
@@ -8457,7 +8469,7 @@ output:
                 start: 1
                 end: 336
         colo_name:
-            reason: Query is using many-to-many vector matching with `on(colo_name)`, labels included inside `on(...)` will be present on the results.
+            reason: Query is using many-to-many vector matching with `on(colo_name)`, labels included inside `on(...)` will be present on the results if matched time series have them.
             kind: included
             fragment:
                 start: 412
@@ -10360,7 +10372,7 @@ expr: |4
 output:
     - labels:
         colo_name:
-            reason: Query is using many-to-many vector matching with `on(colo_name)`, labels included inside `on(...)` will be present on the results.
+            reason: Query is using many-to-many vector matching with `on(colo_name)`, labels included inside `on(...)` will be present on the results if matched time series have them.
             kind: included
             fragment:
                 start: 50
@@ -11705,6 +11717,59 @@ output:
       position:
         start: 53
         end: 67
+      type: selector
+
+---
+
+[TestLabelsSource/181 - 1]
+expr: foo or ignoring(job) bar
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+      position:
+        start: 0
+        end: 3
+      type: selector
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] bar'
+          op: ""
+      position:
+        start: 21
+        end: 24
+      type: selector
+
+---
+
+[TestLabelsSource/182 - 1]
+expr: foo or on(job) bar
+output:
+    - labels:
+        job:
+            reason: Query is using many-to-many vector matching with `on(job)`, labels included inside `on(...)` will be present on the results if matched time series have them.
+            kind: included
+            fragment:
+                start: 10
+                end: 13
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+      usedLabels:
+        - job
+      position:
+        start: 0
+        end: 3
+      type: selector
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] bar'
+          op: ""
+      position:
+        start: 15
+        end: 18
       type: selector
 
 ---

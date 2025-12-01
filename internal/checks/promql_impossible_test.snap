@@ -2144,6 +2144,42 @@
 
 ---
 
+[TestImpossibleCheck/impossible_group_left_and - 1]
+- description: impossible group_left and
+  content: |4
+
+    - record: foo
+      expr: |
+        up{node_status="v", job="node_exporter"}
+        and on (colo_name) colo_metadata{colo_status="v"}
+        * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+  output: |
+    4 |     up{node_status="v", job="node_exporter"}
+    5 |     and on (colo_name) colo_metadata{colo_status="v"}
+            ^^^ This binary operation prevents previously joined label `sliver` from being added to the results.
+    6 |     * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
+                                        ^^^^^^ Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+  problem:
+    reporter: promql/impossible
+    summary: orphaned label
+    details: ""
+    diagnostics:
+        - message: This binary operation prevents previously joined label `sliver` from being added to the results.
+          firstcolumn: 42
+          lastcolumn: 44
+          kind: 0
+        - message: Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          firstcolumn: 120
+          lastcolumn: 125
+          kind: 1
+    lines:
+        first: 4
+        last: 6
+    severity: 1
+    anchor: 0
+
+---
+
 [TestImpossibleCheck/impossible_match_due_to_orphaned_group_left - 1]
 - description: impossible match due to orphaned group_left
   content: |4
@@ -3221,6 +3257,11 @@
         last: 6
     severity: 1
     anchor: 0
+
+---
+
+[TestImpossibleCheck/possible_group_left_and - 1]
+[]
 
 ---
 

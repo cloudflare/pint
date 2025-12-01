@@ -372,6 +372,8 @@ group by (cluster, namespace, workload, workload_type, pod) (
 `,
 	`foo{job="xxx"} + on(job) group_right(instance) bar{}`,
 	`foo{job="xxx"} + ignoring(job) group_right(instance) bar{job="zzz"}`,
+	`foo or ignoring(job) bar`,
+	`foo or on(job) bar`,
 }
 
 func TestLabelsSource(t *testing.T) {
