@@ -663,6 +663,78 @@ foo details
 			},
 		},
 		{
+			description: "Create() doesn't merge details with different Lines.Last",
+			reports: []Report{
+				{
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
+					ModifiedLines: []int{2, 3, 4, 5},
+					Rule:          mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Reporter: "foo",
+						Summary:  "foo error 1",
+						Details:  "foo details",
+						Lines:    diags.LineRange{First: 1, Last: 3},
+						Severity: checks.Bug,
+						Anchor:   checks.AnchorAfter,
+					},
+				},
+				{
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
+					ModifiedLines: []int{2, 3, 4, 5},
+					Rule:          mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Reporter: "foo",
+						Summary:  "foo error 2",
+						Details:  "foo details",
+						Lines:    diags.LineRange{First: 1, Last: 5},
+						Severity: checks.Bug,
+						Anchor:   checks.AnchorAfter,
+					},
+				},
+			},
+			commenter: testCommenter{
+				destinations: func(_ context.Context) ([]any, error) {
+					return []any{1}, nil
+				},
+				summary: func(_ context.Context, _ any, _ Summary, _ []PendingComment, errs []error) error {
+					if len(errs) != 0 {
+						return fmt.Errorf("Expected empty errs, got %v", errs)
+					}
+					return nil
+				},
+				list: func(_ context.Context, _ any) ([]ExistingComment, error) {
+					return nil, nil
+				},
+				create: func(_ context.Context, _ any, p PendingComment) error {
+					if p.path != "foo.txt" {
+						return fmt.Errorf("wrong path: %s", p.path)
+					}
+					if p.line != 3 && p.line != 5 {
+						return fmt.Errorf("wrong line: %d", p.line)
+					}
+					return nil
+				},
+				delete: func(_ context.Context, _ any, e ExistingComment) error {
+					return fmt.Errorf("shouldn't try to delete %s:%d", e.path, e.line)
+				},
+				isEqual: func(e ExistingComment, p PendingComment) bool {
+					return e.path == p.path && e.line == p.line && e.text == p.text
+				},
+				canCreate: func(_ int) bool {
+					return true
+				},
+			},
+			checkErr: func(t *testing.T, err error) {
+				require.NoError(t, err)
+			},
+		},
+		{
 			description: "Delete() fails",
 			reports:     []Report{barReport},
 			commenter: testCommenter{

@@ -2,6 +2,7 @@ package reporter_test
 
 import (
 	"bytes"
+	"errors"
 	"log/slog"
 	"strings"
 	"testing"
@@ -16,6 +17,12 @@ import (
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/reporter"
 )
+
+type failingWriter struct{}
+
+func (failingWriter) Write(_ []byte) (int, error) {
+	return 0, errors.New("write error")
+}
 
 func TestCheckstyleReporter(t *testing.T) {
 	type testCaseT struct {
@@ -129,6 +136,91 @@ func TestCheckstyleReporter(t *testing.T) {
 </checkstyle>
 `,
 		},
+		{
+			description: "multiple files",
+			summary: reporter.NewSummary([]reporter.Report{
+				{
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
+					ModifiedLines: []int{1},
+					Rule:          mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Lines:    diags.LineRange{First: 1, Last: 1},
+						Reporter: "mock",
+						Summary:  "problem in foo",
+						Severity: checks.Warning,
+					},
+				},
+				{
+					Path: discovery.Path{
+						SymlinkTarget: "bar.txt",
+						Name:          "bar.txt",
+					},
+					ModifiedLines: []int{2},
+					Rule:          mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Lines:    diags.LineRange{First: 2, Last: 2},
+						Reporter: "mock",
+						Summary:  "problem in bar",
+						Severity: checks.Fatal,
+					},
+				},
+			}),
+			output: `<?xml version="1.0" encoding="UTF-8"?>
+<checkstyle version="4.3">
+  <file name="foo.txt">
+    <error line="1" severity="Warning" message="problem in foo" source="mock"></error>
+  </file>
+  <file name="bar.txt">
+    <error line="2" severity="Fatal" message="problem in bar" source="mock"></error>
+  </file>
+</checkstyle>
+`,
+		},
+		{
+			description: "multiple reports same file",
+			summary: reporter.NewSummary([]reporter.Report{
+				{
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
+					ModifiedLines: []int{1, 5},
+					Rule:          mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Lines:    diags.LineRange{First: 1, Last: 1},
+						Reporter: "mock1",
+						Summary:  "first problem",
+						Severity: checks.Information,
+					},
+				},
+				{
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
+					ModifiedLines: []int{1, 5},
+					Rule:          mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Lines:    diags.LineRange{First: 5, Last: 5},
+						Reporter: "mock2",
+						Summary:  "second problem",
+						Details:  "with details",
+						Severity: checks.Bug,
+					},
+				},
+			}),
+			output: `<?xml version="1.0" encoding="UTF-8"?>
+<checkstyle version="4.3">
+  <file name="foo.txt">
+    <error line="1" severity="Information" message="first problem" source="mock1"></error>
+    <error line="5" severity="Bug" message="second problem&#xA;with details" source="mock2"></error>
+  </file>
+</checkstyle>
+`,
+		},
 	}
 
 	for _, tc := range testCases {
@@ -148,4 +240,12 @@ func TestCheckstyleReporter(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestCheckstyleReporterWriteError(t *testing.T) {
+	slog.SetDefault(slogt.New(t))
+
+	r := reporter.NewCheckStyleReporter(failingWriter{})
+	err := r.Submit(t.Context(), reporter.Summary{})
+	require.EqualError(t, err, "write error")
 }

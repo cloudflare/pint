@@ -141,6 +141,40 @@ groups:
 				},
 			},
 		},
+		{
+			description: "invalid template syntax in annotation",
+			content: `
+- alert: Foo Is Down
+  expr: up{job="foo"} == 0
+  annotations:
+    summary: "{{ $externalLabels.cluster"
+`,
+			checker:    newAlertsExternalLabelsCheck,
+			prometheus: newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  configResponse{yaml: "global:\n  external_labels:\n    cluster: foo\n"},
+				},
+			},
+		},
+		{
+			description: "invalid template syntax in label",
+			content: `
+- alert: Foo Is Down
+  expr: up{job="foo"} == 0
+  labels:
+    cluster: "{{ $externalLabels.cluster"
+`,
+			checker:    newAlertsExternalLabelsCheck,
+			prometheus: newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  configResponse{yaml: "global:\n  external_labels:\n    cluster: foo\n"},
+				},
+			},
+		},
 	}
 
 	runTests(t, testCases)

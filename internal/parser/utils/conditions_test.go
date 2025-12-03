@@ -75,6 +75,10 @@ func TestRemoveConditions(t *testing.T) {
 			input:  `round((foo > 0), 10)`,
 			output: `round(foo, 10)`,
 		},
+		{
+			input:  `-foo`,
+			output: `-foo`,
+		},
 	}
 
 	for _, tc := range testCases {
