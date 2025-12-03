@@ -9,6 +9,11 @@
 
 ---
 
+[TestRuleDuplicateCheck/ignores_removed_entries - 1]
+[]
+
+---
+
 [TestRuleDuplicateCheck/ignores_rules_for_different_Prometheus_servers - 1]
 []
 

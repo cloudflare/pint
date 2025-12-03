@@ -1,0 +1,20 @@
+! exec pint --no-color watch --listen=127.0.0.1:6225 glob rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=INFO msg="Loading configuration file" path=.pint.hcl
+level=ERROR msg="Execution completed with error(s)" err="failed to load config file \".pint.hcl\": prometheus server name must be unique, found two or more config blocks using \"prom\" name"
+-- rules/0001.yml --
+groups:
+- name: foo
+  rules:
+  - record: sum:up
+    expr: sum(up)
+-- .pint.hcl --
+prometheus "prom" {
+    uri = "http://localhost:7225"
+}
+prometheus "prom" {
+    uri = "http://localhost:8225"
+}

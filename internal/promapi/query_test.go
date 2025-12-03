@@ -95,6 +95,14 @@ func TestQuery(t *testing.T) {
 					"errorType":"execution",
 					"error":"query processing would load too many samples into memory in query execution"
 				}`))
+		case "apiError":
+			w.WriteHeader(http.StatusOK)
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(`{"status":"error","errorType":"bad_data","error":"custom error message"}`))
+		case "badJson":
+			w.WriteHeader(http.StatusOK)
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(`{"status":"success","data":{"resultType"}}`))
 		case "stats":
 			w.WriteHeader(http.StatusOK)
 			w.Header().Set("Content-Type", "application/json")
@@ -240,6 +248,16 @@ func TestQuery(t *testing.T) {
 					},
 				},
 			},
+		},
+		{
+			query:   "apiError",
+			timeout: time.Second,
+			err:     "bad_data: custom error message",
+		},
+		{
+			query:   "badJson",
+			timeout: time.Second,
+			err:     "bad_response: JSON parse error: invalid character '}' after object key",
 		},
 	}
 

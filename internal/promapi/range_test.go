@@ -551,6 +551,32 @@ func TestRange(t *testing.T) {
 			},
 		},
 		{
+			query:   "apiError",
+			start:   timeParse("2022-06-14T00:00:00Z"),
+			end:     timeParse("2022-06-14T00:01:00Z"),
+			step:    time.Minute,
+			timeout: time.Second,
+			err:     "bad_data: custom error message",
+			handler: func(_ *testing.T, w http.ResponseWriter, _ *http.Request) {
+				w.WriteHeader(http.StatusOK)
+				w.Header().Set("Content-Type", "application/json")
+				_, _ = w.Write([]byte(`{"status":"error","errorType":"bad_data","error":"custom error message"}`))
+			},
+		},
+		{
+			query:   "badJson",
+			start:   timeParse("2022-06-14T00:00:00Z"),
+			end:     timeParse("2022-06-14T00:01:00Z"),
+			step:    time.Minute,
+			timeout: time.Second,
+			err:     "bad_response: JSON parse error: invalid character '}' after object key",
+			handler: func(_ *testing.T, w http.ResponseWriter, _ *http.Request) {
+				w.WriteHeader(http.StatusOK)
+				w.Header().Set("Content-Type", "application/json")
+				_, _ = w.Write([]byte(`{"status":"success","data":{"resultType"}}`))
+			},
+		},
+		{
 			query:   "vector",
 			start:   timeParse("2022-06-14T00:00:00Z"),
 			end:     timeParse("2022-06-14T00:05:00Z"),

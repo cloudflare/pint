@@ -1,0 +1,14 @@
+! exec pint --no-color watch --listen=127.0.0.1:6227 --pidfile=nonexistent/pint.pid glob rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=INFO msg="Loading configuration file" path=.pint.hcl
+level=ERROR msg="Execution completed with error(s)" err="open nonexistent/pint.pid: no such file or directory"
+-- rules/0001.yml --
+groups:
+- name: foo
+  rules:
+  - record: sum:up
+    expr: sum(up)
+-- .pint.hcl --

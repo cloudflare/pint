@@ -41,6 +41,10 @@ func TestFlags(t *testing.T) {
 			w.WriteHeader(http.StatusOK)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{"status":"success","data":{"xxx"}}`))
+		case "/apiError" + promapi.APIPathFlags:
+			w.WriteHeader(http.StatusOK)
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(`{"status":"error","errorType":"bad_data","error":"custom error message"}`))
 		default:
 			w.WriteHeader(http.StatusBadRequest)
 			w.Header().Set("Content-Type", "application/json")
@@ -87,6 +91,11 @@ func TestFlags(t *testing.T) {
 			prefix:  "/badYaml",
 			timeout: time.Second,
 			err:     `bad_response: JSON parse error: expected colon after object key`,
+		},
+		{
+			prefix:  "/apiError",
+			timeout: time.Second,
+			err:     `bad_data: custom error message`,
 		},
 	}
 

@@ -1,0 +1,19 @@
+exec bash -x ./test.sh &
+
+exec pint --no-color watch --interval=5s --listen=127.0.0.1:6229 --pidfile=pint.pid glob rules
+
+cmp health.txt health
+
+-- health --
+OK
+-- test.sh --
+sleep 3
+curl -so health.txt http://127.0.0.1:6229/health
+cat pint.pid | xargs kill
+
+-- rules/0001.yml --
+groups:
+- name: foo
+  rules:
+  - record: sum:up
+    expr: sum(up)

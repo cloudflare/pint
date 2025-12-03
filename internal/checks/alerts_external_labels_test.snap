@@ -85,6 +85,16 @@
 
 ---
 
+[TestAlertsExternalLabelsCountCheck/invalid_template_syntax_in_annotation - 1]
+[]
+
+---
+
+[TestAlertsExternalLabelsCountCheck/invalid_template_syntax_in_label - 1]
+[]
+
+---
+
 [TestAlertsExternalLabelsCountCheck/no_cluster_label - 1]
 - description: no cluster label
   content: |4

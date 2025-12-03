@@ -68,7 +68,7 @@ func RemoveConditions(source string) promParser.Node {
 		n.Expr = RemoveConditions(n.Expr.String()).(promParser.Expr)
 		return n
 	case *promParser.StepInvariantExpr:
-		n.Expr = RemoveConditions(n.Expr.String()).(promParser.Expr)
+		// Not possible to get this from the parser.
 		return n
 	case *promParser.NumberLiteral, *promParser.StringLiteral, *promParser.VectorSelector, *promParser.MatrixSelector:
 		return node

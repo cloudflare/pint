@@ -35,6 +35,29 @@ import (
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
+func TestSeverityString(t *testing.T) {
+	type testCaseT struct {
+		output   string
+		severity checks.Severity
+	}
+
+	testCases := []testCaseT{
+		{severity: checks.Information, output: "Information"},
+		{severity: checks.Warning, output: "Warning"},
+		{severity: checks.Bug, output: "Bug"},
+		{severity: checks.Fatal, output: "Fatal"},
+		{severity: checks.Severity(100), output: "Unknown"},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.output, func(t *testing.T) {
+			if tc.severity.String() != tc.output {
+				t.Fatalf("Severity.String() returned %q, expected %q", tc.severity.String(), tc.output)
+			}
+		})
+	}
+}
+
 func TestParseSeverity(t *testing.T) {
 	type testCaseT struct {
 		input       string
@@ -43,12 +66,12 @@ func TestParseSeverity(t *testing.T) {
 	}
 
 	testCases := []testCaseT{
-		{"xxx", "", true},
-		{"Bug", "", true},
-		{"fatal", "Fatal", false},
-		{"bug", "Bug", false},
-		{"info", "Information", false},
-		{"warning", "Warning", false},
+		{input: "xxx", output: "", shouldError: true},
+		{input: "Bug", output: "", shouldError: true},
+		{input: "fatal", output: "Fatal", shouldError: false},
+		{input: "bug", output: "Bug", shouldError: false},
+		{input: "info", output: "Information", shouldError: false},
+		{input: "warning", output: "Warning", shouldError: false},
 	}
 
 	for _, tc := range testCases {

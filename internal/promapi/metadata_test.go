@@ -54,6 +54,14 @@ func TestMetadata(t *testing.T) {
 		case "error":
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte("fake error\n"))
+		case "apiError":
+			w.WriteHeader(http.StatusOK)
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(`{"status":"error","errorType":"bad_data","error":"custom error message"}`))
+		case "badJson":
+			w.WriteHeader(http.StatusOK)
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(`{"status":"success","data":{"gauge"}}`))
 		default:
 			w.WriteHeader(http.StatusBadRequest)
 			w.Header().Set("Content-Type", "application/json")
@@ -119,6 +127,16 @@ func TestMetadata(t *testing.T) {
 				URI:      srv.URL,
 				Metadata: []v1.Metadata{{Type: "gauge", Help: "Text", Unit: ""}},
 			},
+		},
+		{
+			metric:  "apiError",
+			timeout: time.Second,
+			err:     "bad_data: custom error message",
+		},
+		{
+			metric:  "badJson",
+			timeout: time.Second,
+			err:     "bad_response: JSON parse error: expected colon after object key",
 		},
 	}
 

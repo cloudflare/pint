@@ -27,6 +27,21 @@ func TestRuleDuplicateCheck(t *testing.T) {
 			prometheus: newSimpleProm,
 		},
 		{
+			description: "ignores removed entries",
+			content:     "- record: foo\n  expr: up == 0\n",
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewRuleDuplicateCheck(prom)
+			},
+			prometheus: newSimpleProm,
+			entries: func() []*discovery.Entry {
+				entries := mustParseContent("- record: foo\n  expr: up == 0\n")
+				for i := range entries {
+					entries[i].State = discovery.Removed
+				}
+				return entries
+			}(),
+		},
+		{
 			description: "ignores entries with path errors",
 			content:     "- record: foo\n  expr: up == 0\n",
 			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
