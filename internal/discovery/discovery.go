@@ -111,7 +111,7 @@ func (e *Entry) Labels() (ym parser.YamlMap) {
 	return ym
 }
 
-func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, allowedOwners []*regexp.Regexp) (entries []*Entry, _ error) {
+func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, allowedOwners []*regexp.Regexp) (entries []*Entry) {
 	file := p.Parse(r)
 
 	contentLines := diags.LineRange{
@@ -176,7 +176,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 			Owner:         fileOwner,
 			ModifiedLines: contentLines.Expand(),
 		})
-		return entries, nil
+		return entries
 	}
 
 	if file.Error.Err != nil {
@@ -195,7 +195,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 			Owner:         fileOwner,
 			ModifiedLines: contentLines.Expand(),
 		})
-		return entries, nil
+		return entries
 	}
 
 	for _, group := range file.Groups {
@@ -265,7 +265,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 	}
 
 	slog.LogAttrs(context.Background(), slog.LevelDebug, "File parsed", slog.String("path", sourcePath), slog.Int("rules", len(entries)))
-	return entries, nil
+	return entries
 }
 
 func isValidOwner(s string, valid []*regexp.Regexp) bool {

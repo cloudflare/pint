@@ -1320,6 +1320,34 @@ groups:
 				},
 			},
 		},
+		{
+			title: "addSymlinkedEntries error",
+			setup: func(t *testing.T) {
+				commitFile(t, "rules.yml", `
+groups:
+- name: v1
+  rules:
+  - record: foo
+    expr: bar
+`, "v1")
+
+				_, err := git.RunGit("checkout", "-b", "v2")
+				require.NoError(t, err, "git checkout v2")
+
+				commitFile(t, "rules.yml", `
+groups:
+- name: v1
+  rules:
+  - record: foo
+    expr: sum(bar)
+`, "v2")
+
+				require.NoError(t, os.Symlink("/nonexistent/path", "broken.yml"))
+			},
+			finder:  discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4, parser.PrometheusSchema, model.UTF8Validation, nil),
+			entries: nil,
+			err:     "broken.yml is a symlink but target file cannot be evaluated: lstat /nonexistent: no such file or directory",
+		},
 	}
 
 	for _, tc := range testCases {

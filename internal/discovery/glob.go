@@ -78,11 +78,7 @@ func (f GlobFinder) Find() (entries []*Entry, err error) {
 			return nil, err
 		}
 		p := parser.NewParser(!f.filter.IsRelaxed(fp.target), f.schema, f.names)
-		el, err := readRules(fp.target, fp.path, fd, p, f.allowedOwners)
-		if err != nil {
-			fd.Close()
-			return nil, fmt.Errorf("invalid file syntax: %w", err)
-		}
+		el := readRules(fp.target, fp.path, fd, p, f.allowedOwners)
 		fd.Close()
 		for _, e := range el {
 			e.State = Noop

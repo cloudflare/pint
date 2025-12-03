@@ -3,8 +3,10 @@ package discovery
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
+	"os"
 	"strings"
 	"testing"
 
@@ -36,7 +38,6 @@ func TestReadRules(t *testing.T) {
 		title        string
 		reportedPath string
 		sourcePath   string
-		err          string
 		entries      []Entry
 		isStrict     bool
 	}
@@ -331,18 +332,223 @@ groups:
 			func(t *testing.T) {
 				r := tc.sourceFunc(t)
 				p := parser.NewParser(tc.isStrict, parser.PrometheusSchema, model.UTF8Validation)
-				entries, err := readRules(tc.reportedPath, tc.sourcePath, r, p, nil)
-				if tc.err != "" {
-					require.EqualError(t, err, tc.err)
-				} else {
-					require.NoError(t, err)
-
-					expected, err := json.MarshalIndent(tc.entries, "", "  ")
-					require.NoError(t, err, "json(expected)")
-					got, err := json.MarshalIndent(entries, "", "  ")
-					require.NoError(t, err, "json(got)")
-					require.Equal(t, string(expected), string(got))
-				}
+				entries := readRules(tc.reportedPath, tc.sourcePath, r, p, nil)
+				expected, err := json.MarshalIndent(tc.entries, "", "  ")
+				require.NoError(t, err, "json(expected)")
+				got, err := json.MarshalIndent(entries, "", "  ")
+				require.NoError(t, err, "json(got)")
+				require.Equal(t, string(expected), string(got))
 			})
+	}
+}
+
+func TestChangeTypeStringDefault(t *testing.T) {
+	c := ChangeType(255)
+	require.Equal(t, "---", c.String())
+}
+
+func TestPathString(t *testing.T) {
+	testCases := []struct {
+		title    string
+		path     Path
+		expected string
+	}{
+		{
+			title:    "no symlink",
+			path:     Path{Name: "rules.yml", SymlinkTarget: "rules.yml"},
+			expected: "rules.yml",
+		},
+		{
+			title:    "with symlink",
+			path:     Path{Name: "link.yml", SymlinkTarget: "rules.yml"},
+			expected: "link.yml ~> rules.yml",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.title, func(t *testing.T) {
+			require.Equal(t, tc.expected, tc.path.String())
+		})
+	}
+}
+
+func TestCommonLines(t *testing.T) {
+	testCases := []struct {
+		title    string
+		a        []int
+		b        []int
+		expected []int
+	}{
+		{
+			title:    "both empty",
+			a:        nil,
+			b:        nil,
+			expected: nil,
+		},
+		{
+			title:    "a empty",
+			a:        nil,
+			b:        []int{1, 2, 3},
+			expected: nil,
+		},
+		{
+			title:    "b empty",
+			a:        []int{1, 2, 3},
+			b:        nil,
+			expected: nil,
+		},
+		{
+			title:    "no overlap",
+			a:        []int{1, 2, 3},
+			b:        []int{4, 5, 6},
+			expected: nil,
+		},
+		{
+			title:    "full overlap same order",
+			a:        []int{1, 2, 3},
+			b:        []int{1, 2, 3},
+			expected: []int{1, 2, 3},
+		},
+		{
+			title:    "partial overlap from a",
+			a:        []int{1, 2, 3},
+			b:        []int{2, 3, 4},
+			expected: []int{2, 3},
+		},
+		{
+			title:    "partial overlap b has extras",
+			a:        []int{2, 3},
+			b:        []int{1, 2, 3, 4},
+			expected: []int{2, 3},
+		},
+		{
+			title:    "b has element in a not yet in common",
+			a:        []int{1, 3},
+			b:        []int{3, 1},
+			expected: []int{1, 3},
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.title, func(t *testing.T) {
+			result := commonLines(tc.a, tc.b)
+			require.Equal(t, tc.expected, result)
+		})
+	}
+}
+
+func TestFindSymlinks(t *testing.T) {
+	testCases := []struct {
+		title   string
+		setup   func(t *testing.T)
+		cleanup func(t *testing.T)
+		err     string
+	}{
+		{
+			title: "walkdir error on unreadable directory",
+			setup: func(t *testing.T) {
+				require.NoError(t, os.Mkdir("noread", 0o000))
+			},
+			cleanup: func(_ *testing.T) {
+				_ = os.Chmod("noread", 0o755)
+			},
+			err: "open noread: permission denied",
+		},
+		{
+			title: "eval symlinks error on broken symlink",
+			setup: func(t *testing.T) {
+				require.NoError(t, os.WriteFile("target.txt", []byte("test"), 0o644))
+				require.NoError(t, os.Symlink("target.txt", "link.txt"))
+				require.NoError(t, os.Remove("target.txt"))
+			},
+			err: "link.txt is a symlink but target file cannot be evaluated: lstat target.txt: no such file or directory",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.title, func(t *testing.T) {
+			t.Chdir(t.TempDir())
+			tc.setup(t)
+			if tc.cleanup != nil {
+				t.Cleanup(func() { tc.cleanup(t) })
+			}
+
+			_, err := findSymlinks()
+			require.EqualError(t, err, tc.err)
+		})
+	}
+}
+
+func TestAddSymlinkedEntries(t *testing.T) {
+	testCases := []struct {
+		setup   func(t *testing.T)
+		title   string
+		err     string
+		entries []*Entry
+	}{
+		{
+			title: "error from findSymlinks",
+			setup: func(t *testing.T) {
+				require.NoError(t, os.Symlink("/nonexistent/path", "broken.yml"))
+			},
+			entries: []*Entry{},
+			err:     "broken.yml is a symlink but target file cannot be evaluated: lstat /nonexistent: no such file or directory",
+		},
+		{
+			title: "skip removed entry",
+			entries: []*Entry{
+				{
+					State: Removed,
+					Path:  Path{Name: "a.yml", SymlinkTarget: "a.yml"},
+				},
+			},
+		},
+		{
+			title: "skip entry with path error",
+			entries: []*Entry{
+				{
+					State:     Noop,
+					Path:      Path{Name: "b.yml", SymlinkTarget: "b.yml"},
+					PathError: errors.New("some error"),
+				},
+			},
+		},
+		{
+			title: "skip entry with rule error",
+			entries: []*Entry{
+				{
+					State: Noop,
+					Path:  Path{Name: "c.yml", SymlinkTarget: "c.yml"},
+					Rule: parser.Rule{
+						Error: parser.ParseError{Err: errors.New("parse error")},
+					},
+				},
+			},
+		},
+		{
+			title: "skip entry that is already a symlink",
+			entries: []*Entry{
+				{
+					State: Noop,
+					Path:  Path{Name: "link.yml", SymlinkTarget: "d.yml"},
+				},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.title, func(t *testing.T) {
+			t.Chdir(t.TempDir())
+			if tc.setup != nil {
+				tc.setup(t)
+			}
+
+			result, err := addSymlinkedEntries(tc.entries)
+			if tc.err != "" {
+				require.EqualError(t, err, tc.err)
+			} else {
+				require.NoError(t, err)
+				require.Empty(t, result)
+			}
+		})
 	}
 }

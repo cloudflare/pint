@@ -20,6 +20,7 @@ import (
 
 func TestGlobPathFinder(t *testing.T) {
 	type testCaseT struct {
+		setup    func(t *testing.T)
 		files    map[string]string
 		symlinks map[string]string
 		err      string
@@ -42,6 +43,35 @@ func TestGlobPathFinder(t *testing.T) {
 			files:  map[string]string{},
 			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, model.UTF8Validation, nil),
 			err:    "no matching files",
+		},
+		{
+			files: map[string]string{
+				".git/config": "test",
+				"bar.yml":     testRuleBody,
+			},
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, []*regexp.Regexp{regexp.MustCompile(".*")}), parser.PrometheusSchema, model.UTF8Validation, nil),
+			entries: []*discovery.Entry{
+				{
+					State: discovery.Noop,
+					Path: discovery.Path{
+						Name:          "bar.yml",
+						SymlinkTarget: "bar.yml",
+					},
+					Rule:          testFile.Groups[0].Rules[0],
+					ModifiedLines: testFile.Groups[0].Rules[0].Lines.Expand(),
+					Owner:         "bob",
+				},
+			},
+		},
+		{
+			files: map[string]string{
+				"bar.yml": testRuleBody,
+			},
+			symlinks: map[string]string{
+				".git": "/nonexistent/target",
+			},
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, model.UTF8Validation, nil),
+			err:    ".git is a symlink but target file cannot be evaluated: lstat /nonexistent: no such file or directory",
 		},
 		{
 			files:  map[string]string{},
@@ -317,6 +347,37 @@ func TestGlobPathFinder(t *testing.T) {
 			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, model.UTF8Validation, nil),
 			err:    "input.yml is a symlink but target file cannot be evaluated: lstat /xx: no such file or directory",
 		},
+		{
+			files: map[string]string{
+				"bar.yml": testRuleBody,
+			},
+			setup: func(_ *testing.T) {
+				_ = os.Chmod("bar.yml", 0o000)
+			},
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, model.UTF8Validation, nil),
+			err:    "open bar.yml: permission denied",
+		},
+		{
+			files: map[string]string{
+				"subdir/bar.yml": testRuleBody,
+			},
+			symlinks: map[string]string{
+				"subdir/broken.yml": "/nonexistent/target",
+			},
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, model.UTF8Validation, nil),
+			err:    "subdir/broken.yml is a symlink but target file cannot be evaluated: lstat /nonexistent: no such file or directory",
+		},
+		{
+			files: map[string]string{
+				"subdir/bar.yml": testRuleBody,
+			},
+			setup: func(t *testing.T) {
+				require.NoError(t, os.Chmod("subdir", 0o000))
+				t.Cleanup(func() { _ = os.Chmod("subdir", 0o755) })
+			},
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, model.UTF8Validation, nil),
+			err:    "open subdir: permission denied",
+		},
 	}
 
 	for i, tc := range testCases {
@@ -338,6 +399,9 @@ func TestGlobPathFinder(t *testing.T) {
 					require.NoError(t, err)
 				}
 				require.NoError(t, os.Symlink(target, symlink))
+			}
+			if tc.setup != nil {
+				tc.setup(t)
 			}
 
 			entries, err := tc.finder.Find()
