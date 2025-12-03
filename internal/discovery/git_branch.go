@@ -68,26 +68,20 @@ func (f GitBranchFinder) Find(allEntries []*Entry) (entries []*Entry, err error)
 	for _, change := range changes {
 		p := parser.NewParser(!f.filter.IsRelaxed(change.Path.Before.Name), f.schema, f.names)
 		var entriesBefore, entriesAfter []*Entry
-		entriesBefore, err = readRules(
+		entriesBefore = readRules(
 			change.Path.Before.EffectivePath(),
 			change.Path.Before.Name,
 			bytes.NewReader(change.Body.Before),
 			p,
 			nil,
 		)
-		if err != nil {
-			slog.LogAttrs(context.Background(), slog.LevelDebug, "Cannot read before rules", slog.String("path", change.Path.Before.Name), slog.Any("err", err))
-		}
-		entriesAfter, err = readRules(
+		entriesAfter = readRules(
 			change.Path.After.EffectivePath(),
 			change.Path.After.Name,
 			bytes.NewReader(change.Body.After),
 			p,
 			f.allowedOwners,
 		)
-		if err != nil {
-			return nil, fmt.Errorf("invalid file syntax: %w", err)
-		}
 
 		failedEntries := entriesWithPathErrors(entriesAfter)
 
@@ -174,6 +168,7 @@ func (f GitBranchFinder) Find(allEntries []*Entry) (entries []*Entry, err error)
 					slog.String("modifiedLines", output.FormatLineRangeString(me.before.ModifiedLines)),
 				)
 			default:
+				// This should never be reached.
 				slog.LogAttrs(context.Background(), slog.LevelWarn,
 					"Unknown rule state",
 					slog.String("state", me.before.State.String()),
