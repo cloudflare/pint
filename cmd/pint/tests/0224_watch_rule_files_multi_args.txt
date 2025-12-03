@@ -1,0 +1,6 @@
+! exec pint --no-color watch --listen=127.0.0.1:6224 rule_files prom1 prom2
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=ERROR msg="Execution completed with error(s)" err="exactly one argument required with the URI of Prometheus server to query"

@@ -1,0 +1,21 @@
+exec bash -x ./test.sh &
+
+mkdir piddir
+exec pint --no-color watch --interval=5s --listen=127.0.0.1:6228 --pidfile=piddir/pint.pid glob rules
+
+stderr 'level=ERROR msg="Failed to remove pidfile" err="open piddir: permission denied" path=piddir/pint.pid'
+
+-- test.sh --
+sleep 3
+PID=$(cat piddir/pint.pid)
+chmod 000 piddir
+kill $PID
+sleep 1
+chmod 755 piddir
+
+-- rules/0001.yml --
+groups:
+- name: foo
+  rules:
+  - record: sum:up
+    expr: sum(up)
