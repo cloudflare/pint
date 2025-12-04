@@ -1028,6 +1028,11 @@
 
 ---
 
+[TestTemplateCheck/annotation_without_labels_reference - 1]
+[]
+
+---
+
 [TestTemplateCheck/bar_*_ignoring(job)_foo - 1]
 - description: bar * ignoring(job) foo
   content: |4
@@ -1328,6 +1333,11 @@
 
 ---
 
+[TestTemplateCheck/humanize1024_passed_to_value - 1]
+[]
+
+---
+
 [TestTemplateCheck/humanizeDuration_passed_to_value - 1]
 []
 
@@ -1550,6 +1560,11 @@
 
 ---
 
+[TestTemplateCheck/label_referencing_single_label_variable - 1]
+[]
+
+---
+
 [TestTemplateCheck/labels_label_from_vector(0) - 1]
 - description: labels label from vector(0)
   content: |
@@ -1733,6 +1748,11 @@
 
 ---
 
+[TestTemplateCheck/no_annotations - 1]
+[]
+
+---
+
 [TestTemplateCheck/no_humanize_on_irate() - 1]
 - description: no humanize on irate()
   content: |4
@@ -1894,6 +1914,11 @@
 ---
 
 [TestTemplateCheck/rate()_but_no_$value - 1]
+[]
+
+---
+
+[TestTemplateCheck/skips_alerting_rule_with_syntax_error - 1]
 []
 
 ---

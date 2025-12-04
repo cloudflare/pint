@@ -297,6 +297,35 @@
 
 ---
 
+[TestFragileCheck/warns_about_bottomk()_as_source_of_series - 1]
+- description: warns about bottomk() as source of series
+  content: |
+    - alert: foo
+      expr: bottomk(10, foo)
+  output: |
+    2 |   expr: bottomk(10, foo)
+                            ^^^ Using `bottomk` to select time series might return different set of time series on every query, which would cause flapping alerts.
+  problem:
+    reporter: promql/fragile
+    summary: fragile query
+    details: |-
+        Alerts are identified by labels, two alerts with identical sets of labels are identical.
+        If two alerts have the same name but the rest of labels isn't 100% identical then they are two different alerts.
+        If the same alert query returns results that over time have different labels on them then previous alert instances will resolve and new alerts will be fired.
+        This can happen when using one of the aggregation operation like topk or bottomk as they can return a different time series each time they are evaluated.
+    diagnostics:
+        - message: Using `bottomk` to select time series might return different set of time series on every query, which would cause flapping alerts.
+          firstcolumn: 13
+          lastcolumn: 15
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
 [TestFragileCheck/warns_about_topk()_as_source_of_series - 1]
 - description: warns about topk() as source of series
   content: |

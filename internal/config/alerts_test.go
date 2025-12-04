@@ -61,6 +61,31 @@ func TestAlertsSettings(t *testing.T) {
 			},
 			err: errors.New("unknown severity: xxx"),
 		},
+		{
+			conf: AlertsSettings{
+				MinCount: -1,
+			},
+			err: errors.New("minCount cannot be < 0, got -1"),
+		},
+		{
+			conf: AlertsSettings{
+				MinCount: 0,
+				Severity: "bug",
+			},
+			err: errors.New(`cannot set serverity to "bug" when minCount is 0`),
+		},
+		{
+			conf: AlertsSettings{
+				MinCount: 5,
+				Severity: "bug",
+			},
+		},
+		{
+			conf: AlertsSettings{
+				MinCount: 0,
+				Severity: "info",
+			},
+		},
 	}
 
 	for _, tc := range testCases {

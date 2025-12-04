@@ -778,6 +778,55 @@ func TestRateCheck(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "rate_over_sum / entry with syntax error in expr",
+			content:     "- alert: my alert\n  expr: rate(my:sum[5m])\n",
+			entries:     mustParseContent("- record: my:sum\n  expr: sum(foo) without(\n"),
+			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
+				},
+				{
+					conds: []requestCondition{
+						requireMetadataPath,
+						formCond{"metric", "my:sum"},
+					},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{}},
+				},
+			},
+		},
+		{
+			description: "rate_over_sum / unknown type",
+			content:     "- alert: my alert\n  expr: rate(my:sum[5m])\n",
+			entries:     mustParseContent("- record: my:sum\n  expr: sum(foo)\n"),
+			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
+				},
+				{
+					conds: []requestCondition{
+						requireMetadataPath,
+						formCond{"metric", "foo"},
+					},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{
+						"foo": {{Type: "unknown"}},
+					}},
+				},
+				{
+					conds: []requestCondition{
+						requireMetadataPath,
+						formCond{"metric", "my:sum"},
+					},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{}},
+				},
+			},
+		},
 	}
 	runTests(t, testCases)
 }

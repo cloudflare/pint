@@ -20,6 +20,12 @@ func TestTemplateCheck(t *testing.T) {
 			prometheus:  noProm,
 		},
 		{
+			description: "skips alerting rule with syntax error",
+			content:     "- alert: foo\n  expr: sum(foo) without(\n",
+			checker:     newTemplateCheck,
+			prometheus:  noProm,
+		},
+		{
 			description: "invalid syntax in annotations",
 			content:     "- alert: Foo Is Down\n  expr: up{job=\"foo\"} == 0\n  annotations:\n    summary: 'Instance {{ $label.instance }} down'\n",
 			checker:     newTemplateCheck,
@@ -947,6 +953,48 @@ func TestTemplateCheck(t *testing.T) {
 			checker:    newTemplateCheck,
 			prometheus: newSimpleProm,
 			problems:   true,
+		},
+		{
+			description: "humanize1024 passed to value",
+			content: `
+- alert: Foo
+  expr: rate(errors[2m]) > 0
+  annotations:
+    summary: "Seeing {{ $value | humanize1024 }} errors"
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+		},
+		{
+			description: "no annotations",
+			content: `
+- alert: Foo
+  expr: rate(errors[2m]) > 0
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+		},
+		{
+			description: "annotation without labels reference",
+			content: `
+- alert: Foo
+  expr: sum by(job) (errors) > 0
+  annotations:
+    summary: "Seeing errors"
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+		},
+		{
+			description: "label referencing single label variable",
+			content: `
+- alert: Foo
+  expr: sum by(job) (errors) > 0
+  labels:
+    foo: "{{ $labels }}"
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
 		},
 	}
 	runTests(t, testCases)

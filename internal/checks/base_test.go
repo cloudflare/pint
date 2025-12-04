@@ -655,6 +655,9 @@ func generateSampleWithValue(labels map[string]string, val float64) *model.Sampl
 }
 
 func generateSampleStream(labels map[string]string, from, until time.Time, step time.Duration) (s *model.SampleStream) {
+	// Truncate to seconds to ensure deterministic results when using time.Now() in tests.
+	from = from.Truncate(time.Second)
+	until = until.Truncate(time.Second)
 	if from.After(until) {
 		panic(fmt.Sprintf("generateSampleStream() got from > until: %s ~ %s", from.UTC().Format(time.RFC3339), until.UTC().Format(time.RFC3339)))
 	}

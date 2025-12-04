@@ -63,6 +63,16 @@ func TestParserSettings(t *testing.T) {
 			},
 			err: errors.New("unsupported parser names: xxx"),
 		},
+		{
+			conf: Parser{
+				Names: NamesLegacy,
+			},
+		},
+		{
+			conf: Parser{
+				Names: NamesUTF8,
+			},
+		},
 	}
 
 	for _, tc := range testCases {

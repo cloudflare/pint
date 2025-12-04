@@ -561,6 +561,16 @@
 
 ---
 
+[TestRateCheck/rate_over_sum_/_entry_with_syntax_error_in_expr - 1]
+[]
+
+---
+
+[TestRateCheck/rate_over_sum_/_unknown_type - 1]
+[]
+
+---
+
 [TestRateCheck/rate_over_sum_error - 1]
 - description: rate_over_sum_error
   content: |

@@ -43,6 +43,15 @@ func TestRuleName(t *testing.T) {
 			},
 			prometheus: noProm,
 		},
+		{
+			description: "recording rule name doesn't match / no comment",
+			content:     "- record: foo\n  expr: sum(foo)\n",
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewRuleNameCheck(checks.MustTemplatedRegexp("total:.+"), "", checks.Warning)
+			},
+			prometheus: noProm,
+			problems:   true,
+		},
 	}
 	runTests(t, testCases)
 }

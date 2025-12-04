@@ -54,6 +54,31 @@
 
 ---
 
+[TestRuleName/recording_rule_name_doesn't_match_/_no_comment - 1]
+- description: recording rule name doesn't match / no comment
+  content: |
+    - record: foo
+      expr: sum(foo)
+  output: |
+    1 | - record: foo
+                  ^^ recording rule name must match `^total:.+$`.
+  problem:
+    reporter: rule/name
+    summary: name not allowed
+    details: ""
+    diagnostics:
+        - message: recording rule name must match `^total:.+$`.
+          firstcolumn: 1
+          lastcolumn: 2
+          kind: 0
+    lines:
+        first: 1
+        last: 1
+    severity: 1
+    anchor: 0
+
+---
+
 [TestRuleName/recording_rule_name_match - 1]
 []
 

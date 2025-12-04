@@ -932,6 +932,21 @@
 
 ---
 
+[TestSeriesCheck/ALERTS_FOR_STATE_without_alertname - 1]
+[]
+
+---
+
+[TestSeriesCheck/ALERTS_with_regex_alertname - 1]
+[]
+
+---
+
+[TestSeriesCheck/ALERTS_without_alertname - 1]
+[]
+
+---
+
 [TestSeriesCheck/__name__=~_shouldn't_run_{foo=bar}_queries - 1]
 - description: __name__=~ shouldn't run {foo=bar} queries
   content: |-

@@ -195,6 +195,31 @@
 
 ---
 
+[TestRegexpCheck/smelly_selector_/_literal_then_plus - 1]
+- description: smelly selector / literal then plus
+  content: |
+    - record: foo
+      expr: foo{job=~"service.+"}
+  output: |
+    2 |   expr: foo{job=~"service.+"}
+                    ^^^^^^^^^^^^^^^^ `{job=~"service.+"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels
+  problem:
+    reporter: promql/regexp
+    summary: smelly regexp selector
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    diagnostics:
+        - message: '`{job=~"service.+"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels'
+          firstcolumn: 5
+          lastcolumn: 20
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
 [TestRegexpCheck/smelly_selector_/_multiple - 1]
 - description: smelly selector / multiple
   content: |4
@@ -564,6 +589,11 @@
         last: 3
     severity: 1
     anchor: 0
+
+---
+
+[TestRegexpCheck/valid_literal_with_prefix_wildcard - 1]
+[]
 
 ---
 

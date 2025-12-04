@@ -49,6 +49,12 @@ func TestCostSettings(t *testing.T) {
 			},
 			err: errors.New(`unknown unit "abc" in duration "1abc"`),
 		},
+		{
+			conf: CostSettings{
+				MaxEvaluationDuration: "5m",
+				Severity:              "warning",
+			},
+		},
 	}
 
 	for _, tc := range testCases {

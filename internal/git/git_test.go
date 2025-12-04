@@ -54,6 +54,47 @@ func TestGitBlame(t *testing.T) {
 		},
 		{
 			mock: func(_ ...string) ([]byte, error) {
+				// Line with less than 3 parts
+				return []byte("abc123 1\n"), nil
+			},
+			shouldError: true,
+		},
+		{
+			mock: func(_ ...string) ([]byte, error) {
+				// Invalid prev line number
+				return []byte("abc123 notanumber 1 1\n"), nil
+			},
+			shouldError: true,
+		},
+		{
+			mock: func(_ ...string) ([]byte, error) {
+				// Invalid line number
+				return []byte("abc123 1 notanumber 1\n"), nil
+			},
+			shouldError: true,
+		},
+		{
+			mock: func(_ ...string) ([]byte, error) {
+				// Test "previous" line prefix (should be skipped)
+				content := "b33a88cea35abc47f9973983626e1c6f3f3abc44 1 1 1\n" +
+					"author Alice Mock\n" +
+					"previous abc123 foo.txt\n" +
+					"filename foo.txt\n" +
+					"\tcontent\n"
+				return []byte(content), nil
+			},
+			path: "foo.txt",
+			output: git.LineBlames{
+				{
+					Filename: "foo.txt",
+					Line:     1,
+					PrevLine: 1,
+					Commit:   "b33a88cea35abc47f9973983626e1c6f3f3abc44",
+				},
+			},
+		},
+		{
+			mock: func(_ ...string) ([]byte, error) {
 				content := blameLine("b33a88cea35abc47f9973983626e1c6f3f3abc44", 1, 1, "foo.txt", "")
 				return []byte(content), nil
 			},
@@ -213,6 +254,44 @@ func TestRunGit(t *testing.T) {
 				require.NoError(t, err)
 				require.Regexp(t, tc.output, string(output))
 			}
+		})
+	}
+}
+
+func TestHeadCommit(t *testing.T) {
+	type testCaseT struct {
+		mock        git.CommandRunner
+		output      string
+		shouldError bool
+	}
+
+	testCases := []testCaseT{
+		{
+			mock: func(_ ...string) ([]byte, error) {
+				return nil, errors.New("mock error")
+			},
+			output:      "",
+			shouldError: true,
+		},
+		{
+			mock: func(_ ...string) ([]byte, error) {
+				return []byte("abc123\n"), nil
+			},
+			output: "abc123",
+		},
+	}
+
+	for i, tc := range testCases {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			output, err := git.HeadCommit(tc.mock)
+
+			hadError := (err != nil)
+			if hadError != tc.shouldError {
+				t.Errorf("git.HeadCommit() returned err=%v, expected=%v", err, tc.shouldError)
+				return
+			}
+
+			require.Equal(t, tc.output, output, "git.HeadCommit() returned wrong output")
 		})
 	}
 }

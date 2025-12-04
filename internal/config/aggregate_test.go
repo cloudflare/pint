@@ -53,6 +53,19 @@ func TestAggregateSettings(t *testing.T) {
 			},
 			err: errors.New("unknown severity: foo"),
 		},
+		{
+			conf: AggregateSettings{
+				Name:  ".+",
+				Strip: []string{"bar"},
+			},
+		},
+		{
+			conf: AggregateSettings{
+				Name:     ".+",
+				Keep:     []string{"foo"},
+				Severity: "warning",
+			},
+		},
 	}
 
 	for _, tc := range testCases {

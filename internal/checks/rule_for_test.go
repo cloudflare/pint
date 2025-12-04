@@ -93,6 +93,24 @@ func TestRuleForCheck(t *testing.T) {
 			prometheus: noProm,
 			problems:   true,
 		},
+		{
+			description: "alerting rule, keep_firing_for:15m, 5m-10m",
+			content:     "- alert: foo\n  keep_firing_for: 15m\n  expr: sum(foo)\n",
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewRuleForCheck(checks.RuleForKeepFiringFor, time.Minute*5, time.Minute*10, "", checks.Warning)
+			},
+			prometheus: noProm,
+			problems:   true,
+		},
+		{
+			description: "alerting rule, no for, 5m-10m",
+			content:     "- alert: foo\n  expr: sum(foo)\n",
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewRuleForCheck(checks.RuleForFor, time.Minute*5, time.Minute*10, "", checks.Warning)
+			},
+			prometheus: noProm,
+			problems:   true,
+		},
 	}
 	runTests(t, testCases)
 }
