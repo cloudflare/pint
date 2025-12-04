@@ -165,3 +165,63 @@ func TestPrometheusConfig(t *testing.T) {
 		})
 	}
 }
+
+func TestTLSConfigToHTTPConfig(t *testing.T) {
+	type testCaseT struct {
+		err  error
+		conf *TLSConfig
+		name string
+	}
+
+	testCases := []testCaseT{
+		{
+			name: "nil config",
+			conf: nil,
+		},
+		{
+			name: "empty config",
+			conf: &TLSConfig{},
+		},
+		{
+			name: "server name only",
+			conf: &TLSConfig{
+				ServerName: "example.com",
+			},
+		},
+		{
+			name: "insecure skip verify",
+			conf: &TLSConfig{
+				InsecureSkipVerify: true,
+			},
+		},
+		{
+			name: "ca cert file not found",
+			conf: &TLSConfig{
+				CaCert: "/nonexistent/path/ca.crt",
+			},
+			err: errors.New("open /nonexistent/path/ca.crt: no such file or directory"),
+		},
+		{
+			name: "client cert file not found",
+			conf: &TLSConfig{
+				ClientCert: "/nonexistent/path/cert.pem",
+				ClientKey:  "/nonexistent/path/key.pem",
+			},
+			err: errors.New("open /nonexistent/path/cert.pem: no such file or directory"),
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			cfg, err := tc.conf.toHTTPConfig()
+			if err == nil || tc.err == nil {
+				require.Equal(t, tc.err, err)
+				if tc.conf == nil {
+					require.Nil(t, cfg)
+				}
+			} else {
+				require.EqualError(t, err, tc.err.Error())
+			}
+		})
+	}
+}

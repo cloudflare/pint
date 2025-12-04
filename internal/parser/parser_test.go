@@ -5126,6 +5126,42 @@ data:
 				IsRelaxed: true,
 			},
 		},
+		{
+			// Test rule with line comment on the mapping node itself
+			input: []byte(`- record: foo # pint disable line comment
+  expr: bar
+`),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 1, Last: 2},
+								Comments: []comments.Comment{
+									{
+										Type:  comments.DisableType,
+										Value: comments.Disable{Match: "line comment"},
+									},
+								},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "foo",
+										Pos:   diags.PositionRanges{{Line: 1, FirstColumn: 11, LastColumn: 13}},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "bar",
+											Pos:   diags.PositionRanges{{Line: 2, FirstColumn: 9, LastColumn: 11}},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	alwaysEqual := cmp.Comparer(func(_, _ any) bool { return true })

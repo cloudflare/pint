@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/cloudflare/pint/internal/checks"
 )
 
 func TestRuleLinkSettings(t *testing.T) {
@@ -66,6 +68,44 @@ func TestRuleLinkSettings(t *testing.T) {
 			} else {
 				require.EqualError(t, err, tc.err.Error())
 			}
+		})
+	}
+}
+
+func TestRuleLinkSettingsGetSeverity(t *testing.T) {
+	type testCaseT struct {
+		conf     RuleLinkSettings
+		fallback checks.Severity
+		expected checks.Severity
+	}
+
+	testCases := []testCaseT{
+		{
+			conf:     RuleLinkSettings{Severity: "bug"},
+			fallback: checks.Warning,
+			expected: checks.Bug,
+		},
+		{
+			conf:     RuleLinkSettings{Severity: "warning"},
+			fallback: checks.Bug,
+			expected: checks.Warning,
+		},
+		{
+			conf:     RuleLinkSettings{},
+			fallback: checks.Bug,
+			expected: checks.Bug,
+		},
+		{
+			conf:     RuleLinkSettings{},
+			fallback: checks.Warning,
+			expected: checks.Warning,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(fmt.Sprintf("%v/%s", tc.conf, tc.fallback), func(t *testing.T) {
+			result := tc.conf.getSeverity(tc.fallback)
+			require.Equal(t, tc.expected, result)
 		})
 	}
 }

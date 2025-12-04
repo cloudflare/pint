@@ -200,3 +200,90 @@ func TestGitHubSettings(t *testing.T) {
 		})
 	}
 }
+
+func TestGitLabSettings(t *testing.T) {
+	type testCaseT struct {
+		err  error
+		conf GitLab
+	}
+
+	testCases := []testCaseT{
+		{
+			conf: GitLab{
+				Project: 123,
+			},
+		},
+		{
+			conf: GitLab{
+				Project:     123,
+				MaxComments: 50,
+			},
+		},
+		{
+			conf: GitLab{
+				Project: 0,
+			},
+			err: errors.New("project must be set"),
+		},
+		{
+			conf: GitLab{
+				Project: -1,
+			},
+			err: errors.New("project must be set"),
+		},
+		{
+			conf: GitLab{
+				Project:     123,
+				MaxComments: -1,
+			},
+			err: errors.New("maxComments cannot be negative"),
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(fmt.Sprintf("%v", tc.conf), func(t *testing.T) {
+			err := tc.conf.validate()
+			if err == nil || tc.err == nil {
+				require.Equal(t, tc.err, err)
+			} else {
+				require.EqualError(t, err, tc.err.Error())
+			}
+		})
+	}
+}
+
+func TestRepositoryValidate(t *testing.T) {
+	type testCaseT struct {
+		err  error
+		conf Repository
+	}
+
+	testCases := []testCaseT{
+		{
+			conf: Repository{
+				GitLab: &GitLab{
+					Project: 123,
+				},
+			},
+		},
+		{
+			conf: Repository{
+				GitLab: &GitLab{
+					Project: 0,
+				},
+			},
+			err: errors.New("project must be set"),
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(fmt.Sprintf("%v", tc.conf), func(t *testing.T) {
+			err := tc.conf.validate()
+			if err == nil || tc.err == nil {
+				require.Equal(t, tc.err, err)
+			} else {
+				require.EqualError(t, err, tc.err.Error())
+			}
+		})
+	}
+}

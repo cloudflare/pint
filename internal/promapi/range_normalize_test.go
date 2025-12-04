@@ -736,3 +736,57 @@ func TestMetricTimeRangeOverlaps(t *testing.T) {
 		})
 	}
 }
+
+func TestMetricTimeRangesString(t *testing.T) {
+	timeParse := func(s string) time.Time {
+		v, err := time.Parse(time.RFC3339, s)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return v.UTC()
+	}
+
+	type testCaseT struct {
+		output string
+		ranges promapi.MetricTimeRanges
+	}
+
+	testCases := []testCaseT{
+		{
+			ranges: promapi.MetricTimeRanges{},
+			output: "",
+		},
+		{
+			ranges: promapi.MetricTimeRanges{
+				{
+					Labels: labels.FromStrings("instance", "foo"),
+					Start:  timeParse("2022-06-14T00:00:00Z"),
+					End:    timeParse("2022-06-14T01:00:00Z"),
+				},
+			},
+			output: `{instance="foo"} 2022-06-14T00:00:00Z > 2022-06-14T01:00:00Z`,
+		},
+		{
+			ranges: promapi.MetricTimeRanges{
+				{
+					Labels: labels.FromStrings("instance", "foo"),
+					Start:  timeParse("2022-06-14T00:00:00Z"),
+					End:    timeParse("2022-06-14T01:00:00Z"),
+				},
+				{
+					Labels: labels.FromStrings("instance", "bar"),
+					Start:  timeParse("2022-06-14T02:00:00Z"),
+					End:    timeParse("2022-06-14T03:00:00Z"),
+				},
+			},
+			output: `{instance="foo"} 2022-06-14T00:00:00Z > 2022-06-14T01:00:00Z ** {instance="bar"} 2022-06-14T02:00:00Z > 2022-06-14T03:00:00Z`,
+		},
+	}
+
+	for i, tc := range testCases {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			result := tc.ranges.String()
+			require.Equal(t, tc.output, result)
+		})
+	}
+}

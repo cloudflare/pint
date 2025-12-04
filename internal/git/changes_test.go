@@ -713,3 +713,230 @@ func TestChanges(t *testing.T) {
 		})
 	}
 }
+
+func TestChangesMocked(t *testing.T) {
+	type testCaseT struct {
+		title   string
+		err     string
+		mock    git.CommandRunner
+		changes []*git.FileChange
+	}
+
+	testCases := []testCaseT{
+		{
+			title: "empty line in git log output",
+			mock: func(args ...string) ([]byte, error) {
+				if args[0] == "log" {
+					// Empty line should trigger len(parts) == 0
+					return []byte("abc123\n\nM\tfile.txt\n"), nil
+				}
+				if args[0] == "ls-tree" {
+					return []byte("100644 blob abc123def456\tfile.txt\n"), nil
+				}
+				if args[0] == "cat-file" {
+					return []byte("content"), nil
+				}
+				if args[0] == "blame" {
+					return []byte("abc123 1 1 1\nfilename file.txt\n\tcontent\n"), nil
+				}
+				return nil, nil
+			},
+			changes: []*git.FileChange{
+				{
+					Commits: []string{"1"},
+					Path: git.PathDiff{
+						Before: git.Path{
+							Name: "file.txt",
+							Type: git.File,
+						},
+						After: git.Path{
+							Name: "file.txt",
+							Type: git.File,
+						},
+					},
+					Body: git.BodyDiff{
+						Before:        []byte("content"),
+						After:         []byte("content"),
+						ModifiedLines: []int{},
+					},
+				},
+			},
+		},
+		{
+			title: "ls-tree malformed line - less than 3 space-separated parts",
+			mock: func(args ...string) ([]byte, error) {
+				if args[0] == "log" {
+					return []byte("abc123\nA\tnewfile.txt\n"), nil
+				}
+				if args[0] == "ls-tree" {
+					// Only 2 parts instead of 3
+					return []byte("100644 blob\n"), nil
+				}
+				if args[0] == "cat-file" {
+					return []byte("content"), nil
+				}
+				if args[0] == "blame" {
+					return []byte("abc123 1 1 1\nfilename newfile.txt\n\tcontent\n"), nil
+				}
+				return nil, nil
+			},
+			changes: []*git.FileChange{
+				{
+					Commits: []string{"1"},
+					Path: git.PathDiff{
+						Before: git.Path{
+							Name: "",
+							Type: git.Missing,
+						},
+						After: git.Path{
+							Name: "newfile.txt",
+							Type: git.Missing,
+						},
+					},
+					Body: git.BodyDiff{
+						Before:        nil,
+						After:         []byte("content"),
+						ModifiedLines: []int{},
+					},
+				},
+			},
+		},
+		{
+			title: "ls-tree line missing tab separator",
+			mock: func(args ...string) ([]byte, error) {
+				if args[0] == "log" {
+					return []byte("abc123\nA\tnewfile.txt\n"), nil
+				}
+				if args[0] == "ls-tree" {
+					// Has 3 space parts but no tab in third part
+					return []byte("100644 blob abc123def456\n"), nil
+				}
+				if args[0] == "cat-file" {
+					return []byte("content"), nil
+				}
+				if args[0] == "blame" {
+					return []byte("abc123 1 1 1\nfilename newfile.txt\n\tcontent\n"), nil
+				}
+				return nil, nil
+			},
+			changes: []*git.FileChange{
+				{
+					Commits: []string{"1"},
+					Path: git.PathDiff{
+						Before: git.Path{
+							Name: "",
+							Type: git.Missing,
+						},
+						After: git.Path{
+							Name: "newfile.txt",
+							Type: git.Missing,
+						},
+					},
+					Body: git.BodyDiff{
+						Before:        nil,
+						After:         []byte("content"),
+						ModifiedLines: []int{},
+					},
+				},
+			},
+		},
+		{
+			title: "ls-tree returns different path",
+			mock: func(args ...string) ([]byte, error) {
+				if args[0] == "log" {
+					return []byte("abc123\nA\tnewfile.txt\n"), nil
+				}
+				if args[0] == "ls-tree" {
+					// Returns a different file path
+					return []byte("100644 blob abc123def456\totherfile.txt\n"), nil
+				}
+				if args[0] == "cat-file" {
+					return []byte("content"), nil
+				}
+				if args[0] == "blame" {
+					return []byte("abc123 1 1 1\nfilename newfile.txt\n\tcontent\n"), nil
+				}
+				return nil, nil
+			},
+			changes: []*git.FileChange{
+				{
+					Commits: []string{"1"},
+					Path: git.PathDiff{
+						Before: git.Path{
+							Name: "",
+							Type: git.Missing,
+						},
+						After: git.Path{
+							Name: "newfile.txt",
+							Type: git.Missing,
+						},
+					},
+					Body: git.BodyDiff{
+						Before:        nil,
+						After:         []byte("content"),
+						ModifiedLines: []int{},
+					},
+				},
+			},
+		},
+		{
+			title: "ls-tree returns tag object type",
+			mock: func(args ...string) ([]byte, error) {
+				if args[0] == "log" {
+					return []byte("abc123\nA\tnewfile.txt\n"), nil
+				}
+				if args[0] == "ls-tree" {
+					// Object type is "tag" not "blob" or "tree"
+					return []byte("100644 tag abc123def456\tnewfile.txt\n"), nil
+				}
+				if args[0] == "cat-file" {
+					return []byte("content"), nil
+				}
+				if args[0] == "blame" {
+					return []byte("abc123 1 1 1\nfilename newfile.txt\n\tcontent\n"), nil
+				}
+				return nil, nil
+			},
+			changes: []*git.FileChange{
+				{
+					Commits: []string{"1"},
+					Path: git.PathDiff{
+						Before: git.Path{
+							Name: "",
+							Type: git.Missing,
+						},
+						After: git.Path{
+							Name: "newfile.txt",
+							Type: git.Missing,
+						},
+					},
+					Body: git.BodyDiff{
+						Before:        nil,
+						After:         []byte("content"),
+						ModifiedLines: []int{},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.title, func(t *testing.T) {
+			slog.SetDefault(slogt.New(t))
+
+			changes, err := git.Changes(tc.mock, "main", git.NewPathFilter(nil, nil, nil))
+			if tc.err != "" {
+				require.EqualError(t, err, tc.err)
+				require.Nil(t, changes)
+			} else {
+				require.NoError(t, err)
+				require.Len(t, changes, len(tc.changes))
+				for i := range tc.changes {
+					require.Len(t, changes[i].Commits, len(tc.changes[i].Commits), "changes[%d].Commits", i)
+					require.Equal(t, tc.changes[i].Path, changes[i].Path, "changes[%d].Path", i)
+					require.Equal(t, tc.changes[i].Body, changes[i].Body, "changes[%d].Body", i)
+				}
+			}
+		})
+	}
+}
