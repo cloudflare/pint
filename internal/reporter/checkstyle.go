@@ -19,14 +19,8 @@ type CheckStyleReporter struct {
 	output io.Writer
 }
 
-type checkstyleReport map[string][]Report
-
-func createCheckstyleReport(summary Summary) checkstyleReport {
-	x := make(checkstyleReport)
-	for _, report := range summary.reports {
-		x[report.Path.Name] = append(x[report.Path.Name], report)
-	}
-	return x
+type checkstyleReport struct {
+	reportsPerPath [][]Report
 }
 
 func (d checkstyleReport) MarshalXML(e *xml.Encoder, _ xml.StartElement) (err error) {
@@ -42,14 +36,17 @@ func (d checkstyleReport) MarshalXML(e *xml.Encoder, _ xml.StartElement) (err er
 	if err != nil {
 		return err
 	}
-	for dir, reports := range d {
+	for _, reports := range d.reportsPerPath {
+		if len(reports) == 0 {
+			continue
+		}
 		if err = e.EncodeToken(
 			xml.StartElement{
 				Name: xml.Name{Local: "file"},
 				Attr: []xml.Attr{
 					{
 						Name:  xml.Name{Local: "name"},
-						Value: dir,
+						Value: reports[0].Path.Name,
 					},
 				},
 			}); err != nil {
@@ -100,8 +97,8 @@ func (r Report) MarshalXML(e *xml.Encoder, _ xml.StartElement) (err error) {
 }
 
 func (cs CheckStyleReporter) Submit(ctx context.Context, summary Summary) error {
-	checkstyleReport := createCheckstyleReport(summary)
-	xmlString, err := xml.MarshalIndent(checkstyleReport, "", "  ")
+	report := checkstyleReport{reportsPerPath: summary.ReportsPerPath()}
+	xmlString, err := xml.MarshalIndent(report, "", "  ")
 	if err != nil {
 		slog.LogAttrs(ctx, slog.LevelError, "Failed to marshal checkstyle report", slog.Any("err", err))
 		return err
