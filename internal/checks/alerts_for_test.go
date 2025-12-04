@@ -67,6 +67,18 @@ func TestAlertsForCheck(t *testing.T) {
 			prometheus:  noProm,
 			problems:    true,
 		},
+		{
+			description: "valid for value",
+			content:     "- alert: foo\n  expr: foo\n  for: 5m\n",
+			checker:     newAlertsForCheck,
+			prometheus:  noProm,
+		},
+		{
+			description: "valid keep_firing_for value",
+			content:     "- alert: foo\n  expr: foo\n  keep_firing_for: 10m\n",
+			checker:     newAlertsForCheck,
+			prometheus:  noProm,
+		},
 	}
 	runTests(t, testCases)
 }

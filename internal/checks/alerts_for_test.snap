@@ -164,3 +164,13 @@
     anchor: 0
 
 ---
+
+[TestAlertsForCheck/valid_for_value - 1]
+[]
+
+---
+
+[TestAlertsForCheck/valid_keep_firing_for_value - 1]
+[]
+
+---

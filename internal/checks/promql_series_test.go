@@ -3740,6 +3740,24 @@ func TestSeriesCheck(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "ALERTS without alertname",
+			content:     "- record: foo\n  expr: count(ALERTS)\n",
+			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
+		},
+		{
+			description: "ALERTS_FOR_STATE without alertname",
+			content:     "- record: foo\n  expr: count(ALERTS_FOR_STATE)\n",
+			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
+		},
+		{
+			description: "ALERTS with regex alertname",
+			content:     "- record: foo\n  expr: count(ALERTS{alertname=~\"my.*\"})\n",
+			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
+		},
 	}
 	runTests(t, testCases)
 }

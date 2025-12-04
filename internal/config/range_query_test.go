@@ -34,6 +34,15 @@ func TestRangeQuerySettings(t *testing.T) {
 			},
 			err: errors.New("unknown severity: bag"),
 		},
+		{
+			conf: RangeQuerySettings{
+				Max:      "1d",
+				Severity: "warning",
+			},
+		},
+		{
+			conf: RangeQuerySettings{},
+		},
 	}
 
 	for _, tc := range testCases {

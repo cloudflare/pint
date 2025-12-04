@@ -53,6 +53,13 @@ func TestFragileCheck(t *testing.T) {
 			problems:    true,
 		},
 		{
+			description: "warns about bottomk() as source of series",
+			content:     "- alert: foo\n  expr: bottomk(10, foo)\n",
+			checker:     newFragileCheck,
+			prometheus:  noProm,
+			problems:    true,
+		},
+		{
 			description: "ignores aggregated topk()",
 			content:     "- alert: foo\n  expr: min(topk(10, foo)) > 5000\n",
 			checker:     newFragileCheck,

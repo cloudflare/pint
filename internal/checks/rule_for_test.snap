@@ -102,8 +102,59 @@
 
 ---
 
+[TestRuleForCheck/alerting_rule,_keep_firing_for:15m,_5m-10m - 1]
+- description: alerting rule, keep_firing_for:15m, 5m-10m
+  content: |
+    - alert: foo
+      keep_firing_for: 15m
+      expr: sum(foo)
+  output: |
+    2 |   keep_firing_for: 15m
+                           ^^^ This alert rule must have a `keep_firing_for` field with a maximum duration of 10m.
+  problem:
+    reporter: rule/for
+    summary: duration too long
+    details: ""
+    diagnostics:
+        - message: This alert rule must have a `keep_firing_for` field with a maximum duration of 10m.
+          firstcolumn: 1
+          lastcolumn: 3
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
 [TestRuleForCheck/alerting_rule,_no_for,_0-0 - 1]
 []
+
+---
+
+[TestRuleForCheck/alerting_rule,_no_for,_5m-10m - 1]
+- description: alerting rule, no for, 5m-10m
+  content: |
+    - alert: foo
+      expr: sum(foo)
+  output: |
+    1 | - alert: foo
+                 ^^^ This alert rule must have a `for` field with a minimum duration of 5m.
+  problem:
+    reporter: rule/for
+    summary: duration required
+    details: ""
+    diagnostics:
+        - message: This alert rule must have a `for` field with a minimum duration of 5m.
+          firstcolumn: 1
+          lastcolumn: 3
+          kind: 0
+    lines:
+        first: 1
+        last: 1
+    severity: 1
+    anchor: 0
 
 ---
 

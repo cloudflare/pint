@@ -248,6 +248,19 @@ func TestRegexpCheck(t *testing.T) {
 			prometheus: noProm,
 			problems:   true,
 		},
+		{
+			description: "valid literal with prefix wildcard",
+			content:     "- record: foo\n  expr: foo{job=~\".*bar\"}\n",
+			checker:     newRegexpCheck,
+			prometheus:  noProm,
+		},
+		{
+			description: "smelly selector / literal then plus",
+			content:     "- record: foo\n  expr: foo{job=~\"service.+\"}\n",
+			checker:     newRegexpCheck,
+			prometheus:  noProm,
+			problems:    true,
+		},
 	}
 	runTests(t, testCases)
 }

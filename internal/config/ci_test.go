@@ -27,6 +27,12 @@ func TestCISettings(t *testing.T) {
 			},
 			err: errors.New("maxCommits cannot be <= 0"),
 		},
+		{
+			conf: CI{
+				MaxCommits: 10,
+				BaseBranch: "main",
+			},
+		},
 	}
 
 	for _, tc := range testCases {
