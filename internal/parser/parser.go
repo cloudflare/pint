@@ -438,6 +438,9 @@ func (p Parser) parseRule(node *yaml.Node, offsetLine, offsetColumn int, content
 					},
 				}, false
 			}
+			// DEAD CODE: model.LabelValue.IsValid() only returns false for invalid UTF-8.
+			// Invalid UTF-8 strings cause YAML parsing to fail first with
+			// "yaml: invalid Unicode character", so this check is never reached.
 			if !model.LabelValue(lab.Value.Value).IsValid() {
 				return Rule{
 					Lines: lines,
@@ -534,6 +537,9 @@ func hasKey(node *yaml.Node, key string) bool {
 }
 
 func hasValue(node *YamlNode) bool {
+	// DEAD CODE: The nil check is unreachable because hasValue is only called
+	// with keyVal (checked for nil before call) or expr.Value (never nil since
+	// newPromQLExpr always creates a struct with non-nil Value via newYamlNode).
 	if node == nil {
 		return false
 	}

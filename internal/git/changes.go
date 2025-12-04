@@ -201,8 +201,8 @@ func Changes(cmd CommandRunner, baseBranch string, filter PathFilter) ([]*FileCh
 		)
 
 		switch {
-		case change.Path.Before.Type != Missing && change.Path.After.Type == Symlink:
-			slog.LogAttrs(context.Background(), slog.LevelDebug, "File was turned into a symlink", slog.String("path", change.Path.After.Name))
+		case change.Path.Before.Type != Missing && change.Path.Before.Type != Symlink && change.Path.After.Type == Symlink:
+			slog.LogAttrs(context.Background(), slog.LevelDebug, "Path was turned into a symlink", slog.String("path", change.Path.After.Name))
 			change.Body.ModifiedLines = CountLines(change.Body.After)
 		case change.Path.Before.Type != Missing && change.Path.After.Type != Missing && change.Path.After.Type != Symlink:
 			change.Body.ModifiedLines, err = getModifiedLines(cmd, change.Commits, change.Path.After.EffectivePath(), lastCommit, change.Body.Before, change.Body.After)

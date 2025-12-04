@@ -7,8 +7,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/go-github/v79/github"
 	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/require"
+
+	"github.com/cloudflare/pint/internal/checks"
 )
 
 func TestGithubReporterDelete(t *testing.T) {
@@ -106,6 +109,96 @@ func TestGithubReporterIsEqual(t *testing.T) {
 			dst := ghPR{files: nil}
 			result := r.IsEqual(dst, tc.existing, tc.pending)
 			require.Equal(t, tc.expected, result)
+		})
+	}
+}
+
+func TestGithubReporterFixCommentLine(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer srv.Close()
+
+	slog.SetDefault(slogt.New(t))
+	r, err := NewGithubReporter(
+		t.Context(),
+		"v0.0.0",
+		srv.URL,
+		srv.URL,
+		time.Second,
+		"token",
+		"owner",
+		"repo",
+		123,
+		50,
+		"HEAD",
+		false,
+	)
+	require.NoError(t, err)
+
+	testCases := []struct {
+		name         string
+		expectedSide string
+		files        []*github.CommitFile
+		pending      PendingComment
+		expectedLine int
+	}{
+		{
+			name: "anchor before returns LEFT side",
+			files: []*github.CommitFile{
+				{
+					Filename: github.Ptr("file.go"),
+					Patch:    github.Ptr("@@ -1,3 +1,4 @@\n line1\n+line2\n line3"),
+				},
+			},
+			pending: PendingComment{
+				path:   "file.go",
+				line:   2,
+				anchor: checks.AnchorBefore,
+			},
+			expectedSide: "LEFT",
+			expectedLine: 1,
+		},
+		{
+			name: "anchor after returns RIGHT side",
+			files: []*github.CommitFile{
+				{
+					Filename: github.Ptr("file.go"),
+					Patch:    github.Ptr("@@ -1,3 +1,4 @@\n line1\n+line2\n line3"),
+				},
+			},
+			pending: PendingComment{
+				path:   "file.go",
+				line:   2,
+				anchor: checks.AnchorAfter,
+			},
+			expectedSide: "RIGHT",
+			expectedLine: 2,
+		},
+		{
+			name: "unmodified line finds first modified",
+			files: []*github.CommitFile{
+				{
+					Filename: github.Ptr("file.go"),
+					Patch:    github.Ptr("@@ -1,3 +1,4 @@\n line1\n+line2\n line3"),
+				},
+			},
+			pending: PendingComment{
+				path:   "file.go",
+				line:   100,
+				anchor: checks.AnchorAfter,
+			},
+			expectedSide: "RIGHT",
+			expectedLine: 2,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			dst := ghPR{files: tc.files}
+			side, line := r.fixCommentLine(dst, tc.pending)
+			require.Equal(t, tc.expectedSide, side)
+			require.Equal(t, tc.expectedLine, line)
 		})
 	}
 }

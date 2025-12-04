@@ -243,6 +243,11 @@ func TestRunGit(t *testing.T) {
 			args: []string{"xxx"},
 			err:  "git: 'xxx' is not a git command. See 'git --help'.\n",
 		},
+		{
+			// config --get with non-existent key exits with 1 but no stderr
+			args: []string{"config", "--get", "nonexistent.key.that.does.not.exist"},
+			err:  "exit status 1",
+		},
 	}
 
 	for _, tc := range testCases {
