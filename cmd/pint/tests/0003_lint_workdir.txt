@@ -6,7 +6,7 @@ cmp stderr stderr.txt
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
-level=INFO msg="Checking Prometheus rules" entries=19 workers=10 online=true
+level=INFO msg="Checking Prometheus rules" entries=20 workers=10 online=true
 Warning: required label is being removed via aggregation (promql/aggregate)
   ---> rules/0001.yml:2 -> `colo_job:fl_cf_html_bytes_in:rate10m`
 2 |   expr: sum(rate(fl_cf_html_bytes_in[10m])) WITHOUT (colo_id, instance, node_type, region, node_status, job, colo_name)
@@ -162,6 +162,9 @@ level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with
 
 - alert: AbsentOverTime
   expr: absent_over_time(foo[5m])
+
+- alert: AbsentVector
+  expr: absent(vector(1))
 
 -- .pint.hcl --
 parser {

@@ -65,6 +65,13 @@ func TestRegexpCheck(t *testing.T) {
 			problems:    true,
 		},
 		{
+			description: "unnecessary regexp with escaped quote",
+			content:     "- record: foo\n  expr: foo{job=~\"foo\\\"bar\"}\n",
+			checker:     newRegexpCheck,
+			prometheus:  noProm,
+			problems:    true,
+		},
+		{
 			description: "empty regexp",
 			content:     "- record: foo\n  expr: foo{job=~\"\"}\n",
 			checker:     newRegexpCheck,

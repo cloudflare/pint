@@ -175,6 +175,12 @@ func TestComparisonCheck(t *testing.T) {
 			prometheus:  noProm,
 			problems:    true,
 		},
+		{
+			description: "alert on absent(vector(1))",
+			content:     "- alert: Foo Is Missing\n  expr: absent(vector(1))\n",
+			checker:     newComparisonCheck,
+			prometheus:  noProm,
+		},
 	}
 
 	runTests(t, testCases)

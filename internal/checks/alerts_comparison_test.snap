@@ -169,6 +169,11 @@
 
 ---
 
+[TestComparisonCheck/alert_on_absent(vector(1)) - 1]
+[]
+
+---
+
 [TestComparisonCheck/alert_on_absent_over_time - 1]
 []
 

@@ -307,8 +307,9 @@ func (dm durationMatch) isMatch(dur time.Duration) bool {
 		return dur >= dm.dur
 	case opMore:
 		return dur > dm.dur
+	default:
+		return false
 	}
-	return false
 }
 
 func stateMatches(states []string, state discovery.ChangeType) bool {

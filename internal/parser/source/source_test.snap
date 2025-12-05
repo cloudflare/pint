@@ -3870,6 +3870,46 @@ output:
 ---
 
 [TestLabelsSource/99 - 1]
+expr: absent(vector(1))
+output:
+    - labels:
+        "":
+            reason: |-
+                The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+                You will only get any results back if the metric selector you pass doesn't match anything.
+                Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+                This means that the only labels you can get back from absent call are the ones you pass to it.
+                If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 6
+      returns: vector
+      operations:
+        - args:
+            - "1"
+          node: '[*parser.Call] vector(1)'
+          op: vector
+        - node: '[*parser.Call] absent(vector(1))'
+          op: absent
+      returnInfo:
+        logicalexpr: ""
+        valueposition:
+            start: 7
+            end: 16
+        returnednumber: 1
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: false
+      position:
+        start: 7
+        end: 16
+      type: function
+      fixedLabels: true
+
+---
+
+[TestLabelsSource/100 - 1]
 expr: absent_over_time(foo[5m]) or absent(bar)
 output:
     - labels:
@@ -3921,7 +3961,7 @@ output:
 
 ---
 
-[TestLabelsSource/100 - 1]
+[TestLabelsSource/101 - 1]
 expr: bar * on() group_right(cluster, env) absent(foo{job="xxx"})
 output:
     - labels:
@@ -3993,7 +4033,7 @@ output:
 
 ---
 
-[TestLabelsSource/101 - 1]
+[TestLabelsSource/102 - 1]
 expr: bar * on() group_right() absent(foo{job="xxx"})
 output:
     - labels:
@@ -4051,7 +4091,7 @@ output:
 
 ---
 
-[TestLabelsSource/102 - 1]
+[TestLabelsSource/103 - 1]
 expr: vector(1)
 output:
     - labels:
@@ -4084,7 +4124,7 @@ output:
 
 ---
 
-[TestLabelsSource/103 - 1]
+[TestLabelsSource/104 - 1]
 expr: vector(scalar(foo))
 output:
     - labels:
@@ -4117,7 +4157,7 @@ output:
 
 ---
 
-[TestLabelsSource/104 - 1]
+[TestLabelsSource/105 - 1]
 expr: vector(0.0  >= bool 0.5) == 1
 output:
     - labels:
@@ -4156,7 +4196,7 @@ output:
 
 ---
 
-[TestLabelsSource/105 - 1]
+[TestLabelsSource/106 - 1]
 expr: sum_over_time(foo{job="myjob"}[5m])
 output:
     - labels:
@@ -4179,7 +4219,7 @@ output:
 
 ---
 
-[TestLabelsSource/106 - 1]
+[TestLabelsSource/107 - 1]
 expr: days_in_month()
 output:
     - labels:
@@ -4210,7 +4250,7 @@ output:
 
 ---
 
-[TestLabelsSource/107 - 1]
+[TestLabelsSource/108 - 1]
 expr: days_in_month(foo{job="foo"})
 output:
     - labels:
@@ -4233,7 +4273,7 @@ output:
 
 ---
 
-[TestLabelsSource/108 - 1]
+[TestLabelsSource/109 - 1]
 expr: label_replace(up{job="api-server",service="a:c"}, "foo", "$1", "service", "(.*):.*")
 output:
     - labels:
@@ -4275,7 +4315,7 @@ output:
 
 ---
 
-[TestLabelsSource/109 - 1]
+[TestLabelsSource/110 - 1]
 expr: label_replace(sum by (pod) (pod_status) > 0, "cluster", "$1", "pod", "(.*)")
 output:
     - labels:
@@ -4327,7 +4367,7 @@ output:
 
 ---
 
-[TestLabelsSource/110 - 1]
+[TestLabelsSource/111 - 1]
 expr: (time() - my_metric) > 5*3600
 output:
     - returns: vector
@@ -4342,7 +4382,7 @@ output:
 
 ---
 
-[TestLabelsSource/111 - 1]
+[TestLabelsSource/112 - 1]
 expr: up{instance="a", job="prometheus"} * ignoring(job) up{instance="a", job="pint"}
 output:
     - labels:
@@ -4406,7 +4446,7 @@ output:
 
 ---
 
-[TestLabelsSource/112 - 1]
+[TestLabelsSource/113 - 1]
 expr: |4
 
     avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"})
@@ -4589,7 +4629,7 @@ output:
 
 ---
 
-[TestLabelsSource/113 - 1]
+[TestLabelsSource/114 - 1]
 expr: label_replace(sum(foo) without(instance), "instance", "none", "", "")
 output:
     - labels:
@@ -4627,7 +4667,7 @@ output:
 
 ---
 
-[TestLabelsSource/114 - 1]
+[TestLabelsSource/115 - 1]
 expr: |4-
 
     sum by (region, target, colo_name) (
@@ -4788,7 +4828,7 @@ output:
 
 ---
 
-[TestLabelsSource/115 - 1]
+[TestLabelsSource/116 - 1]
 expr: vector(1) or foo
 output:
     - labels:
@@ -4834,7 +4874,7 @@ output:
 
 ---
 
-[TestLabelsSource/116 - 1]
+[TestLabelsSource/117 - 1]
 expr: vector(0) > 0
 output:
     - labels:
@@ -4873,7 +4913,7 @@ output:
 
 ---
 
-[TestLabelsSource/117 - 1]
+[TestLabelsSource/118 - 1]
 expr: vector(0) > vector(1)
 output:
     - labels:
@@ -4952,7 +4992,7 @@ output:
 
 ---
 
-[TestLabelsSource/118 - 1]
+[TestLabelsSource/119 - 1]
 expr: sum(foo or vector(0)) > 0
 output:
     - labels:
@@ -5024,7 +5064,7 @@ output:
 
 ---
 
-[TestLabelsSource/119 - 1]
+[TestLabelsSource/120 - 1]
 expr: (sum(foo or vector(1)) > 0) == 2
 output:
     - labels:
@@ -5096,7 +5136,7 @@ output:
 
 ---
 
-[TestLabelsSource/120 - 1]
+[TestLabelsSource/121 - 1]
 expr: (sum(foo or vector(1)) > 0) != 2
 output:
     - labels:
@@ -5163,7 +5203,7 @@ output:
 
 ---
 
-[TestLabelsSource/121 - 1]
+[TestLabelsSource/122 - 1]
 expr: (sum(foo or vector(2)) > 0) != 2
 output:
     - labels:
@@ -5235,7 +5275,7 @@ output:
 
 ---
 
-[TestLabelsSource/122 - 1]
+[TestLabelsSource/123 - 1]
 expr: |-
     (sum(sometimes{foo!="bar"} or vector(0)))
     or
@@ -5363,7 +5403,7 @@ output:
 
 ---
 
-[TestLabelsSource/123 - 1]
+[TestLabelsSource/124 - 1]
 expr: |4-
 
     (
@@ -5554,7 +5594,7 @@ output:
 
 ---
 
-[TestLabelsSource/124 - 1]
+[TestLabelsSource/125 - 1]
 expr: foo offset 5m > 5
 output:
     - returns: vector
@@ -5569,7 +5609,7 @@ output:
 
 ---
 
-[TestLabelsSource/125 - 1]
+[TestLabelsSource/126 - 1]
 expr: |4
 
     (rate(metric2[5m]) or vector(0)) +
@@ -5847,7 +5887,7 @@ output:
 
 ---
 
-[TestLabelsSource/126 - 1]
+[TestLabelsSource/127 - 1]
 expr: label_replace(vector(1), "nexthop_tag", "$1", "nexthop", "(.+)")
 output:
     - labels:
@@ -5895,7 +5935,7 @@ output:
 
 ---
 
-[TestLabelsSource/127 - 1]
+[TestLabelsSource/128 - 1]
 expr: (sum(foo{job="myjob"}))
 output:
     - labels:
@@ -5931,7 +5971,7 @@ output:
 
 ---
 
-[TestLabelsSource/128 - 1]
+[TestLabelsSource/129 - 1]
 expr: (-foo{job="myjob"})
 output:
     - labels:
@@ -5952,7 +5992,7 @@ output:
 
 ---
 
-[TestLabelsSource/129 - 1]
+[TestLabelsSource/130 - 1]
 expr: |4-
 
     ((( group(vector(0)) ))) > 0
@@ -6001,7 +6041,7 @@ output:
 
 ---
 
-[TestLabelsSource/130 - 1]
+[TestLabelsSource/131 - 1]
 expr: 1 > bool 5
 output:
     - labels:
@@ -6035,7 +6075,7 @@ output:
 
 ---
 
-[TestLabelsSource/131 - 1]
+[TestLabelsSource/132 - 1]
 expr: prometheus_ready{job="prometheus"} unless vector(0)
 output:
     - labels:
@@ -6094,7 +6134,7 @@ output:
 
 ---
 
-[TestLabelsSource/132 - 1]
+[TestLabelsSource/133 - 1]
 expr: prometheus_ready{job="prometheus"} unless on() vector(0)
 output:
     - labels:
@@ -6151,7 +6191,7 @@ output:
 
 ---
 
-[TestLabelsSource/133 - 1]
+[TestLabelsSource/134 - 1]
 expr: prometheus_ready{job="prometheus"} unless on(job) vector(0)
 output:
     - labels:
@@ -6211,7 +6251,7 @@ output:
 
 ---
 
-[TestLabelsSource/134 - 1]
+[TestLabelsSource/135 - 1]
 expr: |4
 
     max by (instance, cluster) (cf_node_role{kubernetes_role="master",role="kubernetes"})
@@ -6353,7 +6393,7 @@ output:
 
 ---
 
-[TestLabelsSource/135 - 1]
+[TestLabelsSource/136 - 1]
 expr: foo{a="1"} * on() bar{b="2"}
 output:
     - labels:
@@ -6409,7 +6449,7 @@ output:
 
 ---
 
-[TestLabelsSource/136 - 1]
+[TestLabelsSource/137 - 1]
 expr: foo{a="1"} * on(instance) group_left(c,d) bar{b="2"}
 output:
     - labels:
@@ -6481,7 +6521,7 @@ output:
 
 ---
 
-[TestLabelsSource/137 - 1]
+[TestLabelsSource/138 - 1]
 expr: foo{a="1"} * on(instance) group_right(c,d) bar{b="2"}
 output:
     - labels:
@@ -6553,7 +6593,7 @@ output:
 
 ---
 
-[TestLabelsSource/138 - 1]
+[TestLabelsSource/139 - 1]
 expr: foo{a="1"} * on(instance) sum(bar{b="2"})
 output:
     - labels:
@@ -6638,7 +6678,7 @@ output:
 
 ---
 
-[TestLabelsSource/139 - 1]
+[TestLabelsSource/140 - 1]
 expr: foo{a="1"} * on(instance) group_left(c,d) sum(bar{b="2"})
 output:
     - labels:
@@ -6751,7 +6791,7 @@ output:
 
 ---
 
-[TestLabelsSource/140 - 1]
+[TestLabelsSource/141 - 1]
 expr: sum(foo{a="1"}) * on(instance) group_right(c,d) bar{b="2"}
 output:
     - labels:
@@ -6864,7 +6904,7 @@ output:
 
 ---
 
-[TestLabelsSource/141 - 1]
+[TestLabelsSource/142 - 1]
 expr: foo{a="1"} * on(instance) group_left(c,d) sum(bar{b="2"}) without(instance)
 output:
     - labels:
@@ -6955,7 +6995,7 @@ output:
 
 ---
 
-[TestLabelsSource/142 - 1]
+[TestLabelsSource/143 - 1]
 expr: sum(foo{a="1"}) without(instance) * on(instance) group_right(c,d) bar{b="2"}
 output:
     - labels:
@@ -7046,7 +7086,7 @@ output:
 
 ---
 
-[TestLabelsSource/143 - 1]
+[TestLabelsSource/144 - 1]
 expr: |4
 
      max without (source_instance) (
@@ -7221,7 +7261,7 @@ output:
 
 ---
 
-[TestLabelsSource/144 - 1]
+[TestLabelsSource/145 - 1]
 expr: sum(foo{a="1"}) by(job) * on() bar{b="2"}
 output:
     - labels:
@@ -7285,7 +7325,7 @@ output:
 
 ---
 
-[TestLabelsSource/145 - 1]
+[TestLabelsSource/146 - 1]
 expr: sum(sum(foo) without(job)) by(job)
 output:
     - labels:
@@ -7336,7 +7376,7 @@ output:
 
 ---
 
-[TestLabelsSource/146 - 1]
+[TestLabelsSource/147 - 1]
 expr: |4
 
     prometheus:scrape_series_added:since_gc:sum
@@ -7477,7 +7517,7 @@ output:
 
 ---
 
-[TestLabelsSource/147 - 1]
+[TestLabelsSource/148 - 1]
 expr: (day_of_week() == 6 and hour() < 1) or vector(1)
 output:
     - labels:
@@ -7569,7 +7609,7 @@ output:
 
 ---
 
-[TestLabelsSource/148 - 1]
+[TestLabelsSource/149 - 1]
 expr: |4-
 
     sum by (foo, bar) (
@@ -7679,7 +7719,7 @@ output:
 
 ---
 
-[TestLabelsSource/149 - 1]
+[TestLabelsSource/150 - 1]
 expr: 1 - (foo or vector(0)) < 0.999
 output:
     - returns: vector
@@ -7727,7 +7767,7 @@ output:
 
 ---
 
-[TestLabelsSource/150 - 1]
+[TestLabelsSource/151 - 1]
 expr: |4
 
     (
@@ -7825,7 +7865,7 @@ output:
 
 ---
 
-[TestLabelsSource/151 - 1]
+[TestLabelsSource/152 - 1]
 expr: count by (region) (stddev by (colo_name, region) (error_total))
 output:
     - labels:
@@ -7871,7 +7911,7 @@ output:
 
 ---
 
-[TestLabelsSource/152 - 1]
+[TestLabelsSource/153 - 1]
 expr: |4
 
     (
@@ -9043,7 +9083,7 @@ output:
 
 ---
 
-[TestLabelsSource/153 - 1]
+[TestLabelsSource/154 - 1]
 expr: sum(selector) / sum(selector offset 30m) > 5
 output:
     - labels:
@@ -9105,7 +9145,7 @@ output:
 
 ---
 
-[TestLabelsSource/154 - 1]
+[TestLabelsSource/155 - 1]
 expr: |4-
 
     count by (dc) (
@@ -9204,7 +9244,7 @@ output:
 
 ---
 
-[TestLabelsSource/155 - 1]
+[TestLabelsSource/156 - 1]
 expr: topk(10, prometheus_build_info*prometheus_ready)
 output:
     - labels:
@@ -9244,7 +9284,7 @@ output:
 
 ---
 
-[TestLabelsSource/156 - 1]
+[TestLabelsSource/157 - 1]
 expr: bottomk(10, prometheus_build_info*prometheus_ready)
 output:
     - labels:
@@ -9284,7 +9324,7 @@ output:
 
 ---
 
-[TestLabelsSource/157 - 1]
+[TestLabelsSource/158 - 1]
 expr: histogram_fraction(0, 0.1, metric)
 output:
     - returns: vector
@@ -9303,7 +9343,7 @@ output:
 
 ---
 
-[TestLabelsSource/158 - 1]
+[TestLabelsSource/159 - 1]
 expr: 'foo * foo '
 output:
     - labels:
@@ -9339,7 +9379,7 @@ output:
 
 ---
 
-[TestLabelsSource/159 - 1]
+[TestLabelsSource/160 - 1]
 expr: 'foo + on(__name__, job) foo '
 output:
     - labels:
@@ -9392,7 +9432,7 @@ output:
 
 ---
 
-[TestLabelsSource/160 - 1]
+[TestLabelsSource/161 - 1]
 expr: 'foo + on(__name__, job) group_left foo '
 output:
     - labels:
@@ -9438,7 +9478,7 @@ output:
 
 ---
 
-[TestLabelsSource/161 - 1]
+[TestLabelsSource/162 - 1]
 expr: 'foo + on(__name__, job) group_right foo '
 output:
     - labels:
@@ -9484,7 +9524,7 @@ output:
 
 ---
 
-[TestLabelsSource/162 - 1]
+[TestLabelsSource/163 - 1]
 expr: |-
     group by (env, cluster) (
           up{env="prod", job="foo"} and on (instance) (services_enabled == 999)
@@ -9562,7 +9602,7 @@ output:
 
 ---
 
-[TestLabelsSource/163 - 1]
+[TestLabelsSource/164 - 1]
 expr: |-
     group by (env, cluster) (
           up{env="prod", job="foo"} * on (instance) (services_enabled == 999)
@@ -9660,7 +9700,7 @@ output:
 
 ---
 
-[TestLabelsSource/164 - 1]
+[TestLabelsSource/165 - 1]
 expr: foo / on(instance) sum(bar)
 output:
     - labels:
@@ -9733,7 +9773,7 @@ output:
 
 ---
 
-[TestLabelsSource/165 - 1]
+[TestLabelsSource/166 - 1]
 expr: foo / on(instance) group_left(cluster) sum(bar)
 output:
     - labels:
@@ -9817,7 +9857,7 @@ output:
 
 ---
 
-[TestLabelsSource/166 - 1]
+[TestLabelsSource/167 - 1]
 expr: sum(bar) / on(instance) group_right(cluster) foo
 output:
     - labels:
@@ -9901,7 +9941,7 @@ output:
 
 ---
 
-[TestLabelsSource/167 - 1]
+[TestLabelsSource/168 - 1]
 expr: sum(bar) * on(cluster) sum(foo)
 output:
     - labels:
@@ -9982,7 +10022,7 @@ output:
 
 ---
 
-[TestLabelsSource/168 - 1]
+[TestLabelsSource/169 - 1]
 expr: |4-
 
     group by (colo_name, instance, tier, animal, brand, sliver, pop_name) (
@@ -10252,7 +10292,7 @@ output:
 
 ---
 
-[TestLabelsSource/169 - 1]
+[TestLabelsSource/170 - 1]
 expr: |4
 
     up{node_status="v", job="node_exporter"}
@@ -10363,7 +10403,7 @@ output:
 
 ---
 
-[TestLabelsSource/170 - 1]
+[TestLabelsSource/171 - 1]
 expr: |4
 
     up{node_status="v", job="node_exporter"}
@@ -10480,7 +10520,7 @@ output:
 
 ---
 
-[TestLabelsSource/171 - 1]
+[TestLabelsSource/172 - 1]
 expr: |4
 
     colo_metadata{colo_status="v"} * on (colo_name) group_right(tier, animal, brand, pop_name)
@@ -10696,7 +10736,7 @@ output:
 
 ---
 
-[TestLabelsSource/172 - 1]
+[TestLabelsSource/173 - 1]
 expr: |4
 
     colo_metadata{colo_status="v"} * on (colo_name) group_right(tier, animal, brand, pop_name)
@@ -10921,7 +10961,7 @@ output:
 
 ---
 
-[TestLabelsSource/173 - 1]
+[TestLabelsSource/174 - 1]
 expr: |4
 
     sliver_metadata{node_status="v"} * on (instance) group_right (sliver)
@@ -11042,7 +11082,7 @@ output:
 
 ---
 
-[TestLabelsSource/174 - 1]
+[TestLabelsSource/175 - 1]
 expr: |4
 
     colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
@@ -11198,7 +11238,7 @@ output:
 
 ---
 
-[TestLabelsSource/175 - 1]
+[TestLabelsSource/176 - 1]
 expr: |4
 
     colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
@@ -11306,7 +11346,7 @@ output:
 
 ---
 
-[TestLabelsSource/176 - 1]
+[TestLabelsSource/177 - 1]
 expr: |4
 
     up{node_status="v", job="node_exporter"}
@@ -11378,7 +11418,7 @@ output:
 
 ---
 
-[TestLabelsSource/177 - 1]
+[TestLabelsSource/178 - 1]
 expr: services_enabled{job=""}
 output:
     - labels:
@@ -11399,7 +11439,7 @@ output:
 
 ---
 
-[TestLabelsSource/178 - 1]
+[TestLabelsSource/179 - 1]
 expr: |4
 
     group by (cluster, namespace, workload, workload_type, pod) (
@@ -11603,7 +11643,7 @@ output:
 
 ---
 
-[TestLabelsSource/179 - 1]
+[TestLabelsSource/180 - 1]
 expr: foo{job="xxx"} + on(job) group_right(instance) bar{}
 output:
     - labels:
@@ -11662,7 +11702,7 @@ output:
 
 ---
 
-[TestLabelsSource/180 - 1]
+[TestLabelsSource/181 - 1]
 expr: foo{job="xxx"} + ignoring(job) group_right(instance) bar{job="zzz"}
 output:
     - labels:
@@ -11721,7 +11761,7 @@ output:
 
 ---
 
-[TestLabelsSource/181 - 1]
+[TestLabelsSource/182 - 1]
 expr: foo or ignoring(job) bar
 output:
     - returns: vector
@@ -11743,7 +11783,7 @@ output:
 
 ---
 
-[TestLabelsSource/182 - 1]
+[TestLabelsSource/183 - 1]
 expr: foo or on(job) bar
 output:
     - labels:

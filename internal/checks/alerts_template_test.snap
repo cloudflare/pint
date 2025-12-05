@@ -1918,6 +1918,34 @@
 
 ---
 
+[TestTemplateCheck/rate()_with_$value_but_invalid_template_syntax - 1]
+- description: rate() with $value but invalid template syntax
+  content: |4
+
+    - alert: Foo
+      expr: rate(errors[2m]) > 0
+      annotations:
+        summary: "Seeing {{ $value"
+  output: |
+    5 |     summary: "Seeing {{ $value"
+                      ^^^^^^^^^^^^^^^^ Template failed to parse with this error: `unclosed action`.
+  problem:
+    reporter: alerts/template
+    summary: template syntax error
+    details: Supported template syntax is documented [here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#templating).
+    diagnostics:
+        - message: 'Template failed to parse with this error: `unclosed action`.'
+          firstcolumn: 1
+          lastcolumn: 16
+          kind: 0
+    lines:
+        first: 5
+        last: 5
+    severity: 3
+    anchor: 0
+
+---
+
 [TestTemplateCheck/skips_alerting_rule_with_syntax_error - 1]
 []
 

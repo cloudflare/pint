@@ -167,15 +167,6 @@ func (f GitBranchFinder) Find(allEntries []*Entry) (entries []*Entry, err error)
 					slog.String("ruleLines", me.before.Rule.Lines.String()),
 					slog.String("modifiedLines", output.FormatLineRangeString(me.before.ModifiedLines)),
 				)
-			default:
-				// This should never be reached.
-				slog.LogAttrs(context.Background(), slog.LevelWarn,
-					"Unknown rule state",
-					slog.String("state", me.before.State.String()),
-					slog.String("path", me.before.Path.Name),
-					slog.String("modifiedLines", output.FormatLineRangeString(me.before.ModifiedLines)),
-				)
-				entries = append(entries, me.after)
 			}
 		}
 	}

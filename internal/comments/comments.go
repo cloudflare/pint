@@ -162,11 +162,13 @@ func parseSnooze(s string) (snz Snooze, err error) {
 }
 
 func parseValue(typ Type, s string, line int) (CommentValue, error) {
+	// nolint:exhaustive
 	switch typ {
 	case IgnoreFileType, IgnoreLineType, IgnoreBeginType, IgnoreEndType, IgnoreNextLineType:
 		if s != "" {
 			return nil, fmt.Errorf("unexpected comment suffix: %q", s)
 		}
+		return nil, nil
 	case FileOwnerType:
 		if s == "" {
 			return nil, fmt.Errorf("missing %s value", FileOwnerComment)
@@ -203,9 +205,12 @@ func parseValue(typ Type, s string, line int) (CommentValue, error) {
 		}
 		return RuleSet{Value: s}, nil
 	case UnknownType, InvalidComment:
-		// pass
+		// these are never passed here
+		return nil, nil
+	default:
+		// this is not reachable
+		return nil, nil
 	}
-	return nil, nil
 }
 
 const (

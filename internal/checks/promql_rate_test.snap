@@ -601,6 +601,11 @@
 
 ---
 
+[TestRateCheck/rate_with_subquery - 1]
+[]
+
+---
+
 [TestRateCheck/sum(rate(sum))_/_sum(rate(sum)) - 1]
 - description: sum(rate(sum)) / sum(rate(sum))
   content: |4

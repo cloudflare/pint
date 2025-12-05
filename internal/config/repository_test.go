@@ -274,6 +274,16 @@ func TestRepositoryValidate(t *testing.T) {
 			},
 			err: errors.New("project must be set"),
 		},
+		{
+			conf: Repository{
+				GitHub: &GitHub{
+					Repo:    "foo",
+					Owner:   "bar",
+					Timeout: "invalid",
+				},
+			},
+			err: errors.New(`not a valid duration string: "invalid"`),
+		},
 	}
 
 	for _, tc := range testCases {

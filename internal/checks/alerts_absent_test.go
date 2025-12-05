@@ -182,6 +182,19 @@ func TestAlertsAbsentCheck(t *testing.T) {
 			},
 			problems: true,
 		},
+		{
+			description: "alert on absent(vector(1))",
+			content:     "- alert: Foo Is Missing\n  expr: absent(vector(1))\n  for: 5m\n",
+			checker:     newAlertsAbsentCheck,
+			prometheus:  newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
+				},
+			},
+			problems: true,
+		},
 	}
 	runTests(t, testCases)
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/require"
 )
 
@@ -224,4 +225,29 @@ func TestTLSConfigToHTTPConfig(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestGenerateStaticDuplicateName(t *testing.T) {
+	cfg := Config{
+		Prometheus: []PrometheusConfig{
+			{
+				Name:      "prom",
+				URI:       "http://localhost:9090",
+				Timeout:   "5s",
+				RateLimit: 100,
+			},
+			{
+				Name:      "prom",
+				URI:       "http://localhost:9091",
+				Timeout:   "5s",
+				RateLimit: 100,
+			},
+		},
+	}
+
+	gen := NewPrometheusGenerator(cfg, prometheus.NewRegistry())
+	defer gen.Stop()
+
+	err := gen.GenerateStatic()
+	require.EqualError(t, err, "Duplicated name for Prometheus server definition: prom")
 }

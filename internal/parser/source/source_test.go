@@ -17,6 +17,7 @@ import (
 	"github.com/cloudflare/pint/internal/parser/source"
 
 	promParser "github.com/prometheus/prometheus/promql/parser"
+	"github.com/prometheus/prometheus/promql/parser/posrange"
 )
 
 func TestMain(t *testing.M) {
@@ -134,6 +135,7 @@ sum(foo:count) by(job) > 20`,
 	`1 + sum(foo) by(notjob)`,
 	`count(node_exporter_build_info) by (instance, version) != ignoring(package,version) group_left(foo) count(deb_package_version) by (instance, version, package)`,
 	`absent(foo) or absent(bar)`,
+	`absent(vector(1))`,
 	`absent_over_time(foo[5m]) or absent(bar)`,
 	`bar * on() group_right(cluster, env) absent(foo{job="xxx"})`,
 	`bar * on() group_right() absent(foo{job="xxx"})`,
@@ -496,6 +498,12 @@ func TestVectorOperation(t *testing.T) {
 func TestDeadLabelKindUnknownString(t *testing.T) {
 	var dl source.DeadLabelKind = 100
 	require.Equal(t, "unknown", dl.String())
+}
+
+func TestFindFuncNamePositionNoMatch(t *testing.T) {
+	within := posrange.PositionRange{Start: 0, End: 8}
+	pos := source.FindFuncNamePosition("sum(foo)", within, "rate")
+	require.Equal(t, within, pos)
 }
 
 func BenchmarkLabelsSource(b *testing.B) {

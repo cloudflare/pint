@@ -203,11 +203,9 @@ func (prom *Prometheus) StartWorkers() {
 func (prom *Prometheus) doRequest(ctx context.Context, method, path string, args url.Values) (*http.Response, error) {
 	u, _ := url.Parse(prom.unsafeURI)
 	u.Path = strings.TrimSuffix(u.Path, "/")
-
-	uri, err := url.JoinPath(u.String(), path)
-	if err != nil {
-		return nil, err
-	}
+	// url.JoinPath only fails if passed u.String() fails to parse with url.Parse()
+	// but we already parsed it above so it can't fail here.
+	uri, _ := url.JoinPath(u.String(), path)
 
 	var body io.Reader
 	if method == http.MethodPost {

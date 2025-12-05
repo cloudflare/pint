@@ -163,6 +163,32 @@
 
 ---
 
+[TestAlertsAbsentCheck/alert_on_absent(vector(1)) - 1]
+- description: alert on absent(vector(1))
+  content: |
+    - alert: Foo Is Missing
+      expr: absent(vector(1))
+      for: 5m
+  output: |
+    2 |   expr: absent(vector(1))
+                ^^^^^^^^^^^^^^^^^ Query passed inside `absent()` will always return some results, so absent will never return anything.
+  problem:
+    reporter: alerts/absent
+    summary: never firing alert
+    details: ""
+    diagnostics:
+        - message: Query passed inside `absent()` will always return some results, so absent will never return anything.
+          firstcolumn: 1
+          lastcolumn: 17
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
 [TestAlertsAbsentCheck/connection_refused - 1]
 - description: connection refused
   content: |

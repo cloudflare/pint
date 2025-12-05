@@ -212,10 +212,8 @@ func (c TemplateCheck) checkHumanizeIsNeeded(expr parser.PromQLExpr, ann *parser
 	if hasHumanize(ann.Value.Value) {
 		return problems
 	}
-	vars, aliases, ok := findTemplateVariables(ann.Key.Value, ann.Value.Value)
-	if !ok {
-		return problems
-	}
+	// parsing always works, if template is broken hasValue would exit early
+	vars, aliases, _ := findTemplateVariables(ann.Key.Value, ann.Value.Value)
 	for _, src := range expr.Source() {
 		call := isRateResult(src)
 		if call != nil {

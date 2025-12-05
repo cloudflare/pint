@@ -495,6 +495,8 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 				Name:          metricName,
 				LabelMatchers: []*labels.Matcher{lm},
 			}
+			// We're checking for a specific label but we need to query using the selector name (if set).
+			// If we don't re-add the name then we'll query too much.
 			addNameSelectorIfNeeded(labelSelector, selector.LabelMatchers)
 			labelSelectorString := labelSelector.String()
 			slog.LogAttrs(ctx, slog.LevelDebug, "Checking if there are historical series matching filter", slog.String("check", c.Reporter()), slog.String("selector", labelSelectorString), slog.String("matcher", lms))
@@ -1213,12 +1215,6 @@ func addNameSelectorIfNeeded(selector *promParser.VectorSelector, matchers []*la
 	if selector.Name != "" {
 		return
 	}
-	for _, lm := range selector.LabelMatchers {
-		if lm.Name == model.MetricNameLabel {
-			return
-		}
-	}
-
 	for _, lm := range matchers {
 		if lm.Name == model.MetricNameLabel {
 			selector.LabelMatchers = append(selector.LabelMatchers, lm)

@@ -1287,6 +1287,11 @@
 
 ---
 
+[TestSeriesCheck/duplicate_label_matchers - 1]
+[]
+
+---
+
 [TestSeriesCheck/expanding_series:_context_deadline_exceeded - 1]
 - description: 'expanding series: context deadline exceeded'
   content: |
@@ -1329,6 +1334,32 @@
 
 [TestSeriesCheck/label_replace() - 1]
 []
+
+---
+
+[TestSeriesCheck/metric_missing_/_other_server_query_error - 1]
+- description: metric missing / other server query error
+  content: |4
+
+    - record: foo
+      expr: sum(foo)
+  output: |
+    3 |   expr: sum(foo)
+                    ^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `foo` metric in the last 1w.
+  problem:
+    reporter: promql/series
+    summary: query on nonexistent series
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    diagnostics:
+        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for `foo` metric in the last 1w.'
+          firstcolumn: 5
+          lastcolumn: 7
+          kind: 0
+    lines:
+        first: 3
+        last: 3
+    severity: 2
+    anchor: 0
 
 ---
 

@@ -319,6 +319,7 @@ func (fp FilePath) Discover(ctx context.Context) ([]*promapi.FailoverGroup, erro
 			}
 			path, err = filepath.Rel(fp.Directory, path)
 			if err != nil {
+				// This should never fail since filepath.Rel only really errors on Windows.
 				return fmt.Errorf("filepath discovery error: %w", err)
 			}
 			if fp.isIgnored(path) {
