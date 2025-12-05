@@ -247,11 +247,6 @@ func commonLines(a, b []int) (common []int) {
 			common = append(common, ai)
 		}
 	}
-	for _, bi := range b {
-		if slices.Contains(a, bi) && !slices.Contains(common, bi) {
-			common = append(common, bi)
-		}
-	}
 	return common
 }
 

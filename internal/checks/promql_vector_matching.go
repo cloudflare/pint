@@ -328,9 +328,7 @@ func (ls labelSet) String() string {
 }
 
 func (ls *labelSet) add(n string) {
-	if ls.hasName(n) {
-		return
-	}
+	// Label keys are always unique so we can just append here.
 	ls.names = append(ls.names, n)
 }
 
