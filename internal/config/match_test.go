@@ -203,3 +203,11 @@ func TestDurationMatchIsMatch(t *testing.T) {
 		})
 	}
 }
+
+func TestDurationMatchInvalidOp(t *testing.T) {
+	dm := durationMatch{
+		op:  "invalid",
+		dur: time.Minute,
+	}
+	require.False(t, dm.isMatch(time.Minute))
+}

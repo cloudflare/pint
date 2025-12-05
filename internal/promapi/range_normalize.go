@@ -22,109 +22,35 @@ type MetricTimeRange struct {
 }
 
 func Overlaps(a, b MetricTimeRange, step time.Duration) (c TimeRange, ok bool) {
-	// 0. Different labels
+	// Different labels cannot overlap.
 	if a.Fingerprint != b.Fingerprint {
 		return c, false
 	}
 
-	// 1. Equal (within step)
-	//    [s1 e1]
-	//    [s2 e2]
-	if a.Start.Sub(b.Start).Abs() <= step && a.End.Sub(b.End).Abs() <= step {
-		if a.Start.Before(b.Start) {
-			c.Start = a.Start
-		} else {
-			c.Start = b.Start
-		}
-		if a.End.After(b.End) {
-			c.End = a.End
-		} else {
-			c.End = b.End
-		}
-		return c, true
+	// Ranges can be merged if they overlap or the gap between them is <= step.
+	// If a ends before b starts, gap = b.Start - a.End.
+	// If b ends before a starts, gap = a.Start - b.End.
+	// Otherwise they overlap (gap <= 0).
+	if a.End.Before(b.Start) && b.Start.Sub(a.End) > step {
+		return c, false
+	}
+	if b.End.Before(a.Start) && a.Start.Sub(b.End) > step {
+		return c, false
 	}
 
-	// 2. Overlap e1 and s2
-	//    [s1 e1]
-	//      [s2 es2]
-	if a.Start.Before(b.Start) && a.End.After(b.Start) && a.End.Before(b.End) {
+	// Ranges can be merged - return their union.
+	if a.Start.Before(b.Start) {
 		c.Start = a.Start
-		c.End = b.End
-		return c, true
-	}
-
-	// 3. Overlap e2 and s1
-	//      [s1 e2]
-	//    [s2 e2]
-	if a.Start.After(b.Start) && a.Start.Before(b.End) && a.End.After(b.End) {
+	} else {
 		c.Start = b.Start
-		c.End = a.End
-		return c, true
 	}
-
-	// 4. s2 continues e1
-	//    [s1 e1]
-	//           [s2 e2]
-	if a.Start.Before(b.Start) && a.End.Before(b.End) && a.End.Sub(b.Start).Abs() <= step {
-		c.Start = a.Start
+	if a.End.After(b.End) {
+		c.End = a.End
+	} else {
 		c.End = b.End
-		return c, true
 	}
 
-	// 5. s1 continues e2
-	//           [s1 e1]
-	//    [s2 e2]
-	if a.Start.After(b.Start) && a.End.After(b.End) && a.Start.Sub(b.End).Abs() <= step {
-		c.Start = b.Start
-		c.End = a.End
-		return c, true
-	}
-
-	// 6. Second range fully included in first range
-	//    [s1     e1]
-	//      [s2 e2]
-	if a.Start.Before(b.Start) && a.End.After(b.End) {
-		c.Start = a.Start
-		c.End = a.End
-		return c, true
-	}
-
-	// 7. Second range included in first range (start aligned)
-	//    [s1   e1]
-	//    [s2 e2]
-	if a.Start.Sub(b.Start).Abs() <= step && a.End.After(b.End) {
-		if a.Start.Before(b.Start) {
-			c.Start = a.Start
-		} else {
-			c.Start = b.Start
-		}
-		c.End = a.End
-		return c, true
-	}
-
-	// 8. Second range included in first range (end aligned)
-	//    [s1   e1]
-	//      [s2 e2]
-	if a.Start.Before(b.Start) && a.End.Sub(b.End).Abs() <= step {
-		c.Start = a.Start
-		if a.End.After(b.End) {
-			c.End = a.End
-		} else {
-			c.End = b.End
-		}
-		return c, true
-	}
-
-	// 9. First range fully included in second range
-	//      [s1 e1]
-	//    [s2     e2]
-	if a.Start.After(b.Start) && a.End.Before(b.End) {
-		c.Start = b.Start
-		c.End = b.End
-		return c, true
-	}
-
-	return c, false
+	return c, true
 }
 
 type MetricTimeRanges []MetricTimeRange

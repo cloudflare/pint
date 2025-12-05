@@ -93,15 +93,36 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, entry *discovery.Entry, _ 
 			return problems
 		}
 		forVal = time.Duration(forDur)
-		if forVal >= cfg.Config.Global.ScrapeInterval*2 {
-			return problems
-		}
 	}
 
 	for _, s := range absentSources {
 		var summary string
 
 		call, _ := source.MostOuterOperation[*promParser.Call](s)
+		if s.ReturnInfo.AlwaysReturns {
+			problems = append(problems, Problem{
+				Anchor:   AnchorAfter,
+				Lines:    entry.Rule.AlertingRule.Expr.Value.Pos.Lines(),
+				Reporter: c.Reporter(),
+				Summary:  "never firing alert",
+				Details:  "",
+				Severity: Warning,
+				Diagnostics: []diags.Diagnostic{
+					{
+						Message:     "Query passed inside `absent()` will always return some results, so absent will never return anything.",
+						Pos:         entry.Rule.AlertingRule.Expr.Value.Pos,
+						FirstColumn: int(call.PosRange.Start) + 1,
+						LastColumn:  int(call.PosRange.End),
+						Kind:        diags.Issue,
+					},
+				},
+			})
+		}
+
+		if forVal >= cfg.Config.Global.ScrapeInterval*2 {
+			continue
+		}
+
 		dgs := []diags.Diagnostic{
 			{
 				Message:     "Using `absent()` might cause false positive alerts when Prometheus restarts.",

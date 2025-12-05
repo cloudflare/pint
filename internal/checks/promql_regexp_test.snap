@@ -425,6 +425,31 @@
 
 ---
 
+[TestRegexpCheck/unnecessary_regexp_with_escaped_quote - 1]
+- description: unnecessary regexp with escaped quote
+  content: |
+    - record: foo
+      expr: foo{job=~"foo\"bar"}
+  output: |
+    2 |   expr: foo{job=~"foo\"bar"}
+                ^^^^^^^^^^^^^^^^^^^^ Unnecessary regexp match on static string `job=~"foo\"bar"`, use `job="foo\"bar"` instead.
+  problem:
+    reporter: promql/regexp
+    summary: redundant regexp
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    diagnostics:
+        - message: Unnecessary regexp match on static string `job=~"foo\"bar"`, use `job="foo\"bar"` instead.
+          firstcolumn: 1
+          lastcolumn: 21
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
 [TestRegexpCheck/unnecessary_wildcard_regexp - 1]
 - description: unnecessary wildcard regexp
   content: |

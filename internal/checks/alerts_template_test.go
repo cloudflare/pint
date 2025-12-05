@@ -389,6 +389,18 @@ func TestTemplateCheck(t *testing.T) {
 			prometheus: noProm,
 		},
 		{
+			description: "rate() with $value but invalid template syntax",
+			content: `
+- alert: Foo
+  expr: rate(errors[2m]) > 0
+  annotations:
+    summary: "Seeing {{ $value"
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   true,
+		},
+		{
 			description: "humanize passed to value",
 			content: `
 - alert: Foo

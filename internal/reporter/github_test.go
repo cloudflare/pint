@@ -1223,3 +1223,63 @@ Below is the list of checks that were disabled for each Prometheus server define
 		})
 	}
 }
+
+func TestNewGithubReporterEnterpriseURLError(t *testing.T) {
+	slog.SetDefault(slogt.New(t))
+	// Invalid URL scheme should cause WithEnterpriseURLs to fail
+	_, err := reporter.NewGithubReporter(
+		t.Context(),
+		"v0.0.0",
+		"://invalid",
+		"://invalid",
+		time.Second,
+		"token",
+		"owner",
+		"repo",
+		123,
+		50,
+		"HEAD",
+		false,
+	)
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "creating new GitHub client")
+}
+
+func TestGithubReporterListSkipsGeneralComments(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/api/v3/repos/owner/repo/pulls/123/comments" {
+			// Return a mix of file comments and general comments (empty path)
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(`[
+				{"id": 1, "path": "file.yml", "body": "file comment", "line": 10},
+				{"id": 2, "path": "", "body": "general comment", "line": 0},
+				{"id": 3, "path": "other.yml", "body": "another file comment", "line": 5}
+			]`))
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer srv.Close()
+
+	slog.SetDefault(slogt.New(t))
+	r, err := reporter.NewGithubReporter(
+		t.Context(),
+		"v0.0.0",
+		srv.URL,
+		srv.URL,
+		time.Second,
+		"token",
+		"owner",
+		"repo",
+		123,
+		50,
+		"HEAD",
+		false,
+	)
+	require.NoError(t, err)
+
+	comments, err := r.List(t.Context(), nil)
+	require.NoError(t, err)
+	// Should only have 2 comments (general comment with empty path skipped)
+	require.Len(t, comments, 2)
+}

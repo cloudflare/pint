@@ -536,8 +536,8 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 	case *promParser.UnaryExpr:
 		src = append(src, walkNode(expr, n.Expr)...)
 
-	case *promParser.StepInvariantExpr:
-		// Not possible to get this from the parser.
+	// case *promParser.StepInvariantExpr:
+	// Not possible to get this from the parser.
 
 	case *promParser.VectorSelector:
 		var s Source
@@ -563,9 +563,6 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 		}
 		s.Position = n.PosRange
 		src = append(src, s)
-
-	default:
-		// unhandled type
 	}
 	return src
 }

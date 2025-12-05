@@ -354,6 +354,14 @@ func TestPrometheusTemplateRender(t *testing.T) {
 			data: map[string]string{"bob": "bob"},
 			err:  "clientCert and clientKey must be set together",
 		},
+		{
+			template: PrometheusTemplate{
+				Name: "foo",
+				URI:  "http://{{ .missing }}",
+			},
+			data: map[string]string{"name": "foo"},
+			err:  `bad uri template "http://{{ .missing }}": template: discovery:1:30: executing "discovery" at <.missing>: map has no entry for key "missing"`,
+		},
 	}
 
 	for i, tc := range testCases {

@@ -64,6 +64,18 @@ func TestRateCheck(t *testing.T) {
 			},
 		},
 		{
+			description: "rate with subquery",
+			content:     "- record: foo\n  expr: rate(foo[5m:1m])\n",
+			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
+				},
+			},
+		},
+		{
 			description: "rate == 4x scrape interval",
 			content:     "- record: foo\n  expr: rate(foo[2m])\n",
 			checker:     newRateCheck,

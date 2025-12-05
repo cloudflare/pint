@@ -5162,6 +5162,79 @@ data:
 				},
 			},
 		},
+		{
+			// Test flow mapping with line comment (comment attached to parent node)
+			input: []byte(`- {record: foo, expr: bar} # pint disable flow comment
+`),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 1, Last: 1},
+								Comments: []comments.Comment{
+									{
+										Type:  comments.DisableType,
+										Value: comments.Disable{Match: "flow comment"},
+									},
+								},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "foo",
+										Pos:   diags.PositionRanges{{Line: 1, FirstColumn: 12, LastColumn: 14}},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "bar",
+											Pos:   diags.PositionRanges{{Line: 1, FirstColumn: 23, LastColumn: 25}},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			// Test flow mapping with foot comment (comment attached to parent node's FootComment)
+			input: []byte(`groups:
+- name: test
+  rules:
+  - {record: foo, expr: bar}
+  # pint disable foot comment
+`),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Name: "test",
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 4, Last: 4},
+								Comments: []comments.Comment{
+									{
+										Type:  comments.DisableType,
+										Value: comments.Disable{Match: "foot comment"},
+									},
+								},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "foo",
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "bar",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	alwaysEqual := cmp.Comparer(func(_, _ any) bool { return true })

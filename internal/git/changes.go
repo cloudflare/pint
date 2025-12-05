@@ -81,11 +81,7 @@ func Changes(cmd CommandRunner, baseBranch string, filter PathFilter) ([]*FileCh
 		line := s.Text()
 
 		parts := strings.Split(line, "\t")
-
-		if len(parts) == 0 {
-			continue
-		}
-
+		// Split always returns at least 1 element slice.
 		if len(parts) == 1 {
 			if parts[0] != "" {
 				commit = parts[0]

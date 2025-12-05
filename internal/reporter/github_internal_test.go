@@ -88,6 +88,20 @@ func TestGithubReporterIsEqual(t *testing.T) {
 			expected: false,
 		},
 		{
+			name: "same path, different line",
+			existing: ExistingComment{
+				path: "file.yml",
+				line: 10,
+				text: "comment",
+			},
+			pending: PendingComment{
+				path: "file.yml",
+				line: 20,
+				text: "comment",
+			},
+			expected: false,
+		},
+		{
 			name: "same path, different text",
 			existing: ExistingComment{
 				path: "file.yml",

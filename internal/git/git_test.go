@@ -54,6 +54,14 @@ func TestGitBlame(t *testing.T) {
 		},
 		{
 			mock: func(_ ...string) ([]byte, error) {
+				// Line exceeds scanner buffer size, triggers scanner.Err()
+				longLine := strings.Repeat("a", 65537)
+				return []byte(longLine), nil
+			},
+			shouldError: true,
+		},
+		{
+			mock: func(_ ...string) ([]byte, error) {
 				// Line with less than 3 parts
 				return []byte("abc123 1\n"), nil
 			},

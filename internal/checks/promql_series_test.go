@@ -223,6 +223,18 @@ func TestSeriesCheck(t *testing.T) {
 			},
 		},
 		{
+			description: "duplicate label matchers",
+			content:     "- record: foo\n  expr: found{job=\"a\", job=\"b\"}\n",
+			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireQueryPath},
+					resp:  respondWithSingleInstantVector(),
+				},
+			},
+		},
+		{
 			description: "#1 series present",
 			content:     "- record: foo\n  expr: found > 0\n",
 			checker:     newSeriesCheck,
@@ -3692,6 +3704,51 @@ func TestSeriesCheck(t *testing.T) {
 					conds: []requestCondition{
 						requestPathCond{path: "/other" + promapi.APIPathQuery},
 						formCond{key: "query", value: `foo`},
+					},
+					resp: respondWithInternalError(),
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(\nfoo\n)"},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(\nfoo\n)"},
+					},
+					resp: respondWithEmptyMatrix(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(\nup\n)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
+			},
+		},
+		{
+			description: "metric missing / other server query error",
+			content: `
+- record: foo
+  expr: sum(foo)
+`,
+			checker: newSeriesCheck,
+			otherProms: func(uri string) []*promapi.FailoverGroup {
+				return []*promapi.FailoverGroup{
+					simpleProm("prom1", uri+"/other", time.Second, false),
+				}
+			},
+			prometheus: newSimpleProm,
+			problems:   true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requestPathCond{path: "/other" + promapi.APIPathQuery},
+						formCond{key: "query", value: "count(\nfoo\n)"},
 					},
 					resp: respondWithInternalError(),
 				},
