@@ -1053,18 +1053,19 @@ func matchSelectorToMetric(selector *promParser.VectorSelector, metric string) (
 		// Ignore errors
 		return false, false
 	}
+
 	for _, l := range m {
 		var isMatch bool
 		for _, s := range selector.LabelMatchers {
 			if s.Type == l.Type && s.Name == l.Name && s.Value == l.Value {
-				return true, true
+				isMatch = true
 			}
 		}
 		if !isMatch {
 			return false, true
 		}
 	}
-	return false, true
+	return true, true
 }
 
 func parseRuleSet(s string) (matcher, key, value string) {
@@ -1186,10 +1187,8 @@ func avgLife(ranges []promapi.MetricTimeRange) (d time.Duration) {
 		// to have more round results
 		d += r.End.Sub(r.Start) + time.Second
 	}
-	if len(ranges) == 0 {
-		return time.Duration(0)
-	}
-	return time.Second * time.Duration(int(d.Seconds())/len(ranges))
+	// use max(1, ...) to ensure we never divide by zero
+	return time.Second * time.Duration(int(d.Seconds())/max(len(ranges), 1))
 }
 
 func oldest(ranges []promapi.MetricTimeRange) (ts time.Time) {

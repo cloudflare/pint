@@ -75,7 +75,7 @@ var (
 			t := textTemplate.
 				New(TemplateCheckName).
 				Funcs(templateFuncMap).
-				Option("missingkey=zero")
+				Option(dummyFuncMap("missingkey=zero")) // this is only so that dummyFuncMap is called at least once
 			return t
 		},
 	}
