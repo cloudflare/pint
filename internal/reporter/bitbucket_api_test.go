@@ -972,3 +972,332 @@ func TestBitBucketAPIGetPullRequestComments(t *testing.T) {
 		require.Error(t, err)
 	})
 }
+
+func TestFindPullRequestForBranchErrors(t *testing.T) {
+	slog.SetDefault(slogt.New(t))
+
+	t.Run("returns error on invalid JSON", func(t *testing.T) {
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Path == "/plugins/servlet/applinks/whoami" {
+				w.WriteHeader(http.StatusOK)
+				_, _ = w.Write([]byte(`testuser`))
+				return
+			}
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`invalid json`))
+		}))
+		defer srv.Close()
+
+		bb := bitBucketAPI{
+			uri:       srv.URL,
+			authToken: "test-token",
+			timeout:   time.Second * 5,
+			project:   "proj",
+			repo:      "repo",
+		}
+
+		_, err := bb.findPullRequestForBranch("feature", "commit123")
+		require.Error(t, err)
+	})
+
+	t.Run("paginates through results", func(t *testing.T) {
+		callCount := 0
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Path == "/plugins/servlet/applinks/whoami" {
+				w.WriteHeader(http.StatusOK)
+				_, _ = w.Write([]byte(`testuser`))
+				return
+			}
+			callCount++
+			var prs BitBucketPullRequests
+			if callCount == 1 {
+				prs = BitBucketPullRequests{
+					IsLastPage:    false,
+					NextPageStart: 1,
+					Values: []BitBucketPullRequest{
+						{ID: 1, Open: true, FromRef: BitBucketRef{ID: "refs/heads/other"}, ToRef: BitBucketRef{ID: "refs/heads/main"}},
+					},
+				}
+			} else {
+				prs = BitBucketPullRequests{
+					IsLastPage: true,
+					Values: []BitBucketPullRequest{
+						{ID: 2, Open: true, FromRef: BitBucketRef{ID: "refs/heads/feature", Commit: "abc123"}, ToRef: BitBucketRef{ID: "refs/heads/main", Commit: "def456"}},
+					},
+				}
+			}
+			data, _ := json.Marshal(prs)
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write(data)
+		}))
+		defer srv.Close()
+
+		bb := bitBucketAPI{
+			uri:       srv.URL,
+			authToken: "test-token",
+			timeout:   time.Second * 5,
+			project:   "proj",
+			repo:      "repo",
+		}
+
+		pr, err := bb.findPullRequestForBranch("feature", "commit123")
+		require.NoError(t, err)
+		require.NotNil(t, pr)
+		require.Equal(t, 2, pr.ID)
+		require.Equal(t, 2, callCount)
+	})
+}
+
+func TestGetPullRequestChangesErrors(t *testing.T) {
+	slog.SetDefault(slogt.New(t))
+
+	t.Run("returns error on invalid JSON", func(t *testing.T) {
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Path == "/plugins/servlet/applinks/whoami" {
+				w.WriteHeader(http.StatusOK)
+				_, _ = w.Write([]byte(`testuser`))
+				return
+			}
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`invalid json`))
+		}))
+		defer srv.Close()
+
+		bb := bitBucketAPI{
+			uri:       srv.URL,
+			authToken: "test-token",
+			timeout:   time.Second * 5,
+			project:   "proj",
+			repo:      "repo",
+		}
+
+		pr := &bitBucketPR{ID: 1}
+		_, err := bb.getPullRequestChanges(pr)
+		require.Error(t, err)
+	})
+
+	t.Run("returns error on getFileDiff failure", func(t *testing.T) {
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Path == "/plugins/servlet/applinks/whoami" {
+				w.WriteHeader(http.StatusOK)
+				_, _ = w.Write([]byte(`testuser`))
+				return
+			}
+			if r.URL.Path == "/rest/api/1.0/projects/proj/repos/repo/pull-requests/1/changes" {
+				changes := BitBucketPullRequestChanges{
+					IsLastPage: true,
+					Values:     []BitBucketPullRequestChange{{Path: BitBucketPath{ToString: "file.yaml"}}},
+				}
+				data, _ := json.Marshal(changes)
+				w.WriteHeader(http.StatusOK)
+				_, _ = w.Write(data)
+				return
+			}
+			// getFileDiff request - return error
+			w.WriteHeader(http.StatusInternalServerError)
+		}))
+		defer srv.Close()
+
+		bb := bitBucketAPI{
+			uri:       srv.URL,
+			authToken: "test-token",
+			timeout:   time.Second * 5,
+			project:   "proj",
+			repo:      "repo",
+		}
+
+		pr := &bitBucketPR{ID: 1, srcHead: "abc", dstHead: "def"}
+		_, err := bb.getPullRequestChanges(pr)
+		require.Error(t, err)
+	})
+
+	t.Run("paginates through results", func(t *testing.T) {
+		callCount := 0
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Path == "/plugins/servlet/applinks/whoami" {
+				w.WriteHeader(http.StatusOK)
+				_, _ = w.Write([]byte(`testuser`))
+				return
+			}
+			if r.URL.Path == "/rest/api/1.0/projects/proj/repos/repo/pull-requests/1/changes" {
+				callCount++
+				var changes BitBucketPullRequestChanges
+				if callCount == 1 {
+					changes = BitBucketPullRequestChanges{
+						IsLastPage:    false,
+						NextPageStart: 1,
+						Values:        []BitBucketPullRequestChange{},
+					}
+				} else {
+					changes = BitBucketPullRequestChanges{
+						IsLastPage: true,
+						Values:     []BitBucketPullRequestChange{},
+					}
+				}
+				data, _ := json.Marshal(changes)
+				w.WriteHeader(http.StatusOK)
+				_, _ = w.Write(data)
+				return
+			}
+			w.WriteHeader(http.StatusOK)
+		}))
+		defer srv.Close()
+
+		bb := bitBucketAPI{
+			uri:       srv.URL,
+			authToken: "test-token",
+			timeout:   time.Second * 5,
+			project:   "proj",
+			repo:      "repo",
+		}
+
+		pr := &bitBucketPR{ID: 1, srcHead: "abc", dstHead: "def"}
+		_, err := bb.getPullRequestChanges(pr)
+		require.NoError(t, err)
+		require.Equal(t, 2, callCount)
+	})
+}
+
+func TestGetFileDiffErrors(t *testing.T) {
+	slog.SetDefault(slogt.New(t))
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/plugins/servlet/applinks/whoami" {
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`testuser`))
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`invalid json`))
+	}))
+	defer srv.Close()
+
+	bb := bitBucketAPI{
+		uri:       srv.URL,
+		authToken: "test-token",
+		timeout:   time.Second * 5,
+		project:   "proj",
+		repo:      "repo",
+	}
+
+	pr := &bitBucketPR{ID: 1, srcHead: "abc", dstHead: "def"}
+	_, _, err := bb.getFileDiff(pr, "file.yaml")
+	require.Error(t, err)
+}
+
+func TestBitBucketAPIErrorHandling(t *testing.T) {
+	slog.SetDefault(slogt.New(t))
+
+	type testCaseT struct {
+		run  func(bb bitBucketAPI, pr *bitBucketPR)
+		name string
+	}
+
+	testCases := []testCaseT{
+		{
+			name: "updateSeverity logs error on failure",
+			run: func(bb bitBucketAPI, pr *bitBucketPR) {
+				cur := bitBucketComment{id: 1, version: 1, anchor: BitBucketCommentAnchor{Path: "file.yaml", Line: 10}}
+				bb.updateSeverity(pr, cur, "BLOCKER")
+			},
+		},
+		{
+			name: "resolveTask logs error on failure",
+			run: func(bb bitBucketAPI, pr *bitBucketPR) {
+				cur := bitBucketComment{id: 1, version: 1}
+				bb.resolveTask(pr, cur)
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(_ *testing.T) {
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.URL.Path == "/plugins/servlet/applinks/whoami" {
+					w.WriteHeader(http.StatusOK)
+					_, _ = w.Write([]byte(`testuser`))
+					return
+				}
+				w.WriteHeader(http.StatusInternalServerError)
+			}))
+			defer srv.Close()
+
+			bb := bitBucketAPI{
+				uri:       srv.URL,
+				authToken: "test-token",
+				timeout:   time.Second * 5,
+				project:   "proj",
+				repo:      "repo",
+			}
+
+			pr := &bitBucketPR{ID: 1}
+			tc.run(bb, pr)
+		})
+	}
+}
+
+func TestAddCommentsSkipsDuplicates(t *testing.T) {
+	slog.SetDefault(slogt.New(t))
+
+	addCount := 0
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/plugins/servlet/applinks/whoami" {
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`testuser`))
+			return
+		}
+		if r.Method == http.MethodPost {
+			addCount++
+		}
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{}`))
+	}))
+	defer srv.Close()
+
+	bb := bitBucketAPI{
+		uri:       srv.URL,
+		authToken: "test-token",
+		timeout:   time.Second * 5,
+		project:   "proj",
+		repo:      "repo",
+	}
+
+	pr := &bitBucketPR{ID: 1}
+	currentComments := []bitBucketComment{
+		{
+			id:   1,
+			text: "existing comment",
+			anchor: BitBucketCommentAnchor{
+				Path:     "file.yaml",
+				Line:     10,
+				LineType: "ADDED",
+				DiffType: "EFFECTIVE",
+			},
+		},
+	}
+	pendingComments := []BitBucketPendingComment{
+		{
+			Text: "existing comment",
+			Anchor: BitBucketPendingCommentAnchor{
+				Path:     "file.yaml",
+				Line:     10,
+				LineType: "ADDED",
+				DiffType: "EFFECTIVE",
+			},
+		},
+		{
+			Text: "new comment",
+			Anchor: BitBucketPendingCommentAnchor{
+				Path:     "file.yaml",
+				Line:     20,
+				LineType: "ADDED",
+				DiffType: "EFFECTIVE",
+			},
+		},
+	}
+
+	err := bb.addComments(pr, currentComments, pendingComments)
+	require.NoError(t, err)
+	// Only the new comment should be added, duplicate skipped
+	require.Equal(t, 1, addCount)
+}
