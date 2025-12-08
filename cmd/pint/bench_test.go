@@ -152,7 +152,7 @@ rule {
 	require.NoError(b, err)
 
 	gen := config.NewPrometheusGenerator(cfg, prometheus.NewRegistry())
-	require.NoError(b, gen.GenerateStatic())
+	gen.GenerateStatic()
 
 	b.ResetTimer()
 	for b.Loop() {
@@ -282,7 +282,7 @@ rule {
 	require.NoError(b, err)
 
 	gen := config.NewPrometheusGenerator(cfg, prometheus.NewRegistry())
-	require.NoError(b, gen.GenerateStatic())
+	gen.GenerateStatic()
 
 	b.ResetTimer()
 	for b.Loop() {

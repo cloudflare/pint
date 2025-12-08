@@ -97,10 +97,7 @@ func actionLint(ctx context.Context, c *cli.Command) error {
 
 	gen := config.NewPrometheusGenerator(meta.cfg, metricsRegistry)
 	defer gen.Stop()
-
-	if err = gen.GenerateStatic(); err != nil {
-		return err
-	}
+	gen.GenerateStatic()
 
 	summary, err := checkRules(ctx, meta.workers, meta.isOffline, gen, meta.cfg, entries)
 	if err != nil {

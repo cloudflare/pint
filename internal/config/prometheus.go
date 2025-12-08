@@ -234,12 +234,7 @@ func (pg *PrometheusGenerator) ServerWithName(name string) *promapi.FailoverGrou
 	return nil
 }
 
-func (pg *PrometheusGenerator) addServer(server *promapi.FailoverGroup) error {
-	for _, s := range pg.servers {
-		if s.Name() == server.Name() {
-			return fmt.Errorf("Duplicated name for Prometheus server definition: %s", s.Name()) // nolint: staticcheck
-		}
-	}
+func (pg *PrometheusGenerator) addServer(server *promapi.FailoverGroup) {
 	pg.servers = append(pg.servers, server)
 	slog.LogAttrs(context.Background(), slog.LevelInfo,
 		"Configured new Prometheus server",
@@ -251,17 +246,12 @@ func (pg *PrometheusGenerator) addServer(server *promapi.FailoverGroup) error {
 		slog.Any("exclude", server.Exclude()),
 	)
 	server.StartWorkers(pg.metricsRegistry)
-	return nil
 }
 
-func (pg *PrometheusGenerator) GenerateStatic() (err error) {
+func (pg *PrometheusGenerator) GenerateStatic() {
 	for _, pc := range pg.cfg.Prometheus {
-		err = pg.addServer(newFailoverGroup(pc))
-		if err != nil {
-			return err
-		}
+		pg.addServer(newFailoverGroup(pc))
 	}
-	return nil
 }
 
 func (pg *PrometheusGenerator) GenerateDynamic(ctx context.Context) (err error) {
@@ -271,10 +261,12 @@ func (pg *PrometheusGenerator) GenerateDynamic(ctx context.Context) (err error) 
 			return err
 		}
 		for _, server := range servers {
-			err = pg.addServer(server)
-			if err != nil {
-				return err
+			for _, s := range pg.servers {
+				if s.Name() == server.Name() {
+					return fmt.Errorf("Duplicated name for Prometheus server definition: %s", s.Name()) // nolint: staticcheck
+				}
 			}
+			pg.addServer(server)
 		}
 	}
 	return nil

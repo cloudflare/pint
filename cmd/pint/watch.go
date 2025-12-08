@@ -81,9 +81,7 @@ var watchCmd = &cli.Command{
 				}
 
 				gen := config.NewPrometheusGenerator(meta.cfg, prometheus.NewRegistry())
-				if err = gen.GenerateStatic(); err != nil {
-					return err
-				}
+				gen.GenerateStatic()
 
 				prom := gen.ServerWithName(args[0])
 				if prom == nil {
@@ -206,9 +204,7 @@ func actionWatch(c *cli.Command, meta actionMeta, f pathFinderFunc) error {
 	interval := c.Duration(intervalFlag)
 
 	gen := config.NewPrometheusGenerator(meta.cfg, metricsRegistry)
-	if err = gen.GenerateStatic(); err != nil {
-		return err
-	}
+	gen.GenerateStatic()
 
 	schema := parseSchema(meta.cfg.Parser.Schema)
 	names := parseNames(meta.cfg.Parser.Names)
