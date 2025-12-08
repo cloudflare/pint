@@ -122,10 +122,7 @@ func actionCI(ctx context.Context, c *cli.Command) error {
 	gen := config.NewPrometheusGenerator(meta.cfg, metricsRegistry)
 	defer gen.Stop()
 
-	if err = gen.GenerateStatic(); err != nil {
-		return err
-	}
-
+	gen.GenerateStatic()
 	slog.LogAttrs(ctx, slog.LevelDebug, "Generated all Prometheus servers", slog.Int("count", gen.Count()))
 
 	summary, err := checkRules(ctx, meta.workers, meta.isOffline, gen, meta.cfg, entries)
