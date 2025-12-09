@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/prometheus/common/model"
 	"github.com/prometheus/prometheus/model/labels"
 	promParser "github.com/prometheus/prometheus/promql/parser"
 	"github.com/prometheus/prometheus/promql/parser/posrange"
@@ -582,7 +583,7 @@ func labelsFromSelectors(matches []labels.MatchType, selector *promParser.Vector
 	}
 	// Any label used in positive filters is gurnateed to be present.
 	for _, lm := range selector.LabelMatchers {
-		if lm.Name == labels.MetricName {
+		if lm.Name == model.MetricNameLabel {
 			continue
 		}
 		if !slices.Contains(matches, lm.Type) {
@@ -595,7 +596,7 @@ func labelsFromSelectors(matches []labels.MatchType, selector *promParser.Vector
 
 func labelsWithEmptyValueSelector(selector *promParser.VectorSelector) (names []string) {
 	for _, lm := range selector.LabelMatchers {
-		if lm.Name == labels.MetricName {
+		if lm.Name == model.MetricNameLabel {
 			continue
 		}
 		if lm.Type == labels.MatchEqual && lm.Value == "" {
@@ -631,8 +632,8 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 				n.PosRange,
 				n.Param.(*promParser.StringLiteral).Val,
 			)
-			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
-				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
+			if n.Without || !slices.Contains(n.Grouping, model.MetricNameLabel) {
+				s.excludeLabel("Aggregation removes metric name.", n.PosRange, model.MetricNameLabel)
 			}
 			src = append(src, s)
 		}
@@ -656,8 +657,8 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 				Node:      n,
 				Arguments: args,
 			})
-			if n.Without || !slices.Contains(n.Grouping, labels.MetricName) {
-				s.excludeLabel("Aggregation removes metric name.", n.PosRange, labels.MetricName)
+			if n.Without || !slices.Contains(n.Grouping, model.MetricNameLabel) {
+				s.excludeLabel("Aggregation removes metric name.", n.PosRange, model.MetricNameLabel)
 			}
 			src = append(src, s)
 		}
@@ -1128,7 +1129,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 				})
 			}
 			ls.DeadLabels = append(ls.DeadLabels, ls.checkJoinedLabels(expr, n, ls)...)
-			ls.excludeLabel("Binary operation between two vectors removes metric names.", pos, labels.MetricName)
+			ls.excludeLabel("Binary operation between two vectors removes metric names.", pos, model.MetricNameLabel)
 			ls.IsConditional, ls.ReturnInfo.IsReturnBool = checkConditions(ls, n.Op, n.ReturnBool)
 			src = append(src, ls)
 		}
@@ -1192,7 +1193,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					IsOn:           n.VectorMatching.On,
 				})
 			}
-			rs.excludeLabel("Binary operation between two vectors removes metric names.", pos, labels.MetricName)
+			rs.excludeLabel("Binary operation between two vectors removes metric names.", pos, model.MetricNameLabel)
 			rs.IsConditional, rs.ReturnInfo.IsReturnBool = checkConditions(rs, n.Op, n.ReturnBool)
 			src = append(src, rs)
 		}
@@ -1253,7 +1254,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					IsOn:           n.VectorMatching.On,
 				})
 			}
-			ls.excludeLabel("Binary operation between two vectors removes metric names.", pos, labels.MetricName)
+			ls.excludeLabel("Binary operation between two vectors removes metric names.", pos, model.MetricNameLabel)
 			ls.IsConditional, ls.ReturnInfo.IsReturnBool = checkConditions(ls, n.Op, n.ReturnBool)
 			src = append(src, ls)
 		}

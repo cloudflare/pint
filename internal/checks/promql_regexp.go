@@ -241,7 +241,7 @@ type badMatcher struct {
 func makeLabel(name string, matchers ...*labels.Matcher) string {
 	filtered := make([]*labels.Matcher, 0, len(matchers))
 	for _, m := range matchers {
-		if m.Type == labels.MatchEqual && m.Name == labels.MetricName {
+		if m.Type == labels.MatchEqual && m.Name == model.MetricNameLabel {
 			continue
 		}
 		filtered = append(filtered, m)

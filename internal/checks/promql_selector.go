@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"slices"
 
+	"github.com/prometheus/common/model"
 	"github.com/prometheus/prometheus/model/labels"
 	promParser "github.com/prometheus/prometheus/promql/parser"
 
@@ -113,7 +114,7 @@ func (c SelectorCheck) checkSource(keyRe, callRe *regexp.Regexp, s source.Source
 		return problems
 	}
 	for _, lm := range vs.LabelMatchers {
-		if lm.Name == labels.MetricName && !keyRe.MatchString(lm.Value) {
+		if lm.Name == model.MetricNameLabel && !keyRe.MatchString(lm.Value) {
 			return problems
 		}
 	}

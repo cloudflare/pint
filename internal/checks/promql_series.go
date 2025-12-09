@@ -175,7 +175,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 		metricName := selector.Name
 		if metricName == "" {
 			for _, lm := range selector.LabelMatchers {
-				if lm.Name == labels.MetricName && lm.Type == labels.MatchEqual {
+				if lm.Name == model.MetricNameLabel && lm.Type == labels.MatchEqual {
 					metricName = lm.Value
 					break
 				}
@@ -232,7 +232,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 
 		labelNames := []string{}
 		for _, lm := range selector.LabelMatchers {
-			if lm.Name == labels.MetricName {
+			if lm.Name == model.MetricNameLabel {
 				continue
 			}
 			if lm.Type == labels.MatchNotEqual || lm.Type == labels.MatchNotRegexp {
@@ -479,7 +479,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 		}
 
 		for _, lm := range selector.LabelMatchers {
-			if lm.Name == labels.MetricName {
+			if lm.Name == model.MetricNameLabel {
 				continue
 			}
 			if lm.Type != labels.MatchEqual && lm.Type != labels.MatchRegexp {
@@ -995,7 +995,7 @@ func stripLabels(selector *promParser.VectorSelector) promParser.VectorSelector 
 		LabelMatchers: []*labels.Matcher{},
 	}
 	for _, lm := range selector.LabelMatchers {
-		if lm.Name == labels.MetricName {
+		if lm.Name == model.MetricNameLabel {
 			s.LabelMatchers = append(s.LabelMatchers, lm)
 			if lm.Type == labels.MatchEqual {
 				s.Name = lm.Value

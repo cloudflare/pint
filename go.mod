@@ -15,13 +15,13 @@ require (
 	github.com/prometheus/client_golang v1.23.2
 	github.com/prometheus/client_model v0.6.2
 	github.com/prometheus/common v0.67.4
-	github.com/prometheus/prometheus v0.307.3
+	github.com/prometheus/prometheus v0.308.0
 	github.com/prymitive/current v0.1.1
 	github.com/rogpeppe/go-internal v1.14.1
 	github.com/stretchr/testify v1.11.1
 	github.com/urfave/cli/v3 v3.6.1
 	github.com/zclconf/go-cty v1.17.0
-	gitlab.com/gitlab-org/api/client-go v1.7.0
+	gitlab.com/gitlab-org/api/client-go v1.8.0
 	go.nhat.io/httpmock v0.11.0
 	go.uber.org/ratelimit v0.3.1
 	go.yaml.in/yaml/v3 v3.0.4
@@ -38,7 +38,6 @@ require (
 	github.com/dennwc/varint v1.0.0 // indirect
 	github.com/edsrzf/mmap-go v1.2.0 // indirect
 	github.com/facette/natsort v0.0.0-20181210072756-2cd4dd1e2dcb // indirect
-	github.com/fatih/color v1.18.0 // indirect
 	github.com/gkampitakis/ciinfo v0.3.2 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
