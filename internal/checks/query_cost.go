@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/prometheus/common/model"
 	"github.com/prometheus/prometheus/model/labels"
 	promParser "github.com/prometheus/prometheus/promql/parser"
 
@@ -470,7 +471,7 @@ func (c CostCheck) isSuggestionFor(src, potential source.Source, join *source.Jo
 
 			lms := c.selectorLabels(ops)
 			for _, lm := range lms {
-				if lm.Name == labels.MetricName {
+				if lm.Name == model.MetricNameLabel {
 					continue
 				}
 				if !potential.CanHaveLabel(lm.Name) {
@@ -482,7 +483,7 @@ func (c CostCheck) isSuggestionFor(src, potential source.Source, join *source.Jo
 				var buf strings.Builder
 				var added int
 				for _, lm := range lms {
-					if lm.Name == labels.MetricName {
+					if lm.Name == model.MetricNameLabel {
 						continue
 					}
 					if added == 0 {
@@ -535,7 +536,7 @@ func (c CostCheck) metricName(ops source.Operations) string {
 	for _, op := range ops {
 		if vs, ok := op.Node.(*promParser.VectorSelector); ok {
 			for _, lm := range vs.LabelMatchers {
-				if lm.Type == labels.MatchEqual && lm.Name == labels.MetricName {
+				if lm.Type == labels.MatchEqual && lm.Name == model.MetricNameLabel {
 					return lm.Value
 				}
 			}

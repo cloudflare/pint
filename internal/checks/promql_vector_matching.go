@@ -97,7 +97,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 		if lhs, ok := n.LHS.(*promParser.VectorSelector); ok {
 			lhsVec = true
 			for _, lm := range lhs.LabelMatchers {
-				if lm.Name != labels.MetricName && lm.Type == labels.MatchEqual {
+				if lm.Name != model.MetricNameLabel && lm.Type == labels.MatchEqual {
 					if n.VectorMatching.On != slices.Contains(n.VectorMatching.MatchingLabels, lm.Name) {
 						continue
 					}
@@ -109,7 +109,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 		if rhs, ok := n.RHS.(*promParser.VectorSelector); ok {
 			rhsVec = true
 			for _, lm := range rhs.LabelMatchers {
-				if lm.Name != labels.MetricName && lm.Type == labels.MatchEqual {
+				if lm.Name != model.MetricNameLabel && lm.Type == labels.MatchEqual {
 					rhsMatchers[lm.Name] = lm.Value
 				}
 			}
