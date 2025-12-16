@@ -62,7 +62,7 @@
       expr: http_requests_total == 1 and http_requests_total > 2 or http_requests_total < 3
   output: |
     3 |   expr: http_requests_total == 1 and http_requests_total > 2 or http_requests_total < 3
-                ^^^^^^^^^^^^^^^^^^^ `http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangarous to use its value directly.
+                ^^^^^^^^^^^^^^^^^^^ `http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangerous to use its value directly.
   problem:
     reporter: promql/counter
     summary: direct counter read
@@ -72,7 +72,7 @@
         To use the value of a counter in PromQL you most likely want to calculate the rate of events using the [rate()](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) function, or any other function that is safe to use with counters.
         Once you calculate the rate you can use that result in other functions or aggregations that are not counter safe, like [sum()](https://prometheus.io/docs/prometheus/latest/querying/operators/#aggregation-operators).
     diagnostics:
-        - message: '`http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangarous to use its value directly.'
+        - message: '`http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangerous to use its value directly.'
           firstcolumn: 1
           lastcolumn: 19
           kind: 0
@@ -91,7 +91,7 @@
       expr: http_requests_total > 1
   output: |
     2 |   expr: http_requests_total > 1
-                ^^^^^^^^^^^^^^^^^^^ `http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangarous to use its value directly.
+                ^^^^^^^^^^^^^^^^^^^ `http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangerous to use its value directly.
   problem:
     reporter: promql/counter
     summary: direct counter read
@@ -101,7 +101,7 @@
         To use the value of a counter in PromQL you most likely want to calculate the rate of events using the [rate()](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) function, or any other function that is safe to use with counters.
         Once you calculate the rate you can use that result in other functions or aggregations that are not counter safe, like [sum()](https://prometheus.io/docs/prometheus/latest/querying/operators/#aggregation-operators).
     diagnostics:
-        - message: '`http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangarous to use its value directly.'
+        - message: '`http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangerous to use its value directly.'
           firstcolumn: 1
           lastcolumn: 19
           kind: 0
@@ -131,7 +131,7 @@
       expr:  http_requests_total{cluster="prod"} > 1 unless absent(http_requests_total{cluster="dev"})
   output: |
     3 |   expr:  http_requests_total{cluster="prod"} > 1 unless absent(http_requests_total{cluster="dev"})
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangarous to use its value directly.
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangerous to use its value directly.
   problem:
     reporter: promql/counter
     summary: direct counter read
@@ -141,7 +141,7 @@
         To use the value of a counter in PromQL you most likely want to calculate the rate of events using the [rate()](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) function, or any other function that is safe to use with counters.
         Once you calculate the rate you can use that result in other functions or aggregations that are not counter safe, like [sum()](https://prometheus.io/docs/prometheus/latest/querying/operators/#aggregation-operators).
     diagnostics:
-        - message: '`http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangarous to use its value directly.'
+        - message: '`http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangerous to use its value directly.'
           firstcolumn: 1
           lastcolumn: 35
           kind: 0
@@ -160,7 +160,7 @@
       expr: delta(http_requests_total[2m]) > 1
   output: |
     2 |   expr: delta(http_requests_total[2m]) > 1
-                      ^^^^^^^^^^^^^^^^^^^ `http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangarous to use its value directly.
+                      ^^^^^^^^^^^^^^^^^^^ `http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangerous to use its value directly.
   problem:
     reporter: promql/counter
     summary: direct counter read
@@ -170,7 +170,7 @@
         To use the value of a counter in PromQL you most likely want to calculate the rate of events using the [rate()](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) function, or any other function that is safe to use with counters.
         Once you calculate the rate you can use that result in other functions or aggregations that are not counter safe, like [sum()](https://prometheus.io/docs/prometheus/latest/querying/operators/#aggregation-operators).
     diagnostics:
-        - message: '`http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangarous to use its value directly.'
+        - message: '`http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangerous to use its value directly.'
           firstcolumn: 7
           lastcolumn: 25
           kind: 0
@@ -249,7 +249,7 @@
       expr: sum(http_requests_total) > 1
   output: |
     2 |   expr: sum(http_requests_total) > 1
-                    ^^^^^^^^^^^^^^^^^^^ `http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangarous to use its value directly.
+                    ^^^^^^^^^^^^^^^^^^^ `http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangerous to use its value directly.
   problem:
     reporter: promql/counter
     summary: direct counter read
@@ -259,7 +259,7 @@
         To use the value of a counter in PromQL you most likely want to calculate the rate of events using the [rate()](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) function, or any other function that is safe to use with counters.
         Once you calculate the rate you can use that result in other functions or aggregations that are not counter safe, like [sum()](https://prometheus.io/docs/prometheus/latest/querying/operators/#aggregation-operators).
     diagnostics:
-        - message: '`http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangarous to use its value directly.'
+        - message: '`http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangerous to use its value directly.'
           firstcolumn: 5
           lastcolumn: 23
           kind: 0
@@ -278,7 +278,7 @@
       expr: sum(http_requests_total) > 1
   output: |
     2 |   expr: sum(http_requests_total) > 1
-                    ^^^^^^^^^^^^^^^^^^^ `http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangarous to use its value directly.
+                    ^^^^^^^^^^^^^^^^^^^ `http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangerous to use its value directly.
   problem:
     reporter: promql/counter
     summary: direct counter read
@@ -288,7 +288,7 @@
         To use the value of a counter in PromQL you most likely want to calculate the rate of events using the [rate()](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) function, or any other function that is safe to use with counters.
         Once you calculate the rate you can use that result in other functions or aggregations that are not counter safe, like [sum()](https://prometheus.io/docs/prometheus/latest/querying/operators/#aggregation-operators).
     diagnostics:
-        - message: '`http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangarous to use its value directly.'
+        - message: '`http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangerous to use its value directly.'
           firstcolumn: 5
           lastcolumn: 23
           kind: 0

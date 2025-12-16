@@ -131,7 +131,7 @@ LOOP:
 			Severity: Warning,
 			Diagnostics: []diags.Diagnostic{
 				{
-					Message: fmt.Sprintf("`%s` is a counter according to metrics metadata from %s, it can be dangarous to use its value directly.",
+					Message: fmt.Sprintf("`%s` is a counter according to metrics metadata from %s, it can be dangerous to use its value directly.",
 						selector.Name,
 						promText(c.prom.Name(), metadata.URI),
 					),
