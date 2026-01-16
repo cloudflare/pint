@@ -1,4 +1,4 @@
-FROM golang:1.25.5-alpine@sha256:3587db7cc96576822c606d119729370dbf581931c5f43ac6d3fa03ab4ed85a10
+FROM golang:1.26rc2-alpine@sha256:ebf4414ac1ebce5d728a1b9446037ba9aee1b46228bbc8972fb57819a91e164e
 COPY . /src
 WORKDIR /src
 RUN apk add make git
