@@ -161,9 +161,9 @@ func parseSnooze(s string) (snz Snooze, err error) {
 	return snz, nil
 }
 
-func parseValue(typ Type, s string, line int) (CommentValue, error) {
+func parseValue(commentType Type, s string, line int) (CommentValue, error) {
 	// nolint:exhaustive
-	switch typ {
+	switch commentType {
 	case IgnoreFileType, IgnoreLineType, IgnoreBeginType, IgnoreEndType, IgnoreNextLineType:
 		if s != "" {
 			return nil, fmt.Errorf("unexpected comment suffix: %q", s)
@@ -342,10 +342,10 @@ func Parse(lineno int, text string) (comments []Comment) {
 	return comments
 }
 
-func Only[T any](src []Comment, typ Type) []T {
+func Only[T any](src []Comment, commentType Type) []T {
 	dst := make([]T, 0, len(src))
 	for _, c := range src {
-		if c.Type != typ {
+		if c.Type != commentType {
 			continue
 		}
 		dst = append(dst, c.Value.(T))
@@ -353,9 +353,9 @@ func Only[T any](src []Comment, typ Type) []T {
 	return dst
 }
 
-func IsRuleComment(typ Type) bool {
+func IsRuleComment(commentType Type) bool {
 	// nolint:exhaustive
-	switch typ {
+	switch commentType {
 	case RuleOwnerType, DisableType, SnoozeType, RuleSetType:
 		return true
 	}

@@ -320,9 +320,9 @@ func isEntryIdentical(b, a *Entry) bool {
 	return true
 }
 
-func findRulesByName(entries []*Entry, name string, typ parser.RuleType) (nomatch, match []*Entry) {
+func findRulesByName(entries []*Entry, name string, ruleType parser.RuleType) (nomatch, match []*Entry) {
 	for _, entry := range entries {
-		if entry.PathError == nil && entry.Rule.Type() == typ && entry.Rule.Name() == name {
+		if entry.PathError == nil && entry.Rule.Type() == ruleType && entry.Rule.Name() == name {
 			match = append(match, entry)
 		} else {
 			nomatch = append(nomatch, entry)
