@@ -1,0 +1,38 @@
+[default.extend-words]
+# Project-specific terms
+automaxprocs = "automaxprocs"
+cloudflare = "cloudflare"
+deduplicated = "deduplicated"
+endraw = "endraw"
+gitlab = "gitlab"
+golang = "golang"
+hoc = "hoc"
+humanize = "humanize"
+promql = "promql"
+prymitive = "prymitive"
+pushgateway = "pushgateway"
+rulefmt = "rulefmt"
+samber = "samber"
+symlinked = "symlinked"
+templated = "templated"
+tokenize = "tokenize"
+unmarshal = "unmarshal"
+
+[default.extend-identifiers]
+# Variable name abbreviation for PromQLNode
+pn = "pn"
+# Variable name abbreviation for BitBucketCommentAnchor
+ba = "ba"
+
+[files]
+extend-exclude = [
+    "go.sum",
+    # Test rules file contains intentional typos from real-world Prometheus rules
+    "internal/parser/testrules.yml",
+    # Test files with intentional typos in metric names or example data
+    "cmd/pint/tests/*.txt",
+    "internal/checks/*_test.snap",
+    "internal/checks/*_test.go",
+    # Documentation examples showing typos that pint catches
+    "docs/checks/yaml/parse.md",
+]

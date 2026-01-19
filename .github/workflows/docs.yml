@@ -15,9 +15,7 @@ jobs:
           show-progress: false
 
       - name: Spellcheck
-        uses: rojopolis/spellcheck-github-actions@2b78e363a487cd137993dc2cddc17a43c89bf7a1 # 0.57.0
-        with:
-          config_path: .github/spellcheck/config.yml
+        uses: crate-ci/typos@v1.34.0
 
   markdown:
     name: Markdownlint

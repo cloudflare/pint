@@ -453,7 +453,7 @@ func TestGitLabReporter(t *testing.T) {
 					Position: discPosition("foo.txt", 1),
 				}).ReturnJSON(gitlab.Response{})
 				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
-					Body: gitlab.Ptr("This pint run would create 3 comment(s), which is more than the limit configured for pint (1).\n2 comment(s) were skipped and won't be visibile on this PR."),
+					Body: gitlab.Ptr("This pint run would create 3 comment(s), which is more than the limit configured for pint (1).\n2 comment(s) were skipped and won't be visible on this PR."),
 				}).ReturnJSON(gitlab.Response{})
 			}),
 			errorHandler: func(err error) error {
@@ -643,7 +643,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 					},
 					{
 						ID:    "300",
-						Notes: []*gitlab.Note{discNote(301, 123, "This pint run would create 3 comment(s), which is more than the limit configured for pint (1).\n2 comment(s) were skipped and won't be visibile on this PR.", nil)},
+						Notes: []*gitlab.Note{discNote(301, 123, "This pint run would create 3 comment(s), which is more than the limit configured for pint (1).\n2 comment(s) were skipped and won't be visible on this PR.", nil)},
 					},
 				})
 				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{

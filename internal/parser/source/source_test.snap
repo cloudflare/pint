@@ -397,7 +397,7 @@ output:
           addedlabels: []
           src:
             deadInfo:
-                reason: The left hand side always returs something and so the right hand side is never used.
+                reason: The left hand side always returns something and so the right hand side is never used.
                 fragment:
                     start: 35
                     end: 38
@@ -473,7 +473,7 @@ output:
           addedlabels: []
           src:
             deadInfo:
-                reason: The left hand side always returs something and so the right hand side is never used.
+                reason: The left hand side always returns something and so the right hand side is never used.
                 fragment:
                     start: 35
                     end: 38
@@ -4859,7 +4859,7 @@ output:
       type: function
       fixedLabels: true
     - deadInfo:
-        reason: The left hand side always returs something and so the right hand side is never used.
+        reason: The left hand side always returns something and so the right hand side is never used.
         fragment:
             start: 13
             end: 16

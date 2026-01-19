@@ -254,7 +254,7 @@ func (p Parser) parseRuleStrict(rule *yaml.Node, contentLines []string) Rule {
 		return Rule{
 			Error: ParseError{
 				Line: rule.Line,
-				Err:  fmt.Errorf("rule definion must be a %s, got %s", describeTag(mapTag), describeTag(rule.ShortTag())),
+				Err:  fmt.Errorf("rule definition must be a %s, got %s", describeTag(mapTag), describeTag(rule.ShortTag())),
 			},
 		}
 	}

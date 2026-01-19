@@ -367,7 +367,7 @@ func TestGitHubReporter(t *testing.T) {
 					switch b {
 					case `{"body":":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock1** check.\n\n------\n\nsyntax error1\n\nsyntax details1\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock1.html).\n","path":"foo.txt","line":2,"side":"RIGHT","commit_id":"HEAD"}`:
 					case `{"body":":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock2** check.\n\n------\n\nsyntax error2\n\nsyntax details2\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock2.html).\n","path":"foo.txt","line":2,"side":"RIGHT","commit_id":"HEAD"}`:
-					case `{"body":"This pint run would create 4 comment(s), which is more than 2 limit configured for pint.\n2 comments were skipped and won't be visibile on this PR."}`:
+					case `{"body":"This pint run would create 4 comment(s), which is more than 2 limit configured for pint.\n2 comments were skipped and won't be visible on this PR."}`:
 					default:
 						t.Errorf("Unexpected comment: %s", b)
 					}
@@ -473,7 +473,7 @@ func TestGitHubReporter(t *testing.T) {
 				if r.Method == http.MethodPost && r.URL.Path == "/api/v3/repos/foo/bar/issues/123/comments" {
 					body, _ := io.ReadAll(r.Body)
 					b := strings.TrimSpace(strings.TrimRight(string(body), "\n\t\r"))
-					if b == `{"body":"This pint run would create 4 comment(s), which is more than the limit configured for pint (2).\n2 comment(s) were skipped and won't be visibile on this PR."}` {
+					if b == `{"body":"This pint run would create 4 comment(s), which is more than the limit configured for pint (2).\n2 comment(s) were skipped and won't be visible on this PR."}` {
 						w.WriteHeader(http.StatusInternalServerError)
 						_, _ = w.Write([]byte("Cannot create issue comment"))
 						return

@@ -72,7 +72,7 @@ func TestAlertsSettings(t *testing.T) {
 				MinCount: 0,
 				Severity: "bug",
 			},
-			err: errors.New(`cannot set serverity to "bug" when minCount is 0`),
+			err: errors.New(`cannot set severity to "bug" when minCount is 0`),
 		},
 		{
 			conf: AlertsSettings{

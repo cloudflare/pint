@@ -3756,7 +3756,7 @@ groups:
 						Rules: []parser.Rule{
 							{
 								Error: parser.ParseError{
-									Err:  errors.New("rule definion must be a mapping, got list"),
+									Err:  errors.New("rule definition must be a mapping, got list"),
 									Line: 5,
 								},
 							},

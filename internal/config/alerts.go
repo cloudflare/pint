@@ -40,7 +40,7 @@ func (as AlertsSettings) validate() error {
 			return err
 		}
 		if as.MinCount <= 0 && sev > checks.Information {
-			return fmt.Errorf("cannot set serverity to %q when minCount is 0", as.Severity)
+			return fmt.Errorf("cannot set severity to %q when minCount is 0", as.Severity)
 		}
 	}
 	return nil
