@@ -1907,7 +1907,7 @@ func TestConfigErrors(t *testing.T) {
 	severity = "bug"
   }
 }`,
-			err: `cannot set serverity to "bug" when minCount is 0`,
+			err: `cannot set severity to "bug" when minCount is 0`,
 		},
 		{
 			config: `rule {

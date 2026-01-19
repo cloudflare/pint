@@ -557,7 +557,7 @@ func TestBitBucketMakeComments(t *testing.T) {
 					},
 				},
 				{
-					Text:     "This pint run would create 5 comment(s), which is more than 2 limit configured for pint.\n3 comments were skipped and won't be visibile on this PR.",
+					Text:     "This pint run would create 5 comment(s), which is more than 2 limit configured for pint.\n3 comments were skipped and won't be visible on this PR.",
 					Severity: "NORMAL",
 					Anchor: BitBucketPendingCommentAnchor{
 						DiffType: "EFFECTIVE",

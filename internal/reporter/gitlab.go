@@ -630,5 +630,5 @@ func loggifyDiscussion(opt *gitlab.CreateMergeRequestDiscussionOptions) (attrs [
 
 func tooManyCommentsMsg(nr, m int) string {
 	return fmt.Sprintf(`This pint run would create %d comment(s), which is more than the limit configured for pint (%d).
-%d comment(s) were skipped and won't be visibile on this PR.`, nr, m, nr-m)
+%d comment(s) were skipped and won't be visible on this PR.`, nr, m, nr-m)
 }

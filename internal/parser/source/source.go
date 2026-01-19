@@ -440,17 +440,17 @@ func (s *Source) checkJoinedLabels(expr string, n *promParser.BinaryExpr, dst So
 	return dead
 }
 
-func (s *Source) useLabelsNotExcluded(exluded []string) {
+func (s *Source) useLabelsNotExcluded(excluded []string) {
 	// Iterating over a map can yield labels in different order each time
 	// so append labels to an extra slice, sort it, and then append the
-	// sorted reults to UsedLabels.
+	// sorted results to UsedLabels.
 	// Without this tests might show a diff sometimes.
 	toAdd := make([]string, 0, len(s.Labels))
 	for name, lt := range s.Labels {
 		if lt.Kind == ImpossibleLabel {
 			continue
 		}
-		if !slices.Contains(exluded, name) {
+		if !slices.Contains(excluded, name) {
 			toAdd = appendToSlice(toAdd, name)
 		}
 	}
@@ -1357,7 +1357,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 				// If LHS can NOT be empty then RHS is dead code.
 				if !lhsCanBeEmpty {
 					rs.DeadInfo = &DeadInfo{
-						Reason:   "The left hand side always returs something and so the right hand side is never used.",
+						Reason:   "The left hand side always returns something and so the right hand side is never used.",
 						Fragment: rs.Position,
 					}
 				}
