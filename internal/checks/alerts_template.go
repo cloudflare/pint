@@ -368,7 +368,7 @@ func hasValue(text string) bool {
 		return false
 	}
 	aliases := aliasesForTemplate(tt)
-	for _, node := range t.Root.Nodes {
+	for _, node := range tt.Root.Nodes {
 		if _, ok := containsAliasedNode(aliases, node, ".Value"); ok {
 			return true
 		}
