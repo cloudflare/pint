@@ -768,3 +768,189 @@
 []
 
 ---
+
+[TestAggregationCheck/regex_keep:_job|instance_-_both_preserved - 1]
+[]
+
+---
+
+[TestAggregationCheck/regex_keep:_job|instance_-_job_removed - 1]
+- description: 'regex keep: job|instance - job removed'
+  content: |
+    - record: foo
+      expr: sum(foo) without(job)
+  output: |
+    2 |   expr: sum(foo) without(job)
+                                 ^^^ `job` label is required and should be preserved when aggregating all rules.
+                                     Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
+  problem:
+    reporter: promql/aggregate
+    summary: required label is being removed via aggregation
+    details: ""
+    diagnostics:
+        - message: '`job` label is required and should be preserved when aggregating all rules.'
+          firstcolumn: 18
+          lastcolumn: 20
+          kind: 0
+        - message: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
+          firstcolumn: 18
+          lastcolumn: 20
+          kind: 1
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestAggregationCheck/regex_keep:_job|instance_-_instance_removed - 1]
+- description: 'regex keep: job|instance - instance removed'
+  content: |
+    - record: foo
+      expr: sum(foo) without(instance)
+  output: |
+    2 |   expr: sum(foo) without(instance)
+                                 ^^^^^^^^ `instance` label is required and should be preserved when aggregating all rules.
+                                          Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
+  problem:
+    reporter: promql/aggregate
+    summary: required label is being removed via aggregation
+    details: ""
+    diagnostics:
+        - message: '`instance` label is required and should be preserved when aggregating all rules.'
+          firstcolumn: 18
+          lastcolumn: 25
+          kind: 0
+        - message: Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
+          firstcolumn: 18
+          lastcolumn: 25
+          kind: 1
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestAggregationCheck/regex_keep:_job|instance_-_both_removed - 1]
+- description: 'regex keep: job|instance - both removed'
+  content: |
+    - record: foo
+      expr: sum(foo) without(job, instance)
+  output: |
+    2 |   expr: sum(foo) without(job, instance)
+                                 ^^^ `job` label is required and should be preserved when aggregating all rules.
+                                     Query is using aggregation with `without(job, instance)`, all labels included inside `without(...)` will be removed from the results.
+  problem:
+    reporter: promql/aggregate
+    summary: required label is being removed via aggregation
+    details: ""
+    diagnostics:
+        - message: '`job` label is required and should be preserved when aggregating all rules.'
+          firstcolumn: 18
+          lastcolumn: 20
+          kind: 0
+        - message: Query is using aggregation with `without(job, instance)`, all labels included inside `without(...)` will be removed from the results.
+          firstcolumn: 18
+          lastcolumn: 20
+          kind: 1
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+- description: 'regex keep: job|instance - both removed'
+  content: |
+    - record: foo
+      expr: sum(foo) without(job, instance)
+  output: |
+    2 |   expr: sum(foo) without(job, instance)
+                                      ^^^^^^^^ `instance` label is required and should be preserved when aggregating all rules.
+                                               Query is using aggregation with `without(job, instance)`, all labels included inside `without(...)` will be removed from the results.
+  problem:
+    reporter: promql/aggregate
+    summary: required label is being removed via aggregation
+    details: ""
+    diagnostics:
+        - message: '`instance` label is required and should be preserved when aggregating all rules.'
+          firstcolumn: 23
+          lastcolumn: 30
+          kind: 0
+        - message: Query is using aggregation with `without(job, instance)`, all labels included inside `without(...)` will be removed from the results.
+          firstcolumn: 23
+          lastcolumn: 30
+          kind: 1
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestAggregationCheck/regex_strip:_job|instance_-_both_stripped - 1]
+[]
+
+---
+
+[TestAggregationCheck/regex_strip:_job|instance_-_job_present - 1]
+- description: 'regex strip: job|instance - job present'
+  content: |
+    - record: foo
+      expr: sum(foo) by(job)
+  output: |
+    2 |   expr: sum(foo) by(job)
+                            ^^^ `job` label should be removed when aggregating all rules.
+  problem:
+    reporter: promql/aggregate
+    summary: label must be removed in aggregations
+    details: ""
+    diagnostics:
+        - message: '`job` label should be removed when aggregating all rules.'
+          firstcolumn: 13
+          lastcolumn: 15
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestAggregationCheck/regex_strip:_job|instance_-_instance_present - 1]
+- description: 'regex strip: job|instance - instance present'
+  content: |
+    - record: foo
+      expr: sum(foo) by(instance)
+  output: |
+    2 |   expr: sum(foo) by(instance)
+                            ^^^^^^^^ `instance` label should be removed when aggregating all rules.
+  problem:
+    reporter: promql/aggregate
+    summary: label must be removed in aggregations
+    details: ""
+    diagnostics:
+        - message: '`instance` label should be removed when aggregating all rules.'
+          firstcolumn: 13
+          lastcolumn: 20
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestAggregationCheck/regex_strip:_job|instance_-_neither_present - 1]
+[]
+
+---
+
+[TestAggregationCheck/regex_keep:_static_label_overrides_aggregation - 1]
+[]
+
+---

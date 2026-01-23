@@ -28,8 +28,11 @@ aggregate "$pattern" {
   for details.
 - `comment` - set a custom comment that will be added to reported problems.
 - `severity` - set custom severity for reported issues, defaults to a warning.
-- `keep` - list of label names that must be preserved.
-- `strip` - list of label names that must be stripped.
+- `keep` - list of label name patterns that must be preserved. Each pattern can be
+  a literal label name (e.g., `"job"`) or a regex pattern (e.g., `"job|instance"`
+  to match multiple labels).
+- `strip` - list of label name patterns that must be stripped. Each pattern can be
+  a literal label name or a regex pattern.
 
 ## How to enable it
 
@@ -65,6 +68,33 @@ rule {
   }
   aggregate "cluster:.+" {
     strip = ["instance"]
+  }
+}
+```
+
+You can use regex patterns to match multiple labels at once. For example, to ensure
+that both `job` and `instance` labels are preserved:
+
+```js
+rule {
+  match {
+    kind = "alerting"
+  }
+  aggregate ".+" {
+    keep = ["job|instance"]
+  }
+}
+```
+
+Or to ensure that multiple labels are stripped:
+
+```js
+rule {
+  match {
+    kind = "recording"
+  }
+  aggregate "cluster:.+" {
+    strip = ["instance|pod|container"]
   }
 }
 ```

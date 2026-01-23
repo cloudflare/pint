@@ -161,20 +161,22 @@ func parseRule(rule Rule, prometheusServers []*promapi.FailoverGroup, defaultSta
 			}
 			severity := aggr.getSeverity(checks.Warning)
 			for _, label := range aggr.Keep {
+				labelRegex := checks.MustTemplatedRegexp(label)
 				rules = append(rules, newParsedRule(
 					rule,
 					defaultStates,
 					checks.AggregationCheckName,
-					checks.NewAggregationCheck(nameRegex, label, true, aggr.Comment, severity),
+					checks.NewAggregationCheck(nameRegex, labelRegex, true, aggr.Comment, severity),
 					nil,
 				))
 			}
 			for _, label := range aggr.Strip {
+				labelRegex := checks.MustTemplatedRegexp(label)
 				rules = append(rules, newParsedRule(
 					rule,
 					defaultStates,
 					checks.AggregationCheckName,
-					checks.NewAggregationCheck(nameRegex, label, false, aggr.Comment, severity),
+					checks.NewAggregationCheck(nameRegex, labelRegex, false, aggr.Comment, severity),
 					nil,
 				))
 			}

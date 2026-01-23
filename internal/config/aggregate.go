@@ -33,6 +33,18 @@ func (ag AggregateSettings) validate() error {
 		return errors.New("must specify keep or strip list")
 	}
 
+	// Validate label patterns as regex.
+	for _, label := range ag.Keep {
+		if _, err := checks.NewTemplatedRegexp(label); err != nil {
+			return err
+		}
+	}
+	for _, label := range ag.Strip {
+		if _, err := checks.NewTemplatedRegexp(label); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 

@@ -66,6 +66,33 @@ func TestAggregateSettings(t *testing.T) {
 				Severity: "warning",
 			},
 		},
+		// Regex label pattern tests
+		{
+			conf: AggregateSettings{
+				Name: ".+",
+				Keep: []string{"job|instance"},
+			},
+		},
+		{
+			conf: AggregateSettings{
+				Name:  ".+",
+				Strip: []string{"job|instance"},
+			},
+		},
+		{
+			conf: AggregateSettings{
+				Name: ".+",
+				Keep: []string{".+++"},
+			},
+			err: errors.New("error parsing regexp: invalid nested repetition operator: `++`"),
+		},
+		{
+			conf: AggregateSettings{
+				Name:  ".+",
+				Strip: []string{"{{nil}}"},
+			},
+			err: errors.New(`template: regexp:1:125: executing "regexp" at <nil>: nil is not a command`),
+		},
 	}
 
 	for _, tc := range testCases {
