@@ -15,7 +15,7 @@ jobs:
           show-progress: false
 
       - name: Spellcheck
-        uses: crate-ci/typos@v1.34.0
+        uses: crate-ci/typos@65120634e79d8374d1aa2f27e54baa0c364fff5a # v1.42.1
 
   markdown:
     name: Markdownlint
