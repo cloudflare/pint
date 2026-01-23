@@ -13,6 +13,7 @@ import (
 
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/parser"
 )
 
 const (
@@ -99,69 +100,74 @@ func (c RuleLinkCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*d
 			slog.LogAttrs(ctx, slog.LevelDebug, "Link URI rewritten by rule", slog.String("link", u.String()), slog.String("uri", uri))
 		}
 
-		rctx, cancel := context.WithTimeout(ctx, c.timeout)
-		defer cancel()
-
-		req, _ := http.NewRequestWithContext(rctx, http.MethodGet, uri, nil)
-
-		for k, v := range c.headers {
-			req.Header.Set(k, v)
+		if problem := c.checkLink(ctx, ann, uri); problem != nil {
+			problems = append(problems, *problem)
 		}
-
-		resp, err := http.DefaultClient.Do(req)
-		if err != nil {
-			problems = append(problems, Problem{
-				Anchor: AnchorAfter,
-				Lines: diags.LineRange{
-					First: ann.Key.Pos.Lines().First,
-					Last:  ann.Value.Pos.Lines().Last,
-				},
-				Reporter: c.Reporter(),
-				Summary:  "link check failed",
-				Details:  maybeComment(c.comment),
-				Diagnostics: []diags.Diagnostic{
-					{
-						Message:     fmt.Sprintf("GET request for %s returned an error: %s.", uri, err),
-						Pos:         ann.Value.Pos,
-						FirstColumn: 1,
-						LastColumn:  len(ann.Value.Value),
-						Kind:        diags.Issue,
-					},
-				},
-				Severity: c.severity,
-			})
-			slog.LogAttrs(ctx, slog.LevelDebug, "Link request returned an error", slog.String("uri", uri), slog.Any("err", err))
-			continue
-		}
-		_, _ = io.Copy(io.Discard, resp.Body)
-		resp.Body.Close()
-
-		if resp.StatusCode != http.StatusOK {
-			problems = append(problems, Problem{
-				Anchor: AnchorAfter,
-				Lines: diags.LineRange{
-					First: ann.Key.Pos.Lines().First,
-					Last:  ann.Value.Pos.Lines().Last,
-				},
-				Reporter: c.Reporter(),
-				Summary:  "link check failed",
-				Details:  maybeComment(c.comment),
-				Diagnostics: []diags.Diagnostic{
-					{
-						Message:     fmt.Sprintf("GET request for %s returned invalid status code: `%s`.", uri, resp.Status),
-						Pos:         ann.Value.Pos,
-						FirstColumn: 1,
-						LastColumn:  len(ann.Value.Value),
-						Kind:        diags.Issue,
-					},
-				},
-				Severity: c.severity,
-			})
-			slog.LogAttrs(ctx, slog.LevelDebug, "Link request returned invalid status code", slog.String("uri", uri), slog.String("status", resp.Status))
-			continue
-		}
-		slog.LogAttrs(ctx, slog.LevelDebug, "Link request returned a valid status code", slog.String("uri", uri), slog.String("status", resp.Status))
 	}
 
 	return problems
+}
+
+func (c RuleLinkCheck) checkLink(ctx context.Context, ann *parser.YamlKeyValue, uri string) *Problem {
+	rctx, cancel := context.WithTimeout(ctx, c.timeout)
+	defer cancel()
+
+	req, _ := http.NewRequestWithContext(rctx, http.MethodGet, uri, nil)
+
+	for k, v := range c.headers {
+		req.Header.Set(k, v)
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		slog.LogAttrs(ctx, slog.LevelDebug, "Link request returned an error", slog.String("uri", uri), slog.Any("err", err))
+		return &Problem{
+			Anchor: AnchorAfter,
+			Lines: diags.LineRange{
+				First: ann.Key.Pos.Lines().First,
+				Last:  ann.Value.Pos.Lines().Last,
+			},
+			Reporter: c.Reporter(),
+			Summary:  "link check failed",
+			Details:  maybeComment(c.comment),
+			Diagnostics: []diags.Diagnostic{
+				{
+					Message:     fmt.Sprintf("GET request for %s returned an error: %s.", uri, err),
+					Pos:         ann.Value.Pos,
+					FirstColumn: 1,
+					LastColumn:  len(ann.Value.Value),
+					Kind:        diags.Issue,
+				},
+			},
+			Severity: c.severity,
+		}
+	}
+	_, _ = io.Copy(io.Discard, resp.Body)
+	resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		slog.LogAttrs(ctx, slog.LevelDebug, "Link request returned invalid status code", slog.String("uri", uri), slog.String("status", resp.Status))
+		return &Problem{
+			Anchor: AnchorAfter,
+			Lines: diags.LineRange{
+				First: ann.Key.Pos.Lines().First,
+				Last:  ann.Value.Pos.Lines().Last,
+			},
+			Reporter: c.Reporter(),
+			Summary:  "link check failed",
+			Details:  maybeComment(c.comment),
+			Diagnostics: []diags.Diagnostic{
+				{
+					Message:     fmt.Sprintf("GET request for %s returned invalid status code: `%s`.", uri, resp.Status),
+					Pos:         ann.Value.Pos,
+					FirstColumn: 1,
+					LastColumn:  len(ann.Value.Value),
+					Kind:        diags.Issue,
+				},
+			},
+			Severity: c.severity,
+		}
+	}
+	slog.LogAttrs(ctx, slog.LevelDebug, "Link request returned a valid status code", slog.String("uri", uri), slog.String("status", resp.Status))
+	return nil
 }
