@@ -362,7 +362,7 @@ func updateDestination(ctx context.Context, s Summary, c Commenter, dst any, sho
 		slog.String("reporter", c.Describe()),
 		slog.Int("reports", len(s.reports)),
 		slog.Int("online", int(s.OnlineChecks)),
-		slog.Int("offline", int(s.OnlineChecks)),
+		slog.Int("offline", int(s.OfflineChecks)),
 		slog.String("duration", output.HumanizeDuration(s.Duration)),
 		slog.Int("entries", s.TotalEntries),
 		slog.Int("checked", int(s.CheckedEntries)),
