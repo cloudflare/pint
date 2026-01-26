@@ -70,13 +70,13 @@ func TestAggregateSettings(t *testing.T) {
 		{
 			conf: AggregateSettings{
 				Name: ".+",
-				Keep: []string{"job|instance"},
+				Keep: []string{"job_.+"},
 			},
 		},
 		{
 			conf: AggregateSettings{
 				Name:  ".+",
-				Strip: []string{"job|instance"},
+				Strip: []string{".*instance.*"},
 			},
 		},
 		{

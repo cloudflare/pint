@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"regexp"
-	"strings"
 
 	promParser "github.com/prometheus/prometheus/promql/parser"
 
@@ -17,19 +16,10 @@ const (
 	AggregationCheckName = "promql/aggregate"
 )
 
-// labelLiteralPattern matches simple label patterns that are either:
-// - A single literal label name (e.g., "job")
-// - An alternation of literal label names (e.g., "job|instance")
-var labelLiteralPattern = regexp.MustCompile(`^[a-zA-Z_][a-zA-Z0-9_]*(\|[a-zA-Z_][a-zA-Z0-9_]*)*$`)
-
-// extractLiteralLabels extracts individual label names from a simple pattern.
-// Returns nil if the pattern contains complex regex constructs.
-func extractLiteralLabels(pattern string) []string {
-	if !labelLiteralPattern.MatchString(pattern) {
-		return nil
-	}
-	return strings.Split(pattern, "|")
-}
+// isLiteralLabelName returns true if the pattern is a valid Prometheus label name
+// (contains no regex metacharacters). This is used to determine whether to use
+// the original CanHaveLabel behavior for backward compatibility.
+var literalLabelName = regexp.MustCompile(`^[a-zA-Z_][a-zA-Z0-9_]*$`)
 
 func NewAggregationCheck(nameRegex, labelRegex *TemplatedRegexp, keep bool, comment string, severity Severity) AggregationCheck {
 	return AggregationCheck{
@@ -119,9 +109,7 @@ func (c AggregationCheck) Check(_ context.Context, entry *discovery.Entry, _ []*
 
 		if c.keep {
 			// For keep=true: find all labels matching the regex that are being removed.
-			// Track which labels we've already reported to avoid duplicates.
-			reportedLabels := make(map[string]bool)
-
+			// First, check all labels explicitly tracked in the query.
 			for labelName, labelInfo := range src.Labels {
 				// Skip empty label name (used for default exclusion reason).
 				if labelName == "" {
@@ -163,24 +151,16 @@ func (c AggregationCheck) Check(_ context.Context, entry *discovery.Entry, _ []*
 						},
 						Severity: c.severity,
 					})
-					reportedLabels[labelName] = true
 				}
 			}
 
-			// For simple literal patterns, also check using CanHaveLabel for labels
-			// not explicitly tracked. This handles the case where FixedLabels=true
-			// but the label wasn't mentioned in the query (e.g., "sum(foo) by(x)").
-			if literals := extractLiteralLabels(c.labelRegex.original); literals != nil {
-				for _, labelName := range literals {
-					// Skip if already reported or statically defined.
-					if reportedLabels[labelName] || staticLabels[labelName] {
-						continue
-					}
-					// Skip if the label is already in src.Labels (already handled above).
-					if _, ok := src.Labels[labelName]; ok {
-						continue
-					}
-					// Check if this label cannot be present (i.e., it's being removed).
+			// For literal label names (no regex metacharacters), also check using
+			// CanHaveLabel for backward compatibility. This catches cases like
+			// "sum(foo) by(x)" where the checked label isn't explicitly mentioned.
+			if literalLabelName.MatchString(c.labelRegex.original) {
+				labelName := c.labelRegex.original
+				// Skip if already in src.Labels (handled above) or statically defined.
+				if _, ok := src.Labels[labelName]; !ok && !staticLabels[labelName] {
 					if !src.CanHaveLabel(labelName) {
 						reason, fragment := src.LabelExcludeReason(labelName)
 						problems = append(problems, Problem{
@@ -213,10 +193,6 @@ func (c AggregationCheck) Check(_ context.Context, entry *discovery.Entry, _ []*
 			}
 		} else {
 			// For keep=false (strip): find all labels matching the regex that are still present.
-			// Track which labels we've already reported to avoid duplicates.
-			reportedLabels := make(map[string]bool)
-
-			// First, check labels explicitly tracked in src.Labels.
 			for labelName, labelInfo := range src.Labels {
 				// Skip empty label name.
 				if labelName == "" {
@@ -260,26 +236,17 @@ func (c AggregationCheck) Check(_ context.Context, entry *discovery.Entry, _ []*
 						},
 						Severity: c.severity,
 					})
-					reportedLabels[labelName] = true
 				}
 			}
 
-			// For simple literal patterns (like "job" or "job|instance"), also check
-			// using CanHaveLabel for labels not explicitly tracked in src.Labels.
-			// This handles the case where aggregation with "without(x)" doesn't track
-			// other labels that would still be present.
-			if literals := extractLiteralLabels(c.labelRegex.original); literals != nil {
-				for _, labelName := range literals {
-					// Skip if already reported.
-					if reportedLabels[labelName] {
-						continue
-					}
-					// Skip if explicitly marked as impossible in src.Labels.
-					if labelInfo, ok := src.Labels[labelName]; ok && labelInfo.Kind == source.ImpossibleLabel {
-						continue
-					}
-					// Check if this label can be present.
-					if src.CanHaveLabel(labelName) {
+			// For literal label names (no regex metacharacters), also check using
+			// CanHaveLabel for backward compatibility. This catches cases like
+			// "sum(foo) without(x)" where the checked label isn't explicitly mentioned.
+			if literalLabelName.MatchString(c.labelRegex.original) {
+				labelName := c.labelRegex.original
+				// Skip if explicitly marked as impossible in src.Labels (handled above).
+				if labelInfo, ok := src.Labels[labelName]; !ok || labelInfo.Kind != source.ImpossibleLabel {
+					if _, inLabels := src.Labels[labelName]; !inLabels && src.CanHaveLabel(labelName) {
 						posrange := src.Position
 						if aggr, ok := source.MostOuterOperation[*promParser.AggregateExpr](src); ok {
 							posrange = aggr.PosRange

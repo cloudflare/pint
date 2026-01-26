@@ -402,82 +402,82 @@ func TestAggregationCheck(t *testing.T) {
 		},
 		// Regex pattern tests
 		{
-			description: "regex keep: job|instance - both preserved",
-			content:     "- record: foo\n  expr: sum(foo) by(job, instance)\n",
+			description: "regex keep: job_.+ - job_eu preserved",
+			content:     "- record: foo\n  expr: sum(foo) by(job_eu)\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), checks.MustTemplatedRegexp("job|instance"), true, "", checks.Warning)
+				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), checks.MustTemplatedRegexp("job_.+"), true, "", checks.Warning)
 			},
 			prometheus: noProm,
 			problems:   false,
 		},
 		{
-			description: "regex keep: job|instance - job removed",
-			content:     "- record: foo\n  expr: sum(foo) without(job)\n",
+			description: "regex keep: job_.+ - job_eu removed",
+			content:     "- record: foo\n  expr: sum(foo) without(job_eu)\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), checks.MustTemplatedRegexp("job|instance"), true, "", checks.Warning)
+				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), checks.MustTemplatedRegexp("job_.+"), true, "", checks.Warning)
 			},
 			prometheus: noProm,
 			problems:   true,
 		},
 		{
-			description: "regex keep: job|instance - instance removed",
-			content:     "- record: foo\n  expr: sum(foo) without(instance)\n",
+			description: "regex keep: job_.+ - multiple matching labels removed",
+			content:     "- record: foo\n  expr: sum(foo) without(job_eu, job_us)\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), checks.MustTemplatedRegexp("job|instance"), true, "", checks.Warning)
+				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), checks.MustTemplatedRegexp("job_.+"), true, "", checks.Warning)
 			},
 			prometheus: noProm,
 			problems:   true,
 		},
 		{
-			description: "regex keep: job|instance - both removed",
-			content:     "- record: foo\n  expr: sum(foo) without(job, instance)\n",
+			description: "regex strip: job_.+ - matching label stripped",
+			content:     "- record: foo\n  expr: sum(foo) without(job_eu)\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), checks.MustTemplatedRegexp("job|instance"), true, "", checks.Warning)
-			},
-			prometheus: noProm,
-			problems:   true,
-		},
-		{
-			description: "regex strip: job|instance - both stripped",
-			content:     "- record: foo\n  expr: sum(foo) without(job, instance)\n",
-			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), checks.MustTemplatedRegexp("job|instance"), false, "", checks.Warning)
+				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), checks.MustTemplatedRegexp("job_.+"), false, "", checks.Warning)
 			},
 			prometheus: noProm,
 			problems:   false,
 		},
 		{
-			description: "regex strip: job|instance - job present",
-			content:     "- record: foo\n  expr: sum(foo) by(job)\n",
+			description: "regex strip: job_.+ - matching label present",
+			content:     "- record: foo\n  expr: sum(foo) by(job_eu)\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), checks.MustTemplatedRegexp("job|instance"), false, "", checks.Warning)
+				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), checks.MustTemplatedRegexp("job_.+"), false, "", checks.Warning)
 			},
 			prometheus: noProm,
 			problems:   true,
 		},
 		{
-			description: "regex strip: job|instance - instance present",
-			content:     "- record: foo\n  expr: sum(foo) by(instance)\n",
-			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), checks.MustTemplatedRegexp("job|instance"), false, "", checks.Warning)
-			},
-			prometheus: noProm,
-			problems:   true,
-		},
-		{
-			description: "regex strip: job|instance - neither present",
+			description: "regex strip: job_.+ - non-matching label present",
 			content:     "- record: foo\n  expr: sum(foo) by(cluster)\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), checks.MustTemplatedRegexp("job|instance"), false, "", checks.Warning)
+				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), checks.MustTemplatedRegexp("job_.+"), false, "", checks.Warning)
 			},
 			prometheus: noProm,
 			problems:   false,
+		},
+		{
+			description: "regex keep: .*instance.* - env_instance_id preserved",
+			content:     "- record: foo\n  expr: sum(foo) by(env_instance_id)\n",
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), checks.MustTemplatedRegexp(".*instance.*"), true, "", checks.Warning)
+			},
+			prometheus: noProm,
+			problems:   false,
+		},
+		{
+			description: "regex keep: .*instance.* - env_instance_id removed",
+			content:     "- record: foo\n  expr: sum(foo) without(env_instance_id)\n",
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), checks.MustTemplatedRegexp(".*instance.*"), true, "", checks.Warning)
+			},
+			prometheus: noProm,
+			problems:   true,
 		},
 		{
 			description: "regex keep: static label overrides aggregation",
-			content:     "- record: foo\n  expr: sum(foo) by(instance)\n  labels:\n    job: bar\n",
+			content:     "- record: foo\n  expr: sum(foo) without(job_eu)\n  labels:\n    job_eu: bar\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), checks.MustTemplatedRegexp("job|instance"), true, "", checks.Warning)
+				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), checks.MustTemplatedRegexp("job_.+"), true, "", checks.Warning)
 			},
 			prometheus: noProm,
 			problems:   false,
