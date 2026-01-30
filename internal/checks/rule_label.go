@@ -104,7 +104,7 @@ func (c LabelCheck) checkRecordingRule(entry *discovery.Entry) (problems []Probl
 		if c.isRequired {
 			problems = append(problems, Problem{
 				Anchor:   AnchorAfter,
-				Lines:    entry.Rule.RecordingRule.Labels.Lines(),
+				Lines:    entryLabels.Lines(),
 				Reporter: c.Reporter(),
 				Summary:  "required label not set",
 				Details:  maybeComment(c.comment),
@@ -112,9 +112,9 @@ func (c LabelCheck) checkRecordingRule(entry *discovery.Entry) (problems []Probl
 				Diagnostics: []diags.Diagnostic{
 					{
 						Message:     fmt.Sprintf("`%s` label is required.", c.keyRe.original),
-						Pos:         entry.Rule.RecordingRule.Labels.Key.Pos,
+						Pos:         entryLabels.Key.Pos,
 						FirstColumn: 1,
-						LastColumn:  len(entry.Rule.RecordingRule.Labels.Key.Value),
+						LastColumn:  len(entryLabels.Key.Value),
 						Kind:        diags.Issue,
 					},
 				},
