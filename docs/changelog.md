@@ -7,6 +7,10 @@
 - Removed [uber-go/automaxprocs](https://github.com/uber-go/automaxprocs) as it's
   no longer needed with Go 1.25+.
 
+### Fixed
+
+- Fixed a crash in [rule/label](checks/rule/label.md) - [#1696](https://github.com/cloudflare/pint/pull/1696).
+
 ## v0.78.0
 
 ### Fixed

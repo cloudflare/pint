@@ -1,0 +1,36 @@
+! exec pint --no-color lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=INFO msg="Loading configuration file" path=.pint.hcl
+level=INFO msg="Finding all rules to check" paths=["rules"]
+level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
+Bug: required label not set (rule/label)
+  ---> rules/1.yml:3-4 -> `alert:http_success_rate:ratio_2m`
+3 |   labels:
+      ^^^^^^ `service` label is required.
+
+level=INFO msg="Problems found" Bug=1
+level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
+-- rules/1.yml --
+groups:
+- name: has group but no local
+  labels:
+    some: random
+  rules:
+  - record: alert:http_success_rate:ratio_2m
+    expr: sum by(job) (up == 1)
+
+-- .pint.hcl --
+rule {
+  match {
+    kind = "recording"
+    name = "alert:[\\w\\-]+:[\\w\\-]+"
+  }
+
+  label "service" {
+    severity = "bug"
+    required = true
+  }
+}
