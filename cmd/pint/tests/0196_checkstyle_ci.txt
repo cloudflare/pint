@@ -46,7 +46,7 @@ parser {
 <?xml version="1.0" encoding="UTF-8"?>
 <checkstyle version="4.3">
   <file name="rules.yml">
-    <error line="2" severity="Warning" message="always firing alert&#xA;Prometheus alerting rules will trigger an alert for each query that returns *any* result.&#xA;Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.&#xA;In most cases this can be achieved by having some condition in the query expression.&#xA;For example `up == 0` or `rate(error_total[2m]) &gt; 0`.&#xA;Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators)." source="alerts/comparison"></error>
-    <error line="3" severity="Information" message="redundant field with default value" source="alerts/for"></error>
+    <error line="2" severity="warning" message="always firing alert&#xA;Prometheus alerting rules will trigger an alert for each query that returns *any* result.&#xA;Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.&#xA;In most cases this can be achieved by having some condition in the query expression.&#xA;For example `up == 0` or `rate(error_total[2m]) &gt; 0`.&#xA;Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators)." source="alerts/comparison"></error>
+    <error line="3" severity="info" message="redundant field with default value" source="alerts/for"></error>
   </file>
 </checkstyle>

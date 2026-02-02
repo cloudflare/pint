@@ -71,7 +71,7 @@ func TestCheckstyleReporter(t *testing.T) {
 			output: `<?xml version="1.0" encoding="UTF-8"?>
 <checkstyle version="4.3">
   <file name="foo.txt">
-    <error line="5" severity="Information" message="mock text&#xA;mock details" source="mock"></error>
+    <error line="5" severity="info" message="mock text&#xA;mock details" source="mock"></error>
   </file>
 </checkstyle>
 `,
@@ -100,7 +100,7 @@ func TestCheckstyleReporter(t *testing.T) {
 			output: `<?xml version="1.0" encoding="UTF-8"?>
 <checkstyle version="4.3">
   <file name="foo.txt">
-    <error line="5" severity="Bug" message="mock text" source="mock"></error>
+    <error line="5" severity="error" message="mock text" source="mock"></error>
   </file>
 </checkstyle>
 `,
@@ -131,7 +131,7 @@ func TestCheckstyleReporter(t *testing.T) {
 			output: `<?xml version="1.0" encoding="UTF-8"?>
 <checkstyle version="4.3">
   <file name="foo.txt">
-    <error line="5" severity="Bug" message="mock text&#xA;&#x9;&#x9;with [new lines] and pipe| chars that are &#39;quoted&#39;&#xA;&#x9;&#x9;" source="mock"></error>
+    <error line="5" severity="error" message="mock text&#xA;&#x9;&#x9;with [new lines] and pipe| chars that are &#39;quoted&#39;&#xA;&#x9;&#x9;" source="mock"></error>
   </file>
 </checkstyle>
 `,
@@ -171,10 +171,10 @@ func TestCheckstyleReporter(t *testing.T) {
 			output: `<?xml version="1.0" encoding="UTF-8"?>
 <checkstyle version="4.3">
   <file name="foo.txt">
-    <error line="1" severity="Warning" message="problem in foo" source="mock"></error>
+    <error line="1" severity="warning" message="problem in foo" source="mock"></error>
   </file>
   <file name="bar.txt">
-    <error line="2" severity="Fatal" message="problem in bar" source="mock"></error>
+    <error line="2" severity="error" message="problem in bar" source="mock"></error>
   </file>
 </checkstyle>
 `,
@@ -215,8 +215,8 @@ func TestCheckstyleReporter(t *testing.T) {
 			output: `<?xml version="1.0" encoding="UTF-8"?>
 <checkstyle version="4.3">
   <file name="foo.txt">
-    <error line="1" severity="Information" message="first problem" source="mock1"></error>
-    <error line="5" severity="Bug" message="second problem&#xA;with details" source="mock2"></error>
+    <error line="1" severity="info" message="first problem" source="mock1"></error>
+    <error line="5" severity="error" message="second problem&#xA;with details" source="mock2"></error>
   </file>
 </checkstyle>
 `,
