@@ -82,8 +82,6 @@ func (r Report) MarshalXML(e *xml.Encoder, _ xml.StartElement) (err error) {
 		checkstyleSeverity = "error"
 	case checks.Fatal:
 		checkstyleSeverity = "error"
-	default:
-		checkstyleSeverity = "error" // Better too high than too low when unknown.
 	}
 
 	startel := xml.StartElement{
