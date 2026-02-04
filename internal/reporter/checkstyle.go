@@ -7,6 +7,8 @@ import (
 	"io"
 	"log/slog"
 	"strconv"
+
+	"github.com/cloudflare/pint/internal/checks"
 )
 
 func NewCheckStyleReporter(output io.Writer) CheckStyleReporter {
@@ -69,6 +71,19 @@ func (r Report) MarshalXML(e *xml.Encoder, _ xml.StartElement) (err error) {
 	if r.Problem.Details != "" {
 		msg += "\n" + r.Problem.Details
 	}
+
+	var checkstyleSeverity string
+	switch r.Problem.Severity {
+	case checks.Information:
+		checkstyleSeverity = "info"
+	case checks.Warning:
+		checkstyleSeverity = "warning"
+	case checks.Bug:
+		checkstyleSeverity = "error"
+	case checks.Fatal:
+		checkstyleSeverity = "error"
+	}
+
 	startel := xml.StartElement{
 		Name: xml.Name{Local: "error"},
 		Attr: []xml.Attr{
@@ -78,7 +93,7 @@ func (r Report) MarshalXML(e *xml.Encoder, _ xml.StartElement) (err error) {
 			},
 			{
 				Name:  xml.Name{Local: "severity"},
-				Value: r.Problem.Severity.String(),
+				Value: checkstyleSeverity,
 			},
 			{
 				Name:  xml.Name{Local: "message"},
