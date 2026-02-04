@@ -376,6 +376,14 @@ group by (cluster, namespace, workload, workload_type, pod) (
 	`foo{job="xxx"} + ignoring(job) group_right(instance) bar{job="zzz"}`,
 	`foo or ignoring(job) bar`,
 	`foo or on(job) bar`,
+	`
+(
+  sum(rate(panics_total{module_name=~".+"}[5m])) by (colo_name, module_name)
+  /
+  ignoring(module_name) group_left
+  sum(colo:requests:rate5m) by (colo_name)
+) > 0.01
+`,
 }
 
 func TestLabelsSource(t *testing.T) {

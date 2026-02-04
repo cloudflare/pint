@@ -11813,3 +11813,98 @@ output:
       type: selector
 
 ---
+
+[TestLabelsSource/184 - 1]
+expr: |4
+
+    (
+      sum(rate(panics_total{module_name=~".+"}[5m])) by (colo_name, module_name)
+      /
+      ignoring(module_name) group_left
+      sum(colo:requests:rate5m) by (colo_name)
+    ) > 0.01
+output:
+    - labels:
+        "":
+            reason: Query is using aggregation with `by(colo_name, module_name)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 52
+                end: 55
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 5
+                end: 161
+        colo_name:
+            reason: Query is using aggregation with `by(colo_name, module_name)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 56
+                end: 65
+        module_name:
+            reason: Query will only return series where these labels are present.
+            kind: guaranteed
+            fragment:
+                start: 9
+                end: 50
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] panics_total{module_name=~".+"}'
+          op: ""
+        - node: '[*parser.Call] rate(panics_total{module_name=~".+"}[5m])'
+          op: rate
+        - node: '[*parser.AggregateExpr] sum by (colo_name, module_name) (rate(panics_total{module_name=~".+"}[5m]))'
+          op: sum
+      joins:
+        - matchinglabels:
+            - module_name
+          addedlabels: []
+          src:
+            labels:
+                "":
+                    reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
+                    kind: excluded
+                    fragment:
+                        start: 147
+                        end: 150
+                __name__:
+                    reason: Aggregation removes metric name.
+                    kind: excluded
+                    fragment:
+                        start: 121
+                        end: 161
+                colo_name:
+                    reason: Query is using aggregation with `by(colo_name)`, only labels included inside `by(...)` will be present on the results.
+                    kind: included
+                    fragment:
+                        start: 151
+                        end: 160
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] colo:requests:rate5m'
+                  op: ""
+                - node: '[*parser.AggregateExpr] sum by (colo_name) (colo:requests:rate5m)'
+                  op: sum
+            usedLabels:
+                - colo_name
+            position:
+                start: 125
+                end: 145
+            type: aggregation
+            fixedLabels: true
+          op: 57384
+          depth: 0
+          ison: false
+      usedLabels:
+        - colo_name
+        - module_name
+      position:
+        start: 14
+        end: 49
+      type: aggregation
+      fixedLabels: true
+      isConditional: true
+
+---
