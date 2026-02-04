@@ -1404,6 +1404,9 @@ func canJoin(ls, rs Source, vm *promParser.VectorMatching) (bool, string, posran
 			if l.Kind != GuaranteedLabel {
 				continue
 			}
+			if slices.Contains(vm.MatchingLabels, name) {
+				continue
+			}
 			if ls.CanHaveLabel(name) && !rs.CanHaveLabel(name) {
 				reason, fragment := rs.LabelExcludeReason(name)
 				return false, fmt.Sprintf("The %s hand side will never be matched because it doesn't have the `%s` label while the left hand side will. %s",

@@ -3265,6 +3265,11 @@
 
 ---
 
+[TestImpossibleCheck/sum(...)_by(a,b)_/_ignoring(b)_sum(...)_by(a) - 1]
+[]
+
+---
+
 [TestImpossibleCheck/sum(foo_or_vector(0))_>_0 - 1]
 - description: sum(foo or vector(0)) > 0
   content: |4

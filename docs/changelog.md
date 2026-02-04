@@ -10,6 +10,7 @@
 ### Fixed
 
 - Fixed a crash in [rule/label](checks/rule/label.md) - [#1696](https://github.com/cloudflare/pint/pull/1696).
+- Fixed false positive reports from [promql/impossible](checks/promql/impossible.md) check.
 
 ## v0.78.0
 

@@ -707,6 +707,20 @@ func TestImpossibleCheck(t *testing.T) {
 			checker:    newImpossibleCheck,
 			prometheus: newSimpleProm,
 		},
+		{
+			description: "sum(...) by(a,b) / ignoring(b) sum(...) by(a)",
+			content: `
+- alert: foo
+  expr: |
+    (
+      sum(rate(panics_total{module_name=~".+"}[5m])) by (colo_name, module_name)
+      / ignoring(module_name) group_left
+      sum(colo:requests:rate5m) by (colo_name)
+    ) > 0.01
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+		},
 	}
 
 	runTests(t, testCases)
