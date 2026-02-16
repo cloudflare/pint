@@ -195,7 +195,7 @@ func (s Summary) Reports() (reports []Report) {
 }
 
 func (s Summary) ReportsPerPath() (reports [][]Report) {
-	curPath := []Report{}
+	curPath := make([]Report, 0, len(s.reports))
 	for _, r := range s.reports {
 		if len(curPath) > 0 && curPath[0].Path.Name != r.Path.Name {
 			reports = append(reports, curPath)

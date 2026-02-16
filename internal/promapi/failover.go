@@ -117,7 +117,7 @@ func (fg *FailoverGroup) GetDisabledChecks() map[string][]string {
 }
 
 func (fg *FailoverGroup) Include() []string {
-	sl := []string{}
+	sl := make([]string, 0, len(fg.pathsInclude))
 	for _, re := range fg.pathsInclude {
 		sl = append(sl, re.String())
 	}
@@ -125,7 +125,7 @@ func (fg *FailoverGroup) Include() []string {
 }
 
 func (fg *FailoverGroup) Exclude() []string {
-	sl := []string{}
+	sl := make([]string, 0, len(fg.pathsExclude))
 	for _, re := range fg.pathsExclude {
 		sl = append(sl, re.String())
 	}

@@ -3274,7 +3274,7 @@ func TestSeriesCheck(t *testing.T) {
 			checker:     newSeriesCheck,
 			prometheus:  newSimpleProm,
 			otherProms: func(uri string) []*promapi.FailoverGroup {
-				var proms []*promapi.FailoverGroup
+				proms := make([]*promapi.FailoverGroup, 0, 5)
 				for i := range 5 {
 					proms = append(proms, simpleProm(fmt.Sprintf("prom%d", i), uri+"/other", time.Second, false))
 				}
@@ -3302,7 +3302,7 @@ func TestSeriesCheck(t *testing.T) {
 			checker:     newSeriesCheck,
 			prometheus:  newSimpleProm,
 			otherProms: func(uri string) []*promapi.FailoverGroup {
-				var proms []*promapi.FailoverGroup
+				proms := make([]*promapi.FailoverGroup, 0, 5)
 				for i := range 5 {
 					proms = append(proms, simpleProm(fmt.Sprintf("prom%d", i), uri+"/other", time.Second, false))
 				}
@@ -3330,7 +3330,7 @@ func TestSeriesCheck(t *testing.T) {
 			checker:     newSeriesCheck,
 			prometheus:  newSimpleProm,
 			otherProms: func(uri string) []*promapi.FailoverGroup {
-				var proms []*promapi.FailoverGroup
+				proms := make([]*promapi.FailoverGroup, 0, 15)
 				for i := range 15 {
 					proms = append(proms, simpleProm(fmt.Sprintf("prom%d", i), uri+"/other", time.Second, false))
 				}
@@ -3368,7 +3368,7 @@ func TestSeriesCheck(t *testing.T) {
 				return context.WithValue(ctx, checks.SettingsKey(checks.SeriesCheckName), &s)
 			},
 			otherProms: func(uri string) []*promapi.FailoverGroup {
-				var proms []*promapi.FailoverGroup
+				proms := make([]*promapi.FailoverGroup, 0, 15)
 				for i := range 15 {
 					proms = append(proms, simpleProm(fmt.Sprintf("prom%d", i), fmt.Sprintf("%s/other/%d", uri, i), time.Second, false))
 				}
@@ -3417,7 +3417,7 @@ func TestSeriesCheck(t *testing.T) {
 				return context.WithValue(ctx, checks.SettingsKey(checks.SeriesCheckName), &s)
 			},
 			otherProms: func(uri string) []*promapi.FailoverGroup {
-				var proms []*promapi.FailoverGroup
+				proms := make([]*promapi.FailoverGroup, 0, 30)
 				for i := range 30 {
 					proms = append(proms, simpleProm(fmt.Sprintf("prom%d", i), uri+"/other", time.Second, false))
 				}
@@ -3527,7 +3527,7 @@ func TestSeriesCheck(t *testing.T) {
 				return context.WithValue(ctx, checks.SettingsKey(checks.SeriesCheckName), &s)
 			},
 			otherProms: func(uri string) []*promapi.FailoverGroup {
-				var proms []*promapi.FailoverGroup
+				proms := make([]*promapi.FailoverGroup, 0, 30)
 				for i := range 30 {
 					proms = append(proms, simpleProm(fmt.Sprintf("prom%d", i), uri+"/other", time.Second, false))
 				}
@@ -3605,7 +3605,7 @@ func TestSeriesCheck(t *testing.T) {
 				return context.WithValue(ctx, checks.SettingsKey(checks.SeriesCheckName), &s)
 			},
 			otherProms: func(uri string) []*promapi.FailoverGroup {
-				var proms []*promapi.FailoverGroup
+				proms := make([]*promapi.FailoverGroup, 0, 30)
 				for i := range 30 {
 					proms = append(proms, simpleProm(fmt.Sprintf("prom%d", i), uri+"/other", time.Second, false))
 				}
@@ -3684,9 +3684,9 @@ func TestSeriesCheck(t *testing.T) {
 				return context.WithValue(ctx, checks.SettingsKey(checks.SeriesCheckName), &s)
 			},
 			otherProms: func(uri string) []*promapi.FailoverGroup {
-				var proms []*promapi.FailoverGroup
-				for i := range 30 {
-					proms = append(proms, simpleProm(fmt.Sprintf("prom%d", i), uri+"/other", time.Second, false))
+				proms := make([]*promapi.FailoverGroup, 30)
+				for i := range proms {
+					proms[i] = simpleProm(fmt.Sprintf("prom%d", i), uri+"/other", time.Second, false)
 				}
 				return proms
 			},
