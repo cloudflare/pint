@@ -167,9 +167,8 @@ func newFailoverGroup(prom PrometheusConfig) *promapi.FailoverGroup {
 
 	var tlsConf *tls.Config
 	tlsConf, _ = prom.TLS.toHTTPConfig()
-	upstreams := []*promapi.Prometheus{
-		promapi.NewPrometheus(prom.Name, prom.URI, prom.PublicURI, prom.Headers, timeout, prom.Concurrency, prom.RateLimit, tlsConf),
-	}
+	upstreams := make([]*promapi.Prometheus, 0, len(prom.Failover)+1)
+	upstreams = append(upstreams, promapi.NewPrometheus(prom.Name, prom.URI, prom.PublicURI, prom.Headers, timeout, prom.Concurrency, prom.RateLimit, tlsConf))
 	for _, uri := range prom.Failover {
 		upstreams = append(upstreams, promapi.NewPrometheus(prom.Name, uri, prom.PublicURI, prom.Headers, timeout, prom.Concurrency, prom.RateLimit, tlsConf))
 	}

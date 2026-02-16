@@ -7,7 +7,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.3.0
 	github.com/gkampitakis/go-snaps v0.5.19
 	github.com/google/go-cmp v0.7.0
-	github.com/google/go-github/v79 v79.0.0
+	github.com/google/go-github/v82 v82.0.0
 	github.com/hashicorp/hcl/v2 v2.24.0
 	github.com/itchyny/json2yaml v0.1.4
 	github.com/klauspost/compress v1.18.4
