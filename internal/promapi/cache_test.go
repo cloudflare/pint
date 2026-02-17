@@ -285,6 +285,10 @@ func BenchmarkQueryCacheOnlySet(b *testing.B) {
 }
 
 func BenchmarkQueryCacheSetGrow(b *testing.B) {
+	if testing.Short() {
+		b.SkipNow()
+	}
+
 	const maxSize = 1000
 	mockErr := errors.New("Fake Error")
 	cache := newQueryCache(time.Minute, time.Now)
@@ -301,8 +305,11 @@ func BenchmarkQueryCacheSetGrow(b *testing.B) {
 }
 
 func BenchmarkQueryCacheGetMiss(b *testing.B) {
-	cache := newQueryCache(time.Minute, time.Now)
+	if testing.Short() {
+		b.SkipNow()
+	}
 
+	cache := newQueryCache(time.Minute, time.Now)
 	b.ResetTimer()
 	for n := 0; b.Loop(); n++ {
 		cache.get(uint64(n), "/foo")
@@ -310,6 +317,10 @@ func BenchmarkQueryCacheGetMiss(b *testing.B) {
 }
 
 func BenchmarkQueryCacheGC(b *testing.B) {
+	if testing.Short() {
+		b.SkipNow()
+	}
+
 	mockErr := errors.New("Fake Error")
 
 	for _, percent := range []uint64{0, 1, 10, 20, 25, 50, 75, 99, 100} {

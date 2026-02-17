@@ -156,7 +156,7 @@ rule {
 
 	b.ResetTimer()
 	for b.Loop() {
-		_, _ = checkRules(b.Context(), 10, false, gen, cfg, entries)
+		_, _ = checkRules(b.Context(), 1, false, gen, cfg, entries)
 	}
 }
 
