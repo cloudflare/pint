@@ -59,9 +59,10 @@ coverhtml: test
 .PHONY: benchmark
 benchmark:
 	go test \
-		-timeout=15m \
-		-count=5 \
+		-timeout=20m \
+		-count=10 \
 		-run=none \
+		-short \
 		-bench=. \
 		-benchmem \
 		./...
