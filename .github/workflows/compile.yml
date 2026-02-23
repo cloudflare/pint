@@ -44,7 +44,7 @@ jobs:
 
       - name: Test releasing binaries
         if: github.event_name == 'pull_request'
-        uses: goreleaser/goreleaser-action@e435ccd777264be153ace6237001ef4d979d3a7a # v6.4.0
+        uses: goreleaser/goreleaser-action@ec59f474b9834571250b370d4735c50f8e2d1e29 # v7.0.0
         with:
           args: release --clean --skip=validate --skip=sign --skip=sbom --skip=publish --snapshot
 
@@ -68,7 +68,7 @@ jobs:
 
       - name: Release binaries
         if: startsWith(github.ref, 'refs/tags/')
-        uses: goreleaser/goreleaser-action@e435ccd777264be153ace6237001ef4d979d3a7a # v6.4.0
+        uses: goreleaser/goreleaser-action@ec59f474b9834571250b370d4735c50f8e2d1e29 # v7.0.0
         with:
           args: release --clean --release-notes=.tmp/changelog.txt
         env:
