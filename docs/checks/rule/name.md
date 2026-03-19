@@ -44,7 +44,7 @@ rule {
   }
 
   name "rec:.+" {
-    comment  = "ALl recording rules must use the `rec:` prefix."
+    comment  = "All recording rules must use the `rec:` prefix."
     severity = "bug"
   }
 }
@@ -84,7 +84,7 @@ Example pint rule:
 
 ```js
 name "rec:.+" {
-  comment  = "ALl recording rules must use the `rec:` prefix."
+  comment  = "All recording rules must use the `rec:` prefix."
   severity = "bug"
 }
 ```

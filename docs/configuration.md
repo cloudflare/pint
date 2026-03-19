@@ -414,7 +414,7 @@ prometheus "prod-tls" {
   tags        = ["prod"]
   tls {
     serverName = "prometheus.example.com"
-    clientCert = "/ssl/ca.pem"
+    caCert = "/ssl/ca.pem"
     clientCert = "/ssl/client.pem"
     clientKey  = "/ssl/client.key"
   }
