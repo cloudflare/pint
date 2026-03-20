@@ -48,7 +48,7 @@ rather than it's existence.
 
 ## Common problems
 
-If you see this check complaining about some metric it's might due to a number
+If you see this check complaining about some metric it might be due to a number
 of different issues. Here are some usual cases.
 
 ### Your query is using ALERTS or ALERTS_FOR_STATE metrics
@@ -262,7 +262,7 @@ Let's say we have a query using `my_service_errors_total{env="prod"}` and three 
 - `promA` - `my_service_errors_total{env="prod", job="pushgateway", instance="foo", reason="bad request"}`
 - `promC` - `my_service_errors_total{env="prod", job="pushgateway", instance="bar", reason="not found"}`
 
-but `promB` does have any time series for `my_service_errors_total` at all.
+but `promB` doesn't have any time series for `my_service_errors_total` at all.
 We also have this configuration for pint:
 
 ```js
