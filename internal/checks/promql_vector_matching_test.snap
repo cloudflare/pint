@@ -190,6 +190,11 @@
 
 ---
 
+[TestVectorMatchingCheck/ignoring()_skips_guaranteed_label_in_ignore_list - 1]
+[]
+
+---
+
 [TestVectorMatchingCheck/max()_by(a)_and_on(a)_foo - 1]
 - description: max() by(a) and on(a) foo
   content: "\n- record: foo\n  expr: |\n    max by (cluster, env) (\n      increase(error_total{}[10m])\n    ) > 0\n    and on (cluster)\n    cluster_metadata{cluster=\"foo\", environment=\"prod\"} > 0\n  "
@@ -396,6 +401,21 @@
 ---
 
 [TestVectorMatchingCheck/scalar - 1]
+[]
+
+---
+
+[TestVectorMatchingCheck/skip_when_join_is_statically_impossible_via_guaranteed_labels - 1]
+[]
+
+---
+
+[TestVectorMatchingCheck/skip_when_join_is_statically_impossible_via_on() - 1]
+[]
+
+---
+
+[TestVectorMatchingCheck/skip_when_on()_label_is_statically_impossible_on_RHS - 1]
 []
 
 ---

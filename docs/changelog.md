@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.80.0
+
+### Fixed
+
+- [promql/vector_matching](checks/promql/vector_matching.md) check no longer reports problems that are also reported by [promql/impossible](checks/promql/impossible.md).
+
 ## v0.79.0
 
 ### Changed

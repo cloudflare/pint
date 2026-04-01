@@ -1178,6 +1178,106 @@ func TestVectorMatchingCheck(t *testing.T) {
 			},
 			problems: true,
 		},
+		// Verifies that promql_vector_matching doesn't report when the join is statically
+		// impossible - the promql_impossible check already handles this case.
+		// sum by(instance) removes job from LHS, but on(instance, job) requires it.
+		{
+			description: "skip when join is statically impossible via on()",
+			content:     "- record: foo\n  expr: sum by(instance) (foo) * on(instance, job) bar\n",
+			checker:     newVectorMatchingCheck,
+			prometheus:  newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(\nsum by (instance) (foo) * on (instance, job) bar\n)"},
+					},
+					resp: respondWithEmptyVector(),
+				},
+			},
+		},
+		// Verifies that vector_matching doesn't report when the join is statically
+		// impossible due to label mismatch without on/ignoring modifiers.
+		// LHS has instance as guaranteed label via the selector, but sum(bar)
+		// removes all labels making instance structurally impossible on RHS.
+		{
+			description: "skip when join is statically impossible via guaranteed labels",
+			content:     "- record: foo\n  expr: foo{instance=\"a\"} / sum(bar)\n",
+			checker:     newVectorMatchingCheck,
+			prometheus:  newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(\nfoo{instance=\"a\"} / sum(bar)\n)"},
+					},
+					resp: respondWithEmptyVector(),
+				},
+			},
+		},
+		// Verifies that vector_matching skips when on() label is structurally
+		// impossible on the RHS. LHS (foo) can have job, but RHS sum by(instance)
+		// removes job, hitting the ls.CanHaveLabel && !rs.CanHaveLabel branch.
+		{
+			description: "skip when on() label is statically impossible on RHS",
+			content:     "- record: foo\n  expr: foo * on(instance, job) sum by(instance) (bar)\n",
+			checker:     newVectorMatchingCheck,
+			prometheus:  newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(\nfoo * on (instance, job) sum by (instance) (bar)\n)"},
+					},
+					resp: respondWithEmptyVector(),
+				},
+			},
+		},
+		// Verifies that ignoring() with a guaranteed label in the ignore list
+		// doesn't cause a false skip. LHS guarantees instance via the selector,
+		// and instance is in the ignoring() list so it should be excluded from
+		// the label comparison, allowing the check to proceed normally.
+		{
+			description: "ignoring() skips guaranteed label in ignore list",
+			content:     "- record: foo\n  expr: foo{instance=\"a\"} / ignoring(instance) bar\n",
+			checker:     newVectorMatchingCheck,
+			prometheus:  newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(\nfoo{instance=\"a\"} / ignoring (instance) bar\n)"},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(\nfoo{instance=\"a\"}\n) without(__name__,instance)"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{
+								"job": "aaa",
+							}),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(\nbar\n) without(__name__,instance)"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{
+								"job": "aaa",
+							}),
+						},
+					},
+				},
+			},
+		},
 	}
 	runTests(t, testCases)
 }
