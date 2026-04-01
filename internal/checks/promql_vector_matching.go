@@ -139,6 +139,12 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 			}
 		}
 
+		lhsSources := source.LabelsSource(expr.Value.Value, node.Expr.(*promParser.BinaryExpr).LHS)
+		rhsSources := source.LabelsSource(expr.Value.Value, node.Expr.(*promParser.BinaryExpr).RHS)
+		if !canJoinStatically(lhsSources, rhsSources, n.VectorMatching) {
+			goto NEXT
+		}
+
 		leftLabels, leftURI, err := c.seriesLabels(ctx, n.LHS.String(), ignored...)
 		if err != nil {
 			problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug))
@@ -282,6 +288,39 @@ NEXT:
 	}
 
 	return problems
+}
+
+func canJoinStatically(lhsSources, rhsSources []source.Source, vm *promParser.VectorMatching) bool {
+	for _, ls := range lhsSources {
+		for _, rs := range rhsSources {
+			switch {
+			case vm.On && len(vm.MatchingLabels) == 0:
+				return true
+			case vm.On:
+				for _, name := range vm.MatchingLabels {
+					if ls.CanHaveLabel(name) && !rs.CanHaveLabel(name) {
+						return false
+					}
+					if rs.CanHaveLabel(name) && !ls.CanHaveLabel(name) {
+						return false
+					}
+				}
+			default:
+				for name, l := range ls.Labels {
+					if l.Kind != source.GuaranteedLabel {
+						continue
+					}
+					if slices.Contains(vm.MatchingLabels, name) {
+						continue
+					}
+					if !rs.CanHaveLabel(name) {
+						return false
+					}
+				}
+			}
+		}
+	}
+	return true
 }
 
 func (c VectorMatchingCheck) seriesLabels(ctx context.Context, query string, ignored ...model.LabelName) (labelSets, string, error) {
