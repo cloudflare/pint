@@ -152,10 +152,14 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 
 	params := promapi.NewRelativeRange(settings.lookbackRangeDuration, settings.lookbackStepDuration)
 
-	selectors := getNonFallbackSelectors(expr)
+	selectors := getSelectors(expr)
 
 	done := map[string]bool{}
-	for _, selector := range selectors {
+	for _, si := range selectors {
+		if si.hasFallback {
+			continue
+		}
+		selector := si.selector
 		s := selector.String()
 		if _, ok := done[s]; ok {
 			continue
@@ -679,6 +683,12 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 	}
 
 	for _, comment := range orphanedComments(ctx, entry.Rule, selectors) {
+		var msg string
+		if comment.fallback != "" {
+			msg = fmt.Sprintf("pint %s comment `%s` has no effect because the selector is not being checked due to a fallback `%s`", comment.kind, comment.match, comment.fallback)
+		} else {
+			msg = fmt.Sprintf("pint %s comment `%s` doesn't match any selector in this query", comment.kind, comment.match)
+		}
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
 			Lines:    expr.Value.Pos.Lines(),
@@ -688,7 +698,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 			Summary:  "invalid comment",
 			Diagnostics: []diags.Diagnostic{
 				{
-					Message:     fmt.Sprintf("pint %s comment `%s` doesn't match any selector in this query", comment.kind, comment.match),
+					Message:     msg,
 					Pos:         expr.Value.Pos,
 					FirstColumn: 1,
 					LastColumn:  len(expr.Value.Value),
@@ -961,20 +971,51 @@ func joinHasFallback(src []source.Join) bool {
 	return false
 }
 
-func getNonFallbackSelectors(n *parser.PromQLExpr) (selectors []*promParser.VectorSelector) {
+type selectorInfo struct {
+	selector    *promParser.VectorSelector
+	fallback    string
+	hasFallback bool
+}
+
+func getSelectors(n *parser.PromQLExpr) (selectors []selectorInfo) {
+	expr := n.Value.Value
 	sources := n.Source()
 	hasVectorFallback := sourceHasFallback(sources)
-	for _, ls := range sources {
-		if !hasVectorFallback {
-			if vs, ok := source.MostOuterOperation[*promParser.VectorSelector](ls); ok {
-				selectors = append(selectors, selectorWithoutOffset(vs))
+	var fallbackExpr string
+	if hasVectorFallback {
+		for _, ls := range sources {
+			if ls.ReturnInfo.AlwaysReturns {
+				fallbackExpr = source.GetQueryFragment(expr, ls.Position)
+				break
 			}
 		}
-		if !joinHasFallback(ls.Joins) {
+	}
+	joinFallback := false
+	for _, ls := range sources {
+		if vs, ok := source.MostOuterOperation[*promParser.VectorSelector](ls); ok {
+			selectors = append(selectors, selectorInfo{
+				selector:    selectorWithoutOffset(vs),
+				hasFallback: hasVectorFallback,
+				fallback:    fallbackExpr,
+			})
+		}
+		joinFallback = joinHasFallback(ls.Joins)
+		var joinFallbackExpr string
+		if joinFallback {
 			for _, js := range ls.Joins {
-				if vs, ok := source.MostOuterOperation[*promParser.VectorSelector](js.Src); ok {
-					selectors = append(selectors, selectorWithoutOffset(vs))
+				if js.Src.ReturnInfo.AlwaysReturns {
+					joinFallbackExpr = source.GetQueryFragment(expr, js.Src.Position)
+					break
 				}
+			}
+		}
+		for _, js := range ls.Joins {
+			if vs, ok := source.MostOuterOperation[*promParser.VectorSelector](js.Src); ok {
+				selectors = append(selectors, selectorInfo{
+					selector:    selectorWithoutOffset(vs),
+					hasFallback: joinFallback,
+					fallback:    joinFallbackExpr,
+				})
 			}
 		}
 		for _, us := range ls.Unless {
@@ -982,7 +1023,11 @@ func getNonFallbackSelectors(n *parser.PromQLExpr) (selectors []*promParser.Vect
 				continue
 			}
 			if vs, ok := source.MostOuterOperation[*promParser.VectorSelector](us.Src); ok {
-				selectors = append(selectors, selectorWithoutOffset(vs))
+				selectors = append(selectors, selectorInfo{
+					selector:    selectorWithoutOffset(vs),
+					fallback:    "",
+					hasFallback: false,
+				})
 			}
 		}
 	}
@@ -1087,37 +1132,38 @@ func parseRuleSet(s string) (matcher, key, value string) {
 	return matcher, key, value
 }
 
-func wasCommentUsed(commentMatch string, promNames, promTags []string, selectors []*promParser.VectorSelector) bool {
+func wasCommentUsed(commentMatch string, promNames, promTags []string, selectors []selectorInfo) (used bool, fallback string) {
 	match := strings.TrimSuffix(strings.TrimPrefix(commentMatch, SeriesCheckName+"("), ")")
 	// Skip matching tags.
 	if strings.HasPrefix(match, "+") && slices.Contains(promTags, strings.TrimPrefix(match, "+")) {
-		return true
+		return true, ""
 	}
 	// Skip matching Prometheus servers.
 	if slices.Contains(promNames, match) {
-		return true
+		return true, ""
 	}
 	if !strings.HasPrefix(commentMatch, SeriesCheckName+"(") || !strings.HasSuffix(commentMatch, ")") {
-		return true
+		return true, ""
 	}
-	for _, selector := range selectors {
-		isMatch, ok := matchSelectorToMetric(selector, match)
+	for _, si := range selectors {
+		isMatch, ok := matchSelectorToMetric(si.selector, match)
 		if !ok {
 			continue
 		}
 		if isMatch {
-			return true
+			return true, si.fallback
 		}
 	}
-	return false
+	return false, ""
 }
 
 type orphanedComment struct {
-	kind  string
-	match string
+	kind     string
+	match    string
+	fallback string
 }
 
-func orphanedComments(ctx context.Context, rule parser.Rule, selectors []*promParser.VectorSelector) (orhpaned []orphanedComment) {
+func orphanedComments(ctx context.Context, rule parser.Rule, selectors []selectorInfo) (orhpaned []orphanedComment) {
 	var promNames, promTags []string
 	if val := ctx.Value(promapi.AllPrometheusServers); val != nil {
 		for _, server := range val.([]*promapi.FailoverGroup) {
@@ -1126,31 +1172,35 @@ func orphanedComments(ctx context.Context, rule parser.Rule, selectors []*promPa
 		}
 	}
 	for _, disable := range comments.Only[comments.Disable](rule.Comments, comments.DisableType) {
-		if !wasCommentUsed(disable.Match, promNames, promTags, selectors) {
+		used, fallback := wasCommentUsed(disable.Match, promNames, promTags, selectors)
+		if !used || fallback != "" {
 			orhpaned = append(orhpaned, orphanedComment{
-				kind:  comments.DisableComment,
-				match: disable.Match,
+				kind:     comments.DisableComment,
+				match:    disable.Match,
+				fallback: fallback,
 			})
 		}
 	}
 	for _, snooze := range comments.Only[comments.Snooze](rule.Comments, comments.SnoozeType) {
-		if !wasCommentUsed(snooze.Match, promNames, promTags, selectors) {
+		used, fallback := wasCommentUsed(snooze.Match, promNames, promTags, selectors)
+		if !used || fallback != "" {
 			orhpaned = append(orhpaned, orphanedComment{
-				kind:  comments.SnoozeComment,
-				match: snooze.Match,
+				kind:     comments.SnoozeComment,
+				match:    snooze.Match,
+				fallback: fallback,
 			})
 		}
 	}
 	return orhpaned
 }
 
-func orphanedRuleSetComments(rule parser.Rule, selectors []*promParser.VectorSelector) (orhpaned []comments.RuleSet) {
+func orphanedRuleSetComments(rule parser.Rule, selectors []selectorInfo) (orhpaned []comments.RuleSet) {
 	for _, ruleSet := range comments.Only[comments.RuleSet](rule.Comments, comments.RuleSetType) {
 		var wasUsed bool
 		matcher, key, value := parseRuleSet(ruleSet.Value)
-		for _, selector := range selectors {
+		for _, si := range selectors {
 			if matcher != "" {
-				isMatch, _ := matchSelectorToMetric(selector, matcher)
+				isMatch, _ := matchSelectorToMetric(si.selector, matcher)
 				if !isMatch {
 					continue
 				}
@@ -1159,7 +1209,7 @@ func orphanedRuleSetComments(rule parser.Rule, selectors []*promParser.VectorSel
 			case "min-age":
 				wasUsed = true
 			case "ignore/label-value":
-				for _, lm := range selector.LabelMatchers {
+				for _, lm := range si.selector.LabelMatchers {
 					if lm.Name == value {
 						wasUsed = true
 						goto NEXT
