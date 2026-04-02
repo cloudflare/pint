@@ -1199,7 +1199,7 @@
      8 |     (rate(metric1[5m]) or vector(0)) +
      9 |     (rate(metric3{log_name="samplerd"}[5m]) or vector(0))
     10 |     > 0
-             ^^^ pint disable comment `promql/series(metric1)` doesn't match any selector in this query
+             ^^^ pint disable comment `promql/series(metric1)` has no effect because the selector is not being checked due to a fallback `vector(0)`
   problem:
     reporter: promql/series
     summary: invalid comment
@@ -1207,7 +1207,7 @@
         One of the `# pint disable promql/series` comments used in this rule doesn't have any effect and won't disable anything. Make sure that the comment targets series that are used in the rule query and are not already ignored.
         [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax.
     diagnostics:
-        - message: pint disable comment `promql/series(metric1)` doesn't match any selector in this query
+        - message: pint disable comment `promql/series(metric1)` has no effect because the selector is not being checked due to a fallback `vector(0)`
           firstcolumn: 1
           lastcolumn: 128
           kind: 0
@@ -1233,7 +1233,7 @@
      8 |     (rate(metric1[5m]) or vector(0)) +
      9 |     (rate(metric3{log_name="samplerd"}[5m]) or vector(0))
     10 |     > 0
-             ^^^ pint disable comment `promql/series(metric2)` doesn't match any selector in this query
+             ^^^ pint disable comment `promql/series(metric2)` has no effect because the selector is not being checked due to a fallback `vector(0)`
   problem:
     reporter: promql/series
     summary: invalid comment
@@ -1241,7 +1241,7 @@
         One of the `# pint disable promql/series` comments used in this rule doesn't have any effect and won't disable anything. Make sure that the comment targets series that are used in the rule query and are not already ignored.
         [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax.
     diagnostics:
-        - message: pint disable comment `promql/series(metric2)` doesn't match any selector in this query
+        - message: pint disable comment `promql/series(metric2)` has no effect because the selector is not being checked due to a fallback `vector(0)`
           firstcolumn: 1
           lastcolumn: 128
           kind: 0
@@ -1267,7 +1267,7 @@
      8 |     (rate(metric1[5m]) or vector(0)) +
      9 |     (rate(metric3{log_name="samplerd"}[5m]) or vector(0))
     10 |     > 0
-             ^^^ pint disable comment `promql/series(metric3)` doesn't match any selector in this query
+             ^^^ pint disable comment `promql/series(metric3)` has no effect because the selector is not being checked due to a fallback `vector(0)`
   problem:
     reporter: promql/series
     summary: invalid comment
@@ -1275,7 +1275,7 @@
         One of the `# pint disable promql/series` comments used in this rule doesn't have any effect and won't disable anything. Make sure that the comment targets series that are used in the rule query and are not already ignored.
         [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax.
     diagnostics:
-        - message: pint disable comment `promql/series(metric3)` doesn't match any selector in this query
+        - message: pint disable comment `promql/series(metric3)` has no effect because the selector is not being checked due to a fallback `vector(0)`
           firstcolumn: 1
           lastcolumn: 128
           kind: 0
@@ -2390,32 +2390,6 @@
 ---
 
 [TestSeriesCheck/unused_rule/set_comment_or_vector - 1]
-- description: unused rule/set comment or vector
-  content: |4
-
-    - alert : Foo
-      # pint rule/set promql/series(mymetric) ignore/label-value action
-      # pint rule/set promql/series(mymetric) ignore/label-value type
-      expr: (rate(mymetric{action="failure"}[2m]) or vector(0)) > 0
-  output: |
-    5 |   expr: (rate(mymetric{action="failure"}[2m]) or vector(0)) > 0
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ pint rule/set comment `promql/series(mymetric) ignore/label-value action` doesn't match any label matcher in this query
-  problem:
-    reporter: promql/series
-    summary: invalid comment
-    details: |-
-        One of the `# pint rule/set promql/series` comments used in this rule doesn't have any effect. Make sure that the comment targets series and labels that are used in the rule query and are not already ignored.
-        [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#ignorelabel-value) for docs about comment syntax.
-    diagnostics:
-        - message: pint rule/set comment `promql/series(mymetric) ignore/label-value action` doesn't match any label matcher in this query
-          firstcolumn: 1
-          lastcolumn: 55
-          kind: 0
-    lines:
-        first: 5
-        last: 5
-    severity: 1
-    anchor: 0
 - description: unused rule/set comment or vector
   content: |4
 
