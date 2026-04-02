@@ -419,7 +419,7 @@ func (pq PrometheusQuery) Discover(ctx context.Context) ([]*promapi.FailoverGrou
 func formatAliases(data map[string]string, t string) string {
 	var vars strings.Builder
 	for k := range data {
-		vars.WriteString(fmt.Sprintf("{{ $%s := .%s }}", k, k))
+		fmt.Fprintf(&vars, "{{ $%s := .%s }}", k, k)
 	}
 	vars.WriteString(t)
 	return vars.String()
