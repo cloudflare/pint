@@ -478,6 +478,11 @@ func (c CostCheck) isSuggestionFor(src, potential source.Source, join *source.Jo
 					goto NEXT
 				}
 			}
+			for _, name := range src.TransformedLabels(source.PossibleLabel, source.GuaranteedLabel) {
+				if !potential.CanHaveLabel(name) {
+					goto NEXT
+				}
+			}
 			var extra string
 			if len(lms) > 0 {
 				var buf strings.Builder

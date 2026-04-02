@@ -7,6 +7,7 @@
 - [promql/vector_matching](checks/promql/vector_matching.md) check no longer reports problems that are also reported by [promql/impossible](checks/promql/impossible.md).
 - Fixed problem description in [promql/series](checks/promql/series.md) check for
   disable comments that have no effect.
+- Fixed invalid suggestions from the [query/cost](checks/query/cost.md) check.
 
 ## v0.79.0
 

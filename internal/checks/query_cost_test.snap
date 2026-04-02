@@ -397,6 +397,11 @@
 
 ---
 
+[TestCostCheck/suggest_recording_rule_/_by_vs_without_mismatch - 1]
+[]
+
+---
+
 [TestCostCheck/suggest_recording_rule_/_complex - 1]
 - description: suggest recording rule / complex
   content: |
