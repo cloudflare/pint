@@ -316,10 +316,10 @@ func (c CostCheck) suggestRecordingRules(
 						details.WriteRune('\n')
 						details.WriteRune('\n')
 						details.WriteString("To get results for both original and suggested query click below:\n\n")
-						details.WriteString(fmt.Sprintf("- [Original query](%s/graph?g0.expr=%s&g0.tab=table)\n",
-							qr.URI, url.QueryEscape(expr.Value.Value)))
-						details.WriteString(fmt.Sprintf("- [Suggested query](%s/graph?g0.expr=%s&g0.tab=table)\n",
-							qr.URI, url.QueryEscape(sq)))
+						fmt.Fprintf(&details, "- [Original query](%s/graph?g0.expr=%s&g0.tab=table)\n",
+							qr.URI, url.QueryEscape(expr.Value.Value))
+						fmt.Fprintf(&details, "- [Suggested query](%s/graph?g0.expr=%s&g0.tab=table)\n",
+							qr.URI, url.QueryEscape(sq))
 					}
 
 					problems = append(problems, Problem{

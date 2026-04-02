@@ -34,7 +34,7 @@ func TestAppendSampleToRanges(t *testing.T) {
 	printRange := func(tr []promapi.MetricTimeRange) string {
 		var buf strings.Builder
 		for _, r := range tr {
-			buf.WriteString(fmt.Sprintf("%s %s - %s\n", r.Labels, r.Start.UTC().Format(time.RFC3339), r.End.UTC().Format(time.RFC3339)))
+			fmt.Fprintf(&buf, "%s %s - %s\n", r.Labels, r.Start.UTC().Format(time.RFC3339), r.End.UTC().Format(time.RFC3339))
 		}
 		return buf.String()
 	}
@@ -484,7 +484,7 @@ func TestMergeRanges(t *testing.T) {
 	printRange := func(tr []promapi.MetricTimeRange) string {
 		var buf strings.Builder
 		for _, r := range tr {
-			buf.WriteString(fmt.Sprintf("%s %s - %s\n", r.Labels, r.Start.UTC().Format(time.RFC3339), r.End.UTC().Format(time.RFC3339)))
+			fmt.Fprintf(&buf, "%s %s - %s\n", r.Labels, r.Start.UTC().Format(time.RFC3339), r.End.UTC().Format(time.RFC3339))
 		}
 		return buf.String()
 	}
