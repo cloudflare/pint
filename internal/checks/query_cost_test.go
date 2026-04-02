@@ -1706,6 +1706,59 @@ func TestCostCheck(t *testing.T) {
 			},
 		},
 		{
+			// Query uses by(instance) aggregation but the recording rule uses without(instance),
+			// suggesting this rule would produce different label sets and is not a valid substitution.
+			description: "suggest recording rule / by vs without mismatch",
+			content:     "- alert: foo\n  expr: sum by(instance) (rate(foo_total[5m])) > 10\n",
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 100, 100, 0, 0, "check comment", checks.Warning)
+			},
+			prometheus: newSimpleProm,
+			entries: mustParseContent(`
+- record: colo:foo
+  expr: sum(rate(foo_total[5m])) without(instance)
+`),
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(\nsum by(instance) (rate(foo_total[5m])) > 10\n)"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 99,
+								PeakSamples:           19,
+							},
+							Timings: promapi.QueryTimings{
+								EvalTotalTime: 60.3,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: checks.BytesPerSampleQuery},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSampleWithValue(map[string]string{}, 2048),
+						},
+					},
+				},
+			},
+		},
+		{
 			description: "comments at the end",
 			content: `
 {% raw %} # pint ignore/line
