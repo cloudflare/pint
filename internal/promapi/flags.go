@@ -11,12 +11,16 @@ import (
 	"time"
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
-	"github.com/prymitive/current"
 )
 
 const (
 	APIPathFlags = "/api/v1/status/flags"
 )
+
+type PrometheusFlagsResponse struct {
+	Data v1.FlagsResult `json:"data"`
+	PrometheusResponse
+}
 
 type FlagsResult struct {
 	Flags v1.FlagsResult
@@ -50,7 +54,7 @@ func (q flagsQuery) Run() queryResult {
 		return qr
 	}
 
-	flags, err := streamFlags(resp.Body)
+	flags, err := parseFlags(resp.Body)
 	qr.value, qr.err = flags, err
 	return qr
 }
@@ -96,35 +100,20 @@ func (prom *Prometheus) Flags(ctx context.Context) (*FlagsResult, error) {
 	return &r, nil
 }
 
-func streamFlags(r io.Reader) (flags v1.FlagsResult, err error) {
+func parseFlags(r io.Reader) (_ v1.FlagsResult, err error) {
 	defer dummyReadAll(r)
 
-	var status, errType, errText string
-	errText = "empty response object"
-	flags = v1.FlagsResult{}
-	decoder := current.Object(
-		current.Key("status", current.Value(func(s string, _ bool) {
-			status = s
-		})),
-		current.Key("error", current.Value(func(s string, _ bool) {
-			errText = s
-		})),
-		current.Key("errorType", current.Value(func(s string, _ bool) {
-			errType = s
-		})),
-		current.Key("data", current.Map(func(k, v string) {
-			flags[k] = v
-		})),
-	)
-
-	dec := json.NewDecoder(r)
-	if err = decoder.Stream(dec); err != nil {
-		return nil, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: "JSON parse error: " + err.Error()}
+	var data PrometheusFlagsResponse
+	if err = json.NewDecoder(r).Decode(&data); err != nil {
+		return data.Data, APIError{Status: data.Status, ErrorType: v1.ErrBadResponse, Err: "JSON parse error: " + err.Error()}
 	}
 
-	if status != "success" {
-		return nil, APIError{Status: status, ErrorType: decodeErrorType(errType), Err: errText}
+	if data.Status != "success" {
+		if data.Error == "" {
+			data.Error = "empty response object"
+		}
+		return data.Data, APIError{Status: data.Status, ErrorType: decodeErrorType(data.ErrorType), Err: data.Error}
 	}
 
-	return flags, nil
+	return data.Data, nil
 }

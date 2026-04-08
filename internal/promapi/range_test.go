@@ -569,7 +569,7 @@ func TestRange(t *testing.T) {
 			end:     timeParse("2022-06-14T00:01:00Z"),
 			step:    time.Minute,
 			timeout: time.Second,
-			err:     "bad_response: JSON parse error: invalid character '}' after object key",
+			err:     `bad_response: JSON parse error: jsontext: invalid character '}' after object name (expecting ':') within "/data/resultType" after offset 40`,
 			handler: func(_ *testing.T, w http.ResponseWriter, _ *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				w.Header().Set("Content-Type", "application/json")

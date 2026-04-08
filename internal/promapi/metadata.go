@@ -11,12 +11,16 @@ import (
 	"time"
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
-	"github.com/prymitive/current"
 )
 
 const (
 	APIPathMetadata = "/api/v1/metadata"
 )
+
+type PrometheusMetadataResponse struct {
+	Data map[string][]v1.Metadata `json:"data"`
+	PrometheusResponse
+}
 
 type MetadataResult struct {
 	URI      string
@@ -56,7 +60,7 @@ func (q metadataQuery) Run() queryResult {
 		return qr
 	}
 
-	meta, err := streamMetadata(resp.Body)
+	meta, err := parseMetadata(resp.Body)
 	qr.value, qr.err = meta, err
 	return qr
 }
@@ -103,35 +107,20 @@ func (prom *Prometheus) Metadata(ctx context.Context, metric string) (*MetadataR
 	return &metadata, nil
 }
 
-func streamMetadata(r io.Reader) (meta map[string][]v1.Metadata, err error) {
+func parseMetadata(r io.Reader) (meta map[string][]v1.Metadata, err error) {
 	defer dummyReadAll(r)
 
-	var status, errType, errText string
-	errText = "empty response object"
-	meta = map[string][]v1.Metadata{}
-	decoder := current.Object(
-		current.Key("status", current.Value(func(s string, _ bool) {
-			status = s
-		})),
-		current.Key("error", current.Value(func(s string, _ bool) {
-			errText = s
-		})),
-		current.Key("errorType", current.Value(func(s string, _ bool) {
-			errType = s
-		})),
-		current.Key("data", current.Map(func(k string, v []v1.Metadata) {
-			meta[k] = v
-		})),
-	)
-
-	dec := json.NewDecoder(r)
-	if err = decoder.Stream(dec); err != nil {
-		return nil, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: "JSON parse error: " + err.Error()}
+	var data PrometheusMetadataResponse
+	if err = json.NewDecoder(r).Decode(&data); err != nil {
+		return data.Data, APIError{Status: data.Status, ErrorType: v1.ErrBadResponse, Err: "JSON parse error: " + err.Error()}
 	}
 
-	if status != "success" {
-		return nil, APIError{Status: status, ErrorType: decodeErrorType(errType), Err: errText}
+	if data.Status != "success" {
+		if data.Error == "" {
+			data.Error = "empty response object"
+		}
+		return data.Data, APIError{Status: data.Status, ErrorType: decodeErrorType(data.ErrorType), Err: data.Error}
 	}
 
-	return meta, nil
+	return data.Data, nil
 }

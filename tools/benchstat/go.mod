@@ -1,6 +1,6 @@
 module _
 
-go 1.25.0
+go 1.26.0
 
 tool golang.org/x/perf/cmd/benchstat
 

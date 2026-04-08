@@ -239,7 +239,7 @@ func (gl GitLabReporter) Delete(ctx context.Context, dst any, comment ExistingCo
 		gl.project,
 		mr.mrID,
 		c.discussionID,
-		&gitlab.ResolveMergeRequestDiscussionOptions{Resolved: gitlab.Ptr(true)},
+		&gitlab.ResolveMergeRequestDiscussionOptions{Resolved: new(true)},
 		gitlab.WithContext(reqCtx),
 	)
 	return err
@@ -280,8 +280,8 @@ func (gl *GitLabReporter) getMRs(ctx context.Context) (ids []int64, err error) {
 		reqCtx, cancel := context.WithTimeout(ctx, gl.timeout)
 		defer cancel()
 		return gl.client.MergeRequests.ListProjectMergeRequests(gl.project, &gitlab.ListProjectMergeRequestsOptions{
-			State:        gitlab.Ptr("opened"),
-			SourceBranch: gitlab.Ptr(gl.branch),
+			State:        new("opened"),
+			SourceBranch: new(gl.branch),
 			ListOptions:  gitlab.ListOptions{Page: pageNum},
 		}, gitlab.WithContext(reqCtx))
 	})
@@ -363,7 +363,7 @@ func (gl GitLabReporter) generalComment(ctx context.Context, mr gitlabMR, msg st
 
 	reqCtx, cancel := context.WithTimeout(ctx, gl.timeout)
 	defer cancel()
-	opt := gitlab.CreateMergeRequestDiscussionOptions{Body: gitlab.Ptr(msg)}
+	opt := gitlab.CreateMergeRequestDiscussionOptions{Body: new(msg)}
 	_, _, err = gl.client.Discussions.CreateMergeRequestDiscussion(gl.project, mr.mrID, &opt, gitlab.WithContext(reqCtx))
 	return err
 }
@@ -421,7 +421,7 @@ func (gl GitLabReporter) unresolveIfPresent(ctx context.Context, dst any, commen
 					gl.project,
 					mr.mrID,
 					meta.discussionID,
-					&gitlab.ResolveMergeRequestDiscussionOptions{Resolved: gitlab.Ptr(false)},
+					&gitlab.ResolveMergeRequestDiscussionOptions{Resolved: new(false)},
 					gitlab.WithContext(reqCtx),
 				)
 				return err == nil, err
@@ -441,19 +441,19 @@ func reportToGitLabDiscussion(ctx context.Context, pending PendingComment, diffs
 	}
 
 	d := gitlab.CreateMergeRequestDiscussionOptions{
-		Body: gitlab.Ptr(pending.text),
+		Body: new(pending.text),
 		Position: &gitlab.PositionOptions{
-			PositionType: gitlab.Ptr("text"),
-			BaseSHA:      gitlab.Ptr(ver.BaseCommitSHA),
-			HeadSHA:      gitlab.Ptr(ver.HeadCommitSHA),
-			StartSHA:     gitlab.Ptr(ver.StartCommitSHA),
+			PositionType: new("text"),
+			BaseSHA:      new(ver.BaseCommitSHA),
+			HeadSHA:      new(ver.HeadCommitSHA),
+			StartSHA:     new(ver.StartCommitSHA),
 		},
 	}
 
 	for _, diff := range pathDiffs {
-		d.Position.OldPath = gitlab.Ptr(diff.OldPath)
+		d.Position.OldPath = new(diff.OldPath)
 		if d.Position.NewPath == nil {
-			d.Position.NewPath = gitlab.Ptr(diff.NewPath)
+			d.Position.NewPath = new(diff.NewPath)
 		}
 
 		// Diff is empty, decide if it was modified based on git history.
@@ -464,13 +464,13 @@ func reportToGitLabDiscussion(ctx context.Context, pending PendingComment, diffs
 				slog.Bool("modified", pending.modifiedLine))
 			switch {
 			case pending.anchor == checks.AnchorBefore:
-				d.Position.OldLine = gitlab.Ptr(int64(pending.line))
+				d.Position.OldLine = new(int64(pending.line))
 				d.Position.NewLine = nil
 			case pending.modifiedLine:
-				d.Position.NewLine = gitlab.Ptr(int64(pending.line))
+				d.Position.NewLine = new(int64(pending.line))
 			case !pending.modifiedLine:
-				d.Position.NewLine = gitlab.Ptr(int64(pending.line))
-				d.Position.OldLine = gitlab.Ptr(int64(pending.line))
+				d.Position.NewLine = new(int64(pending.line))
+				d.Position.OldLine = new(int64(pending.line))
 			}
 			continue
 		}
@@ -479,19 +479,19 @@ func reportToGitLabDiscussion(ctx context.Context, pending PendingComment, diffs
 		switch {
 		case !ok:
 			// No diffLine for this line, could be a file rename.
-			d.Position.NewLine = gitlab.Ptr(int64(pending.line))
-			d.Position.OldLine = gitlab.Ptr(int64(pending.line))
+			d.Position.NewLine = new(int64(pending.line))
+			d.Position.OldLine = new(int64(pending.line))
 		case pending.anchor == checks.AnchorBefore:
 			// Comment on removed line.
-			d.Position.OldLine = gitlab.Ptr(int64(pending.line))
+			d.Position.OldLine = new(int64(pending.line))
 			d.Position.NewLine = nil
 		case ok && !dl.wasModified:
 			// Comment on unmodified line.
-			d.Position.NewLine = gitlab.Ptr(dl.new)
-			d.Position.OldLine = gitlab.Ptr(dl.old)
+			d.Position.NewLine = new(dl.new)
+			d.Position.OldLine = new(dl.old)
 		default:
 			// Comment on new or modified line.
-			d.Position.NewLine = gitlab.Ptr(dl.new)
+			d.Position.NewLine = new(dl.new)
 		}
 	}
 

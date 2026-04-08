@@ -161,8 +161,8 @@ func TestGithubReporterFixCommentLine(t *testing.T) {
 			name: "anchor before returns LEFT side",
 			files: []*github.CommitFile{
 				{
-					Filename: github.Ptr("file.go"),
-					Patch:    github.Ptr("@@ -1,3 +1,4 @@\n line1\n+line2\n line3"),
+					Filename: new("file.go"),
+					Patch:    new("@@ -1,3 +1,4 @@\n line1\n+line2\n line3"),
 				},
 			},
 			pending: PendingComment{
@@ -177,8 +177,8 @@ func TestGithubReporterFixCommentLine(t *testing.T) {
 			name: "anchor after returns RIGHT side",
 			files: []*github.CommitFile{
 				{
-					Filename: github.Ptr("file.go"),
-					Patch:    github.Ptr("@@ -1,3 +1,4 @@\n line1\n+line2\n line3"),
+					Filename: new("file.go"),
+					Patch:    new("@@ -1,3 +1,4 @@\n line1\n+line2\n line3"),
 				},
 			},
 			pending: PendingComment{
@@ -193,8 +193,8 @@ func TestGithubReporterFixCommentLine(t *testing.T) {
 			name: "unmodified line finds first modified",
 			files: []*github.CommitFile{
 				{
-					Filename: github.Ptr("file.go"),
-					Patch:    github.Ptr("@@ -1,3 +1,4 @@\n line1\n+line2\n line3"),
+					Filename: new("file.go"),
+					Patch:    new("@@ -1,3 +1,4 @@\n line1\n+line2\n line3"),
 				},
 			},
 			pending: PendingComment{

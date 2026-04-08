@@ -11,7 +11,6 @@ import (
 	"syscall"
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
-	"github.com/prymitive/current"
 )
 
 func isUnsupportedError(err error) bool {
@@ -110,6 +109,12 @@ func decodeError(err error) string {
 	return err.Error()
 }
 
+type PrometheusResponse struct {
+	Status    string `json:"status"`
+	Error     string `json:"error"`
+	ErrorType string `json:"errorType"`
+}
+
 func tryDecodingAPIError(resp *http.Response) error {
 	slog.LogAttrs(context.Background(), slog.LevelDebug, "Trying to parse Prometheus error response", slog.Int("code", resp.StatusCode))
 
@@ -136,21 +141,8 @@ func tryDecodingAPIError(resp *http.Response) error {
 		}
 	}
 
-	var status, errType, errText string
-	decoder := current.Object(
-		current.Key("status", current.Value(func(s string, _ bool) {
-			status = s
-		})),
-		current.Key("error", current.Value(func(s string, _ bool) {
-			errText = s
-		})),
-		current.Key("errorType", current.Value(func(s string, _ bool) {
-			errType = s
-		})),
-	)
-
-	dec := json.NewDecoder(resp.Body)
-	if err := decoder.Stream(dec); err != nil {
+	var data PrometheusResponse
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		switch resp.StatusCode / 100 {
 		case 4:
 			return APIError{Status: "error", ErrorType: v1.ErrClient, Err: resp.Status}
@@ -160,5 +152,5 @@ func tryDecodingAPIError(resp *http.Response) error {
 		return APIError{Status: "error", ErrorType: v1.ErrBadResponse, Err: resp.Status}
 	}
 
-	return APIError{Status: status, ErrorType: decodeErrorType(errType), Err: errText}
+	return APIError{Status: data.Status, ErrorType: decodeErrorType(data.ErrorType), Err: data.Error}
 }
