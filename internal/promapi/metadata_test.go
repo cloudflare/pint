@@ -62,6 +62,10 @@ func TestMetadata(t *testing.T) {
 			w.WriteHeader(http.StatusOK)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{"status":"success","data":{"gauge"}}`))
+		case "emptyError":
+			w.WriteHeader(http.StatusOK)
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(`{"status":"error","errorType":"bad_data"}`))
 		default:
 			w.WriteHeader(http.StatusBadRequest)
 			w.Header().Set("Content-Type", "application/json")
@@ -137,6 +141,11 @@ func TestMetadata(t *testing.T) {
 			metric:  "badJson",
 			timeout: time.Second,
 			err:     `bad_response: JSON parse error: invalid character '}' after object key`,
+		},
+		{
+			metric:  "emptyError",
+			timeout: time.Second,
+			err:     `bad_data: empty response object`,
 		},
 	}
 

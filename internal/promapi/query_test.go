@@ -99,6 +99,10 @@ func TestQuery(t *testing.T) {
 			w.WriteHeader(http.StatusOK)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{"status":"error","errorType":"bad_data","error":"custom error message"}`))
+		case "emptyError":
+			w.WriteHeader(http.StatusOK)
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(`{"status":"error","errorType":"bad_data"}`))
 		case "badJson":
 			w.WriteHeader(http.StatusOK)
 			w.Header().Set("Content-Type", "application/json")
@@ -258,6 +262,11 @@ func TestQuery(t *testing.T) {
 			query:   "badJson",
 			timeout: time.Second,
 			err:     `bad_response: JSON parse error: jsontext: invalid character '}' after object name (expecting ':') within "/data/resultType" after offset 40`,
+		},
+		{
+			query:   "emptyError",
+			timeout: time.Second,
+			err:     `bad_data: empty response object`,
 		},
 	}
 

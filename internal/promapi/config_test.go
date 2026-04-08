@@ -55,6 +55,10 @@ func TestConfig(t *testing.T) {
 			w.WriteHeader(http.StatusOK)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{"status":"error","errorType":"bad_data","error":"custom error message"}`))
+		case "/emptyError" + promapi.APIPathConfig:
+			w.WriteHeader(http.StatusOK)
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(`{"status":"error","errorType":"bad_data"}`))
 		default:
 			w.WriteHeader(http.StatusBadRequest)
 			w.Header().Set("Content-Type", "application/json")
@@ -135,6 +139,11 @@ func TestConfig(t *testing.T) {
 			prefix:  "/apiError",
 			timeout: time.Second,
 			err:     "bad_data: custom error message",
+		},
+		{
+			prefix:  "/emptyError",
+			timeout: time.Second,
+			err:     "bad_data: empty response object",
 		},
 	}
 
