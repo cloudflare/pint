@@ -3,7 +3,6 @@ package promapi_test
 import (
 	"fmt"
 	"net/http"
-	"net/http/httptest"
 	"strconv"
 	"strings"
 	"testing"
@@ -13,6 +12,7 @@ import (
 	"github.com/prometheus/common/model"
 	"github.com/prometheus/prometheus/model/labels"
 	"github.com/stretchr/testify/require"
+	"go.nhat.io/httpmock"
 
 	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/promapi"
@@ -53,12 +53,10 @@ func (ar absoluteRange) String() string {
 }
 
 func TestRange(t *testing.T) {
-	type handlerFunc func(t *testing.T, w http.ResponseWriter, r *http.Request)
-
 	type testCaseT struct {
 		start   time.Time
 		end     time.Time
-		handler handlerFunc
+		mock    httpmock.Mocker
 		query   string
 		err     string
 		out     promapi.SeriesTimeRanges
@@ -91,27 +89,12 @@ func TestRange(t *testing.T) {
 			step:    time.Minute,
 			timeout: time.Second,
 			out:     promapi.SeriesTimeRanges{},
-			handler: func(t *testing.T, w http.ResponseWriter, r *http.Request) {
-				err := r.ParseForm()
-				if err != nil {
-					t.Fatal(err)
-				}
-				require.Equal(t, "1m", r.Form.Get("query"))
-				require.Equal(t, "60", r.Form.Get("step"))
-
-				start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
-				require.InEpsilon(t, timeParse("2022-06-14T00:00:00Z").Unix(), start, 0.0001, "invalid start")
-
-				end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
-				require.InEpsilon(t, timeParse("2022-06-14T00:01:00Z").Unix(), end, 0.0001, "invalid end")
-
-				diff := time.Unix(int64(end), 0).Sub(time.Unix(int64(start), 0))
-				require.Equal(t, time.Minute, diff)
-
-				w.WriteHeader(http.StatusOK)
-				w.Header().Set("Content-Type", "application/json")
-				_, _ = w.Write([]byte(`{"status":"success","data":{"resultType":"matrix","result":[]}}`))
-			},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPost(promapi.APIPathQueryRange).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"resultType":"matrix","result":[]}}`).
+					UnlimitedTimes()
+			}),
 		},
 		{
 			query:   "5m",
@@ -128,34 +111,17 @@ func TestRange(t *testing.T) {
 					},
 				},
 			},
-			handler: func(t *testing.T, w http.ResponseWriter, r *http.Request) {
-				err := r.ParseForm()
-				if err != nil {
-					t.Fatal(err)
-				}
-				require.Equal(t, "5m", r.Form.Get("query"))
-				require.Equal(t, "300", r.Form.Get("step"))
-
-				start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
-				end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
-
-				switch start {
-				case float64(timeParse("2022-06-14T00:00:00Z").Unix()):
-					require.InEpsilon(t, timeParse("2022-06-14T01:59:59Z").Unix(), end, 0.0001, "invalid end for #0")
-				case float64(timeParse("2022-06-14T02:00:00Z").Unix()):
-					require.InEpsilon(t, timeParse("2022-06-14T03:00:00Z").Unix(), end, 0.0001, "invalid end for #1")
-
-				default:
-					t.Fatalf("unknown start: %.2f", start)
-				}
-
-				w.WriteHeader(http.StatusOK)
-				w.Header().Set("Content-Type", "application/json")
-				values := make([]string, 0, 1)
-				values = append(values, fmt.Sprintf(`[%d.0,"1"]`, timeParse("2022-06-14T01:00:00Z").Unix()))
-
-				_, _ = fmt.Fprintf(w, `{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]}]}}`, strings.Join(values, ","))
-			},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPost(promapi.APIPathQueryRange).
+					ReturnHeader("Content-Type", "application/json").
+					Run(func(r *http.Request) ([]byte, error) {
+						_ = r.ParseForm()
+						values := make([]string, 0, 1)
+						values = append(values, fmt.Sprintf(`[%d.0,"1"]`, timeParse("2022-06-14T01:00:00Z").Unix()))
+						return fmt.Appendf(nil, `{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]}]}}`, strings.Join(values, ",")), nil
+					}).
+					UnlimitedTimes()
+			}),
 		},
 		{
 			query:   "1h",
@@ -164,27 +130,12 @@ func TestRange(t *testing.T) {
 			step:    time.Minute,
 			timeout: time.Second,
 			out:     promapi.SeriesTimeRanges{},
-			handler: func(t *testing.T, w http.ResponseWriter, r *http.Request) {
-				err := r.ParseForm()
-				if err != nil {
-					t.Fatal(err)
-				}
-				require.Equal(t, "1h", r.Form.Get("query"))
-				require.Equal(t, "60", r.Form.Get("step"))
-
-				start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
-				require.InEpsilon(t, timeParse("2022-06-14T00:00:00Z").Unix(), start, 0.0001, "invalid start")
-
-				end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
-				require.InEpsilon(t, timeParse("2022-06-14T01:00:00Z").Unix(), end, 0.0001, "invalid end")
-
-				diff := time.Unix(int64(end), 0).Sub(time.Unix(int64(start), 0))
-				require.Equal(t, time.Hour, diff)
-
-				w.WriteHeader(http.StatusOK)
-				w.Header().Set("Content-Type", "application/json")
-				_, _ = w.Write([]byte(`{"status":"success","data":{"resultType":"matrix","result":[]}}`))
-			},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPost(promapi.APIPathQueryRange).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"resultType":"matrix","result":[]}}`).
+					UnlimitedTimes()
+			}),
 		},
 		{
 			query:   "2h",
@@ -193,27 +144,12 @@ func TestRange(t *testing.T) {
 			step:    time.Minute,
 			timeout: time.Second,
 			out:     promapi.SeriesTimeRanges{},
-			handler: func(t *testing.T, w http.ResponseWriter, r *http.Request) {
-				err := r.ParseForm()
-				if err != nil {
-					t.Fatal(err)
-				}
-				require.Equal(t, "2h", r.Form.Get("query"))
-				require.Equal(t, "60", r.Form.Get("step"))
-
-				start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
-				require.InEpsilon(t, timeParse("2022-06-14T00:00:00Z").Unix(), start, 0.0001, "invalid start")
-
-				end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
-				require.InEpsilon(t, timeParse("2022-06-14T02:00:00Z").Unix(), end, 0.0001, "invalid end")
-
-				diff := time.Unix(int64(end), 0).Sub(time.Unix(int64(start), 0))
-				require.Equal(t, time.Hour*2, diff)
-
-				w.WriteHeader(http.StatusOK)
-				w.Header().Set("Content-Type", "application/json")
-				_, _ = w.Write([]byte(`{"status":"success","data":{"resultType":"matrix","result":[]}}`))
-			},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPost(promapi.APIPathQueryRange).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"resultType":"matrix","result":[]}}`).
+					UnlimitedTimes()
+			}),
 		},
 		{
 			query:   "2h1m",
@@ -230,35 +166,19 @@ func TestRange(t *testing.T) {
 					},
 				},
 			},
-			handler: func(t *testing.T, w http.ResponseWriter, r *http.Request) {
-				err := r.ParseForm()
-				if err != nil {
-					t.Fatal(err)
-				}
-				require.Equal(t, "2h1m", r.Form.Get("query"))
-				require.Equal(t, "60", r.Form.Get("step"))
-
-				start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
-				end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
-
-				switch start {
-				case float64(timeParse("2022-06-14T16:00:00Z").Unix()):
-					require.InEpsilon(t, timeParse("2022-06-14T17:59:59Z").Unix(), end, 0.0001, "invalid end for #0")
-				case float64(timeParse("2022-06-14T18:00:00Z").Unix()):
-					require.InEpsilon(t, timeParse("2022-06-14T18:35:00Z").Unix(), end, 0.0001, "invalid end for #1")
-
-				default:
-					t.Fatalf("unknown start: %.2f", start)
-				}
-
-				w.WriteHeader(http.StatusOK)
-				w.Header().Set("Content-Type", "application/json")
-				var values []string
-				for i := float64(timeParse("2022-06-14T16:34:00Z").Unix()); i <= float64(timeParse("2022-06-14T18:35:00Z").Unix()); i += 60 {
-					values = append(values, fmt.Sprintf(`[%3f,"1"]`, i))
-				}
-				_, _ = fmt.Fprintf(w, `{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]}]}}`, strings.Join(values, ","))
-			},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPost(promapi.APIPathQueryRange).
+					ReturnHeader("Content-Type", "application/json").
+					Run(func(r *http.Request) ([]byte, error) {
+						_ = r.ParseForm()
+						var values []string
+						for i := float64(timeParse("2022-06-14T16:34:00Z").Unix()); i <= float64(timeParse("2022-06-14T18:35:00Z").Unix()); i += 60 {
+							values = append(values, fmt.Sprintf(`[%3f,"1"]`, i))
+						}
+						return fmt.Appendf(nil, `{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]}]}}`, strings.Join(values, ",")), nil
+					}).
+					UnlimitedTimes()
+			}),
 		},
 		{
 			query:   "3h",
@@ -285,38 +205,24 @@ func TestRange(t *testing.T) {
 					},
 				},
 			},
-			handler: func(t *testing.T, w http.ResponseWriter, r *http.Request) {
-				err := r.ParseForm()
-				if err != nil {
-					t.Fatal(err)
-				}
-				require.Equal(t, "3h", r.Form.Get("query"))
-				require.Equal(t, "300", r.Form.Get("step"))
-
-				start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
-				end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
-
-				switch start {
-				case float64(timeParse("2022-06-14T00:00:00Z").Unix()):
-					require.InEpsilon(t, timeParse("2022-06-14T01:59:59Z").Unix(), end, 0.0001, "invalid end for #0")
-				case float64(timeParse("2022-06-14T02:00:00Z").Unix()):
-					require.InEpsilon(t, timeParse("2022-06-14T03:00:00Z").Unix(), end, 0.0001, "invalid end for #1")
-
-				default:
-					t.Fatalf("unknown start: %.2f", start)
-				}
-
-				w.WriteHeader(http.StatusOK)
-				w.Header().Set("Content-Type", "application/json")
-				var values []string
-				for i := start; i < end; i += 300 {
-					values = append(values, fmt.Sprintf(`[%3f,"1"]`, i))
-				}
-				_, _ = fmt.Fprintf(
-					w,
-					`{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]},{"metric":{"instance":"2"}, "values":[%s]},{"metric":{"instance":"3"}, "values":[%s]}]}}`,
-					strings.Join(values, ","), strings.Join(values, ","), strings.Join(values, ","))
-			},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPost(promapi.APIPathQueryRange).
+					ReturnHeader("Content-Type", "application/json").
+					Run(func(r *http.Request) ([]byte, error) {
+						_ = r.ParseForm()
+						start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
+						end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
+						var values []string
+						for i := start; i < end; i += 300 {
+							values = append(values, fmt.Sprintf(`[%3f,"1"]`, i))
+						}
+						return fmt.Appendf(nil,
+							`{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]},{"metric":{"instance":"2"}, "values":[%s]},{"metric":{"instance":"3"}, "values":[%s]}]}}`,
+							strings.Join(values, ","), strings.Join(values, ","), strings.Join(values, ","),
+						), nil
+					}).
+					UnlimitedTimes()
+			}),
 		},
 		{
 			query:   "gap",
@@ -340,28 +246,10 @@ func TestRange(t *testing.T) {
 					},
 				},
 			},
-			handler: func(t *testing.T, w http.ResponseWriter, r *http.Request) {
-				err := r.ParseForm()
-				if err != nil {
-					t.Fatal(err)
-				}
-				require.Equal(t, "gap", r.Form.Get("query"))
-				require.Equal(t, "300", r.Form.Get("step"))
-
-				start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
-				end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
-
-				switch start {
-				case float64(1677780240):
-					require.InEpsilon(t, float64(1677786840), end, 0.0001, "invalid end for #0")
-				default:
-					t.Fatalf("unknown start: %.2f", start)
-				}
-
-				w.WriteHeader(http.StatusOK)
-				w.Header().Set("Content-Type", "application/json")
-				_, _ = w.Write([]byte(`
-					{
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPost(promapi.APIPathQueryRange).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{
 						"status":"success",
 						"data":{
 							"resultType":"matrix",
@@ -387,7 +275,7 @@ func TestRange(t *testing.T) {
 										[1677784740,"1"],
 										[1677785040,"1"],
 										[1677785340,"1"],
-										
+
 										[1677785940,"1"],
 										[1677786240,"1"],
 										[1677786540,"1"],
@@ -396,9 +284,9 @@ func TestRange(t *testing.T) {
 								}
 							]
 						}
-					}
-				`))
-			},
+					}`).
+					UnlimitedTimes()
+			}),
 		},
 		{
 			query:   "7h",
@@ -415,42 +303,24 @@ func TestRange(t *testing.T) {
 					},
 				},
 			},
-			handler: func(t *testing.T, w http.ResponseWriter, r *http.Request) {
-				err := r.ParseForm()
-				if err != nil {
-					t.Fatal(err)
-				}
-				require.Equal(t, "7h", r.Form.Get("query"))
-				require.Equal(t, "60", r.Form.Get("step"))
-
-				start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
-				end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
-
-				switch start {
-				case float64(timeParse("2022-06-14T00:00:00Z").Unix()):
-					require.InEpsilon(t, timeParse("2022-06-14T01:59:59Z").Unix(), end, 0.0001, "invalid end for #0")
-				case float64(timeParse("2022-06-14T02:00:00Z").Unix()):
-					require.InEpsilon(t, timeParse("2022-06-14T03:59:59Z").Unix(), end, 0.0001, "invalid end for #1")
-				case float64(timeParse("2022-06-14T04:00:00Z").Unix()):
-					require.InEpsilon(t, timeParse("2022-06-14T05:59:59Z").Unix(), end, 0.0001, "invalid end for #2")
-				case float64(timeParse("2022-06-14T06:00:00Z").Unix()):
-					require.InEpsilon(t, timeParse("2022-06-14T07:00:00Z").Unix(), end, 0.0001, "invalid end for #3")
-				default:
-					t.Fatalf("unknown start: %.2f", start)
-				}
-
-				w.WriteHeader(http.StatusOK)
-				w.Header().Set("Content-Type", "application/json")
-				var values []string
-				for i := start; i < end; i += 60 {
-					values = append(values, fmt.Sprintf(`[%3f,"1"]`, i))
-				}
-				_, _ = fmt.Fprintf(
-					w,
-					`{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]}]}}`,
-					strings.Join(values, ","),
-				)
-			},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPost(promapi.APIPathQueryRange).
+					ReturnHeader("Content-Type", "application/json").
+					Run(func(r *http.Request) ([]byte, error) {
+						_ = r.ParseForm()
+						start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
+						end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
+						var values []string
+						for i := start; i < end; i += 60 {
+							values = append(values, fmt.Sprintf(`[%3f,"1"]`, i))
+						}
+						return fmt.Appendf(nil,
+							`{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]}]}}`,
+							strings.Join(values, ","),
+						), nil
+					}).
+					UnlimitedTimes()
+			}),
 		},
 		{
 			query:   "7h30m",
@@ -467,42 +337,24 @@ func TestRange(t *testing.T) {
 					},
 				},
 			},
-			handler: func(t *testing.T, w http.ResponseWriter, r *http.Request) {
-				err := r.ParseForm()
-				if err != nil {
-					t.Fatal(err)
-				}
-				require.Equal(t, "7h30m", r.Form.Get("query"))
-				require.Equal(t, "300", r.Form.Get("step"))
-
-				start, _ := strconv.Atoi(r.Form.Get("start"))
-				end, _ := strconv.Atoi(r.Form.Get("end"))
-
-				switch start {
-				case int(timeParse("2022-06-14T00:00:00Z").Unix()):
-					require.Equal(t, int(timeParse("2022-06-14T01:59:59Z").Unix()), end, "invalid end for #0")
-				case int(timeParse("2022-06-14T02:00:00Z").Unix()):
-					require.Equal(t, int(timeParse("2022-06-14T03:59:59Z").Unix()), end, "invalid end for #1")
-				case int(timeParse("2022-06-14T04:00:00Z").Unix()):
-					require.Equal(t, int(timeParse("2022-06-14T05:59:59Z").Unix()), end, "invalid end for #2")
-				case int(timeParse("2022-06-14T06:00:00Z").Unix()):
-					require.Equal(t, int(timeParse("2022-06-14T07:30:00Z").Unix()), end, "invalid end for #3")
-				default:
-					t.Fatalf("unknown start: %d", start)
-				}
-
-				w.WriteHeader(http.StatusOK)
-				w.Header().Set("Content-Type", "application/json")
-				var values []string
-				for i := start; i < end; i += 300 {
-					values = append(values, fmt.Sprintf(`[%d,"1"]`, i))
-				}
-				_, _ = fmt.Fprintf(
-					w,
-					`{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]}]}}`,
-					strings.Join(values, ","),
-				)
-			},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPost(promapi.APIPathQueryRange).
+					ReturnHeader("Content-Type", "application/json").
+					Run(func(r *http.Request) ([]byte, error) {
+						_ = r.ParseForm()
+						start, _ := strconv.Atoi(r.Form.Get("start"))
+						end, _ := strconv.Atoi(r.Form.Get("end"))
+						var values []string
+						for i := start; i < end; i += 300 {
+							values = append(values, fmt.Sprintf(`[%d,"1"]`, i))
+						}
+						return fmt.Appendf(nil,
+							`{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]}]}}`,
+							strings.Join(values, ","),
+						), nil
+					}).
+					UnlimitedTimes()
+			}),
 		},
 		{
 			query:   "3h/timeout",
@@ -511,44 +363,29 @@ func TestRange(t *testing.T) {
 			step:    time.Minute * 5,
 			timeout: time.Second,
 			err:     "timeout: query timed out in expression evaluation",
-			handler: func(t *testing.T, w http.ResponseWriter, r *http.Request) {
-				err := r.ParseForm()
-				if err != nil {
-					t.Fatal(err)
-				}
-				require.Equal(t, "3h/timeout", r.Form.Get("query"))
-				require.Equal(t, "300", r.Form.Get("step"))
-
-				start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
-				end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
-
-				switch start {
-				case float64(timeParse("2022-06-14T00:00:00Z").Unix()):
-					require.InEpsilon(t, timeParse("2022-06-14T01:59:59Z").Unix(), end, 0.0001, "invalid end for #0")
-					w.WriteHeader(http.StatusOK)
-					w.Header().Set("Content-Type", "application/json")
-					var values []string
-					for i := start; i <= end; i += 300 {
-						values = append(values, fmt.Sprintf(`[%3f,"1"]`, i))
-					}
-					_, _ = fmt.Fprintf(
-						w,
-						`{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]}]}}`,
-						strings.Join(values, ","),
-					)
-				case float64(timeParse("2022-06-14T02:00:00Z").Unix()):
-					require.InEpsilon(t, timeParse("2022-06-14T03:00:00Z").Unix(), end, 0.0001, "invalid end for #1")
-					w.WriteHeader(http.StatusServiceUnavailable)
-					w.Header().Set("Content-Type", "application/json")
-					_, _ = w.Write([]byte(`{
-                                       "status": "error",
-                                       "errorType": "timeout",
-                                       "error": "query timed out in expression evaluation"
-                               }`))
-				default:
-					t.Fatalf("unknown start: %.2f", start)
-				}
-			},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPost(promapi.APIPathQueryRange).
+					ReturnHeader("Content-Type", "application/json").
+					Run(func(r *http.Request) ([]byte, error) {
+						_ = r.ParseForm()
+						start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
+						end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
+						var values []string
+						for i := start; i <= end; i += 300 {
+							values = append(values, fmt.Sprintf(`[%3f,"1"]`, i))
+						}
+						return fmt.Appendf(nil,
+							`{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]}]}}`,
+							strings.Join(values, ","),
+						), nil
+					}).
+					Once()
+				s.ExpectPost(promapi.APIPathQueryRange).
+					ReturnCode(http.StatusServiceUnavailable).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"error","errorType":"timeout","error":"query timed out in expression evaluation"}`).
+					UnlimitedTimes()
+			}),
 		},
 		{
 			query:   "apiError",
@@ -557,11 +394,12 @@ func TestRange(t *testing.T) {
 			step:    time.Minute,
 			timeout: time.Second,
 			err:     "bad_data: custom error message",
-			handler: func(_ *testing.T, w http.ResponseWriter, _ *http.Request) {
-				w.WriteHeader(http.StatusOK)
-				w.Header().Set("Content-Type", "application/json")
-				_, _ = w.Write([]byte(`{"status":"error","errorType":"bad_data","error":"custom error message"}`))
-			},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPost(promapi.APIPathQueryRange).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"error","errorType":"bad_data","error":"custom error message"}`).
+					UnlimitedTimes()
+			}),
 		},
 		{
 			query:   "badJson",
@@ -570,11 +408,12 @@ func TestRange(t *testing.T) {
 			step:    time.Minute,
 			timeout: time.Second,
 			err:     `bad_response: JSON parse error: jsontext: invalid character '}' after object name (expecting ':') within "/data/resultType" after offset 40`,
-			handler: func(_ *testing.T, w http.ResponseWriter, _ *http.Request) {
-				w.WriteHeader(http.StatusOK)
-				w.Header().Set("Content-Type", "application/json")
-				_, _ = w.Write([]byte(`{"status":"success","data":{"resultType"}}`))
-			},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPost(promapi.APIPathQueryRange).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"resultType"}}`).
+					UnlimitedTimes()
+			}),
 		},
 		{
 			query:   "emptyError",
@@ -583,11 +422,12 @@ func TestRange(t *testing.T) {
 			step:    time.Minute,
 			timeout: time.Second,
 			err:     `bad_data: empty response object`,
-			handler: func(_ *testing.T, w http.ResponseWriter, _ *http.Request) {
-				w.WriteHeader(http.StatusOK)
-				w.Header().Set("Content-Type", "application/json")
-				_, _ = w.Write([]byte(`{"status":"error","errorType":"bad_data"}`))
-			},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPost(promapi.APIPathQueryRange).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"error","errorType":"bad_data"}`).
+					UnlimitedTimes()
+			}),
 		},
 		{
 			query:   "vector",
@@ -596,33 +436,12 @@ func TestRange(t *testing.T) {
 			step:    time.Second,
 			timeout: time.Second,
 			err:     "bad_response: invalid result type, expected matrix, got vector",
-			handler: func(t *testing.T, w http.ResponseWriter, r *http.Request) {
-				err := r.ParseForm()
-				if err != nil {
-					t.Fatal(err)
-				}
-				require.Equal(t, "vector", r.Form.Get("query"))
-				require.Equal(t, "1", r.Form.Get("step"))
-
-				start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
-				require.InEpsilon(t, timeParse("2022-06-14T00:00:00Z").Unix(), start, 0.0001, "invalid start")
-
-				end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
-				require.InEpsilon(t, timeParse("2022-06-14T00:05:00Z").Unix(), end, 0.0001, "invalid end")
-
-				diff := time.Unix(int64(end), 0).Sub(time.Unix(int64(start), 0))
-				require.Equal(t, time.Minute*5, diff)
-
-				w.WriteHeader(http.StatusOK)
-				w.Header().Set("Content-Type", "application/json")
-				_, _ = w.Write([]byte(`{
-					"status":"success",
-					"data":{
-						"resultType":"vector",
-						"result":[{"metric":{},"value":[1614859502.068,"1"]}]
-					}
-				}`))
-			},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPost(promapi.APIPathQueryRange).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"resultType":"vector","result":[{"metric":{},"value":[1614859502.068,"1"]}]}}`).
+					UnlimitedTimes()
+			}),
 		},
 		{
 			query:   "stats",
@@ -653,74 +472,33 @@ func TestRange(t *testing.T) {
 					PeakSamples:           500 * 4,
 				},
 			},
-			handler: func(t *testing.T, w http.ResponseWriter, r *http.Request) {
-				err := r.ParseForm()
-				if err != nil {
-					t.Fatal(err)
-				}
-				require.Equal(t, "stats", r.Form.Get("query"))
-				require.Equal(t, "60", r.Form.Get("step"))
-
-				start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
-				end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
-
-				switch start {
-				case float64(timeParse("2022-06-14T00:00:00Z").Unix()):
-					require.InEpsilon(t, timeParse("2022-06-14T01:59:59Z").Unix(), end, 0.0001, "invalid end for #0")
-				case float64(timeParse("2022-06-14T02:00:00Z").Unix()):
-					require.InEpsilon(t, timeParse("2022-06-14T03:59:59Z").Unix(), end, 0.0001, "invalid end for #1")
-				case float64(timeParse("2022-06-14T04:00:00Z").Unix()):
-					require.InEpsilon(t, timeParse("2022-06-14T05:59:59Z").Unix(), end, 0.0001, "invalid end for #2")
-				case float64(timeParse("2022-06-14T06:00:00Z").Unix()):
-					require.InEpsilon(t, timeParse("2022-06-14T07:00:00Z").Unix(), end, 0.0001, "invalid end for #3")
-				default:
-					t.Fatalf("unknown start: %.2f", start)
-				}
-
-				w.WriteHeader(http.StatusOK)
-				w.Header().Set("Content-Type", "application/json")
-				var values []string
-				for i := start; i < end; i += 60 {
-					values = append(values, fmt.Sprintf(`[%3f,"1"]`, i))
-				}
-				_, _ = fmt.Fprintf(
-					w,
-					`{
-						"status":"success",
-						"data":{
-							"resultType":"matrix",
-							"result":[{"metric":{"instance":"1"}, "values":[%s]}],
-							"stats": {
-								"timings": {
-									"evalTotalTime": 10.1,
-									  "resultSortTime": 0.5,
-									  "queryPreparationTime": 1.5,
-									  "innerEvalTime": 0.7,
-									  "execQueueTime": 0.01,
-									  "execTotalTime": 5.1
-								},
-								"samples": {
-									  "totalQueryableSamples": 1000,
-									  "peakSamples": 500
-								}
-							}
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPost(promapi.APIPathQueryRange).
+					ReturnHeader("Content-Type", "application/json").
+					Run(func(r *http.Request) ([]byte, error) {
+						_ = r.ParseForm()
+						start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
+						end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
+						var values []string
+						for i := start; i < end; i += 60 {
+							values = append(values, fmt.Sprintf(`[%3f,"1"]`, i))
 						}
-					}`,
-					strings.Join(values, ","),
-				)
-			},
+						return fmt.Appendf(nil,
+							`{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]}],"stats":{"timings":{"evalTotalTime":10.1,"resultSortTime":0.5,"queryPreparationTime":1.5,"innerEvalTime":0.7,"execQueueTime":0.01,"execTotalTime":5.1},"samples":{"totalQueryableSamples":1000,"peakSamples":500}}}}`,
+							strings.Join(values, ","),
+						), nil
+					}).
+					UnlimitedTimes()
+			}),
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.query, func(t *testing.T) {
-			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				tc.handler(t, w, r)
-			}))
-			t.Cleanup(srv.Close)
+			srv := tc.mock(t)
 
-			fg := promapi.NewFailoverGroup("test", srv.URL, []*promapi.Prometheus{
-				promapi.NewPrometheus("test", srv.URL, "", nil, tc.timeout, 1, 100, nil),
+			fg := promapi.NewFailoverGroup("test", srv.URL(), []*promapi.Prometheus{
+				promapi.NewPrometheus("test", srv.URL(), "", nil, tc.timeout, 1, 100, nil),
 			}, true, "up", nil, nil, nil)
 			reg := prometheus.NewRegistry()
 			fg.StartWorkers(reg)

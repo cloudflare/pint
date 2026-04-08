@@ -1,77 +1,27 @@
 package promapi_test
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
-	"strings"
 	"testing"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.nhat.io/httpmock"
 
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
 func TestConfig(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.URL.Path {
-		case "/30s" + promapi.APIPathConfig:
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"success","data":{"yaml":"global:\n  scrape_interval: 30s\n"}}`))
-		case "/1m" + promapi.APIPathConfig:
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"success","data":{"yaml":"global:\n  scrape_interval: 1m\n"}}`))
-		case "/default" + promapi.APIPathConfig:
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"success","data":{"yaml":"global:\n  {}\n"}}`))
-		case "/once" + promapi.APIPathConfig:
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"success","data":{"yaml":"global:\n  {}\n"}}`))
-		case "/slow" + promapi.APIPathConfig:
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			time.Sleep(time.Second * 2)
-			_, _ = w.Write([]byte(`{"status":"success","data":{"yaml":"global:\n  {}\n"}}`))
-		case "/error" + promapi.APIPathConfig:
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte("fake error\n"))
-		case "/badYaml" + promapi.APIPathConfig:
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"success","data":{"yaml":"invalid yaml"}}`))
-		case "/badJson" + promapi.APIPathConfig:
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"success","data":{"yaml"}}`))
-		case "/apiError" + promapi.APIPathConfig:
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"error","errorType":"bad_data","error":"custom error message"}`))
-		case "/emptyError" + promapi.APIPathConfig:
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"error","errorType":"bad_data"}`))
-		default:
-			w.WriteHeader(http.StatusBadRequest)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"error","errorType":"bad_data","error":"unhandled path"}`))
-		}
-	}))
-	t.Cleanup(srv.Close)
-
 	type testCaseT struct {
-		prefix  string
-		err     string
-		cfg     promapi.ConfigResult
-		timeout time.Duration
+		mock     httpmock.Mocker
+		errCheck func(t *testing.T, err error)
+		name     string
+		cfg      promapi.PrometheusConfig
+		timeout  time.Duration
 	}
 
 	defaults := promapi.PrometheusConfig{
@@ -85,80 +35,147 @@ func TestConfig(t *testing.T) {
 
 	testCases := []testCaseT{
 		{
-			prefix:  "/default",
+			name:    "default",
 			timeout: time.Second,
-			cfg: promapi.ConfigResult{
-				URI:    srv.URL + "/default",
-				Config: defaults,
-			},
+			cfg:     defaults,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(promapi.APIPathConfig).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"yaml":"global:\n  {}\n"}}`).
+					UnlimitedTimes()
+			}),
 		},
 		{
-			prefix:  "/1m",
+			name:    "1m",
 			timeout: time.Second,
-			cfg: promapi.ConfigResult{
-				URI:    srv.URL + "/1m",
-				Config: defaults,
-			},
+			cfg:     defaults,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(promapi.APIPathConfig).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"yaml":"global:\n  scrape_interval: 1m\n"}}`).
+					UnlimitedTimes()
+			}),
 		},
 		{
-			prefix:  "/30s",
+			name:    "30s",
 			timeout: time.Second,
-			cfg: promapi.ConfigResult{
-				URI: srv.URL + "/30s",
-				Config: promapi.PrometheusConfig{
-					Global: promapi.ConfigSectionGlobal{
-						ScrapeInterval:     time.Second * 30,
-						ScrapeTimeout:      time.Second * 10,
-						EvaluationInterval: time.Minute,
-						ExternalLabels:     nil,
-					},
+			cfg: promapi.PrometheusConfig{
+				Global: promapi.ConfigSectionGlobal{
+					ScrapeInterval:     time.Second * 30,
+					ScrapeTimeout:      time.Second * 10,
+					EvaluationInterval: time.Minute,
+					ExternalLabels:     nil,
 				},
 			},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(promapi.APIPathConfig).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"yaml":"global:\n  scrape_interval: 30s\n"}}`).
+					UnlimitedTimes()
+			}),
 		},
 		{
-			prefix:  "/slow",
+			name:    "slow",
 			timeout: time.Millisecond * 10,
-			err:     "connection timeout",
+			errCheck: func(t *testing.T, err error) {
+				t.Helper()
+				require.EqualError(t, err, "connection timeout")
+			},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(promapi.APIPathConfig).
+					Run(func(_ *http.Request) ([]byte, error) {
+						time.Sleep(time.Second * 2)
+						return []byte(`{"status":"success","data":{"yaml":"global:\n  {}\n"}}`), nil
+					}).
+					UnlimitedTimes()
+			}),
 		},
 		{
-			prefix:  "/error",
+			name:    "error",
 			timeout: time.Second,
-			err:     "server_error: 500 Internal Server Error",
+			errCheck: func(t *testing.T, err error) {
+				t.Helper()
+				require.EqualError(t, err, "server_error: 500 Internal Server Error")
+			},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(promapi.APIPathConfig).
+					ReturnCode(http.StatusInternalServerError).
+					Return("fake error\n").
+					UnlimitedTimes()
+			}),
 		},
 		{
-			prefix:  "/badYaml",
+			name:    "badYaml",
 			timeout: time.Second,
-			err:     fmt.Sprintf("failed to decode config data in %s/badYaml response: yaml: unmarshal errors:\n  line 1: cannot unmarshal !!str `invalid...` into promapi.PrometheusConfig", srv.URL),
+			errCheck: func(t *testing.T, err error) {
+				t.Helper()
+				require.ErrorContains(t, err, "failed to decode config data in")
+			},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(promapi.APIPathConfig).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"yaml":"invalid yaml"}}`).
+					UnlimitedTimes()
+			}),
 		},
 		{
-			prefix:  "/badJson",
+			name:    "badJson",
 			timeout: time.Second,
-			err:     `bad_response: JSON parse error: jsontext: invalid character '}' after object name (expecting ':') within "/data/yaml" after offset 34`,
+			errCheck: func(t *testing.T, err error) {
+				t.Helper()
+				require.EqualError(t, err, `bad_response: JSON parse error: jsontext: invalid character '}' after object name (expecting ':') within "/data/yaml" after offset 34`)
+			},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(promapi.APIPathConfig).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"yaml"}}`).
+					UnlimitedTimes()
+			}),
 		},
 		{
-			prefix:  "/apiError",
+			name:    "apiError",
 			timeout: time.Second,
-			err:     "bad_data: custom error message",
+			errCheck: func(t *testing.T, err error) {
+				t.Helper()
+				require.EqualError(t, err, "bad_data: custom error message")
+			},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(promapi.APIPathConfig).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"error","errorType":"bad_data","error":"custom error message"}`).
+					UnlimitedTimes()
+			}),
 		},
 		{
-			prefix:  "/emptyError",
+			name:    "emptyError",
 			timeout: time.Second,
-			err:     "bad_data: empty response object",
+			errCheck: func(t *testing.T, err error) {
+				t.Helper()
+				require.EqualError(t, err, "bad_data: empty response object")
+			},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(promapi.APIPathConfig).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"error","errorType":"bad_data"}`).
+					UnlimitedTimes()
+			}),
 		},
 	}
 
 	for _, tc := range testCases {
-		t.Run(strings.TrimPrefix(tc.prefix, "/"), func(t *testing.T) {
-			prom := promapi.NewPrometheus("test", srv.URL+tc.prefix, "", nil, tc.timeout, 1, 100, nil)
+		t.Run(tc.name, func(t *testing.T) {
+			srv := tc.mock(t)
+
+			prom := promapi.NewPrometheus("test", srv.URL(), "", nil, tc.timeout, 1, 100, nil)
 			prom.StartWorkers()
 			t.Cleanup(prom.Close)
 
 			cfg, err := prom.Config(t.Context(), time.Minute)
-			if tc.err != "" {
-				require.EqualError(t, err, tc.err, tc)
+			if tc.errCheck != nil {
+				tc.errCheck(t, err)
 			} else {
 				require.NoError(t, err)
-				require.Equal(t, *cfg, tc.cfg)
+				require.Equal(t, tc.cfg, cfg.Config)
 			}
 		})
 	}

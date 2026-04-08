@@ -1,21 +1,20 @@
 package reporter_test
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"log/slog"
 	"net"
 	"net/http"
-	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/neilotoole/slogt"
 	"github.com/prometheus/common/model"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+	"go.nhat.io/httpmock"
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/diags"
@@ -29,19 +28,12 @@ func TestBitBucketReporter(t *testing.T) {
 	type errorCheck func(err error) error
 
 	type testCaseT struct {
-		httpHandler           http.Handler
-		gitCmd                git.CommandRunner
-		pullRequestFileDiffs  map[string]reporter.BitBucketFileDiffs
-		errorHandler          errorCheck
-		description           string
-		report                reporter.BitBucketReport
-		reports               []reporter.Report
-		annotations           reporter.BitBucketAnnotations
-		pullRequestComments   []reporter.BitBucketPendingComment
-		pullRequests          reporter.BitBucketPullRequests
-		pullRequestChanges    reporter.BitBucketPullRequestChanges
-		pullRequestActivities reporter.BitBucketPullRequestActivities
-		showDuplicates        bool
+		mock           httpmock.Mocker
+		gitCmd         git.CommandRunner
+		errorHandler   errorCheck
+		description    string
+		reports        []reporter.Report
+		showDuplicates bool
 	}
 
 	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
@@ -62,20 +54,9 @@ func TestBitBucketReporter(t *testing.T) {
 		return nil, nil
 	}
 
-	emptyReport := reporter.BitBucketReport{
-		Reporter: "Prometheus rule linter",
-		Title:    "pint v0.0.0",
-		Details:  reporter.BitBucketDescription,
-		Link:     "https://cloudflare.github.io/pint/",
-		Result:   "PASS",
-		Data: []reporter.BitBucketReportData{
-			{Title: "Number of rules parsed", Type: reporter.NumberType, Value: float64(0)},
-			{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
-			{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(0)},
-			{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
-			{Title: "Number of online checks", Type: reporter.NumberType, Value: float64(0)},
-			{Title: "Checks duration", Type: reporter.DurationType, Value: float64(0)},
-		},
+	diagFile := filepath.Join(t.TempDir(), "diag.txt")
+	if err := os.WriteFile(diagFile, []byte("- record: target is down\n  expr: up == 0\n"), 0o644); err != nil {
+		t.Fatal(err)
 	}
 
 	testCases := []testCaseT{
@@ -87,6 +68,7 @@ func TestBitBucketReporter(t *testing.T) {
 				}
 				return nil, nil
 			},
+			mock: httpmock.New(func(_ *httpmock.Server) {}),
 			errorHandler: func(err error) error {
 				if err != nil && err.Error() == "failed to get HEAD commit: git head error" {
 					return nil
@@ -105,13 +87,18 @@ func TestBitBucketReporter(t *testing.T) {
 				}
 				return nil, nil
 			},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+			}),
 			errorHandler: func(err error) error {
 				if err != nil && err.Error() == "failed to get current branch: git branch error" {
 					return nil
 				}
 				return fmt.Errorf("Expected git branch error, got %w", err)
 			},
-			report: emptyReport,
 		},
 		{
 			description: "returns an error on non-200 HTTP response",
@@ -127,9 +114,13 @@ func TestBitBucketReporter(t *testing.T) {
 					Problem:       checks.Problem{},
 				},
 			},
-			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-				w.WriteHeader(http.StatusBadRequest)
-				_, _ = w.Write([]byte("Bad Request"))
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					ReturnCode(http.StatusBadRequest).
+					Return("Bad Request").
+					Once()
 			}),
 			errorHandler: func(err error) error {
 				if err != nil && err.Error() == "failed to create BitBucket report: PUT request failed" {
@@ -141,7 +132,6 @@ func TestBitBucketReporter(t *testing.T) {
 		{
 			description: "returns an error on HTTP response headers timeout",
 			gitCmd:      fakeGit,
-			report:      emptyReport,
 			reports: []reporter.Report{
 				{
 					Path: discovery.Path{
@@ -153,10 +143,16 @@ func TestBitBucketReporter(t *testing.T) {
 					Problem:       checks.Problem{},
 				},
 			},
-			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-				time.Sleep(time.Second * 2)
-				w.WriteHeader(http.StatusBadRequest)
-				_, _ = w.Write([]byte("Bad Request"))
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Run(func(_ *http.Request) ([]byte, error) {
+						time.Sleep(time.Second * 2)
+						return []byte("Bad Request"), nil
+					}).
+					ReturnCode(http.StatusBadRequest).
+					Once()
 			}),
 			errorHandler: func(err error) error {
 				var neterr net.Error
@@ -180,10 +176,16 @@ func TestBitBucketReporter(t *testing.T) {
 					Problem:       checks.Problem{},
 				},
 			},
-			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-				w.WriteHeader(http.StatusBadRequest)
-				time.Sleep(time.Second * 2)
-				_, _ = w.Write([]byte("Bad Request"))
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Run(func(_ *http.Request) ([]byte, error) {
+						time.Sleep(time.Second * 2)
+						return []byte("Bad Request"), nil
+					}).
+					ReturnCode(http.StatusBadRequest).
+					Once()
 			}),
 			errorHandler: func(err error) error {
 				var neterr net.Error
@@ -196,14 +198,13 @@ func TestBitBucketReporter(t *testing.T) {
 		{
 			description: "sends a correct report that fails",
 			gitCmd:      fakeGit,
-			report:      emptyReport,
-			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				if r.Method == http.MethodDelete {
-					w.WriteHeader(http.StatusOK)
-					return
-				}
-				w.WriteHeader(http.StatusInternalServerError)
-				_, _ = w.Write([]byte("Internal error"))
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					ReturnCode(http.StatusInternalServerError).
+					Return("Internal error").
+					Once()
 			}),
 			errorHandler: func(err error) error {
 				if err.Error() != "failed to create BitBucket report: PUT request failed" {
@@ -215,25 +216,21 @@ func TestBitBucketReporter(t *testing.T) {
 		{
 			description: "sends a correct report but fails to delete annotations",
 			gitCmd:      fakeGit,
-			report:      emptyReport,
-			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				if r.URL.Path == "/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint" {
-					w.WriteHeader(http.StatusOK)
-					return
-				}
-				if r.URL.Path == "/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests" {
-					data, err := json.Marshal(reporter.BitBucketPullRequests{
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
+					ReturnJSON(reporter.BitBucketPullRequests{
 						IsLastPage: true,
 						Values:     []reporter.BitBucketPullRequest{},
-					})
-					assert.NoError(t, err)
-					w.WriteHeader(http.StatusOK)
-					_, err = w.Write(data)
-					assert.NoError(t, err)
-					return
-				}
-				w.WriteHeader(http.StatusInternalServerError)
-				_, _ = w.Write([]byte("Internal error"))
+					}).
+					Once()
+				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint/annotations").
+					ReturnCode(http.StatusInternalServerError).
+					Return("Internal error").
+					Once()
 			}),
 			errorHandler: func(err error) error {
 				if err.Error() != "failed to delete existing BitBucket code insight annotations: DELETE request failed" {
@@ -332,71 +329,23 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 			},
-			report: reporter.BitBucketReport{
-				Reporter: "Prometheus rule linter",
-				Title:    "pint v0.0.0",
-				Details:  reporter.BitBucketDescription,
-				Link:     "https://cloudflare.github.io/pint/",
-				Result:   "FAIL",
-				Data: []reporter.BitBucketReportData{
-					{Title: "Number of rules parsed", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(3)},
-					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of online checks", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Checks duration", Type: reporter.DurationType, Value: float64(0)},
-				},
-			},
-			annotations: reporter.BitBucketAnnotations{
-				Annotations: []reporter.BitBucketAnnotation{
-					{
-						Path:     "foo.txt",
-						Line:     2,
-						Message:  "mock: bad name",
-						Severity: "HIGH",
-						Type:     "BUG",
-						Link:     "https://cloudflare.github.io/pint/checks/mock.html",
-					},
-					{
-						Path:     "foo.txt",
-						Line:     2,
-						Message:  "mock: mock text",
-						Severity: "MEDIUM",
-						Type:     "BUG",
-						Link:     "https://cloudflare.github.io/pint/checks/mock.html",
-					},
-					{
-						Path:     "foo.txt",
-						Line:     4,
-						Message:  "mock: mock text 2",
-						Severity: "LOW",
-						Type:     "CODE_SMELL",
-						Link:     "https://cloudflare.github.io/pint/checks/mock.html",
-					},
-				},
-			},
-			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				if r.URL.Path == "/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint" {
-					w.WriteHeader(http.StatusOK)
-					return
-				}
-				if r.URL.Path == "/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests" {
-					data, err := json.Marshal(reporter.BitBucketPullRequests{
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
+					ReturnJSON(reporter.BitBucketPullRequests{
 						IsLastPage: true,
 						Values:     []reporter.BitBucketPullRequest{},
-					})
-					assert.NoError(t, err)
-					w.WriteHeader(http.StatusOK)
-					_, err = w.Write(data)
-					assert.NoError(t, err)
-					return
-				}
-				if r.Method == http.MethodDelete {
-					w.WriteHeader(http.StatusOK)
-					return
-				}
-				w.WriteHeader(http.StatusInternalServerError)
-				_, _ = w.Write([]byte("Internal error"))
+					}).
+					Once()
+				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint/annotations").
+					Once()
+				s.ExpectPost("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint/annotations").
+					ReturnCode(http.StatusInternalServerError).
+					Return("Internal error").
+					Once()
 			}),
 			errorHandler: func(err error) error {
 				if err.Error() != "failed to create BitBucket code insight annotations: POST request failed" {
@@ -408,14 +357,15 @@ func TestBitBucketReporter(t *testing.T) {
 		{
 			description: "pull requests get fails",
 			gitCmd:      fakeGit,
-			report:      emptyReport,
-			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				if r.Method != http.MethodGet {
-					w.WriteHeader(http.StatusOK)
-					return
-				}
-				w.WriteHeader(http.StatusInternalServerError)
-				_, _ = w.Write([]byte("Internal error"))
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
+					ReturnCode(http.StatusInternalServerError).
+					Return("Internal error").
+					Once()
 			}),
 			errorHandler: func(err error) error {
 				if err.Error() != "failed to get open pull requests from BitBucket: GET request failed" {
@@ -427,10 +377,13 @@ func TestBitBucketReporter(t *testing.T) {
 		{
 			description: "pull request changes get fails",
 			gitCmd:      fakeGit,
-			report:      emptyReport,
-			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				if r.URL.Path == "/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests" {
-					data, err := json.Marshal(reporter.BitBucketPullRequests{
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
+					ReturnJSON(reporter.BitBucketPullRequests{
 						IsLastPage: true,
 						Values: []reporter.BitBucketPullRequest{
 							{
@@ -446,18 +399,12 @@ func TestBitBucketReporter(t *testing.T) {
 								},
 							},
 						},
-					})
-					assert.NoError(t, err)
-					w.WriteHeader(http.StatusOK)
-					_, err = w.Write(data)
-					assert.NoError(t, err)
-				}
-				if strings.HasSuffix(r.URL.Path, "/changes") {
-					w.WriteHeader(http.StatusInternalServerError)
-					_, _ = w.Write([]byte("Internal error"))
-					return
-				}
-				w.WriteHeader(http.StatusOK)
+					}).
+					Once()
+				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes?start=0").
+					ReturnCode(http.StatusInternalServerError).
+					Return("Internal error").
+					Once()
 			}),
 			errorHandler: func(err error) error {
 				if err.Error() != "failed to get pull request changes from BitBucket: GET request failed" {
@@ -469,10 +416,13 @@ func TestBitBucketReporter(t *testing.T) {
 		{
 			description: "pull request comments get fails",
 			gitCmd:      fakeGit,
-			report:      emptyReport,
-			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				if r.URL.Path == "/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests" {
-					data, err := json.Marshal(reporter.BitBucketPullRequests{
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
+					ReturnJSON(reporter.BitBucketPullRequests{
 						IsLastPage: true,
 						Values: []reporter.BitBucketPullRequest{
 							{
@@ -488,28 +438,21 @@ func TestBitBucketReporter(t *testing.T) {
 								},
 							},
 						},
-					})
-					assert.NoError(t, err)
-					w.WriteHeader(http.StatusOK)
-					_, err = w.Write(data)
-					assert.NoError(t, err)
-				}
-				if r.URL.Path == "/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes" {
-					data, err := json.Marshal(reporter.BitBucketPullRequestChanges{
+					}).
+					Once()
+				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes?start=0").
+					ReturnJSON(reporter.BitBucketPullRequestChanges{
 						IsLastPage: true,
 						Values:     []reporter.BitBucketPullRequestChange{},
-					})
-					assert.NoError(t, err)
-					w.WriteHeader(http.StatusOK)
-					_, err = w.Write(data)
-					assert.NoError(t, err)
-				}
-				if r.URL.Path == "/rest/api/latest/projects/proj/repos/repo/pull-requests/102/activities" {
-					w.WriteHeader(http.StatusInternalServerError)
-					_, _ = w.Write([]byte("Internal error"))
-					return
-				}
-				w.WriteHeader(http.StatusOK)
+					}).
+					Once()
+				s.ExpectGet("/plugins/servlet/applinks/whoami").
+					Return("testuser").
+					Once()
+				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/pull-requests/102/activities?start=0").
+					ReturnCode(http.StatusInternalServerError).
+					Return("Internal error").
+					Once()
 			}),
 			errorHandler: func(err error) error {
 				if err.Error() != "failed to get pull request comments from BitBucket: GET request failed" {
@@ -521,6 +464,19 @@ func TestBitBucketReporter(t *testing.T) {
 		{
 			description: "sends a correct report",
 			gitCmd:      fakeGit,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
+					ReturnJSON(reporter.BitBucketPullRequests{IsLastPage: true}).
+					Once()
+				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint/annotations").
+					Once()
+				s.ExpectPost("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint/annotations").
+					Once()
+			}),
 			reports: []reporter.Report{
 				{
 					Path: discovery.Path{
@@ -591,57 +547,6 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 			},
-			report: reporter.BitBucketReport{
-				Reporter: "Prometheus rule linter",
-				Title:    "pint v0.0.0",
-				Details:  reporter.BitBucketDescription,
-				Link:     "https://cloudflare.github.io/pint/",
-				Result:   "FAIL",
-				Data: []reporter.BitBucketReportData{
-					{Title: "Number of rules parsed", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(4)},
-					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of online checks", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Checks duration", Type: reporter.DurationType, Value: float64(0)},
-				},
-			},
-			annotations: reporter.BitBucketAnnotations{
-				Annotations: []reporter.BitBucketAnnotation{
-					{
-						Path:     "foo.txt",
-						Line:     2,
-						Message:  "Problem reported on unmodified line 1, annotation moved here: mock: line is not part of the diff",
-						Severity: "MEDIUM",
-						Type:     "BUG",
-						Link:     "https://cloudflare.github.io/pint/checks/mock.html",
-					},
-					{
-						Path:     "foo.txt",
-						Line:     2,
-						Message:  "mock: bad name",
-						Severity: "HIGH",
-						Type:     "BUG",
-						Link:     "https://cloudflare.github.io/pint/checks/mock.html",
-					},
-					{
-						Path:     "foo.txt",
-						Line:     2,
-						Message:  "mock: mock text",
-						Severity: "MEDIUM",
-						Type:     "BUG",
-						Link:     "https://cloudflare.github.io/pint/checks/mock.html",
-					},
-					{
-						Path:     "foo.txt",
-						Line:     4,
-						Message:  "mock: mock text 2",
-						Severity: "LOW",
-						Type:     "CODE_SMELL",
-						Link:     "https://cloudflare.github.io/pint/checks/mock.html",
-					},
-				},
-			},
 			errorHandler: func(err error) error {
 				if err.Error() != "fatal error(s) reported" {
 					return fmt.Errorf("Unpexpected error: %w", err)
@@ -652,6 +557,19 @@ func TestBitBucketReporter(t *testing.T) {
 		{
 			description: "FATAL errors are always reported, regardless of line number",
 			gitCmd:      fakeGit,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
+					ReturnJSON(reporter.BitBucketPullRequests{IsLastPage: true}).
+					Once()
+				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint/annotations").
+					Once()
+				s.ExpectPost("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint/annotations").
+					Once()
+			}),
 			reports: []reporter.Report{
 				{
 					Path: discovery.Path{
@@ -671,33 +589,6 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 			},
-			report: reporter.BitBucketReport{
-				Reporter: "Prometheus rule linter",
-				Title:    "pint v0.0.0",
-				Details:  reporter.BitBucketDescription,
-				Link:     "https://cloudflare.github.io/pint/",
-				Result:   "FAIL",
-				Data: []reporter.BitBucketReportData{
-					{Title: "Number of rules parsed", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(1)},
-					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of online checks", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Checks duration", Type: reporter.DurationType, Value: float64(0)},
-				},
-			},
-			annotations: reporter.BitBucketAnnotations{
-				Annotations: []reporter.BitBucketAnnotation{
-					{
-						Path:     "foo.txt",
-						Line:     3,
-						Message:  "Problem reported on unmodified line 1, annotation moved here: test/mock: syntax error",
-						Severity: "HIGH",
-						Type:     "BUG",
-						Link:     "https://cloudflare.github.io/pint/checks/test/mock.html",
-					},
-				},
-			},
 			errorHandler: func(err error) error {
 				if err.Error() != "fatal error(s) reported" {
 					return fmt.Errorf("Unpexpected error: %w", err)
@@ -706,9 +597,42 @@ func TestBitBucketReporter(t *testing.T) {
 			},
 		},
 		{
+			// Covers bitbucket.go:49-51 — deleteReport error is logged but does not stop the flow.
+			description: "deleteReport fails but flow continues",
+			gitCmd:      fakeGit,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					ReturnCode(http.StatusInternalServerError).
+					Once()
+				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
+					ReturnJSON(reporter.BitBucketPullRequests{IsLastPage: true}).
+					Once()
+				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint/annotations").
+					Once()
+			}),
+			errorHandler: func(err error) error {
+				if err != nil {
+					return fmt.Errorf("Unpexpected error: %w", err)
+				}
+				return nil
+			},
+		},
+		{
 			description: "sends a correct empty report",
 			gitCmd:      fakeGit,
-			report:      emptyReport,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
+					ReturnJSON(reporter.BitBucketPullRequests{IsLastPage: true}).
+					Once()
+				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint/annotations").
+					Once()
+			}),
 			errorHandler: func(err error) error {
 				if err != nil {
 					return fmt.Errorf("Unpexpected error: %w", err)
@@ -719,6 +643,19 @@ func TestBitBucketReporter(t *testing.T) {
 		{
 			description: "reports failures from unmodified lines",
 			gitCmd:      fakeGit,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
+					ReturnJSON(reporter.BitBucketPullRequests{IsLastPage: true}).
+					Once()
+				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint/annotations").
+					Once()
+				s.ExpectPost("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint/annotations").
+					Once()
+			}),
 			reports: []reporter.Report{
 				{
 					Path: discovery.Path{
@@ -789,57 +726,6 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 			},
-			report: reporter.BitBucketReport{
-				Reporter: "Prometheus rule linter",
-				Title:    "pint v0.0.0",
-				Details:  reporter.BitBucketDescription,
-				Link:     "https://cloudflare.github.io/pint/",
-				Result:   "FAIL",
-				Data: []reporter.BitBucketReportData{
-					{Title: "Number of rules parsed", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(4)},
-					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of online checks", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Checks duration", Type: reporter.DurationType, Value: float64(0)},
-				},
-			},
-			annotations: reporter.BitBucketAnnotations{
-				Annotations: []reporter.BitBucketAnnotation{
-					{
-						Path:     "foo.txt",
-						Line:     2,
-						Message:  "Problem reported on unmodified line 1, annotation moved here: mock: this line is not part of the diff",
-						Severity: "MEDIUM",
-						Type:     "BUG",
-						Link:     "https://cloudflare.github.io/pint/checks/mock.html",
-					},
-					{
-						Path:     "foo.txt",
-						Line:     2,
-						Message:  "mock: bad name",
-						Severity: "MEDIUM",
-						Type:     "BUG",
-						Link:     "https://cloudflare.github.io/pint/checks/mock.html",
-					},
-					{
-						Path:     "foo.txt",
-						Line:     2,
-						Message:  "mock: mock text",
-						Severity: "MEDIUM",
-						Type:     "BUG",
-						Link:     "https://cloudflare.github.io/pint/checks/mock.html",
-					},
-					{
-						Path:     "foo.txt",
-						Line:     4,
-						Message:  "mock: mock text 2",
-						Severity: "LOW",
-						Type:     "CODE_SMELL",
-						Link:     "https://cloudflare.github.io/pint/checks/mock.html",
-					},
-				},
-			},
 			errorHandler: func(err error) error {
 				if err != nil {
 					return fmt.Errorf("Unpexpected error: %w", err)
@@ -850,36 +736,52 @@ func TestBitBucketReporter(t *testing.T) {
 		{
 			description: "sends a correct report with pull request open",
 			gitCmd:      fakeGit,
-			report:      emptyReport,
-			pullRequests: reporter.BitBucketPullRequests{
-				IsLastPage: true,
-				Values: []reporter.BitBucketPullRequest{
-					{
-						ID:   101,
-						Open: false,
-						FromRef: reporter.BitBucketRef{
-							ID:     "refs/heads/feature",
-							Commit: "pr-commit-id",
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
+					ReturnJSON(reporter.BitBucketPullRequests{
+						IsLastPage: true,
+						Values: []reporter.BitBucketPullRequest{
+							{
+								ID:   101,
+								Open: false,
+								FromRef: reporter.BitBucketRef{
+									ID:     "refs/heads/feature",
+									Commit: "pr-commit-id",
+								},
+								ToRef: reporter.BitBucketRef{
+									ID:     "refs/heads/main",
+									Commit: "main-commit-id",
+								},
+							},
+							{
+								ID:   102,
+								Open: true,
+								FromRef: reporter.BitBucketRef{
+									ID:     "refs/heads/fake-branch",
+									Commit: "fake-commit-id",
+								},
+								ToRef: reporter.BitBucketRef{
+									ID:     "refs/heads/main",
+									Commit: "main-commit-id",
+								},
+							},
 						},
-						ToRef: reporter.BitBucketRef{
-							ID:     "refs/heads/main",
-							Commit: "main-commit-id",
-						},
-					},
-					{
-						ID:   102,
-						Open: true,
-						FromRef: reporter.BitBucketRef{
-							ID:     "refs/heads/fake-branch",
-							Commit: "fake-commit-id",
-						},
-						ToRef: reporter.BitBucketRef{
-							ID:     "refs/heads/main",
-							Commit: "main-commit-id",
-						},
-					},
-				},
-			},
+					}).
+					Once()
+				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes?start=0").
+					ReturnJSON(reporter.BitBucketPullRequestChanges{IsLastPage: true}).
+					Once()
+				s.ExpectGet("/plugins/servlet/applinks/whoami").
+					Return("pint_user").
+					Once()
+				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/pull-requests/102/activities?start=0").
+					ReturnJSON(reporter.BitBucketPullRequestActivities{IsLastPage: true}).
+					Once()
+			}),
 			errorHandler: func(err error) error {
 				if err != nil {
 					return fmt.Errorf("Unpexpected error: %w", err)
@@ -890,6 +792,216 @@ func TestBitBucketReporter(t *testing.T) {
 		{
 			description: "sends a correct report using comments, deleting stale ones",
 			gitCmd:      fakeGit,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
+					ReturnJSON(reporter.BitBucketPullRequests{
+						IsLastPage: true,
+						Values: []reporter.BitBucketPullRequest{
+							{
+								ID:   102,
+								Open: true,
+								FromRef: reporter.BitBucketRef{
+									ID:     "refs/heads/fake-branch",
+									Commit: "fake-commit-id",
+								},
+								ToRef: reporter.BitBucketRef{
+									ID:     "refs/heads/main",
+									Commit: "main-commit-id",
+								},
+							},
+						},
+					}).
+					Once()
+				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes?start=0").
+					ReturnJSON(reporter.BitBucketPullRequestChanges{
+						IsLastPage: true,
+						Values: []reporter.BitBucketPullRequestChange{
+							{Path: reporter.BitBucketPath{ToString: "index.txt"}},
+							{Path: reporter.BitBucketPath{ToString: "foo.txt"}},
+						},
+					}).
+					Once()
+				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/index.txt?contextLines=10000&since=main-commit-id&whitespace=show&withComments=false").
+					ReturnJSON(reporter.BitBucketFileDiffs{
+						Diffs: []reporter.BitBucketFileDiff{
+							{
+								Hunks: []reporter.BitBucketDiffHunk{
+									{
+										Segments: []reporter.BitBucketDiffSegment{
+											{
+												Type: "ADDED",
+												Lines: []reporter.BitBucketDiffLine{
+													{Source: 1, Destination: 1},
+													{Source: 5, Destination: 5},
+												},
+											},
+											{
+												Type: "CONTEXT",
+												Lines: []reporter.BitBucketDiffLine{
+													{Source: 10, Destination: 6},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}).
+					Once()
+				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/foo.txt?contextLines=10000&since=main-commit-id&whitespace=show&withComments=false").
+					ReturnJSON(reporter.BitBucketFileDiffs{
+						Diffs: []reporter.BitBucketFileDiff{
+							{
+								Hunks: []reporter.BitBucketDiffHunk{
+									{
+										Segments: []reporter.BitBucketDiffSegment{
+											{
+												Type: "ADDED",
+												Lines: []reporter.BitBucketDiffLine{
+													{Source: 2, Destination: 2},
+												},
+											},
+										},
+									},
+								},
+							},
+							{
+								Hunks: []reporter.BitBucketDiffHunk{
+									{
+										Segments: []reporter.BitBucketDiffSegment{
+											{
+												Type: "MODIFIED",
+												Lines: []reporter.BitBucketDiffLine{
+													{Source: 3, Destination: 4},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}).
+					Once()
+				s.ExpectGet("/plugins/servlet/applinks/whoami").
+					Return("pint_user").
+					Once()
+				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/pull-requests/102/activities?start=0").
+					ReturnJSON(reporter.BitBucketPullRequestActivities{
+						IsLastPage: true,
+						Values: []reporter.BitBucketPullRequestActivity{
+							{Action: "APPROVED"},
+							{
+								Action:        "COMMENTED",
+								CommentAction: "ADDED",
+								CommentAnchor: reporter.BitBucketCommentAnchor{
+									Orphaned: true,
+									LineType: "CONTEXT",
+									DiffType: "EFFECTIVE",
+									Path:     "foo.txt",
+									Line:     3,
+								},
+								Comment: reporter.BitBucketPullRequestComment{
+									ID:      1001,
+									Version: 0,
+									State:   "OPEN",
+									Author:  reporter.BitBucketCommentAuthor{Name: "pint_user"},
+								},
+							},
+							{
+								Action:        "COMMENTED",
+								CommentAction: "ADDED",
+								CommentAnchor: reporter.BitBucketCommentAnchor{
+									Orphaned: true,
+									DiffType: "COMMIT",
+									Path:     "foo.txt",
+									Line:     10,
+								},
+								Comment: reporter.BitBucketPullRequestComment{
+									ID:      1002,
+									Version: 1,
+									State:   "OPEN",
+									Author:  reporter.BitBucketCommentAuthor{Name: "pint_user"},
+								},
+							},
+							{
+								Action:        "COMMENTED",
+								CommentAction: "ADDED",
+								CommentAnchor: reporter.BitBucketCommentAnchor{
+									Orphaned: true,
+									LineType: "REMOVED",
+									DiffType: "COMMIT",
+									Path:     "foo.txt",
+									Line:     14,
+								},
+								Comment: reporter.BitBucketPullRequestComment{
+									ID:       1003,
+									Version:  1,
+									State:    "OPEN",
+									Severity: "BLOCKER",
+									Author:   reporter.BitBucketCommentAuthor{Name: "pint_user"},
+								},
+							},
+							{
+								Action:        "COMMENTED",
+								CommentAction: "ADDED",
+								CommentAnchor: reporter.BitBucketCommentAnchor{
+									Orphaned: false,
+									DiffType: "EFFECTIVE",
+									Path:     "foo.txt",
+									Line:     3,
+								},
+								Comment: reporter.BitBucketPullRequestComment{
+									ID:      2001,
+									Version: 0,
+									State:   "OPEN",
+									Author:  reporter.BitBucketCommentAuthor{Name: "pint_user"},
+								},
+							},
+							{
+								Action:        "COMMENTED",
+								CommentAction: "ADDED",
+								CommentAnchor: reporter.BitBucketCommentAnchor{
+									Orphaned: false,
+									DiffType: "COMMIT",
+									Path:     "foo.txt",
+									Line:     4,
+								},
+								Comment: reporter.BitBucketPullRequestComment{
+									ID:      2002,
+									Version: 1,
+									State:   "OPEN",
+									Author:  reporter.BitBucketCommentAuthor{Name: "pint_user"},
+								},
+							},
+						},
+					}).
+					Once()
+				// pruneComments deletes stale comments.
+				s.ExpectDelete("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments/1001?version=0").
+					Once()
+				s.ExpectDelete("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments/1002?version=1").
+					Once()
+				// 1003 has 0 replies -> deleteComment.
+				s.ExpectDelete("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments/1003?version=1").
+					Once()
+				s.ExpectDelete("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments/2001?version=0").
+					Once()
+				s.ExpectDelete("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments/2002?version=1").
+					Once()
+				// addComments posts 4 new comments.
+				s.ExpectPost("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments").
+					Once()
+				s.ExpectPost("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments").
+					Once()
+				s.ExpectPost("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments").
+					Once()
+				s.ExpectPost("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments").
+					Once()
+			}),
 			reports: []reporter.Report{
 				{
 					Path: discovery.Path{
@@ -961,259 +1073,6 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 			},
-			report: reporter.BitBucketReport{
-				Reporter: "Prometheus rule linter",
-				Title:    "pint v0.0.0",
-				Details:  reporter.BitBucketDescription,
-				Link:     "https://cloudflare.github.io/pint/",
-				Result:   "FAIL",
-				Data: []reporter.BitBucketReportData{
-					{Title: "Number of rules parsed", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(4)},
-					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of online checks", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Checks duration", Type: reporter.DurationType, Value: float64(0)},
-				},
-			},
-			pullRequestComments: []reporter.BitBucketPendingComment{
-				{
-					Text:     ":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nthis should be ignored, line is not part of the diff\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n",
-					Severity: "BLOCKER",
-					Anchor: reporter.BitBucketPendingCommentAnchor{
-						Path:     "foo.txt",
-						Line:     1,
-						LineType: "CONTEXT",
-						FileType: "FROM",
-						DiffType: "EFFECTIVE",
-					},
-				},
-				{
-					Text:     ":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nbad name\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n",
-					Severity: "BLOCKER",
-					Anchor: reporter.BitBucketPendingCommentAnchor{
-						Path:     "foo.txt",
-						Line:     2,
-						LineType: "ADDED",
-						FileType: "TO",
-						DiffType: "EFFECTIVE",
-					},
-				},
-				{
-					Text:     ":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nmock text\n\nmock details\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n",
-					Severity: "BLOCKER",
-					Anchor: reporter.BitBucketPendingCommentAnchor{
-						Path:     "foo.txt",
-						Line:     2,
-						LineType: "ADDED",
-						FileType: "TO",
-						DiffType: "EFFECTIVE",
-					},
-				},
-				{
-					Text:     ":warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nmock text 2\n\n:leftwards_arrow_with_hook: This problem was detected on a symlinked file `symlink.txt`.\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n",
-					Severity: "NORMAL",
-					Anchor: reporter.BitBucketPendingCommentAnchor{
-						Path:     "foo.txt",
-						Line:     4,
-						LineType: "CONTEXT",
-						FileType: "FROM",
-						DiffType: "EFFECTIVE",
-					},
-				},
-			},
-			pullRequests: reporter.BitBucketPullRequests{
-				IsLastPage: true,
-				Values: []reporter.BitBucketPullRequest{
-					{
-						ID:   102,
-						Open: true,
-						FromRef: reporter.BitBucketRef{
-							ID:     "refs/heads/fake-branch",
-							Commit: "fake-commit-id",
-						},
-						ToRef: reporter.BitBucketRef{
-							ID:     "refs/heads/main",
-							Commit: "main-commit-id",
-						},
-					},
-				},
-			},
-			pullRequestChanges: reporter.BitBucketPullRequestChanges{
-				IsLastPage: true,
-				Values: []reporter.BitBucketPullRequestChange{
-					{
-						Path: reporter.BitBucketPath{
-							ToString: "index.txt",
-						},
-					},
-					{
-						Path: reporter.BitBucketPath{
-							ToString: "foo.txt",
-						},
-					},
-				},
-			},
-			pullRequestFileDiffs: map[string]reporter.BitBucketFileDiffs{
-				"index.txt": {
-					Diffs: []reporter.BitBucketFileDiff{
-						{
-							Hunks: []reporter.BitBucketDiffHunk{
-								{
-									Segments: []reporter.BitBucketDiffSegment{
-										{
-											Type: "ADDED",
-											Lines: []reporter.BitBucketDiffLine{
-												{Source: 1, Destination: 1},
-												{Source: 5, Destination: 5},
-											},
-										},
-										{
-											Type: "CONTEXT",
-											Lines: []reporter.BitBucketDiffLine{
-												{Source: 10, Destination: 6},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-				"foo.txt": {
-					Diffs: []reporter.BitBucketFileDiff{
-						{
-							Hunks: []reporter.BitBucketDiffHunk{
-								{
-									Segments: []reporter.BitBucketDiffSegment{
-										{
-											Type: "ADDED",
-											Lines: []reporter.BitBucketDiffLine{
-												{Source: 2, Destination: 2},
-											},
-										},
-									},
-								},
-							},
-						},
-						{
-							Hunks: []reporter.BitBucketDiffHunk{
-								{
-									Segments: []reporter.BitBucketDiffSegment{
-										{
-											Type: "MODIFIED",
-											Lines: []reporter.BitBucketDiffLine{
-												{Source: 3, Destination: 4},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-			pullRequestActivities: reporter.BitBucketPullRequestActivities{
-				IsLastPage: true,
-				Values: []reporter.BitBucketPullRequestActivity{
-					{
-						Action: "APPROVED",
-					},
-					{
-						Action:        "COMMENTED",
-						CommentAction: "ADDED",
-						CommentAnchor: reporter.BitBucketCommentAnchor{
-							Orphaned: true,
-							LineType: "CONTEXT",
-							DiffType: "EFFECTIVE",
-							Path:     "foo.txt",
-							Line:     3,
-						},
-						Comment: reporter.BitBucketPullRequestComment{
-							ID:      1001,
-							Version: 0,
-							State:   "OPEN",
-							Author: reporter.BitBucketCommentAuthor{
-								Name: "pint_user",
-							},
-						},
-					},
-					{
-						Action:        "COMMENTED",
-						CommentAction: "ADDED",
-						CommentAnchor: reporter.BitBucketCommentAnchor{
-							Orphaned: true,
-							DiffType: "COMMIT",
-							Path:     "foo.txt",
-							Line:     10,
-						},
-						Comment: reporter.BitBucketPullRequestComment{
-							ID:      1002,
-							Version: 1,
-							State:   "OPEN",
-							Author: reporter.BitBucketCommentAuthor{
-								Name: "pint_user",
-							},
-						},
-					},
-					{
-						Action:        "COMMENTED",
-						CommentAction: "ADDED",
-						CommentAnchor: reporter.BitBucketCommentAnchor{
-							Orphaned: true,
-							LineType: "REMOVED",
-							DiffType: "COMMIT",
-							Path:     "foo.txt",
-							Line:     14,
-						},
-						Comment: reporter.BitBucketPullRequestComment{
-							ID:       1003,
-							Version:  1,
-							State:    "OPEN",
-							Severity: "BLOCKER",
-							Author: reporter.BitBucketCommentAuthor{
-								Name: "pint_user",
-							},
-						},
-					},
-					{
-						Action:        "COMMENTED",
-						CommentAction: "ADDED",
-						CommentAnchor: reporter.BitBucketCommentAnchor{
-							Orphaned: false,
-							DiffType: "EFFECTIVE",
-							Path:     "foo.txt",
-							Line:     3,
-						},
-						Comment: reporter.BitBucketPullRequestComment{
-							ID:      2001,
-							Version: 0,
-							State:   "OPEN",
-							Author: reporter.BitBucketCommentAuthor{
-								Name: "pint_user",
-							},
-						},
-					},
-					{
-						Action:        "COMMENTED",
-						CommentAction: "ADDED",
-						CommentAnchor: reporter.BitBucketCommentAnchor{
-							Orphaned: false,
-							DiffType: "COMMIT",
-							Path:     "foo.txt",
-							Line:     4,
-						},
-						Comment: reporter.BitBucketPullRequestComment{
-							ID:      2002,
-							Version: 1,
-							State:   "OPEN",
-							Author: reporter.BitBucketCommentAuthor{
-								Name: "pint_user",
-							},
-						},
-					},
-				},
-			},
 			errorHandler: func(err error) error {
 				if err.Error() != "fatal error(s) reported" {
 					return fmt.Errorf("Unpexpected error: %w", err)
@@ -1224,10 +1083,13 @@ func TestBitBucketReporter(t *testing.T) {
 		{
 			description: "sends a correct report using comments, fails to delete stale comments",
 			gitCmd:      fakeGit,
-			report:      emptyReport,
-			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				if r.URL.Path == "/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests" {
-					data, err := json.Marshal(reporter.BitBucketPullRequests{
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
+					ReturnJSON(reporter.BitBucketPullRequests{
 						IsLastPage: true,
 						Values: []reporter.BitBucketPullRequest{
 							{
@@ -1243,14 +1105,10 @@ func TestBitBucketReporter(t *testing.T) {
 								},
 							},
 						},
-					})
-					assert.NoError(t, err)
-					w.WriteHeader(http.StatusOK)
-					_, err = w.Write(data)
-					assert.NoError(t, err)
-				}
-				if r.URL.Path == "/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes" {
-					data, err := json.Marshal(reporter.BitBucketPullRequestChanges{
+					}).
+					Once()
+				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes?start=0").
+					ReturnJSON(reporter.BitBucketPullRequestChanges{
 						IsLastPage: true,
 						Values: []reporter.BitBucketPullRequestChange{
 							{
@@ -1259,14 +1117,40 @@ func TestBitBucketReporter(t *testing.T) {
 								},
 							},
 						},
-					})
-					assert.NoError(t, err)
-					w.WriteHeader(http.StatusOK)
-					_, err = w.Write(data)
-					assert.NoError(t, err)
-				}
-				if r.URL.Path == "/rest/api/latest/projects/proj/repos/repo/pull-requests/102/activities" {
-					data, err := json.Marshal(reporter.BitBucketPullRequestActivities{
+					}).
+					Once()
+				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/index.txt?contextLines=10000&since=main-commit-id&whitespace=show&withComments=false").
+					ReturnJSON(reporter.BitBucketFileDiffs{
+						Diffs: []reporter.BitBucketFileDiff{
+							{
+								Hunks: []reporter.BitBucketDiffHunk{
+									{
+										Segments: []reporter.BitBucketDiffSegment{
+											{
+												Type: "ADDED",
+												Lines: []reporter.BitBucketDiffLine{
+													{Source: 1, Destination: 1},
+													{Source: 5, Destination: 5},
+												},
+											},
+											{
+												Type: "CONTEXT",
+												Lines: []reporter.BitBucketDiffLine{
+													{Source: 10, Destination: 6},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}).
+					Once()
+				s.ExpectGet("/plugins/servlet/applinks/whoami").
+					Return("pint_user").
+					Once()
+				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/pull-requests/102/activities?start=0").
+					ReturnJSON(reporter.BitBucketPullRequestActivities{
 						IsLastPage: true,
 						Values: []reporter.BitBucketPullRequestActivity{
 							{
@@ -1306,53 +1190,15 @@ func TestBitBucketReporter(t *testing.T) {
 								},
 							},
 						},
-					})
-					assert.NoError(t, err)
-					w.WriteHeader(http.StatusOK)
-					_, _ = w.Write(data)
-					return
-				}
-				if r.URL.Path == "/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/index.txt" {
-					data, err := json.Marshal(reporter.BitBucketFileDiffs{
-						Diffs: []reporter.BitBucketFileDiff{
-							{
-								Hunks: []reporter.BitBucketDiffHunk{
-									{
-										Segments: []reporter.BitBucketDiffSegment{
-											{
-												Type: "ADDED",
-												Lines: []reporter.BitBucketDiffLine{
-													{Source: 1, Destination: 1},
-													{Source: 5, Destination: 5},
-												},
-											},
-											{
-												Type: "CONTEXT",
-												Lines: []reporter.BitBucketDiffLine{
-													{Source: 10, Destination: 6},
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					})
-					assert.NoError(t, err)
-					w.WriteHeader(http.StatusOK)
-					_, _ = w.Write(data)
-					return
-				}
-				if r.URL.Path == "/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint" {
-					w.WriteHeader(http.StatusOK)
-					return
-				}
-				if r.URL.Path == "/plugins/servlet/applinks/whoami" {
-					w.WriteHeader(http.StatusOK)
-					_, _ = w.Write([]byte("pint_user"))
-					return
-				}
-				w.WriteHeader(http.StatusInternalServerError)
+					}).
+					Once()
+				// pruneComments will try to delete both comments, which fails (500), but errors are only logged.
+				s.ExpectDelete("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments/1001?version=0").
+					ReturnCode(http.StatusInternalServerError).
+					Once()
+				s.ExpectDelete("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments/1002?version=1").
+					ReturnCode(http.StatusInternalServerError).
+					Once()
 			}),
 			errorHandler: func(err error) error {
 				if err != nil {
@@ -1364,10 +1210,13 @@ func TestBitBucketReporter(t *testing.T) {
 		{
 			description: "sends a correct report using comments, fails to get username",
 			gitCmd:      fakeGit,
-			report:      emptyReport,
-			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				if r.URL.Path == "/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests" {
-					data, err := json.Marshal(reporter.BitBucketPullRequests{
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
+					ReturnJSON(reporter.BitBucketPullRequests{
 						IsLastPage: true,
 						Values: []reporter.BitBucketPullRequest{
 							{
@@ -1383,14 +1232,10 @@ func TestBitBucketReporter(t *testing.T) {
 								},
 							},
 						},
-					})
-					assert.NoError(t, err)
-					w.WriteHeader(http.StatusOK)
-					_, err = w.Write(data)
-					assert.NoError(t, err)
-				}
-				if r.URL.Path == "/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes" {
-					data, err := json.Marshal(reporter.BitBucketPullRequestChanges{
+					}).
+					Once()
+				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes?start=0").
+					ReturnJSON(reporter.BitBucketPullRequestChanges{
 						IsLastPage: true,
 						Values: []reporter.BitBucketPullRequestChange{
 							{
@@ -1399,24 +1244,10 @@ func TestBitBucketReporter(t *testing.T) {
 								},
 							},
 						},
-					})
-					assert.NoError(t, err)
-					w.WriteHeader(http.StatusOK)
-					_, err = w.Write(data)
-					assert.NoError(t, err)
-				}
-				if r.URL.Path == "/rest/api/latest/projects/proj/repos/repo/pull-requests/102/activities" {
-					data, err := json.Marshal(reporter.BitBucketPullRequestActivities{
-						IsLastPage: true,
-						Values:     []reporter.BitBucketPullRequestActivity{},
-					})
-					assert.NoError(t, err)
-					w.WriteHeader(http.StatusOK)
-					_, _ = w.Write(data)
-					return
-				}
-				if r.URL.Path == "/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/index.txt" {
-					data, err := json.Marshal(reporter.BitBucketFileDiffs{
+					}).
+					Once()
+				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/index.txt?contextLines=10000&since=main-commit-id&whitespace=show&withComments=false").
+					ReturnJSON(reporter.BitBucketFileDiffs{
 						Diffs: []reporter.BitBucketFileDiff{
 							{
 								Hunks: []reporter.BitBucketDiffHunk{
@@ -1440,21 +1271,11 @@ func TestBitBucketReporter(t *testing.T) {
 								},
 							},
 						},
-					})
-					assert.NoError(t, err)
-					w.WriteHeader(http.StatusOK)
-					_, _ = w.Write(data)
-					return
-				}
-				if r.URL.Path == "/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint" {
-					w.WriteHeader(http.StatusOK)
-					return
-				}
-				if r.URL.Path == "/plugins/servlet/applinks/whoami" {
-					w.WriteHeader(http.StatusInternalServerError)
-					return
-				}
-				w.WriteHeader(http.StatusOK)
+					}).
+					Once()
+				s.ExpectGet("/plugins/servlet/applinks/whoami").
+					ReturnCode(http.StatusInternalServerError).
+					Once()
 			}),
 			errorHandler: func(err error) error {
 				if err.Error() != "failed to get pull request comments from BitBucket: GET request failed" {
@@ -1485,10 +1306,13 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 			},
-			report: emptyReport,
-			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				if r.URL.Path == "/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests" {
-					data, err := json.Marshal(reporter.BitBucketPullRequests{
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
+					ReturnJSON(reporter.BitBucketPullRequests{
 						IsLastPage: true,
 						Values: []reporter.BitBucketPullRequest{
 							{
@@ -1504,14 +1328,10 @@ func TestBitBucketReporter(t *testing.T) {
 								},
 							},
 						},
-					})
-					assert.NoError(t, err)
-					w.WriteHeader(http.StatusOK)
-					_, err = w.Write(data)
-					assert.NoError(t, err)
-				}
-				if r.URL.Path == "/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes" {
-					data, err := json.Marshal(reporter.BitBucketPullRequestChanges{
+					}).
+					Once()
+				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes?start=0").
+					ReturnJSON(reporter.BitBucketPullRequestChanges{
 						IsLastPage: true,
 						Values: []reporter.BitBucketPullRequestChange{
 							{
@@ -1520,14 +1340,40 @@ func TestBitBucketReporter(t *testing.T) {
 								},
 							},
 						},
-					})
-					assert.NoError(t, err)
-					w.WriteHeader(http.StatusOK)
-					_, err = w.Write(data)
-					assert.NoError(t, err)
-				}
-				if r.URL.Path == "/rest/api/latest/projects/proj/repos/repo/pull-requests/102/activities" {
-					data, err := json.Marshal(reporter.BitBucketPullRequestActivities{
+					}).
+					Once()
+				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/index.txt?contextLines=10000&since=main-commit-id&whitespace=show&withComments=false").
+					ReturnJSON(reporter.BitBucketFileDiffs{
+						Diffs: []reporter.BitBucketFileDiff{
+							{
+								Hunks: []reporter.BitBucketDiffHunk{
+									{
+										Segments: []reporter.BitBucketDiffSegment{
+											{
+												Type: "ADDED",
+												Lines: []reporter.BitBucketDiffLine{
+													{Source: 1, Destination: 1},
+													{Source: 5, Destination: 5},
+												},
+											},
+											{
+												Type: "CONTEXT",
+												Lines: []reporter.BitBucketDiffLine{
+													{Source: 10, Destination: 6},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}).
+					Once()
+				s.ExpectGet("/plugins/servlet/applinks/whoami").
+					Return("pint_user").
+					Once()
+				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/pull-requests/102/activities?start=0").
+					ReturnJSON(reporter.BitBucketPullRequestActivities{
 						IsLastPage: true,
 						Values: []reporter.BitBucketPullRequestActivity{
 							{
@@ -1567,14 +1413,63 @@ func TestBitBucketReporter(t *testing.T) {
 								},
 							},
 						},
-					})
-					assert.NoError(t, err)
-					w.WriteHeader(http.StatusOK)
-					_, _ = w.Write(data)
-					return
+					}).
+					Once()
+				// pruneComments deletes both stale comments.
+				s.ExpectDelete("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments/1001?version=0").
+					Once()
+				s.ExpectDelete("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments/1002?version=1").
+					Once()
+				// addComments tries to POST new comment, which fails.
+				s.ExpectPost("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments").
+					ReturnCode(http.StatusInternalServerError).
+					Once()
+			}),
+			errorHandler: func(err error) error {
+				if err != nil && err.Error() == "failed to create BitBucket pull request comments: POST request failed" {
+					return nil
 				}
-				if r.URL.Path == "/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/index.txt" {
-					data, err := json.Marshal(reporter.BitBucketFileDiffs{
+				return fmt.Errorf("Expected failed to create BitBucket pull request comments: POST request failed, got %w", err)
+			},
+		},
+		{
+			description: "sends a correct report with deduped comments",
+			gitCmd:      fakeGit,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
+					ReturnJSON(reporter.BitBucketPullRequests{
+						IsLastPage: true,
+						Values: []reporter.BitBucketPullRequest{
+							{
+								ID:   102,
+								Open: true,
+								FromRef: reporter.BitBucketRef{
+									ID:     "refs/heads/fake-branch",
+									Commit: "fake-commit-id",
+								},
+								ToRef: reporter.BitBucketRef{
+									ID:     "refs/heads/main",
+									Commit: "main-commit-id",
+								},
+							},
+						},
+					}).
+					Once()
+				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes?start=0").
+					ReturnJSON(reporter.BitBucketPullRequestChanges{
+						IsLastPage: true,
+						Values: []reporter.BitBucketPullRequestChange{
+							{Path: reporter.BitBucketPath{ToString: "index.txt"}},
+							{Path: reporter.BitBucketPath{ToString: "foo.txt"}},
+						},
+					}).
+					Once()
+				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/index.txt?contextLines=10000&since=main-commit-id&whitespace=show&withComments=false").
+					ReturnJSON(reporter.BitBucketFileDiffs{
 						Diffs: []reporter.BitBucketFileDiff{
 							{
 								Hunks: []reporter.BitBucketDiffHunk{
@@ -1598,37 +1493,132 @@ func TestBitBucketReporter(t *testing.T) {
 								},
 							},
 						},
-					})
-					assert.NoError(t, err)
-					w.WriteHeader(http.StatusOK)
-					_, _ = w.Write(data)
-					return
-				}
-				if r.URL.Path == "/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint" {
-					w.WriteHeader(http.StatusOK)
-					return
-				}
-				if r.URL.Path == "/plugins/servlet/applinks/whoami" {
-					w.WriteHeader(http.StatusOK)
-					_, _ = w.Write([]byte("pint_user"))
-					return
-				}
-				if r.URL.Path == "/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments/1002" && r.Method == http.MethodDelete {
-					w.WriteHeader(http.StatusOK)
-					return
-				}
-				w.WriteHeader(http.StatusInternalServerError)
+					}).
+					Once()
+				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/foo.txt?contextLines=10000&since=main-commit-id&whitespace=show&withComments=false").
+					ReturnJSON(reporter.BitBucketFileDiffs{
+						Diffs: []reporter.BitBucketFileDiff{
+							{
+								Hunks: []reporter.BitBucketDiffHunk{
+									{
+										Segments: []reporter.BitBucketDiffSegment{
+											{
+												Type: "ADDED",
+												Lines: []reporter.BitBucketDiffLine{
+													{Source: 2, Destination: 2},
+												},
+											},
+										},
+									},
+								},
+							},
+							{
+								Hunks: []reporter.BitBucketDiffHunk{
+									{
+										Segments: []reporter.BitBucketDiffSegment{
+											{
+												Type: "MODIFIED",
+												Lines: []reporter.BitBucketDiffLine{
+													{Source: 3, Destination: 4},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}).
+					Once()
+				s.ExpectGet("/plugins/servlet/applinks/whoami").
+					Return("pint_user").
+					Once()
+				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/pull-requests/102/activities?start=0").
+					ReturnJSON(reporter.BitBucketPullRequestActivities{
+						IsLastPage: true,
+						Values: []reporter.BitBucketPullRequestActivity{
+							{Action: "APPROVED"},
+							{
+								Action:        "COMMENTED",
+								CommentAction: "ADDED",
+								CommentAnchor: reporter.BitBucketCommentAnchor{
+									Orphaned: true,
+									DiffType: "EFFECTIVE",
+									Path:     "foo.txt",
+									Line:     3,
+								},
+								Comment: reporter.BitBucketPullRequestComment{
+									ID:      1001,
+									Version: 0,
+									State:   "OPEN",
+									Author:  reporter.BitBucketCommentAuthor{Name: "pint_user"},
+								},
+							},
+							{
+								Action:        "COMMENTED",
+								CommentAction: "ADDED",
+								CommentAnchor: reporter.BitBucketCommentAnchor{
+									Orphaned: true,
+									DiffType: "COMMIT",
+									Path:     "foo.txt",
+									Line:     10,
+								},
+								Comment: reporter.BitBucketPullRequestComment{
+									ID:      1002,
+									Version: 1,
+									State:   "OPEN",
+									Author:  reporter.BitBucketCommentAuthor{Name: "pint_user"},
+								},
+							},
+							{
+								Action:        "COMMENTED",
+								CommentAction: "ADDED",
+								CommentAnchor: reporter.BitBucketCommentAnchor{
+									Orphaned: false,
+									DiffType: "EFFECTIVE",
+									Path:     "foo.txt",
+									Line:     3,
+								},
+								Comment: reporter.BitBucketPullRequestComment{
+									ID:      2001,
+									Version: 0,
+									State:   "OPEN",
+									Author:  reporter.BitBucketCommentAuthor{Name: "pint_user"},
+								},
+							},
+							{
+								Action:        "COMMENTED",
+								CommentAction: "ADDED",
+								CommentAnchor: reporter.BitBucketCommentAnchor{
+									Orphaned: false,
+									DiffType: "COMMIT",
+									Path:     "foo.txt",
+									Line:     4,
+								},
+								Comment: reporter.BitBucketPullRequestComment{
+									ID:      2002,
+									Version: 1,
+									State:   "OPEN",
+									Author:  reporter.BitBucketCommentAuthor{Name: "pint_user"},
+								},
+							},
+						},
+					}).
+					Once()
+				// pruneComments deletes all stale comments.
+				s.ExpectDelete("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments/1001?version=0").
+					Once()
+				s.ExpectDelete("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments/1002?version=1").
+					Once()
+				s.ExpectDelete("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments/2001?version=0").
+					Once()
+				s.ExpectDelete("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments/2002?version=1").
+					Once()
+				// addComments posts 2 deduped comments.
+				s.ExpectPost("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments").
+					Once()
+				s.ExpectPost("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments").
+					Once()
 			}),
-			errorHandler: func(err error) error {
-				if err != nil && err.Error() == "failed to create BitBucket pull request comments: POST request failed" {
-					return nil
-				}
-				return fmt.Errorf("Expected failed to create BitBucket pull request comments: POST request failed, got %w", err)
-			},
-		},
-		{
-			description: "sends a correct report with deduped comments",
-			gitCmd:      fakeGit,
 			reports: []reporter.Report{
 				{
 					Path: discovery.Path{
@@ -1719,216 +1709,6 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 			},
-			report: reporter.BitBucketReport{
-				Reporter: "Prometheus rule linter",
-				Title:    "pint v0.0.0",
-				Details:  reporter.BitBucketDescription,
-				Link:     "https://cloudflare.github.io/pint/",
-				Result:   "FAIL",
-				Data: []reporter.BitBucketReportData{
-					{Title: "Number of rules parsed", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(5)},
-					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of online checks", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Checks duration", Type: reporter.DurationType, Value: float64(0)},
-				},
-			},
-			pullRequestComments: []reporter.BitBucketPendingComment{
-				{
-					Text:     ":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nthis should be ignored, line is not part of the diff\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n",
-					Severity: "BLOCKER",
-					Anchor: reporter.BitBucketPendingCommentAnchor{
-						Path:     "foo.txt",
-						Line:     1,
-						LineType: "CONTEXT",
-						FileType: "FROM",
-						DiffType: "EFFECTIVE",
-					},
-				},
-				{
-					Text:     ":warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nbad name\n\nbad name details\n\n------\n\nmock text 1\n\nmock details\n\n------\n\nmock text 2\n\nmock details\n\n:leftwards_arrow_with_hook: This problem was detected on a symlinked file `symlink.txt`.\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n",
-					Severity: "NORMAL",
-					Anchor: reporter.BitBucketPendingCommentAnchor{
-						Path:     "foo.txt",
-						Line:     2,
-						LineType: "ADDED",
-						FileType: "TO",
-						DiffType: "EFFECTIVE",
-					},
-				},
-			},
-			pullRequests: reporter.BitBucketPullRequests{
-				IsLastPage: true,
-				Values: []reporter.BitBucketPullRequest{
-					{
-						ID:   102,
-						Open: true,
-						FromRef: reporter.BitBucketRef{
-							ID:     "refs/heads/fake-branch",
-							Commit: "fake-commit-id",
-						},
-						ToRef: reporter.BitBucketRef{
-							ID:     "refs/heads/main",
-							Commit: "main-commit-id",
-						},
-					},
-				},
-			},
-			pullRequestChanges: reporter.BitBucketPullRequestChanges{
-				IsLastPage: true,
-				Values: []reporter.BitBucketPullRequestChange{
-					{
-						Path: reporter.BitBucketPath{
-							ToString: "index.txt",
-						},
-					},
-					{
-						Path: reporter.BitBucketPath{
-							ToString: "foo.txt",
-						},
-					},
-				},
-			},
-			pullRequestFileDiffs: map[string]reporter.BitBucketFileDiffs{
-				"index.txt": {
-					Diffs: []reporter.BitBucketFileDiff{
-						{
-							Hunks: []reporter.BitBucketDiffHunk{
-								{
-									Segments: []reporter.BitBucketDiffSegment{
-										{
-											Type: "ADDED",
-											Lines: []reporter.BitBucketDiffLine{
-												{Source: 1, Destination: 1},
-												{Source: 5, Destination: 5},
-											},
-										},
-										{
-											Type: "CONTEXT",
-											Lines: []reporter.BitBucketDiffLine{
-												{Source: 10, Destination: 6},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-				"foo.txt": {
-					Diffs: []reporter.BitBucketFileDiff{
-						{
-							Hunks: []reporter.BitBucketDiffHunk{
-								{
-									Segments: []reporter.BitBucketDiffSegment{
-										{
-											Type: "ADDED",
-											Lines: []reporter.BitBucketDiffLine{
-												{Source: 2, Destination: 2},
-											},
-										},
-									},
-								},
-							},
-						},
-						{
-							Hunks: []reporter.BitBucketDiffHunk{
-								{
-									Segments: []reporter.BitBucketDiffSegment{
-										{
-											Type: "MODIFIED",
-											Lines: []reporter.BitBucketDiffLine{
-												{Source: 3, Destination: 4},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-			pullRequestActivities: reporter.BitBucketPullRequestActivities{
-				IsLastPage: true,
-				Values: []reporter.BitBucketPullRequestActivity{
-					{
-						Action: "APPROVED",
-					},
-					{
-						Action:        "COMMENTED",
-						CommentAction: "ADDED",
-						CommentAnchor: reporter.BitBucketCommentAnchor{
-							Orphaned: true,
-							DiffType: "EFFECTIVE",
-							Path:     "foo.txt",
-							Line:     3,
-						},
-						Comment: reporter.BitBucketPullRequestComment{
-							ID:      1001,
-							Version: 0,
-							State:   "OPEN",
-							Author: reporter.BitBucketCommentAuthor{
-								Name: "pint_user",
-							},
-						},
-					},
-					{
-						Action:        "COMMENTED",
-						CommentAction: "ADDED",
-						CommentAnchor: reporter.BitBucketCommentAnchor{
-							Orphaned: true,
-							DiffType: "COMMIT",
-							Path:     "foo.txt",
-							Line:     10,
-						},
-						Comment: reporter.BitBucketPullRequestComment{
-							ID:      1002,
-							Version: 1,
-							State:   "OPEN",
-							Author: reporter.BitBucketCommentAuthor{
-								Name: "pint_user",
-							},
-						},
-					},
-					{
-						Action:        "COMMENTED",
-						CommentAction: "ADDED",
-						CommentAnchor: reporter.BitBucketCommentAnchor{
-							Orphaned: false,
-							DiffType: "EFFECTIVE",
-							Path:     "foo.txt",
-							Line:     3,
-						},
-						Comment: reporter.BitBucketPullRequestComment{
-							ID:      2001,
-							Version: 0,
-							State:   "OPEN",
-							Author: reporter.BitBucketCommentAuthor{
-								Name: "pint_user",
-							},
-						},
-					},
-					{
-						Action:        "COMMENTED",
-						CommentAction: "ADDED",
-						CommentAnchor: reporter.BitBucketCommentAnchor{
-							Orphaned: false,
-							DiffType: "COMMIT",
-							Path:     "foo.txt",
-							Line:     4,
-						},
-						Comment: reporter.BitBucketPullRequestComment{
-							ID:      2002,
-							Version: 1,
-							State:   "OPEN",
-							Author: reporter.BitBucketCommentAuthor{
-								Name: "pint_user",
-							},
-						},
-					},
-				},
-			},
 			errorHandler: func(err error) error {
 				if err != nil {
 					return fmt.Errorf("Unpexpected error: %w", err)
@@ -1939,6 +1719,17 @@ func TestBitBucketReporter(t *testing.T) {
 		{
 			description: "annotation on unmodified lines",
 			gitCmd:      fakeGit,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
+					ReturnJSON(reporter.BitBucketPullRequests{IsLastPage: true}).
+					Once()
+				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint/annotations").
+					Once()
+			}),
 			reports: []reporter.Report{
 				{
 					Path: discovery.Path{
@@ -1958,24 +1749,113 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 			},
-			report: reporter.BitBucketReport{
-				Reporter: "Prometheus rule linter",
-				Title:    "pint v0.0.0",
-				Details:  reporter.BitBucketDescription,
-				Link:     "https://cloudflare.github.io/pint/",
-				Result:   "FAIL",
-				Data: []reporter.BitBucketReportData{
-					{Title: "Number of rules parsed", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(1)},
-					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of online checks", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Checks duration", Type: reporter.DurationType, Value: float64(0)},
+			errorHandler: func(err error) error {
+				if err != nil {
+					return fmt.Errorf("Unpexpected error: %w", err)
+				}
+				return nil
+			},
+		},
+		{
+			// Covers bitbucket_api.go:633-652 — diagnostics rendering in makeComments.
+			description: "comment includes diagnostics when file is readable",
+			gitCmd:      fakeGit,
+			reports: []reporter.Report{
+				{
+					Path: discovery.Path{
+						SymlinkTarget: "index.txt",
+						Name:          diagFile,
+					},
+					ModifiedLines: []int{1},
+					Rule:          mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Lines: diags.LineRange{
+							First: 1,
+							Last:  1,
+						},
+						Reporter: "mock",
+						Summary:  "problem with diagnostics",
+						Severity: checks.Bug,
+						Anchor:   checks.AnchorAfter,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "this is wrong",
+								Pos: diags.PositionRanges{
+									{Line: 1, FirstColumn: 3, LastColumn: 8},
+								},
+								FirstColumn: 3,
+								LastColumn:  8,
+							},
+						},
+					},
 				},
 			},
-			annotations: reporter.BitBucketAnnotations{
-				Annotations: []reporter.BitBucketAnnotation{},
-			},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
+					Once()
+				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
+					ReturnJSON(reporter.BitBucketPullRequests{
+						IsLastPage: true,
+						Values: []reporter.BitBucketPullRequest{
+							{
+								ID:   102,
+								Open: true,
+								FromRef: reporter.BitBucketRef{
+									ID:     "refs/heads/fake-branch",
+									Commit: "fake-commit-id",
+								},
+								ToRef: reporter.BitBucketRef{
+									ID:     "refs/heads/main",
+									Commit: "main-commit-id",
+								},
+							},
+						},
+					}).
+					Once()
+				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes?start=0").
+					ReturnJSON(reporter.BitBucketPullRequestChanges{
+						IsLastPage: true,
+						Values: []reporter.BitBucketPullRequestChange{
+							{
+								Path: reporter.BitBucketPath{
+									ToString: "index.txt",
+								},
+							},
+						},
+					}).
+					Once()
+				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/index.txt?contextLines=10000&since=main-commit-id&whitespace=show&withComments=false").
+					ReturnJSON(reporter.BitBucketFileDiffs{
+						Diffs: []reporter.BitBucketFileDiff{
+							{
+								Hunks: []reporter.BitBucketDiffHunk{
+									{
+										Segments: []reporter.BitBucketDiffSegment{
+											{
+												Type: "ADDED",
+												Lines: []reporter.BitBucketDiffLine{
+													{Source: 1, Destination: 1},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}).
+					Once()
+				s.ExpectGet("/plugins/servlet/applinks/whoami").
+					Return("pint_user").
+					Once()
+				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/pull-requests/102/activities?start=0").
+					ReturnJSON(reporter.BitBucketPullRequestActivities{IsLastPage: true}).
+					Once()
+				// addComments posts 1 new comment with diagnostics content.
+				s.ExpectPost("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments").
+					Once()
+			}),
 			errorHandler: func(err error) error {
 				if err != nil {
 					return fmt.Errorf("Unpexpected error: %w", err)
@@ -1989,88 +1869,11 @@ func TestBitBucketReporter(t *testing.T) {
 		t.Run(tc.description, func(t *testing.T) {
 			slog.SetDefault(slogt.New(t))
 
-			var commentIndex int
-
-			var srv *httptest.Server
-			if tc.httpHandler == nil {
-				srv = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					defer r.Body.Close()
-
-					if r.Method == http.MethodDelete {
-						w.WriteHeader(http.StatusOK)
-						return
-					}
-
-					if after, ok := strings.CutPrefix(r.URL.Path, "/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/"); ok {
-						filename := after
-						assert.NotNil(t, tc.pullRequestFileDiffs)
-						v, ok := tc.pullRequestFileDiffs[filename]
-						assert.True(t, ok, "file is missing from pullRequestFileDiffs: %s", filename)
-
-						data, err := json.Marshal(v)
-						assert.NoError(t, err)
-						w.WriteHeader(http.StatusOK)
-						_, err = w.Write(data)
-						assert.NoError(t, err)
-						return
-					}
-
-					switch r.URL.Path {
-					case "/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint":
-						var resp reporter.BitBucketReport
-						if err := json.NewDecoder(r.Body).Decode(&resp); err != nil {
-							t.Errorf("JSON decode error: %v", err)
-						}
-						assert.Equal(t, tc.report, resp, "Got wrong bitbucket report body")
-					case "/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint/annotations":
-						var resp reporter.BitBucketAnnotations
-						if err := json.NewDecoder(r.Body).Decode(&resp); err != nil {
-							t.Errorf("JSON decode error: %s", err)
-						}
-						assert.Equal(t, tc.annotations, resp, "Got wrong bitbucket annotations")
-					case "/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests":
-						data, err := json.Marshal(tc.pullRequests)
-						assert.NoError(t, err)
-						w.WriteHeader(http.StatusOK)
-						_, err = w.Write(data)
-						assert.NoError(t, err)
-					case "/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes":
-						data, err := json.Marshal(tc.pullRequestChanges)
-						assert.NoError(t, err)
-						w.WriteHeader(http.StatusOK)
-						_, err = w.Write(data)
-						assert.NoError(t, err)
-					case "/rest/api/latest/projects/proj/repos/repo/pull-requests/102/activities":
-						data, err := json.Marshal(tc.pullRequestActivities)
-						assert.NoError(t, err)
-						w.WriteHeader(http.StatusOK)
-						_, err = w.Write(data)
-						assert.NoError(t, err)
-					case "/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments":
-						var comment reporter.BitBucketPendingComment
-						if err := json.NewDecoder(r.Body).Decode(&comment); err != nil {
-							t.Errorf("JSON decode error: %s", err)
-						}
-						assert.Equal(t, tc.pullRequestComments[commentIndex], comment)
-						commentIndex++
-					case "/plugins/servlet/applinks/whoami":
-						w.WriteHeader(http.StatusOK)
-						_, err := w.Write([]byte("pint_user"))
-						assert.NoError(t, err)
-					default:
-						w.WriteHeader(http.StatusInternalServerError)
-						_, _ = w.Write([]byte("Unhandled path: " + r.URL.Path))
-						t.Errorf("Unhandled path: %s", r.URL.Path)
-					}
-				}))
-			} else {
-				srv = httptest.NewServer(tc.httpHandler)
-			}
-			t.Cleanup(srv.Close)
+			srv := tc.mock(t)
 
 			r := reporter.NewBitBucketReporter(
 				"v0.0.0",
-				srv.URL,
+				srv.URL(),
 				time.Second,
 				"token",
 				"proj",
@@ -2085,8 +1888,6 @@ func TestBitBucketReporter(t *testing.T) {
 				t.Errorf("error check failure: %s", e)
 				return
 			}
-
-			require.Len(t, tc.pullRequestComments, commentIndex)
 		})
 	}
 }

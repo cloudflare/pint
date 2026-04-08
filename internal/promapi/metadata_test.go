@@ -2,170 +2,164 @@ package promapi_test
 
 import (
 	"net/http"
-	"net/http/httptest"
+	"regexp"
 	"testing"
 	"time"
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/require"
+	"go.nhat.io/httpmock"
 
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
 func TestMetadata(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := r.ParseForm()
-		if err != nil {
-			t.Fatal(err)
-		}
-		metric := r.Form.Get("metric")
-
-		switch metric {
-		case "gauge":
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"success","data":{"gauge":[{"type":"gauge","help":"Text","unit":""}]}}`))
-		case "counter":
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"success","data":{"counter":[{"type":"counter","help":"Text","unit":""}]}}`))
-		case "mixed":
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"success","data":{"mixed":[{"type":"gauge","help":"Text1","unit":"abc"},{"type":"counter","help":"Text2","unit":""}]}}`))
-		case "notfound":
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"success","data":{}}`))
-		case "once":
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"success","data":{"once":[{"type":"gauge","help":"Text","unit":""}]}}`))
-		case "slow":
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			time.Sleep(time.Second * 2)
-			_, _ = w.Write([]byte(`{"status":"success","data":{"once":[{"type":"gauge","help":"Text","unit":""}]}}`))
-		case "empty":
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{}`))
-		case "error":
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte("fake error\n"))
-		case "apiError":
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"error","errorType":"bad_data","error":"custom error message"}`))
-		case "badJson":
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"success","data":{"gauge"}}`))
-		case "emptyError":
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"error","errorType":"bad_data"}`))
-		default:
-			w.WriteHeader(http.StatusBadRequest)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"error","errorType":"bad_data","error":"unhandled metric"}`))
-		}
-	}))
-	t.Cleanup(srv.Close)
-
 	type testCaseT struct {
-		metric   string
+		mock     httpmock.Mocker
+		name     string
 		err      string
-		metadata promapi.MetadataResult
+		metadata []v1.Metadata
 		timeout  time.Duration
 	}
 
 	testCases := []testCaseT{
 		{
-			metric:  "gauge",
-			timeout: time.Second,
-			metadata: promapi.MetadataResult{
-				URI:      srv.URL,
-				Metadata: []v1.Metadata{{Type: "gauge", Help: "Text", Unit: ""}},
-			},
+			name:     "gauge",
+			timeout:  time.Second,
+			metadata: []v1.Metadata{{Type: "gauge", Help: "Text", Unit: ""}},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(regexp.MustCompile("^"+promapi.APIPathMetadata)).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"gauge":[{"type":"gauge","help":"Text","unit":""}]}}`).
+					UnlimitedTimes()
+			}),
 		},
 		{
-			metric:  "counter",
-			timeout: time.Second,
-			metadata: promapi.MetadataResult{
-				URI:      srv.URL,
-				Metadata: []v1.Metadata{{Type: "counter", Help: "Text", Unit: ""}},
-			},
+			name:     "counter",
+			timeout:  time.Second,
+			metadata: []v1.Metadata{{Type: "counter", Help: "Text", Unit: ""}},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(regexp.MustCompile("^"+promapi.APIPathMetadata)).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"counter":[{"type":"counter","help":"Text","unit":""}]}}`).
+					UnlimitedTimes()
+			}),
 		},
 		{
-			metric:  "mixed",
+			name:    "mixed",
 			timeout: time.Second,
-			metadata: promapi.MetadataResult{
-				URI: srv.URL,
-				Metadata: []v1.Metadata{
-					{Type: "gauge", Help: "Text1", Unit: "abc"},
-					{Type: "counter", Help: "Text2", Unit: ""},
-				},
+			metadata: []v1.Metadata{
+				{Type: "gauge", Help: "Text1", Unit: "abc"},
+				{Type: "counter", Help: "Text2", Unit: ""},
 			},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(regexp.MustCompile("^"+promapi.APIPathMetadata)).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"mixed":[{"type":"gauge","help":"Text1","unit":"abc"},{"type":"counter","help":"Text2","unit":""}]}}`).
+					UnlimitedTimes()
+			}),
 		},
 		{
-			metric:  "slow",
+			name:    "slow",
 			timeout: time.Millisecond * 10,
 			err:     "connection timeout",
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(regexp.MustCompile("^" + promapi.APIPathMetadata)).
+					Run(func(_ *http.Request) ([]byte, error) {
+						time.Sleep(time.Second * 2)
+						return []byte(`{"status":"success","data":{}}`), nil
+					}).
+					UnlimitedTimes()
+			}),
 		},
 		{
-			metric:  "empty",
+			name:    "empty",
 			timeout: time.Second,
 			err:     "unknown: empty response object",
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(regexp.MustCompile("^"+promapi.APIPathMetadata)).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{}`).
+					UnlimitedTimes()
+			}),
 		},
 		{
-			metric:  "error",
+			name:    "error",
 			timeout: time.Second,
 			err:     "server_error: 500 Internal Server Error",
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(regexp.MustCompile("^" + promapi.APIPathMetadata)).
+					ReturnCode(http.StatusInternalServerError).
+					Return("fake error\n").
+					UnlimitedTimes()
+			}),
 		},
 		{
-			metric:  "once",
-			timeout: time.Second,
-			metadata: promapi.MetadataResult{
-				URI:      srv.URL,
-				Metadata: []v1.Metadata{{Type: "gauge", Help: "Text", Unit: ""}},
-			},
+			name:     "once",
+			timeout:  time.Second,
+			metadata: []v1.Metadata{{Type: "gauge", Help: "Text", Unit: ""}},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(regexp.MustCompile("^"+promapi.APIPathMetadata)).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"once":[{"type":"gauge","help":"Text","unit":""}]}}`).
+					UnlimitedTimes()
+			}),
 		},
 		{
-			metric:  "apiError",
+			name:    "apiError",
 			timeout: time.Second,
 			err:     "bad_data: custom error message",
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(regexp.MustCompile("^"+promapi.APIPathMetadata)).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"error","errorType":"bad_data","error":"custom error message"}`).
+					UnlimitedTimes()
+			}),
 		},
 		{
-			metric:  "badJson",
+			name:    "badJson",
 			timeout: time.Second,
 			err:     `bad_response: JSON parse error: invalid character '}' after object key`,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(regexp.MustCompile("^"+promapi.APIPathMetadata)).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"gauge"}}`).
+					UnlimitedTimes()
+			}),
 		},
 		{
-			metric:  "emptyError",
+			name:    "emptyError",
 			timeout: time.Second,
 			err:     `bad_data: empty response object`,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(regexp.MustCompile("^"+promapi.APIPathMetadata)).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"error","errorType":"bad_data"}`).
+					UnlimitedTimes()
+			}),
 		},
 	}
 
 	for _, tc := range testCases {
-		t.Run(tc.metric, func(t *testing.T) {
-			fg := promapi.NewFailoverGroup("test", srv.URL, []*promapi.Prometheus{
-				promapi.NewPrometheus("test", srv.URL, "", nil, tc.timeout, 1, 100, nil),
+		t.Run(tc.name, func(t *testing.T) {
+			srv := tc.mock(t)
+
+			fg := promapi.NewFailoverGroup("test", srv.URL(), []*promapi.Prometheus{
+				promapi.NewPrometheus("test", srv.URL(), "", nil, tc.timeout, 1, 100, nil),
 			}, true, "up", nil, nil, nil)
 			reg := prometheus.NewRegistry()
 			fg.StartWorkers(reg)
 			defer fg.Close(reg)
 
-			metadata, err := fg.Metadata(t.Context(), tc.metric)
+			metadata, err := fg.Metadata(t.Context(), tc.name)
 			if tc.err != "" {
 				require.EqualError(t, err, tc.err, tc)
 			} else {
 				require.NoError(t, err)
 			}
 			if metadata != nil {
-				require.Equal(t, *metadata, tc.metadata)
+				require.Equal(t, tc.metadata, metadata.Metadata)
 			}
 		})
 	}
