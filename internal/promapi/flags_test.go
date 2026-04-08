@@ -2,107 +2,114 @@ package promapi_test
 
 import (
 	"net/http"
-	"net/http/httptest"
-	"strings"
 	"testing"
 	"time"
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/require"
+	"go.nhat.io/httpmock"
 
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
 func TestFlags(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.URL.Path {
-		case "/default" + promapi.APIPathFlags:
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"success","data":{}}`))
-		case "/foo" + promapi.APIPathFlags:
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"success","data":{"foo":"bar"}}`))
-		case "/once" + promapi.APIPathFlags:
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"success","data":{}}`))
-		case "/slow" + promapi.APIPathFlags:
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			time.Sleep(time.Second * 2)
-			_, _ = w.Write([]byte(`{"status":"success","data":{}}`))
-		case "/error" + promapi.APIPathFlags:
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte("fake error\n"))
-		case "/badYaml" + promapi.APIPathFlags:
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"success","data":{"xxx"}}`))
-		case "/apiError" + promapi.APIPathFlags:
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"error","errorType":"bad_data","error":"custom error message"}`))
-		default:
-			w.WriteHeader(http.StatusBadRequest)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"error","errorType":"bad_data","error":"unhandled path"}`))
-		}
-	}))
-	t.Cleanup(srv.Close)
-
 	type testCaseT struct {
-		flags   promapi.FlagsResult
-		prefix  string
+		flags   v1.FlagsResult
+		mock    httpmock.Mocker
+		name    string
 		err     string
 		timeout time.Duration
 	}
 
 	testCases := []testCaseT{
 		{
-			prefix:  "/default",
+			name:    "default",
 			timeout: time.Second,
-			flags: promapi.FlagsResult{
-				URI:   srv.URL + "/default",
-				Flags: v1.FlagsResult{},
-			},
+			flags:   v1.FlagsResult{},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(promapi.APIPathFlags).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{}}`).
+					UnlimitedTimes()
+			}),
 		},
 		{
-			prefix:  "/foo",
+			name:    "foo",
 			timeout: time.Second,
-			flags: promapi.FlagsResult{
-				URI:   srv.URL + "/foo",
-				Flags: v1.FlagsResult{"foo": "bar"},
-			},
+			flags:   v1.FlagsResult{"foo": "bar"},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(promapi.APIPathFlags).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"foo":"bar"}}`).
+					UnlimitedTimes()
+			}),
 		},
 		{
-			prefix:  "/slow",
+			name:    "slow",
 			timeout: time.Millisecond * 10,
 			err:     "connection timeout",
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(promapi.APIPathFlags).
+					Run(func(_ *http.Request) ([]byte, error) {
+						time.Sleep(time.Second * 2)
+						return []byte(`{"status":"success","data":{}}`), nil
+					}).
+					UnlimitedTimes()
+			}),
 		},
 		{
-			prefix:  "/error",
+			name:    "error",
 			timeout: time.Second,
 			err:     "server_error: 500 Internal Server Error",
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(promapi.APIPathFlags).
+					ReturnCode(http.StatusInternalServerError).
+					Return("fake error\n").
+					UnlimitedTimes()
+			}),
 		},
 		{
-			prefix:  "/badYaml",
+			name:    "badJson",
 			timeout: time.Second,
 			err:     `bad_response: JSON parse error: invalid character '}' after object key`,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(promapi.APIPathFlags).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"xxx"}}`).
+					UnlimitedTimes()
+			}),
 		},
 		{
-			prefix:  "/apiError",
+			name:    "apiError",
 			timeout: time.Second,
 			err:     `bad_data: custom error message`,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(promapi.APIPathFlags).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"error","errorType":"bad_data","error":"custom error message"}`).
+					UnlimitedTimes()
+			}),
+		},
+		{
+			name:    "emptyError",
+			timeout: time.Second,
+			err:     `bad_data: empty response object`,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(promapi.APIPathFlags).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"error","errorType":"bad_data"}`).
+					UnlimitedTimes()
+			}),
 		},
 	}
 
 	for _, tc := range testCases {
-		t.Run(strings.TrimPrefix(tc.prefix, "/"), func(t *testing.T) {
-			fg := promapi.NewFailoverGroup("test", srv.URL+tc.prefix, []*promapi.Prometheus{
-				promapi.NewPrometheus("test", srv.URL+tc.prefix, "", nil, tc.timeout, 1, 100, nil),
+		t.Run(tc.name, func(t *testing.T) {
+			srv := tc.mock(t)
+
+			fg := promapi.NewFailoverGroup("test", srv.URL(), []*promapi.Prometheus{
+				promapi.NewPrometheus("test", srv.URL(), "", nil, tc.timeout, 1, 100, nil),
 			}, true, "up", nil, nil, nil)
 
 			reg := prometheus.NewRegistry()
@@ -114,7 +121,7 @@ func TestFlags(t *testing.T) {
 				require.EqualError(t, err, tc.err, tc)
 			} else {
 				require.NoError(t, err)
-				require.Equal(t, *flags, tc.flags)
+				require.Equal(t, tc.flags, flags.Flags)
 			}
 		})
 	}

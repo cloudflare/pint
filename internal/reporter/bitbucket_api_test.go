@@ -5,13 +5,12 @@ import (
 	"encoding/json"
 	"log/slog"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 	"time"
 
 	"github.com/neilotoole/slogt"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.nhat.io/httpmock"
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/diags"
@@ -489,16 +488,16 @@ func TestBitBucketAPIRequest(t *testing.T) {
 	slog.SetDefault(slogt.New(t))
 
 	t.Run("successful request with body", func(t *testing.T) {
-		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-			assert.Equal(t, "Bearer test-token", r.Header.Get("Authorization"))
-			w.WriteHeader(http.StatusOK)
-			_, _ = w.Write([]byte(`{"result": "ok"}`))
-		}))
-		defer srv.Close()
+		srv := httpmock.New(func(s *httpmock.Server) {
+			s.ExpectPost("/test").
+				WithHeader("Content-Type", "application/json").
+				WithHeader("Authorization", "Bearer test-token").
+				Return(`{"result": "ok"}`).
+				Once()
+		})(t)
 
 		bb := bitBucketAPI{
-			uri:       srv.URL,
+			uri:       srv.URL(),
 			authToken: "test-token",
 			timeout:   time.Second * 5,
 		}
@@ -521,14 +520,15 @@ func TestBitBucketAPIRequest(t *testing.T) {
 	})
 
 	t.Run("non-2xx response returns error", func(t *testing.T) {
-		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte("Bad Request"))
-		}))
-		defer srv.Close()
+		srv := httpmock.New(func(s *httpmock.Server) {
+			s.ExpectGet("/test").
+				ReturnCode(http.StatusBadRequest).
+				Return("Bad Request").
+				Once()
+		})(t)
 
 		bb := bitBucketAPI{
-			uri:       srv.URL,
+			uri:       srv.URL(),
 			authToken: "test-token",
 			timeout:   time.Second * 5,
 		}
@@ -543,14 +543,11 @@ func TestBitBucketAPIPruneComments(t *testing.T) {
 	slog.SetDefault(slogt.New(t))
 
 	t.Run("keeps matching comment", func(t *testing.T) {
-		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-			t.Error("should not make any request when comment matches")
-			w.WriteHeader(http.StatusOK)
-		}))
-		defer srv.Close()
+		// No requests should be made when comment matches.
+		srv := httpmock.New(func(_ *httpmock.Server) {})(t)
 
 		bb := bitBucketAPI{
-			uri:       srv.URL,
+			uri:       srv.URL(),
 			authToken: "test-token",
 			timeout:   time.Second * 5,
 			project:   "proj",
@@ -586,20 +583,17 @@ func TestBitBucketAPIPruneComments(t *testing.T) {
 		}
 
 		bb.pruneComments(pr, currentComments, pendingComments)
+		require.Empty(t, srv.Requests, "no requests should be made when comment matches")
 	})
 
 	t.Run("deletes comment with no replies", func(t *testing.T) {
-		deleteCalled := false
-		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.Method == http.MethodDelete {
-				deleteCalled = true
-			}
-			w.WriteHeader(http.StatusOK)
-		}))
-		defer srv.Close()
+		srv := httpmock.New(func(s *httpmock.Server) {
+			s.ExpectDelete("/rest/api/1.0/projects/proj/repos/repo/pull-requests/1/comments/1?version=1").
+				Once()
+		})(t)
 
 		bb := bitBucketAPI{
-			uri:       srv.URL,
+			uri:       srv.URL(),
 			authToken: "test-token",
 			timeout:   time.Second * 5,
 			project:   "proj",
@@ -625,25 +619,18 @@ func TestBitBucketAPIPruneComments(t *testing.T) {
 		pendingComments := []BitBucketPendingComment{}
 
 		bb.pruneComments(pr, currentComments, pendingComments)
-		require.True(t, deleteCalled, "expected delete to be called")
+		require.Len(t, srv.Requests, 1, "expected delete to be called")
+		require.Equal(t, http.MethodDelete, srv.Requests[0].Method())
 	})
 
 	t.Run("resolves blocker comment with replies", func(t *testing.T) {
-		resolveCalled := false
-		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.Method == http.MethodPut {
-				var update BitBucketCommentStateUpdate
-				err := json.NewDecoder(r.Body).Decode(&update)
-				if err == nil && update.State == "RESOLVED" {
-					resolveCalled = true
-				}
-			}
-			w.WriteHeader(http.StatusOK)
-		}))
-		defer srv.Close()
+		srv := httpmock.New(func(s *httpmock.Server) {
+			s.ExpectPut("/rest/api/1.0/projects/proj/repos/repo/pull-requests/1/comments/1").
+				Once()
+		})(t)
 
 		bb := bitBucketAPI{
-			uri:       srv.URL,
+			uri:       srv.URL(),
 			authToken: "test-token",
 			timeout:   time.Second * 5,
 			project:   "proj",
@@ -669,30 +656,21 @@ func TestBitBucketAPIPruneComments(t *testing.T) {
 		pendingComments := []BitBucketPendingComment{}
 
 		bb.pruneComments(pr, currentComments, pendingComments)
-		require.True(t, resolveCalled, "expected resolve to be called")
+		require.Len(t, srv.Requests, 1, "expected resolve to be called")
+		require.Equal(t, http.MethodPut, srv.Requests[0].Method())
 	})
 
 	t.Run("updates severity and resolves normal comment with replies", func(t *testing.T) {
-		updateCalled := false
-		resolveCalled := false
-		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.Method == http.MethodPut {
-				body := make([]byte, 1024)
-				n, _ := r.Body.Read(body)
-				bodyStr := string(body[:n])
-				if bytes.Contains([]byte(bodyStr), []byte(`"severity"`)) {
-					updateCalled = true
-				}
-				if bytes.Contains([]byte(bodyStr), []byte(`"state"`)) {
-					resolveCalled = true
-				}
-			}
-			w.WriteHeader(http.StatusOK)
-		}))
-		defer srv.Close()
+		srv := httpmock.New(func(s *httpmock.Server) {
+			// First PUT: severity update, second PUT: resolve.
+			s.ExpectPut("/rest/api/1.0/projects/proj/repos/repo/pull-requests/1/comments/1").
+				Once()
+			s.ExpectPut("/rest/api/1.0/projects/proj/repos/repo/pull-requests/1/comments/1").
+				Once()
+		})(t)
 
 		bb := bitBucketAPI{
-			uri:       srv.URL,
+			uri:       srv.URL(),
 			authToken: "test-token",
 			timeout:   time.Second * 5,
 			project:   "proj",
@@ -718,22 +696,19 @@ func TestBitBucketAPIPruneComments(t *testing.T) {
 		pendingComments := []BitBucketPendingComment{}
 
 		bb.pruneComments(pr, currentComments, pendingComments)
-		require.True(t, updateCalled, "expected severity update to be called")
-		require.True(t, resolveCalled, "expected resolve to be called")
+		require.Len(t, srv.Requests, 2, "expected severity update and resolve to be called")
+		require.Equal(t, http.MethodPut, srv.Requests[0].Method())
+		require.Equal(t, http.MethodPut, srv.Requests[1].Method())
 	})
 
 	t.Run("handles COMMIT diffType", func(t *testing.T) {
-		deleteCalled := false
-		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.Method == http.MethodDelete {
-				deleteCalled = true
-			}
-			w.WriteHeader(http.StatusOK)
-		}))
-		defer srv.Close()
+		srv := httpmock.New(func(s *httpmock.Server) {
+			s.ExpectDelete("/rest/api/1.0/projects/proj/repos/repo/pull-requests/1/comments/1?version=1").
+				Once()
+		})(t)
 
 		bb := bitBucketAPI{
-			uri:       srv.URL,
+			uri:       srv.URL(),
 			authToken: "test-token",
 			timeout:   time.Second * 5,
 			project:   "proj",
@@ -769,7 +744,8 @@ func TestBitBucketAPIPruneComments(t *testing.T) {
 		}
 
 		bb.pruneComments(pr, currentComments, pendingComments)
-		require.True(t, deleteCalled, "expected delete to be called for COMMIT diffType")
+		require.Len(t, srv.Requests, 1, "expected delete to be called for COMMIT diffType")
+		require.Equal(t, http.MethodDelete, srv.Requests[0].Method())
 	})
 }
 
@@ -777,95 +753,95 @@ func TestBitBucketAPIGetPullRequestComments(t *testing.T) {
 	slog.SetDefault(slogt.New(t))
 
 	t.Run("filters comments correctly", func(t *testing.T) {
-		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.URL.Path == "/plugins/servlet/applinks/whoami" {
-				w.WriteHeader(http.StatusOK)
-				_, _ = w.Write([]byte(`testuser`))
-				return
-			}
-			activities := BitBucketPullRequestActivities{
-				IsLastPage: true,
-				Values: []BitBucketPullRequestActivity{
-					{
-						Action:        "COMMENTED",
-						CommentAction: "ADDED",
-						Comment: BitBucketPullRequestComment{
-							ID:      1,
-							Version: 1,
-							State:   "OPEN",
-							Author:  BitBucketCommentAuthor{Name: "testuser"},
-							Text:    "valid comment",
-						},
-						CommentAnchor: BitBucketCommentAnchor{Path: "foo.yaml", Line: 10},
+		activities := BitBucketPullRequestActivities{
+			IsLastPage: true,
+			Values: []BitBucketPullRequestActivity{
+				{
+					Action:        "COMMENTED",
+					CommentAction: "ADDED",
+					Comment: BitBucketPullRequestComment{
+						ID:      1,
+						Version: 1,
+						State:   "OPEN",
+						Author:  BitBucketCommentAuthor{Name: "testuser"},
+						Text:    "valid comment",
 					},
-					{
-						Action:        "APPROVED",
-						CommentAction: "ADDED",
-						Comment: BitBucketPullRequestComment{
-							ID:     2,
-							State:  "OPEN",
-							Author: BitBucketCommentAuthor{Name: "testuser"},
-						},
-					},
-					{
-						Action:        "COMMENTED",
-						CommentAction: "EDITED",
-						Comment: BitBucketPullRequestComment{
-							ID:     3,
-							State:  "OPEN",
-							Author: BitBucketCommentAuthor{Name: "testuser"},
-						},
-					},
-					{
-						Action:        "COMMENTED",
-						CommentAction: "ADDED",
-						Comment: BitBucketPullRequestComment{
-							ID:     4,
-							State:  "RESOLVED",
-							Author: BitBucketCommentAuthor{Name: "testuser"},
-						},
-					},
-					{
-						Action:        "COMMENTED",
-						CommentAction: "ADDED",
-						Comment: BitBucketPullRequestComment{
-							ID:     5,
-							State:  "OPEN",
-							Author: BitBucketCommentAuthor{Name: "otheruser"},
-						},
-					},
-					{
-						Action:        "COMMENTED",
-						CommentAction: "ADDED",
-						Comment: BitBucketPullRequestComment{
-							ID:       6,
-							State:    "OPEN",
-							Author:   BitBucketCommentAuthor{Name: "testuser"},
-							Severity: "BLOCKER",
-							Resolved: true,
-						},
-					},
-					{
-						Action:        "COMMENTED",
-						CommentAction: "ADDED",
-						Comment: BitBucketPullRequestComment{
-							ID:       7,
-							State:    "OPEN",
-							Author:   BitBucketCommentAuthor{Name: "testuser"},
-							Severity: "NORMAL",
-						},
-						CommentAnchor: BitBucketCommentAnchor{Orphaned: true},
+					CommentAnchor: BitBucketCommentAnchor{Path: "foo.yaml", Line: 10},
+				},
+				{
+					Action:        "APPROVED",
+					CommentAction: "ADDED",
+					Comment: BitBucketPullRequestComment{
+						ID:     2,
+						State:  "OPEN",
+						Author: BitBucketCommentAuthor{Name: "testuser"},
 					},
 				},
-			}
-			data, _ := json.Marshal(activities)
-			w.WriteHeader(http.StatusOK)
-			_, _ = w.Write(data)
-		}))
-		defer srv.Close()
+				{
+					Action:        "COMMENTED",
+					CommentAction: "EDITED",
+					Comment: BitBucketPullRequestComment{
+						ID:     3,
+						State:  "OPEN",
+						Author: BitBucketCommentAuthor{Name: "testuser"},
+					},
+				},
+				{
+					Action:        "COMMENTED",
+					CommentAction: "ADDED",
+					Comment: BitBucketPullRequestComment{
+						ID:     4,
+						State:  "RESOLVED",
+						Author: BitBucketCommentAuthor{Name: "testuser"},
+					},
+				},
+				{
+					Action:        "COMMENTED",
+					CommentAction: "ADDED",
+					Comment: BitBucketPullRequestComment{
+						ID:     5,
+						State:  "OPEN",
+						Author: BitBucketCommentAuthor{Name: "otheruser"},
+					},
+				},
+				{
+					Action:        "COMMENTED",
+					CommentAction: "ADDED",
+					Comment: BitBucketPullRequestComment{
+						ID:       6,
+						State:    "OPEN",
+						Author:   BitBucketCommentAuthor{Name: "testuser"},
+						Severity: "BLOCKER",
+						Resolved: true,
+					},
+				},
+				{
+					Action:        "COMMENTED",
+					CommentAction: "ADDED",
+					Comment: BitBucketPullRequestComment{
+						ID:       7,
+						State:    "OPEN",
+						Author:   BitBucketCommentAuthor{Name: "testuser"},
+						Severity: "NORMAL",
+					},
+					CommentAnchor: BitBucketCommentAnchor{Orphaned: true},
+				},
+			},
+		}
+		activitiesJSON, _ := json.Marshal(activities)
+
+		srv := httpmock.New(func(s *httpmock.Server) {
+			s.ExpectGet("/plugins/servlet/applinks/whoami").
+				Return("testuser").
+				Once()
+			s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/pull-requests/1/activities?start=0").
+				ReturnHeader("Content-Type", "application/json").
+				Return(string(activitiesJSON)).
+				Once()
+		})(t)
 
 		bb := bitBucketAPI{
-			uri:       srv.URL,
+			uri:       srv.URL(),
 			authToken: "test-token",
 			timeout:   time.Second * 5,
 			project:   "proj",
@@ -881,59 +857,56 @@ func TestBitBucketAPIGetPullRequestComments(t *testing.T) {
 	})
 
 	t.Run("handles pagination", func(t *testing.T) {
-		callCount := 0
-		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.URL.Path == "/plugins/servlet/applinks/whoami" {
-				w.WriteHeader(http.StatusOK)
-				_, _ = w.Write([]byte(`testuser`))
-				return
-			}
-			callCount++
-			var activities BitBucketPullRequestActivities
-			if callCount == 1 {
-				activities = BitBucketPullRequestActivities{
-					IsLastPage:    false,
-					NextPageStart: 1,
-					Values: []BitBucketPullRequestActivity{
-						{
-							Action:        "COMMENTED",
-							CommentAction: "ADDED",
-							Comment: BitBucketPullRequestComment{
-								ID:     1,
-								State:  "OPEN",
-								Author: BitBucketCommentAuthor{Name: "testuser"},
-								Text:   "comment 1",
-							},
-							CommentAnchor: BitBucketCommentAnchor{Path: "foo.yaml"},
-						},
+		page1, _ := json.Marshal(BitBucketPullRequestActivities{
+			IsLastPage:    false,
+			NextPageStart: 1,
+			Values: []BitBucketPullRequestActivity{
+				{
+					Action:        "COMMENTED",
+					CommentAction: "ADDED",
+					Comment: BitBucketPullRequestComment{
+						ID:     1,
+						State:  "OPEN",
+						Author: BitBucketCommentAuthor{Name: "testuser"},
+						Text:   "comment 1",
 					},
-				}
-			} else {
-				activities = BitBucketPullRequestActivities{
-					IsLastPage: true,
-					Values: []BitBucketPullRequestActivity{
-						{
-							Action:        "COMMENTED",
-							CommentAction: "ADDED",
-							Comment: BitBucketPullRequestComment{
-								ID:     2,
-								State:  "OPEN",
-								Author: BitBucketCommentAuthor{Name: "testuser"},
-								Text:   "comment 2",
-							},
-							CommentAnchor: BitBucketCommentAnchor{Path: "bar.yaml"},
-						},
+					CommentAnchor: BitBucketCommentAnchor{Path: "foo.yaml"},
+				},
+			},
+		})
+		page2, _ := json.Marshal(BitBucketPullRequestActivities{
+			IsLastPage: true,
+			Values: []BitBucketPullRequestActivity{
+				{
+					Action:        "COMMENTED",
+					CommentAction: "ADDED",
+					Comment: BitBucketPullRequestComment{
+						ID:     2,
+						State:  "OPEN",
+						Author: BitBucketCommentAuthor{Name: "testuser"},
+						Text:   "comment 2",
 					},
-				}
-			}
-			data, _ := json.Marshal(activities)
-			w.WriteHeader(http.StatusOK)
-			_, _ = w.Write(data)
-		}))
-		defer srv.Close()
+					CommentAnchor: BitBucketCommentAnchor{Path: "bar.yaml"},
+				},
+			},
+		})
+
+		srv := httpmock.New(func(s *httpmock.Server) {
+			s.ExpectGet("/plugins/servlet/applinks/whoami").
+				Return("testuser").
+				Once()
+			s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/pull-requests/1/activities?start=0").
+				ReturnHeader("Content-Type", "application/json").
+				Return(string(page1)).
+				Once()
+			s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/pull-requests/1/activities?start=1").
+				ReturnHeader("Content-Type", "application/json").
+				Return(string(page2)).
+				Once()
+		})(t)
 
 		bb := bitBucketAPI{
-			uri:       srv.URL,
+			uri:       srv.URL(),
 			authToken: "test-token",
 			timeout:   time.Second * 5,
 			project:   "proj",
@@ -944,23 +917,20 @@ func TestBitBucketAPIGetPullRequestComments(t *testing.T) {
 		comments, err := bb.getPullRequestComments(pr)
 		require.NoError(t, err)
 		require.Len(t, comments, 2)
-		require.Equal(t, 2, callCount)
 	})
 
 	t.Run("returns error on invalid JSON", func(t *testing.T) {
-		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.URL.Path == "/plugins/servlet/applinks/whoami" {
-				w.WriteHeader(http.StatusOK)
-				_, _ = w.Write([]byte(`testuser`))
-				return
-			}
-			w.WriteHeader(http.StatusOK)
-			_, _ = w.Write([]byte(`invalid json`))
-		}))
-		defer srv.Close()
+		srv := httpmock.New(func(s *httpmock.Server) {
+			s.ExpectGet("/plugins/servlet/applinks/whoami").
+				Return("testuser").
+				Once()
+			s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/pull-requests/1/activities?start=0").
+				Return("invalid json").
+				Once()
+		})(t)
 
 		bb := bitBucketAPI{
-			uri:       srv.URL,
+			uri:       srv.URL(),
 			authToken: "test-token",
 			timeout:   time.Second * 5,
 			project:   "proj",
@@ -977,19 +947,14 @@ func TestFindPullRequestForBranchErrors(t *testing.T) {
 	slog.SetDefault(slogt.New(t))
 
 	t.Run("returns error on invalid JSON", func(t *testing.T) {
-		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.URL.Path == "/plugins/servlet/applinks/whoami" {
-				w.WriteHeader(http.StatusOK)
-				_, _ = w.Write([]byte(`testuser`))
-				return
-			}
-			w.WriteHeader(http.StatusOK)
-			_, _ = w.Write([]byte(`invalid json`))
-		}))
-		defer srv.Close()
+		srv := httpmock.New(func(s *httpmock.Server) {
+			s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/commit123/pull-requests?start=0").
+				Return("invalid json").
+				Once()
+		})(t)
 
 		bb := bitBucketAPI{
-			uri:       srv.URL,
+			uri:       srv.URL(),
 			authToken: "test-token",
 			timeout:   time.Second * 5,
 			project:   "proj",
@@ -1001,39 +966,33 @@ func TestFindPullRequestForBranchErrors(t *testing.T) {
 	})
 
 	t.Run("paginates through results", func(t *testing.T) {
-		callCount := 0
-		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.URL.Path == "/plugins/servlet/applinks/whoami" {
-				w.WriteHeader(http.StatusOK)
-				_, _ = w.Write([]byte(`testuser`))
-				return
-			}
-			callCount++
-			var prs BitBucketPullRequests
-			if callCount == 1 {
-				prs = BitBucketPullRequests{
-					IsLastPage:    false,
-					NextPageStart: 1,
-					Values: []BitBucketPullRequest{
-						{ID: 1, Open: true, FromRef: BitBucketRef{ID: "refs/heads/other"}, ToRef: BitBucketRef{ID: "refs/heads/main"}},
-					},
-				}
-			} else {
-				prs = BitBucketPullRequests{
-					IsLastPage: true,
-					Values: []BitBucketPullRequest{
-						{ID: 2, Open: true, FromRef: BitBucketRef{ID: "refs/heads/feature", Commit: "abc123"}, ToRef: BitBucketRef{ID: "refs/heads/main", Commit: "def456"}},
-					},
-				}
-			}
-			data, _ := json.Marshal(prs)
-			w.WriteHeader(http.StatusOK)
-			_, _ = w.Write(data)
-		}))
-		defer srv.Close()
+		page1, _ := json.Marshal(BitBucketPullRequests{
+			IsLastPage:    false,
+			NextPageStart: 1,
+			Values: []BitBucketPullRequest{
+				{ID: 1, Open: true, FromRef: BitBucketRef{ID: "refs/heads/other"}, ToRef: BitBucketRef{ID: "refs/heads/main"}},
+			},
+		})
+		page2, _ := json.Marshal(BitBucketPullRequests{
+			IsLastPage: true,
+			Values: []BitBucketPullRequest{
+				{ID: 2, Open: true, FromRef: BitBucketRef{ID: "refs/heads/feature", Commit: "abc123"}, ToRef: BitBucketRef{ID: "refs/heads/main", Commit: "def456"}},
+			},
+		})
+
+		srv := httpmock.New(func(s *httpmock.Server) {
+			s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/commit123/pull-requests?start=0").
+				ReturnHeader("Content-Type", "application/json").
+				Return(string(page1)).
+				Once()
+			s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/commit123/pull-requests?start=1").
+				ReturnHeader("Content-Type", "application/json").
+				Return(string(page2)).
+				Once()
+		})(t)
 
 		bb := bitBucketAPI{
-			uri:       srv.URL,
+			uri:       srv.URL(),
 			authToken: "test-token",
 			timeout:   time.Second * 5,
 			project:   "proj",
@@ -1044,7 +1003,6 @@ func TestFindPullRequestForBranchErrors(t *testing.T) {
 		require.NoError(t, err)
 		require.NotNil(t, pr)
 		require.Equal(t, 2, pr.ID)
-		require.Equal(t, 2, callCount)
 	})
 }
 
@@ -1052,19 +1010,14 @@ func TestGetPullRequestChangesErrors(t *testing.T) {
 	slog.SetDefault(slogt.New(t))
 
 	t.Run("returns error on invalid JSON", func(t *testing.T) {
-		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.URL.Path == "/plugins/servlet/applinks/whoami" {
-				w.WriteHeader(http.StatusOK)
-				_, _ = w.Write([]byte(`testuser`))
-				return
-			}
-			w.WriteHeader(http.StatusOK)
-			_, _ = w.Write([]byte(`invalid json`))
-		}))
-		defer srv.Close()
+		srv := httpmock.New(func(s *httpmock.Server) {
+			s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/1/changes?start=0").
+				Return("invalid json").
+				Once()
+		})(t)
 
 		bb := bitBucketAPI{
-			uri:       srv.URL,
+			uri:       srv.URL(),
 			authToken: "test-token",
 			timeout:   time.Second * 5,
 			project:   "proj",
@@ -1077,29 +1030,23 @@ func TestGetPullRequestChangesErrors(t *testing.T) {
 	})
 
 	t.Run("returns error on getFileDiff failure", func(t *testing.T) {
-		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.URL.Path == "/plugins/servlet/applinks/whoami" {
-				w.WriteHeader(http.StatusOK)
-				_, _ = w.Write([]byte(`testuser`))
-				return
-			}
-			if r.URL.Path == "/rest/api/1.0/projects/proj/repos/repo/pull-requests/1/changes" {
-				changes := BitBucketPullRequestChanges{
-					IsLastPage: true,
-					Values:     []BitBucketPullRequestChange{{Path: BitBucketPath{ToString: "file.yaml"}}},
-				}
-				data, _ := json.Marshal(changes)
-				w.WriteHeader(http.StatusOK)
-				_, _ = w.Write(data)
-				return
-			}
-			// getFileDiff request - return error
-			w.WriteHeader(http.StatusInternalServerError)
-		}))
-		defer srv.Close()
+		changesJSON, _ := json.Marshal(BitBucketPullRequestChanges{
+			IsLastPage: true,
+			Values:     []BitBucketPullRequestChange{{Path: BitBucketPath{ToString: "file.yaml"}}},
+		})
+
+		srv := httpmock.New(func(s *httpmock.Server) {
+			s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/1/changes?start=0").
+				ReturnHeader("Content-Type", "application/json").
+				Return(string(changesJSON)).
+				Once()
+			s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/commits/abc/diff/file.yaml?contextLines=10000&since=def&whitespace=show&withComments=false").
+				ReturnCode(http.StatusInternalServerError).
+				Once()
+		})(t)
 
 		bb := bitBucketAPI{
-			uri:       srv.URL,
+			uri:       srv.URL(),
 			authToken: "test-token",
 			timeout:   time.Second * 5,
 			project:   "proj",
@@ -1112,39 +1059,29 @@ func TestGetPullRequestChangesErrors(t *testing.T) {
 	})
 
 	t.Run("paginates through results", func(t *testing.T) {
-		callCount := 0
-		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.URL.Path == "/plugins/servlet/applinks/whoami" {
-				w.WriteHeader(http.StatusOK)
-				_, _ = w.Write([]byte(`testuser`))
-				return
-			}
-			if r.URL.Path == "/rest/api/1.0/projects/proj/repos/repo/pull-requests/1/changes" {
-				callCount++
-				var changes BitBucketPullRequestChanges
-				if callCount == 1 {
-					changes = BitBucketPullRequestChanges{
-						IsLastPage:    false,
-						NextPageStart: 1,
-						Values:        []BitBucketPullRequestChange{},
-					}
-				} else {
-					changes = BitBucketPullRequestChanges{
-						IsLastPage: true,
-						Values:     []BitBucketPullRequestChange{},
-					}
-				}
-				data, _ := json.Marshal(changes)
-				w.WriteHeader(http.StatusOK)
-				_, _ = w.Write(data)
-				return
-			}
-			w.WriteHeader(http.StatusOK)
-		}))
-		defer srv.Close()
+		page1, _ := json.Marshal(BitBucketPullRequestChanges{
+			IsLastPage:    false,
+			NextPageStart: 1,
+			Values:        []BitBucketPullRequestChange{},
+		})
+		page2, _ := json.Marshal(BitBucketPullRequestChanges{
+			IsLastPage: true,
+			Values:     []BitBucketPullRequestChange{},
+		})
+
+		srv := httpmock.New(func(s *httpmock.Server) {
+			s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/1/changes?start=0").
+				ReturnHeader("Content-Type", "application/json").
+				Return(string(page1)).
+				Once()
+			s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/1/changes?start=1").
+				ReturnHeader("Content-Type", "application/json").
+				Return(string(page2)).
+				Once()
+		})(t)
 
 		bb := bitBucketAPI{
-			uri:       srv.URL,
+			uri:       srv.URL(),
 			authToken: "test-token",
 			timeout:   time.Second * 5,
 			project:   "proj",
@@ -1154,26 +1091,20 @@ func TestGetPullRequestChangesErrors(t *testing.T) {
 		pr := &bitBucketPR{ID: 1, srcHead: "abc", dstHead: "def"}
 		_, err := bb.getPullRequestChanges(pr)
 		require.NoError(t, err)
-		require.Equal(t, 2, callCount)
 	})
 }
 
 func TestGetFileDiffErrors(t *testing.T) {
 	slog.SetDefault(slogt.New(t))
 
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == "/plugins/servlet/applinks/whoami" {
-			w.WriteHeader(http.StatusOK)
-			_, _ = w.Write([]byte(`testuser`))
-			return
-		}
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte(`invalid json`))
-	}))
-	defer srv.Close()
+	srv := httpmock.New(func(s *httpmock.Server) {
+		s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/commits/abc/diff/file.yaml?contextLines=10000&since=def&whitespace=show&withComments=false").
+			Return("invalid json").
+			Once()
+	})(t)
 
 	bb := bitBucketAPI{
-		uri:       srv.URL,
+		uri:       srv.URL(),
 		authToken: "test-token",
 		timeout:   time.Second * 5,
 		project:   "proj",
@@ -1212,18 +1143,14 @@ func TestBitBucketAPIErrorHandling(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(_ *testing.T) {
-			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				if r.URL.Path == "/plugins/servlet/applinks/whoami" {
-					w.WriteHeader(http.StatusOK)
-					_, _ = w.Write([]byte(`testuser`))
-					return
-				}
-				w.WriteHeader(http.StatusInternalServerError)
-			}))
-			defer srv.Close()
+			srv := httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPut("/rest/api/1.0/projects/proj/repos/repo/pull-requests/1/comments/1").
+					ReturnCode(http.StatusInternalServerError).
+					Once()
+			})(t)
 
 			bb := bitBucketAPI{
-				uri:       srv.URL,
+				uri:       srv.URL(),
 				authToken: "test-token",
 				timeout:   time.Second * 5,
 				project:   "proj",
@@ -1239,23 +1166,15 @@ func TestBitBucketAPIErrorHandling(t *testing.T) {
 func TestAddCommentsSkipsDuplicates(t *testing.T) {
 	slog.SetDefault(slogt.New(t))
 
-	addCount := 0
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == "/plugins/servlet/applinks/whoami" {
-			w.WriteHeader(http.StatusOK)
-			_, _ = w.Write([]byte(`testuser`))
-			return
-		}
-		if r.Method == http.MethodPost {
-			addCount++
-		}
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte(`{}`))
-	}))
-	defer srv.Close()
+	srv := httpmock.New(func(s *httpmock.Server) {
+		// Only the new comment should be posted, duplicate skipped.
+		s.ExpectPost("/rest/api/1.0/projects/proj/repos/repo/pull-requests/1/comments").
+			Return("{}").
+			Once()
+	})(t)
 
 	bb := bitBucketAPI{
-		uri:       srv.URL,
+		uri:       srv.URL(),
 		authToken: "test-token",
 		timeout:   time.Second * 5,
 		project:   "proj",
@@ -1298,6 +1217,6 @@ func TestAddCommentsSkipsDuplicates(t *testing.T) {
 
 	err := bb.addComments(pr, currentComments, pendingComments)
 	require.NoError(t, err)
-	// Only the new comment should be added, duplicate skipped
-	require.Equal(t, 1, addCount)
+	require.Len(t, srv.Requests, 1, "only the new comment should be added, duplicate skipped")
+	require.Equal(t, http.MethodPost, srv.Requests[0].Method())
 }

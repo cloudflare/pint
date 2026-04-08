@@ -2,284 +2,228 @@ package promapi_test
 
 import (
 	"net/http"
-	"net/http/httptest"
 	"testing"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/prometheus/model/labels"
 	"github.com/stretchr/testify/require"
+	"go.nhat.io/httpmock"
 
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
 func TestQuery(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := r.ParseForm()
-		if err != nil {
-			t.Fatal(err)
-		}
-		query := r.Form.Get("query")
-
-		switch query {
-		case "empty":
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{
-				"status":"success",
-				"data":{
-					"resultType":"vector",
-					"result":[]
-				}
-			}`))
-		case "single_result":
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{
-				"status":"success",
-				"data":{
-					"resultType":"vector",
-					"result":[{"metric":{},"value":[1614859502.068,"1"]}]
-				}
-			}`))
-		case "three_results":
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{
-				"status":"success",
-				"data":{
-					"resultType":"vector",
-					"result":[
-						{"metric":{"instance": "1"},"value":[1614859502.068,"1"]},
-						{"metric":{"instance": "2"},"value":[1614859502.168,"2"]},
-						{"metric":{"instance": "3"},"value":[1614859503.000,"3"]}
-					]
-				}
-			}`))
-		case "once":
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{
-				"status":"success",
-				"data":{
-					"resultType":"vector",
-					"result":[{"metric":{},"value":[1614859502.068,"1"]}]
-				}
-			}`))
-		case "matrix":
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{
-				"status":"success",
-				"data":{
-					"resultType":"matrix",
-					"result":[]
-				}
-			}`))
-		case "timeout":
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			time.Sleep(time.Second * 2)
-			_, _ = w.Write([]byte(`{
-				"status":"success",
-				"data":{
-					"resultType":"vector",
-					"result":[]
-				}
-			}`))
-		case "overload":
-			w.WriteHeader(http.StatusUnprocessableEntity)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{
-					"status":"error",
-					"errorType":"execution",
-					"error":"query processing would load too many samples into memory in query execution"
-				}`))
-		case "apiError":
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"error","errorType":"bad_data","error":"custom error message"}`))
-		case "badJson":
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"success","data":{"resultType"}}`))
-		case "stats":
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{
-					"status":"success",
-					"data":{
-						"resultType":"vector",
-						"result":[{"metric":{},"value":[1614859502.068,"1"]}],
-						"stats": {
-							"timings": {
-								"evalTotalTime": 10.1,
-							  	"resultSortTime": 0.5,
-							  	"queryPreparationTime": 1.5,
-							  	"innerEvalTime": 0.7,
-							  	"execQueueTime": 0.01,
-							  	"execTotalTime": 5.1
-							},
-							"samples": {
-							  	"totalQueryableSamples": 1000,
-							  	"peakSamples": 500
-							}
-						}
-					}
-				}`))
-		default:
-			w.WriteHeader(http.StatusBadRequest)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{
-				"status":"error",
-				"errorType":"bad_data",
-				"error":"unhandled query"
-			}`))
-		}
-	}))
-	t.Cleanup(srv.Close)
-
 	type testCaseT struct {
-		query   string
+		mock    httpmock.Mocker
+		name    string
 		err     string
-		result  promapi.QueryResult
+		series  []promapi.Sample
+		stats   promapi.QueryStats
 		timeout time.Duration
 	}
 
 	testCases := []testCaseT{
 		{
-			query:   "empty",
+			name:    "empty",
 			timeout: time.Second,
-			result: promapi.QueryResult{
-				URI:    srv.URL,
-				Series: []promapi.Sample{},
-			},
+			series:  []promapi.Sample{},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPost(promapi.APIPathQuery).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"resultType":"vector","result":[]}}`).
+					UnlimitedTimes()
+			}),
 		},
 		{
-			query:   "single_result",
+			name:    "single_result",
 			timeout: time.Second * 5,
-			result: promapi.QueryResult{
-				URI: srv.URL,
-				Series: []promapi.Sample{
-					{
-						Labels: labels.EmptyLabels(),
-						Value:  1,
-					},
+			series: []promapi.Sample{
+				{
+					Labels: labels.EmptyLabels(),
+					Value:  1,
 				},
 			},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPost(promapi.APIPathQuery).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"resultType":"vector","result":[{"metric":{},"value":[1614859502.068,"1"]}]}}`).
+					UnlimitedTimes()
+			}),
 		},
 		{
-			query:   "three_results",
+			name:    "three_results",
 			timeout: time.Second,
-			result: promapi.QueryResult{
-				URI: srv.URL,
-				Series: []promapi.Sample{
-					{
-						Labels: labels.FromStrings("instance", "1"),
-						Value:  1,
-					},
-					{
-						Labels: labels.FromStrings("instance", "2"),
-						Value:  2,
-					},
-					{
-						Labels: labels.FromStrings("instance", "3"),
-						Value:  3,
-					},
+			series: []promapi.Sample{
+				{
+					Labels: labels.FromStrings("instance", "1"),
+					Value:  1,
+				},
+				{
+					Labels: labels.FromStrings("instance", "2"),
+					Value:  2,
+				},
+				{
+					Labels: labels.FromStrings("instance", "3"),
+					Value:  3,
 				},
 			},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPost(promapi.APIPathQuery).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"resultType":"vector","result":[{"metric":{"instance":"1"},"value":[1614859502.068,"1"]},{"metric":{"instance":"2"},"value":[1614859502.168,"2"]},{"metric":{"instance":"3"},"value":[1614859503.000,"3"]}]}}`).
+					UnlimitedTimes()
+			}),
 		},
 		{
-			query:   "error",
+			name:    "error",
 			timeout: time.Second,
 			err:     "bad_data: unhandled query",
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPost(promapi.APIPathQuery).
+					ReturnCode(http.StatusBadRequest).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"error","errorType":"bad_data","error":"unhandled query"}`).
+					UnlimitedTimes()
+			}),
 		},
 		{
-			query:   "matrix",
+			name:    "matrix",
 			timeout: time.Second,
 			err:     "bad_response: invalid result type, expected vector, got matrix",
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPost(promapi.APIPathQuery).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"resultType":"matrix","result":[]}}`).
+					UnlimitedTimes()
+			}),
 		},
 		{
-			query:   "timeout",
+			name:    "timeout",
 			timeout: time.Millisecond * 20,
 			err:     "connection timeout",
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPost(promapi.APIPathQuery).
+					Run(func(_ *http.Request) ([]byte, error) {
+						time.Sleep(time.Second * 2)
+						return []byte(`{"status":"success","data":{"resultType":"vector","result":[]}}`), nil
+					}).
+					UnlimitedTimes()
+			}),
 		},
 		{
-			query:   "once",
+			name:    "once",
 			timeout: time.Second,
-			result: promapi.QueryResult{
-				URI: srv.URL,
-				Series: []promapi.Sample{
-					{
-						Labels: labels.EmptyLabels(),
-						Value:  1,
-					},
+			series: []promapi.Sample{
+				{
+					Labels: labels.EmptyLabels(),
+					Value:  1,
 				},
 			},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPost(promapi.APIPathQuery).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"resultType":"vector","result":[{"metric":{},"value":[1614859502.068,"1"]}]}}`).
+					UnlimitedTimes()
+			}),
 		},
 		{
-			query:   "overload",
+			name:    "overload",
 			timeout: time.Second,
 			err:     "execution: query processing would load too many samples into memory in query execution",
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPost(promapi.APIPathQuery).
+					ReturnCode(http.StatusUnprocessableEntity).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"error","errorType":"execution","error":"query processing would load too many samples into memory in query execution"}`).
+					UnlimitedTimes()
+			}),
 		},
 		{
-			query:   "stats",
+			name:    "stats",
 			timeout: time.Second * 5,
-			result: promapi.QueryResult{
-				URI: srv.URL,
-				Series: []promapi.Sample{
-					{
-						Labels: labels.EmptyLabels(),
-						Value:  1,
-					},
-				},
-				Stats: promapi.QueryStats{
-					Timings: promapi.QueryTimings{
-						EvalTotalTime:        10.1,
-						ResultSortTime:       0.5,
-						QueryPreparationTime: 1.5,
-						InnerEvalTime:        0.7,
-						ExecQueueTime:        0.01,
-						ExecTotalTime:        5.1,
-					},
-					Samples: promapi.QuerySamples{
-						TotalQueryableSamples: 1000,
-						PeakSamples:           500,
-					},
+			series: []promapi.Sample{
+				{
+					Labels: labels.EmptyLabels(),
+					Value:  1,
 				},
 			},
+			stats: promapi.QueryStats{
+				Timings: promapi.QueryTimings{
+					EvalTotalTime:        10.1,
+					ResultSortTime:       0.5,
+					QueryPreparationTime: 1.5,
+					InnerEvalTime:        0.7,
+					ExecQueueTime:        0.01,
+					ExecTotalTime:        5.1,
+				},
+				Samples: promapi.QuerySamples{
+					TotalQueryableSamples: 1000,
+					PeakSamples:           500,
+				},
+			},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPost(promapi.APIPathQuery).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"resultType":"vector","result":[{"metric":{},"value":[1614859502.068,"1"]}],"stats":{"timings":{"evalTotalTime":10.1,"resultSortTime":0.5,"queryPreparationTime":1.5,"innerEvalTime":0.7,"execQueueTime":0.01,"execTotalTime":5.1},"samples":{"totalQueryableSamples":1000,"peakSamples":500}}}}`).
+					UnlimitedTimes()
+			}),
 		},
 		{
-			query:   "apiError",
+			name:    "apiError",
 			timeout: time.Second,
 			err:     "bad_data: custom error message",
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPost(promapi.APIPathQuery).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"error","errorType":"bad_data","error":"custom error message"}`).
+					UnlimitedTimes()
+			}),
 		},
 		{
-			query:   "badJson",
+			name:    "badJson",
 			timeout: time.Second,
 			err:     `bad_response: JSON parse error: jsontext: invalid character '}' after object name (expecting ':') within "/data/resultType" after offset 40`,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPost(promapi.APIPathQuery).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"resultType"}}`).
+					UnlimitedTimes()
+			}),
+		},
+		{
+			name:    "emptyError",
+			timeout: time.Second,
+			err:     `bad_data: empty response object`,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPost(promapi.APIPathQuery).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"error","errorType":"bad_data"}`).
+					UnlimitedTimes()
+			}),
 		},
 	}
 
 	for _, tc := range testCases {
-		t.Run(tc.query, func(t *testing.T) {
-			fg := promapi.NewFailoverGroup("test", srv.URL, []*promapi.Prometheus{
-				promapi.NewPrometheus("test", srv.URL, srv.URL, nil, tc.timeout, 1, 100, nil),
+		t.Run(tc.name, func(t *testing.T) {
+			srv := tc.mock(t)
+
+			fg := promapi.NewFailoverGroup("test", srv.URL(), []*promapi.Prometheus{
+				promapi.NewPrometheus("test", srv.URL(), srv.URL(), nil, tc.timeout, 1, 100, nil),
 			}, true, "up", nil, nil, nil)
 			reg := prometheus.NewRegistry()
 			fg.StartWorkers(reg)
 			defer fg.Close(reg)
 
-			qr, err := fg.Query(t.Context(), tc.query)
+			qr, err := fg.Query(t.Context(), tc.name)
 			if tc.err != "" {
 				require.EqualError(t, err, tc.err, tc)
 			} else {
 				require.NoError(t, err)
 			}
 			if qr != nil {
-				require.Equal(t, tc.result.URI, qr.URI)
-				require.Equal(t, tc.result.Series, qr.Series)
-				require.Equal(t, tc.result.Stats, qr.Stats)
+				require.Equal(t, tc.series, qr.Series)
+				require.Equal(t, tc.stats, qr.Stats)
 			}
 		})
 	}
