@@ -129,7 +129,7 @@ func TestConfig(t *testing.T) {
 		{
 			prefix:  "/badJson",
 			timeout: time.Second,
-			err:     "bad_response: JSON parse error: invalid character '}' after object key",
+			err:     `bad_response: JSON parse error: jsontext: invalid character '}' after object name (expecting ':') within "/data/yaml" after offset 34`,
 		},
 		{
 			prefix:  "/apiError",

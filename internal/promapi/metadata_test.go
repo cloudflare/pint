@@ -136,7 +136,7 @@ func TestMetadata(t *testing.T) {
 		{
 			metric:  "badJson",
 			timeout: time.Second,
-			err:     "bad_response: JSON parse error: expected colon after object key",
+			err:     `bad_response: JSON parse error: invalid character '}' after object key`,
 		},
 	}
 

@@ -2,7 +2,6 @@ package promapi
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"log/slog"
@@ -10,8 +9,8 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/go-json-experiment/json"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
-	"github.com/prymitive/current"
 	"go.yaml.in/yaml/v3"
 )
 
@@ -29,6 +28,11 @@ type ConfigSectionGlobal struct {
 type PrometheusConfig struct {
 	RuleFiles []string            `yaml:"rule_files"`
 	Global    ConfigSectionGlobal `yaml:"global"`
+}
+
+type PrometheusConfigResponse struct {
+	PrometheusResponse
+	Data v1.ConfigResult `json:"data"`
 }
 
 type ConfigResult struct {
@@ -64,7 +68,7 @@ func (q configQuery) Run() queryResult {
 		return qr
 	}
 
-	qr.value, err = streamConfig(resp.Body)
+	qr.value, err = parseConfig(resp.Body)
 	if err != nil {
 		prometheusQueryErrorsTotal.WithLabelValues(q.prom.name, APIPathConfig, errReason(err)).Inc()
 		qr.err = fmt.Errorf("failed to decode config data in %s response: %w", q.prom.safeURI, err)
@@ -117,38 +121,22 @@ func (prom *Prometheus) Config(ctx context.Context, cacheTTL time.Duration) (*Co
 	return &r, nil
 }
 
-func streamConfig(r io.Reader) (cfg PrometheusConfig, err error) {
+func parseConfig(r io.Reader) (cfg PrometheusConfig, err error) {
 	defer dummyReadAll(r)
 
-	var yamlBody, status, errType, errText string
-	errText = "empty response object"
-	decoder := current.Object(
-		current.Key("status", current.Value(func(s string, _ bool) {
-			status = s
-		})),
-		current.Key("error", current.Value(func(s string, _ bool) {
-			errText = s
-		})),
-		current.Key("errorType", current.Value(func(s string, _ bool) {
-			errType = s
-		})),
-		current.Key("data", current.Object(
-			current.Key("yaml", current.Value(func(s string, _ bool) {
-				yamlBody = s
-			})),
-		)),
-	)
-
-	dec := json.NewDecoder(r)
-	if err = decoder.Stream(dec); err != nil {
-		return cfg, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: "JSON parse error: " + err.Error()}
+	var data PrometheusConfigResponse
+	if err = json.UnmarshalRead(r, &data); err != nil {
+		return cfg, APIError{Status: data.Status, ErrorType: v1.ErrBadResponse, Err: "JSON parse error: " + err.Error()}
 	}
 
-	if status != "success" {
-		return cfg, APIError{Status: status, ErrorType: decodeErrorType(errType), Err: errText}
+	if data.Status != "success" {
+		if data.Error == "" {
+			data.Error = "empty response object"
+		}
+		return cfg, APIError{Status: data.Status, ErrorType: decodeErrorType(data.ErrorType), Err: data.Error}
 	}
 
-	if err = yaml.Unmarshal([]byte(yamlBody), &cfg); err != nil {
+	if err = yaml.Unmarshal([]byte(data.Data.YAML), &cfg); err != nil {
 		return cfg, err
 	}
 

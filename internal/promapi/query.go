@@ -2,18 +2,18 @@ package promapi
 
 import (
 	"context"
-	"encoding/json"
 	"io"
 	"log/slog"
-	"math"
 	"net/http"
 	"net/url"
+	"strconv"
 	"time"
 
+	"github.com/go-json-experiment/json"
+	"github.com/go-json-experiment/json/jsontext"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
 	"github.com/prometheus/prometheus/model/labels"
-	"github.com/prymitive/current"
 )
 
 const (
@@ -24,6 +24,93 @@ type QueryResult struct {
 	URI    string
 	Series []Sample
 	Stats  QueryStats
+}
+
+type SampleLabels labels.Labels
+
+func (s *SampleLabels) UnmarshalJSONFrom(dec *jsontext.Decoder) (err error) {
+	var (
+		tok jsontext.Token
+		k   jsontext.Kind
+	)
+
+	if k = dec.PeekKind(); k != '{' {
+		return &json.SemanticError{JSONKind: k} // nolint: exhaustruct
+	}
+	if _, err = dec.ReadToken(); err != nil {
+		return err
+	}
+
+	var parts []string
+	for dec.PeekKind() != '}' {
+		if tok, err = dec.ReadToken(); err != nil {
+			return err
+		}
+		parts = append(parts, tok.String())
+	}
+	*s = SampleLabels(labels.FromStrings(parts...))
+
+	if _, err = dec.ReadToken(); err != nil {
+		return err
+	}
+	return nil
+}
+
+type SampleTimestampValue struct {
+	Timestamp model.Time
+	Value     model.SampleValue
+}
+
+func (s *SampleTimestampValue) UnmarshalJSONFrom(dec *jsontext.Decoder) (err error) {
+	var (
+		tok jsontext.Token
+		k   jsontext.Kind
+		f   float64
+	)
+
+	if k = dec.PeekKind(); k != '[' {
+		return &json.SemanticError{JSONKind: k} // nolint: exhaustruct
+	}
+	if _, err = dec.ReadToken(); err != nil {
+		return err
+	}
+
+	tok, err = dec.ReadToken()
+	if err != nil {
+		return err
+	}
+	s.Timestamp = model.Time(tok.Int() * 1000)
+
+	tok, err = dec.ReadToken()
+	if err != nil {
+		return err
+	}
+	f, err = strconv.ParseFloat(tok.String(), 64)
+	if err == nil {
+		s.Value = model.SampleValue(f)
+	}
+
+	if k = dec.PeekKind(); k != ']' {
+		return &json.SemanticError{JSONKind: k} // nolint: exhaustruct
+	}
+	if _, err = dec.ReadToken(); err != nil {
+		return err
+	}
+	return nil
+}
+
+type PrometheusQuerySample struct {
+	Labels SampleLabels         `json:"metric"`
+	Value  SampleTimestampValue `json:"value"`
+}
+
+type PrometheusQueryResponse struct {
+	PrometheusResponse
+	Data struct {
+		ResultType string                  `json:"resultType"`
+		Result     []PrometheusQuerySample `json:"result"`
+		Stats      QueryStats              `json:"stats"`
+	} `json:"data"`
 }
 
 type instantQuery struct {
@@ -61,7 +148,7 @@ func (q instantQuery) Run() queryResult {
 		return qr
 	}
 
-	qr.value, qr.stats, qr.err = streamSamples(resp.Body)
+	qr.value, qr.stats, qr.err = parseVectorSamples(resp.Body)
 	return qr
 }
 
@@ -114,82 +201,32 @@ type Sample struct {
 	Value  float64
 }
 
-func streamSamples(r io.Reader) (samples []Sample, stats QueryStats, err error) {
+func parseVectorSamples(r io.Reader) (samples []Sample, _ QueryStats, err error) {
 	defer dummyReadAll(r)
 
-	var status, resultType, errType, errText string
-	errText = "empty response object"
-	samples = []Sample{}
-	var sample model.Sample
-	decoder := current.Object(
-		current.Key("status", current.Value(func(s string, _ bool) {
-			status = s
-		})),
-		current.Key("error", current.Value(func(s string, _ bool) {
-			errText = s
-		})),
-		current.Key("errorType", current.Value(func(s string, _ bool) {
-			errType = s
-		})),
-		current.Key("data", current.Object(
-			current.Key("resultType", current.Value(func(s string, _ bool) {
-				resultType = s
-			})),
-			current.Key("result", current.Array(
-				&sample,
-				func() {
-					samples = append(samples, Sample{
-						Labels: MetricToLabels(sample.Metric),
-						Value:  float64(sample.Value),
-					})
-					sample.Metric = model.Metric{}
-				},
-			)),
-			current.Key("stats", current.Object(
-				current.Key("timings", current.Object(
-					current.Key("evalTotalTime", current.Value(func(v float64, _ bool) {
-						stats.Timings.EvalTotalTime = v
-					})),
-					current.Key("resultSortTime", current.Value(func(v float64, _ bool) {
-						stats.Timings.ResultSortTime = v
-					})),
-					current.Key("queryPreparationTime", current.Value(func(v float64, _ bool) {
-						stats.Timings.QueryPreparationTime = v
-					})),
-					current.Key("innerEvalTime", current.Value(func(v float64, _ bool) {
-						stats.Timings.InnerEvalTime = v
-					})),
-					current.Key("execQueueTime", current.Value(func(v float64, _ bool) {
-						stats.Timings.ExecQueueTime = v
-					})),
-					current.Key("execTotalTime", current.Value(func(v float64, _ bool) {
-						stats.Timings.ExecTotalTime = v
-					})),
-				)),
-				current.Key("samples", current.Object(
-					current.Key("totalQueryableSamples", current.Value(func(v float64, _ bool) {
-						stats.Samples.TotalQueryableSamples = int(math.Round(v))
-					})),
-					current.Key("peakSamples", current.Value(func(v float64, _ bool) {
-						stats.Samples.PeakSamples = int(math.Round(v))
-					})),
-				)),
-			)),
-		)),
-	)
-
-	dec := json.NewDecoder(r)
-	if err = decoder.Stream(dec); err != nil {
-		return nil, stats, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: "JSON parse error: " + err.Error()}
+	var data PrometheusQueryResponse
+	if err = json.UnmarshalRead(r, &data); err != nil {
+		return samples, data.Data.Stats, APIError{Status: data.Status, ErrorType: v1.ErrBadResponse, Err: "JSON parse error: " + err.Error()}
 	}
 
-	if status != "success" {
-		return nil, stats, APIError{Status: status, ErrorType: decodeErrorType(errType), Err: errText}
+	if data.Status != "success" {
+		if data.Error == "" {
+			data.Error = "empty response object"
+		}
+		return samples, data.Data.Stats, APIError{Status: data.Status, ErrorType: decodeErrorType(data.ErrorType), Err: data.Error}
 	}
 
-	if resultType != "vector" {
-		return nil, stats, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: "invalid result type, expected vector, got " + resultType}
+	if data.Data.ResultType != "vector" {
+		return nil, data.Data.Stats, APIError{Status: data.Status, ErrorType: v1.ErrBadResponse, Err: "invalid result type, expected vector, got " + data.Data.ResultType}
 	}
 
-	return samples, stats, nil
+	samples = make([]Sample, 0, len(data.Data.Result))
+	for _, s := range data.Data.Result {
+		samples = append(samples, Sample{
+			Labels: labels.Labels(s.Labels),
+			Value:  float64(s.Value.Value),
+		})
+	}
+
+	return samples, data.Data.Stats, nil
 }

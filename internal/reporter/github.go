@@ -194,11 +194,11 @@ func (gr GithubReporter) Create(ctx context.Context, dst any, p PendingComment) 
 	side, line := gr.fixCommentLine(dst, p)
 
 	comment := &github.PullRequestComment{
-		CommitID: github.Ptr(gr.headCommit),
-		Path:     github.Ptr(p.path),
-		Body:     github.Ptr(p.text),
-		Line:     github.Ptr(line),
-		Side:     github.Ptr(side),
+		CommitID: new(gr.headCommit),
+		Path:     new(p.path),
+		Body:     new(p.text),
+		Line:     new(line),
+		Side:     new(side),
 	}
 
 	slog.LogAttrs(ctx, slog.LevelDebug, "Creating a pr comment",
@@ -281,9 +281,9 @@ func (gr GithubReporter) createReview(ctx context.Context, summary Summary) erro
 	defer cancel()
 
 	review := github.PullRequestReviewRequest{
-		CommitID: github.Ptr(gr.headCommit),
-		Body:     github.Ptr(formatGHReviewBody(ctx, gr.version, summary, gr.showDuplicates)),
-		Event:    github.Ptr("COMMENT"),
+		CommitID: new(gr.headCommit),
+		Body:     new(formatGHReviewBody(ctx, gr.version, summary, gr.showDuplicates)),
+		Event:    new("COMMENT"),
 	}
 	slog.LogAttrs(ctx, slog.LevelDebug, "Creating a review",
 		slog.String("commit", review.GetCommitID()),
@@ -399,7 +399,7 @@ func formatGHReviewBody(ctx context.Context, version string, summary Summary, sh
 
 func (gr GithubReporter) generalComment(ctx context.Context, body string) error {
 	comment := github.IssueComment{
-		Body: github.Ptr(body),
+		Body: new(body),
 	}
 
 	slog.LogAttrs(ctx, slog.LevelDebug, "Creating PR comment", slog.String("body", comment.GetBody()))

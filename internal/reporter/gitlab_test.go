@@ -149,7 +149,7 @@ func TestGitLabReporter(t *testing.T) {
 		return path
 	}
 	discBody := func(reporter, summary, details string) *string {
-		return gitlab.Ptr(fmt.Sprintf(`:stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **%s** check.
+		return new(fmt.Sprintf(`:stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **%s** check.
 
 ------
 
@@ -166,7 +166,7 @@ func TestGitLabReporter(t *testing.T) {
 `, reporter, summary, details, reporter))
 	}
 	discBodyWithDiag := func(reporter, summary, details, yml, diag string) *string {
-		return gitlab.Ptr(fmt.Sprintf(
+		return new(fmt.Sprintf(
 			`:stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **%s** check.
 
 <details>
@@ -186,19 +186,19 @@ func TestGitLabReporter(t *testing.T) {
 `, reporter, summary, yml, diag, details))
 	}
 	discPosition := func(path string, line int64) *gitlab.PositionOptions {
-		return gitlab.Ptr(gitlab.PositionOptions{
-			BaseSHA:      gitlab.Ptr("base"),
-			StartSHA:     gitlab.Ptr("start"),
-			HeadSHA:      gitlab.Ptr("head"),
-			OldPath:      gitlab.Ptr(path),
-			NewPath:      gitlab.Ptr(path),
-			PositionType: gitlab.Ptr("text"),
-			NewLine:      gitlab.Ptr(line),
-			OldLine:      gitlab.Ptr(line),
+		return new(gitlab.PositionOptions{
+			BaseSHA:      new("base"),
+			StartSHA:     new("start"),
+			HeadSHA:      new("head"),
+			OldPath:      new(path),
+			NewPath:      new(path),
+			PositionType: new("text"),
+			NewLine:      new(line),
+			OldLine:      new(line),
 		})
 	}
 	notePos := func(oldPath, newPath string, newLine, oldLine int64) *gitlab.NotePosition {
-		return gitlab.Ptr(gitlab.NotePosition{
+		return new(gitlab.NotePosition{
 			BaseSHA:      "base",
 			StartSHA:     "start",
 			HeadSHA:      "head",
@@ -210,7 +210,7 @@ func TestGitLabReporter(t *testing.T) {
 		})
 	}
 	discNote := func(id, authorID int64, body string, pos *gitlab.NotePosition) *gitlab.Note {
-		return gitlab.Ptr(gitlab.Note{
+		return new(gitlab.Note{
 			ID:       id,
 			Author:   gitlab.NoteAuthor{ID: authorID},
 			Position: pos,
@@ -366,15 +366,15 @@ func TestGitLabReporter(t *testing.T) {
 					}).ReturnJSON(gitlab.Response{})
 
 					s.ExpectPut(apiDiscussions(i, false) + "/300").WithBodyJSON(
-						gitlab.ResolveMergeRequestDiscussionOptions{Resolved: gitlab.Ptr(true)},
+						gitlab.ResolveMergeRequestDiscussionOptions{Resolved: new(true)},
 					).ReturnJSON(gitlab.Response{})
 					s.ExpectPut(apiDiscussions(i, false) + "/400").WithBodyJSON(
-						gitlab.ResolveMergeRequestDiscussionOptions{Resolved: gitlab.Ptr(true)},
+						gitlab.ResolveMergeRequestDiscussionOptions{Resolved: new(true)},
 					).ReturnJSON(gitlab.Response{})
 				}
 
 				s.ExpectPost(apiDiscussions(5, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
-					Body:     gitlab.Ptr(":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **foo** check.\n\n------\n\nfoo error\n\n\u003cdetails\u003e\n\u003csummary\u003eMore information\u003c/summary\u003e\nfoo details\n\u003c/details\u003e\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/foo.html).\n"),
+					Body:     new(":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **foo** check.\n\n------\n\nfoo error\n\n\u003cdetails\u003e\n\u003csummary\u003eMore information\u003c/summary\u003e\nfoo details\n\u003c/details\u003e\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/foo.html).\n"),
 					Position: discPosition("foo.txt", 2),
 				}).ReturnJSON(gitlab.Response{})
 			}),
@@ -453,7 +453,7 @@ func TestGitLabReporter(t *testing.T) {
 					Position: discPosition("foo.txt", 1),
 				}).ReturnJSON(gitlab.Response{})
 				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
-					Body: gitlab.Ptr("This pint run would create 3 comment(s), which is more than the limit configured for pint (1).\n2 comment(s) were skipped and won't be visible on this PR."),
+					Body: new("This pint run would create 3 comment(s), which is more than the limit configured for pint (1).\n2 comment(s) were skipped and won't be visible on this PR."),
 				}).ReturnJSON(gitlab.Response{})
 			}),
 			errorHandler: func(err error) error {
@@ -566,7 +566,7 @@ func TestGitLabReporter(t *testing.T) {
 				})
 				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{})
 				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
-					Body: gitlab.Ptr(`Some checks were disabled because one or more configured Prometheus server doesn't seem to support all required Prometheus APIs.
+					Body: new(`Some checks were disabled because one or more configured Prometheus server doesn't seem to support all required Prometheus APIs.
 This usually means that you're running pint against a service like Thanos or Mimir that allows to query metrics but doesn't implement all APIs documented [here](https://prometheus.io/docs/prometheus/latest/querying/api/).
 Since pint uses many of these API endpoint for querying information needed to run online checks only a real Prometheus server will allow it to run all of these checks.
 Below is the list of checks that were disabled for each Prometheus server defined in pint config file.
@@ -782,13 +782,13 @@ Below is the list of checks that were disabled for each Prometheus server define
 					},
 				})
 				s.ExpectPut(apiDiscussions(1, false) + "/200").WithBodyJSON(
-					gitlab.ResolveMergeRequestDiscussionOptions{Resolved: gitlab.Ptr(true)},
+					gitlab.ResolveMergeRequestDiscussionOptions{Resolved: new(true)},
 				).ReturnJSON(gitlab.Response{})
 				s.ExpectPut(apiDiscussions(1, false) + "/300").WithBodyJSON(
-					gitlab.ResolveMergeRequestDiscussionOptions{Resolved: gitlab.Ptr(true)},
+					gitlab.ResolveMergeRequestDiscussionOptions{Resolved: new(true)},
 				).ReturnJSON(gitlab.Response{})
 				s.ExpectPut(apiDiscussions(1, false) + "/400").WithBodyJSON(
-					gitlab.ResolveMergeRequestDiscussionOptions{Resolved: gitlab.Ptr(true)},
+					gitlab.ResolveMergeRequestDiscussionOptions{Resolved: new(true)},
 				).ReturnJSON(gitlab.Response{})
 			}),
 			errorHandler: func(err error) error {
@@ -835,7 +835,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 					},
 				})
 				s.ExpectPut(apiDiscussions(1, false) + "/200").WithBodyJSON(
-					gitlab.ResolveMergeRequestDiscussionOptions{Resolved: gitlab.Ptr(false)},
+					gitlab.ResolveMergeRequestDiscussionOptions{Resolved: new(false)},
 				).ReturnJSON(gitlab.Response{})
 			}),
 			errorHandler: func(err error) error {
@@ -882,7 +882,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 					},
 				})
 				s.ExpectPut(apiDiscussions(1, false) + "/200").WithBodyJSON(
-					gitlab.ResolveMergeRequestDiscussionOptions{Resolved: gitlab.Ptr(false)},
+					gitlab.ResolveMergeRequestDiscussionOptions{Resolved: new(false)},
 				).Times(6).ReturnCode(http.StatusInternalServerError).Return("Mock error")
 				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
 					Body:     discBody("b", "foo error2", "foo details"),
@@ -962,14 +962,14 @@ Below is the list of checks that were disabled for each Prometheus server define
 				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{})
 				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
 					Body: discBodyWithDiag("a", "foo error1", "foo details", "```yaml\n2 | - record: target is down\n3 |   expr: up == 0\n      ^^ \n```", "Diagnostic message"),
-					Position: gitlab.Ptr(gitlab.PositionOptions{
-						BaseSHA:      gitlab.Ptr("base"),
-						StartSHA:     gitlab.Ptr("start"),
-						HeadSHA:      gitlab.Ptr("head"),
-						OldPath:      gitlab.Ptr("foo.old"),
-						NewPath:      gitlab.Ptr(mockPath),
-						PositionType: gitlab.Ptr("text"),
-						NewLine:      gitlab.Ptr(int64(3)),
+					Position: new(gitlab.PositionOptions{
+						BaseSHA:      new("base"),
+						StartSHA:     new("start"),
+						HeadSHA:      new("head"),
+						OldPath:      new("foo.old"),
+						NewPath:      new(mockPath),
+						PositionType: new("text"),
+						NewLine:      new(int64(3)),
 						// Old file is gone so we don't have OldLine here at all
 					}),
 				}).ReturnJSON(gitlab.Response{})
@@ -1047,14 +1047,14 @@ Below is the list of checks that were disabled for each Prometheus server define
 				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{})
 				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
 					Body: discBodyWithDiag("a", "foo error1", "foo details", "```yaml\n2 | - record: target is down\n3 |   expr: up == 0\n      ^^ \n```", "Diagnostic message"),
-					Position: gitlab.Ptr(gitlab.PositionOptions{
-						BaseSHA:      gitlab.Ptr("base"),
-						StartSHA:     gitlab.Ptr("start"),
-						HeadSHA:      gitlab.Ptr("head"),
-						OldPath:      gitlab.Ptr("foo.old"),
-						NewPath:      gitlab.Ptr(mockPath),
-						PositionType: gitlab.Ptr("text"),
-						NewLine:      gitlab.Ptr(int64(3)),
+					Position: new(gitlab.PositionOptions{
+						BaseSHA:      new("base"),
+						StartSHA:     new("start"),
+						HeadSHA:      new("head"),
+						OldPath:      new("foo.old"),
+						NewPath:      new(mockPath),
+						PositionType: new("text"),
+						NewLine:      new(int64(3)),
 						// Old file is gone so we don't have OldLine here at all
 					}),
 				}).ReturnJSON(gitlab.Response{})
@@ -1105,14 +1105,14 @@ Below is the list of checks that were disabled for each Prometheus server define
 				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{})
 				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
 					Body: discBody("a", "foo error1", "foo details"),
-					Position: gitlab.Ptr(gitlab.PositionOptions{
-						BaseSHA:      gitlab.Ptr("base"),
-						StartSHA:     gitlab.Ptr("start"),
-						HeadSHA:      gitlab.Ptr("head"),
-						OldPath:      gitlab.Ptr(mockPath),
-						NewPath:      gitlab.Ptr(mockPath),
-						PositionType: gitlab.Ptr("text"),
-						OldLine:      gitlab.Ptr(int64(3)),
+					Position: new(gitlab.PositionOptions{
+						BaseSHA:      new("base"),
+						StartSHA:     new("start"),
+						HeadSHA:      new("head"),
+						OldPath:      new(mockPath),
+						NewPath:      new(mockPath),
+						PositionType: new("text"),
+						OldLine:      new(int64(3)),
 					}),
 				}).ReturnJSON(gitlab.Response{})
 			}),
@@ -1162,15 +1162,15 @@ Below is the list of checks that were disabled for each Prometheus server define
 				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{})
 				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
 					Body: discBody("a", "foo error1", "foo details"),
-					Position: gitlab.Ptr(gitlab.PositionOptions{
-						BaseSHA:      gitlab.Ptr("base"),
-						StartSHA:     gitlab.Ptr("start"),
-						HeadSHA:      gitlab.Ptr("head"),
-						OldPath:      gitlab.Ptr(mockPath),
-						NewPath:      gitlab.Ptr(mockPath),
-						PositionType: gitlab.Ptr("text"),
-						OldLine:      gitlab.Ptr(int64(3)),
-						NewLine:      gitlab.Ptr(int64(3)),
+					Position: new(gitlab.PositionOptions{
+						BaseSHA:      new("base"),
+						StartSHA:     new("start"),
+						HeadSHA:      new("head"),
+						OldPath:      new(mockPath),
+						NewPath:      new(mockPath),
+						PositionType: new("text"),
+						OldLine:      new(int64(3)),
+						NewLine:      new(int64(3)),
 					}),
 				}).ReturnJSON(gitlab.Response{})
 			}),

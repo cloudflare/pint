@@ -2,11 +2,9 @@ package promapi
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"io"
 	"log/slog"
-	"math"
 	"net/http"
 	"net/url"
 	"slices"
@@ -14,9 +12,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/go-json-experiment/json"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
-	"github.com/prymitive/current"
+	"github.com/prometheus/prometheus/model/labels"
 
 	"github.com/cloudflare/pint/internal/output"
 )
@@ -29,6 +28,20 @@ type RangeQueryResult struct {
 	URI    string
 	Series SeriesTimeRanges
 	Stats  QueryStats
+}
+
+type PrometheusRangeQuerySample struct {
+	Labels map[string]string      `json:"metric"`
+	Values []SampleTimestampValue `json:"values"`
+}
+
+type PrometheusRangeQueryResponse struct {
+	PrometheusResponse
+	Data struct {
+		ResultType string                       `json:"resultType"`
+		Result     []PrometheusRangeQuerySample `json:"result"`
+		Stats      QueryStats                   `json:"stats"`
+	} `json:"data"`
 }
 
 type rangeQuery struct {
@@ -65,7 +78,7 @@ func (q rangeQuery) Run() queryResult {
 	}
 
 	var ranges MetricTimeRanges
-	ranges, qr.stats, qr.err = streamSampleStream(resp.Body, q.r.Step)
+	ranges, qr.stats, qr.err = parseMatrixSamples(resp.Body, q.r.Step)
 	ExpandRangesEnd(ranges, q.r.Step)
 	qr.value = ranges
 	return qr
@@ -275,80 +288,36 @@ func (rr RelativeRange) String() string {
 	return output.HumanizeDuration(rr.lookback) + "/" + output.HumanizeDuration(rr.step)
 }
 
-func streamSampleStream(r io.Reader, step time.Duration) (dst MetricTimeRanges, stats QueryStats, err error) {
+func parseMatrixSamples(r io.Reader, step time.Duration) (dst MetricTimeRanges, _ QueryStats, err error) {
 	defer dummyReadAll(r)
 
-	var status, errType, errText, resultType string
-	errText = "empty response object"
-	var sample model.SampleStream
-	decoder := current.Object(
-		current.Key("status", current.Value(func(s string, _ bool) {
-			status = s
-		})),
-		current.Key("error", current.Value(func(s string, _ bool) {
-			errText = s
-		})),
-		current.Key("errorType", current.Value(func(s string, _ bool) {
-			errType = s
-		})),
-		current.Key("data", current.Object(
-			current.Key("resultType", current.Value(func(s string, _ bool) {
-				resultType = s
-			})),
-			current.Key("result", current.Array(
-				&sample,
-				func() {
-					lset := MetricToLabels(sample.Metric)
-					dst = AppendSampleToRanges(dst, lset, sample.Values, step)
-					sample.Metric = model.Metric{}
-					sample.Values = make([]model.SamplePair, 0, len(sample.Values))
-				},
-			)),
-			current.Key("stats", current.Object(
-				current.Key("timings", current.Object(
-					current.Key("evalTotalTime", current.Value(func(v float64, _ bool) {
-						stats.Timings.EvalTotalTime = v
-					})),
-					current.Key("resultSortTime", current.Value(func(v float64, _ bool) {
-						stats.Timings.ResultSortTime = v
-					})),
-					current.Key("queryPreparationTime", current.Value(func(v float64, _ bool) {
-						stats.Timings.QueryPreparationTime = v
-					})),
-					current.Key("innerEvalTime", current.Value(func(v float64, _ bool) {
-						stats.Timings.InnerEvalTime = v
-					})),
-					current.Key("execQueueTime", current.Value(func(v float64, _ bool) {
-						stats.Timings.ExecQueueTime = v
-					})),
-					current.Key("execTotalTime", current.Value(func(v float64, _ bool) {
-						stats.Timings.ExecTotalTime = v
-					})),
-				)),
-				current.Key("samples", current.Object(
-					current.Key("totalQueryableSamples", current.Value(func(v float64, _ bool) {
-						stats.Samples.TotalQueryableSamples = int(math.Round(v))
-					})),
-					current.Key("peakSamples", current.Value(func(v float64, _ bool) {
-						stats.Samples.PeakSamples = int(math.Round(v))
-					})),
-				)),
-			)),
-		)),
-	)
-
-	dec := json.NewDecoder(r)
-	if err = decoder.Stream(dec); err != nil {
-		return nil, stats, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: "JSON parse error: " + err.Error()}
+	var data PrometheusRangeQueryResponse
+	if err = json.UnmarshalRead(r, &data); err != nil {
+		return dst, data.Data.Stats, APIError{Status: data.Status, ErrorType: v1.ErrBadResponse, Err: "JSON parse error: " + err.Error()}
 	}
 
-	if status != "success" {
-		return nil, stats, APIError{Status: status, ErrorType: decodeErrorType(errType), Err: errText}
+	if data.Status != "success" {
+		if data.Error == "" {
+			data.Error = "empty response object"
+		}
+		return dst, data.Data.Stats, APIError{Status: data.Status, ErrorType: decodeErrorType(data.ErrorType), Err: data.Error}
 	}
 
-	if resultType != "matrix" {
-		return nil, stats, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: "invalid result type, expected matrix, got " + resultType}
+	if data.Data.ResultType != "matrix" {
+		return nil, data.Data.Stats, APIError{Status: data.Status, ErrorType: v1.ErrBadResponse, Err: "invalid result type, expected matrix, got " + data.Data.ResultType}
 	}
 
-	return dst, stats, nil
+	var sp model.SamplePair
+	for _, s := range data.Data.Result {
+		lset := labels.FromMap(s.Labels)
+		values := make([]model.SamplePair, 0, len(s.Values))
+		for _, val := range s.Values {
+			sp.Timestamp = val.Timestamp
+			sp.Value = model.SampleValue(val.Value)
+			values = append(values, sp)
+		}
+		dst = AppendSampleToRanges(dst, lset, values, step)
+	}
+
+	return dst, data.Data.Stats, nil
 }
