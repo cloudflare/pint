@@ -245,6 +245,11 @@
 
 ---
 
+[TestCostCheck/ignores_scalar_expressions - 1]
+[]
+
+---
+
 [TestCostCheck/ignores_self - 1]
 []
 

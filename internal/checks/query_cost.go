@@ -88,6 +88,10 @@ func (c CostCheck) Check(ctx context.Context, entry *discovery.Entry, entries []
 		return problems
 	}
 
+	if !hasVectorSelector(expr.Source()) {
+		return problems
+	}
+
 	slog.LogAttrs(ctx, slog.LevelDebug, "Calculating cost of the raw query", slog.String("expr", expr.Value.Value))
 	qr, series, err := c.getQueryCost(ctx, expr.Value.Value)
 	if err != nil {
@@ -558,6 +562,15 @@ func (c CostCheck) selectorLabels(ops source.Operations) (lms []*labels.Matcher)
 		}
 	}
 	return lms
+}
+
+func hasVectorSelector(sources []source.Source) bool {
+	for _, src := range sources {
+		if _, ok := source.MostOuterOperation[*promParser.VectorSelector](src); ok {
+			return true
+		}
+	}
+	return false
 }
 
 func wrapExpr(expr, call string) string {
