@@ -23,6 +23,16 @@ func TestCostCheck(t *testing.T) {
 			prometheus: newSimpleProm,
 		},
 		{
+			// Scalar expressions can't be wrapped in count() because aggregation functions
+			// require an instant vector, not a scalar.
+			description: "ignores scalar expressions",
+			content:     "- record: prometheus:write:1s\n  expr: '1'\n",
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 0, 0, 0, 0, "", checks.Bug)
+			},
+			prometheus: newSimpleProm,
+		},
+		{
 			description: "empty response",
 			content:     content,
 			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
@@ -1128,49 +1138,13 @@ func TestCostCheck(t *testing.T) {
 			},
 		},
 		{
+			// Expression uses vector() which doesn't read any time series, so cost check is skipped.
 			description: "suggest recording rule / sum(vector)",
 			content:     "- alert: foo\n  expr: sum(vector(1)) > 0\n",
 			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
 				return checks.NewCostCheck(prom, 100, 100, 0, 0, "check comment", checks.Warning)
 			},
 			prometheus: newSimpleProm,
-			entries: mustParseContent(`
-- record: vec
-  expr: sum(vector(1))
-`),
-			mocks: []*prometheusMock{
-				{
-					conds: []requestCondition{
-						requireQueryPath,
-						formCond{key: "query", value: "count(\nsum(vector(1)) > 0\n)"},
-					},
-					resp: vectorResponse{
-						samples: []*model.Sample{
-							generateSample(map[string]string{}),
-						},
-						stats: promapi.QueryStats{
-							Samples: promapi.QuerySamples{
-								TotalQueryableSamples: 0,
-								PeakSamples:           0,
-							},
-							Timings: promapi.QueryTimings{
-								EvalTotalTime: 0.1,
-							},
-						},
-					},
-				},
-				{
-					conds: []requestCondition{
-						requireQueryPath,
-						formCond{key: "query", value: checks.BytesPerSampleQuery},
-					},
-					resp: vectorResponse{
-						samples: []*model.Sample{
-							generateSampleWithValue(map[string]string{}, 4096),
-						},
-					},
-				},
-			},
 		},
 		{
 			description: "suggest recording rule / label mismatch",

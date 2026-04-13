@@ -12,6 +12,10 @@ selected Prometheus servers and report results.
 This check can be used for both recording and alerting rules, but is mostly
 useful for recording rules.
 
+Expressions that don't read any time series, such as number literals or
+function calls like `scalar()`, `vector()`, `time()`, or `pi()`, will be
+skipped by this check since they have minimal query cost.
+
 ## Query evaluation duration
 
 The total duration of a query comes from Prometheus query stats included

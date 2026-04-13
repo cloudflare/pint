@@ -8,6 +8,7 @@
 - Fixed problem description in [promql/series](checks/promql/series.md) check for
   disable comments that have no effect.
 - Fixed invalid suggestions from the [query/cost](checks/query/cost.md) check.
+- [query/cost](checks/query/cost.md) check will now skip expressions that don't read any time series, like `scalar()`, `vector()`, `time()`, `pi()`, or number literals.
 
 ## v0.79.0
 
