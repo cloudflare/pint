@@ -85,8 +85,7 @@ func (c SelectorCheck) Check(_ context.Context, entry *discovery.Entry, _ []*dis
 
 func (c SelectorCheck) findSelector(callRe *regexp.Regexp, s source.Source) (*promParser.VectorSelector, *promParser.Call) {
 	var call *promParser.Call
-	for i := len(s.Operations) - 1; i >= 0; i-- {
-		op := s.Operations[i]
+	for _, op := range slices.Backward(s.Operations) {
 		if callRe != nil && call == nil {
 			if cl, ok := op.Node.(*promParser.Call); ok {
 				if callRe.MatchString(cl.Func.Name) {

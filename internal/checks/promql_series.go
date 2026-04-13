@@ -73,13 +73,13 @@ func (c *PromqlSeriesSettings) Validate() error {
 	}
 
 	for selector := range c.IgnoreLabelsValue {
-		if _, err := promParser.ParseMetricSelector(selector); err != nil {
+		if _, err := parser.PromQLParser.ParseMetricSelector(selector); err != nil {
 			return fmt.Errorf("%q is not a valid PromQL metric selector: %w", selector, err)
 		}
 	}
 
 	for _, selector := range c.IgnoreMatchingElsewhere {
-		if _, err := promParser.ParseMetricSelector(selector); err != nil {
+		if _, err := parser.PromQLParser.ParseMetricSelector(selector); err != nil {
 			return fmt.Errorf("%q is not a valid PromQL metric selector: %w", selector, err)
 		}
 	}
@@ -489,7 +489,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 			if lm.Type != labels.MatchEqual && lm.Type != labels.MatchRegexp {
 				continue
 			}
-			if c.isLabelValueIgnored(settings, entry.Rule, selector, lm.Name) {
+			if isLabelValueIgnored(settings, entry.Rule, selector, lm.Name) {
 				continue
 			}
 			lms := lm.String()
@@ -785,7 +785,7 @@ func (c SeriesCheck) checkOtherServer(ctx context.Context, query string, setting
 
 		if series > 0 {
 			for _, selector := range settings.IgnoreMatchingElsewhere {
-				m, _ := promParser.ParseMetricSelector(selector)
+				m, _ := parser.PromQLParser.ParseMetricSelector(selector)
 				if c.hasSeriesWithSelector(ctx, prom, query, m) {
 					return "", false
 				}
@@ -897,7 +897,7 @@ func (c SeriesCheck) getMinAge(rule parser.Rule, selector *promParser.VectorSele
 	return minAge, problems
 }
 
-func (c SeriesCheck) isLabelValueIgnored(settings *PromqlSeriesSettings, rule parser.Rule, selector *promParser.VectorSelector, labelName string) bool {
+func isLabelValueIgnored(settings *PromqlSeriesSettings, rule parser.Rule, selector *promParser.VectorSelector, labelName string) bool {
 	for matcher, names := range settings.IgnoreLabelsValue {
 		isMatch, _ := matchSelectorToMetric(selector, matcher)
 		if !isMatch {
@@ -1095,7 +1095,7 @@ func matchSelectorToMetric(selector *promParser.VectorSelector, metric string) (
 		return true, true
 	}
 	// Then try matchers.
-	m, err := promParser.ParseMetricSelector(metric)
+	m, err := parser.PromQLParser.ParseMetricSelector(metric)
 	if err != nil {
 		// Ignore errors
 		return false, false

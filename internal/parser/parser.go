@@ -36,21 +36,32 @@ const (
 	ThanosSchema
 )
 
-func NewParser(isStrict bool, schema Schema, names model.ValidationScheme) Parser {
-	if names == model.UnsetValidation {
-		names = model.LegacyValidation
+type Options struct {
+	Names    model.ValidationScheme
+	Schema   Schema
+	IsStrict bool
+}
+
+var DefaultOptions = Options{
+	Names:    model.UTF8Validation,
+	Schema:   PrometheusSchema,
+	IsStrict: false,
+}
+
+func (o Options) WithStrict(strict bool) Options {
+	o.IsStrict = strict
+	return o
+}
+
+func NewParser(opts Options) Parser {
+	if opts.Names == model.UnsetValidation {
+		opts.Names = model.LegacyValidation
 	}
-	return Parser{
-		isStrict: isStrict,
-		schema:   schema,
-		names:    names,
-	}
+	return Parser{opts: opts}
 }
 
 type Parser struct {
-	names    model.ValidationScheme
-	schema   Schema
-	isStrict bool
+	opts Options
 }
 
 func (p Parser) Parse(src io.Reader) (f File) {
@@ -63,7 +74,7 @@ func (p Parser) Parse(src io.Reader) (f File) {
 		f.TotalLines = cr.lineno
 	}()
 
-	f.IsRelaxed = !p.isStrict
+	f.IsRelaxed = !p.opts.IsStrict
 
 	var index int
 	var g []Group
@@ -80,7 +91,7 @@ func (p Parser) Parse(src io.Reader) (f File) {
 		}
 		index++
 
-		if p.isStrict {
+		if p.opts.IsStrict {
 			g, f.Error = p.parseGroups(&doc, 0, 0, cr.lines)
 			if f.Error.Err != nil {
 				return f
@@ -90,7 +101,7 @@ func (p Parser) Parse(src io.Reader) (f File) {
 			f.Groups = append(f.Groups, p.parseNode(&doc, nil, nil, 0, 0, cr.lines)...)
 		}
 
-		if index > 1 && p.isStrict {
+		if index > 1 && p.opts.IsStrict {
 			f.Error = ParseError{
 				Err: errors.New("multi-document YAML files are not allowed"),
 				Details: `This is a multi-document YAML file. Prometheus will only parse the first document and silently ignore the rest.
@@ -417,7 +428,7 @@ func (p Parser) parseRule(node *yaml.Node, offsetLine, offsetColumn int, content
 		return rule, false
 	}
 
-	if recordPart != nil && !p.names.IsValidMetricName(recordPart.Value) {
+	if recordPart != nil && !p.opts.Names.IsValidMetricName(recordPart.Value) {
 		return Rule{
 			Lines: lines,
 			Error: ParseError{
@@ -429,7 +440,7 @@ func (p Parser) parseRule(node *yaml.Node, offsetLine, offsetColumn int, content
 
 	if (recordPart != nil || alertPart != nil) && labelsPart != nil {
 		for _, lab := range labelsPart.Items {
-			if !p.names.IsValidLabelName(lab.Key.Value) || lab.Key.Value == model.MetricNameLabel {
+			if !p.opts.Names.IsValidLabelName(lab.Key.Value) || lab.Key.Value == model.MetricNameLabel {
 				return Rule{
 					Lines: lines,
 					Error: ParseError{
@@ -446,7 +457,7 @@ func (p Parser) parseRule(node *yaml.Node, offsetLine, offsetColumn int, content
 
 	if alertPart != nil && annotationsPart != nil {
 		for _, ann := range annotationsPart.Items {
-			if !p.names.IsValidLabelName(ann.Key.Value) {
+			if !p.opts.Names.IsValidLabelName(ann.Key.Value) {
 				return Rule{
 					Lines: lines,
 					Error: ParseError{

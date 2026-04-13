@@ -10,7 +10,6 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/diags"
@@ -40,7 +39,7 @@ func TestGitBranchFinder(t *testing.T) {
 	includeAll := []*regexp.Regexp{regexp.MustCompile(".*")}
 
 	mustParse := func(offset int, s string) parser.Rule {
-		p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
+		p := parser.NewParser(parser.DefaultOptions)
 		file := p.Parse(strings.NewReader(strings.Repeat("\n", offset) + s))
 		if file.Error.Err != nil {
 			panic(fmt.Sprintf("failed to parse rule:\n---\n%s\n---\nerror: %s", s, file.Error))
@@ -75,7 +74,7 @@ func TestGitBranchFinder(t *testing.T) {
 				git.NewPathFilter(includeAll, nil, nil),
 				"main",
 				50,
-				parser.PrometheusSchema, model.UTF8Validation,
+				parser.DefaultOptions,
 				nil,
 			),
 			entries: nil,
@@ -91,7 +90,7 @@ func TestGitBranchFinder(t *testing.T) {
 				git.NewPathFilter(includeAll, nil, nil),
 				"master",
 				50,
-				parser.PrometheusSchema, model.UTF8Validation,
+				parser.DefaultOptions,
 				nil,
 			),
 			entries: nil,
@@ -110,7 +109,7 @@ func TestGitBranchFinder(t *testing.T) {
 				commitFile(t, "rules.yml", "# v2-3\n", "v2-3")
 				commitFile(t, "rules.yml", "# v2-4\n", "v2-4")
 			},
-			finder:  discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 3, parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder:  discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 3, parser.DefaultOptions, nil),
 			entries: nil,
 			err:     "number of commits to check (4) is higher than maxCommits (3), exiting",
 		},
@@ -129,7 +128,7 @@ func TestGitBranchFinder(t *testing.T) {
 				git.NewPathFilter(includeAll, nil, nil),
 				"main",
 				4,
-				parser.PrometheusSchema, model.UTF8Validation,
+				parser.DefaultOptions,
 				nil,
 			),
 			entries: nil,
@@ -150,7 +149,7 @@ func TestGitBranchFinder(t *testing.T) {
 				git.NewPathFilter(includeAll, nil, nil),
 				"main",
 				4,
-				parser.PrometheusSchema, model.UTF8Validation,
+				parser.DefaultOptions,
 				nil,
 			),
 			entries: nil,
@@ -177,7 +176,7 @@ func TestGitBranchFinder(t *testing.T) {
 				git.NewPathFilter(includeAll, nil, nil),
 				"main",
 				4,
-				parser.PrometheusSchema, model.UTF8Validation,
+				parser.DefaultOptions,
 				nil,
 			),
 			entries: nil,
@@ -193,7 +192,7 @@ func TestGitBranchFinder(t *testing.T) {
 
 				commitFile(t, "rules.yml", "# v2\n", "v2")
 			},
-			finder:  discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4, parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder:  discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4, parser.DefaultOptions, nil),
 			entries: nil,
 		},
 		{
@@ -218,7 +217,7 @@ groups:
     expr: count(up == 1)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4, parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4, parser.DefaultOptions, nil),
 			entries: []*discovery.Entry{
 				{
 					State: discovery.Noop,
@@ -253,7 +252,7 @@ groups:
     expr: count(up == 1)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4, parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4, parser.DefaultOptions, nil),
 			entries: []*discovery.Entry{
 				{
 					State: discovery.Modified,
@@ -282,7 +281,7 @@ groups:
   expr: count(up == 1)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4, parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4, parser.DefaultOptions, nil),
 			entries: []*discovery.Entry{
 				{
 					State: discovery.Modified,
@@ -311,7 +310,7 @@ groups:
   expr: count(up == 1)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(nil, nil, includeAll), "main", 4, parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(nil, nil, includeAll), "main", 4, parser.DefaultOptions, nil),
 			entries: []*discovery.Entry{
 				{
 					State: discovery.Modified,
@@ -351,7 +350,7 @@ groups:
 				git.NewPathFilter([]*regexp.Regexp{regexp.MustCompile("^foo#")}, nil, nil),
 				"main",
 				4,
-				parser.PrometheusSchema, model.UTF8Validation,
+				parser.DefaultOptions,
 				nil,
 			),
 			entries: nil,
@@ -378,7 +377,7 @@ groups:
     expr: count(up == 1)
 `, "v2\nskip this commit\n[skip ci]\n")
 			},
-			finder:  discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4, parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder:  discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4, parser.DefaultOptions, nil),
 			entries: nil,
 		},
 		{
@@ -403,7 +402,7 @@ groups:
     expr: count(up == 1)
 `, "v2\nskip this commit\n[no ci]\n")
 			},
-			finder:  discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4, parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder:  discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4, parser.DefaultOptions, nil),
 			entries: nil,
 		},
 		{
@@ -423,7 +422,7 @@ groups:
 				require.NoError(t, err, "git add")
 				gitCommit(t, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4, parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4, parser.DefaultOptions, nil),
 			entries: []*discovery.Entry{
 				{
 					State: discovery.Added,
@@ -468,7 +467,7 @@ groups:
     expr: count(up)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4, parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4, parser.DefaultOptions, nil),
 			entries: []*discovery.Entry{
 				{
 					State: discovery.Modified,
@@ -540,7 +539,7 @@ groups:
   for: 0s
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4, parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4, parser.DefaultOptions, nil),
 			entries: []*discovery.Entry{
 				{
 					State: discovery.Modified,
@@ -580,7 +579,7 @@ groups:
   expr: sum(foo) by(job)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4, parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4, parser.DefaultOptions, nil),
 			entries: []*discovery.Entry{
 				{
 					State: discovery.Noop,
@@ -620,7 +619,7 @@ groups:
   expr: sum(foo) by(job)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4, parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4, parser.DefaultOptions, nil),
 			entries: []*discovery.Entry{
 				{
 					State: discovery.Noop,
@@ -664,7 +663,7 @@ groups:
   expr: sum(foo) by(job)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4, parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4, parser.DefaultOptions, nil),
 			entries: []*discovery.Entry{
 				{
 					State: discovery.Noop,
@@ -718,7 +717,7 @@ groups:
     expr: count(up)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4, parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4, parser.DefaultOptions, nil),
 			entries: []*discovery.Entry{
 				{
 					State: discovery.Added,
@@ -770,7 +769,7 @@ groups:
   expr: sum(foo) by(job)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4, parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4, parser.DefaultOptions, nil),
 			entries: []*discovery.Entry{
 				{
 					State: discovery.Noop,
@@ -832,7 +831,7 @@ groups:
   expr: sum(foo) by(job)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4, parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4, parser.DefaultOptions, nil),
 			entries: []*discovery.Entry{
 				{
 					State: discovery.Modified,
@@ -901,7 +900,7 @@ groups:
     foo: bar
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4, parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4, parser.DefaultOptions, nil),
 			entries: []*discovery.Entry{
 				{
 					State: discovery.Noop,
@@ -939,7 +938,7 @@ groups:
 
 				gitCommit(t, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4, parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4, parser.DefaultOptions, nil),
 			entries: []*discovery.Entry{
 				{
 					State: discovery.Moved,
@@ -974,7 +973,7 @@ groups:
 
 				gitCommit(t, "v3")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4, parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4, parser.DefaultOptions, nil),
 			entries: []*discovery.Entry{
 				{
 					State: discovery.Moved,
@@ -1012,7 +1011,7 @@ groups:
 
 				gitCommit(t, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4, parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4, parser.DefaultOptions, nil),
 			entries: []*discovery.Entry{
 				{
 					State: discovery.Moved,
@@ -1072,7 +1071,7 @@ groups:
     expr: sum(up)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4, parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4, parser.DefaultOptions, nil),
 			entries: []*discovery.Entry{
 				{
 					State: discovery.Added,
@@ -1116,7 +1115,7 @@ groups:
   expr: sum(foo) by(job)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4, parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4, parser.DefaultOptions, nil),
 			entries: []*discovery.Entry{
 				{
 					State: discovery.Modified,
@@ -1172,7 +1171,7 @@ groups:
   expr: sum(foo) by(job)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4, parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4, parser.DefaultOptions, nil),
 			entries: []*discovery.Entry{
 				{
 					State: discovery.Noop,
@@ -1245,7 +1244,7 @@ groups:
     expr: sum(up)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4, parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4, parser.DefaultOptions, nil),
 			entries: []*discovery.Entry{
 				{
 					State: discovery.Added,
@@ -1298,7 +1297,7 @@ groups:
       )
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4, parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4, parser.DefaultOptions, nil),
 			entries: []*discovery.Entry{
 				{
 					State: discovery.Added,
@@ -1344,7 +1343,7 @@ groups:
 
 				require.NoError(t, os.Symlink("/nonexistent/path", "broken.yml"))
 			},
-			finder:  discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4, parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder:  discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4, parser.DefaultOptions, nil),
 			entries: nil,
 			err:     "broken.yml is a symlink but target file cannot be evaluated: lstat /nonexistent: no such file or directory",
 		},
@@ -1366,7 +1365,7 @@ groups:
   expr: up != 0
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4, parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4, parser.DefaultOptions, nil),
 			entries: []*discovery.Entry{
 				{
 					State: discovery.Added,

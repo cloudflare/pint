@@ -137,8 +137,7 @@ type RuleChecker interface {
 
 func problemFromError(err error, rule parser.Rule, reporter, prom string, s Severity) Problem {
 	promDesc := "\"" + prom + "\""
-	var perr *promapi.FailoverGroupError
-	perrOk := errors.As(err, &perr)
+	perr, perrOk := errors.AsType[*promapi.FailoverGroupError](err)
 	if perrOk {
 		if uri := perr.URI(); uri != "" {
 			promDesc = promText(prom, uri)

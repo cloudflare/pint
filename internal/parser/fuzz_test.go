@@ -4,8 +4,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/prometheus/common/model"
-
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -279,7 +277,7 @@ labels:
 	for _, tc := range testcases {
 		f.Add(tc)
 	}
-	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
+	p := parser.NewParser(parser.DefaultOptions)
 	f.Fuzz(func(t *testing.T, s string) {
 		t.Logf("Parsing: [%s]\n", s)
 		_ = p.Parse(strings.NewReader(s))

@@ -27,6 +27,21 @@ const (
 	AggregateSource
 )
 
+type RangeSelectorMode uint8
+
+const (
+	RangeSelectorDefault  RangeSelectorMode = iota
+	RangeSelectorAnchored                   // VectorSelector uses the anchored modifier.
+	RangeSelectorSmoothed                   // VectorSelector uses the smoothed modifier.
+)
+
+const (
+	FeatureExperimentalFunctions  = "promql-experimental-functions"
+	FeatureDurationExpr           = "promql-duration-expr"
+	FeatureExtendedRangeSelectors = "promql-extended-range-selectors"
+	FeatureBinopFillModifiers     = "promql-binop-fill-modifiers"
+)
+
 // Used for test snapshots.
 func (st Type) MarshalYAML() (any, error) {
 	var name string
@@ -43,6 +58,17 @@ func (st Type) MarshalYAML() (any, error) {
 		name = "aggregation"
 	}
 	return name, nil
+}
+
+// Used for test snapshots.
+func (rsm RangeSelectorMode) MarshalYAML() (any, error) {
+	switch rsm { // nolint: exhaustive
+	case RangeSelectorAnchored:
+		return "anchored", nil
+	case RangeSelectorSmoothed:
+		return "smoothed", nil
+	}
+	return "default", nil
 }
 
 type LabelPromiseType uint8
@@ -140,8 +166,7 @@ func (so Operation) MarshalYAML() (any, error) {
 type Operations []Operation
 
 func MostOuterOperation[T promParser.Node](s Source) (T, bool) {
-	for i := len(s.Operations) - 1; i >= 0; i-- {
-		op := s.Operations[i]
+	for _, op := range slices.Backward(s.Operations) {
 		if o, ok := op.Node.(T); ok {
 			return o, true
 		}
@@ -149,7 +174,13 @@ func MostOuterOperation[T promParser.Node](s Source) (T, bool) {
 	return *new(T), false
 }
 
+type Fill struct {
+	LHS float64
+	RHS float64
+}
+
 type Join struct {
+	Fill           *Fill `yaml:"fill,omitempty"` // Fill values for unmatched series (binop fill modifiers).
 	MatchingLabels []string
 	AddedLabels    []string
 	Src            Source              // The source we're joining with.
@@ -173,15 +204,23 @@ type Source struct {
 	// Any other sources this source joins with.
 	Joins []Join `yaml:"joins,omitempty"`
 	// Any other sources this source is suppressed by.
-	Unless     []Unless               `yaml:"unless,omitempty"`
-	UsedLabels []string               `yaml:"usedLabels,omitempty"`
-	ReturnInfo ReturnInfo             `yaml:"returnInfo,omitempty"`
-	Position   posrange.PositionRange `yaml:"position"`
-	Type       Type                   `yaml:"type"`
+	Unless        []Unless               `yaml:"unless,omitempty"`
+	NeedsFeatures []string               `yaml:"needsFeatures,omitempty"`
+	UsedLabels    []string               `yaml:"usedLabels,omitempty"`
+	ReturnInfo    ReturnInfo             `yaml:"returnInfo,omitempty"`
+	Position      posrange.PositionRange `yaml:"position"`
+	Type          Type                   `yaml:"type"`
 	// Labels are fixed and only allowed labels can be present.
 	FixedLabels bool `yaml:"fixedLabels,omitempty"`
 	// True if this source is guarded by 'foo > 5' or other condition.
-	IsConditional bool `yaml:"isConditional,omitempty"`
+	IsConditional     bool              `yaml:"isConditional,omitempty"`
+	RangeSelectorMode RangeSelectorMode `yaml:"rangeSelectorMode,omitempty"`
+}
+
+func (s *Source) requireFeature(f string) {
+	if !slices.Contains(s.NeedsFeatures, f) {
+		s.NeedsFeatures = append(s.NeedsFeatures, f)
+	}
 }
 
 func (s Source) Operation() string {
@@ -492,6 +531,9 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 	case *promParser.MatrixSelector:
 		for _, s := range walkNode(expr, n.VectorSelector) {
 			s.Returns = promParser.ValueTypeMatrix
+			if n.RangeExpr != nil {
+				s.requireFeature(FeatureDurationExpr)
+			}
 			/*
 				// Prepend Matrix operation
 				s.Operations = append(SourceOperations{
@@ -506,7 +548,12 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 		}
 
 	case *promParser.SubqueryExpr:
-		src = append(src, walkNode(expr, n.Expr)...)
+		for _, s := range walkNode(expr, n.Expr) {
+			if n.RangeExpr != nil || n.StepExpr != nil || n.OriginalOffsetExpr != nil {
+				s.requireFeature(FeatureDurationExpr)
+			}
+			src = append(src, s)
+		}
 
 	case *promParser.NumberLiteral:
 		var s Source
@@ -545,6 +592,17 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 		s.Labels = map[string]LabelTransform{}
 		s.Type = SelectorSource
 		s.Returns = promParser.ValueTypeVector
+		switch {
+		case n.Anchored:
+			s.RangeSelectorMode = RangeSelectorAnchored
+			s.requireFeature(FeatureExtendedRangeSelectors)
+		case n.Smoothed:
+			s.RangeSelectorMode = RangeSelectorSmoothed
+			s.requireFeature(FeatureExtendedRangeSelectors)
+		}
+		if n.OriginalOffsetExpr != nil {
+			s.requireFeature(FeatureDurationExpr)
+		}
 		s.Operations = append(s.Operations, Operation{
 			Operation: "",
 			Node:      n,
@@ -618,6 +676,8 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 		args = append(args, n.Param.String())
 	}
 
+	isExperimental := n.Op.IsExperimentalAggregator()
+
 	switch n.Op {
 	case promParser.COUNT_VALUES:
 		for _, s = range parseAggregation(expr, n) {
@@ -660,19 +720,11 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 			if n.Without || !slices.Contains(n.Grouping, model.MetricNameLabel) {
 				s.excludeLabel("Aggregation removes metric name.", n.PosRange, model.MetricNameLabel)
 			}
+			if isExperimental {
+				s.requireFeature(FeatureExperimentalFunctions)
+			}
 			src = append(src, s)
 		}
-		/*
-			TODO these are experimental and promParser.EnableExperimentalFunctions must be set to true to enable parsing of these.
-				case promParser.LIMITK:
-					s = walkNode(expr, n.Expr)
-					s.Type = AggregateSource
-					s.Operation = "limitk"
-				case promParser.LIMIT_RATIO:
-					s = walkNode(expr, n.Expr)
-					s.Type = AggregateSource
-					s.Operation = "limit_ratio"
-		*/
 	}
 	return src
 }
@@ -740,8 +792,13 @@ func parseAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 }
 
 func parsePromQLFunc(s Source, expr string, n *promParser.Call) Source {
+	if n.Func.Experimental {
+		s.requireFeature(FeatureExperimentalFunctions)
+	}
 	switch n.Func.Name {
-	case "abs", "sgn", "acos", "acosh", "asin", "asinh", "atan", "atanh", "cos", "cosh", "sin", "sinh", "tan", "tanh":
+	case "abs", "sgn",
+		"acos", "acosh", "asin", "asinh", "atan", "atanh",
+		"cos", "cosh", "sin", "sinh", "tan", "tanh":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
 		vs, _ := MostOuterOperation[*promParser.VectorSelector](s)
@@ -804,7 +861,18 @@ If you're hoping to get instance specific labels this way and alert when some ta
 			names...,
 		)
 
-	case "avg_over_time", "count_over_time", "last_over_time", "max_over_time", "min_over_time", "present_over_time", "quantile_over_time", "stddev_over_time", "stdvar_over_time", "sum_over_time":
+	case "avg_over_time",
+		"count_over_time",
+		"first_over_time",
+		"last_over_time",
+		"mad_over_time",
+		"max_over_time",
+		"min_over_time",
+		"present_over_time",
+		"quantile_over_time",
+		"stddev_over_time",
+		"stdvar_over_time",
+		"sum_over_time":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
 		vs, _ := MostOuterOperation[*promParser.VectorSelector](s)
@@ -856,7 +924,14 @@ If you're hoping to get instance specific labels this way and alert when some ta
 			labelsFromSelectors(guaranteedLabelsMatches, vs)...,
 		)
 
-	case "histogram_avg", "histogram_count", "histogram_sum", "histogram_stddev", "histogram_stdvar", "histogram_fraction", "histogram_quantile":
+	case "histogram_avg",
+		"histogram_count",
+		"histogram_fraction",
+		"histogram_quantile",
+		"histogram_quantiles",
+		"histogram_stddev",
+		"histogram_stdvar",
+		"histogram_sum":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
 		vs, _ := MostOuterOperation[*promParser.VectorSelector](s)
@@ -866,7 +941,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 			labelsFromSelectors(guaranteedLabelsMatches, vs)...,
 		)
 
-	case "holt_winters", "predict_linear":
+	case "double_exponential_smoothing", "holt_winters", "predict_linear":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
 		vs, _ := MostOuterOperation[*promParser.VectorSelector](s)
@@ -924,7 +999,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 			nil,
 		)
 
-	case "sort", "sort_desc":
+	case "sort", "sort_desc", "sort_by_label", "sort_by_label_desc":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
 
@@ -940,8 +1015,23 @@ If you're hoping to get instance specific labels this way and alert when some ta
 			nil,
 		)
 
-	case "timestamp":
+	case "timestamp",
+		"ts_of_first_over_time",
+		"ts_of_last_over_time",
+		"ts_of_max_over_time",
+		"ts_of_min_over_time":
 		// No change to labels.
+		s.Returns = promParser.ValueTypeVector
+		vs, _ := MostOuterOperation[*promParser.VectorSelector](s)
+		s.guaranteeLabel(
+			"Query will only return series where these labels are present.",
+			n.PosRange,
+			labelsFromSelectors(guaranteedLabelsMatches, vs)...,
+		)
+
+	case "info":
+		// info() joins labels from an info-series onto the input vector.
+		// The joined labels are dynamic so we treat this as no label change.
 		s.Returns = promParser.ValueTypeVector
 		vs, _ := MostOuterOperation[*promParser.VectorSelector](s)
 		s.guaranteeLabel(
@@ -1026,6 +1116,23 @@ func parseCall(expr string, n *promParser.Call) (src []Source) {
 	}
 
 	return src
+}
+
+func fillFromMatching(vm *promParser.VectorMatching) *Fill {
+	if vm == nil {
+		return nil
+	}
+	if vm.FillValues.LHS == nil && vm.FillValues.RHS == nil {
+		return nil
+	}
+	var f Fill
+	if vm.FillValues.LHS != nil {
+		f.LHS = *vm.FillValues.LHS
+	}
+	if vm.FillValues.RHS != nil {
+		f.RHS = *vm.FillValues.RHS
+	}
+	return &f
 }
 
 func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
@@ -1119,14 +1226,19 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 						Fragment: p,
 					}
 				}
+				fill := fillFromMatching(n.VectorMatching)
 				ls.Joins = append(ls.Joins, Join{
 					Src:            rs,
+					Fill:           fill,
 					Op:             n.Op,
 					Depth:          0,
 					MatchingLabels: n.VectorMatching.MatchingLabels,
 					AddedLabels:    nil,
 					IsOn:           n.VectorMatching.On,
 				})
+				if fill != nil {
+					ls.requireFeature(FeatureBinopFillModifiers)
+				}
 			}
 			ls.DeadLabels = append(ls.DeadLabels, ls.checkJoinedLabels(expr, n, ls)...)
 			ls.excludeLabel("Binary operation between two vectors removes metric names.", pos, model.MetricNameLabel)
@@ -1184,14 +1296,19 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 						Fragment: p,
 					}
 				}
+				fill := fillFromMatching(n.VectorMatching)
 				rs.Joins = append(rs.Joins, Join{
 					Src:            ls,
+					Fill:           fill,
 					Op:             n.Op,
 					Depth:          0,
 					MatchingLabels: n.VectorMatching.MatchingLabels,
 					AddedLabels:    n.VectorMatching.Include,
 					IsOn:           n.VectorMatching.On,
 				})
+				if fill != nil {
+					rs.requireFeature(FeatureBinopFillModifiers)
+				}
 			}
 			rs.excludeLabel("Binary operation between two vectors removes metric names.", pos, model.MetricNameLabel)
 			rs.IsConditional, rs.ReturnInfo.IsReturnBool = checkConditions(rs, n.Op, n.ReturnBool)
@@ -1245,14 +1362,19 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 						Fragment: p,
 					}
 				}
+				fill := fillFromMatching(n.VectorMatching)
 				ls.Joins = append(ls.Joins, Join{
 					Src:            rs,
+					Fill:           fill,
 					Op:             n.Op,
 					Depth:          0,
 					MatchingLabels: n.VectorMatching.MatchingLabels,
 					AddedLabels:    n.VectorMatching.Include,
 					IsOn:           n.VectorMatching.On,
 				})
+				if fill != nil {
+					ls.requireFeature(FeatureBinopFillModifiers)
+				}
 			}
 			ls.excludeLabel("Binary operation between two vectors removes metric names.", pos, model.MetricNameLabel)
 			ls.IsConditional, ls.ReturnInfo.IsReturnBool = checkConditions(ls, n.Op, n.ReturnBool)
@@ -1336,14 +1458,19 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 						IsOn:           n.VectorMatching.On,
 					})
 				case n.Op != promParser.LOR:
+					fill := fillFromMatching(n.VectorMatching)
 					ls.Joins = append(ls.Joins, Join{
 						Src:            rs,
+						Fill:           fill,
 						Op:             n.Op,
 						Depth:          0,
 						MatchingLabels: n.VectorMatching.MatchingLabels,
 						AddedLabels:    nil,
 						IsOn:           n.VectorMatching.On,
 					})
+					if fill != nil {
+						ls.requireFeature(FeatureBinopFillModifiers)
+					}
 				}
 				ls.DeadLabels = append(ls.DeadLabels, rs.checkJoinedLabels(expr, n, ls)...)
 			}

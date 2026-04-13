@@ -14,24 +14,21 @@ import (
 )
 
 func isUnsupportedError(err error) bool {
-	var e1 APIError
-	if ok := errors.As(err, &e1); ok {
+	if e1, ok := errors.AsType[APIError](err); ok {
 		return e1.ErrorType == ErrAPIUnsupported
 	}
 	return false
 }
 
 func IsUnavailableError(err error) bool {
-	var e1 APIError
-	if ok := errors.As(err, &e1); ok {
+	if e1, ok := errors.AsType[APIError](err); ok {
 		return e1.ErrorType == v1.ErrServer
 	}
 	return true
 }
 
 func IsQueryTooExpensive(err error) bool {
-	var e1 APIError
-	if ok := errors.As(err, &e1); ok {
+	if e1, ok := errors.AsType[APIError](err); ok {
 		if e1.ErrorType != v1.ErrExec {
 			return false
 		}
@@ -96,13 +93,11 @@ func decodeError(err error) string {
 		return errConnRefused
 	}
 
-	var neterr net.Error
-	if ok := errors.As(err, &neterr); ok && neterr.Timeout() {
+	if neterr, ok := errors.AsType[net.Error](err); ok && neterr.Timeout() {
 		return errConnTimeout
 	}
 
-	var e1 APIError
-	if ok := errors.As(err, &e1); ok {
+	if e1, ok := errors.AsType[APIError](err); ok {
 		return string(e1.ErrorType) + ": " + e1.Err
 	}
 

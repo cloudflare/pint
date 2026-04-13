@@ -555,8 +555,8 @@ func (c CostCheck) metricName(ops source.Operations) string {
 }
 
 func (c CostCheck) selectorLabels(ops source.Operations) (lms []*labels.Matcher) {
-	for i := len(ops) - 1; i >= 0; i-- {
-		if vs, ok := ops[i].Node.(*promParser.VectorSelector); ok {
+	for _, op := range slices.Backward(ops) {
+		if vs, ok := op.Node.(*promParser.VectorSelector); ok {
 			lms = vs.LabelMatchers
 			break
 		}

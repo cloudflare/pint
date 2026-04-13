@@ -1,0 +1,30 @@
+exec pint parse 'bar + fill_left(0) baz'
+cmp stdout stdout.txt
+! stderr .
+
+-- stdout.txt --
+++ node: bar + fill_left (0) baz
+  BinaryExpr:
+    * Type: vector
+    * Op: +
+    * LHS: bar
+    * RHS: baz
+    * VectorMatching:
+      * Card: one-to-one
+      * MatchingLabels: []
+      * On: false
+      * Include: []
+      * FillLHS: 0
+    * ReturnBool: false
+      ++ node: bar
+        VectorSelector:
+          * Type: vector
+          * Name: bar
+          * Offset: 0s
+          * LabelMatchers: [__name__="bar"]
+      ++ node: baz
+        VectorSelector:
+          * Type: vector
+          * Name: baz
+          * Offset: 0s
+          * LabelMatchers: [__name__="baz"]

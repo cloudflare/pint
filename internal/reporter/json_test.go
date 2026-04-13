@@ -7,7 +7,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -42,7 +41,7 @@ func TestJSONReporter(t *testing.T) {
 		buf := &bytes.Buffer{}
 		jr := reporter.NewJSONReporter(buf)
 
-		p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
+		p := parser.NewParser(parser.DefaultOptions)
 		mockFile := p.Parse(strings.NewReader(`
 - record: test
   expr: up == 0
@@ -90,7 +89,7 @@ func TestJSONReporter(t *testing.T) {
 		buf := &bytes.Buffer{}
 		jr := reporter.NewJSONReporter(buf)
 
-		p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
+		p := parser.NewParser(parser.DefaultOptions)
 		mockFile := p.Parse(strings.NewReader(`
 - record: test1
   expr: up == 0
@@ -143,7 +142,7 @@ func TestJSONReporter(t *testing.T) {
 		buf := &bytes.Buffer{}
 		jr := reporter.NewJSONReporter(buf)
 
-		p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
+		p := parser.NewParser(parser.DefaultOptions)
 		mockFile := p.Parse(strings.NewReader(`
 - record: test
   expr: up

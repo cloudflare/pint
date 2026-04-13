@@ -10,7 +10,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/diags"
@@ -19,7 +18,7 @@ import (
 
 func TestReadRules(t *testing.T) {
 	mustParse := func(offset int, s string) parser.Rule {
-		p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
+		p := parser.NewParser(parser.DefaultOptions)
 		file := p.Parse(strings.NewReader(strings.Repeat("\n", offset) + s))
 		if file.Error.Err != nil {
 			panic(fmt.Sprintf("failed to parse rule:\n---\n%s\n---\nerror: %s", s, file.Error))
@@ -331,7 +330,7 @@ groups:
 			fmt.Sprintf("rPath=%s sPath=%s strict=%v title=%s", tc.reportedPath, tc.sourcePath, tc.isStrict, tc.title),
 			func(t *testing.T) {
 				r := tc.sourceFunc(t)
-				p := parser.NewParser(tc.isStrict, parser.PrometheusSchema, model.UTF8Validation)
+				p := parser.NewParser(parser.DefaultOptions.WithStrict(tc.isStrict))
 				entries := readRules(tc.reportedPath, tc.sourcePath, r, p, nil)
 				expected, err := json.MarshalIndent(tc.entries, "", "  ")
 				require.NoError(t, err, "json(expected)")

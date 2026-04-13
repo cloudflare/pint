@@ -10,18 +10,15 @@ import (
 	"path/filepath"
 	"regexp"
 
-	"github.com/prometheus/common/model"
-
 	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
-func NewGlobFinder(patterns []string, filter git.PathFilter, schema parser.Schema, names model.ValidationScheme, allowedOwners []*regexp.Regexp) GlobFinder {
+func NewGlobFinder(patterns []string, filter git.PathFilter, opts parser.Options, allowedOwners []*regexp.Regexp) GlobFinder {
 	return GlobFinder{
 		patterns:      patterns,
 		filter:        filter,
-		schema:        schema,
-		names:         names,
+		opts:          opts,
 		allowedOwners: allowedOwners,
 	}
 }
@@ -30,8 +27,7 @@ type GlobFinder struct {
 	filter        git.PathFilter
 	patterns      []string
 	allowedOwners []*regexp.Regexp
-	schema        parser.Schema
-	names         model.ValidationScheme
+	opts          parser.Options
 }
 
 func (f GlobFinder) Find() (entries []*Entry, err error) {
@@ -77,7 +73,7 @@ func (f GlobFinder) Find() (entries []*Entry, err error) {
 		if err != nil {
 			return nil, err
 		}
-		p := parser.NewParser(!f.filter.IsRelaxed(fp.target), f.schema, f.names)
+		p := parser.NewParser(f.opts.WithStrict(!f.filter.IsRelaxed(fp.target)))
 		el := readRules(fp.target, fp.path, fd, p, f.allowedOwners)
 		fd.Close()
 		for _, e := range el {

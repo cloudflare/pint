@@ -10,6 +10,15 @@ import (
 	"github.com/cloudflare/pint/internal/parser/source"
 )
 
+// PromQLParser is a shared, goroutine-safe PromQL parser with all feature flags enabled.
+// Each method creates its own internal parser state, so it is safe to call concurrently.
+var PromQLParser = promParser.NewParser(promParser.Options{
+	EnableExperimentalFunctions:  true,
+	ExperimentalDurationExpr:     true,
+	EnableExtendedRangeSelectors: true,
+	EnableBinopFillModifiers:     true,
+})
+
 type PromQLExpr struct {
 	syntaxError error
 	Value       *YamlNode
@@ -127,10 +136,9 @@ func WalkUpParent[T promParser.Node](node *PromQLNode) (nodes []*PromQLNode) {
 }
 
 func DecodeExpr(expr string) (*PromQLNode, error) {
-	node, err := promParser.ParseExpr(expr)
+	node, err := PromQLParser.ParseExpr(expr)
 	if err != nil {
-		var errorList promParser.ParseErrors
-		if errors.As(err, &errorList) {
+		if errorList, ok := errors.AsType[promParser.ParseErrors](err); ok {
 			// Find the error pointing at the shortest query fragment.
 			slices.SortFunc(errorList, func(a, b promParser.ParseErr) int {
 				ar := a.PositionRange.End - a.PositionRange.Start

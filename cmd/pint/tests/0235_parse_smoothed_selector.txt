@@ -1,0 +1,12 @@
+exec pint parse 'bar smoothed'
+cmp stdout stdout.txt
+! stderr .
+
+-- stdout.txt --
+++ node: bar smoothed
+  VectorSelector:
+    * Type: vector
+    * Name: bar
+    * Offset: 0s
+    * LabelMatchers: [__name__="bar"]
+    * Smoothed: true

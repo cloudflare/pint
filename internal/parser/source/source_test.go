@@ -477,6 +477,54 @@ func TestLabelsSourceCallCoverage(t *testing.T) {
 	}
 }
 
+// Verifies that experimental functions can be parsed and that
+// LabelsSource produces output.
+func TestLabelsSourceCallCoverageExperimental(t *testing.T) {
+	// info() second arg must be a bare label selector, not a named metric.
+	overrides := map[string]string{
+		"info": `info(http_requests_total, {job="foo"})`,
+	}
+
+	for name, def := range promParser.Functions {
+		t.Run(name, func(t *testing.T) {
+			if !def.Experimental {
+				t.SkipNow()
+			}
+
+			var b strings.Builder
+			if override, ok := overrides[name]; ok {
+				b.WriteString(override)
+			} else {
+				b.WriteString(name)
+				b.WriteRune('(')
+				for i, at := range def.ArgTypes {
+					if i > 0 {
+						b.WriteString(", ")
+					}
+					switch at {
+					case promParser.ValueTypeNone:
+					case promParser.ValueTypeScalar:
+						b.WriteRune('1')
+					case promParser.ValueTypeVector:
+						b.WriteString("http_requests_total")
+					case promParser.ValueTypeMatrix:
+						b.WriteString("http_requests_total[2m]")
+					case promParser.ValueTypeString:
+						b.WriteString(`"foo"`)
+					}
+				}
+				b.WriteRune(')')
+			}
+
+			n, err := parser.DecodeExpr(b.String())
+			require.NoError(t, err, "unexpected parse error for: %s", b.String())
+
+			output := source.LabelsSource(b.String(), n.Expr)
+			require.NotEmpty(t, output, "LabelsSource returned no sources for: %s", b.String())
+		})
+	}
+}
+
 func TestLabelsSourceCallCoverageFail(t *testing.T) {
 	n := &parser.PromQLNode{
 		Expr: &promParser.Call{
@@ -512,6 +560,148 @@ func TestFindFuncNamePositionNoMatch(t *testing.T) {
 	within := posrange.PositionRange{Start: 0, End: 8}
 	pos := source.FindFuncNamePosition("sum(foo)", within, "rate")
 	require.Equal(t, within, pos)
+}
+
+// Verifies that RangeSelectorMode.MarshalYAML returns "default" for the zero value.
+func TestRangeSelectorModeDefaultMarshalYAML(t *testing.T) {
+	var rsm source.RangeSelectorMode
+	val, err := rsm.MarshalYAML()
+	require.NoError(t, err)
+	require.Equal(t, "default", val)
+}
+
+// Verifies that LabelsSource correctly processes expressions that require
+// experimental parser features.
+func TestLabelsSourceWithFeatures(t *testing.T) {
+	type Snapshot struct {
+		Expr   string
+		Output []source.Source
+	}
+
+	_, file, _, ok := runtime.Caller(0)
+	require.True(t, ok, "can't get caller function")
+	file = strings.TrimSuffix(filepath.Base(file), ".go")
+
+	type testCaseT struct {
+		description string
+		expr        string
+	}
+
+	testCases := []testCaseT{
+		// Experimental function: mad_over_time.
+		{
+			description: "mad_over_time",
+			expr:        `mad_over_time(foo[5m])`,
+		},
+		// Experimental aggregator: limitk.
+		{
+			description: "limitk",
+			expr:        `limitk(5, foo)`,
+		},
+		// Experimental function: sort_by_label.
+		{
+			description: "sort_by_label",
+			expr:        `sort_by_label(foo, "job")`,
+		},
+		// Duration expression in matrix selector.
+		{
+			description: "duration expression in matrix selector",
+			expr:        `foo[11s+10s]`,
+		},
+		// Duration expression inside rate().
+		{
+			description: "duration expression inside rate",
+			expr:        `rate(foo[5m+1m])`,
+		},
+		// Anchored modifier on vector selector.
+		{
+			description: "anchored vector selector",
+			expr:        `foo anchored`,
+		},
+		// Smoothed modifier on matrix selector.
+		{
+			description: "smoothed matrix selector inside rate",
+			expr:        `rate(foo[5m] smoothed)`,
+		},
+		// Fill modifier on binop.
+		{
+			description: "binop fill modifier",
+			expr:        `foo + on(job) fill(0) bar`,
+		},
+		// fill_left modifier on binop.
+		{
+			description: "binop fill_left modifier",
+			expr:        `foo + on(job) fill_left(0) bar`,
+		},
+		// Experimental function with fill modifier.
+		{
+			description: "experimental function with fill modifier",
+			expr:        `mad_over_time(foo[5m]) + on(job) fill(0) bar`,
+		},
+		// Experimental function with smoothed modifier.
+		{
+			description: "experimental function with smoothed modifier",
+			expr:        `mad_over_time(foo[5m] smoothed)`,
+		},
+		// Duration expression with smoothed modifier.
+		{
+			description: "duration expression with smoothed modifier",
+			expr:        `rate(foo[5m+1m] smoothed)`,
+		},
+		// fill_left modifier on binop.
+		{
+			description: "binop fill_left modifier only",
+			expr:        `foo + on(job) fill_left(0) bar`,
+		},
+		// fill_right modifier on binop.
+		{
+			description: "binop fill_right modifier only",
+			expr:        `foo + on(job) fill_right(0) bar`,
+		},
+		// Duration expression in subquery range.
+		{
+			description: "duration expression in subquery range",
+			expr:        `max_over_time(rate(foo[5m])[1h+10m:5m])`,
+		},
+		// Duration expression in subquery step.
+		{
+			description: "duration expression in subquery step",
+			expr:        `max_over_time(foo[1h:5m+1m])`,
+		},
+		// Duration expression in both subquery range and step.
+		{
+			description: "duration expression in subquery range and step",
+			expr:        `max_over_time(rate(foo[5m])[1h+10m:5m+1m])`,
+		},
+		// Duration expression in vector selector offset.
+		{
+			description: "duration expression in vector offset",
+			expr:        `foo offset 5m+1m`,
+		},
+		// All four features combined in a single query.
+		{
+			description: "all four features combined",
+			expr:        `mad_over_time(foo[5m+1m] smoothed) + on(job) fill(0) bar`,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.description, func(t *testing.T) {
+			n, err := parser.DecodeExpr(tc.expr)
+			require.NoError(t, err, "unexpected parse error for: %s", tc.expr)
+
+			output := source.LabelsSource(tc.expr, n.Expr)
+			require.NotEmpty(t, output, "LabelsSource returned no sources for: %s", tc.expr)
+
+			snap := Snapshot{
+				Expr:   tc.expr,
+				Output: output,
+			}
+			d, err := yaml.Marshal(snap)
+			require.NoError(t, err, "failed to YAML encode snapshots")
+			snaps.WithConfig(snaps.Dir("."), snaps.Filename(file)).MatchSnapshot(t, string(d))
+		})
+	}
 }
 
 func BenchmarkLabelsSource(b *testing.B) {

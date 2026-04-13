@@ -10,13 +10,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/prometheus/common/model"
-
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/config"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/git"
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/reporter"
 
 	"github.com/urfave/cli/v3"
@@ -103,16 +100,14 @@ func actionCI(ctx context.Context, c *cli.Command) error {
 		config.MustCompileRegexes(meta.cfg.Parser.Relaxed...),
 	)
 
-	schema := parseSchema(meta.cfg.Parser.Schema)
-	names := parseNames(meta.cfg.Parser.Names)
 	allowedOwners := meta.cfg.Owners.CompileAllowed()
 	var entries []*discovery.Entry
-	entries, err = discovery.NewGlobFinder([]string{"*"}, filter, schema, names, allowedOwners).Find()
+	entries, err = discovery.NewGlobFinder([]string{"*"}, filter, meta.cfg.Parser.Options(), allowedOwners).Find()
 	if err != nil {
 		return err
 	}
 
-	entries, err = discovery.NewGitBranchFinder(git.RunGit, filter, baseBranch, meta.cfg.CI.MaxCommits, schema, names, allowedOwners).Find(entries)
+	entries, err = discovery.NewGitBranchFinder(git.RunGit, filter, baseBranch, meta.cfg.CI.MaxCommits, meta.cfg.Parser.Options(), allowedOwners).Find(entries)
 	if err != nil {
 		return err
 	}
@@ -358,18 +353,4 @@ func detectGithubActions(ctx context.Context, gh *config.GitHub) *config.GitHub 
 		return nil
 	}
 	return gh
-}
-
-func parseSchema(s string) parser.Schema {
-	if s == config.SchemaThanos {
-		return parser.ThanosSchema
-	}
-	return parser.PrometheusSchema
-}
-
-func parseNames(s string) model.ValidationScheme {
-	if s == config.NamesLegacy {
-		return model.LegacyValidation
-	}
-	return model.UTF8Validation
 }

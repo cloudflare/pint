@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/config"
@@ -26,8 +25,7 @@ func BenchmarkGlobFinder(b *testing.B) {
 	finder := discovery.NewGlobFinder(
 		[]string{"bench/rules"},
 		git.NewPathFilter(nil, nil, nil),
-		parser.PrometheusSchema,
-		model.UTF8Validation,
+		parser.DefaultOptions,
 		nil,
 	)
 
@@ -71,8 +69,7 @@ func BenchmarkGitFinder(b *testing.B) {
 		git.NewPathFilter(nil, nil, nil),
 		"main",
 		50,
-		parser.PrometheusSchema,
-		model.UTF8Validation,
+		parser.DefaultOptions,
 		nil,
 	)
 
@@ -88,8 +85,7 @@ func BenchmarkCheckRules(b *testing.B) {
 	finder := discovery.NewGlobFinder(
 		[]string{"bench/rules"},
 		git.NewPathFilter(nil, nil, nil),
-		parser.PrometheusSchema,
-		model.UTF8Validation,
+		parser.DefaultOptions,
 		nil,
 	)
 	entries, err := finder.Find()
@@ -166,8 +162,7 @@ func BenchmarkRuleIsIdentical(b *testing.B) {
 	finder := discovery.NewGlobFinder(
 		[]string{"bench/rules"},
 		git.NewPathFilter(nil, nil, nil),
-		parser.PrometheusSchema,
-		model.UTF8Validation,
+		parser.DefaultOptions,
 		nil,
 	)
 	entries, err := finder.Find()
@@ -192,8 +187,7 @@ func BenchmarkGetChecksForEntry(b *testing.B) {
 	finder := discovery.NewGlobFinder(
 		[]string{"bench/rules"},
 		git.NewPathFilter(nil, nil, nil),
-		parser.PrometheusSchema,
-		model.UTF8Validation,
+		parser.DefaultOptions,
 		nil,
 	)
 	entries, err := finder.Find()

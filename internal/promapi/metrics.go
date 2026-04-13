@@ -38,13 +38,11 @@ func RegisterMetrics(reg *prometheus.Registry) {
 }
 
 func errReason(err error) string {
-	var neterr net.Error
-	if ok := errors.As(err, &neterr); ok && neterr.Timeout() {
+	if neterr, ok := errors.AsType[net.Error](err); ok && neterr.Timeout() {
 		return "connection/timeout"
 	}
 
-	var e1 APIError
-	if ok := errors.As(err, &e1); ok {
+	if e1, ok := errors.AsType[APIError](err); ok {
 		return "api/" + string(e1.ErrorType)
 	}
 

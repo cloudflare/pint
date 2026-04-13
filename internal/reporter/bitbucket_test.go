@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/neilotoole/slogt"
-	"github.com/prometheus/common/model"
 	"go.nhat.io/httpmock"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -36,7 +35,7 @@ func TestBitBucketReporter(t *testing.T) {
 		showDuplicates bool
 	}
 
-	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
+	p := parser.NewParser(parser.DefaultOptions)
 	mockFile := p.Parse(strings.NewReader(`
 - record: target is down
   expr: up == 0
@@ -155,8 +154,7 @@ func TestBitBucketReporter(t *testing.T) {
 					Once()
 			}),
 			errorHandler: func(err error) error {
-				var neterr net.Error
-				if ok := errors.As(errors.Unwrap(err), &neterr); ok && neterr.Timeout() {
+				if neterr, ok := errors.AsType[net.Error](errors.Unwrap(err)); ok && neterr.Timeout() {
 					return nil
 				}
 				return fmt.Errorf("Expected a timeout error, got %w", err)
@@ -188,8 +186,7 @@ func TestBitBucketReporter(t *testing.T) {
 					Once()
 			}),
 			errorHandler: func(err error) error {
-				var neterr net.Error
-				if ok := errors.As(errors.Unwrap(err), &neterr); ok && neterr.Timeout() {
+				if neterr, ok := errors.AsType[net.Error](errors.Unwrap(err)); ok && neterr.Timeout() {
 					return nil
 				}
 				return fmt.Errorf("Expected a timeout error, got %w", err)

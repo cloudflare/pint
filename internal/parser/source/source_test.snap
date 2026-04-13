@@ -390,7 +390,7 @@ output:
                 end: 31
             type: function
             fixedLabels: true
-          op: 57395
+          op: 57397
           depth: 0
           ison: false
         - matchinglabels: []
@@ -409,7 +409,7 @@ output:
                 start: 35
                 end: 38
             type: selector
-          op: 57395
+          op: 57397
           depth: 0
           ison: false
       position:
@@ -466,7 +466,7 @@ output:
                 end: 31
             type: function
             fixedLabels: true
-          op: 57395
+          op: 57397
           depth: 0
           ison: false
         - matchinglabels: []
@@ -485,7 +485,7 @@ output:
                 start: 35
                 end: 38
             type: selector
-          op: 57395
+          op: 57397
           depth: 0
           ison: false
       returnInfo:
@@ -1010,7 +1010,7 @@ output:
                 end: 11
             type: selector
             isConditional: true
-          op: 57389
+          op: 57391
           depth: 0
           ison: false
       position:
@@ -2331,7 +2331,7 @@ output:
                 start: 30
                 end: 33
             type: selector
-          op: 57395
+          op: 57397
           depth: 0
           ison: true
       usedLabels:
@@ -2390,7 +2390,7 @@ output:
                 start: 46
                 end: 49
             type: selector
-          op: 57395
+          op: 57397
           depth: 0
           ison: true
       usedLabels:
@@ -2461,7 +2461,7 @@ output:
                 start: 50
                 end: 84
             type: selector
-          op: 57395
+          op: 57397
           depth: 0
           ison: true
       usedLabels:
@@ -2532,7 +2532,7 @@ output:
                 start: 0
                 end: 30
             type: selector
-          op: 57395
+          op: 57397
           depth: 0
           ison: true
       usedLabels:
@@ -2744,7 +2744,7 @@ output:
                 start: 33
                 end: 36
             type: selector
-          op: 57389
+          op: 57391
           depth: 0
           ison: false
       usedLabels:
@@ -2796,7 +2796,7 @@ output:
                 start: 45
                 end: 48
             type: selector
-          op: 57389
+          op: 57391
           depth: 0
           ison: true
       usedLabels:
@@ -3268,7 +3268,7 @@ output:
                 start: 68
                 end: 78
             type: selector
-          op: 57395
+          op: 57397
           depth: 0
           ison: true
         - matchinglabels:
@@ -3308,7 +3308,7 @@ output:
             type: aggregation
             fixedLabels: true
             isConditional: true
-          op: 57389
+          op: 57391
           depth: 0
           ison: true
       usedLabels:
@@ -3645,7 +3645,7 @@ output:
                 start: 51
                 end: 72
             type: selector
-          op: 57389
+          op: 57391
           depth: 0
           ison: true
       usedLabels:
@@ -3801,7 +3801,7 @@ output:
                 end: 125
             type: aggregation
             fixedLabels: true
-          op: 57396
+          op: 57398
           depth: 0
           ison: false
       usedLabels:
@@ -4020,7 +4020,7 @@ output:
                 start: 0
                 end: 3
             type: selector
-          op: 57395
+          op: 57397
           depth: 0
           ison: true
       usedLabels:
@@ -4078,7 +4078,7 @@ output:
                 start: 0
                 end: 3
             type: selector
-          op: 57395
+          op: 57397
           depth: 0
           ison: true
       usedLabels:
@@ -4434,7 +4434,7 @@ output:
                 start: 51
                 end: 79
             type: selector
-          op: 57395
+          op: 57397
           depth: 0
           ison: false
       usedLabels:
@@ -4575,7 +4575,7 @@ output:
                 end: 288
             type: aggregation
             fixedLabels: true
-          op: 57391
+          op: 57393
           depth: 0
           ison: true
       position:
@@ -5448,7 +5448,7 @@ output:
                 end: 60
             type: selector
             isConditional: true
-          op: 57389
+          op: 57391
           depth: 0
           ison: false
         - matchinglabels: []
@@ -5478,7 +5478,7 @@ output:
                 end: 77
             type: aggregation
             fixedLabels: true
-          op: 57389
+          op: 57391
           depth: 0
           ison: false
         - matchinglabels: []
@@ -5493,7 +5493,7 @@ output:
                 end: 93
             type: selector
             isConditional: true
-          op: 57389
+          op: 57391
           depth: 0
           ison: false
       position:
@@ -5528,7 +5528,7 @@ output:
                 end: 60
             type: selector
             isConditional: true
-          op: 57389
+          op: 57391
           depth: 0
           ison: false
         - matchinglabels: []
@@ -5558,7 +5558,7 @@ output:
                 end: 77
             type: aggregation
             fixedLabels: true
-          op: 57389
+          op: 57391
           depth: 0
           ison: false
         - matchinglabels: []
@@ -5573,7 +5573,7 @@ output:
                 end: 93
             type: selector
             isConditional: true
-          op: 57389
+          op: 57391
           depth: 0
           ison: false
       returnInfo:
@@ -6370,7 +6370,7 @@ output:
                         start: 247
                         end: 303
                     type: selector
-                  op: 57395
+                  op: 57397
                   depth: 0
                   ison: true
             usedLabels:
@@ -6438,7 +6438,7 @@ output:
                 start: 18
                 end: 28
             type: selector
-          op: 57395
+          op: 57397
           depth: 0
           ison: true
       position:
@@ -6509,7 +6509,7 @@ output:
                 start: 42
                 end: 52
             type: selector
-          op: 57395
+          op: 57397
           depth: 0
           ison: true
       usedLabels:
@@ -6581,7 +6581,7 @@ output:
                 start: 0
                 end: 10
             type: selector
-          op: 57395
+          op: 57397
           depth: 0
           ison: true
       usedLabels:
@@ -6665,7 +6665,7 @@ output:
                 end: 40
             type: aggregation
             fixedLabels: true
-          op: 57395
+          op: 57397
           depth: 0
           ison: true
       usedLabels:
@@ -6779,7 +6779,7 @@ output:
                 end: 56
             type: aggregation
             fixedLabels: true
-          op: 57395
+          op: 57397
           depth: 0
           ison: true
       usedLabels:
@@ -6892,7 +6892,7 @@ output:
                 end: 14
             type: aggregation
             fixedLabels: true
-          op: 57395
+          op: 57397
           depth: 0
           ison: true
       usedLabels:
@@ -6983,7 +6983,7 @@ output:
                 start: 46
                 end: 56
             type: aggregation
-          op: 57395
+          op: 57397
           depth: 0
           ison: true
       usedLabels:
@@ -7074,7 +7074,7 @@ output:
                 start: 4
                 end: 14
             type: aggregation
-          op: 57395
+          op: 57397
           depth: 0
           ison: true
       usedLabels:
@@ -7174,7 +7174,7 @@ output:
                 end: 313
             type: function
             fixedLabels: true
-          op: 57389
+          op: 57391
           depth: 1
           ison: true
         - matchinglabels:
@@ -7206,7 +7206,7 @@ output:
                 start: 365
                 end: 405
             type: function
-          op: 57395
+          op: 57397
           depth: 0
           ison: true
       unless:
@@ -7314,7 +7314,7 @@ output:
                 start: 31
                 end: 41
             type: selector
-          op: 57395
+          op: 57397
           depth: 0
           ison: true
       position:
@@ -7505,7 +7505,7 @@ output:
                 end: 241
             type: function
             fixedLabels: true
-          op: 57395
+          op: 57397
           depth: 0
           ison: true
       usedLabels:
@@ -7561,7 +7561,7 @@ output:
             type: function
             fixedLabels: true
             isConditional: true
-          op: 57389
+          op: 57391
           depth: 0
           ison: false
       returnInfo:
@@ -7705,7 +7705,7 @@ output:
                 start: 94
                 end: 113
             type: selector
-          op: 57395
+          op: 57397
           depth: 1
           ison: true
       usedLabels:
@@ -7817,7 +7817,7 @@ output:
             type: function
             fixedLabels: true
             isConditional: true
-          op: 57389
+          op: 57391
           depth: 0
           ison: false
       returnInfo:
@@ -8388,7 +8388,7 @@ output:
                 end: 382
             type: selector
             isConditional: true
-          op: 57389
+          op: 57391
           depth: 0
           ison: true
         - matchinglabels:
@@ -8428,7 +8428,7 @@ output:
             type: function
             fixedLabels: true
             isConditional: true
-          op: 57389
+          op: 57391
           depth: 0
           ison: true
         - matchinglabels:
@@ -8444,7 +8444,7 @@ output:
                 end: 459
             type: selector
             isConditional: true
-          op: 57389
+          op: 57391
           depth: 0
           ison: true
         - matchinglabels:
@@ -8484,7 +8484,7 @@ output:
             type: function
             fixedLabels: true
             isConditional: true
-          op: 57389
+          op: 57391
           depth: 0
           ison: true
       usedLabels:
@@ -8964,7 +8964,7 @@ output:
                 end: 382
             type: selector
             isConditional: true
-          op: 57389
+          op: 57391
           depth: 0
           ison: true
         - matchinglabels:
@@ -9004,7 +9004,7 @@ output:
             type: function
             fixedLabels: true
             isConditional: true
-          op: 57389
+          op: 57391
           depth: 0
           ison: true
         - matchinglabels:
@@ -9020,7 +9020,7 @@ output:
                 end: 459
             type: selector
             isConditional: true
-          op: 57389
+          op: 57391
           depth: 0
           ison: true
         - matchinglabels:
@@ -9060,7 +9060,7 @@ output:
             type: function
             fixedLabels: true
             isConditional: true
-          op: 57389
+          op: 57391
           depth: 0
           ison: true
       usedLabels:
@@ -9230,7 +9230,7 @@ output:
             type: aggregation
             fixedLabels: true
             isConditional: true
-          op: 57395
+          op: 57397
           depth: 1
           ison: true
       usedLabels:
@@ -9274,7 +9274,7 @@ output:
                 start: 31
                 end: 47
             type: selector
-          op: 57395
+          op: 57397
           depth: 1
           ison: false
       position:
@@ -9314,7 +9314,7 @@ output:
                 start: 34
                 end: 50
             type: selector
-          op: 57395
+          op: 57397
           depth: 1
           ison: false
       position:
@@ -9369,7 +9369,7 @@ output:
                 start: 6
                 end: 9
             type: selector
-          op: 57395
+          op: 57397
           depth: 0
           ison: false
       position:
@@ -9587,7 +9587,7 @@ output:
                 end: 93
             type: selector
             isConditional: true
-          op: 57389
+          op: 57391
           depth: 1
           ison: true
       usedLabels:
@@ -9686,7 +9686,7 @@ output:
                 end: 91
             type: selector
             isConditional: true
-          op: 57395
+          op: 57397
           depth: 1
           ison: true
       usedLabels:
@@ -10009,7 +10009,7 @@ output:
                 end: 30
             type: aggregation
             fixedLabels: true
-          op: 57395
+          op: 57397
           depth: 0
           ison: true
       usedLabels:
@@ -10238,7 +10238,7 @@ output:
                         start: 229
                         end: 259
                     type: selector
-                  op: 57395
+                  op: 57397
                   depth: 0
                   ison: true
                 - matchinglabels:
@@ -10261,7 +10261,7 @@ output:
                         start: 298
                         end: 330
                     type: selector
-                  op: 57395
+                  op: 57397
                   depth: 0
                   ison: true
             usedLabels:
@@ -10272,7 +10272,7 @@ output:
                 end: 159
             type: selector
             isConditional: true
-          op: 57389
+          op: 57391
           depth: 1
           ison: true
       usedLabels:
@@ -10367,7 +10367,7 @@ output:
                 start: 76
                 end: 106
             type: selector
-          op: 57395
+          op: 57397
           depth: 0
           ison: true
         - matchinglabels:
@@ -10390,7 +10390,7 @@ output:
                 start: 143
                 end: 175
             type: selector
-          op: 57395
+          op: 57397
           depth: 0
           ison: true
       usedLabels:
@@ -10499,7 +10499,7 @@ output:
                         start: 128
                         end: 160
                     type: selector
-                  op: 57395
+                  op: 57397
                   depth: 0
                   ison: true
             usedLabels:
@@ -10508,7 +10508,7 @@ output:
                 start: 61
                 end: 91
             type: selector
-          op: 57389
+          op: 57391
           depth: 0
           ison: true
       usedLabels:
@@ -10685,7 +10685,7 @@ output:
                         start: 1
                         end: 31
                     type: selector
-                  op: 57395
+                  op: 57397
                   depth: 0
                   ison: true
             usedLabels:
@@ -10694,7 +10694,7 @@ output:
                 start: 92
                 end: 124
             type: selector
-          op: 57395
+          op: 57397
           depth: 0
           ison: true
         - matchinglabels:
@@ -10722,7 +10722,7 @@ output:
                 start: 210
                 end: 250
             type: selector
-          op: 57395
+          op: 57397
           depth: 0
           ison: true
       usedLabels:
@@ -10930,7 +10930,7 @@ output:
                                 start: 1
                                 end: 31
                             type: selector
-                          op: 57395
+                          op: 57397
                           depth: 0
                           ison: true
                     usedLabels:
@@ -10939,7 +10939,7 @@ output:
                         start: 92
                         end: 124
                     type: selector
-                  op: 57395
+                  op: 57397
                   depth: 0
                   ison: true
             usedLabels:
@@ -10949,7 +10949,7 @@ output:
                 end: 185
             type: selector
             isConditional: true
-          op: 57395
+          op: 57397
           depth: 0
           ison: true
       usedLabels:
@@ -11042,7 +11042,7 @@ output:
                 start: 1
                 end: 33
             type: selector
-          op: 57395
+          op: 57397
           depth: 0
           ison: true
         - matchinglabels:
@@ -11068,7 +11068,7 @@ output:
                 start: 162
                 end: 192
             type: selector
-          op: 57395
+          op: 57397
           depth: 0
           ison: true
       usedLabels:
@@ -11217,7 +11217,7 @@ output:
                         start: 1
                         end: 14
                     type: selector
-                  op: 57395
+                  op: 57397
                   depth: 0
                   ison: true
             usedLabels:
@@ -11226,7 +11226,7 @@ output:
                 start: 75
                 end: 90
             type: selector
-          op: 57395
+          op: 57397
           depth: 0
           ison: true
       usedLabels:
@@ -11314,7 +11314,7 @@ output:
                 start: 81
                 end: 96
             type: selector
-          op: 57395
+          op: 57397
           depth: 0
           ison: true
         - matchinglabels:
@@ -11333,7 +11333,7 @@ output:
                 start: 1
                 end: 14
             type: selector
-          op: 57395
+          op: 57397
           depth: 0
           ison: true
       usedLabels:
@@ -11406,7 +11406,7 @@ output:
                 start: 81
                 end: 96
             type: selector
-          op: 57395
+          op: 57397
           depth: 0
           ison: true
       usedLabels:
@@ -11626,7 +11626,7 @@ output:
                 end: 515
             type: aggregation
             fixedLabels: true
-          op: 57395
+          op: 57397
           depth: 1
           ison: true
       usedLabels:
@@ -11906,5 +11906,610 @@ output:
       type: aggregation
       fixedLabels: true
       isConditional: true
+
+---
+
+[TestLabelsSourceWithFeatures/all_four_features_combined - 1]
+expr: mad_over_time(foo[5m+1m] smoothed) + on(job) fill(0) bar
+output:
+    - labels:
+        "":
+            reason: Query is using one-to-one vector matching with `on(job)`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 37
+                end: 44
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 56
+        job:
+            reason: Query is using one-to-one vector matching with `on(job)`, only labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 40
+                end: 43
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo smoothed'
+          op: ""
+        - node: '[*parser.Call] mad_over_time(foo[5m + 1m] smoothed)'
+          op: mad_over_time
+      joins:
+        - fill:
+            lhs: 0
+            rhs: 0
+          matchinglabels:
+            - job
+          addedlabels: []
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+            position:
+                start: 53
+                end: 56
+            type: selector
+          op: 57383
+          depth: 0
+          ison: true
+      needsFeatures:
+        - promql-extended-range-selectors
+        - promql-duration-expr
+        - promql-experimental-functions
+        - promql-binop-fill-modifiers
+      usedLabels:
+        - job
+      position:
+        start: 14
+        end: 24
+      type: function
+      fixedLabels: true
+      rangeSelectorMode: smoothed
+
+---
+
+[TestLabelsSourceWithFeatures/anchored_vector_selector - 1]
+expr: foo anchored
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo anchored'
+          op: ""
+      needsFeatures:
+        - promql-extended-range-selectors
+      position:
+        start: 0
+        end: 3
+      type: selector
+      rangeSelectorMode: anchored
+
+---
+
+[TestLabelsSourceWithFeatures/binop_fill_left_modifier - 1]
+expr: foo + on(job) fill_left(0) bar
+output:
+    - labels:
+        "":
+            reason: Query is using one-to-one vector matching with `on(job)`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 6
+                end: 13
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 30
+        job:
+            reason: Query is using one-to-one vector matching with `on(job)`, only labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 9
+                end: 12
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+      joins:
+        - fill:
+            lhs: 0
+            rhs: 0
+          matchinglabels:
+            - job
+          addedlabels: []
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+            position:
+                start: 27
+                end: 30
+            type: selector
+          op: 57383
+          depth: 0
+          ison: true
+      needsFeatures:
+        - promql-binop-fill-modifiers
+      usedLabels:
+        - job
+      position:
+        start: 0
+        end: 3
+      type: selector
+      fixedLabels: true
+
+---
+
+[TestLabelsSourceWithFeatures/binop_fill_left_modifier_only - 1]
+expr: foo + on(job) fill_left(0) bar
+output:
+    - labels:
+        "":
+            reason: Query is using one-to-one vector matching with `on(job)`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 6
+                end: 13
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 30
+        job:
+            reason: Query is using one-to-one vector matching with `on(job)`, only labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 9
+                end: 12
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+      joins:
+        - fill:
+            lhs: 0
+            rhs: 0
+          matchinglabels:
+            - job
+          addedlabels: []
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+            position:
+                start: 27
+                end: 30
+            type: selector
+          op: 57383
+          depth: 0
+          ison: true
+      needsFeatures:
+        - promql-binop-fill-modifiers
+      usedLabels:
+        - job
+      position:
+        start: 0
+        end: 3
+      type: selector
+      fixedLabels: true
+
+---
+
+[TestLabelsSourceWithFeatures/binop_fill_modifier - 1]
+expr: foo + on(job) fill(0) bar
+output:
+    - labels:
+        "":
+            reason: Query is using one-to-one vector matching with `on(job)`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 6
+                end: 13
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 25
+        job:
+            reason: Query is using one-to-one vector matching with `on(job)`, only labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 9
+                end: 12
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+      joins:
+        - fill:
+            lhs: 0
+            rhs: 0
+          matchinglabels:
+            - job
+          addedlabels: []
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+            position:
+                start: 22
+                end: 25
+            type: selector
+          op: 57383
+          depth: 0
+          ison: true
+      needsFeatures:
+        - promql-binop-fill-modifiers
+      usedLabels:
+        - job
+      position:
+        start: 0
+        end: 3
+      type: selector
+      fixedLabels: true
+
+---
+
+[TestLabelsSourceWithFeatures/binop_fill_right_modifier_only - 1]
+expr: foo + on(job) fill_right(0) bar
+output:
+    - labels:
+        "":
+            reason: Query is using one-to-one vector matching with `on(job)`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 6
+                end: 13
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 31
+        job:
+            reason: Query is using one-to-one vector matching with `on(job)`, only labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 9
+                end: 12
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+      joins:
+        - fill:
+            lhs: 0
+            rhs: 0
+          matchinglabels:
+            - job
+          addedlabels: []
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+            position:
+                start: 28
+                end: 31
+            type: selector
+          op: 57383
+          depth: 0
+          ison: true
+      needsFeatures:
+        - promql-binop-fill-modifiers
+      usedLabels:
+        - job
+      position:
+        start: 0
+        end: 3
+      type: selector
+      fixedLabels: true
+
+---
+
+[TestLabelsSourceWithFeatures/duration_expression_in_matrix_selector - 1]
+expr: foo[11s+10s]
+output:
+    - returns: matrix
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+      needsFeatures:
+        - promql-duration-expr
+      position:
+        start: 0
+        end: 3
+      type: selector
+
+---
+
+[TestLabelsSourceWithFeatures/duration_expression_in_subquery_range - 1]
+expr: max_over_time(rate(foo[5m])[1h+10m:5m])
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] rate(foo[5m])'
+          op: rate
+        - node: '[*parser.Call] max_over_time(rate(foo[5m])[1h + 10m:5m])'
+          op: max_over_time
+      needsFeatures:
+        - promql-duration-expr
+      position:
+        start: 14
+        end: 38
+      type: function
+
+---
+
+[TestLabelsSourceWithFeatures/duration_expression_in_subquery_range_and_step - 1]
+expr: max_over_time(rate(foo[5m])[1h+10m:5m+1m])
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] rate(foo[5m])'
+          op: rate
+        - node: '[*parser.Call] max_over_time(rate(foo[5m])[1h + 10m:5m + 1m])'
+          op: max_over_time
+      needsFeatures:
+        - promql-duration-expr
+      position:
+        start: 14
+        end: 41
+      type: function
+
+---
+
+[TestLabelsSourceWithFeatures/duration_expression_in_subquery_step - 1]
+expr: max_over_time(foo[1h:5m+1m])
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] max_over_time(foo[1h:5m + 1m])'
+          op: max_over_time
+      needsFeatures:
+        - promql-duration-expr
+      position:
+        start: 14
+        end: 27
+      type: function
+
+---
+
+[TestLabelsSourceWithFeatures/duration_expression_in_vector_offset - 1]
+expr: foo offset 5m+1m
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo offset 5m'
+          op: ""
+      position:
+        start: 0
+        end: 13
+      type: selector
+
+---
+
+[TestLabelsSourceWithFeatures/duration_expression_inside_rate - 1]
+expr: rate(foo[5m+1m])
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] rate(foo[5m + 1m])'
+          op: rate
+      needsFeatures:
+        - promql-duration-expr
+      position:
+        start: 5
+        end: 15
+      type: function
+
+---
+
+[TestLabelsSourceWithFeatures/duration_expression_with_smoothed_modifier - 1]
+expr: rate(foo[5m+1m] smoothed)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo smoothed'
+          op: ""
+        - node: '[*parser.Call] rate(foo[5m + 1m] smoothed)'
+          op: rate
+      needsFeatures:
+        - promql-extended-range-selectors
+        - promql-duration-expr
+      position:
+        start: 5
+        end: 15
+      type: function
+      rangeSelectorMode: smoothed
+
+---
+
+[TestLabelsSourceWithFeatures/experimental_function_with_fill_modifier - 1]
+expr: mad_over_time(foo[5m]) + on(job) fill(0) bar
+output:
+    - labels:
+        "":
+            reason: Query is using one-to-one vector matching with `on(job)`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 25
+                end: 32
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 44
+        job:
+            reason: Query is using one-to-one vector matching with `on(job)`, only labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 28
+                end: 31
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] mad_over_time(foo[5m])'
+          op: mad_over_time
+      joins:
+        - fill:
+            lhs: 0
+            rhs: 0
+          matchinglabels:
+            - job
+          addedlabels: []
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+            position:
+                start: 41
+                end: 44
+            type: selector
+          op: 57383
+          depth: 0
+          ison: true
+      needsFeatures:
+        - promql-experimental-functions
+        - promql-binop-fill-modifiers
+      usedLabels:
+        - job
+      position:
+        start: 14
+        end: 21
+      type: function
+      fixedLabels: true
+
+---
+
+[TestLabelsSourceWithFeatures/experimental_function_with_smoothed_modifier - 1]
+expr: mad_over_time(foo[5m] smoothed)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo smoothed'
+          op: ""
+        - node: '[*parser.Call] mad_over_time(foo[5m] smoothed)'
+          op: mad_over_time
+      needsFeatures:
+        - promql-extended-range-selectors
+        - promql-experimental-functions
+      position:
+        start: 14
+        end: 21
+      type: function
+      rangeSelectorMode: smoothed
+
+---
+
+[TestLabelsSourceWithFeatures/limitk - 1]
+expr: limitk(5, foo)
+output:
+    - labels:
+        "":
+            reason: Query is using aggregation that removes all labels.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 6
+        __name__:
+            reason: Aggregation removes metric name.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 14
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - args:
+            - "5"
+          node: '[*parser.AggregateExpr] limitk(5, foo)'
+          op: limitk
+      needsFeatures:
+        - promql-experimental-functions
+      position:
+        start: 10
+        end: 13
+      type: aggregation
+      fixedLabels: true
+
+---
+
+[TestLabelsSourceWithFeatures/mad_over_time - 1]
+expr: mad_over_time(foo[5m])
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] mad_over_time(foo[5m])'
+          op: mad_over_time
+      needsFeatures:
+        - promql-experimental-functions
+      position:
+        start: 14
+        end: 21
+      type: function
+
+---
+
+[TestLabelsSourceWithFeatures/smoothed_matrix_selector_inside_rate - 1]
+expr: rate(foo[5m] smoothed)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo smoothed'
+          op: ""
+        - node: '[*parser.Call] rate(foo[5m] smoothed)'
+          op: rate
+      needsFeatures:
+        - promql-extended-range-selectors
+      position:
+        start: 5
+        end: 12
+      type: function
+      rangeSelectorMode: smoothed
+
+---
+
+[TestLabelsSourceWithFeatures/sort_by_label - 1]
+expr: sort_by_label(foo, "job")
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - args:
+            - '"job"'
+          node: '[*parser.Call] sort_by_label(foo, "job")'
+          op: sort_by_label
+      needsFeatures:
+        - promql-experimental-functions
+      position:
+        start: 14
+        end: 17
+      type: function
 
 ---

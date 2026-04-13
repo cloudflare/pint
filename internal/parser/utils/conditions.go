@@ -2,12 +2,14 @@ package utils
 
 import (
 	promParser "github.com/prometheus/prometheus/promql/parser"
+
+	"github.com/cloudflare/pint/internal/parser"
 )
 
 // RemoveConditions takes a *valid* PromQL expression and removes
 // any condition from it.
 func RemoveConditions(source string) promParser.Node {
-	node, _ := promParser.ParseExpr(source)
+	node, _ := parser.PromQLParser.ParseExpr(source)
 	switch n := node.(type) {
 	case *promParser.AggregateExpr:
 		n.Expr = RemoveConditions(n.Expr.String()).(promParser.Expr)

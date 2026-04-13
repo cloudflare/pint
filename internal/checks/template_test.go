@@ -4,7 +4,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -107,7 +106,7 @@ func TestTemplatedRegexpExpand(t *testing.T) {
 }
 
 func newMustRule(content string) parser.Rule {
-	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
+	p := parser.NewParser(parser.DefaultOptions)
 	file := p.Parse(strings.NewReader(content))
 	if file.Error.Err != nil {
 		panic(file.Error)

@@ -124,11 +124,11 @@ func MergeRanges(source MetricTimeRanges, step time.Duration) (MetricTimeRanges,
 	merged := make(MetricTimeRanges, 0, len(source))
 L:
 	for i := range source {
-		for j := len(merged) - 1; j >= 0; j-- {
-			if source[i].Fingerprint != merged[j].Fingerprint {
+		for j, m := range slices.Backward(merged) {
+			if source[i].Fingerprint != m.Fingerprint {
 				continue
 			}
-			if tr, ok = Overlaps(merged[j], source[i], step); ok {
+			if tr, ok = Overlaps(m, source[i], step); ok {
 				merged[j].Start = tr.Start
 				merged[j].End = tr.End
 				hadMerged = true

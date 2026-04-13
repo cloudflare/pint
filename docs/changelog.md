@@ -2,6 +2,10 @@
 
 ## v0.80.0
 
+### Added
+
+- Better support for PromQL features and experimanal functions.
+
 ### Fixed
 
 - [promql/vector_matching](checks/promql/vector_matching.md) check no longer reports problems that are also reported by [promql/impossible](checks/promql/impossible.md).
