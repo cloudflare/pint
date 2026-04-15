@@ -135,6 +135,7 @@ type checkTest struct {
 	ctx           newCtxFn
 	checker       newCheckFn
 	snapshot      snapshotFn
+	setup         func(t *testing.T)
 	description   string
 	content       string
 	entries       []*discovery.Entry
@@ -167,6 +168,9 @@ func runTests(t *testing.T, testCases []checkTest) {
 	for _, tc := range testCases {
 		// original test
 		t.Run(tc.description, func(t *testing.T) {
+			if tc.setup != nil {
+				tc.setup(t)
+			}
 			slog.SetDefault(slogt.New(t))
 
 			var uri string
@@ -377,6 +381,7 @@ func (fc formCond) isMatch(r *http.Request) bool {
 var (
 	requireConfigPath     = requestPathCond{path: promapi.APIPathConfig}
 	requireFlagsPath      = requestPathCond{path: promapi.APIPathFlags}
+	requireBuildInfoPath  = requestPathCond{path: promapi.APIPathBuildInfo}
 	requireQueryPath      = requestPathCond{path: promapi.APIPathQuery}
 	requireRangeQueryPath = requestPathCond{path: promapi.APIPathQueryRange}
 	requireMetadataPath   = requestPathCond{path: promapi.APIPathMetadata}
@@ -538,6 +543,27 @@ func (fg flagsResponse) respond(w http.ResponseWriter, _ *http.Request) {
 	}{
 		Status: "success",
 		Data:   fg.flags,
+	}
+	d, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		panic(err)
+	}
+	_, _ = w.Write(d)
+}
+
+type buildInfoResponse struct {
+	version string
+}
+
+func (bi buildInfoResponse) respond(w http.ResponseWriter, _ *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	result := struct {
+		Data   v1.BuildinfoResult `json:"data"`
+		Status string             `json:"status"`
+	}{
+		Status: "success",
+		Data:   v1.BuildinfoResult{Version: bi.version},
 	}
 	d, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {

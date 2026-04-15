@@ -360,8 +360,11 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - matchinglabels: []
-          addedlabels: []
+        - addedlabels: []
+          depth: 0
+          ison: false
+          matchinglabels: []
+          op: '*'
           src:
             labels:
                 "":
@@ -390,11 +393,11 @@ output:
                 end: 31
             type: function
             fixedLabels: true
-          op: 57397
+        - addedlabels: []
           depth: 0
           ison: false
-        - matchinglabels: []
-          addedlabels: []
+          matchinglabels: []
+          op: '*'
           src:
             deadInfo:
                 reason: The left hand side always returns something and so the right hand side is never used.
@@ -409,9 +412,6 @@ output:
                 start: 35
                 end: 38
             type: selector
-          op: 57397
-          depth: 0
-          ison: false
       position:
         start: 1
         end: 4
@@ -436,8 +436,11 @@ output:
           node: '[*parser.Call] vector(5)'
           op: vector
       joins:
-        - matchinglabels: []
-          addedlabels: []
+        - addedlabels: []
+          depth: 0
+          ison: false
+          matchinglabels: []
+          op: '*'
           src:
             labels:
                 "":
@@ -466,11 +469,11 @@ output:
                 end: 31
             type: function
             fixedLabels: true
-          op: 57397
+        - addedlabels: []
           depth: 0
           ison: false
-        - matchinglabels: []
-          addedlabels: []
+          matchinglabels: []
+          op: '*'
           src:
             deadInfo:
                 reason: The left hand side always returns something and so the right hand side is never used.
@@ -485,9 +488,6 @@ output:
                 start: 35
                 end: 38
             type: selector
-          op: 57397
-          depth: 0
-          ison: false
       returnInfo:
         logicalexpr: vector(5) * vector(2)
         valueposition:
@@ -674,8 +674,11 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - matchinglabels: []
-          addedlabels: []
+        - addedlabels: []
+          depth: 0
+          ison: false
+          matchinglabels: []
+          op: '>'
           src:
             returns: vector
             operations:
@@ -685,9 +688,6 @@ output:
                 start: 11
                 end: 14
             type: selector
-          op: 57388
-          depth: 0
-          ison: false
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -720,8 +720,11 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - matchinglabels: []
-          addedlabels: []
+        - addedlabels: []
+          depth: 0
+          ison: false
+          matchinglabels: []
+          op: '>'
           src:
             returns: vector
             operations:
@@ -731,9 +734,6 @@ output:
                 start: 12
                 end: 15
             type: selector
-          op: 57388
-          depth: 0
-          ison: false
       position:
         start: 1
         end: 4
@@ -769,9 +769,12 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - matchinglabels:
+        - addedlabels: []
+          depth: 0
+          ison: true
+          matchinglabels:
             - instance
-          addedlabels: []
+          op: '>'
           src:
             returns: vector
             operations:
@@ -781,9 +784,6 @@ output:
                 start: 24
                 end: 27
             type: selector
-          op: 57388
-          depth: 0
-          ison: true
       usedLabels:
         - instance
       returnInfo:
@@ -831,9 +831,12 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - matchinglabels:
+        - addedlabels: []
+          depth: 0
+          ison: true
+          matchinglabels:
             - instance
-          addedlabels: []
+          op: '>'
           src:
             returns: vector
             operations:
@@ -843,9 +846,6 @@ output:
                 start: 25
                 end: 28
             type: selector
-          op: 57388
-          depth: 0
-          ison: true
       usedLabels:
         - instance
       position:
@@ -884,10 +884,13 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - matchinglabels:
-            - instance
-          addedlabels:
+        - addedlabels:
             - version
+          depth: 0
+          ison: true
+          matchinglabels:
+            - instance
+          op: '>'
           src:
             returns: vector
             operations:
@@ -897,9 +900,6 @@ output:
                 start: 44
                 end: 47
             type: selector
-          op: 57388
-          depth: 0
-          ison: true
       usedLabels:
         - instance
       returnInfo:
@@ -946,10 +946,13 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - matchinglabels:
-            - instance
-          addedlabels:
+        - addedlabels:
             - version
+          depth: 0
+          ison: true
+          matchinglabels:
+            - instance
+          op: '>'
           src:
             returns: vector
             operations:
@@ -959,9 +962,6 @@ output:
                 start: 0
                 end: 3
             type: selector
-          op: 57388
-          depth: 0
-          ison: true
       usedLabels:
         - instance
       returnInfo:
@@ -989,8 +989,11 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - matchinglabels: []
-          addedlabels: []
+        - addedlabels: []
+          depth: 0
+          ison: false
+          matchinglabels: []
+          op: and
           src:
             returns: vector
             operations:
@@ -1010,9 +1013,6 @@ output:
                 end: 11
             type: selector
             isConditional: true
-          op: 57391
-          depth: 0
-          ison: false
       position:
         start: 0
         end: 3
@@ -1658,8 +1658,11 @@ output:
         - node: '[*parser.AggregateExpr] min(foo{job="myjob"})'
           op: min
       joins:
-        - matchinglabels: []
-          addedlabels: []
+        - addedlabels: []
+          depth: 0
+          ison: false
+          matchinglabels: []
+          op: /
           src:
             labels:
                 "":
@@ -1691,9 +1694,6 @@ output:
                 end: 44
             type: aggregation
             fixedLabels: true
-          op: 57384
-          depth: 0
-          ison: false
       position:
         start: 4
         end: 20
@@ -1731,8 +1731,11 @@ output:
         - node: '[*parser.AggregateExpr] max(foo{job="myjob"})'
           op: max
       joins:
-        - matchinglabels: []
-          addedlabels: []
+        - addedlabels: []
+          depth: 0
+          ison: false
+          matchinglabels: []
+          op: /
           src:
             labels:
                 "":
@@ -1764,9 +1767,6 @@ output:
                 end: 44
             type: aggregation
             fixedLabels: true
-          op: 57384
-          depth: 0
-          ison: false
       position:
         start: 4
         end: 20
@@ -2263,8 +2263,11 @@ output:
         - node: '[*parser.VectorSelector] foo{job="foo"}'
           op: ""
       joins:
-        - matchinglabels: []
-          addedlabels: []
+        - addedlabels: []
+          depth: 0
+          ison: false
+          matchinglabels: []
+          op: /
           src:
             returns: vector
             operations:
@@ -2274,9 +2277,6 @@ output:
                 start: 17
                 end: 20
             type: selector
-          op: 57384
-          depth: 0
-          ison: false
       usedLabels:
         - job
       position:
@@ -2319,9 +2319,12 @@ output:
         - node: '[*parser.VectorSelector] foo{job="foo"}'
           op: ""
       joins:
-        - matchinglabels:
+        - addedlabels: []
+          depth: 0
+          ison: true
+          matchinglabels:
             - instance
-          addedlabels: []
+          op: '*'
           src:
             returns: vector
             operations:
@@ -2331,9 +2334,6 @@ output:
                 start: 30
                 end: 33
             type: selector
-          op: 57397
-          depth: 0
-          ison: true
       usedLabels:
         - instance
       position:
@@ -2377,10 +2377,13 @@ output:
         - node: '[*parser.VectorSelector] foo{job="foo"}'
           op: ""
       joins:
-        - matchinglabels:
-            - instance
-          addedlabels:
+        - addedlabels:
             - bar
+          depth: 0
+          ison: true
+          matchinglabels:
+            - instance
+          op: '*'
           src:
             returns: vector
             operations:
@@ -2390,9 +2393,6 @@ output:
                 start: 46
                 end: 49
             type: selector
-          op: 57397
-          depth: 0
-          ison: true
       usedLabels:
         - instance
       position:
@@ -2435,10 +2435,13 @@ output:
         - node: '[*parser.VectorSelector] foo{job="foo"}'
           op: ""
       joins:
-        - matchinglabels:
-            - instance
-          addedlabels:
+        - addedlabels:
             - cluster
+          depth: 0
+          ison: true
+          matchinglabels:
+            - instance
+          op: '*'
           src:
             labels:
                 cluster:
@@ -2461,9 +2464,6 @@ output:
                 start: 50
                 end: 84
             type: selector
-          op: 57397
-          depth: 0
-          ison: true
       usedLabels:
         - instance
       position:
@@ -2506,10 +2506,13 @@ output:
         - node: '[*parser.VectorSelector] bar{cluster="bar"}'
           op: ""
       joins:
-        - matchinglabels:
-            - instance
-          addedlabels:
+        - addedlabels:
             - job
+          depth: 0
+          ison: true
+          matchinglabels:
+            - instance
+          op: '*'
           src:
             labels:
                 ignored:
@@ -2532,9 +2535,6 @@ output:
                 start: 0
                 end: 30
             type: selector
-          op: 57397
-          depth: 0
-          ison: true
       usedLabels:
         - instance
       position:
@@ -2567,8 +2567,11 @@ output:
         - node: '[*parser.AggregateExpr] count(foo / bar)'
           op: count
       joins:
-        - matchinglabels: []
-          addedlabels: []
+        - addedlabels: []
+          depth: 1
+          ison: false
+          matchinglabels: []
+          op: /
           src:
             returns: vector
             operations:
@@ -2578,9 +2581,6 @@ output:
                 start: 12
                 end: 15
             type: selector
-          op: 57384
-          depth: 1
-          ison: false
       position:
         start: 6
         end: 9
@@ -2618,8 +2618,11 @@ output:
         - node: '[*parser.AggregateExpr] count(up{job="a"} / on () up{job="b"})'
           op: count
       joins:
-        - matchinglabels: []
-          addedlabels: []
+        - addedlabels: []
+          depth: 1
+          ison: true
+          matchinglabels: []
+          op: /
           src:
             labels:
                 job:
@@ -2636,9 +2639,6 @@ output:
                 start: 26
                 end: 37
             type: selector
-          op: 57384
-          depth: 1
-          ison: true
       position:
         start: 6
         end: 17
@@ -2682,9 +2682,12 @@ output:
         - node: '[*parser.AggregateExpr] count(up{job="a"} / on (env) up{job="b"})'
           op: count
       joins:
-        - matchinglabels:
+        - addedlabels: []
+          depth: 1
+          ison: true
+          matchinglabels:
             - env
-          addedlabels: []
+          op: /
           src:
             labels:
                 job:
@@ -2701,9 +2704,6 @@ output:
                 start: 29
                 end: 40
             type: selector
-          op: 57384
-          depth: 1
-          ison: true
       position:
         start: 6
         end: 17
@@ -2733,8 +2733,11 @@ output:
         - node: '[*parser.VectorSelector] foo{instance="1",job="foo"}'
           op: ""
       joins:
-        - matchinglabels: []
-          addedlabels: []
+        - addedlabels: []
+          depth: 0
+          ison: false
+          matchinglabels: []
+          op: and
           src:
             returns: vector
             operations:
@@ -2744,9 +2747,6 @@ output:
                 start: 33
                 end: 36
             type: selector
-          op: 57391
-          depth: 0
-          ison: false
       usedLabels:
         - instance
         - job
@@ -2784,9 +2784,12 @@ output:
         - node: '[*parser.VectorSelector] foo{instance="1",job="foo"}'
           op: ""
       joins:
-        - matchinglabels:
+        - addedlabels: []
+          depth: 0
+          ison: true
+          matchinglabels:
             - cluster
-          addedlabels: []
+          op: and
           src:
             returns: vector
             operations:
@@ -2796,9 +2799,6 @@ output:
                 start: 45
                 end: 48
             type: selector
-          op: 57391
-          depth: 0
-          ison: true
       usedLabels:
         - cluster
       position:
@@ -3255,10 +3255,13 @@ output:
         - node: '[*parser.AggregateExpr] sum without (notify) (foo:sum > 0)'
           op: sum
       joins:
-        - matchinglabels:
-            - job
-          addedlabels:
+        - addedlabels:
             - notify
+          depth: 0
+          ison: true
+          matchinglabels:
+            - job
+          op: '*'
           src:
             returns: vector
             operations:
@@ -3268,12 +3271,12 @@ output:
                 start: 68
                 end: 78
             type: selector
-          op: 57397
+        - addedlabels: []
           depth: 0
           ison: true
-        - matchinglabels:
+          matchinglabels:
             - job
-          addedlabels: []
+          op: and
           src:
             labels:
                 "":
@@ -3308,9 +3311,6 @@ output:
             type: aggregation
             fixedLabels: true
             isConditional: true
-          op: 57391
-          depth: 0
-          ison: true
       usedLabels:
         - job
       position:
@@ -3354,10 +3354,13 @@ output:
         - node: '[*parser.VectorSelector] container_file_descriptors'
           op: ""
       joins:
-        - matchinglabels:
+        - addedlabels: []
+          depth: 0
+          ison: true
+          matchinglabels:
             - instance
             - app_name
-          addedlabels: []
+          op: /
           src:
             labels:
                 ulimit:
@@ -3374,9 +3377,6 @@ output:
                 start: 53
                 end: 100
             type: selector
-          op: 57384
-          depth: 0
-          ison: true
       usedLabels:
         - instance
         - app_name
@@ -3415,10 +3415,13 @@ output:
         - node: '[*parser.VectorSelector] container_file_descriptors'
           op: ""
       joins:
-        - matchinglabels:
+        - addedlabels: []
+          depth: 0
+          ison: true
+          matchinglabels:
             - instance
             - app_name
-          addedlabels: []
+          op: /
           src:
             labels:
                 ulimit:
@@ -3435,9 +3438,6 @@ output:
                 start: 66
                 end: 113
             type: selector
-          op: 57384
-          depth: 0
-          ison: true
       usedLabels:
         - instance
         - app_name
@@ -3633,9 +3633,12 @@ output:
         - node: '[*parser.Call] absent(foo{job="prometheus",xxx="1"})'
           op: absent
       joins:
-        - matchinglabels:
+        - addedlabels: []
+          depth: 0
+          ison: true
+          matchinglabels:
             - job
-          addedlabels: []
+          op: and
           src:
             returns: vector
             operations:
@@ -3645,9 +3648,6 @@ output:
                 start: 51
                 end: 72
             type: selector
-          op: 57391
-          depth: 0
-          ison: true
       usedLabels:
         - job
         - xxx
@@ -3738,11 +3738,14 @@ output:
         - node: '[*parser.AggregateExpr] count by (instance, version) (node_exporter_build_info)'
           op: count
       joins:
-        - matchinglabels:
+        - addedlabels:
+            - foo
+          depth: 0
+          ison: false
+          matchinglabels:
             - package
             - version
-          addedlabels:
-            - foo
+          op: '!='
           src:
             labels:
                 "":
@@ -3801,9 +3804,6 @@ output:
                 end: 125
             type: aggregation
             fixedLabels: true
-          op: 57398
-          depth: 0
-          ison: false
       usedLabels:
         - instance
         - version
@@ -4007,10 +4007,13 @@ output:
         - node: '[*parser.Call] absent(foo{job="xxx"})'
           op: absent
       joins:
-        - matchinglabels: []
-          addedlabels:
+        - addedlabels:
             - cluster
             - env
+          depth: 0
+          ison: true
+          matchinglabels: []
+          op: '*'
           src:
             returns: vector
             operations:
@@ -4020,9 +4023,6 @@ output:
                 start: 0
                 end: 3
             type: selector
-          op: 57397
-          depth: 0
-          ison: true
       usedLabels:
         - job
       position:
@@ -4067,8 +4067,11 @@ output:
         - node: '[*parser.Call] absent(foo{job="xxx"})'
           op: absent
       joins:
-        - matchinglabels: []
-          addedlabels: []
+        - addedlabels: []
+          depth: 0
+          ison: true
+          matchinglabels: []
+          op: '*'
           src:
             returns: vector
             operations:
@@ -4078,9 +4081,6 @@ output:
                 start: 0
                 end: 3
             type: selector
-          op: 57397
-          depth: 0
-          ison: true
       usedLabels:
         - job
       position:
@@ -4409,9 +4409,12 @@ output:
         - node: '[*parser.VectorSelector] up{instance="a",job="prometheus"}'
           op: ""
       joins:
-        - matchinglabels:
+        - addedlabels: []
+          depth: 0
+          ison: false
+          matchinglabels:
             - job
-          addedlabels: []
+          op: '*'
           src:
             labels:
                 instance:
@@ -4434,9 +4437,6 @@ output:
                 start: 51
                 end: 79
             type: selector
-          op: 57397
-          depth: 0
-          ison: false
       usedLabels:
         - instance
       position:
@@ -4536,8 +4536,11 @@ output:
         - node: '[*parser.AggregateExpr] sum without (router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"})'
           op: sum
       joins:
-        - matchinglabels: []
-          addedlabels: []
+        - addedlabels: []
+          depth: 0
+          ison: true
+          matchinglabels: []
+          op: <
           src:
             labels:
                 "":
@@ -4575,9 +4578,6 @@ output:
                 end: 288
             type: aggregation
             fixedLabels: true
-          op: 57393
-          depth: 0
-          ison: true
       position:
         start: 155
         end: 212
@@ -4941,8 +4941,11 @@ output:
           node: '[*parser.Call] vector(0)'
           op: vector
       joins:
-        - matchinglabels: []
-          addedlabels: []
+        - addedlabels: []
+          depth: 0
+          ison: false
+          matchinglabels: []
+          op: '>'
           src:
             labels:
                 "":
@@ -4971,9 +4974,6 @@ output:
                 end: 21
             type: function
             fixedLabels: true
-          op: 57388
-          depth: 0
-          ison: false
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -5436,8 +5436,11 @@ output:
         - node: '[*parser.AggregateExpr] sum(sometimes{foo!="bar"})'
           op: sum
       joins:
-        - matchinglabels: []
-          addedlabels: []
+        - addedlabels: []
+          depth: 0
+          ison: false
+          matchinglabels: []
+          op: and
           src:
             returns: vector
             operations:
@@ -5448,11 +5451,11 @@ output:
                 end: 60
             type: selector
             isConditional: true
-          op: 57391
+        - addedlabels: []
           depth: 0
           ison: false
-        - matchinglabels: []
-          addedlabels: []
+          matchinglabels: []
+          op: and
           src:
             labels:
                 "":
@@ -5478,11 +5481,11 @@ output:
                 end: 77
             type: aggregation
             fixedLabels: true
-          op: 57391
+        - addedlabels: []
           depth: 0
           ison: false
-        - matchinglabels: []
-          addedlabels: []
+          matchinglabels: []
+          op: and
           src:
             returns: vector
             operations:
@@ -5493,9 +5496,6 @@ output:
                 end: 93
             type: selector
             isConditional: true
-          op: 57391
-          depth: 0
-          ison: false
       position:
         start: 8
         end: 29
@@ -5516,8 +5516,11 @@ output:
           node: '[*parser.Call] vector(1)'
           op: vector
       joins:
-        - matchinglabels: []
-          addedlabels: []
+        - addedlabels: []
+          depth: 0
+          ison: false
+          matchinglabels: []
+          op: and
           src:
             returns: vector
             operations:
@@ -5528,11 +5531,11 @@ output:
                 end: 60
             type: selector
             isConditional: true
-          op: 57391
+        - addedlabels: []
           depth: 0
           ison: false
-        - matchinglabels: []
-          addedlabels: []
+          matchinglabels: []
+          op: and
           src:
             labels:
                 "":
@@ -5558,11 +5561,11 @@ output:
                 end: 77
             type: aggregation
             fixedLabels: true
-          op: 57391
+        - addedlabels: []
           depth: 0
           ison: false
-        - matchinglabels: []
-          addedlabels: []
+          matchinglabels: []
+          op: and
           src:
             returns: vector
             operations:
@@ -5573,9 +5576,6 @@ output:
                 end: 93
             type: selector
             isConditional: true
-          op: 57391
-          depth: 0
-          ison: false
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -5630,8 +5630,11 @@ output:
         - node: '[*parser.Call] rate(metric2[5m])'
           op: rate
       joins:
-        - matchinglabels: []
-          addedlabels: []
+        - addedlabels: []
+          depth: 0
+          ison: false
+          matchinglabels: []
+          op: +
           src:
             returns: vector
             operations:
@@ -5643,11 +5646,11 @@ output:
                 start: 42
                 end: 53
             type: function
-          op: 57383
+        - addedlabels: []
           depth: 0
           ison: false
-        - matchinglabels: []
-          addedlabels: []
+          matchinglabels: []
+          op: +
           src:
             labels:
                 "":
@@ -5676,11 +5679,11 @@ output:
                 end: 67
             type: function
             fixedLabels: true
-          op: 57383
+        - addedlabels: []
           depth: 0
           ison: false
-        - matchinglabels: []
-          addedlabels: []
+          matchinglabels: []
+          op: +
           src:
             labels:
                 log_name:
@@ -5701,11 +5704,11 @@ output:
                 start: 77
                 end: 109
             type: function
-          op: 57383
+        - addedlabels: []
           depth: 0
           ison: false
-        - matchinglabels: []
-          addedlabels: []
+          matchinglabels: []
+          op: +
           src:
             labels:
                 "":
@@ -5734,9 +5737,6 @@ output:
                 end: 123
             type: function
             fixedLabels: true
-          op: 57383
-          depth: 0
-          ison: false
       position:
         start: 7
         end: 18
@@ -5762,8 +5762,11 @@ output:
           node: '[*parser.Call] vector(0)'
           op: vector
       joins:
-        - matchinglabels: []
-          addedlabels: []
+        - addedlabels: []
+          depth: 0
+          ison: false
+          matchinglabels: []
+          op: +
           src:
             returns: vector
             operations:
@@ -5775,11 +5778,11 @@ output:
                 start: 42
                 end: 53
             type: function
-          op: 57383
+        - addedlabels: []
           depth: 0
           ison: false
-        - matchinglabels: []
-          addedlabels: []
+          matchinglabels: []
+          op: +
           src:
             labels:
                 "":
@@ -5808,11 +5811,11 @@ output:
                 end: 67
             type: function
             fixedLabels: true
-          op: 57383
+        - addedlabels: []
           depth: 0
           ison: false
-        - matchinglabels: []
-          addedlabels: []
+          matchinglabels: []
+          op: +
           src:
             labels:
                 log_name:
@@ -5833,11 +5836,11 @@ output:
                 start: 77
                 end: 109
             type: function
-          op: 57383
+        - addedlabels: []
           depth: 0
           ison: false
-        - matchinglabels: []
-          addedlabels: []
+          matchinglabels: []
+          op: +
           src:
             labels:
                 "":
@@ -5866,9 +5869,6 @@ output:
                 end: 123
             type: function
             fixedLabels: true
-          op: 57383
-          depth: 0
-          ison: false
       returnInfo:
         logicalexpr: vector(0) + vector(1) + vector(2)
         valueposition:
@@ -6344,10 +6344,13 @@ output:
                 - node: '[*parser.AggregateExpr] sum by (instance, cluster) (time() - node_systemd_timer_last_trigger_seconds{name=~"etcd-defrag-.*.timer"})'
                   op: sum
             joins:
-                - matchinglabels:
-                    - instance
-                  addedlabels:
+                - addedlabels:
                     - cluster
+                  depth: 0
+                  ison: true
+                  matchinglabels:
+                    - instance
+                  op: '*'
                   src:
                     labels:
                         kubernetes_role:
@@ -6370,9 +6373,6 @@ output:
                         start: 247
                         end: 303
                     type: selector
-                  op: 57397
-                  depth: 0
-                  ison: true
             usedLabels:
                 - instance
                 - cluster
@@ -6420,8 +6420,11 @@ output:
         - node: '[*parser.VectorSelector] foo{a="1"}'
           op: ""
       joins:
-        - matchinglabels: []
-          addedlabels: []
+        - addedlabels: []
+          depth: 0
+          ison: true
+          matchinglabels: []
+          op: '*'
           src:
             labels:
                 b:
@@ -6438,9 +6441,6 @@ output:
                 start: 18
                 end: 28
             type: selector
-          op: 57397
-          depth: 0
-          ison: true
       position:
         start: 0
         end: 10
@@ -6488,11 +6488,14 @@ output:
         - node: '[*parser.VectorSelector] foo{a="1"}'
           op: ""
       joins:
-        - matchinglabels:
-            - instance
-          addedlabels:
+        - addedlabels:
             - c
             - d
+          depth: 0
+          ison: true
+          matchinglabels:
+            - instance
+          op: '*'
           src:
             labels:
                 b:
@@ -6509,9 +6512,6 @@ output:
                 start: 42
                 end: 52
             type: selector
-          op: 57397
-          depth: 0
-          ison: true
       usedLabels:
         - instance
       position:
@@ -6560,11 +6560,14 @@ output:
         - node: '[*parser.VectorSelector] bar{b="2"}'
           op: ""
       joins:
-        - matchinglabels:
-            - instance
-          addedlabels:
+        - addedlabels:
             - c
             - d
+          depth: 0
+          ison: true
+          matchinglabels:
+            - instance
+          op: '*'
           src:
             labels:
                 a:
@@ -6581,9 +6584,6 @@ output:
                 start: 0
                 end: 10
             type: selector
-          op: 57397
-          depth: 0
-          ison: true
       usedLabels:
         - instance
       position:
@@ -6626,9 +6626,12 @@ output:
         - node: '[*parser.VectorSelector] foo{a="1"}'
           op: ""
       joins:
-        - matchinglabels:
+        - addedlabels: []
+          depth: 0
+          ison: true
+          matchinglabels:
             - instance
-          addedlabels: []
+          op: '*'
           src:
             labels:
                 "":
@@ -6665,9 +6668,6 @@ output:
                 end: 40
             type: aggregation
             fixedLabels: true
-          op: 57397
-          depth: 0
-          ison: true
       usedLabels:
         - instance
       position:
@@ -6717,11 +6717,14 @@ output:
         - node: '[*parser.VectorSelector] foo{a="1"}'
           op: ""
       joins:
-        - matchinglabels:
-            - instance
-          addedlabels:
+        - addedlabels:
             - c
             - d
+          depth: 0
+          ison: true
+          matchinglabels:
+            - instance
+          op: '*'
           src:
             labels:
                 "":
@@ -6779,9 +6782,6 @@ output:
                 end: 56
             type: aggregation
             fixedLabels: true
-          op: 57397
-          depth: 0
-          ison: true
       usedLabels:
         - instance
       position:
@@ -6830,11 +6830,14 @@ output:
         - node: '[*parser.VectorSelector] bar{b="2"}'
           op: ""
       joins:
-        - matchinglabels:
-            - instance
-          addedlabels:
+        - addedlabels:
             - c
             - d
+          depth: 0
+          ison: true
+          matchinglabels:
+            - instance
+          op: '*'
           src:
             labels:
                 "":
@@ -6892,9 +6895,6 @@ output:
                 end: 14
             type: aggregation
             fixedLabels: true
-          op: 57397
-          depth: 0
-          ison: true
       usedLabels:
         - instance
       position:
@@ -6943,11 +6943,14 @@ output:
         - node: '[*parser.VectorSelector] foo{a="1"}'
           op: ""
       joins:
-        - matchinglabels:
-            - instance
-          addedlabels:
+        - addedlabels:
             - c
             - d
+          depth: 0
+          ison: true
+          matchinglabels:
+            - instance
+          op: '*'
           src:
             labels:
                 __name__:
@@ -6983,9 +6986,6 @@ output:
                 start: 46
                 end: 56
             type: aggregation
-          op: 57397
-          depth: 0
-          ison: true
       usedLabels:
         - instance
       position:
@@ -7034,11 +7034,14 @@ output:
         - node: '[*parser.VectorSelector] bar{b="2"}'
           op: ""
       joins:
-        - matchinglabels:
-            - instance
-          addedlabels:
+        - addedlabels:
             - c
             - d
+          depth: 0
+          ison: true
+          matchinglabels:
+            - instance
+          op: '*'
           src:
             labels:
                 __name__:
@@ -7074,9 +7077,6 @@ output:
                 start: 4
                 end: 14
             type: aggregation
-          op: 57397
-          depth: 0
-          ison: true
       usedLabels:
         - instance
       position:
@@ -7136,10 +7136,13 @@ output:
         - node: '[*parser.AggregateExpr] max without (source_instance) (increase(kernel_device_io_errors_total{device!~"loop.+"}[2h]) > 3 unless on (instance, device) (increase(kernel_device_io_soft_errors_total{device!~"loop.+"}[2h5m]) * 2 > increase(kernel_device_io_errors_total[2h])) and on (device, instance) absent(node_disk_info))'
           op: max
       joins:
-        - matchinglabels:
+        - addedlabels: []
+          depth: 1
+          ison: true
+          matchinglabels:
             - device
             - instance
-          addedlabels: []
+          op: and
           src:
             labels:
                 "":
@@ -7174,13 +7177,13 @@ output:
                 end: 313
             type: function
             fixedLabels: true
-          op: 57391
-          depth: 1
-          ison: true
-        - matchinglabels:
-            - instance
-          addedlabels:
+        - addedlabels:
             - group
+          depth: 0
+          ison: true
+          matchinglabels:
+            - instance
+          op: '*'
           src:
             labels:
                 instance:
@@ -7206,9 +7209,6 @@ output:
                 start: 365
                 end: 405
             type: function
-          op: 57397
-          depth: 0
-          ison: true
       unless:
         - matchinglabels:
             - instance
@@ -7228,8 +7228,11 @@ output:
                 - node: '[*parser.Call] increase(kernel_device_io_soft_errors_total{device!~"loop.+"}[2h5m])'
                   op: increase
             joins:
-                - matchinglabels: []
-                  addedlabels: []
+                - addedlabels: []
+                  depth: 0
+                  ison: false
+                  matchinglabels: []
+                  op: '>'
                   src:
                     returns: vector
                     operations:
@@ -7241,9 +7244,6 @@ output:
                         start: 222
                         end: 257
                     type: function
-                  op: 57388
-                  depth: 0
-                  ison: false
             position:
                 start: 149
                 end: 207
@@ -7296,8 +7296,11 @@ output:
         - node: '[*parser.AggregateExpr] sum by (job) (foo{a="1"})'
           op: sum
       joins:
-        - matchinglabels: []
-          addedlabels: []
+        - addedlabels: []
+          depth: 0
+          ison: true
+          matchinglabels: []
+          op: '*'
           src:
             labels:
                 b:
@@ -7314,9 +7317,6 @@ output:
                 start: 31
                 end: 41
             type: selector
-          op: 57397
-          depth: 0
-          ison: true
       position:
         start: 4
         end: 14
@@ -7407,9 +7407,12 @@ output:
         - node: '[*parser.VectorSelector] prometheus:scrape_series_added:since_gc:sum'
           op: ""
       joins:
-        - matchinglabels:
+        - addedlabels: []
+          depth: 0
+          ison: true
+          matchinglabels:
             - prometheus
-          addedlabels: []
+          op: '*'
           src:
             labels:
                 "":
@@ -7458,8 +7461,11 @@ output:
                   node: '[*parser.Call] label_replace(max by (instance) (max_over_time(go_memstats_alloc_bytes{job="prometheus"}[2h])) / max by (instance) (max_over_time(prometheus_tsdb_head_series[2h])), "prometheus", "$1", "instance", "(.+)")'
                   op: label_replace
             joins:
-                - matchinglabels: []
-                  addedlabels: []
+                - addedlabels: []
+                  depth: 0
+                  ison: false
+                  matchinglabels: []
+                  op: /
                   src:
                     labels:
                         "":
@@ -7495,9 +7501,6 @@ output:
                         end: 226
                     type: aggregation
                     fixedLabels: true
-                  op: 57384
-                  depth: 0
-                  ison: false
             usedLabels:
                 - instance
             position:
@@ -7505,9 +7508,6 @@ output:
                 end: 241
             type: function
             fixedLabels: true
-          op: 57397
-          depth: 0
-          ison: true
       usedLabels:
         - prometheus
       position:
@@ -7532,8 +7532,11 @@ output:
         - node: '[*parser.Call] day_of_week()'
           op: day_of_week
       joins:
-        - matchinglabels: []
-          addedlabels: []
+        - addedlabels: []
+          depth: 0
+          ison: false
+          matchinglabels: []
+          op: and
           src:
             labels:
                 "":
@@ -7561,9 +7564,6 @@ output:
             type: function
             fixedLabels: true
             isConditional: true
-          op: 57391
-          depth: 0
-          ison: false
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -7691,11 +7691,14 @@ output:
         - node: '[*parser.AggregateExpr] sum by (foo, bar) (rate(errors_total[5m]) * on (instance) group_left (bob, alice) server_errors_total)'
           op: sum
       joins:
-        - matchinglabels:
-            - instance
-          addedlabels:
+        - addedlabels:
             - bob
             - alice
+          depth: 1
+          ison: true
+          matchinglabels:
+            - instance
+          op: '*'
           src:
             returns: vector
             operations:
@@ -7705,9 +7708,6 @@ output:
                 start: 94
                 end: 113
             type: selector
-          op: 57397
-          depth: 1
-          ison: true
       usedLabels:
         - foo
         - bar
@@ -7788,8 +7788,11 @@ output:
           node: '[*parser.Call] vector(1)'
           op: vector
       joins:
-        - matchinglabels: []
-          addedlabels: []
+        - addedlabels: []
+          depth: 0
+          ison: false
+          matchinglabels: []
+          op: and
           src:
             labels:
                 "":
@@ -7817,9 +7820,6 @@ output:
             type: function
             fixedLabels: true
             isConditional: true
-          op: 57391
-          depth: 0
-          ison: false
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -7973,8 +7973,11 @@ output:
         - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h]) or vector(0))'
           op: avg
       joins:
-        - matchinglabels: []
-          addedlabels: []
+        - addedlabels: []
+          depth: 0
+          ison: false
+          matchinglabels: []
+          op: /
           src:
             labels:
                 "":
@@ -8010,11 +8013,11 @@ output:
                 end: 120
             type: aggregation
             fixedLabels: true
-          op: 57384
+        - addedlabels: []
           depth: 0
           ison: false
-        - matchinglabels: []
-          addedlabels: []
+          matchinglabels: []
+          op: /
           src:
             labels:
                 "":
@@ -8070,11 +8073,11 @@ output:
                 end: 140
             type: aggregation
             fixedLabels: true
-          op: 57384
+        - addedlabels: []
           depth: 0
           ison: false
-        - matchinglabels: []
-          addedlabels: []
+          matchinglabels: []
+          op: '>'
           src:
             labels:
                 "":
@@ -8104,8 +8107,11 @@ output:
                 - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h] offset 1d) or vector(0))'
                   op: avg
             joins:
-                - matchinglabels: []
-                  addedlabels: []
+                - addedlabels: []
+                  depth: 0
+                  ison: false
+                  matchinglabels: []
+                  op: /
                   src:
                     labels:
                         "":
@@ -8141,11 +8147,11 @@ output:
                         end: 299
                     type: aggregation
                     fixedLabels: true
-                  op: 57384
+                - addedlabels: []
                   depth: 0
                   ison: false
-                - matchinglabels: []
-                  addedlabels: []
+                  matchinglabels: []
+                  op: /
                   src:
                     labels:
                         "":
@@ -8201,9 +8207,6 @@ output:
                         end: 315
                     type: aggregation
                     fixedLabels: true
-                  op: 57384
-                  depth: 0
-                  ison: false
             usedLabels:
                 - colo_name
             position:
@@ -8211,11 +8214,11 @@ output:
                 end: 220
             type: aggregation
             fixedLabels: true
-          op: 57388
+        - addedlabels: []
           depth: 0
           ison: false
-        - matchinglabels: []
-          addedlabels: []
+          matchinglabels: []
+          op: '>'
           src:
             labels:
                 "":
@@ -8256,8 +8259,11 @@ output:
                 - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h] offset 1d) or vector(0))'
                   op: avg
             joins:
-                - matchinglabels: []
-                  addedlabels: []
+                - addedlabels: []
+                  depth: 0
+                  ison: false
+                  matchinglabels: []
+                  op: /
                   src:
                     labels:
                         "":
@@ -8293,11 +8299,11 @@ output:
                         end: 299
                     type: aggregation
                     fixedLabels: true
-                  op: 57384
+                - addedlabels: []
                   depth: 0
                   ison: false
-                - matchinglabels: []
-                  addedlabels: []
+                  matchinglabels: []
+                  op: /
                   src:
                     labels:
                         "":
@@ -8353,9 +8359,6 @@ output:
                         end: 315
                     type: aggregation
                     fixedLabels: true
-                  op: 57384
-                  depth: 0
-                  ison: false
             usedLabels:
                 - colo_name
             returnInfo:
@@ -8372,12 +8375,12 @@ output:
                 end: 236
             type: aggregation
             fixedLabels: true
-          op: 57388
+        - addedlabels: []
           depth: 0
-          ison: false
-        - matchinglabels:
+          ison: true
+          matchinglabels:
             - colo_name
-          addedlabels: []
+          op: and
           src:
             returns: vector
             operations:
@@ -8388,12 +8391,12 @@ output:
                 end: 382
             type: selector
             isConditional: true
-          op: 57391
+        - addedlabels: []
           depth: 0
           ison: true
-        - matchinglabels:
+          matchinglabels:
             - colo_name
-          addedlabels: []
+          op: and
           src:
             labels:
                 "":
@@ -8428,12 +8431,12 @@ output:
             type: function
             fixedLabels: true
             isConditional: true
-          op: 57391
+        - addedlabels: []
           depth: 0
           ison: true
-        - matchinglabels:
+          matchinglabels:
             - colo_name
-          addedlabels: []
+          op: and
           src:
             returns: vector
             operations:
@@ -8444,12 +8447,12 @@ output:
                 end: 459
             type: selector
             isConditional: true
-          op: 57391
+        - addedlabels: []
           depth: 0
           ison: true
-        - matchinglabels:
+          matchinglabels:
             - colo_name
-          addedlabels: []
+          op: and
           src:
             labels:
                 "":
@@ -8484,9 +8487,6 @@ output:
             type: function
             fixedLabels: true
             isConditional: true
-          op: 57391
-          depth: 0
-          ison: true
       usedLabels:
         - colo_name
       position:
@@ -8549,8 +8549,11 @@ output:
         - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h]) or vector(0))'
           op: avg
       joins:
-        - matchinglabels: []
-          addedlabels: []
+        - addedlabels: []
+          depth: 0
+          ison: false
+          matchinglabels: []
+          op: /
           src:
             labels:
                 "":
@@ -8586,11 +8589,11 @@ output:
                 end: 120
             type: aggregation
             fixedLabels: true
-          op: 57384
+        - addedlabels: []
           depth: 0
           ison: false
-        - matchinglabels: []
-          addedlabels: []
+          matchinglabels: []
+          op: /
           src:
             labels:
                 "":
@@ -8646,11 +8649,11 @@ output:
                 end: 140
             type: aggregation
             fixedLabels: true
-          op: 57384
+        - addedlabels: []
           depth: 0
           ison: false
-        - matchinglabels: []
-          addedlabels: []
+          matchinglabels: []
+          op: '>'
           src:
             labels:
                 "":
@@ -8680,8 +8683,11 @@ output:
                 - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h] offset 1d) or vector(0))'
                   op: avg
             joins:
-                - matchinglabels: []
-                  addedlabels: []
+                - addedlabels: []
+                  depth: 0
+                  ison: false
+                  matchinglabels: []
+                  op: /
                   src:
                     labels:
                         "":
@@ -8717,11 +8723,11 @@ output:
                         end: 299
                     type: aggregation
                     fixedLabels: true
-                  op: 57384
+                - addedlabels: []
                   depth: 0
                   ison: false
-                - matchinglabels: []
-                  addedlabels: []
+                  matchinglabels: []
+                  op: /
                   src:
                     labels:
                         "":
@@ -8777,9 +8783,6 @@ output:
                         end: 315
                     type: aggregation
                     fixedLabels: true
-                  op: 57384
-                  depth: 0
-                  ison: false
             usedLabels:
                 - colo_name
             position:
@@ -8787,11 +8790,11 @@ output:
                 end: 220
             type: aggregation
             fixedLabels: true
-          op: 57388
+        - addedlabels: []
           depth: 0
           ison: false
-        - matchinglabels: []
-          addedlabels: []
+          matchinglabels: []
+          op: '>'
           src:
             labels:
                 "":
@@ -8832,8 +8835,11 @@ output:
                 - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_rejections[6h] offset 1d) or vector(0))'
                   op: avg
             joins:
-                - matchinglabels: []
-                  addedlabels: []
+                - addedlabels: []
+                  depth: 0
+                  ison: false
+                  matchinglabels: []
+                  op: /
                   src:
                     labels:
                         "":
@@ -8869,11 +8875,11 @@ output:
                         end: 299
                     type: aggregation
                     fixedLabels: true
-                  op: 57384
+                - addedlabels: []
                   depth: 0
                   ison: false
-                - matchinglabels: []
-                  addedlabels: []
+                  matchinglabels: []
+                  op: /
                   src:
                     labels:
                         "":
@@ -8929,9 +8935,6 @@ output:
                         end: 315
                     type: aggregation
                     fixedLabels: true
-                  op: 57384
-                  depth: 0
-                  ison: false
             usedLabels:
                 - colo_name
             returnInfo:
@@ -8948,12 +8951,12 @@ output:
                 end: 236
             type: aggregation
             fixedLabels: true
-          op: 57388
+        - addedlabels: []
           depth: 0
-          ison: false
-        - matchinglabels:
+          ison: true
+          matchinglabels:
             - colo_name
-          addedlabels: []
+          op: and
           src:
             returns: vector
             operations:
@@ -8964,12 +8967,12 @@ output:
                 end: 382
             type: selector
             isConditional: true
-          op: 57391
+        - addedlabels: []
           depth: 0
           ison: true
-        - matchinglabels:
+          matchinglabels:
             - colo_name
-          addedlabels: []
+          op: and
           src:
             labels:
                 "":
@@ -9004,12 +9007,12 @@ output:
             type: function
             fixedLabels: true
             isConditional: true
-          op: 57391
+        - addedlabels: []
           depth: 0
           ison: true
-        - matchinglabels:
+          matchinglabels:
             - colo_name
-          addedlabels: []
+          op: and
           src:
             returns: vector
             operations:
@@ -9020,12 +9023,12 @@ output:
                 end: 459
             type: selector
             isConditional: true
-          op: 57391
+        - addedlabels: []
           depth: 0
           ison: true
-        - matchinglabels:
+          matchinglabels:
             - colo_name
-          addedlabels: []
+          op: and
           src:
             labels:
                 "":
@@ -9060,9 +9063,6 @@ output:
             type: function
             fixedLabels: true
             isConditional: true
-          op: 57391
-          depth: 0
-          ison: true
       usedLabels:
         - colo_name
       returnInfo:
@@ -9106,8 +9106,11 @@ output:
         - node: '[*parser.AggregateExpr] sum(selector)'
           op: sum
       joins:
-        - matchinglabels: []
-          addedlabels: []
+        - addedlabels: []
+          depth: 0
+          ison: false
+          matchinglabels: []
+          op: /
           src:
             labels:
                 "":
@@ -9133,9 +9136,6 @@ output:
                 end: 39
             type: aggregation
             fixedLabels: true
-          op: 57384
-          depth: 0
-          ison: false
       position:
         start: 4
         end: 12
@@ -9193,9 +9193,12 @@ output:
         - node: '[*parser.AggregateExpr] count by (dc) (max by (instance) (0 < (token_expiration - time()) < (6 * 60 * 60)) * on (instance) group_right () label_replace(configured_minions, "instance", "$1", "minion", "(.+)"))'
           op: count
       joins:
-        - matchinglabels:
+        - addedlabels: []
+          depth: 1
+          ison: true
+          matchinglabels:
             - instance
-          addedlabels: []
+          op: '*'
           src:
             labels:
                 "":
@@ -9230,9 +9233,6 @@ output:
             type: aggregation
             fixedLabels: true
             isConditional: true
-          op: 57397
-          depth: 1
-          ison: true
       usedLabels:
         - dc
       position:
@@ -9263,8 +9263,11 @@ output:
           node: '[*parser.AggregateExpr] topk(10, prometheus_build_info * prometheus_ready)'
           op: topk
       joins:
-        - matchinglabels: []
-          addedlabels: []
+        - addedlabels: []
+          depth: 1
+          ison: false
+          matchinglabels: []
+          op: '*'
           src:
             returns: vector
             operations:
@@ -9274,9 +9277,6 @@ output:
                 start: 31
                 end: 47
             type: selector
-          op: 57397
-          depth: 1
-          ison: false
       position:
         start: 9
         end: 30
@@ -9303,8 +9303,11 @@ output:
           node: '[*parser.AggregateExpr] bottomk(10, prometheus_build_info * prometheus_ready)'
           op: bottomk
       joins:
-        - matchinglabels: []
-          addedlabels: []
+        - addedlabels: []
+          depth: 1
+          ison: false
+          matchinglabels: []
+          op: '*'
           src:
             returns: vector
             operations:
@@ -9314,9 +9317,6 @@ output:
                 start: 34
                 end: 50
             type: selector
-          op: 57397
-          depth: 1
-          ison: false
       position:
         start: 12
         end: 33
@@ -9358,8 +9358,11 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - matchinglabels: []
-          addedlabels: []
+        - addedlabels: []
+          depth: 0
+          ison: false
+          matchinglabels: []
+          op: '*'
           src:
             returns: vector
             operations:
@@ -9369,9 +9372,6 @@ output:
                 start: 6
                 end: 9
             type: selector
-          op: 57397
-          depth: 0
-          ison: false
       position:
         start: 0
         end: 3
@@ -9406,10 +9406,13 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - matchinglabels:
+        - addedlabels: []
+          depth: 0
+          ison: true
+          matchinglabels:
             - __name__
             - job
-          addedlabels: []
+          op: +
           src:
             returns: vector
             operations:
@@ -9419,9 +9422,6 @@ output:
                 start: 24
                 end: 27
             type: selector
-          op: 57383
-          depth: 0
-          ison: true
       usedLabels:
         - job
       position:
@@ -9453,10 +9453,13 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - matchinglabels:
+        - addedlabels: []
+          depth: 0
+          ison: true
+          matchinglabels:
             - __name__
             - job
-          addedlabels: []
+          op: +
           src:
             returns: vector
             operations:
@@ -9466,9 +9469,6 @@ output:
                 start: 35
                 end: 38
             type: selector
-          op: 57383
-          depth: 0
-          ison: true
       usedLabels:
         - job
       position:
@@ -9499,10 +9499,13 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - matchinglabels:
+        - addedlabels: []
+          depth: 0
+          ison: true
+          matchinglabels:
             - __name__
             - job
-          addedlabels: []
+          op: +
           src:
             returns: vector
             operations:
@@ -9512,9 +9515,6 @@ output:
                 start: 0
                 end: 3
             type: selector
-          op: 57383
-          depth: 0
-          ison: true
       usedLabels:
         - job
       position:
@@ -9574,9 +9574,12 @@ output:
         - node: '[*parser.AggregateExpr] group by (env, cluster) (up{env="prod",job="foo"} and on (instance) (services_enabled == 999))'
           op: group
       joins:
-        - matchinglabels:
+        - addedlabels: []
+          depth: 1
+          ison: true
+          matchinglabels:
             - instance
-          addedlabels: []
+          op: and
           src:
             returns: vector
             operations:
@@ -9587,9 +9590,6 @@ output:
                 end: 93
             type: selector
             isConditional: true
-          op: 57391
-          depth: 1
-          ison: true
       usedLabels:
         - env
         - cluster
@@ -9673,9 +9673,12 @@ output:
         - node: '[*parser.AggregateExpr] group by (env, cluster) (up{env="prod",job="foo"} * on (instance) (services_enabled == 999))'
           op: group
       joins:
-        - matchinglabels:
+        - addedlabels: []
+          depth: 1
+          ison: true
+          matchinglabels:
             - instance
-          addedlabels: []
+          op: '*'
           src:
             returns: vector
             operations:
@@ -9686,9 +9689,6 @@ output:
                 end: 91
             type: selector
             isConditional: true
-          op: 57397
-          depth: 1
-          ison: true
       usedLabels:
         - env
         - cluster
@@ -9727,9 +9727,12 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - matchinglabels:
+        - addedlabels: []
+          depth: 0
+          ison: true
+          matchinglabels:
             - instance
-          addedlabels: []
+          op: /
           src:
             labels:
                 "":
@@ -9760,9 +9763,6 @@ output:
                 end: 26
             type: aggregation
             fixedLabels: true
-          op: 57384
-          depth: 0
-          ison: true
       usedLabels:
         - instance
       position:
@@ -9800,10 +9800,13 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - matchinglabels:
-            - instance
-          addedlabels:
+        - addedlabels:
             - cluster
+          depth: 0
+          ison: true
+          matchinglabels:
+            - instance
+          op: /
           src:
             labels:
                 "":
@@ -9845,9 +9848,6 @@ output:
                 end: 46
             type: aggregation
             fixedLabels: true
-          op: 57384
-          depth: 0
-          ison: true
       usedLabels:
         - instance
       position:
@@ -9884,10 +9884,13 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - matchinglabels:
-            - instance
-          addedlabels:
+        - addedlabels:
             - cluster
+          depth: 0
+          ison: true
+          matchinglabels:
+            - instance
+          op: /
           src:
             labels:
                 "":
@@ -9929,9 +9932,6 @@ output:
                 end: 7
             type: aggregation
             fixedLabels: true
-          op: 57384
-          depth: 0
-          ison: true
       usedLabels:
         - instance
       position:
@@ -9981,9 +9981,12 @@ output:
         - node: '[*parser.AggregateExpr] sum(bar)'
           op: sum
       joins:
-        - matchinglabels:
+        - addedlabels: []
+          depth: 0
+          ison: true
+          matchinglabels:
             - cluster
-          addedlabels: []
+          op: '*'
           src:
             labels:
                 "":
@@ -10009,9 +10012,6 @@ output:
                 end: 30
             type: aggregation
             fixedLabels: true
-          op: 57397
-          depth: 0
-          ison: true
       usedLabels:
         - cluster
       position:
@@ -10157,9 +10157,12 @@ output:
         - node: '[*parser.AggregateExpr] group by (colo_name, instance, tier, animal, brand, sliver, pop_name) (up{job="node_exporter",node_status="v"} and on (instance) (metal_services_enabled == 999) * on (colo_name) group_left (tier, animal, brand, pop_name) colo_metadata{colo_status="v"} * on (instance) group_left (sliver) sliver_metadata{node_status="v"})'
           op: group
       joins:
-        - matchinglabels:
+        - addedlabels: []
+          depth: 1
+          ison: true
+          matchinglabels:
             - instance
-          addedlabels: []
+          op: and
           src:
             labels:
                 __name__:
@@ -10215,13 +10218,16 @@ output:
                 - node: '[*parser.VectorSelector] metal_services_enabled'
                   op: ""
             joins:
-                - matchinglabels:
-                    - colo_name
-                  addedlabels:
+                - addedlabels:
                     - tier
                     - animal
                     - brand
                     - pop_name
+                  depth: 0
+                  ison: true
+                  matchinglabels:
+                    - colo_name
+                  op: '*'
                   src:
                     labels:
                         colo_status:
@@ -10238,13 +10244,13 @@ output:
                         start: 229
                         end: 259
                     type: selector
-                  op: 57397
+                - addedlabels:
+                    - sliver
                   depth: 0
                   ison: true
-                - matchinglabels:
+                  matchinglabels:
                     - instance
-                  addedlabels:
-                    - sliver
+                  op: '*'
                   src:
                     labels:
                         node_status:
@@ -10261,9 +10267,6 @@ output:
                         start: 298
                         end: 330
                     type: selector
-                  op: 57397
-                  depth: 0
-                  ison: true
             usedLabels:
                 - colo_name
                 - instance
@@ -10272,9 +10275,6 @@ output:
                 end: 159
             type: selector
             isConditional: true
-          op: 57391
-          depth: 1
-          ison: true
       usedLabels:
         - instance
         - colo_name
@@ -10347,10 +10347,13 @@ output:
         - node: '[*parser.VectorSelector] up{job="node_exporter",node_status="v"}'
           op: ""
       joins:
-        - matchinglabels:
-            - colo_name
-          addedlabels:
+        - addedlabels:
             - tier
+          depth: 0
+          ison: true
+          matchinglabels:
+            - colo_name
+          op: '*'
           src:
             labels:
                 colo_status:
@@ -10367,13 +10370,13 @@ output:
                 start: 76
                 end: 106
             type: selector
-          op: 57397
+        - addedlabels:
+            - sliver
           depth: 0
           ison: true
-        - matchinglabels:
+          matchinglabels:
             - instance
-          addedlabels:
-            - sliver
+          op: '*'
           src:
             labels:
                 node_status:
@@ -10390,9 +10393,6 @@ output:
                 start: 143
                 end: 175
             type: selector
-          op: 57397
-          depth: 0
-          ison: true
       usedLabels:
         - colo_name
         - instance
@@ -10445,9 +10445,12 @@ output:
         - node: '[*parser.VectorSelector] up{job="node_exporter",node_status="v"}'
           op: ""
       joins:
-        - matchinglabels:
+        - addedlabels: []
+          depth: 0
+          ison: true
+          matchinglabels:
             - colo_name
-          addedlabels: []
+          op: and
           src:
             labels:
                 __name__:
@@ -10479,10 +10482,13 @@ output:
                 - node: '[*parser.VectorSelector] colo_metadata{colo_status="v"}'
                   op: ""
             joins:
-                - matchinglabels:
-                    - instance
-                  addedlabels:
+                - addedlabels:
                     - sliver
+                  depth: 0
+                  ison: true
+                  matchinglabels:
+                    - instance
+                  op: '*'
                   src:
                     labels:
                         node_status:
@@ -10499,18 +10505,12 @@ output:
                         start: 128
                         end: 160
                     type: selector
-                  op: 57397
-                  depth: 0
-                  ison: true
             usedLabels:
                 - instance
             position:
                 start: 61
                 end: 91
             type: selector
-          op: 57391
-          depth: 0
-          ison: true
       usedLabels:
         - colo_name
       position:
@@ -10609,10 +10609,13 @@ output:
         - node: '[*parser.VectorSelector] metal_services_enabled'
           op: ""
       joins:
-        - matchinglabels:
-            - instance
-          addedlabels:
+        - addedlabels:
             - sliver
+          depth: 0
+          ison: true
+          matchinglabels:
+            - instance
+          op: '*'
           src:
             labels:
                 __name__:
@@ -10662,13 +10665,16 @@ output:
                 - node: '[*parser.VectorSelector] sliver_metadata{node_status="v"}'
                   op: ""
             joins:
-                - matchinglabels:
-                    - colo_name
-                  addedlabels:
+                - addedlabels:
                     - tier
                     - animal
                     - brand
                     - pop_name
+                  depth: 0
+                  ison: true
+                  matchinglabels:
+                    - colo_name
+                  op: '*'
                   src:
                     labels:
                         colo_status:
@@ -10685,21 +10691,18 @@ output:
                         start: 1
                         end: 31
                     type: selector
-                  op: 57397
-                  depth: 0
-                  ison: true
             usedLabels:
                 - colo_name
             position:
                 start: 92
                 end: 124
             type: selector
-          op: 57397
+        - addedlabels: []
           depth: 0
           ison: true
-        - matchinglabels:
+          matchinglabels:
             - instance
-          addedlabels: []
+          op: '*'
           src:
             labels:
                 job:
@@ -10722,9 +10725,6 @@ output:
                 start: 210
                 end: 250
             type: selector
-          op: 57397
-          depth: 0
-          ison: true
       usedLabels:
         - instance
       position:
@@ -10785,9 +10785,12 @@ output:
         - node: '[*parser.VectorSelector] up{job="node_exporter",node_status="v"}'
           op: ""
       joins:
-        - matchinglabels:
+        - addedlabels: []
+          depth: 0
+          ison: true
+          matchinglabels:
             - instance
-          addedlabels: []
+          op: '*'
           src:
             labels:
                 __name__:
@@ -10854,10 +10857,13 @@ output:
                 - node: '[*parser.VectorSelector] metal_services_enabled'
                   op: ""
             joins:
-                - matchinglabels:
-                    - instance
-                  addedlabels:
+                - addedlabels:
                     - sliver
+                  depth: 0
+                  ison: true
+                  matchinglabels:
+                    - instance
+                  op: '*'
                   src:
                     labels:
                         __name__:
@@ -10907,13 +10913,16 @@ output:
                         - node: '[*parser.VectorSelector] sliver_metadata{node_status="v"}'
                           op: ""
                     joins:
-                        - matchinglabels:
-                            - colo_name
-                          addedlabels:
+                        - addedlabels:
                             - tier
                             - animal
                             - brand
                             - pop_name
+                          depth: 0
+                          ison: true
+                          matchinglabels:
+                            - colo_name
+                          op: '*'
                           src:
                             labels:
                                 colo_status:
@@ -10930,18 +10939,12 @@ output:
                                 start: 1
                                 end: 31
                             type: selector
-                          op: 57397
-                          depth: 0
-                          ison: true
                     usedLabels:
                         - colo_name
                     position:
                         start: 92
                         end: 124
                     type: selector
-                  op: 57397
-                  depth: 0
-                  ison: true
             usedLabels:
                 - instance
             position:
@@ -10949,9 +10952,6 @@ output:
                 end: 185
             type: selector
             isConditional: true
-          op: 57397
-          depth: 0
-          ison: true
       usedLabels:
         - instance
       position:
@@ -11022,10 +11022,13 @@ output:
         - node: '[*parser.VectorSelector] metal_services_enabled'
           op: ""
       joins:
-        - matchinglabels:
-            - instance
-          addedlabels:
+        - addedlabels:
             - sliver
+          depth: 0
+          ison: true
+          matchinglabels:
+            - instance
+          op: '*'
           src:
             labels:
                 node_status:
@@ -11042,16 +11045,16 @@ output:
                 start: 1
                 end: 33
             type: selector
-          op: 57397
-          depth: 0
-          ison: true
-        - matchinglabels:
-            - colo_name
-          addedlabels:
+        - addedlabels:
             - tier
             - animal
             - brand
             - pop_name
+          depth: 0
+          ison: true
+          matchinglabels:
+            - colo_name
+          op: '*'
           src:
             labels:
                 colo_status:
@@ -11068,9 +11071,6 @@ output:
                 start: 162
                 end: 192
             type: selector
-          op: 57397
-          depth: 0
-          ison: true
       usedLabels:
         - instance
         - colo_name
@@ -11154,10 +11154,13 @@ output:
         - node: '[*parser.VectorSelector] metal_services_enabled'
           op: ""
       joins:
-        - matchinglabels:
-            - instance
-          addedlabels:
+        - addedlabels:
             - sliver
+          depth: 0
+          ison: true
+          matchinglabels:
+            - instance
+          op: '*'
           src:
             labels:
                 __name__:
@@ -11201,13 +11204,16 @@ output:
                 - node: '[*parser.VectorSelector] sliver_metadata'
                   op: ""
             joins:
-                - matchinglabels:
-                    - colo_name
-                  addedlabels:
+                - addedlabels:
                     - tier
                     - animal
                     - brand
                     - pop_name
+                  depth: 0
+                  ison: true
+                  matchinglabels:
+                    - colo_name
+                  op: '*'
                   src:
                     returns: vector
                     operations:
@@ -11217,18 +11223,12 @@ output:
                         start: 1
                         end: 14
                     type: selector
-                  op: 57397
-                  depth: 0
-                  ison: true
             usedLabels:
                 - colo_name
             position:
                 start: 75
                 end: 90
             type: selector
-          op: 57397
-          depth: 0
-          ison: true
       usedLabels:
         - instance
       position:
@@ -11301,10 +11301,13 @@ output:
         - node: '[*parser.VectorSelector] metal_services_enabled'
           op: ""
       joins:
-        - matchinglabels:
-            - instance
-          addedlabels:
+        - addedlabels:
             - sliver
+          depth: 0
+          ison: true
+          matchinglabels:
+            - instance
+          op: '*'
           src:
             returns: vector
             operations:
@@ -11314,16 +11317,16 @@ output:
                 start: 81
                 end: 96
             type: selector
-          op: 57397
-          depth: 0
-          ison: true
-        - matchinglabels:
-            - colo_name
-          addedlabels:
+        - addedlabels:
             - tier
             - animal
             - brand
             - pop_name
+          depth: 0
+          ison: true
+          matchinglabels:
+            - colo_name
+          op: '*'
           src:
             returns: vector
             operations:
@@ -11333,9 +11336,6 @@ output:
                 start: 1
                 end: 14
             type: selector
-          op: 57397
-          depth: 0
-          ison: true
       usedLabels:
         - instance
         - colo_name
@@ -11393,10 +11393,13 @@ output:
         - node: '[*parser.VectorSelector] up{job="node_exporter",node_status="v"}'
           op: ""
       joins:
-        - matchinglabels:
-            - instance
-          addedlabels:
+        - addedlabels:
             - node_status
+          depth: 0
+          ison: true
+          matchinglabels:
+            - instance
+          op: '*'
           src:
             returns: vector
             operations:
@@ -11406,9 +11409,6 @@ output:
                 start: 81
                 end: 96
             type: selector
-          op: 57397
-          depth: 0
-          ison: true
       usedLabels:
         - instance
       position:
@@ -11552,13 +11552,16 @@ output:
         - node: '[*parser.AggregateExpr] group by (cluster, namespace, workload, workload_type, pod) (label_join(label_join(group by (cluster, namespace, job_name, pod) (label_join(kube_pod_owner{job="kube-state-metrics",owner_kind="Job"}, "job_name", "", "owner_name")) * on (cluster, namespace, job_name) group_left (owner_kind, owner_name) group by (cluster, namespace, job_name, owner_kind, owner_name) (kube_job_owner{job="kube-state-metrics",owner_kind!="",owner_kind!="Pod"}), "workload", "", "owner_name"), "workload_type", "", "owner_kind"))'
           op: group
       joins:
-        - matchinglabels:
+        - addedlabels:
+            - owner_kind
+            - owner_name
+          depth: 1
+          ison: true
+          matchinglabels:
             - cluster
             - namespace
             - job_name
-          addedlabels:
-            - owner_kind
-            - owner_name
+          op: '*'
           src:
             labels:
                 "":
@@ -11626,9 +11629,6 @@ output:
                 end: 515
             type: aggregation
             fixedLabels: true
-          op: 57397
-          depth: 1
-          ison: true
       usedLabels:
         - cluster
         - namespace
@@ -11670,10 +11670,13 @@ output:
         - node: '[*parser.VectorSelector] bar'
           op: ""
       joins:
-        - matchinglabels:
-            - job
-          addedlabels:
+        - addedlabels:
             - instance
+          depth: 0
+          ison: true
+          matchinglabels:
+            - job
+          op: +
           src:
             labels:
                 job:
@@ -11690,9 +11693,6 @@ output:
                 start: 0
                 end: 14
             type: selector
-          op: 57383
-          depth: 0
-          ison: true
       usedLabels:
         - job
       position:
@@ -11729,10 +11729,13 @@ output:
         - node: '[*parser.VectorSelector] bar{job="zzz"}'
           op: ""
       joins:
-        - matchinglabels:
-            - job
-          addedlabels:
+        - addedlabels:
             - instance
+          depth: 0
+          ison: false
+          matchinglabels:
+            - job
+          op: +
           src:
             labels:
                 job:
@@ -11749,9 +11752,6 @@ output:
                 start: 0
                 end: 14
             type: selector
-          op: 57383
-          depth: 0
-          ison: false
       usedLabels:
         - instance
       position:
@@ -11858,9 +11858,12 @@ output:
         - node: '[*parser.AggregateExpr] sum by (colo_name, module_name) (rate(panics_total{module_name=~".+"}[5m]))'
           op: sum
       joins:
-        - matchinglabels:
+        - addedlabels: []
+          depth: 0
+          ison: false
+          matchinglabels:
             - module_name
-          addedlabels: []
+          op: /
           src:
             labels:
                 "":
@@ -11894,9 +11897,6 @@ output:
                 end: 145
             type: aggregation
             fixedLabels: true
-          op: 57384
-          depth: 0
-          ison: false
       usedLabels:
         - colo_name
         - module_name
@@ -11906,6 +11906,1831 @@ output:
       type: aggregation
       fixedLabels: true
       isConditional: true
+
+---
+
+[TestLabelsSource/185 - 1]
+expr: foo atan2 bar
+output:
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 13
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+      joins:
+        - addedlabels: []
+          depth: 0
+          ison: false
+          matchinglabels: []
+          op: atan2
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+            position:
+                start: 10
+                end: 13
+            type: selector
+      position:
+        start: 0
+        end: 3
+      type: selector
+
+---
+
+[TestLabelsSource/186 - 1]
+expr: foo offset -5m
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo offset -5m'
+          op: ""
+      position:
+        start: 0
+        end: 14
+      type: selector
+
+---
+
+[TestLabelsSource/187 - 1]
+expr: foo @ 1609459200
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo @ 1609459200.000'
+          op: ""
+      position:
+        start: 0
+        end: 16
+      type: selector
+
+---
+
+[TestLabelsSource/188 - 1]
+expr: foo @ start()
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo @ start()'
+          op: ""
+      position:
+        start: 0
+        end: 13
+      type: selector
+
+---
+
+[TestLabelsSource/189 - 1]
+expr: foo @ end()
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo @ end()'
+          op: ""
+      position:
+        start: 0
+        end: 11
+      type: selector
+
+---
+
+[TestLabelsSource/190 - 1]
+expr: foo[5m] @ 1609459200
+output:
+    - returns: matrix
+      operations:
+        - node: '[*parser.VectorSelector] foo @ 1609459200.000'
+          op: ""
+      position:
+        start: 0
+        end: 3
+      type: selector
+
+---
+
+[TestLabelsSource/191 - 1]
+expr: rate(foo[5m] @ start())
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo @ start()'
+          op: ""
+        - node: '[*parser.Call] rate(foo[5m] @ start())'
+          op: rate
+      position:
+        start: 5
+        end: 22
+      type: function
+
+---
+
+[TestLabelsSource/192 - 1]
+expr: histogram_quantile(0.9, rate(foo[5m]))
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] rate(foo[5m])'
+          op: rate
+        - args:
+            - "0.9"
+          node: '[*parser.Call] histogram_quantile(0.9, rate(foo[5m]))'
+          op: histogram_quantile
+      position:
+        start: 24
+        end: 37
+      type: function
+
+---
+
+[TestLabelsSource/193 - 1]
+expr: predict_linear(foo[5m], 3600)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - args:
+            - "3600"
+          node: '[*parser.Call] predict_linear(foo[5m], 3600)'
+          op: predict_linear
+      position:
+        start: 15
+        end: 22
+      type: function
+
+---
+
+[TestLabelsSource/194 - 1]
+expr: clamp(foo, 0, 100)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - args:
+            - "0"
+            - "100"
+          node: '[*parser.Call] clamp(foo, 0, 100)'
+          op: clamp
+      position:
+        start: 6
+        end: 9
+      type: function
+
+---
+
+[TestLabelsSource/195 - 1]
+expr: irate(foo[5m])
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] irate(foo[5m])'
+          op: irate
+      position:
+        start: 6
+        end: 13
+      type: function
+
+---
+
+[TestLabelsSource/196 - 1]
+expr: delta(foo[5m])
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] delta(foo[5m])'
+          op: delta
+      position:
+        start: 6
+        end: 13
+      type: function
+
+---
+
+[TestLabelsSource/197 - 1]
+expr: idelta(foo[5m])
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] idelta(foo[5m])'
+          op: idelta
+      position:
+        start: 7
+        end: 14
+      type: function
+
+---
+
+[TestLabelsSource/198 - 1]
+expr: increase(foo[5m])
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] increase(foo[5m])'
+          op: increase
+      position:
+        start: 9
+        end: 16
+      type: function
+
+---
+
+[TestLabelsSource/199 - 1]
+expr: changes(foo[5m])
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] changes(foo[5m])'
+          op: changes
+      position:
+        start: 8
+        end: 15
+      type: function
+
+---
+
+[TestLabelsSource/200 - 1]
+expr: resets(foo[5m])
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] resets(foo[5m])'
+          op: resets
+      position:
+        start: 7
+        end: 14
+      type: function
+
+---
+
+[TestLabelsSource/201 - 1]
+expr: timestamp(foo)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] timestamp(foo)'
+          op: timestamp
+      position:
+        start: 10
+        end: 13
+      type: function
+
+---
+
+[TestLabelsSource/202 - 1]
+expr: sort(foo)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] sort(foo)'
+          op: sort
+      position:
+        start: 5
+        end: 8
+      type: function
+
+---
+
+[TestLabelsSource/203 - 1]
+expr: sort_desc(foo)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] sort_desc(foo)'
+          op: sort_desc
+      position:
+        start: 10
+        end: 13
+      type: function
+
+---
+
+[TestLabelsSource/204 - 1]
+expr: pi()
+output:
+    - labels:
+        "":
+            reason: Calling `pi()` will return a scalar value with no labels.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 4
+      returns: scalar
+      operations:
+        - node: '[*parser.Call] pi()'
+          op: pi
+      returnInfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 4
+        returnednumber: 3.141592653589793
+        alwaysreturns: true
+        knownreturn: true
+        isreturnbool: false
+      position:
+        start: 0
+        end: 4
+      type: function
+      fixedLabels: true
+
+---
+
+[TestLabelsSource/205 - 1]
+expr: sgn(foo)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] sgn(foo)'
+          op: sgn
+      position:
+        start: 4
+        end: 7
+      type: function
+
+---
+
+[TestLabelsSource/206 - 1]
+expr: clamp_min(foo, 0)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - args:
+            - "0"
+          node: '[*parser.Call] clamp_min(foo, 0)'
+          op: clamp_min
+      position:
+        start: 10
+        end: 13
+      type: function
+
+---
+
+[TestLabelsSource/207 - 1]
+expr: clamp_max(foo, 100)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - args:
+            - "100"
+          node: '[*parser.Call] clamp_max(foo, 100)'
+          op: clamp_max
+      position:
+        start: 10
+        end: 13
+      type: function
+
+---
+
+[TestLabelsSource/208 - 1]
+expr: round(foo, 0.1)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - args:
+            - "0.1"
+          node: '[*parser.Call] round(foo, 0.1)'
+          op: round
+      position:
+        start: 6
+        end: 9
+      type: function
+
+---
+
+[TestLabelsSource/209 - 1]
+expr: exp(foo)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] exp(foo)'
+          op: exp
+      position:
+        start: 4
+        end: 7
+      type: function
+
+---
+
+[TestLabelsSource/210 - 1]
+expr: ln(foo)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] ln(foo)'
+          op: ln
+      position:
+        start: 3
+        end: 6
+      type: function
+
+---
+
+[TestLabelsSource/211 - 1]
+expr: log2(foo)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] log2(foo)'
+          op: log2
+      position:
+        start: 5
+        end: 8
+      type: function
+
+---
+
+[TestLabelsSource/212 - 1]
+expr: log10(foo)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] log10(foo)'
+          op: log10
+      position:
+        start: 6
+        end: 9
+      type: function
+
+---
+
+[TestLabelsSource/213 - 1]
+expr: sqrt(foo)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] sqrt(foo)'
+          op: sqrt
+      position:
+        start: 5
+        end: 8
+      type: function
+
+---
+
+[TestLabelsSource/214 - 1]
+expr: ceil(foo)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] ceil(foo)'
+          op: ceil
+      position:
+        start: 5
+        end: 8
+      type: function
+
+---
+
+[TestLabelsSource/215 - 1]
+expr: floor(foo)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] floor(foo)'
+          op: floor
+      position:
+        start: 6
+        end: 9
+      type: function
+
+---
+
+[TestLabelsSource/216 - 1]
+expr: avg_over_time(foo[5m])
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] avg_over_time(foo[5m])'
+          op: avg_over_time
+      position:
+        start: 14
+        end: 21
+      type: function
+
+---
+
+[TestLabelsSource/217 - 1]
+expr: min_over_time(foo[5m])
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] min_over_time(foo[5m])'
+          op: min_over_time
+      position:
+        start: 14
+        end: 21
+      type: function
+
+---
+
+[TestLabelsSource/218 - 1]
+expr: max_over_time(foo[5m])
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] max_over_time(foo[5m])'
+          op: max_over_time
+      position:
+        start: 14
+        end: 21
+      type: function
+
+---
+
+[TestLabelsSource/219 - 1]
+expr: count_over_time(foo[5m])
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] count_over_time(foo[5m])'
+          op: count_over_time
+      position:
+        start: 16
+        end: 23
+      type: function
+
+---
+
+[TestLabelsSource/220 - 1]
+expr: last_over_time(foo[5m])
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] last_over_time(foo[5m])'
+          op: last_over_time
+      position:
+        start: 15
+        end: 22
+      type: function
+
+---
+
+[TestLabelsSource/221 - 1]
+expr: present_over_time(foo[5m])
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] present_over_time(foo[5m])'
+          op: present_over_time
+      position:
+        start: 18
+        end: 25
+      type: function
+
+---
+
+[TestLabelsSource/222 - 1]
+expr: quantile_over_time(0.9, foo[5m])
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - args:
+            - "0.9"
+          node: '[*parser.Call] quantile_over_time(0.9, foo[5m])'
+          op: quantile_over_time
+      position:
+        start: 24
+        end: 31
+      type: function
+
+---
+
+[TestLabelsSource/223 - 1]
+expr: absent_over_time(foo[5m])
+output:
+    - labels:
+        "":
+            reason: |-
+                The [absent_over_time()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent_over_time) function is used to check if provided query doesn't match any time series.
+                You will only get any results back if the metric selector you pass doesn't match anything.
+                Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+                This means that the only labels you can get back from absent call are the ones you pass to it.
+                If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 16
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] absent_over_time(foo[5m])'
+          op: absent_over_time
+      position:
+        start: 17
+        end: 24
+      type: function
+      fixedLabels: true
+
+---
+
+[TestLabelsSource/224 - 1]
+expr: deg(foo)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] deg(foo)'
+          op: deg
+      position:
+        start: 4
+        end: 7
+      type: function
+
+---
+
+[TestLabelsSource/225 - 1]
+expr: rad(foo)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] rad(foo)'
+          op: rad
+      position:
+        start: 4
+        end: 7
+      type: function
+
+---
+
+[TestLabelsSource/226 - 1]
+expr: acos(foo)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] acos(foo)'
+          op: acos
+      position:
+        start: 5
+        end: 8
+      type: function
+
+---
+
+[TestLabelsSource/227 - 1]
+expr: asin(foo)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] asin(foo)'
+          op: asin
+      position:
+        start: 5
+        end: 8
+      type: function
+
+---
+
+[TestLabelsSource/228 - 1]
+expr: atan(foo)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] atan(foo)'
+          op: atan
+      position:
+        start: 5
+        end: 8
+      type: function
+
+---
+
+[TestLabelsSource/229 - 1]
+expr: cos(foo)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] cos(foo)'
+          op: cos
+      position:
+        start: 4
+        end: 7
+      type: function
+
+---
+
+[TestLabelsSource/230 - 1]
+expr: sin(foo)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] sin(foo)'
+          op: sin
+      position:
+        start: 4
+        end: 7
+      type: function
+
+---
+
+[TestLabelsSource/231 - 1]
+expr: tan(foo)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] tan(foo)'
+          op: tan
+      position:
+        start: 4
+        end: 7
+      type: function
+
+---
+
+[TestLabelsSource/232 - 1]
+expr: acosh(foo)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] acosh(foo)'
+          op: acosh
+      position:
+        start: 6
+        end: 9
+      type: function
+
+---
+
+[TestLabelsSource/233 - 1]
+expr: asinh(foo)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] asinh(foo)'
+          op: asinh
+      position:
+        start: 6
+        end: 9
+      type: function
+
+---
+
+[TestLabelsSource/234 - 1]
+expr: atanh(foo)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] atanh(foo)'
+          op: atanh
+      position:
+        start: 6
+        end: 9
+      type: function
+
+---
+
+[TestLabelsSource/235 - 1]
+expr: cosh(foo)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] cosh(foo)'
+          op: cosh
+      position:
+        start: 5
+        end: 8
+      type: function
+
+---
+
+[TestLabelsSource/236 - 1]
+expr: sinh(foo)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] sinh(foo)'
+          op: sinh
+      position:
+        start: 5
+        end: 8
+      type: function
+
+---
+
+[TestLabelsSource/237 - 1]
+expr: tanh(foo)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] tanh(foo)'
+          op: tanh
+      position:
+        start: 5
+        end: 8
+      type: function
+
+---
+
+[TestLabelsSource/238 - 1]
+expr: histogram_count(foo)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] histogram_count(foo)'
+          op: histogram_count
+      position:
+        start: 16
+        end: 19
+      type: function
+
+---
+
+[TestLabelsSource/239 - 1]
+expr: histogram_sum(foo)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] histogram_sum(foo)'
+          op: histogram_sum
+      position:
+        start: 14
+        end: 17
+      type: function
+
+---
+
+[TestLabelsSource/240 - 1]
+expr: histogram_avg(foo)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] histogram_avg(foo)'
+          op: histogram_avg
+      position:
+        start: 14
+        end: 17
+      type: function
+
+---
+
+[TestLabelsSource/241 - 1]
+expr: histogram_fraction(0, 0.1, foo)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - args:
+            - "0"
+            - "0.1"
+          node: '[*parser.Call] histogram_fraction(0, 0.1, foo)'
+          op: histogram_fraction
+      position:
+        start: 27
+        end: 30
+      type: function
+
+---
+
+[TestLabelsSource/242 - 1]
+expr: histogram_stddev(foo)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] histogram_stddev(foo)'
+          op: histogram_stddev
+      position:
+        start: 17
+        end: 20
+      type: function
+
+---
+
+[TestLabelsSource/243 - 1]
+expr: histogram_stdvar(foo)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] histogram_stdvar(foo)'
+          op: histogram_stdvar
+      position:
+        start: 17
+        end: 20
+      type: function
+
+---
+
+[TestLabelsSource/244 - 1]
+expr: min(foo) by(job)
+output:
+    - labels:
+        "":
+            reason: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 9
+                end: 11
+        __name__:
+            reason: Aggregation removes metric name.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 16
+        job:
+            reason: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 12
+                end: 15
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.AggregateExpr] min by (job) (foo)'
+          op: min
+      usedLabels:
+        - job
+      position:
+        start: 4
+        end: 7
+      type: aggregation
+      fixedLabels: true
+
+---
+
+[TestLabelsSource/245 - 1]
+expr: max(foo) without(job)
+output:
+    - labels:
+        __name__:
+            reason: Aggregation removes metric name.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 21
+        job:
+            reason: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
+            kind: excluded
+            fragment:
+                start: 17
+                end: 20
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.AggregateExpr] max without (job) (foo)'
+          op: max
+      position:
+        start: 4
+        end: 7
+      type: aggregation
+
+---
+
+[TestLabelsSource/246 - 1]
+expr: sum(foo * on(job) group_left(cluster) bar) by(cluster)
+output:
+    - labels:
+        "":
+            reason: Query is using aggregation with `by(cluster)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 43
+                end: 45
+        __name__:
+            reason: Aggregation removes metric name.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 54
+        cluster:
+            reason: Query is using aggregation with `by(cluster)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 46
+                end: 53
+        job:
+            reason: Query is using aggregation with `by(cluster)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 43
+                end: 54
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum by (cluster) (foo * on (job) group_left (cluster) bar)'
+          op: sum
+      joins:
+        - addedlabels:
+            - cluster
+          depth: 1
+          ison: true
+          matchinglabels:
+            - job
+          op: '*'
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+            position:
+                start: 38
+                end: 41
+            type: selector
+      usedLabels:
+        - cluster
+      position:
+        start: 4
+        end: 7
+      type: aggregation
+      fixedLabels: true
+
+---
+
+[TestLabelsSource/247 - 1]
+expr: sum(foo * on(job) group_left(cluster) bar) without(instance)
+output:
+    - labels:
+        __name__:
+            reason: Aggregation removes metric name.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 60
+        cluster:
+            reason: Query is using `group_left(cluster)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+            kind: included
+            fragment:
+                start: 29
+                end: 36
+        instance:
+            reason: Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
+            kind: excluded
+            fragment:
+                start: 51
+                end: 59
+        job:
+            reason: Query is using many-to-one vector matching with `on(job)`, labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 13
+                end: 16
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum without (instance) (foo * on (job) group_left (cluster) bar)'
+          op: sum
+      joins:
+        - addedlabels:
+            - cluster
+          depth: 1
+          ison: true
+          matchinglabels:
+            - job
+          op: '*'
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+            position:
+                start: 38
+                end: 41
+            type: selector
+      usedLabels:
+        - job
+      position:
+        start: 4
+        end: 7
+      type: aggregation
+
+---
+
+[TestLabelsSource/248 - 1]
+expr: foo atan2 on(job) bar
+output:
+    - labels:
+        "":
+            reason: Query is using one-to-one vector matching with `on(job)`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 10
+                end: 17
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 21
+        job:
+            reason: Query is using one-to-one vector matching with `on(job)`, only labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 13
+                end: 16
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+      joins:
+        - addedlabels: []
+          depth: 0
+          ison: true
+          matchinglabels:
+            - job
+          op: atan2
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+            position:
+                start: 18
+                end: 21
+            type: selector
+      usedLabels:
+        - job
+      position:
+        start: 0
+        end: 3
+      type: selector
+      fixedLabels: true
+
+---
+
+[TestLabelsSource/249 - 1]
+expr: foo atan2 on(job) group_left(cluster) bar
+output:
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 41
+        cluster:
+            reason: Query is using `group_left(cluster)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+            kind: included
+            fragment:
+                start: 29
+                end: 36
+        job:
+            reason: Query is using many-to-one vector matching with `on(job)`, labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 13
+                end: 16
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+      joins:
+        - addedlabels:
+            - cluster
+          depth: 0
+          ison: true
+          matchinglabels:
+            - job
+          op: atan2
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+            position:
+                start: 38
+                end: 41
+            type: selector
+      usedLabels:
+        - job
+      position:
+        start: 0
+        end: 3
+      type: selector
+
+---
+
+[TestLabelsSource/250 - 1]
+expr: foo != bool bar
+output:
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 15
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+      joins:
+        - addedlabels: []
+          depth: 0
+          ison: false
+          matchinglabels: []
+          op: '!='
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+            position:
+                start: 12
+                end: 15
+            type: selector
+      returnInfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: false
+        knownreturn: false
+        isreturnbool: true
+      position:
+        start: 0
+        end: 3
+      type: selector
+      isConditional: true
+
+---
+
+[TestLabelsSource/251 - 1]
+expr: foo == on(job) bar
+output:
+    - labels:
+        "":
+            reason: Query is using one-to-one vector matching with `on(job)`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 7
+                end: 14
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 18
+        job:
+            reason: Query is using one-to-one vector matching with `on(job)`, only labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 10
+                end: 13
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+      joins:
+        - addedlabels: []
+          depth: 0
+          ison: true
+          matchinglabels:
+            - job
+          op: ==
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+            position:
+                start: 15
+                end: 18
+            type: selector
+      usedLabels:
+        - job
+      position:
+        start: 0
+        end: 3
+      type: selector
+      fixedLabels: true
+      isConditional: true
+
+---
+
+[TestLabelsSource/252 - 1]
+expr: foo > on(job) group_left() bar
+output:
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 30
+        job:
+            reason: Query is using many-to-one vector matching with `on(job)`, labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 9
+                end: 12
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+      joins:
+        - addedlabels: []
+          depth: 0
+          ison: true
+          matchinglabels:
+            - job
+          op: '>'
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+            position:
+                start: 27
+                end: 30
+            type: selector
+      usedLabels:
+        - job
+      position:
+        start: 0
+        end: 3
+      type: selector
+      isConditional: true
+
+---
+
+[TestLabelsSource/253 - 1]
+expr: foo < on(job) group_right() bar
+output:
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 31
+        job:
+            reason: Query is using one-to-many vector matching with `on(job)`, labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 9
+                end: 12
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] bar'
+          op: ""
+      joins:
+        - addedlabels: []
+          depth: 0
+          ison: true
+          matchinglabels:
+            - job
+          op: <
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] foo'
+                  op: ""
+            position:
+                start: 0
+                end: 3
+            type: selector
+      usedLabels:
+        - job
+      position:
+        start: 28
+        end: 31
+      type: selector
+      isConditional: true
+
+---
+
+[TestLabelsSource/254 - 1]
+expr: foo >= on(job) group_left(cluster) bar
+output:
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 38
+        cluster:
+            reason: Query is using `group_left(cluster)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+            kind: included
+            fragment:
+                start: 26
+                end: 33
+        job:
+            reason: Query is using many-to-one vector matching with `on(job)`, labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 10
+                end: 13
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+      joins:
+        - addedlabels:
+            - cluster
+          depth: 0
+          ison: true
+          matchinglabels:
+            - job
+          op: '>='
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+            position:
+                start: 35
+                end: 38
+            type: selector
+      usedLabels:
+        - job
+      position:
+        start: 0
+        end: 3
+      type: selector
+      isConditional: true
+
+---
+
+[TestLabelsSource/255 - 1]
+expr: foo <= on(job) group_right(cluster) bar
+output:
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 39
+        cluster:
+            reason: Query is using `group_right(cluster)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
+            kind: included
+            fragment:
+                start: 27
+                end: 34
+        job:
+            reason: Query is using one-to-many vector matching with `on(job)`, labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 10
+                end: 13
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] bar'
+          op: ""
+      joins:
+        - addedlabels:
+            - cluster
+          depth: 0
+          ison: true
+          matchinglabels:
+            - job
+          op: <=
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] foo'
+                  op: ""
+            position:
+                start: 0
+                end: 3
+            type: selector
+      usedLabels:
+        - job
+      position:
+        start: 36
+        end: 39
+      type: selector
+      isConditional: true
+
+---
+
+[TestLabelsSource/256 - 1]
+expr: foo * ignoring(job) group_left() bar
+output:
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 36
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+      joins:
+        - addedlabels: []
+          depth: 0
+          ison: false
+          matchinglabels:
+            - job
+          op: '*'
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+            position:
+                start: 33
+                end: 36
+            type: selector
+      position:
+        start: 0
+        end: 3
+      type: selector
+
+---
+
+[TestLabelsSource/257 - 1]
+expr: foo / ignoring(job) group_right() bar
+output:
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 37
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] bar'
+          op: ""
+      joins:
+        - addedlabels: []
+          depth: 0
+          ison: false
+          matchinglabels:
+            - job
+          op: /
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] foo'
+                  op: ""
+            position:
+                start: 0
+                end: 3
+            type: selector
+      position:
+        start: 34
+        end: 37
+      type: selector
+
+---
+
+[TestLabelsSource/258 - 1]
+expr: foo % bar
+output:
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 9
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+      joins:
+        - addedlabels: []
+          depth: 0
+          ison: false
+          matchinglabels: []
+          op: '%'
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+            position:
+                start: 6
+                end: 9
+            type: selector
+      position:
+        start: 0
+        end: 3
+      type: selector
+
+---
+
+[TestLabelsSource/259 - 1]
+expr: foo ^ bar
+output:
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 9
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+      joins:
+        - addedlabels: []
+          depth: 0
+          ison: false
+          matchinglabels: []
+          op: ^
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+            position:
+                start: 6
+                end: 9
+            type: selector
+      position:
+        start: 0
+        end: 3
+      type: selector
+
+---
+
+[TestLabelsSource/260 - 1]
+expr: sum(foo * on(job) group_left(cluster) bar) by(job) * on(job) group_left(cluster) baz
+output:
+    - labels:
+        "":
+            reason: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 43
+                end: 45
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 84
+        cluster:
+            reason: Query is using `group_left(cluster)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+            kind: included
+            fragment:
+                start: 72
+                end: 79
+        job:
+            reason: Query is using many-to-one vector matching with `on(job)`, labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 56
+                end: 59
+      deadLabels:
+        - name: cluster
+          reason: Previously joined label `cluster` is being removed from the results.
+          labelreason: Query is using `group_left(cluster)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+          usagefragment:
+            start: 43
+            end: 50
+          labelfragment:
+            start: 29
+            end: 36
+          kind: 3
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum by (job) (foo * on (job) group_left (cluster) bar)'
+          op: sum
+      joins:
+        - addedlabels:
+            - cluster
+          depth: 1
+          ison: true
+          matchinglabels:
+            - job
+          op: '*'
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+            position:
+                start: 38
+                end: 41
+            type: selector
+        - addedlabels:
+            - cluster
+          depth: 0
+          ison: true
+          matchinglabels:
+            - job
+          op: '*'
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] baz'
+                  op: ""
+            position:
+                start: 81
+                end: 84
+            type: selector
+      usedLabels:
+        - job
+      position:
+        start: 4
+        end: 7
+      type: aggregation
+      fixedLabels: true
 
 ---
 
@@ -11938,12 +13763,15 @@ output:
         - node: '[*parser.Call] mad_over_time(foo[5m + 1m] smoothed)'
           op: mad_over_time
       joins:
-        - fill:
+        - addedlabels: []
+          depth: 0
+          fill:
             lhs: 0
             rhs: 0
+          ison: true
           matchinglabels:
             - job
-          addedlabels: []
+          op: +
           src:
             returns: vector
             operations:
@@ -11953,14 +13781,27 @@ output:
                 start: 53
                 end: 56
             type: selector
-          op: 57383
-          depth: 0
-          ison: true
       needsFeatures:
-        - promql-extended-range-selectors
-        - promql-duration-expr
-        - promql-experimental-functions
-        - promql-binop-fill-modifiers
+        - feature: promql-extended-range-selectors
+          name: smoothed
+          fragments:
+            - start: 14
+              end: 17
+        - feature: promql-duration-expr
+          name: duration_expr
+          fragments:
+            - start: 18
+              end: 23
+        - feature: promql-experimental-functions
+          name: mad_over_time
+          fragments:
+            - start: 0
+              end: 13
+        - feature: promql-binop-fill-modifiers
+          name: fill
+          fragments:
+            - start: 45
+              end: 49
       usedLabels:
         - job
       position:
@@ -11980,7 +13821,11 @@ output:
         - node: '[*parser.VectorSelector] foo anchored'
           op: ""
       needsFeatures:
-        - promql-extended-range-selectors
+        - feature: promql-extended-range-selectors
+          name: anchored
+          fragments:
+            - start: 0
+              end: 3
       position:
         start: 0
         end: 3
@@ -12016,12 +13861,15 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - fill:
+        - addedlabels: []
+          depth: 0
+          fill:
             lhs: 0
             rhs: 0
+          ison: true
           matchinglabels:
             - job
-          addedlabels: []
+          op: +
           src:
             returns: vector
             operations:
@@ -12031,11 +13879,12 @@ output:
                 start: 27
                 end: 30
             type: selector
-          op: 57383
-          depth: 0
-          ison: true
       needsFeatures:
-        - promql-binop-fill-modifiers
+        - feature: promql-binop-fill-modifiers
+          name: fill
+          fragments:
+            - start: 14
+              end: 18
       usedLabels:
         - job
       position:
@@ -12073,12 +13922,15 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - fill:
+        - addedlabels: []
+          depth: 0
+          fill:
             lhs: 0
             rhs: 0
+          ison: true
           matchinglabels:
             - job
-          addedlabels: []
+          op: +
           src:
             returns: vector
             operations:
@@ -12088,11 +13940,12 @@ output:
                 start: 27
                 end: 30
             type: selector
-          op: 57383
-          depth: 0
-          ison: true
       needsFeatures:
-        - promql-binop-fill-modifiers
+        - feature: promql-binop-fill-modifiers
+          name: fill
+          fragments:
+            - start: 14
+              end: 18
       usedLabels:
         - job
       position:
@@ -12130,12 +13983,15 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - fill:
+        - addedlabels: []
+          depth: 0
+          fill:
             lhs: 0
             rhs: 0
+          ison: true
           matchinglabels:
             - job
-          addedlabels: []
+          op: +
           src:
             returns: vector
             operations:
@@ -12145,11 +14001,12 @@ output:
                 start: 22
                 end: 25
             type: selector
-          op: 57383
-          depth: 0
-          ison: true
       needsFeatures:
-        - promql-binop-fill-modifiers
+        - feature: promql-binop-fill-modifiers
+          name: fill
+          fragments:
+            - start: 14
+              end: 18
       usedLabels:
         - job
       position:
@@ -12187,12 +14044,15 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       joins:
-        - fill:
+        - addedlabels: []
+          depth: 0
+          fill:
             lhs: 0
             rhs: 0
+          ison: true
           matchinglabels:
             - job
-          addedlabels: []
+          op: +
           src:
             returns: vector
             operations:
@@ -12202,11 +14062,12 @@ output:
                 start: 28
                 end: 31
             type: selector
-          op: 57383
-          depth: 0
-          ison: true
       needsFeatures:
-        - promql-binop-fill-modifiers
+        - feature: promql-binop-fill-modifiers
+          name: fill
+          fragments:
+            - start: 14
+              end: 18
       usedLabels:
         - job
       position:
@@ -12225,11 +14086,37 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       needsFeatures:
-        - promql-duration-expr
+        - feature: promql-duration-expr
+          name: duration_expr
+          fragments:
+            - start: 4
+              end: 11
       position:
         start: 0
         end: 3
       type: selector
+
+---
+
+[TestLabelsSourceWithFeatures/duration_expression_in_subquery_offset_expr - 1]
+expr: max_over_time(foo[1h:5m] offset (5m+1m))
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] max_over_time(foo[1h:5m] offset (5m + 1m))'
+          op: max_over_time
+      needsFeatures:
+        - feature: promql-duration-expr
+          name: duration_expr
+          fragments:
+            - start: 33
+              end: 38
+      position:
+        start: 14
+        end: 40
+      type: function
 
 ---
 
@@ -12245,7 +14132,11 @@ output:
         - node: '[*parser.Call] max_over_time(rate(foo[5m])[1h + 10m:5m])'
           op: max_over_time
       needsFeatures:
-        - promql-duration-expr
+        - feature: promql-duration-expr
+          name: duration_expr
+          fragments:
+            - start: 28
+              end: 34
       position:
         start: 14
         end: 38
@@ -12265,7 +14156,13 @@ output:
         - node: '[*parser.Call] max_over_time(rate(foo[5m])[1h + 10m:5m + 1m])'
           op: max_over_time
       needsFeatures:
-        - promql-duration-expr
+        - feature: promql-duration-expr
+          name: duration_expr
+          fragments:
+            - start: 28
+              end: 34
+            - start: 35
+              end: 40
       position:
         start: 14
         end: 41
@@ -12283,7 +14180,11 @@ output:
         - node: '[*parser.Call] max_over_time(foo[1h:5m + 1m])'
           op: max_over_time
       needsFeatures:
-        - promql-duration-expr
+        - feature: promql-duration-expr
+          name: duration_expr
+          fragments:
+            - start: 21
+              end: 26
       position:
         start: 14
         end: 27
@@ -12305,6 +14206,26 @@ output:
 
 ---
 
+[TestLabelsSourceWithFeatures/duration_expression_in_vector_selector_offset_expr - 1]
+expr: foo offset (5m+1m)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo offset (5m + 1m)'
+          op: ""
+      needsFeatures:
+        - feature: promql-duration-expr
+          name: duration_expr
+          fragments:
+            - start: 12
+              end: 17
+      position:
+        start: 0
+        end: 18
+      type: selector
+
+---
+
 [TestLabelsSourceWithFeatures/duration_expression_inside_rate - 1]
 expr: rate(foo[5m+1m])
 output:
@@ -12315,7 +14236,11 @@ output:
         - node: '[*parser.Call] rate(foo[5m + 1m])'
           op: rate
       needsFeatures:
-        - promql-duration-expr
+        - feature: promql-duration-expr
+          name: duration_expr
+          fragments:
+            - start: 9
+              end: 14
       position:
         start: 5
         end: 15
@@ -12333,8 +14258,16 @@ output:
         - node: '[*parser.Call] rate(foo[5m + 1m] smoothed)'
           op: rate
       needsFeatures:
-        - promql-extended-range-selectors
-        - promql-duration-expr
+        - feature: promql-extended-range-selectors
+          name: smoothed
+          fragments:
+            - start: 5
+              end: 8
+        - feature: promql-duration-expr
+          name: duration_expr
+          fragments:
+            - start: 9
+              end: 14
       position:
         start: 5
         end: 15
@@ -12372,12 +14305,15 @@ output:
         - node: '[*parser.Call] mad_over_time(foo[5m])'
           op: mad_over_time
       joins:
-        - fill:
+        - addedlabels: []
+          depth: 0
+          fill:
             lhs: 0
             rhs: 0
+          ison: true
           matchinglabels:
             - job
-          addedlabels: []
+          op: +
           src:
             returns: vector
             operations:
@@ -12387,12 +14323,17 @@ output:
                 start: 41
                 end: 44
             type: selector
-          op: 57383
-          depth: 0
-          ison: true
       needsFeatures:
-        - promql-experimental-functions
-        - promql-binop-fill-modifiers
+        - feature: promql-experimental-functions
+          name: mad_over_time
+          fragments:
+            - start: 0
+              end: 13
+        - feature: promql-binop-fill-modifiers
+          name: fill
+          fragments:
+            - start: 33
+              end: 37
       usedLabels:
         - job
       position:
@@ -12413,13 +14354,212 @@ output:
         - node: '[*parser.Call] mad_over_time(foo[5m] smoothed)'
           op: mad_over_time
       needsFeatures:
-        - promql-extended-range-selectors
-        - promql-experimental-functions
+        - feature: promql-extended-range-selectors
+          name: smoothed
+          fragments:
+            - start: 14
+              end: 17
+        - feature: promql-experimental-functions
+          name: mad_over_time
+          fragments:
+            - start: 0
+              end: 13
       position:
         start: 14
         end: 21
       type: function
       rangeSelectorMode: smoothed
+
+---
+
+[TestLabelsSourceWithFeatures/fill_with_group_left - 1]
+expr: foo + on(job) group_left() fill(0) bar
+output:
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 38
+        job:
+            reason: Query is using many-to-one vector matching with `on(job)`, labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 9
+                end: 12
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+      joins:
+        - addedlabels: []
+          depth: 0
+          fill:
+            lhs: 0
+            rhs: 0
+          ison: true
+          matchinglabels:
+            - job
+          op: +
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+            position:
+                start: 35
+                end: 38
+            type: selector
+      needsFeatures:
+        - feature: promql-binop-fill-modifiers
+          name: fill
+          fragments:
+            - start: 27
+              end: 31
+      usedLabels:
+        - job
+      position:
+        start: 0
+        end: 3
+      type: selector
+
+---
+
+[TestLabelsSourceWithFeatures/fill_with_group_right - 1]
+expr: foo + on(job) group_right() fill(0) bar
+output:
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 39
+        job:
+            reason: Query is using one-to-many vector matching with `on(job)`, labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 9
+                end: 12
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] bar'
+          op: ""
+      joins:
+        - addedlabels: []
+          depth: 0
+          fill:
+            lhs: 0
+            rhs: 0
+          ison: true
+          matchinglabels:
+            - job
+          op: +
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] foo'
+                  op: ""
+            position:
+                start: 0
+                end: 3
+            type: selector
+      needsFeatures:
+        - feature: promql-binop-fill-modifiers
+          name: fill
+          fragments:
+            - start: 28
+              end: 32
+      usedLabels:
+        - job
+      position:
+        start: 36
+        end: 39
+      type: selector
+
+---
+
+[TestLabelsSourceWithFeatures/limit_ratio_aggregator - 1]
+expr: limit_ratio(0.5, foo) by(job)
+output:
+    - labels:
+        "":
+            reason: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 22
+                end: 24
+        __name__:
+            reason: Aggregation removes metric name.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 29
+        job:
+            reason: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 25
+                end: 28
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - args:
+            - "0.5"
+          node: '[*parser.AggregateExpr] limit_ratio by (job) (0.5, foo)'
+          op: limit_ratio
+      needsFeatures:
+        - feature: promql-experimental-functions
+          name: limit_ratio
+          fragments:
+            - start: 0
+              end: 11
+      usedLabels:
+        - job
+      position:
+        start: 17
+        end: 20
+      type: aggregation
+      fixedLabels: true
+
+---
+
+[TestLabelsSourceWithFeatures/limit_ratio_with_without - 1]
+expr: limit_ratio(0.5, foo) without(job)
+output:
+    - labels:
+        __name__:
+            reason: Aggregation removes metric name.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 34
+        job:
+            reason: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
+            kind: excluded
+            fragment:
+                start: 30
+                end: 33
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - args:
+            - "0.5"
+          node: '[*parser.AggregateExpr] limit_ratio without (job) (0.5, foo)'
+          op: limit_ratio
+      needsFeatures:
+        - feature: promql-experimental-functions
+          name: limit_ratio
+          fragments:
+            - start: 0
+              end: 11
+      position:
+        start: 17
+        end: 20
+      type: aggregation
 
 ---
 
@@ -12448,7 +14588,95 @@ output:
           node: '[*parser.AggregateExpr] limitk(5, foo)'
           op: limitk
       needsFeatures:
-        - promql-experimental-functions
+        - feature: promql-experimental-functions
+          name: limitk
+          fragments:
+            - start: 0
+              end: 6
+      position:
+        start: 10
+        end: 13
+      type: aggregation
+      fixedLabels: true
+
+---
+
+[TestLabelsSourceWithFeatures/limitk_aggregator - 1]
+expr: limitk(5, foo) by(job)
+output:
+    - labels:
+        "":
+            reason: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 15
+                end: 17
+        __name__:
+            reason: Aggregation removes metric name.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 22
+        job:
+            reason: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 18
+                end: 21
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - args:
+            - "5"
+          node: '[*parser.AggregateExpr] limitk by (job) (5, foo)'
+          op: limitk
+      needsFeatures:
+        - feature: promql-experimental-functions
+          name: limitk
+          fragments:
+            - start: 0
+              end: 6
+      usedLabels:
+        - job
+      position:
+        start: 10
+        end: 13
+      type: aggregation
+      fixedLabels: true
+
+---
+
+[TestLabelsSourceWithFeatures/limitk_without_grouping - 1]
+expr: limitk(5, foo)
+output:
+    - labels:
+        "":
+            reason: Query is using aggregation that removes all labels.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 6
+        __name__:
+            reason: Aggregation removes metric name.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 14
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - args:
+            - "5"
+          node: '[*parser.AggregateExpr] limitk(5, foo)'
+          op: limitk
+      needsFeatures:
+        - feature: promql-experimental-functions
+          name: limitk
+          fragments:
+            - start: 0
+              end: 6
       position:
         start: 10
         end: 13
@@ -12467,7 +14695,11 @@ output:
         - node: '[*parser.Call] mad_over_time(foo[5m])'
           op: mad_over_time
       needsFeatures:
-        - promql-experimental-functions
+        - feature: promql-experimental-functions
+          name: mad_over_time
+          fragments:
+            - start: 0
+              end: 13
       position:
         start: 14
         end: 21
@@ -12485,7 +14717,11 @@ output:
         - node: '[*parser.Call] rate(foo[5m] smoothed)'
           op: rate
       needsFeatures:
-        - promql-extended-range-selectors
+        - feature: promql-extended-range-selectors
+          name: smoothed
+          fragments:
+            - start: 5
+              end: 8
       position:
         start: 5
         end: 12
@@ -12506,7 +14742,11 @@ output:
           node: '[*parser.Call] sort_by_label(foo, "job")'
           op: sort_by_label
       needsFeatures:
-        - promql-experimental-functions
+        - feature: promql-experimental-functions
+          name: sort_by_label
+          fragments:
+            - start: 0
+              end: 13
       position:
         start: 14
         end: 17

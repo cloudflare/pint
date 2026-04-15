@@ -24,7 +24,10 @@ func IsUnavailableError(err error) bool {
 	if e1, ok := errors.AsType[APIError](err); ok {
 		return e1.ErrorType == v1.ErrServer
 	}
-	return true
+	if _, ok := errors.AsType[QueryError](err); ok {
+		return true
+	}
+	return false
 }
 
 func IsQueryTooExpensive(err error) bool {
@@ -124,6 +127,8 @@ func tryDecodingAPIError(resp *http.Response) error {
 				apiPath = APIPathFlags
 			case strings.HasSuffix(resp.Request.URL.Path, APIPathMetadata):
 				apiPath = APIPathMetadata
+			case strings.HasSuffix(resp.Request.URL.Path, APIPathBuildInfo):
+				apiPath = APIPathBuildInfo
 			}
 			msg = "`" + apiPath + "` API endpoint"
 		}

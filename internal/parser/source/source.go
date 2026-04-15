@@ -180,7 +180,7 @@ type Fill struct {
 }
 
 type Join struct {
-	Fill           *Fill `yaml:"fill,omitempty"` // Fill values for unmatched series (binop fill modifiers).
+	Fill           *Fill // Fill values for unmatched series (binop fill modifiers).
 	MatchingLabels []string
 	AddedLabels    []string
 	Src            Source              // The source we're joining with.
@@ -189,10 +189,32 @@ type Join struct {
 	IsOn           bool
 }
 
+// Used for test snapshots.
+func (j Join) MarshalYAML() (any, error) {
+	m := map[string]any{
+		"matchinglabels": j.MatchingLabels,
+		"addedlabels":    j.AddedLabels,
+		"src":            j.Src,
+		"op":             promParser.ItemTypeStr[j.Op],
+		"depth":          j.Depth,
+		"ison":           j.IsOn,
+	}
+	if j.Fill != nil {
+		m["fill"] = j.Fill
+	}
+	return m, nil
+}
+
 type Unless struct {
 	MatchingLabels []string
 	Src            Source
 	IsOn           bool
+}
+
+type FeatureRequirement struct {
+	Feature   string                   `yaml:"feature"`
+	Name      string                   `yaml:"name"`
+	Fragments []posrange.PositionRange `yaml:"fragments"`
 }
 
 type Source struct {
@@ -205,7 +227,7 @@ type Source struct {
 	Joins []Join `yaml:"joins,omitempty"`
 	// Any other sources this source is suppressed by.
 	Unless        []Unless               `yaml:"unless,omitempty"`
-	NeedsFeatures []string               `yaml:"needsFeatures,omitempty"`
+	NeedsFeatures []FeatureRequirement   `yaml:"needsFeatures,omitempty"`
 	UsedLabels    []string               `yaml:"usedLabels,omitempty"`
 	ReturnInfo    ReturnInfo             `yaml:"returnInfo,omitempty"`
 	Position      posrange.PositionRange `yaml:"position"`
@@ -217,10 +239,32 @@ type Source struct {
 	RangeSelectorMode RangeSelectorMode `yaml:"rangeSelectorMode,omitempty"`
 }
 
-func (s *Source) requireFeature(f string) {
-	if !slices.Contains(s.NeedsFeatures, f) {
-		s.NeedsFeatures = append(s.NeedsFeatures, f)
+// requireFeature is called for every PromQL function, aggregation, and modifier.
+// It looks up the element name in the feature version map to determine whether
+// a feature flag is needed. If the name is not in the map then it's a standard
+// PromQL element that doesn't require any feature flag, so we skip it.
+// When a match is found, the query position is recorded so that diagnostics
+// can later highlight the exact fragment that requires the flag.
+func (s *Source) requireFeature(name string, pos posrange.PositionRange) {
+	// Only elements listed in the feature version map require a feature flag.
+	// Everything else is standard PromQL and can be ignored.
+	fv, ok := LookupFeatureVersion(name)
+	if !ok {
+		return
 	}
+	// If we already recorded a requirement for the same feature+name pair,
+	// just append the new position fragment to avoid duplicate entries.
+	for i, req := range s.NeedsFeatures {
+		if req.Feature == fv.Flag && req.Name == name {
+			s.NeedsFeatures[i].Fragments = append(s.NeedsFeatures[i].Fragments, pos)
+			return
+		}
+	}
+	s.NeedsFeatures = append(s.NeedsFeatures, FeatureRequirement{
+		Feature:   fv.Flag,
+		Name:      name,
+		Fragments: []posrange.PositionRange{pos},
+	})
 }
 
 func (s Source) Operation() string {
@@ -532,7 +576,7 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 		for _, s := range walkNode(expr, n.VectorSelector) {
 			s.Returns = promParser.ValueTypeMatrix
 			if n.RangeExpr != nil {
-				s.requireFeature(FeatureDurationExpr)
+				s.requireFeature("duration_expr", n.RangeExpr.PositionRange())
 			}
 			/*
 				// Prepend Matrix operation
@@ -549,8 +593,14 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 
 	case *promParser.SubqueryExpr:
 		for _, s := range walkNode(expr, n.Expr) {
-			if n.RangeExpr != nil || n.StepExpr != nil || n.OriginalOffsetExpr != nil {
-				s.requireFeature(FeatureDurationExpr)
+			if n.RangeExpr != nil {
+				s.requireFeature("duration_expr", n.RangeExpr.PositionRange())
+			}
+			if n.StepExpr != nil {
+				s.requireFeature("duration_expr", n.StepExpr.PositionRange())
+			}
+			if n.OriginalOffsetExpr != nil {
+				s.requireFeature("duration_expr", n.OriginalOffsetExpr.PositionRange())
 			}
 			src = append(src, s)
 		}
@@ -595,13 +645,13 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 		switch {
 		case n.Anchored:
 			s.RangeSelectorMode = RangeSelectorAnchored
-			s.requireFeature(FeatureExtendedRangeSelectors)
+			s.requireFeature(promParser.ItemTypeStr[promParser.ANCHORED], n.PosRange)
 		case n.Smoothed:
 			s.RangeSelectorMode = RangeSelectorSmoothed
-			s.requireFeature(FeatureExtendedRangeSelectors)
+			s.requireFeature(promParser.ItemTypeStr[promParser.SMOOTHED], n.PosRange)
 		}
 		if n.OriginalOffsetExpr != nil {
-			s.requireFeature(FeatureDurationExpr)
+			s.requireFeature("duration_expr", n.OriginalOffsetExpr.PositionRange())
 		}
 		s.Operations = append(s.Operations, Operation{
 			Operation: "",
@@ -676,8 +726,6 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 		args = append(args, n.Param.String())
 	}
 
-	isExperimental := n.Op.IsExperimentalAggregator()
-
 	switch n.Op {
 	case promParser.COUNT_VALUES:
 		for _, s = range parseAggregation(expr, n) {
@@ -720,8 +768,9 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 			if n.Without || !slices.Contains(n.Grouping, model.MetricNameLabel) {
 				s.excludeLabel("Aggregation removes metric name.", n.PosRange, model.MetricNameLabel)
 			}
-			if isExperimental {
-				s.requireFeature(FeatureExperimentalFunctions)
+			{
+				name := promParser.ItemTypeStr[n.Op]
+				s.requireFeature(name, FindFuncNamePosition(expr, n.PosRange, name))
 			}
 			src = append(src, s)
 		}
@@ -792,9 +841,7 @@ func parseAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 }
 
 func parsePromQLFunc(s Source, expr string, n *promParser.Call) Source {
-	if n.Func.Experimental {
-		s.requireFeature(FeatureExperimentalFunctions)
-	}
+	s.requireFeature(n.Func.Name, FindFuncNamePosition(expr, n.PositionRange(), n.Func.Name))
 	switch n.Func.Name {
 	case "abs", "sgn",
 		"acos", "acosh", "asin", "asinh", "atan", "atanh",
@@ -1119,9 +1166,6 @@ func parseCall(expr string, n *promParser.Call) (src []Source) {
 }
 
 func fillFromMatching(vm *promParser.VectorMatching) *Fill {
-	if vm == nil {
-		return nil
-	}
 	if vm.FillValues.LHS == nil && vm.FillValues.RHS == nil {
 		return nil
 	}
@@ -1237,7 +1281,8 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					IsOn:           n.VectorMatching.On,
 				})
 				if fill != nil {
-					ls.requireFeature(FeatureBinopFillModifiers)
+					name := promParser.ItemTypeStr[promParser.FILL]
+					ls.requireFeature(name, findBinOpsOperatorPosition(expr, n, name))
 				}
 			}
 			ls.DeadLabels = append(ls.DeadLabels, ls.checkJoinedLabels(expr, n, ls)...)
@@ -1307,7 +1352,8 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					IsOn:           n.VectorMatching.On,
 				})
 				if fill != nil {
-					rs.requireFeature(FeatureBinopFillModifiers)
+					name := promParser.ItemTypeStr[promParser.FILL]
+					rs.requireFeature(name, findBinOpsOperatorPosition(expr, n, name))
 				}
 			}
 			rs.excludeLabel("Binary operation between two vectors removes metric names.", pos, model.MetricNameLabel)
@@ -1373,7 +1419,8 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					IsOn:           n.VectorMatching.On,
 				})
 				if fill != nil {
-					ls.requireFeature(FeatureBinopFillModifiers)
+					name := promParser.ItemTypeStr[promParser.FILL]
+					ls.requireFeature(name, findBinOpsOperatorPosition(expr, n, name))
 				}
 			}
 			ls.excludeLabel("Binary operation between two vectors removes metric names.", pos, model.MetricNameLabel)
@@ -1458,19 +1505,15 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 						IsOn:           n.VectorMatching.On,
 					})
 				case n.Op != promParser.LOR:
-					fill := fillFromMatching(n.VectorMatching)
 					ls.Joins = append(ls.Joins, Join{
 						Src:            rs,
-						Fill:           fill,
+						Fill:           nil,
 						Op:             n.Op,
 						Depth:          0,
 						MatchingLabels: n.VectorMatching.MatchingLabels,
 						AddedLabels:    nil,
 						IsOn:           n.VectorMatching.On,
 					})
-					if fill != nil {
-						ls.requireFeature(FeatureBinopFillModifiers)
-					}
 				}
 				ls.DeadLabels = append(ls.DeadLabels, rs.checkJoinedLabels(expr, n, ls)...)
 			}

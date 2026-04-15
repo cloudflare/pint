@@ -145,7 +145,7 @@ data:
   - value: 48
     title: Number of offline checks
     type: NUMBER
-  - value: 42
+  - value: 48
     title: Number of online checks
     type: NUMBER
   - value: 0

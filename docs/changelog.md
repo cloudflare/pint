@@ -4,7 +4,7 @@
 
 ### Added
 
-- Better support for PromQL features and experimanal functions.
+- Added [promql/features](checks/promql/features.md) check.
 
 ### Fixed
 

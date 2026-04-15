@@ -13,30 +13,31 @@ config: |-
         "enabled": [
           "alerts/absent",
           "alerts/annotation",
+          "alerts/comparison",
           "alerts/count",
           "alerts/external_labels",
           "alerts/for",
           "alerts/template",
           "labels/conflict",
           "promql/aggregate",
-          "alerts/comparison",
-          "promql/impossible",
+          "promql/counter",
+          "promql/features",
           "promql/fragile",
+          "promql/impossible",
           "promql/range_query",
           "promql/rate",
           "promql/regexp",
+          "promql/selector",
+          "promql/series",
           "promql/syntax",
           "promql/vector_matching",
           "query/cost",
-          "promql/counter",
-          "promql/selector",
-          "promql/series",
           "rule/dependency",
           "rule/duplicate",
           "rule/for",
-          "rule/name",
           "rule/label",
           "rule/link",
+          "rule/name",
           "rule/reject",
           "rule/report"
         ]
@@ -149,6 +150,7 @@ checks:
     - promql/fragile
     - promql/regexp
     - promql/impossible
+    - promql/features(prom1)
     - promql/rate(prom2)
     - promql/series(prom2)
     - promql/vector_matching(prom2)
@@ -158,6 +160,7 @@ checks:
     - alerts/external_labels(prom2)
     - promql/counter(prom2)
     - alerts/absent(prom2)
+    - promql/features(prom2)
     - promql/rate(prom3)
     - promql/series(prom3)
     - promql/vector_matching(prom3)
@@ -167,5 +170,6 @@ checks:
     - alerts/external_labels(prom3)
     - promql/counter(prom3)
     - alerts/absent(prom3)
+    - promql/features(prom3)
 
 ---

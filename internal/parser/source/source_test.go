@@ -384,6 +384,82 @@ group by (cluster, namespace, workload, workload_type, pod) (
   sum(colo:requests:rate5m) by (colo_name)
 ) > 0.01
 `,
+	`foo atan2 bar`,
+	`foo offset -5m`,
+	`foo @ 1609459200`,
+	`foo @ start()`,
+	`foo @ end()`,
+	`foo[5m] @ 1609459200`,
+	`rate(foo[5m] @ start())`,
+	`histogram_quantile(0.9, rate(foo[5m]))`,
+	`predict_linear(foo[5m], 3600)`,
+	`clamp(foo, 0, 100)`,
+	`irate(foo[5m])`,
+	`delta(foo[5m])`,
+	`idelta(foo[5m])`,
+	`increase(foo[5m])`,
+	`changes(foo[5m])`,
+	`resets(foo[5m])`,
+	`timestamp(foo)`,
+	`sort(foo)`,
+	`sort_desc(foo)`,
+	`pi()`,
+	`sgn(foo)`,
+	`clamp_min(foo, 0)`,
+	`clamp_max(foo, 100)`,
+	`round(foo, 0.1)`,
+	`exp(foo)`,
+	`ln(foo)`,
+	`log2(foo)`,
+	`log10(foo)`,
+	`sqrt(foo)`,
+	`ceil(foo)`,
+	`floor(foo)`,
+	`avg_over_time(foo[5m])`,
+	`min_over_time(foo[5m])`,
+	`max_over_time(foo[5m])`,
+	`count_over_time(foo[5m])`,
+	`last_over_time(foo[5m])`,
+	`present_over_time(foo[5m])`,
+	`quantile_over_time(0.9, foo[5m])`,
+	`absent_over_time(foo[5m])`,
+	`deg(foo)`,
+	`rad(foo)`,
+	`acos(foo)`,
+	`asin(foo)`,
+	`atan(foo)`,
+	`cos(foo)`,
+	`sin(foo)`,
+	`tan(foo)`,
+	`acosh(foo)`,
+	`asinh(foo)`,
+	`atanh(foo)`,
+	`cosh(foo)`,
+	`sinh(foo)`,
+	`tanh(foo)`,
+	`histogram_count(foo)`,
+	`histogram_sum(foo)`,
+	`histogram_avg(foo)`,
+	`histogram_fraction(0, 0.1, foo)`,
+	`histogram_stddev(foo)`,
+	`histogram_stdvar(foo)`,
+	`min(foo) by(job)`,
+	`max(foo) without(job)`,
+	`sum(foo * on(job) group_left(cluster) bar) by(cluster)`,
+	`sum(foo * on(job) group_left(cluster) bar) without(instance)`,
+	`foo atan2 on(job) bar`,
+	`foo atan2 on(job) group_left(cluster) bar`,
+	`foo != bool bar`,
+	`foo == on(job) bar`,
+	`foo > on(job) group_left() bar`,
+	`foo < on(job) group_right() bar`,
+	`foo >= on(job) group_left(cluster) bar`,
+	`foo <= on(job) group_right(cluster) bar`,
+	`foo * ignoring(job) group_left() bar`,
+	`foo / ignoring(job) group_right() bar`,
+	`foo % bar`,
+	`foo ^ bar`,
+	`sum(foo * on(job) group_left(cluster) bar) by(job) * on(job) group_left(cluster) baz`,
 }
 
 func TestLabelsSource(t *testing.T) {
@@ -678,10 +754,52 @@ func TestLabelsSourceWithFeatures(t *testing.T) {
 			description: "duration expression in vector offset",
 			expr:        `foo offset 5m+1m`,
 		},
+		// Duration expression in vector selector offset using parenthesized
+		// duration to trigger OriginalOffsetExpr on VectorSelector.
+		{
+			description: "duration expression in vector selector offset expr",
+			expr:        `foo offset (5m+1m)`,
+		},
+		// Duration expression in subquery offset using parenthesized duration
+		// to trigger OriginalOffsetExpr on SubqueryExpr.
+		{
+			description: "duration expression in subquery offset expr",
+			expr:        `max_over_time(foo[1h:5m] offset (5m+1m))`,
+		},
+		// Fill modifier with group_right (CardOneToMany).
+		{
+			description: "fill with group_right",
+			expr:        `foo + on(job) group_right() fill(0) bar`,
+		},
+		// Fill modifier with group_left (CardManyToOne).
+		{
+			description: "fill with group_left",
+			expr:        `foo + on(job) group_left() fill(0) bar`,
+		},
 		// All four features combined in a single query.
 		{
 			description: "all four features combined",
 			expr:        `mad_over_time(foo[5m+1m] smoothed) + on(job) fill(0) bar`,
+		},
+		// Experimental aggregator: limitk.
+		{
+			description: "limitk aggregator",
+			expr:        `limitk(5, foo) by(job)`,
+		},
+		// Experimental aggregator: limit_ratio.
+		{
+			description: "limit_ratio aggregator",
+			expr:        `limit_ratio(0.5, foo) by(job)`,
+		},
+		// Experimental aggregator: limitk without grouping.
+		{
+			description: "limitk without grouping",
+			expr:        `limitk(5, foo)`,
+		},
+		// Experimental aggregator: limit_ratio with without().
+		{
+			description: "limit_ratio with without",
+			expr:        `limit_ratio(0.5, foo) without(job)`,
 		},
 	}
 

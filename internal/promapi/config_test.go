@@ -17,11 +17,12 @@ import (
 
 func TestConfig(t *testing.T) {
 	type testCaseT struct {
-		mock     httpmock.Mocker
-		errCheck func(t *testing.T, err error)
-		name     string
-		cfg      promapi.PrometheusConfig
-		timeout  time.Duration
+		mock        httpmock.Mocker
+		errCheck    func(t *testing.T, err error)
+		name        string
+		cfg         promapi.PrometheusConfig
+		timeout     time.Duration
+		useFailover bool
 	}
 
 	defaults := promapi.PrometheusConfig{
@@ -160,6 +161,23 @@ func TestConfig(t *testing.T) {
 					UnlimitedTimes()
 			}),
 		},
+		// Verifies that FailoverGroup.Config returns a FailoverGroupError
+		// immediately when the server returns a non-unavailable error (bad_data).
+		{
+			name:        "failover/non-unavailable error",
+			timeout:     time.Second,
+			useFailover: true,
+			errCheck: func(t *testing.T, err error) {
+				t.Helper()
+				require.EqualError(t, err, "bad_data: custom error message")
+			},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(promapi.APIPathConfig).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"error","errorType":"bad_data","error":"custom error message"}`).
+					UnlimitedTimes()
+			}),
+		},
 	}
 
 	for _, tc := range testCases {
@@ -167,10 +185,21 @@ func TestConfig(t *testing.T) {
 			srv := tc.mock(t)
 
 			prom := promapi.NewPrometheus("test", srv.URL(), "", nil, tc.timeout, 1, 100, nil)
-			prom.StartWorkers()
-			t.Cleanup(prom.Close)
 
-			cfg, err := prom.Config(t.Context(), time.Minute)
+			var cfg *promapi.ConfigResult
+			var err error
+			if tc.useFailover {
+				fg := promapi.NewFailoverGroup("test", srv.URL(), []*promapi.Prometheus{prom}, true, "up", nil, nil, nil)
+				reg := prometheus.NewRegistry()
+				fg.StartWorkers(reg)
+				t.Cleanup(func() { fg.Close(reg) })
+				cfg, err = fg.Config(t.Context(), 0)
+			} else {
+				prom.StartWorkers()
+				t.Cleanup(prom.Close)
+				cfg, err = prom.Config(t.Context(), time.Minute)
+			}
+
 			if tc.errCheck != nil {
 				tc.errCheck(t, err)
 			} else {

@@ -6,13 +6,13 @@
       expr: found > 0
   output: |
     1 | - record: foo
-                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `server_error: internal error`.
+                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.
   problem:
     reporter: promql/series
     summary: unable to run checks
     details: ""
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `server_error: internal error`.'
+        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.'
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -36,13 +36,13 @@
       expr: found > 0
   output: |
     1 | - record: foo
-                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `server_error: internal error`.
+                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.
   problem:
     reporter: promql/series
     summary: unable to run checks
     details: ""
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `server_error: internal error`.'
+        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.'
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -303,13 +303,13 @@
       expr: sum(found{notfound="xxx"})
   output: |
     1 | - record: foo
-                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `server_error: internal error`.
+                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.
   problem:
     reporter: promql/series
     summary: unable to run checks
     details: ""
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `server_error: internal error`.'
+        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.'
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -727,13 +727,13 @@
       expr: sum(found{error="xxx"})
   output: |
     1 | - record: foo
-                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `server_error: internal error`.
+                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.
   problem:
     reporter: promql/series
     summary: unable to run checks
     details: ""
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `server_error: internal error`.'
+        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.'
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -1063,13 +1063,13 @@
       expr: sum(foo)
   output: |
     1 | - record: foo
-                  ^^^ `prom` Prometheus server at http://127.0.0.1:XXXXX failed with: `bad_data: bad input data`.
+                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `bad_data: bad input data`.
   problem:
     reporter: promql/series
     summary: unable to run checks
     details: ""
     diagnostics:
-        - message: '`prom` Prometheus server at http://127.0.0.1:XXXXX failed with: `bad_data: bad input data`.'
+        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `bad_data: bad input data`.'
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -1088,13 +1088,13 @@
       expr: sum(foo)
   output: |
     1 | - record: foo
-                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.127.127.127:9999 connection error: `connection refused`.
+                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.127.127.127:9999 error: `connection refused`.
   problem:
     reporter: promql/series
     summary: unable to run checks
     details: ""
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.127.127.127:9999 connection error: `connection refused`.'
+        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.127.127.127:9999 error: `connection refused`.'
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -2316,13 +2316,13 @@
       expr: sum(foo)
   output: |
     1 | - record: foo
-                  ^^^ `prom` Prometheus server at http://127.0.0.1:XXXXX failed with: `client_error: 404 Not Found`.
+                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `client_error: 404 Not Found`.
   problem:
     reporter: promql/series
     summary: unable to run checks
     details: ""
     diagnostics:
-        - message: '`prom` Prometheus server at http://127.0.0.1:XXXXX failed with: `client_error: 404 Not Found`.'
+        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `client_error: 404 Not Found`.'
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -2341,13 +2341,13 @@
       expr: sum(foo)
   output: |
     1 | - record: foo
-                  ^^^ `prom` Prometheus server at http://127.0.0.1:XXXXX failed with: `client_error: 404 Not Found`.
+                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `client_error: 404 Not Found`.
   problem:
     reporter: promql/series
     summary: unable to run checks
     details: ""
     diagnostics:
-        - message: '`prom` Prometheus server at http://127.0.0.1:XXXXX failed with: `client_error: 404 Not Found`.'
+        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `client_error: 404 Not Found`.'
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
