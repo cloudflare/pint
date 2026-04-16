@@ -1,0 +1,18 @@
+exec pint parse 'rate(bar[5m+1m])'
+cmp stdout stdout.txt
+! stderr .
+
+-- stdout.txt --
+++ node: rate(bar[5m + 1m])
+  Call:
+    * Type: vector
+    * Func: rate
+    * Args: bar[5m + 1m]
+      ++ node: bar[5m + 1m]
+        Expressions:
+          ++ node: bar[5m + 1m]
+            MatrixSelector:
+              * Type: matrix
+              * VectorSelector: bar
+              * Range: 0s
+              * RangeExpr: 5m + 1m

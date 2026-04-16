@@ -5264,7 +5264,7 @@ data:
 				tc.output.TotalLines++
 			}
 
-			p := parser.NewParser(tc.strict, tc.schema, tc.names)
+			p := parser.NewParser(parser.Options{IsStrict: tc.strict, Schema: tc.schema, Names: tc.names})
 			file := p.Parse(bytes.NewReader(tc.input))
 
 			if diff := cmp.Diff(tc.output, file,
@@ -5464,7 +5464,7 @@ groups:
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			p := parser.NewParser(false, tc.schema, tc.names)
+			p := parser.NewParser(parser.Options{Schema: tc.schema, Names: tc.names})
 			r := bytes.NewReader(tc.input)
 			file := p.Parse(r)
 
@@ -5487,7 +5487,7 @@ func BenchmarkParse(b *testing.B) {
 	data, err := os.ReadFile("testrules.yml")
 	require.NoError(b, err)
 
-	p := parser.NewParser(true, parser.PrometheusSchema, model.LegacyValidation)
+	p := parser.NewParser(parser.Options{IsStrict: true, Names: model.LegacyValidation})
 	for b.Loop() {
 		b.StopTimer()
 		r := bytes.NewReader(data)

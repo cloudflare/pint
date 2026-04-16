@@ -301,3 +301,18 @@ func (fg *FailoverGroup) Flags(ctx context.Context) (flags *FlagsResult, err err
 	}
 	return nil, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
 }
+
+func (fg *FailoverGroup) BuildInfo(ctx context.Context) (bi *BuildInfoResult, err error) {
+	var uri string
+	for _, prom := range fg.servers {
+		uri = prom.safeURI
+		bi, err = prom.BuildInfo(ctx)
+		if err == nil {
+			return bi, nil
+		}
+		if !IsUnavailableError(err) && !errors.Is(err, ErrUnsupported) {
+			return nil, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
+		}
+	}
+	return nil, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
+}

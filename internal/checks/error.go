@@ -59,13 +59,7 @@ func (c ErrorCheck) Check(_ context.Context, _ *discovery.Entry, _ []*discovery.
 }
 
 func parseRuleError(rule parser.Rule, err error) Problem {
-	var commentErr comments.CommentError
-	var ownerErr comments.OwnerError
-	var ignoreErr discovery.FileIgnoreError
-	var parseErr parser.ParseError
-
-	switch {
-	case errors.As(err, &ignoreErr):
+	if ignoreErr, ok := errors.AsType[discovery.FileIgnoreError](err); ok {
 		slog.LogAttrs(context.Background(), slog.LevelDebug, "ignore/file report", slog.Any("err", ignoreErr))
 		return Problem{
 			Anchor: AnchorAfter,
@@ -81,8 +75,9 @@ func parseRuleError(rule parser.Rule, err error) Problem {
 				ignoreErr.Diagnostic,
 			},
 		}
+	}
 
-	case errors.As(err, &commentErr):
+	if commentErr, ok := errors.AsType[comments.CommentError](err); ok {
 		slog.LogAttrs(context.Background(), slog.LevelDebug, "invalid comment report", slog.Any("err", commentErr))
 		return Problem{
 			Anchor: AnchorAfter,
@@ -98,8 +93,9 @@ func parseRuleError(rule parser.Rule, err error) Problem {
 				commentErr.Diagnostic,
 			},
 		}
+	}
 
-	case errors.As(err, &ownerErr):
+	if ownerErr, ok := errors.AsType[comments.OwnerError](err); ok {
 		slog.LogAttrs(context.Background(), slog.LevelDebug, "invalid owner report", slog.Any("err", ownerErr))
 		return Problem{
 			Anchor: AnchorAfter,
@@ -115,8 +111,9 @@ func parseRuleError(rule parser.Rule, err error) Problem {
 				ownerErr.Diagnostic,
 			},
 		}
+	}
 
-	case errors.As(err, &parseErr):
+	if parseErr, ok := errors.AsType[parser.ParseError](err); ok {
 		slog.LogAttrs(context.Background(), slog.LevelDebug, "parse error", slog.Any("err", parseErr))
 		return Problem{
 			Anchor: AnchorAfter,
@@ -133,24 +130,23 @@ If this file is a template that will be rendered into valid YAML then you can in
 			Severity:    Fatal,
 			Diagnostics: nil,
 		}
+	}
 
-	default:
-		slog.LogAttrs(context.Background(), slog.LevelDebug, "rule error report", slog.Any("err", rule.Error.Err))
-		details := yamlDetails
-		if rule.Error.Details != "" {
-			details = rule.Error.Details
-		}
-		return Problem{
-			Anchor: AnchorAfter,
-			Lines: diags.LineRange{
-				First: rule.Error.Line,
-				Last:  rule.Error.Line,
-			},
-			Reporter:    yamlParseReporter,
-			Summary:     fmt.Sprintf("This rule is not a valid Prometheus rule: `%s`.", rule.Error.Err.Error()),
-			Details:     details,
-			Severity:    Fatal,
-			Diagnostics: nil,
-		}
+	slog.LogAttrs(context.Background(), slog.LevelDebug, "rule error report", slog.Any("err", rule.Error.Err))
+	details := yamlDetails
+	if rule.Error.Details != "" {
+		details = rule.Error.Details
+	}
+	return Problem{
+		Anchor: AnchorAfter,
+		Lines: diags.LineRange{
+			First: rule.Error.Line,
+			Last:  rule.Error.Line,
+		},
+		Reporter:    yamlParseReporter,
+		Summary:     fmt.Sprintf("This rule is not a valid Prometheus rule: `%s`.", rule.Error.Err.Error()),
+		Details:     details,
+		Severity:    Fatal,
+		Diagnostics: nil,
 	}
 }

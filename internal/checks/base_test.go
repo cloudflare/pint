@@ -135,6 +135,7 @@ type checkTest struct {
 	ctx           newCtxFn
 	checker       newCheckFn
 	snapshot      snapshotFn
+	setup         func(t *testing.T)
 	description   string
 	content       string
 	entries       []*discovery.Entry
@@ -167,6 +168,9 @@ func runTests(t *testing.T, testCases []checkTest) {
 	for _, tc := range testCases {
 		// original test
 		t.Run(tc.description, func(t *testing.T) {
+			if tc.setup != nil {
+				tc.setup(t)
+			}
 			slog.SetDefault(slogt.New(t))
 
 			var uri string
@@ -204,7 +208,7 @@ func runTests(t *testing.T, testCases []checkTest) {
 			}
 
 			ctx, cancel := context.WithCancel(t.Context())
-			entries, err := parseContent(tc.content, tc.contentStrict)
+			entries, err := parseContent(tc.content, parser.DefaultOptions.WithStrict(tc.contentStrict))
 			require.NoError(t, err, "cannot parse rule content")
 			for _, entry := range entries {
 				if tc.ctx != nil {
@@ -266,7 +270,7 @@ func runTests(t *testing.T, testCases []checkTest) {
 
 - record: foo
   expr: 'foo{}{}'
-`, false)
+`, parser.DefaultOptions)
 		require.NoError(t, err, "cannot parse rule content")
 		t.Run(tc.description+" (bogus rules)", func(_ *testing.T) {
 			for _, entry := range entries {
@@ -276,8 +280,8 @@ func runTests(t *testing.T, testCases []checkTest) {
 	}
 }
 
-func parseContent(content string, isStrict bool) (entries []*discovery.Entry, _ error) {
-	p := parser.NewParser(isStrict, parser.PrometheusSchema, model.UTF8Validation)
+func parseContent(content string, opts parser.Options) (entries []*discovery.Entry, _ error) {
+	p := parser.NewParser(opts)
 	file := p.Parse(strings.NewReader(content))
 	if file.Error.Err != nil {
 		return nil, file.Error
@@ -302,7 +306,7 @@ func parseContent(content string, isStrict bool) (entries []*discovery.Entry, _ 
 }
 
 func mustParseContent(content string) (entries []*discovery.Entry) {
-	entries, err := parseContent(content, false)
+	entries, err := parseContent(content, parser.DefaultOptions)
 	if err != nil {
 		panic(err)
 	}
@@ -377,6 +381,7 @@ func (fc formCond) isMatch(r *http.Request) bool {
 var (
 	requireConfigPath     = requestPathCond{path: promapi.APIPathConfig}
 	requireFlagsPath      = requestPathCond{path: promapi.APIPathFlags}
+	requireBuildInfoPath  = requestPathCond{path: promapi.APIPathBuildInfo}
 	requireQueryPath      = requestPathCond{path: promapi.APIPathQuery}
 	requireRangeQueryPath = requestPathCond{path: promapi.APIPathQueryRange}
 	requireMetadataPath   = requestPathCond{path: promapi.APIPathMetadata}
@@ -538,6 +543,27 @@ func (fg flagsResponse) respond(w http.ResponseWriter, _ *http.Request) {
 	}{
 		Status: "success",
 		Data:   fg.flags,
+	}
+	d, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		panic(err)
+	}
+	_, _ = w.Write(d)
+}
+
+type buildInfoResponse struct {
+	version string
+}
+
+func (bi buildInfoResponse) respond(w http.ResponseWriter, _ *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	result := struct {
+		Data   v1.BuildinfoResult `json:"data"`
+		Status string             `json:"status"`
+	}{
+		Status: "success",
+		Data:   v1.BuildinfoResult{Version: bi.version},
 	}
 	d, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {

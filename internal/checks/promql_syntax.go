@@ -53,8 +53,7 @@ func (c SyntaxCheck) Check(_ context.Context, entry *discovery.Entry, _ []*disco
 			Kind:        diags.Issue,
 		}
 
-		var perrs promParser.ParseErrors
-		ok := errors.As(expr.SyntaxError(), &perrs)
+		perrs, ok := errors.AsType[promParser.ParseErrors](expr.SyntaxError())
 		if ok {
 			for _, perr := range perrs { // Use only the last error.
 				diag = diags.Diagnostic{

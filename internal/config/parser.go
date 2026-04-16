@@ -3,6 +3,10 @@ package config
 import (
 	"fmt"
 	"regexp"
+
+	"github.com/prometheus/common/model"
+
+	"github.com/cloudflare/pint/internal/parser"
 )
 
 const (
@@ -19,6 +23,12 @@ type Parser struct {
 	Relaxed []string `hcl:"relaxed,optional" json:"relaxed,omitempty"`
 	Include []string `hcl:"include,optional" json:"include,omitempty"`
 	Exclude []string `hcl:"exclude,optional" json:"exclude,omitempty"`
+
+	opts parser.Options
+}
+
+func (p Parser) Options() parser.Options {
+	return p.opts
 }
 
 func (p Parser) getSchema() string {
@@ -67,5 +77,26 @@ func (p Parser) validate() error {
 			return err
 		}
 	}
+
 	return nil
+}
+
+func (p *Parser) initOptions() {
+	var names model.ValidationScheme
+	if p.getNames() == NamesLegacy {
+		names = model.LegacyValidation
+	} else {
+		names = model.UTF8Validation
+	}
+
+	var schema parser.Schema
+	if p.getSchema() == SchemaThanos {
+		schema = parser.ThanosSchema
+	}
+
+	p.opts = parser.Options{
+		Names:    names,
+		Schema:   schema,
+		IsStrict: false,
+	}
 }

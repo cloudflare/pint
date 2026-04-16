@@ -13,30 +13,31 @@ config: |-
         "enabled": [
           "alerts/absent",
           "alerts/annotation",
+          "alerts/comparison",
           "alerts/count",
           "alerts/external_labels",
           "alerts/for",
           "alerts/template",
           "labels/conflict",
           "promql/aggregate",
-          "alerts/comparison",
-          "promql/impossible",
+          "promql/counter",
+          "promql/features",
           "promql/fragile",
+          "promql/impossible",
           "promql/range_query",
           "promql/rate",
           "promql/regexp",
+          "promql/selector",
+          "promql/series",
           "promql/syntax",
           "promql/vector_matching",
           "query/cost",
-          "promql/counter",
-          "promql/selector",
-          "promql/series",
           "rule/dependency",
           "rule/duplicate",
           "rule/for",
-          "rule/name",
           "rule/label",
           "rule/link",
+          "rule/name",
           "rule/reject",
           "rule/report"
         ],
@@ -116,8 +117,10 @@ checks:
     - promql/impossible
     - labels/conflict(prom1)
     - alerts/external_labels(prom1)
+    - promql/features(prom1)
     - promql/series(prom2)
     - labels/conflict(prom2)
     - alerts/external_labels(prom2)
+    - promql/features(prom2)
 
 ---

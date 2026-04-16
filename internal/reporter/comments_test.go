@@ -13,7 +13,6 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/neilotoole/slogt"
-	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -76,7 +75,7 @@ func (tc testCommenter) IsEqual(_ any, e ExistingComment, p PendingComment) bool
 }
 
 func TestCommenter(t *testing.T) {
-	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
+	p := parser.NewParser(parser.DefaultOptions)
 	mockFile := p.Parse(strings.NewReader(`
 - record: target is down
   expr: up == 0
@@ -849,7 +848,7 @@ func TestCommentsCommonPaths(t *testing.T) {
 		showDuplicates bool
 	}
 
-	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
+	p := parser.NewParser(parser.DefaultOptions)
 	mockFile := p.Parse(strings.NewReader(`
 - record: target is down
   expr: up == 0

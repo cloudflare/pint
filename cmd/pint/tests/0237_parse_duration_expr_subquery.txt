@@ -1,0 +1,33 @@
+exec pint parse 'max_over_time(rate(foo[5m])[1h+10m:5m+1m])'
+cmp stdout stdout.txt
+! stderr .
+
+-- stdout.txt --
+++ node: max_over_time(rate(foo[5m])[1h + 10m:5m + 1m])
+  Call:
+    * Type: vector
+    * Func: max_over_time
+    * Args: rate(foo[5m])[1h + 10m:5m + 1m]
+      ++ node: rate(foo[5m])[1h + 10m:5m + 1m]
+        Expressions:
+          ++ node: rate(foo[5m])[1h + 10m:5m + 1m]
+            SubqueryExpr:
+              * Type: matrix
+              * Expr: rate(foo[5m])
+              * Step: 0s
+              * StepExpr: 5m + 1m
+              * Range: 0s
+              * RangeExpr: 1h + 10m
+              * Offset: 0s
+                ++ node: rate(foo[5m])
+                  Call:
+                    * Type: vector
+                    * Func: rate
+                    * Args: foo[5m]
+                      ++ node: foo[5m]
+                        Expressions:
+                          ++ node: foo[5m]
+                            MatrixSelector:
+                              * Type: matrix
+                              * VectorSelector: foo
+                              * Range: 5m0s

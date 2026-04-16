@@ -1,0 +1,38 @@
+http response prometheus /api/v1/metadata 200 {"status":"success","data":{}}
+http response prometheus /api/v1/status/config 200 {"status":"success","data":{"yaml":"global:\n  scrape_interval: 30s\n"}}
+http response prometheus /api/v1/status/flags 200 {"status":"success","data":{"storage.tsdb.retention.time": "1d"}}
+http response prometheus /api/v1/status/buildinfo 200 {"status":"success","data":{"version":"2.49.0"}}
+http start prometheus 127.0.0.1:7240
+
+! exec pint --no-color lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=INFO msg="Loading configuration file" path=.pint.hcl
+level=INFO msg="Finding all rules to check" paths=["rules"]
+level=INFO msg="Configured new Prometheus server" name=prom uris=1 uptime=up tags=[] include=[] exclude=[]
+level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
+Bug: required feature flag not enabled (promql/features)
+  ---> rules/1.yml:2 -> `foo`
+2 |   expr: mad_over_time(bar[5m])
+            ^^^^^^^^^^^^^ `mad_over_time` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at http://127.0.0.1:7240.
+
+level=INFO msg="Problems found" Bug=1
+level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
+-- rules/1.yml --
+- record: foo
+  expr: mad_over_time(bar[5m])
+
+-- .pint.hcl --
+prometheus "prom" {
+  uri      = "http://127.0.0.1:7240"
+  timeout  = "5s"
+  required = true
+}
+parser {
+  relaxed = [".*"]
+}
+checks {
+  disabled = ["promql/series"]
+}

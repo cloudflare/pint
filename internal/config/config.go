@@ -171,11 +171,10 @@ func Load(path string, failOnMissing bool) (cfg Config, fromFile bool, err error
 		}
 	}
 
-	if cfg.Parser != nil {
-		if err = cfg.Parser.validate(); err != nil {
-			return cfg, fromFile, err
-		}
+	if err = cfg.Parser.validate(); err != nil {
+		return cfg, fromFile, err
 	}
+	cfg.Parser.initOptions()
 
 	if cfg.Repository != nil {
 		if err = cfg.Repository.validate(); err != nil {

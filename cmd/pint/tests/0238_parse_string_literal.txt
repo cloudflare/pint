@@ -1,0 +1,8 @@
+exec pint parse '"hello"'
+cmp stdout stdout.txt
+! stderr .
+
+-- stdout.txt --
+++ node: "hello"
+  StringLiteral:
+    * Type: string

@@ -6,13 +6,13 @@
       expr: up{job="foo"} == 0
   output: |
     1 | - alert: Foo Is Down
-                 ^^^^^^^^^^^ `prom` Prometheus server at http://127.0.0.1:XXXXX failed with: `bad_data: bad input data`.
+                 ^^^^^^^^^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `bad_data: bad input data`.
   problem:
     reporter: alerts/count
     summary: unable to run checks
     details: ""
     diagnostics:
-        - message: '`prom` Prometheus server at http://127.0.0.1:XXXXX failed with: `bad_data: bad input data`.'
+        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `bad_data: bad input data`.'
           firstcolumn: 1
           lastcolumn: 11
           kind: 0
@@ -31,13 +31,13 @@
       expr: up{job="foo"} == 0
   output: |
     1 | - alert: Foo Is Down
-                 ^^^^^^^^^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 connection error: `connection refused`.
+                 ^^^^^^^^^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 error: `connection refused`.
   problem:
     reporter: alerts/count
     summary: unable to run checks
     details: ""
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 connection error: `connection refused`.'
+        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 error: `connection refused`.'
           firstcolumn: 1
           lastcolumn: 11
           kind: 0

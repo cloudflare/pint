@@ -5,7 +5,10 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/require"
+
+	"github.com/cloudflare/pint/internal/parser"
 )
 
 func TestParserSettings(t *testing.T) {
@@ -83,6 +86,65 @@ func TestParserSettings(t *testing.T) {
 			} else {
 				require.EqualError(t, err, tc.err.Error())
 			}
+		})
+	}
+}
+
+func TestParserInitOptions(t *testing.T) {
+	type testCaseT struct {
+		// Describes the parser configuration being tested.
+		description string
+		conf        Parser
+		expected    parser.Options
+	}
+
+	testCases := []testCaseT{
+		{
+			// Default parser with no configuration set produces UTF-8 names and Prometheus schema.
+			description: "defaults",
+			conf:        Parser{},
+			expected: parser.Options{
+				Names:    model.UTF8Validation,
+				Schema:   parser.PrometheusSchema,
+				IsStrict: false,
+			},
+		},
+		{
+			// Legacy names setting produces LegacyValidation.
+			description: "legacy names",
+			conf:        Parser{Names: NamesLegacy},
+			expected: parser.Options{
+				Names:    model.LegacyValidation,
+				Schema:   parser.PrometheusSchema,
+				IsStrict: false,
+			},
+		},
+		{
+			// Thanos schema setting produces ThanosSchema.
+			description: "thanos schema",
+			conf:        Parser{Schema: SchemaThanos},
+			expected: parser.Options{
+				Names:    model.UTF8Validation,
+				Schema:   parser.ThanosSchema,
+				IsStrict: false,
+			},
+		},
+		{
+			// Legacy names with thanos schema produces both overrides.
+			description: "legacy names with thanos schema",
+			conf:        Parser{Names: NamesLegacy, Schema: SchemaThanos},
+			expected: parser.Options{
+				Names:    model.LegacyValidation,
+				Schema:   parser.ThanosSchema,
+				IsStrict: false,
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.description, func(t *testing.T) {
+			tc.conf.initOptions()
+			require.Equal(t, tc.expected, tc.conf.Options())
 		})
 	}
 }

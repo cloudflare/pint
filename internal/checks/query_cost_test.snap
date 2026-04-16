@@ -187,13 +187,13 @@
       expr: sum(foo)
   output: |
     1 | - record: foo
-                  ^^^ `prom` Prometheus server at http://127.0.0.1:XXXXX failed with: `bad_data: bad input data`.
+                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `bad_data: bad input data`.
   problem:
     reporter: query/cost
     summary: unable to run checks
     details: ""
     diagnostics:
-        - message: '`prom` Prometheus server at http://127.0.0.1:XXXXX failed with: `bad_data: bad input data`.'
+        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `bad_data: bad input data`.'
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -217,13 +217,13 @@
       expr: sum(foo)
   output: |
     1 | - record: foo
-                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 connection error: `connection refused`.
+                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 error: `connection refused`.
   problem:
     reporter: query/cost
     summary: unable to run checks
     details: ""
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 connection error: `connection refused`.'
+        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 error: `connection refused`.'
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -262,13 +262,13 @@
       expr: sum(foo)
   output: |
     1 | - record: foo
-                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `connection timeout`.
+                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `connection timeout`.
   problem:
     reporter: query/cost
     summary: unable to run checks
     details: ""
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `connection timeout`.'
+        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `connection timeout`.'
           firstcolumn: 1
           lastcolumn: 3
           kind: 0

@@ -10,8 +10,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/prometheus/common/model"
-
 	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
@@ -22,8 +20,7 @@ func NewGitBranchFinder(
 	filter git.PathFilter,
 	baseBranch string,
 	maxCommits int,
-	schema parser.Schema,
-	names model.ValidationScheme,
+	opts parser.Options,
 	allowedOwners []*regexp.Regexp,
 ) GitBranchFinder {
 	return GitBranchFinder{
@@ -31,8 +28,7 @@ func NewGitBranchFinder(
 		filter:        filter,
 		baseBranch:    baseBranch,
 		maxCommits:    maxCommits,
-		schema:        schema,
-		names:         names,
+		opts:          opts,
 		allowedOwners: allowedOwners,
 	}
 }
@@ -43,8 +39,7 @@ type GitBranchFinder struct {
 	filter        git.PathFilter
 	allowedOwners []*regexp.Regexp
 	maxCommits    int
-	schema        parser.Schema
-	names         model.ValidationScheme
+	opts          parser.Options
 }
 
 func (f GitBranchFinder) Find(allEntries []*Entry) (entries []*Entry, err error) {
@@ -66,7 +61,7 @@ func (f GitBranchFinder) Find(allEntries []*Entry) (entries []*Entry, err error)
 	}
 
 	for _, change := range changes {
-		p := parser.NewParser(!f.filter.IsRelaxed(change.Path.Before.Name), f.schema, f.names)
+		p := parser.NewParser(f.opts.WithStrict(!f.filter.IsRelaxed(change.Path.Before.Name)))
 		var entriesBefore, entriesAfter []*Entry
 		entriesBefore = readRules(
 			change.Path.Before.EffectivePath(),

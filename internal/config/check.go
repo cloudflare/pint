@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/cloudflare/pint/internal/checks"
-
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/gohcl"
+
+	"github.com/cloudflare/pint/internal/checks"
 )
 
 type Check struct {

@@ -57,6 +57,8 @@ pint_check_duration_seconds_sum{check="labels/conflict"}
 pint_check_duration_seconds_count{check="labels/conflict"}
 pint_check_duration_seconds_sum{check="promql/counter"}
 pint_check_duration_seconds_count{check="promql/counter"}
+pint_check_duration_seconds_sum{check="promql/features"}
+pint_check_duration_seconds_count{check="promql/features"}
 pint_check_duration_seconds_sum{check="promql/fragile"}
 pint_check_duration_seconds_count{check="promql/fragile"}
 pint_check_duration_seconds_sum{check="promql/impossible"}
@@ -92,15 +94,15 @@ pint_last_run_duration_seconds
 pint_last_run_time_seconds
 # HELP pint_problem Prometheus rule problem reported by pint.
 # TYPE pint_problem gauge
-pint_problem{filename="rules/1.yml",kind="recording",name="aggregate",owner="",problem="unable to run checks: Couldn't run some online checks due to `prom1` Prometheus server at http://127.0.0.1:7054 connection error: `server_error: 500 Internal Server Error`.",reporter="promql/rate",severity="bug"}
-pint_problem{filename="rules/1.yml",kind="recording",name="aggregate",owner="",problem="unable to run checks: Couldn't run some online checks due to `prom2` Prometheus server at http://127.0.0.1:1054 connection error: `connection refused`.",reporter="promql/counter",severity="bug"}
-pint_problem{filename="rules/1.yml",kind="recording",name="aggregate",owner="",problem="unable to run checks: Couldn't run some online checks due to `prom2` Prometheus server at http://127.0.0.1:1054 connection error: `connection refused`.",reporter="promql/range_query",severity="bug"}
-pint_problem{filename="rules/1.yml",kind="recording",name="aggregate",owner="",problem="unable to run checks: Couldn't run some online checks due to `prom2` Prometheus server at http://127.0.0.1:1054 connection error: `connection refused`.",reporter="promql/rate",severity="bug"}
-pint_problem{filename="rules/1.yml",kind="recording",name="aggregate",owner="",problem="unable to run checks: Couldn't run some online checks due to `prom2` Prometheus server at http://127.0.0.1:1054 connection error: `connection refused`.",reporter="promql/series",severity="bug"}
-pint_problem{filename="rules/1.yml",kind="recording",name="aggregate",owner="",problem="unable to run checks: `prom1` Prometheus server at http://127.0.0.1:7054 failed with: `bad_data: bogus query`.",reporter="promql/series",severity="bug"}
+pint_problem{filename="rules/1.yml",kind="recording",name="aggregate",owner="",problem="unable to run checks: Couldn't run some online checks due to `prom1` Prometheus server at http://127.0.0.1:7054 error: `bad_data: bogus query`.",reporter="promql/series",severity="bug"}
+pint_problem{filename="rules/1.yml",kind="recording",name="aggregate",owner="",problem="unable to run checks: Couldn't run some online checks due to `prom1` Prometheus server at http://127.0.0.1:7054 error: `server_error: 500 Internal Server Error`.",reporter="promql/rate",severity="bug"}
+pint_problem{filename="rules/1.yml",kind="recording",name="aggregate",owner="",problem="unable to run checks: Couldn't run some online checks due to `prom2` Prometheus server at http://127.0.0.1:1054 error: `connection refused`.",reporter="promql/counter",severity="bug"}
+pint_problem{filename="rules/1.yml",kind="recording",name="aggregate",owner="",problem="unable to run checks: Couldn't run some online checks due to `prom2` Prometheus server at http://127.0.0.1:1054 error: `connection refused`.",reporter="promql/range_query",severity="bug"}
+pint_problem{filename="rules/1.yml",kind="recording",name="aggregate",owner="",problem="unable to run checks: Couldn't run some online checks due to `prom2` Prometheus server at http://127.0.0.1:1054 error: `connection refused`.",reporter="promql/rate",severity="bug"}
+pint_problem{filename="rules/1.yml",kind="recording",name="aggregate",owner="",problem="unable to run checks: Couldn't run some online checks due to `prom2` Prometheus server at http://127.0.0.1:1054 error: `connection refused`.",reporter="promql/series",severity="bug"}
 pint_problem{filename="rules/1.yml",kind="recording",name="broken",owner="",problem="PromQL syntax error: unexpected right parenthesis ')'",reporter="promql/syntax",severity="fatal"}
-pint_problem{filename="rules/2.yml",kind="alerting",name="comparison",owner="bob and alice",problem="unable to run checks: Couldn't run some online checks due to `prom1` Prometheus server at http://127.0.0.1:7054 connection error: `server_error: 500 Internal Server Error`.",reporter="alerts/external_labels",severity="bug"}
-pint_problem{filename="rules/2.yml",kind="alerting",name="comparison",owner="bob and alice",problem="unable to run checks: Couldn't run some online checks due to `prom2` Prometheus server at http://127.0.0.1:1054 connection error: `connection refused`.",reporter="alerts/external_labels",severity="bug"}
+pint_problem{filename="rules/2.yml",kind="alerting",name="comparison",owner="bob and alice",problem="unable to run checks: Couldn't run some online checks due to `prom1` Prometheus server at http://127.0.0.1:7054 error: `server_error: 500 Internal Server Error`.",reporter="alerts/external_labels",severity="bug"}
+pint_problem{filename="rules/2.yml",kind="alerting",name="comparison",owner="bob and alice",problem="unable to run checks: Couldn't run some online checks due to `prom2` Prometheus server at http://127.0.0.1:1054 error: `connection refused`.",reporter="alerts/external_labels",severity="bug"}
 # HELP pint_problems Total number of problems reported by pint.
 # TYPE pint_problems gauge
 pint_problems

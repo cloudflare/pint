@@ -1,0 +1,407 @@
+
+[TestFeaturesCheck/all_features_enabled - 1]
+[]
+
+---
+
+[TestFeaturesCheck/buildinfo_bad_version - 1]
+- description: buildinfo bad version
+  content: |
+    - record: foo
+      expr: mad_over_time(bar[5m])
+  output: |
+    1 | - record: foo
+                  ^^^ Couldn't run some online checks due to "prom" error: `failed to parse Prometheus version "not-a-version": expected major.minor.patch format`.
+  problem:
+    reporter: promql/features
+    summary: unable to run checks
+    details: ""
+    diagnostics:
+        - message: 'Couldn''t run some online checks due to "prom" error: `failed to parse Prometheus version "not-a-version": expected major.minor.patch format`.'
+          firstcolumn: 1
+          lastcolumn: 3
+          kind: 0
+    lines:
+        first: 1
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestFeaturesCheck/buildinfo_unsupported_still_reports_problem - 1]
+- description: buildinfo unsupported still reports problem
+  content: |
+    - record: foo
+      expr: mad_over_time(bar[5m])
+  output: |
+    2 |   expr: mad_over_time(bar[5m])
+                ^^^^^^^^^^^^^ `mad_over_time` was added in Prometheus 2.49.0 and requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.
+  problem:
+    reporter: promql/features
+    summary: required feature flag not enabled
+    details: |-
+        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+    diagnostics:
+        - message: '`mad_over_time` was added in Prometheus 2.49.0 and requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
+          firstcolumn: 1
+          lastcolumn: 13
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestFeaturesCheck/duplicate_feature_fragments_merged - 1]
+- description: duplicate feature fragments merged
+  content: |
+    - record: foo
+      expr: mad_over_time(bar[5m]) + mad_over_time(baz[5m])
+  output: |
+    2 |   expr: mad_over_time(bar[5m]) + mad_over_time(baz[5m])
+                                         ^^^^^^^^^^^^^ `mad_over_time` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.
+                ^^^^^^^^^^^^^ `mad_over_time` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.
+  problem:
+    reporter: promql/features
+    summary: required feature flag not enabled
+    details: |-
+        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+    diagnostics:
+        - message: '`mad_over_time` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
+          firstcolumn: 1
+          lastcolumn: 13
+          kind: 0
+        - message: '`mad_over_time` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
+          firstcolumn: 26
+          lastcolumn: 38
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestFeaturesCheck/duration_expression_missing_feature_flag - 1]
+- description: duration expression missing feature flag
+  content: |
+    - record: foo
+      expr: rate(bar[5m+1m])
+  output: |
+    2 |   expr: rate(bar[5m+1m])
+                         ^^^^^ `duration_expr` requires Prometheus 3.4.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.
+  problem:
+    reporter: promql/features
+    summary: required feature flag not enabled
+    details: |-
+        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+    diagnostics:
+        - message: '`duration_expr` requires Prometheus 3.4.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.'
+          firstcolumn: 10
+          lastcolumn: 14
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestFeaturesCheck/duration_expression_with_feature_flag_enabled - 1]
+[]
+
+---
+
+[TestFeaturesCheck/experimental_function_missing_feature_flag - 1]
+- description: experimental function missing feature flag
+  content: |
+    - record: foo
+      expr: mad_over_time(bar[5m])
+  output: |
+    2 |   expr: mad_over_time(bar[5m])
+                ^^^^^^^^^^^^^ `mad_over_time` requires Prometheus 2.49.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.
+  problem:
+    reporter: promql/features
+    summary: required feature flag not enabled
+    details: |-
+        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+    diagnostics:
+        - message: '`mad_over_time` requires Prometheus 2.49.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.'
+          firstcolumn: 1
+          lastcolumn: 13
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestFeaturesCheck/experimental_function_with_feature_flag_enabled - 1]
+[]
+
+---
+
+[TestFeaturesCheck/feature_enabled_among_multiple_flags - 1]
+[]
+
+---
+
+[TestFeaturesCheck/feature_flag_enabled_but_version_too_old - 1]
+- description: feature flag enabled but version too old
+  content: |
+    - record: foo
+      expr: mad_over_time(bar[5m])
+  output: |
+    2 |   expr: mad_over_time(bar[5m])
+                ^^^^^^^^^^^^^ `mad_over_time` requires Prometheus 2.49.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.
+  problem:
+    reporter: promql/features
+    summary: required feature flag not enabled
+    details: |-
+        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+    diagnostics:
+        - message: '`mad_over_time` requires Prometheus 2.49.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.'
+          firstcolumn: 1
+          lastcolumn: 13
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestFeaturesCheck/fill_modifier_missing_feature_flag - 1]
+- description: fill modifier missing feature flag
+  content: |
+    - record: foo
+      expr: bar + fill(0) baz
+  output: |
+    2 |   expr: bar + fill(0) baz
+                      ^^^^ `fill` requires Prometheus 3.10.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.
+  problem:
+    reporter: promql/features
+    summary: required feature flag not enabled
+    details: |-
+        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+    diagnostics:
+        - message: '`fill` requires Prometheus 3.10.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.'
+          firstcolumn: 7
+          lastcolumn: 10
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestFeaturesCheck/flags_query_error - 1]
+- description: flags query error
+  content: |
+    - record: foo
+      expr: mad_over_time(bar[5m])
+  output: |
+    1 | - record: foo
+                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.
+  problem:
+    reporter: promql/features
+    summary: unable to run checks
+    details: ""
+    diagnostics:
+        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.'
+          firstcolumn: 1
+          lastcolumn: 3
+          kind: 0
+    lines:
+        first: 1
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestFeaturesCheck/flags_unsupported - 1]
+[]
+
+---
+
+[TestFeaturesCheck/graduated_feature_needs_no_flag - 1]
+[]
+
+---
+
+[TestFeaturesCheck/ignores_rules_with_syntax_errors - 1]
+[]
+
+---
+
+[TestFeaturesCheck/multiple_features_missing - 1]
+- description: multiple features missing
+  content: |
+    - record: foo
+      expr: mad_over_time(bar[5m+1m] smoothed) + on(job) fill(0) baz
+  output: |
+    2 |   expr: mad_over_time(bar[5m+1m] smoothed) + on(job) fill(0) baz
+                                                             ^^^^ `fill` requires Prometheus 3.10.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.
+  problem:
+    reporter: promql/features
+    summary: required feature flag not enabled
+    details: |-
+        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+    diagnostics:
+        - message: '`fill` requires Prometheus 3.10.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.'
+          firstcolumn: 46
+          lastcolumn: 49
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+- description: multiple features missing
+  content: |
+    - record: foo
+      expr: mad_over_time(bar[5m+1m] smoothed) + on(job) fill(0) baz
+  output: |
+    2 |   expr: mad_over_time(bar[5m+1m] smoothed) + on(job) fill(0) baz
+                                  ^^^^^ `duration_expr` requires Prometheus 3.4.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.
+  problem:
+    reporter: promql/features
+    summary: required feature flag not enabled
+    details: |-
+        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+    diagnostics:
+        - message: '`duration_expr` requires Prometheus 3.4.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.'
+          firstcolumn: 19
+          lastcolumn: 23
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+- description: multiple features missing
+  content: |
+    - record: foo
+      expr: mad_over_time(bar[5m+1m] smoothed) + on(job) fill(0) baz
+  output: |
+    2 |   expr: mad_over_time(bar[5m+1m] smoothed) + on(job) fill(0) baz
+                ^^^^^^^^^^^^^ `mad_over_time` requires Prometheus 2.49.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.
+  problem:
+    reporter: promql/features
+    summary: required feature flag not enabled
+    details: |-
+        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+    diagnostics:
+        - message: '`mad_over_time` requires Prometheus 2.49.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.'
+          firstcolumn: 1
+          lastcolumn: 13
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+- description: multiple features missing
+  content: |
+    - record: foo
+      expr: mad_over_time(bar[5m+1m] smoothed) + on(job) fill(0) baz
+  output: |
+    2 |   expr: mad_over_time(bar[5m+1m] smoothed) + on(job) fill(0) baz
+                              ^^^ `smoothed` requires Prometheus 3.7.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.
+  problem:
+    reporter: promql/features
+    summary: required feature flag not enabled
+    details: |-
+        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+    diagnostics:
+        - message: '`smoothed` requires Prometheus 3.7.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.'
+          firstcolumn: 15
+          lastcolumn: 17
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestFeaturesCheck/no_features_needed - 1]
+[]
+
+---
+
+[TestFeaturesCheck/not_yet_graduated_still_needs_flag - 1]
+- description: not yet graduated still needs flag
+  content: |
+    - record: foo
+      expr: mad_over_time(bar[5m])
+  output: |
+    2 |   expr: mad_over_time(bar[5m])
+                ^^^^^^^^^^^^^ `mad_over_time` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.
+  problem:
+    reporter: promql/features
+    summary: required feature flag not enabled
+    details: |-
+        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+    diagnostics:
+        - message: '`mad_over_time` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
+          firstcolumn: 1
+          lastcolumn: 13
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestFeaturesCheck/smoothed_selector_missing_feature_flag - 1]
+- description: smoothed selector missing feature flag
+  content: |
+    - record: foo
+      expr: rate(bar[5m] smoothed)
+  output: |
+    2 |   expr: rate(bar[5m] smoothed)
+                     ^^^ `smoothed` requires Prometheus 3.7.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.
+  problem:
+    reporter: promql/features
+    summary: required feature flag not enabled
+    details: |-
+        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+    diagnostics:
+        - message: '`smoothed` requires Prometheus 3.7.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.'
+          firstcolumn: 6
+          lastcolumn: 8
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---

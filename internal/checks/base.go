@@ -15,30 +15,31 @@ var (
 	CheckNames = []string{
 		AlertsAbsentCheckName,
 		AnnotationCheckName,
+		ComparisonCheckName,
 		AlertsCheckName,
 		AlertsExternalLabelsCheckName,
 		AlertForCheckName,
 		TemplateCheckName,
 		LabelsConflictCheckName,
 		AggregationCheckName,
-		ComparisonCheckName,
-		ImpossibleCheckName,
+		CounterCheckName,
+		FeaturesCheckName,
 		FragileCheckName,
+		ImpossibleCheckName,
 		RangeQueryCheckName,
 		RateCheckName,
 		RegexpCheckName,
+		SelectorCheckName,
+		SeriesCheckName,
 		SyntaxCheckName,
 		VectorMatchingCheckName,
 		CostCheckName,
-		CounterCheckName,
-		SelectorCheckName,
-		SeriesCheckName,
 		RuleDependencyCheckName,
 		RuleDuplicateCheckName,
 		RuleForCheckName,
-		RuleNameCheckName,
 		LabelCheckName,
 		RuleLinkCheckName,
+		RuleNameCheckName,
 		RejectCheckName,
 		ReportCheckName,
 	}
@@ -47,12 +48,13 @@ var (
 		AlertsCheckName,
 		AlertsExternalLabelsCheckName,
 		LabelsConflictCheckName,
+		CounterCheckName,
+		FeaturesCheckName,
 		RangeQueryCheckName,
 		RateCheckName,
+		SeriesCheckName,
 		VectorMatchingCheckName,
 		CostCheckName,
-		CounterCheckName,
-		SeriesCheckName,
 		RuleLinkCheckName,
 	}
 )
@@ -137,8 +139,7 @@ type RuleChecker interface {
 
 func problemFromError(err error, rule parser.Rule, reporter, prom string, s Severity) Problem {
 	promDesc := "\"" + prom + "\""
-	var perr *promapi.FailoverGroupError
-	perrOk := errors.As(err, &perr)
+	perr, perrOk := errors.AsType[*promapi.FailoverGroupError](err)
 	if perrOk {
 		if uri := perr.URI(); uri != "" {
 			promDesc = promText(prom, uri)
@@ -152,13 +153,13 @@ func problemFromError(err error, rule parser.Rule, reporter, prom string, s Seve
 		text = fmt.Sprintf("Couldn't run some online checks on %s because some queries are too expensive: `%s`.", promDesc, err)
 		severity = Warning
 	case promapi.IsUnavailableError(err):
-		text = fmt.Sprintf("Couldn't run some online checks due to %s connection error: `%s`.", promDesc, err)
+		text = fmt.Sprintf("Couldn't run some online checks due to %s error: `%s`.", promDesc, err)
 		severity = Warning
 		if perrOk && perr.IsStrict() {
 			severity = Bug
 		}
 	default:
-		text = fmt.Sprintf("%s failed with: `%s`.", promDesc, err)
+		text = fmt.Sprintf("Couldn't run some online checks due to %s error: `%s`.", promDesc, err)
 		severity = s
 	}
 

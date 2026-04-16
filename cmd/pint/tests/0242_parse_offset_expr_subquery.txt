@@ -1,0 +1,26 @@
+exec pint parse 'max_over_time(foo[1h:5m] offset (5m+1m))'
+cmp stdout stdout.txt
+! stderr .
+
+-- stdout.txt --
+++ node: max_over_time(foo[1h:5m] offset (5m + 1m))
+  Call:
+    * Type: vector
+    * Func: max_over_time
+    * Args: foo[1h:5m] offset (5m + 1m)
+      ++ node: foo[1h:5m] offset (5m + 1m)
+        Expressions:
+          ++ node: foo[1h:5m] offset (5m + 1m)
+            SubqueryExpr:
+              * Type: matrix
+              * Expr: foo
+              * Step: 5m0s
+              * Range: 1h0m0s
+              * Offset: 0s
+              * OriginalOffsetExpr: (5m + 1m)
+                ++ node: foo
+                  VectorSelector:
+                    * Type: vector
+                    * Name: foo
+                    * Offset: 0s
+                    * LabelMatchers: [__name__="foo"]

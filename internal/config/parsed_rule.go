@@ -116,7 +116,8 @@ func defaultMatchStates(cmd ContextCommandVal) []string {
 }
 
 func baseRules(staticRules []staticRule, proms []*promapi.FailoverGroup, match []Match) (rules []*parsedRule) {
-	rules = make([]*parsedRule, 0, len(staticRules)+(len(proms)*9))
+	const checksPerProm = 10 // Number of checks registered per Prometheus server below.
+	rules = make([]*parsedRule, 0, len(staticRules)+(len(proms)*checksPerProm))
 	for _, sr := range staticRules {
 		rules = append(rules, baseParsedRule(match, sr.name, sr.checker, nil))
 	}
@@ -132,6 +133,7 @@ func baseRules(staticRules []staticRule, proms []*promapi.FailoverGroup, match [
 			baseParsedRule(match, checks.AlertsExternalLabelsCheckName, checks.NewAlertsExternalLabelsCheck(p), p.Tags()),
 			baseParsedRule(match, checks.CounterCheckName, checks.NewCounterCheck(p), p.Tags()),
 			baseParsedRule(match, checks.AlertsAbsentCheckName, checks.NewAlertsAbsentCheck(p), p.Tags()),
+			baseParsedRule(match, checks.FeaturesCheckName, checks.NewFeaturesCheck(p), p.Tags()),
 		)
 	}
 

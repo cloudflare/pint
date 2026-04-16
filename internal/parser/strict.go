@@ -194,7 +194,7 @@ func (p Parser) parseGroup(node *yaml.Node, offsetLine, offsetColumn int, conten
 				group.Rules = append(group.Rules, p.parseRuleStrict(rule, contentLines))
 			}
 		case "partial_response_strategy":
-			if p.schema != ThanosSchema {
+			if p.opts.Schema != ThanosSchema {
 				group.Error = ParseError{
 					Line: entry.key.Line,
 					Err:  errors.New("partial_response_strategy is only valid when parser is configured to use the Thanos rule schema"),

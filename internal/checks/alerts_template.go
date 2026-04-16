@@ -281,7 +281,7 @@ func isRateResult(src source.Source) *promParser.Call {
 }
 
 func queryFunc(_ context.Context, expr string, _ time.Time) (promql.Vector, error) {
-	if _, err := promParser.ParseExpr(expr); err != nil {
+	if _, err := parser.PromQLParser.ParseExpr(expr); err != nil {
 		return nil, err
 	}
 	// return a single sample so template using `... | first` don't fail

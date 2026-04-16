@@ -1,0 +1,10 @@
+exec pint parse -- '-foo'
+cmp stdout stdout.txt
+! stderr .
+
+-- stdout.txt --
+++ node: -foo
+  UnaryExpr:
+    * Type: vector
+    * Op: -
+    * Expr: foo

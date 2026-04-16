@@ -10,7 +10,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/discovery"
@@ -28,7 +27,7 @@ func TestGlobPathFinder(t *testing.T) {
 		finder   discovery.GlobFinder
 	}
 
-	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
+	p := parser.NewParser(parser.DefaultOptions)
 	testRuleBody := "# pint file/owner bob\n\n- record: foo\n  expr: sum(foo)\n"
 	testFile := p.Parse(strings.NewReader(testRuleBody))
 	require.NoError(t, testFile.Error.Err)
@@ -36,12 +35,12 @@ func TestGlobPathFinder(t *testing.T) {
 	testCases := []testCaseT{
 		{
 			files:  map[string]string{},
-			finder: discovery.NewGlobFinder([]string{"[]"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGlobFinder([]string{"[]"}, git.NewPathFilter(nil, nil, nil), parser.DefaultOptions, nil),
 			err:    "failed to expand file path pattern []: syntax error in pattern",
 		},
 		{
 			files:  map[string]string{},
-			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.DefaultOptions, nil),
 			err:    "no matching files",
 		},
 		{
@@ -49,7 +48,7 @@ func TestGlobPathFinder(t *testing.T) {
 				".git/config": "test",
 				"bar.yml":     testRuleBody,
 			},
-			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, []*regexp.Regexp{regexp.MustCompile(".*")}), parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, []*regexp.Regexp{regexp.MustCompile(".*")}), parser.DefaultOptions, nil),
 			entries: []*discovery.Entry{
 				{
 					State: discovery.Noop,
@@ -70,27 +69,27 @@ func TestGlobPathFinder(t *testing.T) {
 			symlinks: map[string]string{
 				".git": "/nonexistent/target",
 			},
-			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.DefaultOptions, nil),
 			err:    ".git is a symlink but target file cannot be evaluated: lstat /nonexistent: no such file or directory",
 		},
 		{
 			files:  map[string]string{},
-			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.DefaultOptions, nil),
 			err:    "no matching files",
 		},
 		{
 			files:  map[string]string{},
-			finder: discovery.NewGlobFinder([]string{"foo/*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGlobFinder([]string{"foo/*"}, git.NewPathFilter(nil, nil, nil), parser.DefaultOptions, nil),
 			err:    "no matching files",
 		},
 		{
 			files:  map[string]string{"bar.yml": testRuleBody},
-			finder: discovery.NewGlobFinder([]string{"foo/*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGlobFinder([]string{"foo/*"}, git.NewPathFilter(nil, nil, nil), parser.DefaultOptions, nil),
 			err:    "no matching files",
 		},
 		{
 			files:  map[string]string{"bar.yml": testRuleBody},
-			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, []*regexp.Regexp{regexp.MustCompile(".*")}), parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, []*regexp.Regexp{regexp.MustCompile(".*")}), parser.DefaultOptions, nil),
 			entries: []*discovery.Entry{
 				{
 					State: discovery.Noop,
@@ -106,7 +105,7 @@ func TestGlobPathFinder(t *testing.T) {
 		},
 		{
 			files:  map[string]string{"foo/bar.yml": testRuleBody + "\n\n# pint file/owner alice\n"},
-			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, []*regexp.Regexp{regexp.MustCompile(".*")}), parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, []*regexp.Regexp{regexp.MustCompile(".*")}), parser.DefaultOptions, nil),
 			entries: []*discovery.Entry{
 				{
 					State: discovery.Noop,
@@ -122,7 +121,7 @@ func TestGlobPathFinder(t *testing.T) {
 		},
 		{
 			files:  map[string]string{"bar.yml": testRuleBody},
-			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.DefaultOptions, nil),
 			entries: []*discovery.Entry{
 				{
 					State: discovery.Noop,
@@ -141,7 +140,7 @@ func TestGlobPathFinder(t *testing.T) {
 		},
 		{
 			files:  map[string]string{"bar.yml": "record:::{}\n  expr: sum(foo)\n\n# pint file/owner bob\n"},
-			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, []*regexp.Regexp{regexp.MustCompile(".*")}), parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, []*regexp.Regexp{regexp.MustCompile(".*")}), parser.DefaultOptions, nil),
 			entries: []*discovery.Entry{
 				{
 					State: discovery.Noop,
@@ -161,7 +160,7 @@ func TestGlobPathFinder(t *testing.T) {
 		{
 			files:    map[string]string{"bar.yml": testRuleBody},
 			symlinks: map[string]string{"link.yml": "bar.yml"},
-			finder:   discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder:   discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.DefaultOptions, nil),
 			entries: []*discovery.Entry{
 				{
 					State: discovery.Noop,
@@ -197,7 +196,7 @@ func TestGlobPathFinder(t *testing.T) {
 				"b/link.yml":   "../a/bar.yml",
 				"b/c/link.yml": "../../a/bar.yml",
 			},
-			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.DefaultOptions, nil),
 			entries: []*discovery.Entry{
 				{
 					State: discovery.Noop,
@@ -246,7 +245,7 @@ func TestGlobPathFinder(t *testing.T) {
 				"b/link.yml":   "../a/bar.yml",
 				"b/c/link.yml": "../a/bar.yml",
 			},
-			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.DefaultOptions, nil),
 			err:    "b/c/link.yml is a symlink but target file cannot be evaluated: lstat b/a: no such file or directory",
 		},
 		{
@@ -254,14 +253,14 @@ func TestGlobPathFinder(t *testing.T) {
 			symlinks: map[string]string{
 				"b/c/link.yml": "../../a/bar.yml",
 			},
-			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, []*regexp.Regexp{regexp.MustCompile(".*")}), parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, []*regexp.Regexp{regexp.MustCompile(".*")}), parser.DefaultOptions, nil),
 		},
 		{
 			files: map[string]string{"a/bar.yml": "xxx:\nyyy:\n"},
 			symlinks: map[string]string{
 				"b/c/link.yml": "../../a/bar.yml",
 			},
-			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.DefaultOptions, nil),
 			entries: []*discovery.Entry{
 				{
 					State: discovery.Noop,
@@ -296,21 +295,21 @@ func TestGlobPathFinder(t *testing.T) {
 			symlinks: map[string]string{
 				"b/c/link.yml": "../../a/bar.yml",
 			},
-			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, []*regexp.Regexp{regexp.MustCompile(".*")}), parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, []*regexp.Regexp{regexp.MustCompile(".*")}), parser.DefaultOptions, nil),
 		},
 		{
 			files: map[string]string{"a/bar.yml": "xxx:\nyyy:\n"},
 			symlinks: map[string]string{
 				"b/c/d": "../../a",
 			},
-			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, []*regexp.Regexp{regexp.MustCompile(".*")}), parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, []*regexp.Regexp{regexp.MustCompile(".*")}), parser.DefaultOptions, nil),
 		},
 		{
 			files: map[string]string{"a/bar.yml": testRuleBody},
 			symlinks: map[string]string{
 				"b/c/link.yml": "../../a/bar.yml",
 			},
-			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.DefaultOptions, nil),
 			entries: []*discovery.Entry{
 				{
 					State: discovery.Noop,
@@ -344,7 +343,7 @@ func TestGlobPathFinder(t *testing.T) {
 			symlinks: map[string]string{
 				"input.yml": "/xx/ccc/fdd",
 			},
-			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.DefaultOptions, nil),
 			err:    "input.yml is a symlink but target file cannot be evaluated: lstat /xx: no such file or directory",
 		},
 		{
@@ -354,7 +353,7 @@ func TestGlobPathFinder(t *testing.T) {
 			setup: func(_ *testing.T) {
 				_ = os.Chmod("bar.yml", 0o000)
 			},
-			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.DefaultOptions, nil),
 			err:    "open bar.yml: permission denied",
 		},
 		{
@@ -364,7 +363,7 @@ func TestGlobPathFinder(t *testing.T) {
 			symlinks: map[string]string{
 				"subdir/broken.yml": "/nonexistent/target",
 			},
-			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.DefaultOptions, nil),
 			err:    "subdir/broken.yml is a symlink but target file cannot be evaluated: lstat /nonexistent: no such file or directory",
 		},
 		{
@@ -375,7 +374,7 @@ func TestGlobPathFinder(t *testing.T) {
 				require.NoError(t, os.Chmod("subdir", 0o000))
 				t.Cleanup(func() { _ = os.Chmod("subdir", 0o755) })
 			},
-			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, model.UTF8Validation, nil),
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.DefaultOptions, nil),
 			err:    "open subdir: permission denied",
 		},
 	}
