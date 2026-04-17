@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/prometheus/common/model"
-
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/output"
@@ -69,29 +67,29 @@ func (c RuleForCheck) Check(_ context.Context, entry *discovery.Entry, _ []*disc
 		return nil
 	}
 
-	var forDur model.Duration
+	var forDur time.Duration
 	var lines diags.LineRange
 	var diag diags.Diagnostic
 
 	switch {
-	case c.key == RuleForFor && entry.Rule.AlertingRule.For != nil:
-		forDur, _ = model.ParseDuration(entry.Rule.AlertingRule.For.Value)
+	case c.key == RuleForFor && entry.Rule.AlertingRule.For != nil && entry.Rule.AlertingRule.For.ParseError == nil:
+		forDur = entry.Rule.AlertingRule.For.Value
 		lines = entry.Rule.AlertingRule.For.Pos.Lines()
 		diag = diags.Diagnostic{
 			Message:     "",
 			Pos:         entry.Rule.AlertingRule.For.Pos,
 			FirstColumn: 1,
-			LastColumn:  len(entry.Rule.AlertingRule.For.Value),
+			LastColumn:  entry.Rule.AlertingRule.For.Pos.Len(),
 			Kind:        diags.Issue,
 		}
-	case c.key == RuleForKeepFiringFor && entry.Rule.AlertingRule.KeepFiringFor != nil:
-		forDur, _ = model.ParseDuration(entry.Rule.AlertingRule.KeepFiringFor.Value)
+	case c.key == RuleForKeepFiringFor && entry.Rule.AlertingRule.KeepFiringFor != nil && entry.Rule.AlertingRule.KeepFiringFor.ParseError == nil:
+		forDur = entry.Rule.AlertingRule.KeepFiringFor.Value
 		lines = entry.Rule.AlertingRule.KeepFiringFor.Pos.Lines()
 		diag = diags.Diagnostic{
 			Message:     "",
 			Pos:         entry.Rule.AlertingRule.KeepFiringFor.Pos,
 			FirstColumn: 1,
-			LastColumn:  len(entry.Rule.AlertingRule.KeepFiringFor.Value),
+			LastColumn:  entry.Rule.AlertingRule.KeepFiringFor.Pos.Len(),
 			Kind:        diags.Issue,
 		}
 	default:
@@ -105,7 +103,7 @@ func (c RuleForCheck) Check(_ context.Context, entry *discovery.Entry, _ []*disc
 		}
 	}
 
-	if time.Duration(forDur) < c.minFor {
+	if forDur < c.minFor {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
 			Lines:    lines,
@@ -125,7 +123,7 @@ func (c RuleForCheck) Check(_ context.Context, entry *discovery.Entry, _ []*disc
 		})
 	}
 
-	if c.maxFor > 0 && time.Duration(forDur) > c.maxFor {
+	if c.maxFor > 0 && forDur > c.maxFor {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
 			Lines:    lines,

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/prometheus/common/model"
 	promParser "github.com/prometheus/prometheus/promql/parser"
 
 	"github.com/cloudflare/pint/internal/diags"
@@ -101,7 +100,7 @@ func (c FragileCheck) checkTopK(expr *parser.PromQLExpr, src source.Source) (pro
 	return problems
 }
 
-func (c FragileCheck) checkPartialData(expr *parser.PromQLExpr, src source.Source, forVal *parser.YamlNode) (problems []Problem) {
+func (c FragileCheck) checkPartialData(expr *parser.PromQLExpr, src source.Source, forVal *parser.YamlDuration) (problems []Problem) {
 	if src.Type != source.AggregateSource {
 		return problems
 	}
@@ -109,11 +108,8 @@ func (c FragileCheck) checkPartialData(expr *parser.PromQLExpr, src source.Sourc
 		return problems
 	}
 
-	if forVal != nil {
-		forDur, _ := model.ParseDuration(forVal.Value)
-		if forDur > 0 {
-			return problems
-		}
+	if forVal != nil && forVal.ParseError == nil && forVal.Value > 0 {
+		return problems
 	}
 
 	for _, j := range src.Joins {

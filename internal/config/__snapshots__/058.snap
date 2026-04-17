@@ -23,6 +23,7 @@ config: |-
           "promql/counter",
           "promql/features",
           "promql/fragile",
+          "group/interval",
           "promql/impossible",
           "promql/range_query",
           "promql/rate",
@@ -78,6 +79,7 @@ checks:
     - promql/fragile
     - promql/regexp
     - promql/impossible
+    - group/interval
     - promql/selector(absent:^.+_total$:job)
     - promql/selector(absent:^.+_total$:namespace)
 

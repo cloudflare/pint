@@ -12,7 +12,6 @@ import (
 	"github.com/cloudflare/pint/internal/parser/source"
 	"github.com/cloudflare/pint/internal/promapi"
 
-	"github.com/prometheus/common/model"
 	promParser "github.com/prometheus/prometheus/promql/parser"
 )
 
@@ -86,13 +85,13 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, entry *discovery.Entry, _ 
 		return problems
 	}
 
+	if entry.Rule.AlertingRule.For != nil && entry.Rule.AlertingRule.For.ParseError != nil {
+		return problems
+	}
+
 	var forVal time.Duration
 	if entry.Rule.AlertingRule.For != nil {
-		forDur, err := model.ParseDuration(entry.Rule.AlertingRule.For.Value)
-		if err != nil {
-			return problems
-		}
-		forVal = time.Duration(forDur)
+		forVal = entry.Rule.AlertingRule.For.Value
 	}
 
 	for _, s := range absentSources {
@@ -139,7 +138,7 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, entry *discovery.Entry, _ 
 					output.HumanizeDuration(cfg.Config.Global.ScrapeInterval)),
 				Pos:         entry.Rule.AlertingRule.For.Pos,
 				FirstColumn: 1,
-				LastColumn:  len(entry.Rule.AlertingRule.For.Value),
+				LastColumn:  entry.Rule.AlertingRule.For.Pos.Len(),
 				Kind:        diags.Issue,
 			})
 		} else {

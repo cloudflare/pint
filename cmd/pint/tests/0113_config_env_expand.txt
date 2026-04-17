@@ -32,6 +32,7 @@ level=INFO msg="Loading configuration file" path=.pint.hcl
       "promql/counter",
       "promql/features",
       "promql/fragile",
+      "group/interval",
       "promql/impossible",
       "promql/range_query",
       "promql/rate",

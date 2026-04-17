@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/prometheus/common/model"
-
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
@@ -58,9 +56,8 @@ func (c AlertsForChecksFor) Check(_ context.Context, entry *discovery.Entry, _ [
 	return problems
 }
 
-func (c AlertsForChecksFor) checkField(name string, value *parser.YamlNode) (problems []Problem) {
-	d, err := model.ParseDuration(value.Value)
-	if err != nil {
+func (c AlertsForChecksFor) checkField(name string, value *parser.YamlDuration) (problems []Problem) {
+	if value.ParseError != nil {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
 			Lines:    value.Pos.Lines(),
@@ -70,10 +67,10 @@ func (c AlertsForChecksFor) checkField(name string, value *parser.YamlNode) (pro
 			Severity: Bug,
 			Diagnostics: []diags.Diagnostic{
 				{
-					Message:     err.Error(),
+					Message:     value.ParseError.Error(),
 					Pos:         value.Pos,
 					FirstColumn: 1,
-					LastColumn:  len(value.Value),
+					LastColumn:  value.Pos.Len(),
 					Kind:        diags.Issue,
 				},
 			},
@@ -81,7 +78,7 @@ func (c AlertsForChecksFor) checkField(name string, value *parser.YamlNode) (pro
 		return problems
 	}
 
-	if d == 0 {
+	if value.Value == 0 {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
 			Lines:    value.Pos.Lines(),
@@ -91,10 +88,10 @@ func (c AlertsForChecksFor) checkField(name string, value *parser.YamlNode) (pro
 			Severity: Information,
 			Diagnostics: []diags.Diagnostic{
 				{
-					Message:     fmt.Sprintf("`%s` is the default value of `%s`, this line is unnecessary.", value.Value, name),
+					Message:     fmt.Sprintf("`%s` is the default value of `%s`, this line is unnecessary.", value.Raw, name),
 					Pos:         value.Pos,
 					FirstColumn: 1,
-					LastColumn:  len(value.Value),
+					LastColumn:  value.Pos.Len(),
 					Kind:        diags.Issue,
 				},
 			},

@@ -3,10 +3,13 @@ package parser
 import (
 	"fmt"
 	"slices"
+	"strconv"
 	"sync"
 	"time"
 
 	"go.yaml.in/yaml/v3"
+
+	"github.com/prometheus/common/model"
 
 	"github.com/cloudflare/pint/internal/comments"
 	"github.com/cloudflare/pint/internal/diags"
@@ -60,6 +63,66 @@ func newYamlNode(node *yaml.Node, offsetLine, offsetColumn int, contentLines []s
 		Pos:   pos,
 		Value: nodeValue(node),
 	}
+}
+
+type YamlDuration struct {
+	ParseError error
+	Raw        string
+	Pos        diags.PositionRanges
+	Value      time.Duration
+}
+
+func (yd *YamlDuration) IsIdentical(b *YamlDuration) bool {
+	if (yd == nil) != (b == nil) {
+		return false
+	}
+	if yd == nil {
+		return true
+	}
+	return yd.Value == b.Value
+}
+
+type YamlInt struct {
+	ParseError error
+	Raw        string
+	Pos        diags.PositionRanges
+	Value      int
+}
+
+func newYamlDuration(node *yaml.Node, offsetLine, offsetColumn int, contentLines []string, minColumn int) *YamlDuration {
+	pos := diags.NewPositionRange(contentLines, node, minColumn)
+	pos.AddOffset(offsetLine, offsetColumn)
+	yd := YamlDuration{
+		ParseError: nil,
+		Raw:        nodeValue(node),
+		Pos:        pos,
+		Value:      0,
+	}
+	dur, err := model.ParseDuration(nodeValue(node))
+	if err != nil {
+		yd.ParseError = err
+	} else {
+		yd.Value = time.Duration(dur)
+	}
+	return &yd
+}
+
+func newYamlInt(node *yaml.Node, offsetLine, offsetColumn int, contentLines []string, minColumn int) *YamlInt {
+	pos := diags.NewPositionRange(contentLines, node, minColumn)
+	pos.AddOffset(offsetLine, offsetColumn)
+	yi := YamlInt{
+		ParseError: nil,
+		Raw:        nodeValue(node),
+		Pos:        pos,
+		Value:      0,
+	}
+	val, err := strconv.Atoi(nodeValue(node))
+	if err != nil {
+		yi.ParseError = err
+	} else {
+		yi.Value = val
+	}
+	return &yi
 }
 
 type YamlKeyValue struct {
@@ -170,8 +233,8 @@ func newPromQLExpr(node *yaml.Node, offsetLine, offsetColumn int, contentLines [
 }
 
 type AlertingRule struct {
-	For           *YamlNode
-	KeepFiringFor *YamlNode
+	For           *YamlDuration
+	KeepFiringFor *YamlDuration
 	Labels        *YamlMap
 	Annotations   *YamlMap
 	Alert         YamlNode
@@ -254,12 +317,12 @@ type File struct {
 
 type Group struct {
 	Labels      *YamlMap
-	Name        string
+	Interval    *YamlDuration
+	QueryOffset *YamlDuration
+	Limit       *YamlInt
+	Name        YamlNode
 	Error       ParseError
 	Rules       []Rule
-	Interval    time.Duration
-	QueryOffset time.Duration
-	Limit       int
 }
 
 type Rule struct {
@@ -369,10 +432,16 @@ func (r Rule) LastKey() (node *YamlNode) {
 			node = r.AlertingRule.Expr.Value
 		}
 		if r.AlertingRule.For != nil && r.AlertingRule.For.Pos.Lines().Last > node.Pos.Lines().Last {
-			node = r.AlertingRule.For
+			node = &YamlNode{
+				Pos:   r.AlertingRule.For.Pos,
+				Value: r.AlertingRule.For.Raw,
+			}
 		}
 		if r.AlertingRule.KeepFiringFor != nil && r.AlertingRule.KeepFiringFor.Pos.Lines().Last > node.Pos.Lines().Last {
-			node = r.AlertingRule.KeepFiringFor
+			node = &YamlNode{
+				Pos:   r.AlertingRule.KeepFiringFor.Pos,
+				Value: r.AlertingRule.KeepFiringFor.Raw,
+			}
 		}
 		if r.AlertingRule.Labels != nil {
 			for _, lab := range r.AlertingRule.Labels.Items {

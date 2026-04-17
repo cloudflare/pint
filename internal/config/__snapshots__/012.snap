@@ -23,6 +23,7 @@ config: |-
           "promql/counter",
           "promql/features",
           "promql/fragile",
+          "group/interval",
           "promql/impossible",
           "promql/range_query",
           "promql/rate",
@@ -87,6 +88,7 @@ checks:
     - alerts/template
     - promql/fragile
     - promql/regexp
+    - group/interval
     - promql/aggregate(job:true)
     - promql/aggregate(rack:false)
 
