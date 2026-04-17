@@ -183,13 +183,14 @@ func tryParseGroup(node *yaml.Node, offsetLine, offsetColumn int, contentLines [
 	for _, e := range mappingNodes(node) {
 		switch val := nodeValue(e.key); val {
 		case "name":
-			g.Name = nodeValue(e.val)
+			g.Name = YamlNode{
+				Value: nodeValue(e.val),
+				Pos:   diags.NewPositionRange(contentLines, e.val, 1),
+			}
 		case "interval":
 			g.Interval = newYamlDuration(e.val, offsetLine, offsetColumn, contentLines, 1)
 		case "limit":
-			if limit, err := strconv.Atoi(nodeValue(e.val)); err == nil {
-				g.Limit = limit
-			}
+			g.Limit = newYamlInt(e.val, offsetLine, offsetColumn, contentLines, 1)
 		case "query_offset":
 			g.QueryOffset = newYamlDuration(e.val, offsetLine, offsetColumn, contentLines, 1)
 		case "labels":
@@ -200,7 +201,7 @@ func tryParseGroup(node *yaml.Node, offsetLine, offsetColumn int, contentLines [
 			}
 		}
 	}
-	return g, rules, g.Name != "" && rules.key != nil
+	return g, rules, g.Name.Value != "" && rules.key != nil
 }
 
 func (p Parser) parseRule(node *yaml.Node, offsetLine, offsetColumn int, contentLines []string) (rule Rule, _ bool) {

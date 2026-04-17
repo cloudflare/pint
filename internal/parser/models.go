@@ -3,6 +3,7 @@ package parser
 import (
 	"fmt"
 	"slices"
+	"strconv"
 	"sync"
 	"time"
 
@@ -65,10 +66,10 @@ func newYamlNode(node *yaml.Node, offsetLine, offsetColumn int, contentLines []s
 }
 
 type YamlDuration struct {
-	Error error
-	Raw   string
-	Pos   diags.PositionRanges
-	Value time.Duration
+	ParseError error
+	Raw        string
+	Pos        diags.PositionRanges
+	Value      time.Duration
 }
 
 func (yd *YamlDuration) IsIdentical(b *YamlDuration) bool {
@@ -81,22 +82,47 @@ func (yd *YamlDuration) IsIdentical(b *YamlDuration) bool {
 	return yd.Value == b.Value
 }
 
+type YamlInt struct {
+	ParseError error
+	Raw        string
+	Pos        diags.PositionRanges
+	Value      int
+}
+
 func newYamlDuration(node *yaml.Node, offsetLine, offsetColumn int, contentLines []string, minColumn int) *YamlDuration {
 	pos := diags.NewPositionRange(contentLines, node, minColumn)
 	pos.AddOffset(offsetLine, offsetColumn)
 	yd := YamlDuration{
-		Error: nil,
-		Raw:   nodeValue(node),
-		Pos:   pos,
-		Value: 0,
+		ParseError: nil,
+		Raw:        nodeValue(node),
+		Pos:        pos,
+		Value:      0,
 	}
 	dur, err := model.ParseDuration(nodeValue(node))
 	if err != nil {
-		yd.Error = err
+		yd.ParseError = err
 	} else {
 		yd.Value = time.Duration(dur)
 	}
 	return &yd
+}
+
+func newYamlInt(node *yaml.Node, offsetLine, offsetColumn int, contentLines []string, minColumn int) *YamlInt {
+	pos := diags.NewPositionRange(contentLines, node, minColumn)
+	pos.AddOffset(offsetLine, offsetColumn)
+	yi := YamlInt{
+		ParseError: nil,
+		Raw:        nodeValue(node),
+		Pos:        pos,
+		Value:      0,
+	}
+	val, err := strconv.Atoi(nodeValue(node))
+	if err != nil {
+		yi.ParseError = err
+	} else {
+		yi.Value = val
+	}
+	return &yi
 }
 
 type YamlKeyValue struct {
@@ -293,10 +319,10 @@ type Group struct {
 	Labels      *YamlMap
 	Interval    *YamlDuration
 	QueryOffset *YamlDuration
-	Name        string
+	Limit       *YamlInt
+	Name        YamlNode
 	Error       ParseError
 	Rules       []Rule
-	Limit       int
 }
 
 type Rule struct {

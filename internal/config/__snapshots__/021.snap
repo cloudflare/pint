@@ -23,6 +23,7 @@ config: |-
           "promql/counter",
           "promql/features",
           "promql/fragile",
+          "group/interval",
           "promql/impossible",
           "promql/range_query",
           "promql/rate",
@@ -79,6 +80,7 @@ checks:
     - promql/fragile
     - promql/regexp
     - promql/impossible
+    - group/interval
     - rule/label(priority=~^(1|2|3|4|5)$:true)
 
 ---

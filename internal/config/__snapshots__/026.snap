@@ -49,6 +49,7 @@ checks:
     - promql/fragile
     - promql/regexp
     - promql/impossible
+    - group/interval
     - promql/rate(prom1)
     - promql/series(prom1)
     - promql/vector_matching(prom1)

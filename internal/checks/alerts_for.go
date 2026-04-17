@@ -57,7 +57,7 @@ func (c AlertsForChecksFor) Check(_ context.Context, entry *discovery.Entry, _ [
 }
 
 func (c AlertsForChecksFor) checkField(name string, value *parser.YamlDuration) (problems []Problem) {
-	if value.Error != nil {
+	if value.ParseError != nil {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
 			Lines:    value.Pos.Lines(),
@@ -67,7 +67,7 @@ func (c AlertsForChecksFor) checkField(name string, value *parser.YamlDuration) 
 			Severity: Bug,
 			Diagnostics: []diags.Diagnostic{
 				{
-					Message:     value.Error.Error(),
+					Message:     value.ParseError.Error(),
 					Pos:         value.Pos,
 					FirstColumn: 1,
 					LastColumn:  value.Pos.Len(),

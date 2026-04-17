@@ -108,7 +108,7 @@ func (c FragileCheck) checkPartialData(expr *parser.PromQLExpr, src source.Sourc
 		return problems
 	}
 
-	if forVal != nil && forVal.Error == nil && forVal.Value > 0 {
+	if forVal != nil && forVal.ParseError == nil && forVal.Value > 0 {
 		return problems
 	}
 

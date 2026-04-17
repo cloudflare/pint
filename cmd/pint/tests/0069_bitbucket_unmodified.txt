@@ -101,7 +101,7 @@ data:
   - value: 6
     title: Number of problems found
     type: NUMBER
-  - value: 16
+  - value: 18
     title: Number of offline checks
     type: NUMBER
   - value: 0

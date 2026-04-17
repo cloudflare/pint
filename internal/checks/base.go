@@ -25,6 +25,7 @@ var (
 		CounterCheckName,
 		FeaturesCheckName,
 		FragileCheckName,
+		GroupIntervalCheckName,
 		ImpossibleCheckName,
 		RangeQueryCheckName,
 		RateCheckName,

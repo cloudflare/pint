@@ -23,6 +23,7 @@ config: |-
           "promql/counter",
           "promql/features",
           "promql/fragile",
+          "group/interval",
           "promql/impossible",
           "promql/range_query",
           "promql/rate",
@@ -149,6 +150,7 @@ checks:
     - alerts/for
     - alerts/comparison
     - alerts/template
+    - group/interval
     - alerts/absent(prom1)
     - promql/features(prom1)
     - alerts/absent(prom2)

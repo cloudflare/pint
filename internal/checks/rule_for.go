@@ -72,7 +72,7 @@ func (c RuleForCheck) Check(_ context.Context, entry *discovery.Entry, _ []*disc
 	var diag diags.Diagnostic
 
 	switch {
-	case c.key == RuleForFor && entry.Rule.AlertingRule.For != nil && entry.Rule.AlertingRule.For.Error == nil:
+	case c.key == RuleForFor && entry.Rule.AlertingRule.For != nil && entry.Rule.AlertingRule.For.ParseError == nil:
 		forDur = entry.Rule.AlertingRule.For.Value
 		lines = entry.Rule.AlertingRule.For.Pos.Lines()
 		diag = diags.Diagnostic{
@@ -82,7 +82,7 @@ func (c RuleForCheck) Check(_ context.Context, entry *discovery.Entry, _ []*disc
 			LastColumn:  entry.Rule.AlertingRule.For.Pos.Len(),
 			Kind:        diags.Issue,
 		}
-	case c.key == RuleForKeepFiringFor && entry.Rule.AlertingRule.KeepFiringFor != nil && entry.Rule.AlertingRule.KeepFiringFor.Error == nil:
+	case c.key == RuleForKeepFiringFor && entry.Rule.AlertingRule.KeepFiringFor != nil && entry.Rule.AlertingRule.KeepFiringFor.ParseError == nil:
 		forDur = entry.Rule.AlertingRule.KeepFiringFor.Value
 		lines = entry.Rule.AlertingRule.KeepFiringFor.Pos.Lines()
 		diag = diags.Diagnostic{

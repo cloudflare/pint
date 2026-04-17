@@ -90,11 +90,11 @@ func (c AlertsCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*dis
 	}
 
 	var forDur time.Duration
-	if entry.Rule.AlertingRule.For != nil && entry.Rule.AlertingRule.For.Error == nil {
+	if entry.Rule.AlertingRule.For != nil && entry.Rule.AlertingRule.For.ParseError == nil {
 		forDur = entry.Rule.AlertingRule.For.Value
 	}
 	var keepFiringForDur time.Duration
-	if entry.Rule.AlertingRule.KeepFiringFor != nil && entry.Rule.AlertingRule.KeepFiringFor.Error == nil {
+	if entry.Rule.AlertingRule.KeepFiringFor != nil && entry.Rule.AlertingRule.KeepFiringFor.ParseError == nil {
 		keepFiringForDur = entry.Rule.AlertingRule.KeepFiringFor.Value
 	}
 

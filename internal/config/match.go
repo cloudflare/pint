@@ -156,7 +156,7 @@ func (m Match) IsMatch(ctx context.Context, path string, e *discovery.Entry) boo
 	}
 
 	if m.For != "" {
-		if e.Rule.AlertingRule != nil && e.Rule.AlertingRule.For != nil && e.Rule.AlertingRule.For.Error == nil {
+		if e.Rule.AlertingRule != nil && e.Rule.AlertingRule.For != nil && e.Rule.AlertingRule.For.ParseError == nil {
 			dm, _ := parseDurationMatch(m.For)
 			if !dm.isMatch(e.Rule.AlertingRule.For.Value) {
 				return false
@@ -167,7 +167,7 @@ func (m Match) IsMatch(ctx context.Context, path string, e *discovery.Entry) boo
 	}
 
 	if m.KeepFiringFor != "" {
-		if e.Rule.AlertingRule != nil && e.Rule.AlertingRule.KeepFiringFor != nil && e.Rule.AlertingRule.KeepFiringFor.Error == nil {
+		if e.Rule.AlertingRule != nil && e.Rule.AlertingRule.KeepFiringFor != nil && e.Rule.AlertingRule.KeepFiringFor.ParseError == nil {
 			dm, _ := parseDurationMatch(m.KeepFiringFor)
 			if !dm.isMatch(e.Rule.AlertingRule.KeepFiringFor.Value) {
 				return false

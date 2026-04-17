@@ -740,7 +740,12 @@ groups:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
-						Name: "custom_rules",
+						Name: parser.YamlNode{
+							Value: "custom_rules",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 20},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 5, Last: 9},
@@ -845,8 +850,8 @@ groups:
 										},
 									},
 									For: &parser.YamlDuration{
-										Raw:   "11m\n",
-										Error: errors.New(`unknown unit "m\n" in duration "11m\n"`),
+										Raw:        "11m\n",
+										ParseError: errors.New(`unknown unit "m\n" in duration "11m\n"`),
 										Pos: diags.PositionRanges{
 											{Line: 5, FirstColumn: 5, LastColumn: 7},
 										},
@@ -1023,7 +1028,12 @@ data:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
-						Name: "example-app-alerts",
+						Name: parser.YamlNode{
+							Value: "example-app-alerts",
+							Pos: diags.PositionRanges{
+								{Line: 2, FirstColumn: 11, LastColumn: 28},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 13, Last: 14},
@@ -1047,7 +1057,12 @@ data:
 						},
 					},
 					{
-						Name: "other alerts",
+						Name: parser.YamlNode{
+							Value: "other alerts",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 11, LastColumn: 22},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 28, Last: 29},
@@ -1102,7 +1117,12 @@ data:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
-						Name: "example-app-alerts",
+						Name: parser.YamlNode{
+							Value: "example-app-alerts",
+							Pos: diags.PositionRanges{
+								{Line: 2, FirstColumn: 11, LastColumn: 28},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 13, Last: 20},
@@ -1233,7 +1253,12 @@ data:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
-						Name: "haproxy.api_server.rules",
+						Name: parser.YamlNode{
+							Value: "haproxy.api_server.rules",
+							Pos: diags.PositionRanges{
+								{Line: 2, FirstColumn: 10, LastColumn: 33},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 4, Last: 11},
@@ -1345,7 +1370,12 @@ data:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
-						Name: "certmanager",
+						Name: parser.YamlNode{
+							Value: "certmanager",
+							Pos: diags.PositionRanges{
+								{Line: 2, FirstColumn: 9, LastColumn: 19},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 6, Last: 7},
@@ -1485,7 +1515,12 @@ data:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
-						Name: "certmanager",
+						Name: parser.YamlNode{
+							Value: "certmanager",
+							Pos: diags.PositionRanges{
+								{Line: 2, FirstColumn: 9, LastColumn: 19},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 4, Last: 8},
@@ -2773,7 +2808,12 @@ groups:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
-						Name: "v1",
+						Name: parser.YamlNode{
+							Value: "v1",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 10},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 5, Last: 9},
@@ -2799,7 +2839,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "v1",
+						Name: parser.YamlNode{
+							Value: "v1",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 10},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 5, Last: 6},
@@ -2836,7 +2881,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "v1",
+						Name: parser.YamlNode{
+							Value: "v1",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 10},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 5, Last: 5},
@@ -2944,7 +2994,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "foo",
+						Name: parser.YamlNode{
+							Value: "foo",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 					},
 				},
 			},
@@ -2989,7 +3044,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "bar",
+						Name: parser.YamlNode{
+							Value: "bar",
+							Pos: diags.PositionRanges{
+								{Line: 4, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Error: parser.ParseError{
 							Err:  errors.New("duplicated key name"),
 							Line: 4,
@@ -3011,7 +3071,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "v1",
+						Name: parser.YamlNode{
+							Value: "v1",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 10},
+							},
+						},
 						Error: parser.ParseError{
 							Err:  errors.New("rules must be a list, got mapping"),
 							Line: 4,
@@ -3033,7 +3098,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "v1",
+						Name: parser.YamlNode{
+							Value: "v1",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 10},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Error: parser.ParseError{
@@ -3083,7 +3153,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "v1",
+						Name: parser.YamlNode{
+							Value: "v1",
+							Pos: diags.PositionRanges{
+								{Line: 4, FirstColumn: 9, LastColumn: 10},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 6, Last: 7},
@@ -3107,7 +3182,12 @@ groups:
 						},
 					},
 					{
-						Name: "v1",
+						Name: parser.YamlNode{
+							Value: "v1",
+							Pos: diags.PositionRanges{
+								{Line: 10, FirstColumn: 9, LastColumn: 10},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Error: parser.ParseError{
@@ -3140,7 +3220,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "foo",
+						Name: parser.YamlNode{
+							Value: "foo",
+							Pos: diags.PositionRanges{
+								{Line: 6, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 8, Last: 10},
@@ -3235,7 +3320,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "foo",
+						Name: parser.YamlNode{
+							Value: "foo",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 					},
 				},
 			},
@@ -3272,7 +3362,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "foo",
+						Name: parser.YamlNode{
+							Value: "foo",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 5, Last: 8},
@@ -3337,7 +3432,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "foo",
+						Name: parser.YamlNode{
+							Value: "foo",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Error: parser.ParseError{
@@ -3365,7 +3465,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "foo",
+						Name: parser.YamlNode{
+							Value: "foo",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Error: parser.ParseError{
 							Err:  errors.New("rules must be a list, got mapping"),
 							Line: 4,
@@ -3389,7 +3494,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "foo",
+						Name: parser.YamlNode{
+							Value: "foo",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 5, Last: 9},
@@ -3416,7 +3526,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "foo",
+						Name: parser.YamlNode{
+							Value: "foo",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 5, Last: 7},
@@ -3461,7 +3576,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "foo",
+						Name: parser.YamlNode{
+							Value: "foo",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 8, Last: 9},
@@ -3487,7 +3607,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "v2",
+						Name: parser.YamlNode{
+							Value: "v2",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 10},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 5, Last: 7},
@@ -3531,7 +3656,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "v2",
+						Name: parser.YamlNode{
+							Value: "v2",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 10},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Error: parser.ParseError{
@@ -3561,7 +3691,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "v2",
+						Name: parser.YamlNode{
+							Value: "v2",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 10},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Error: parser.ParseError{
@@ -3586,7 +3721,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "CloudflareKafkaZookeeperExporter",
+						Name: parser.YamlNode{
+							Value: "CloudflareKafkaZookeeperExporter",
+							Pos: diags.PositionRanges{
+								{Line: 4, FirstColumn: 9, LastColumn: 40},
+							},
+						},
 					},
 				},
 			},
@@ -3602,7 +3742,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "foo",
+						Name: parser.YamlNode{
+							Value: "foo",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Error: parser.ParseError{
 							Err:  errors.New("rules must be a list, got mapping"),
 							Line: 4,
@@ -3622,7 +3767,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "foo",
+						Name: parser.YamlNode{
+							Value: "foo",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 5, Last: 5},
@@ -3647,7 +3797,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "foo",
+						Name: parser.YamlNode{
+							Value: "foo",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 5, Last: 5},
@@ -3672,7 +3827,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "foo",
+						Name: parser.YamlNode{
+							Value: "foo",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Error: parser.ParseError{
@@ -3696,7 +3856,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "foo",
+						Name: parser.YamlNode{
+							Value: "foo",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Error: parser.ParseError{
@@ -3720,7 +3885,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "foo",
+						Name: parser.YamlNode{
+							Value: "foo",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 5, Last: 5},
@@ -3746,7 +3916,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "foo",
+						Name: parser.YamlNode{
+							Value: "foo",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 5, Last: 6},
@@ -3773,7 +3948,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "foo",
+						Name: parser.YamlNode{
+							Value: "foo",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 5, Last: 7},
@@ -3810,7 +3990,12 @@ groups:
 				},
 				Groups: []parser.Group{
 					{
-						Name: "foo",
+						Name: parser.YamlNode{
+							Value: "foo",
+							Pos: diags.PositionRanges{
+								{Line: 4, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 6, Last: 7},
@@ -3834,7 +4019,12 @@ groups:
 						},
 					},
 					{
-						Name: "foo",
+						Name: parser.YamlNode{
+							Value: "foo",
+							Pos: diags.PositionRanges{
+								{Line: 10, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 12, Last: 13},
@@ -3873,7 +4063,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "foo",
+						Name: parser.YamlNode{
+							Value: "foo",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 5, Last: 7},
@@ -3900,7 +4095,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "foo",
+						Name: parser.YamlNode{
+							Value: "foo",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 5, Last: 7},
@@ -3927,7 +4127,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "foo",
+						Name: parser.YamlNode{
+							Value: "foo",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 5, Last: 7},
@@ -3952,7 +4157,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "foo",
+						Name: parser.YamlNode{
+							Value: "foo",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Error: parser.ParseError{
@@ -4122,7 +4332,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "foo",
+						Name: parser.YamlNode{
+							Value: "foo",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 11, LastColumn: 13},
+							},
+						},
 						Error: parser.ParseError{
 							Err:  errors.New("group interval must be a string, got integer"),
 							Line: 4,
@@ -4142,10 +4357,15 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "foo",
+						Name: parser.YamlNode{
+							Value: "foo",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 11, LastColumn: 13},
+							},
+						},
 						Interval: &parser.YamlDuration{
-							Error: errors.New(`not a valid duration string: "xxx"`),
-							Raw:   "xxx",
+							ParseError: errors.New(`not a valid duration string: "xxx"`),
+							Raw:        "xxx",
 							Pos: diags.PositionRanges{
 								{Line: 4, FirstColumn: 15, LastColumn: 17},
 							},
@@ -4169,7 +4389,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "foo",
+						Name: parser.YamlNode{
+							Value: "foo",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 11, LastColumn: 13},
+							},
+						},
 						Error: parser.ParseError{
 							Err:  errors.New("group query_offset must be a string, got integer"),
 							Line: 4,
@@ -4189,10 +4414,15 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "foo",
+						Name: parser.YamlNode{
+							Value: "foo",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 11, LastColumn: 13},
+							},
+						},
 						QueryOffset: &parser.YamlDuration{
-							Error: errors.New(`not a valid duration string: "xxx"`),
-							Raw:   "xxx",
+							ParseError: errors.New(`not a valid duration string: "xxx"`),
+							Raw:        "xxx",
 							Pos: diags.PositionRanges{
 								{Line: 4, FirstColumn: 19, LastColumn: 21},
 							},
@@ -4217,7 +4447,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "foo",
+						Name: parser.YamlNode{
+							Value: "foo",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 11, LastColumn: 13},
+							},
+						},
 						QueryOffset: &parser.YamlDuration{
 							Value: time.Minute,
 							Raw:   "1m",
@@ -4255,6 +4490,36 @@ groups:
 			},
 		},
 		{
+			// Non-strict parser accepts any scalar value for limit and records
+			// the strconv error on the YamlInt itself.
+			input: []byte(`
+groups:
+- name: foo
+  limit: abc
+  rules: []
+`),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Name: parser.YamlNode{
+							Value: "foo",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
+						Limit: &parser.YamlInt{
+							ParseError: errors.New(`strconv.Atoi: parsing "abc": invalid syntax`),
+							Raw:        "abc",
+							Pos: diags.PositionRanges{
+								{Line: 4, FirstColumn: 10, LastColumn: 12},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			input: []byte(`
 groups:
 - name: v2
@@ -4270,7 +4535,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "v2",
+						Name: parser.YamlNode{
+							Value: "v2",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 10},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 5, Last: 10},
@@ -4300,8 +4570,19 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name:  "v2",
-						Limit: 1,
+						Name: parser.YamlNode{
+							Value: "v2",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 10},
+							},
+						},
+						Limit: &parser.YamlInt{
+							Value: 1,
+							Raw:   "1",
+							Pos: diags.PositionRanges{
+								{Line: 4, FirstColumn: 15, LastColumn: 15},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 6, Last: 10},
@@ -4328,7 +4609,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "{{ source }}",
+						Name: parser.YamlNode{
+							Value: "{{ source }}",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 10, LastColumn: 21},
+							},
+						},
 					},
 				},
 			},
@@ -4346,7 +4632,12 @@ groups:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
-						Name: "foo",
+						Name: parser.YamlNode{
+							Value: "foo",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 5, Last: 7},
@@ -4385,7 +4676,12 @@ groups:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
-						Name: "foo",
+						Name: parser.YamlNode{
+							Value: "foo",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 5, Last: 7},
@@ -4424,7 +4720,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "mygroup",
+						Name: parser.YamlNode{
+							Value: "mygroup",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 15},
+							},
+						},
 						Error: parser.ParseError{
 							Err:  errors.New("partial_response_strategy is only valid when parser is configured to use the Thanos rule schema"),
 							Line: 4,
@@ -4447,7 +4748,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "mygroup",
+						Name: parser.YamlNode{
+							Value: "mygroup",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 15},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 6, Last: 7},
@@ -4487,7 +4793,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "mygroup",
+						Name: parser.YamlNode{
+							Value: "mygroup",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 15},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 6, Last: 7},
@@ -4528,7 +4839,12 @@ groups:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
-						Name: "mygroup",
+						Name: parser.YamlNode{
+							Value: "mygroup",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 15},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 6, Last: 7},
@@ -4568,7 +4884,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "mygroup",
+						Name: parser.YamlNode{
+							Value: "mygroup",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 15},
+							},
+						},
 						Error: parser.ParseError{
 							Err:  errors.New("invalid partial_response_strategy value: bob"),
 							Line: 4,
@@ -4591,7 +4912,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "mygroup",
+						Name: parser.YamlNode{
+							Value: "mygroup",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 15},
+							},
+						},
 						Error: parser.ParseError{
 							Err:  errors.New("partial_response_strategy must be a string, got integer"),
 							Line: 4,
@@ -4798,7 +5124,12 @@ groups:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
-						Name: "foo",
+						Name: parser.YamlNode{
+							Value: "foo",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 5, Last: 8},
@@ -4848,7 +5179,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "{{ source }}",
+						Name: parser.YamlNode{
+							Value: "{{ source }}",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 10, LastColumn: 21},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 7, Last: 15},
@@ -4922,7 +5258,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "{{ source }}",
+						Name: parser.YamlNode{
+							Value: "{{ source }}",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 10, LastColumn: 21},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 6, Last: 13},
@@ -4975,7 +5316,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "xxx",
+						Name: parser.YamlNode{
+							Value: "xxx",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Interval: &parser.YamlDuration{
 							Value: time.Minute * 3,
 							Raw:   "3m",
@@ -4998,7 +5344,12 @@ groups:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
-						Name: "xxx",
+						Name: parser.YamlNode{
+							Value: "xxx",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Interval: &parser.YamlDuration{
 							Value: time.Minute * 3,
 							Raw:   "3m",
@@ -5026,7 +5377,12 @@ groups:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
-						Name: "xxx",
+						Name: parser.YamlNode{
+							Value: "xxx",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Interval: &parser.YamlDuration{
 							Value: time.Minute * 3,
 							Raw:   "3m",
@@ -5036,7 +5392,12 @@ groups:
 						},
 					},
 					{
-						Name: "yyy",
+						Name: parser.YamlNode{
+							Value: "yyy",
+							Pos: diags.PositionRanges{
+								{Line: 8, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Interval: &parser.YamlDuration{
 							Value: time.Minute * 2,
 							Raw:   "2m",
@@ -5061,7 +5422,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "xxx",
+						Name: parser.YamlNode{
+							Value: "xxx",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Interval: &parser.YamlDuration{
 							Value: time.Minute * 3,
 							Raw:   "3m",
@@ -5109,7 +5475,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "xxx",
+						Name: parser.YamlNode{
+							Value: "xxx",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Error: parser.ParseError{
 							Err:  errors.New("group labels must be a mapping, got list"),
 							Line: 4,
@@ -5130,7 +5501,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "xxx",
+						Name: parser.YamlNode{
+							Value: "xxx",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Error: parser.ParseError{
 							Err:  errors.New("labels foo value must be a string, got integer instead"),
 							Line: 5,
@@ -5153,7 +5529,12 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "xxx",
+						Name: parser.YamlNode{
+							Value: "xxx",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Error: parser.ParseError{
 							Err:  errors.New("duplicated labels key foo"),
 							Line: 7,
@@ -5177,7 +5558,12 @@ groups:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
-						Name: "xxx",
+						Name: parser.YamlNode{
+							Value: "xxx",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Interval: &parser.YamlDuration{
 							Value: time.Minute * 3,
 							Raw:   "3m",
@@ -5192,7 +5578,13 @@ groups:
 								{Line: 5, FirstColumn: 17, LastColumn: 18},
 							},
 						},
-						Limit: 5,
+						Limit: &parser.YamlInt{
+							Value: 5,
+							Raw:   "5",
+							Pos: diags.PositionRanges{
+								{Line: 6, FirstColumn: 10, LastColumn: 10},
+							},
+						},
 						Labels: &parser.YamlMap{
 							Key: &parser.YamlNode{
 								Value: "labels",
@@ -5233,7 +5625,12 @@ groups:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
-						Name: "xxx",
+						Name: parser.YamlNode{
+							Value: "xxx",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Labels: &parser.YamlMap{
 							Key: &parser.YamlNode{
 								Value: "labels",
@@ -5258,7 +5655,12 @@ groups:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
-						Name: "xxx",
+						Name: parser.YamlNode{
+							Value: "xxx",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Labels: &parser.YamlMap{
 							Key: &parser.YamlNode{
 								Value: "labels",
@@ -5301,7 +5703,12 @@ groups:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
-						Name: "xxx",
+						Name: parser.YamlNode{
+							Value: "xxx",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Labels: &parser.YamlMap{
 							Key: &parser.YamlNode{
 								Value: "labels",
@@ -5374,7 +5781,12 @@ groups:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
-						Name: "xxx",
+						Name: parser.YamlNode{
+							Value: "xxx",
+							Pos: diags.PositionRanges{
+								{Line: 2, FirstColumn: 9, LastColumn: 11},
+							},
+						},
 						Interval: &parser.YamlDuration{
 							Value: time.Minute * 3,
 							Raw:   "3m",
@@ -5389,7 +5801,13 @@ groups:
 								{Line: 4, FirstColumn: 17, LastColumn: 18},
 							},
 						},
-						Limit: 5,
+						Limit: &parser.YamlInt{
+							Value: 5,
+							Raw:   "5",
+							Pos: diags.PositionRanges{
+								{Line: 5, FirstColumn: 10, LastColumn: 10},
+							},
+						},
 						Labels: &parser.YamlMap{
 							Key: &parser.YamlNode{
 								Value: "labels",
@@ -5455,7 +5873,7 @@ groups:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
-						Name: "",
+						Name: parser.YamlNode{Value: ""},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 9, Last: 10},
@@ -5603,7 +6021,12 @@ data:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
-						Name: "test",
+						Name: parser.YamlNode{
+							Value: "test",
+							Pos: diags.PositionRanges{
+								{Line: 2, FirstColumn: 9, LastColumn: 12},
+							},
+						},
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 4, Last: 4},

@@ -85,7 +85,7 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, entry *discovery.Entry, _ 
 		return problems
 	}
 
-	if entry.Rule.AlertingRule.For != nil && entry.Rule.AlertingRule.For.Error != nil {
+	if entry.Rule.AlertingRule.For != nil && entry.Rule.AlertingRule.For.ParseError != nil {
 		return problems
 	}
 

@@ -5,6 +5,7 @@
 ### Added
 
 - Added [promql/features](checks/promql/features.md) check.
+- Added [group/interval](checks/group/interval.md) check.
 
 ### Fixed
 
