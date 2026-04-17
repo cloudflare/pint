@@ -7,8 +7,6 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/prometheus/common/model"
-
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/output"
@@ -91,19 +89,19 @@ func (c AlertsCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*dis
 		}
 	}
 
-	var forDur model.Duration
-	if entry.Rule.AlertingRule.For != nil {
-		forDur, _ = model.ParseDuration(entry.Rule.AlertingRule.For.Value)
+	var forDur time.Duration
+	if entry.Rule.AlertingRule.For != nil && entry.Rule.AlertingRule.For.Error == nil {
+		forDur = entry.Rule.AlertingRule.For.Value
 	}
-	var keepFiringForDur model.Duration
-	if entry.Rule.AlertingRule.KeepFiringFor != nil {
-		keepFiringForDur, _ = model.ParseDuration(entry.Rule.AlertingRule.KeepFiringFor.Value)
+	var keepFiringForDur time.Duration
+	if entry.Rule.AlertingRule.KeepFiringFor != nil && entry.Rule.AlertingRule.KeepFiringFor.Error == nil {
+		keepFiringForDur = entry.Rule.AlertingRule.KeepFiringFor.Value
 	}
 
 	var alerts int
 	for _, r := range qr.Series.Ranges {
 		// If `keepFiringFor` is not defined its Duration will be 0
-		if r.End.Sub(r.Start) > (time.Duration(forDur) + time.Duration(keepFiringForDur)) {
+		if r.End.Sub(r.Start) > (forDur + keepFiringForDur) {
 			alerts++
 		}
 	}

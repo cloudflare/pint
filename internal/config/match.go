@@ -156,12 +156,10 @@ func (m Match) IsMatch(ctx context.Context, path string, e *discovery.Entry) boo
 	}
 
 	if m.For != "" {
-		if e.Rule.AlertingRule != nil && e.Rule.AlertingRule.For != nil {
+		if e.Rule.AlertingRule != nil && e.Rule.AlertingRule.For != nil && e.Rule.AlertingRule.For.Error == nil {
 			dm, _ := parseDurationMatch(m.For)
-			if dur, err := parseDuration(e.Rule.AlertingRule.For.Value); err == nil {
-				if !dm.isMatch(dur) {
-					return false
-				}
+			if !dm.isMatch(e.Rule.AlertingRule.For.Value) {
+				return false
 			}
 		} else {
 			return false
@@ -169,12 +167,10 @@ func (m Match) IsMatch(ctx context.Context, path string, e *discovery.Entry) boo
 	}
 
 	if m.KeepFiringFor != "" {
-		if e.Rule.AlertingRule != nil && e.Rule.AlertingRule.KeepFiringFor != nil {
+		if e.Rule.AlertingRule != nil && e.Rule.AlertingRule.KeepFiringFor != nil && e.Rule.AlertingRule.KeepFiringFor.Error == nil {
 			dm, _ := parseDurationMatch(m.KeepFiringFor)
-			if dur, err := parseDuration(e.Rule.AlertingRule.KeepFiringFor.Value); err == nil {
-				if !dm.isMatch(dur) {
-					return false
-				}
+			if !dm.isMatch(e.Rule.AlertingRule.KeepFiringFor.Value) {
+				return false
 			}
 		} else {
 			return false

@@ -577,22 +577,37 @@ func TestParse(t *testing.T) {
 									Labels: &parser.YamlMap{
 										Key: &parser.YamlNode{
 											Value: "labels",
+											Pos: diags.PositionRanges{
+												{Line: 6, FirstColumn: 3, LastColumn: 8},
+											},
 										},
 										Items: []*parser.YamlKeyValue{
 											{
 												Key: &parser.YamlNode{
 													Value: "foo",
+													Pos: diags.PositionRanges{
+														{Line: 8, FirstColumn: 5, LastColumn: 7},
+													},
 												},
 												Value: &parser.YamlNode{
 													Value: "bar",
+													Pos: diags.PositionRanges{
+														{Line: 8, FirstColumn: 10, LastColumn: 12},
+													},
 												},
 											},
 											{
 												Key: &parser.YamlNode{
 													Value: "bob",
+													Pos: diags.PositionRanges{
+														{Line: 10, FirstColumn: 5, LastColumn: 7},
+													},
 												},
 												Value: &parser.YamlNode{
 													Value: "alice",
+													Pos: diags.PositionRanges{
+														{Line: 10, FirstColumn: 10, LastColumn: 14},
+													},
 												},
 											},
 										},
@@ -668,22 +683,37 @@ func TestParse(t *testing.T) {
 									Labels: &parser.YamlMap{
 										Key: &parser.YamlNode{
 											Value: "labels",
+											Pos: diags.PositionRanges{
+												{Line: 4, FirstColumn: 3, LastColumn: 8},
+											},
 										},
 										Items: []*parser.YamlKeyValue{
 											{
 												Key: &parser.YamlNode{
 													Value: "foo",
+													Pos: diags.PositionRanges{
+														{Line: 5, FirstColumn: 5, LastColumn: 7},
+													},
 												},
 												Value: &parser.YamlNode{
 													Value: "bar",
+													Pos: diags.PositionRanges{
+														{Line: 5, FirstColumn: 10, LastColumn: 12},
+													},
 												},
 											},
 											{
 												Key: &parser.YamlNode{
 													Value: "bob",
+													Pos: diags.PositionRanges{
+														{Line: 6, FirstColumn: 5, LastColumn: 7},
+													},
 												},
 												Value: &parser.YamlNode{
 													Value: "alice",
+													Pos: diags.PositionRanges{
+														{Line: 6, FirstColumn: 10, LastColumn: 14},
+													},
 												},
 											},
 										},
@@ -732,22 +762,37 @@ groups:
 									Labels: &parser.YamlMap{
 										Key: &parser.YamlNode{
 											Value: "labels",
+											Pos: diags.PositionRanges{
+												{Line: 7, FirstColumn: 7, LastColumn: 12},
+											},
 										},
 										Items: []*parser.YamlKeyValue{
 											{
 												Key: &parser.YamlNode{
 													Value: "foo",
+													Pos: diags.PositionRanges{
+														{Line: 8, FirstColumn: 9, LastColumn: 11},
+													},
 												},
 												Value: &parser.YamlNode{
 													Value: "bar",
+													Pos: diags.PositionRanges{
+														{Line: 8, FirstColumn: 14, LastColumn: 16},
+													},
 												},
 											},
 											{
 												Key: &parser.YamlNode{
 													Value: "bob",
+													Pos: diags.PositionRanges{
+														{Line: 9, FirstColumn: 9, LastColumn: 11},
+													},
 												},
 												Value: &parser.YamlNode{
 													Value: "alice",
+													Pos: diags.PositionRanges{
+														{Line: 9, FirstColumn: 14, LastColumn: 18},
+													},
 												},
 											},
 										},
@@ -799,8 +844,9 @@ groups:
 											},
 										},
 									},
-									For: &parser.YamlNode{
-										Value: "11m\n",
+									For: &parser.YamlDuration{
+										Raw:   "11m\n",
+										Error: errors.New(`unknown unit "m\n" in duration "11m\n"`),
 										Pos: diags.PositionRanges{
 											{Line: 5, FirstColumn: 5, LastColumn: 7},
 										},
@@ -808,14 +854,23 @@ groups:
 									Labels: &parser.YamlMap{
 										Key: &parser.YamlNode{
 											Value: "labels",
+											Pos: diags.PositionRanges{
+												{Line: 6, FirstColumn: 3, LastColumn: 8},
+											},
 										},
 										Items: []*parser.YamlKeyValue{
 											{
 												Key: &parser.YamlNode{
 													Value: "severity",
+													Pos: diags.PositionRanges{
+														{Line: 7, FirstColumn: 5, LastColumn: 12},
+													},
 												},
 												Value: &parser.YamlNode{
 													Value: "critical",
+													Pos: diags.PositionRanges{
+														{Line: 7, FirstColumn: 15, LastColumn: 22},
+													},
 												},
 											},
 										},
@@ -823,14 +878,23 @@ groups:
 									Annotations: &parser.YamlMap{
 										Key: &parser.YamlNode{
 											Value: "annotations",
+											Pos: diags.PositionRanges{
+												{Line: 8, FirstColumn: 3, LastColumn: 13},
+											},
 										},
 										Items: []*parser.YamlKeyValue{
 											{
 												Key: &parser.YamlNode{
 													Value: "uri",
+													Pos: diags.PositionRanges{
+														{Line: 9, FirstColumn: 5, LastColumn: 7},
+													},
 												},
 												Value: &parser.YamlNode{
 													Value: "https://docs.example.com/down.html",
+													Pos: diags.PositionRanges{
+														{Line: 9, FirstColumn: 10, LastColumn: 43},
+													},
 												},
 											},
 										},
@@ -859,6 +923,9 @@ groups:
 									Labels: &parser.YamlMap{
 										Key: &parser.YamlNode{
 											Value: "labels",
+											Pos: diags.PositionRanges{
+												{Line: 16, FirstColumn: 3, LastColumn: 8},
+											},
 										},
 									},
 								},
@@ -906,8 +973,9 @@ groups:
 											},
 										},
 									},
-									For: &parser.YamlNode{
-										Value: "30m",
+									For: &parser.YamlDuration{
+										Value: time.Minute * 30,
+										Raw:   "30m",
 										Pos: diags.PositionRanges{
 											{Line: 9, FirstColumn: 8, LastColumn: 10},
 										},
@@ -987,14 +1055,14 @@ data:
 									Alert: parser.YamlNode{
 										Value: "Example_High_Restart_Rate",
 										Pos: diags.PositionRanges{
-											{Line: 28, FirstColumn: 20, LastColumn: 44},
+											{Line: 28, FirstColumn: 16, LastColumn: 40},
 										},
 									},
 									Expr: parser.PromQLExpr{
 										Value: &parser.YamlNode{
 											Value: "1",
 											Pos: diags.PositionRanges{
-												{Line: 29, FirstColumn: 20, LastColumn: 20},
+												{Line: 29, FirstColumn: 16, LastColumn: 16},
 											},
 										},
 									},
@@ -1053,8 +1121,9 @@ data:
 											},
 										},
 									},
-									For: &parser.YamlNode{
-										Value: "5m",
+									For: &parser.YamlDuration{
+										Value: time.Minute * 5,
+										Raw:   "5m",
 										Pos: diags.PositionRanges{
 											{Line: 15, FirstColumn: 18, LastColumn: 19},
 										},
@@ -1062,22 +1131,37 @@ data:
 									Labels: &parser.YamlMap{
 										Key: &parser.YamlNode{
 											Value: "labels",
+											Pos: diags.PositionRanges{
+												{Line: 16, FirstColumn: 13, LastColumn: 18},
+											},
 										},
 										Items: []*parser.YamlKeyValue{
 											{
 												Key: &parser.YamlNode{
 													Value: "priority",
+													Pos: diags.PositionRanges{
+														{Line: 17, FirstColumn: 15, LastColumn: 22},
+													},
 												},
 												Value: &parser.YamlNode{
 													Value: "2",
+													Pos: diags.PositionRanges{
+														{Line: 17, FirstColumn: 26, LastColumn: 26},
+													},
 												},
 											},
 											{
 												Key: &parser.YamlNode{
 													Value: "environment",
+													Pos: diags.PositionRanges{
+														{Line: 18, FirstColumn: 15, LastColumn: 25},
+													},
 												},
 												Value: &parser.YamlNode{
 													Value: "production",
+													Pos: diags.PositionRanges{
+														{Line: 18, FirstColumn: 28, LastColumn: 37},
+													},
 												},
 											},
 										},
@@ -1085,14 +1169,23 @@ data:
 									Annotations: &parser.YamlMap{
 										Key: &parser.YamlNode{
 											Value: "annotations",
+											Pos: diags.PositionRanges{
+												{Line: 19, FirstColumn: 13, LastColumn: 23},
+											},
 										},
 										Items: []*parser.YamlKeyValue{
 											{
 												Key: &parser.YamlNode{
 													Value: "summary",
+													Pos: diags.PositionRanges{
+														{Line: 20, FirstColumn: 15, LastColumn: 21},
+													},
 												},
 												Value: &parser.YamlNode{
 													Value: "No replicas for Example have been running for 5 minutes",
+													Pos: diags.PositionRanges{
+														{Line: 20, FirstColumn: 25, LastColumn: 79},
+													},
 												},
 											},
 										},
@@ -1159,8 +1252,9 @@ data:
 											},
 										},
 									},
-									For: &parser.YamlNode{
-										Value: "5m",
+									For: &parser.YamlDuration{
+										Value: time.Minute * 5,
+										Raw:   "5m",
 										Pos: diags.PositionRanges{
 											{Line: 6, FirstColumn: 10, LastColumn: 11},
 										},
@@ -1168,14 +1262,23 @@ data:
 									Labels: &parser.YamlMap{
 										Key: &parser.YamlNode{
 											Value: "labels",
+											Pos: diags.PositionRanges{
+												{Line: 7, FirstColumn: 5, LastColumn: 10},
+											},
 										},
 										Items: []*parser.YamlKeyValue{
 											{
 												Key: &parser.YamlNode{
 													Value: "severity",
+													Pos: diags.PositionRanges{
+														{Line: 8, FirstColumn: 7, LastColumn: 14},
+													},
 												},
 												Value: &parser.YamlNode{
 													Value: "24x7",
+													Pos: diags.PositionRanges{
+														{Line: 8, FirstColumn: 17, LastColumn: 20},
+													},
 												},
 											},
 										},
@@ -1183,22 +1286,37 @@ data:
 									Annotations: &parser.YamlMap{
 										Key: &parser.YamlNode{
 											Value: "annotations",
+											Pos: diags.PositionRanges{
+												{Line: 9, FirstColumn: 5, LastColumn: 15},
+											},
 										},
 										Items: []*parser.YamlKeyValue{
 											{
 												Key: &parser.YamlNode{
 													Value: "summary",
+													Pos: diags.PositionRanges{
+														{Line: 10, FirstColumn: 7, LastColumn: 13},
+													},
 												},
 												Value: &parser.YamlNode{
 													Value: "HAProxy server healthcheck failure (instance {{ $labels.instance }})",
+													Pos: diags.PositionRanges{
+														{Line: 10, FirstColumn: 17, LastColumn: 84},
+													},
 												},
 											},
 											{
 												Key: &parser.YamlNode{
 													Value: "description",
+													Pos: diags.PositionRanges{
+														{Line: 11, FirstColumn: 7, LastColumn: 17},
+													},
 												},
 												Value: &parser.YamlNode{
 													Value: "Some server healthcheck are failing on {{ $labels.server }}\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}",
+													Pos: diags.PositionRanges{
+														{Line: 11, FirstColumn: 21, LastColumn: 79},
+													},
 												},
 											},
 										},
@@ -1389,22 +1507,37 @@ data:
 									Labels: &parser.YamlMap{
 										Key: &parser.YamlNode{
 											Value: "labels",
+											Pos: diags.PositionRanges{
+												{Line: 6, FirstColumn: 5, LastColumn: 10},
+											},
 										},
 										Items: []*parser.YamlKeyValue{
 											{
 												Key: &parser.YamlNode{
 													Value: "label1",
+													Pos: diags.PositionRanges{
+														{Line: 7, FirstColumn: 7, LastColumn: 12},
+													},
 												},
 												Value: &parser.YamlNode{
 													Value: "val1",
+													Pos: diags.PositionRanges{
+														{Line: 7, FirstColumn: 15, LastColumn: 18},
+													},
 												},
 											},
 											{
 												Key: &parser.YamlNode{
 													Value: "label2",
+													Pos: diags.PositionRanges{
+														{Line: 8, FirstColumn: 7, LastColumn: 12},
+													},
 												},
 												Value: &parser.YamlNode{
 													Value: "val2",
+													Pos: diags.PositionRanges{
+														{Line: 8, FirstColumn: 15, LastColumn: 18},
+													},
 												},
 											},
 										},
@@ -1437,22 +1570,37 @@ data:
 									Labels: &parser.YamlMap{
 										Key: &parser.YamlNode{
 											Value: "labels",
+											Pos: diags.PositionRanges{
+												{Line: 11, FirstColumn: 5, LastColumn: 10},
+											},
 										},
 										Items: []*parser.YamlKeyValue{
 											{
 												Key: &parser.YamlNode{
 													Value: "label1",
+													Pos: diags.PositionRanges{
+														{Line: 7, FirstColumn: 7, LastColumn: 12},
+													},
 												},
 												Value: &parser.YamlNode{
 													Value: "val1",
+													Pos: diags.PositionRanges{
+														{Line: 7, FirstColumn: 15, LastColumn: 18},
+													},
 												},
 											},
 											{
 												Key: &parser.YamlNode{
 													Value: "label2",
+													Pos: diags.PositionRanges{
+														{Line: 8, FirstColumn: 7, LastColumn: 12},
+													},
 												},
 												Value: &parser.YamlNode{
 													Value: "val2",
+													Pos: diags.PositionRanges{
+														{Line: 8, FirstColumn: 15, LastColumn: 18},
+													},
 												},
 											},
 										},
@@ -1678,14 +1826,24 @@ data:
 									Labels: &parser.YamlMap{
 										Key: &parser.YamlNode{
 											Value: "labels",
+											Pos: diags.PositionRanges{
+												{Line: 4, FirstColumn: 3, LastColumn: 8},
+											},
 										},
 										Items: []*parser.YamlKeyValue{
 											{
 												Key: &parser.YamlNode{
 													Value: "notify",
+													Pos: diags.PositionRanges{
+														{Line: 5, FirstColumn: 5, LastColumn: 10},
+													},
 												},
 												Value: &parser.YamlNode{
 													Value: "chat-alerts",
+													Pos: diags.PositionRanges{
+														{Line: 5, FirstColumn: 22, LastColumn: 22},
+														{Line: 5, FirstColumn: 37, LastColumn: 46},
+													},
 												},
 											},
 										},
@@ -1712,22 +1870,37 @@ data:
 									Labels: &parser.YamlMap{
 										Key: &parser.YamlNode{
 											Value: "labels",
+											Pos: diags.PositionRanges{
+												{Line: 8, FirstColumn: 3, LastColumn: 8},
+											},
 										},
 										Items: []*parser.YamlKeyValue{
 											{
 												Key: &parser.YamlNode{
 													Value: "notify",
+													Pos: diags.PositionRanges{
+														{Line: 9, FirstColumn: 5, LastColumn: 10},
+													},
 												},
 												Value: &parser.YamlNode{
 													Value: "chat-alerts",
+													Pos: diags.PositionRanges{
+														{Line: 9, FirstColumn: 14, LastColumn: 34},
+													},
 												},
 											},
 											{
 												Key: &parser.YamlNode{
 													Value: "summary",
+													Pos: diags.PositionRanges{
+														{Line: 10, FirstColumn: 5, LastColumn: 11},
+													},
 												},
 												Value: &parser.YamlNode{
 													Value: "foo",
+													Pos: diags.PositionRanges{
+														{Line: 10, FirstColumn: 14, LastColumn: 16},
+													},
 												},
 											},
 										},
@@ -1791,14 +1964,23 @@ data:
 									Labels: &parser.YamlMap{
 										Key: &parser.YamlNode{
 											Value: "labels",
+											Pos: diags.PositionRanges{
+												{Line: 4, FirstColumn: 3, LastColumn: 8},
+											},
 										},
 										Items: []*parser.YamlKeyValue{
 											{
 												Key: &parser.YamlNode{
 													Value: "a b c",
+													Pos: diags.PositionRanges{
+														{Line: 5, FirstColumn: 6, LastColumn: 10},
+													},
 												},
 												Value: &parser.YamlNode{
 													Value: "bar",
+													Pos: diags.PositionRanges{
+														{Line: 5, FirstColumn: 14, LastColumn: 16},
+													},
 												},
 											},
 										},
@@ -2248,6 +2430,9 @@ data:
 									Labels: &parser.YamlMap{
 										Key: &parser.YamlNode{
 											Value: "labels",
+											Pos: diags.PositionRanges{
+												{Line: 4, FirstColumn: 3, LastColumn: 8},
+											},
 										},
 									},
 								},
@@ -2731,10 +2916,16 @@ groups:
 								RecordingRule: &parser.RecordingRule{
 									Record: parser.YamlNode{
 										Value: "up:count",
+										Pos: diags.PositionRanges{
+											{Line: 4, FirstColumn: 13, LastColumn: 20},
+										},
 									},
 									Expr: parser.PromQLExpr{
 										Value: &parser.YamlNode{
 											Value: "count(up)",
+											Pos: diags.PositionRanges{
+												{Line: 5, FirstColumn: 11, LastColumn: 19},
+											},
 										},
 									},
 								},
@@ -3103,14 +3294,23 @@ groups:
 									Labels: &parser.YamlMap{
 										Key: &parser.YamlNode{
 											Value: "labels",
+											Pos: diags.PositionRanges{
+												{Line: 7, FirstColumn: 5, LastColumn: 10},
+											},
 										},
 										Items: []*parser.YamlKeyValue{
 											{
 												Key: &parser.YamlNode{
 													Value: "job",
+													Pos: diags.PositionRanges{
+														{Line: 8, FirstColumn: 7, LastColumn: 9},
+													},
 												},
 												Value: &parser.YamlNode{
 													Value: "foo",
+													Pos: diags.PositionRanges{
+														{Line: 8, FirstColumn: 12, LastColumn: 14},
+													},
 												},
 											},
 										},
@@ -3943,6 +4143,13 @@ groups:
 				Groups: []parser.Group{
 					{
 						Name: "foo",
+						Interval: &parser.YamlDuration{
+							Error: errors.New(`not a valid duration string: "xxx"`),
+							Raw:   "xxx",
+							Pos: diags.PositionRanges{
+								{Line: 4, FirstColumn: 15, LastColumn: 17},
+							},
+						},
 						Error: parser.ParseError{
 							Err:  errors.New("invalid interval value: not a valid duration string: \"xxx\""),
 							Line: 4,
@@ -3983,6 +4190,13 @@ groups:
 				Groups: []parser.Group{
 					{
 						Name: "foo",
+						QueryOffset: &parser.YamlDuration{
+							Error: errors.New(`not a valid duration string: "xxx"`),
+							Raw:   "xxx",
+							Pos: diags.PositionRanges{
+								{Line: 4, FirstColumn: 19, LastColumn: 21},
+							},
+						},
 						Error: parser.ParseError{
 							Err:  errors.New("invalid query_offset value: not a valid duration string: \"xxx\""),
 							Line: 4,
@@ -4003,8 +4217,14 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name:        "foo",
-						QueryOffset: time.Minute,
+						Name: "foo",
+						QueryOffset: &parser.YamlDuration{
+							Value: time.Minute,
+							Raw:   "1m",
+							Pos: diags.PositionRanges{
+								{Line: 4, FirstColumn: 19, LastColumn: 20},
+							},
+						},
 						Error: parser.ParseError{
 							Err:  errors.New("group limit must be a integer, got string"),
 							Line: 5,
@@ -4234,12 +4454,16 @@ groups:
 								RecordingRule: &parser.RecordingRule{
 									Record: parser.YamlNode{
 										Value: "up:count",
-										Pos:   diags.PositionRanges{{Line: 6, FirstColumn: 13, LastColumn: 20}},
+										Pos: diags.PositionRanges{
+											{Line: 6, FirstColumn: 13, LastColumn: 20},
+										},
 									},
 									Expr: parser.PromQLExpr{
 										Value: &parser.YamlNode{
 											Value: "count(up)",
-											Pos:   diags.PositionRanges{{Line: 7, FirstColumn: 11, LastColumn: 19}},
+											Pos: diags.PositionRanges{
+												{Line: 7, FirstColumn: 11, LastColumn: 19},
+											},
 										},
 									},
 								},
@@ -4270,12 +4494,16 @@ groups:
 								RecordingRule: &parser.RecordingRule{
 									Record: parser.YamlNode{
 										Value: "up:count",
-										Pos:   diags.PositionRanges{{Line: 6, FirstColumn: 13, LastColumn: 20}},
+										Pos: diags.PositionRanges{
+											{Line: 6, FirstColumn: 13, LastColumn: 20},
+										},
 									},
 									Expr: parser.PromQLExpr{
 										Value: &parser.YamlNode{
 											Value: "count(up)",
-											Pos:   diags.PositionRanges{{Line: 7, FirstColumn: 11, LastColumn: 19}},
+											Pos: diags.PositionRanges{
+												{Line: 7, FirstColumn: 11, LastColumn: 19},
+											},
 										},
 									},
 								},
@@ -4307,12 +4535,16 @@ groups:
 								RecordingRule: &parser.RecordingRule{
 									Record: parser.YamlNode{
 										Value: "up:count",
-										Pos:   diags.PositionRanges{{Line: 6, FirstColumn: 13, LastColumn: 20}},
+										Pos: diags.PositionRanges{
+											{Line: 6, FirstColumn: 13, LastColumn: 20},
+										},
 									},
 									Expr: parser.PromQLExpr{
 										Value: &parser.YamlNode{
 											Value: "count(up)",
-											Pos:   diags.PositionRanges{{Line: 7, FirstColumn: 11, LastColumn: 19}},
+											Pos: diags.PositionRanges{
+												{Line: 7, FirstColumn: 11, LastColumn: 19},
+											},
 										},
 									},
 								},
@@ -4387,7 +4619,9 @@ groups:
 								AlertingRule: &parser.AlertingRule{
 									Alert: parser.YamlNode{
 										Value: "Multi Line",
-										Pos:   diags.PositionRanges{{Line: 2, FirstColumn: 10, LastColumn: 19}},
+										Pos: diags.PositionRanges{
+											{Line: 2, FirstColumn: 10, LastColumn: 19},
+										},
 									},
 									Expr: parser.PromQLExpr{
 										Value: &parser.YamlNode{
@@ -4428,7 +4662,9 @@ groups:
 								AlertingRule: &parser.AlertingRule{
 									Alert: parser.YamlNode{
 										Value: "FooBar",
-										Pos:   diags.PositionRanges{{Line: 2, FirstColumn: 12, LastColumn: 17}},
+										Pos: diags.PositionRanges{
+											{Line: 2, FirstColumn: 12, LastColumn: 17},
+										},
 									},
 									Expr: parser.PromQLExpr{
 										Value: &parser.YamlNode{
@@ -4470,7 +4706,9 @@ groups:
 								AlertingRule: &parser.AlertingRule{
 									Alert: parser.YamlNode{
 										Value: "FooBar",
-										Pos:   diags.PositionRanges{{Line: 2, FirstColumn: 12, LastColumn: 17}},
+										Pos: diags.PositionRanges{
+											{Line: 2, FirstColumn: 12, LastColumn: 17},
+										},
 									},
 									Expr: parser.PromQLExpr{
 										Value: &parser.YamlNode{
@@ -4482,9 +4720,12 @@ groups:
 											},
 										},
 									},
-									For: &parser.YamlNode{
-										Value: "1m",
-										Pos:   diags.PositionRanges{{Line: 7, FirstColumn: 10, LastColumn: 11}},
+									For: &parser.YamlDuration{
+										Value: time.Minute,
+										Raw:   "1m",
+										Pos: diags.PositionRanges{
+											{Line: 7, FirstColumn: 10, LastColumn: 11},
+										},
 									},
 								},
 							},
@@ -4513,7 +4754,9 @@ groups:
 								AlertingRule: &parser.AlertingRule{
 									Alert: parser.YamlNode{
 										Value: "FooBar",
-										Pos:   diags.PositionRanges{{Line: 2, FirstColumn: 12, LastColumn: 17}},
+										Pos: diags.PositionRanges{
+											{Line: 2, FirstColumn: 12, LastColumn: 17},
+										},
 									},
 									Expr: parser.PromQLExpr{
 										Value: &parser.YamlNode{
@@ -4525,9 +4768,12 @@ groups:
 											},
 										},
 									},
-									For: &parser.YamlNode{
-										Value: "1m",
-										Pos:   diags.PositionRanges{{Line: 6, FirstColumn: 10, LastColumn: 11}},
+									For: &parser.YamlDuration{
+										Value: time.Minute,
+										Raw:   "1m",
+										Pos: diags.PositionRanges{
+											{Line: 6, FirstColumn: 10, LastColumn: 11},
+										},
 									},
 								},
 							},
@@ -4559,7 +4805,9 @@ groups:
 								RecordingRule: &parser.RecordingRule{
 									Record: parser.YamlNode{
 										Value: "colo:foo:sum",
-										Pos:   diags.PositionRanges{{Line: 5, FirstColumn: 13, LastColumn: 24}},
+										Pos: diags.PositionRanges{
+											{Line: 5, FirstColumn: 13, LastColumn: 24},
+										},
 									},
 									Expr: parser.PromQLExpr{
 										Value: &parser.YamlNode{
@@ -4607,19 +4855,30 @@ groups:
 								RecordingRule: &parser.RecordingRule{
 									Record: parser.YamlNode{
 										Value: "some_long_name",
-										Pos:   diags.PositionRanges{{Line: 7, FirstColumn: 13, LastColumn: 26}},
+										Pos: diags.PositionRanges{
+											{Line: 7, FirstColumn: 13, LastColumn: 26},
+										},
 									},
 									Labels: &parser.YamlMap{
 										Key: &parser.YamlNode{
 											Value: "labels",
+											Pos: diags.PositionRanges{
+												{Line: 8, FirstColumn: 5, LastColumn: 10},
+											},
 										},
 										Items: []*parser.YamlKeyValue{
 											{
 												Key: &parser.YamlNode{
 													Value: "metricssource",
+													Pos: diags.PositionRanges{
+														{Line: 9, FirstColumn: 7, LastColumn: 19},
+													},
 												},
 												Value: &parser.YamlNode{
 													Value: "receiver",
+													Pos: diags.PositionRanges{
+														{Line: 9, FirstColumn: 22, LastColumn: 29},
+													},
 												},
 											},
 										},
@@ -4670,7 +4929,9 @@ groups:
 								AlertingRule: &parser.AlertingRule{
 									Alert: parser.YamlNode{
 										Value: "Director_Is_Not_Advertising_Any_Routes",
-										Pos:   diags.PositionRanges{{Line: 6, FirstColumn: 12, LastColumn: 49}},
+										Pos: diags.PositionRanges{
+											{Line: 6, FirstColumn: 12, LastColumn: 49},
+										},
 									},
 									Expr: parser.PromQLExpr{
 										Value: &parser.YamlNode{
@@ -4689,9 +4950,12 @@ groups:
 											},
 										},
 									},
-									For: &parser.YamlNode{
-										Value: "1m",
-										Pos:   diags.PositionRanges{{Line: 13, FirstColumn: 10, LastColumn: 11}},
+									For: &parser.YamlDuration{
+										Value: time.Minute,
+										Raw:   "1m",
+										Pos: diags.PositionRanges{
+											{Line: 13, FirstColumn: 10, LastColumn: 11},
+										},
 									},
 								},
 							},
@@ -4711,8 +4975,14 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name:     "xxx",
-						Interval: time.Minute * 3,
+						Name: "xxx",
+						Interval: &parser.YamlDuration{
+							Value: time.Minute * 3,
+							Raw:   "3m",
+							Pos: diags.PositionRanges{
+								{Line: 4, FirstColumn: 13, LastColumn: 14},
+							},
+						},
 					},
 				},
 			},
@@ -4728,8 +4998,14 @@ groups:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
-						Name:     "xxx",
-						Interval: time.Minute * 3,
+						Name: "xxx",
+						Interval: &parser.YamlDuration{
+							Value: time.Minute * 3,
+							Raw:   "3m",
+							Pos: diags.PositionRanges{
+								{Line: 4, FirstColumn: 13, LastColumn: 14},
+							},
+						},
 					},
 				},
 			},
@@ -4750,12 +5026,24 @@ groups:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
-						Name:     "xxx",
-						Interval: time.Minute * 3,
+						Name: "xxx",
+						Interval: &parser.YamlDuration{
+							Value: time.Minute * 3,
+							Raw:   "3m",
+							Pos: diags.PositionRanges{
+								{Line: 4, FirstColumn: 13, LastColumn: 14},
+							},
+						},
 					},
 					{
-						Name:     "yyy",
-						Interval: time.Minute * 2,
+						Name: "yyy",
+						Interval: &parser.YamlDuration{
+							Value: time.Minute * 2,
+							Raw:   "2m",
+							Pos: diags.PositionRanges{
+								{Line: 9, FirstColumn: 13, LastColumn: 14},
+							},
+						},
 					},
 				},
 			},
@@ -4773,19 +5061,34 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name:     "xxx",
-						Interval: time.Minute * 3,
+						Name: "xxx",
+						Interval: &parser.YamlDuration{
+							Value: time.Minute * 3,
+							Raw:   "3m",
+							Pos: diags.PositionRanges{
+								{Line: 4, FirstColumn: 13, LastColumn: 14},
+							},
+						},
 						Labels: &parser.YamlMap{
 							Key: &parser.YamlNode{
 								Value: "labels",
+								Pos: diags.PositionRanges{
+									{Line: 5, FirstColumn: 3, LastColumn: 8},
+								},
 							},
 							Items: []*parser.YamlKeyValue{
 								{
 									Key: &parser.YamlNode{
 										Value: "foo",
+										Pos: diags.PositionRanges{
+											{Line: 6, FirstColumn: 5, LastColumn: 7},
+										},
 									},
 									Value: &parser.YamlNode{
 										Value: "bar",
+										Pos: diags.PositionRanges{
+											{Line: 6, FirstColumn: 10, LastColumn: 12},
+										},
 									},
 								},
 							},
@@ -4874,21 +5177,42 @@ groups:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
-						Name:        "xxx",
-						Interval:    time.Minute * 3,
-						QueryOffset: time.Second,
-						Limit:       5,
+						Name: "xxx",
+						Interval: &parser.YamlDuration{
+							Value: time.Minute * 3,
+							Raw:   "3m",
+							Pos: diags.PositionRanges{
+								{Line: 4, FirstColumn: 13, LastColumn: 14},
+							},
+						},
+						QueryOffset: &parser.YamlDuration{
+							Value: time.Second,
+							Raw:   "1s",
+							Pos: diags.PositionRanges{
+								{Line: 5, FirstColumn: 17, LastColumn: 18},
+							},
+						},
+						Limit: 5,
 						Labels: &parser.YamlMap{
 							Key: &parser.YamlNode{
 								Value: "labels",
+								Pos: diags.PositionRanges{
+									{Line: 7, FirstColumn: 3, LastColumn: 8},
+								},
 							},
 							Items: []*parser.YamlKeyValue{
 								{
 									Key: &parser.YamlNode{
 										Value: "foo",
+										Pos: diags.PositionRanges{
+											{Line: 8, FirstColumn: 5, LastColumn: 7},
+										},
 									},
 									Value: &parser.YamlNode{
 										Value: "bar",
+										Pos: diags.PositionRanges{
+											{Line: 8, FirstColumn: 10, LastColumn: 12},
+										},
 									},
 								},
 							},
@@ -4913,6 +5237,9 @@ groups:
 						Labels: &parser.YamlMap{
 							Key: &parser.YamlNode{
 								Value: "labels",
+								Pos: diags.PositionRanges{
+									{Line: 4, FirstColumn: 3, LastColumn: 8},
+								},
 							},
 						},
 					},
@@ -4935,14 +5262,23 @@ groups:
 						Labels: &parser.YamlMap{
 							Key: &parser.YamlNode{
 								Value: "labels",
+								Pos: diags.PositionRanges{
+									{Line: 4, FirstColumn: 3, LastColumn: 8},
+								},
 							},
 							Items: []*parser.YamlKeyValue{
 								{
 									Key: &parser.YamlNode{
 										Value: "foo",
+										Pos: diags.PositionRanges{
+											{Line: 5, FirstColumn: 5, LastColumn: 7},
+										},
 									},
 									Value: &parser.YamlNode{
 										Value: "1",
+										Pos: diags.PositionRanges{
+											{Line: 5, FirstColumn: 10, LastColumn: 10},
+										},
 									},
 								},
 							},
@@ -4969,30 +5305,51 @@ groups:
 						Labels: &parser.YamlMap{
 							Key: &parser.YamlNode{
 								Value: "labels",
+								Pos: diags.PositionRanges{
+									{Line: 4, FirstColumn: 3, LastColumn: 8},
+								},
 							},
 							Items: []*parser.YamlKeyValue{
 								{
 									Key: &parser.YamlNode{
 										Value: "foo",
+										Pos: diags.PositionRanges{
+											{Line: 5, FirstColumn: 5, LastColumn: 7},
+										},
 									},
 									Value: &parser.YamlNode{
 										Value: "bar",
+										Pos: diags.PositionRanges{
+											{Line: 5, FirstColumn: 10, LastColumn: 12},
+										},
 									},
 								},
 								{
 									Key: &parser.YamlNode{
 										Value: "bob",
+										Pos: diags.PositionRanges{
+											{Line: 6, FirstColumn: 5, LastColumn: 7},
+										},
 									},
 									Value: &parser.YamlNode{
 										Value: "foo",
+										Pos: diags.PositionRanges{
+											{Line: 6, FirstColumn: 10, LastColumn: 12},
+										},
 									},
 								},
 								{
 									Key: &parser.YamlNode{
 										Value: "foo",
+										Pos: diags.PositionRanges{
+											{Line: 7, FirstColumn: 5, LastColumn: 7},
+										},
 									},
 									Value: &parser.YamlNode{
 										Value: "bob",
+										Pos: diags.PositionRanges{
+											{Line: 7, FirstColumn: 10, LastColumn: 12},
+										},
 									},
 								},
 							},
@@ -5017,21 +5374,42 @@ groups:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
-						Name:        "xxx",
-						Interval:    time.Minute * 3,
-						QueryOffset: time.Second,
-						Limit:       5,
+						Name: "xxx",
+						Interval: &parser.YamlDuration{
+							Value: time.Minute * 3,
+							Raw:   "3m",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 13, LastColumn: 14},
+							},
+						},
+						QueryOffset: &parser.YamlDuration{
+							Value: time.Second,
+							Raw:   "1s",
+							Pos: diags.PositionRanges{
+								{Line: 4, FirstColumn: 17, LastColumn: 18},
+							},
+						},
+						Limit: 5,
 						Labels: &parser.YamlMap{
 							Key: &parser.YamlNode{
 								Value: "labels",
+								Pos: diags.PositionRanges{
+									{Line: 6, FirstColumn: 3, LastColumn: 8},
+								},
 							},
 							Items: []*parser.YamlKeyValue{
 								{
 									Key: &parser.YamlNode{
 										Value: "foo",
+										Pos: diags.PositionRanges{
+											{Line: 7, FirstColumn: 5, LastColumn: 7},
+										},
 									},
 									Value: &parser.YamlNode{
 										Value: "bar",
+										Pos: diags.PositionRanges{
+											{Line: 7, FirstColumn: 10, LastColumn: 12},
+										},
 									},
 								},
 							},
@@ -5042,12 +5420,16 @@ groups:
 								RecordingRule: &parser.RecordingRule{
 									Record: parser.YamlNode{
 										Value: "up:count",
-										Pos:   diags.PositionRanges{{Line: 9, FirstColumn: 13, LastColumn: 20}},
+										Pos: diags.PositionRanges{
+											{Line: 9, FirstColumn: 13, LastColumn: 20},
+										},
 									},
 									Expr: parser.PromQLExpr{
 										Value: &parser.YamlNode{
 											Value: "count(up)",
-											Pos:   diags.PositionRanges{{Line: 10, FirstColumn: 11, LastColumn: 19}},
+											Pos: diags.PositionRanges{
+												{Line: 10, FirstColumn: 11, LastColumn: 19},
+											},
 										},
 									},
 								},
@@ -5080,12 +5462,16 @@ groups:
 								RecordingRule: &parser.RecordingRule{
 									Record: parser.YamlNode{
 										Value: "up:count",
-										Pos:   diags.PositionRanges{{Line: 9, FirstColumn: 13, LastColumn: 20}},
+										Pos: diags.PositionRanges{
+											{Line: 9, FirstColumn: 13, LastColumn: 20},
+										},
 									},
 									Expr: parser.PromQLExpr{
 										Value: &parser.YamlNode{
 											Value: "count(up)",
-											Pos:   diags.PositionRanges{{Line: 10, FirstColumn: 11, LastColumn: 19}},
+											Pos: diags.PositionRanges{
+												{Line: 10, FirstColumn: 11, LastColumn: 19},
+											},
 										},
 									},
 								},
@@ -5147,12 +5533,16 @@ data:
 								RecordingRule: &parser.RecordingRule{
 									Record: parser.YamlNode{
 										Value: "foo",
-										Pos:   diags.PositionRanges{{Line: 1, FirstColumn: 11, LastColumn: 13}},
+										Pos: diags.PositionRanges{
+											{Line: 1, FirstColumn: 11, LastColumn: 13},
+										},
 									},
 									Expr: parser.PromQLExpr{
 										Value: &parser.YamlNode{
 											Value: "bar",
-											Pos:   diags.PositionRanges{{Line: 2, FirstColumn: 9, LastColumn: 11}},
+											Pos: diags.PositionRanges{
+												{Line: 2, FirstColumn: 9, LastColumn: 11},
+											},
 										},
 									},
 								},
@@ -5182,12 +5572,16 @@ data:
 								RecordingRule: &parser.RecordingRule{
 									Record: parser.YamlNode{
 										Value: "foo",
-										Pos:   diags.PositionRanges{{Line: 1, FirstColumn: 12, LastColumn: 14}},
+										Pos: diags.PositionRanges{
+											{Line: 1, FirstColumn: 12, LastColumn: 14},
+										},
 									},
 									Expr: parser.PromQLExpr{
 										Value: &parser.YamlNode{
 											Value: "bar",
-											Pos:   diags.PositionRanges{{Line: 1, FirstColumn: 23, LastColumn: 25}},
+											Pos: diags.PositionRanges{
+												{Line: 1, FirstColumn: 23, LastColumn: 25},
+											},
 										},
 									},
 								},
@@ -5222,10 +5616,16 @@ data:
 								RecordingRule: &parser.RecordingRule{
 									Record: parser.YamlNode{
 										Value: "foo",
+										Pos: diags.PositionRanges{
+											{Line: 4, FirstColumn: 14, LastColumn: 16},
+										},
 									},
 									Expr: parser.PromQLExpr{
 										Value: &parser.YamlNode{
 											Value: "bar",
+											Pos: diags.PositionRanges{
+												{Line: 4, FirstColumn: 25, LastColumn: 27},
+											},
 										},
 									},
 								},
@@ -5270,7 +5670,6 @@ data:
 			if diff := cmp.Diff(tc.output, file,
 				ignorePrometheusExpr,
 				sameErrorText,
-				cmpopts.IgnoreFields(parser.YamlNode{}, "Pos"), // FIXME remove?
 				cmpopts.IgnoreUnexported(parser.PromQLExpr{}),
 			); diff != "" {
 				t.Errorf("Parse() returned wrong output (-want +got):\n%s", diff)

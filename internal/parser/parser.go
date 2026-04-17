@@ -7,7 +7,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"time"
 
 	"go.yaml.in/yaml/v3"
 
@@ -186,17 +185,13 @@ func tryParseGroup(node *yaml.Node, offsetLine, offsetColumn int, contentLines [
 		case "name":
 			g.Name = nodeValue(e.val)
 		case "interval":
-			if interval, err := model.ParseDuration(nodeValue(e.val)); err == nil {
-				g.Interval = time.Duration(interval)
-			}
+			g.Interval = newYamlDuration(e.val, offsetLine, offsetColumn, contentLines, 1)
 		case "limit":
 			if limit, err := strconv.Atoi(nodeValue(e.val)); err == nil {
 				g.Limit = limit
 			}
 		case "query_offset":
-			if queryOffset, err := model.ParseDuration(nodeValue(e.val)); err == nil {
-				g.QueryOffset = time.Duration(queryOffset)
-			}
+			g.QueryOffset = newYamlDuration(e.val, offsetLine, offsetColumn, contentLines, 1)
 		case "labels":
 			g.Labels = newYamlMap(e.key, e.val, offsetLine, offsetColumn, contentLines)
 		case "rules":
@@ -214,8 +209,8 @@ func (p Parser) parseRule(node *yaml.Node, offsetLine, offsetColumn int, content
 	var labelsPart *YamlMap
 
 	var alertPart *YamlNode
-	var forPart *YamlNode
-	var keepFiringForPart *YamlNode
+	var forPart *YamlDuration
+	var keepFiringForPart *YamlDuration
 	var annotationsPart *YamlMap
 
 	var recordNode *yaml.Node
@@ -289,14 +284,14 @@ func (p Parser) parseRule(node *yaml.Node, offsetLine, offsetColumn int, content
 					return duplicatedKeyError(lines, part.Line+offsetLine, forKey)
 				}
 				forNode = part
-				forPart = newYamlNode(part, offsetLine, offsetColumn, contentLines, key.Column+2)
+				forPart = newYamlDuration(part, offsetLine, offsetColumn, contentLines, key.Column+2)
 				lines.Last = max(lines.Last, forPart.Pos.Lines().Last)
 			case keepFiringForKey:
 				if keepFiringForPart != nil {
 					return duplicatedKeyError(lines, part.Line+offsetLine, keepFiringForKey)
 				}
 				keepFiringForNode = part
-				keepFiringForPart = newYamlNode(part, offsetLine, offsetColumn, contentLines, key.Column+2)
+				keepFiringForPart = newYamlDuration(part, offsetLine, offsetColumn, contentLines, key.Column+2)
 				lines.Last = max(lines.Last, keepFiringForPart.Pos.Lines().Last)
 			case labelsKey:
 				if labelsPart != nil {
@@ -340,21 +335,21 @@ func (p Parser) parseRule(node *yaml.Node, offsetLine, offsetColumn int, content
 		}
 		return rule, false
 	}
-	if recordPart != nil && forPart != nil {
+	if recordPart != nil && forNode != nil {
 		rule = Rule{
 			Lines: lines,
 			Error: ParseError{
-				Line: forPart.Pos.Lines().First,
+				Line: forNode.Line + offsetLine,
 				Err:  fmt.Errorf("invalid field '%s' in recording rule", forKey),
 			},
 		}
 		return rule, false
 	}
-	if recordPart != nil && keepFiringForPart != nil {
+	if recordPart != nil && keepFiringForNode != nil {
 		rule = Rule{
 			Lines: lines,
 			Error: ParseError{
-				Line: keepFiringForPart.Pos.Lines().First,
+				Line: keepFiringForNode.Line + offsetLine,
 				Err:  fmt.Errorf("invalid field '%s' in recording rule", keepFiringForKey),
 			},
 		}

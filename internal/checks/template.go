@@ -81,7 +81,7 @@ func newTemplateContext(rule parser.Rule) (c TemplateContext) {
 		c.Alert = rule.AlertingRule.Alert.Value
 		c.Expr = rule.AlertingRule.Expr.Value.Value
 		if rule.AlertingRule.For != nil {
-			c.For = rule.AlertingRule.For.Value
+			c.For = rule.AlertingRule.For.Raw
 		}
 		if rule.AlertingRule.Labels != nil {
 			for _, label := range rule.AlertingRule.Labels.Items {

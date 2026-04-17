@@ -408,6 +408,33 @@ func TestRecordingRuleIsIdenticalNilCases(t *testing.T) {
 	require.False(t, rule.RecordingRule.IsIdentical(nilB))
 }
 
+func TestYamlNodeIsIdentical(t *testing.T) {
+	type testCaseT struct {
+		a     *parser.YamlNode
+		b     *parser.YamlNode
+		equal bool
+	}
+
+	testCases := []testCaseT{
+		// Both nil
+		{a: nil, b: nil, equal: true},
+		// One nil, one not
+		{a: nil, b: &parser.YamlNode{Value: "foo"}, equal: false},
+		{a: &parser.YamlNode{Value: "foo"}, b: nil, equal: false},
+		// Both non-nil, same value
+		{a: &parser.YamlNode{Value: "foo"}, b: &parser.YamlNode{Value: "foo"}, equal: true},
+		// Both non-nil, different value
+		{a: &parser.YamlNode{Value: "foo"}, b: &parser.YamlNode{Value: "bar"}, equal: false},
+	}
+
+	for i, tc := range testCases {
+		t.Run(strconv.Itoa(i+1), func(t *testing.T) {
+			equal := tc.a.IsIdentical(tc.b)
+			require.Equal(t, tc.equal, equal)
+		})
+	}
+}
+
 func TestMergeMaps(t *testing.T) {
 	type testCaseT struct {
 		a      *parser.YamlMap

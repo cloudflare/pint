@@ -5,9 +5,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"time"
 
-	"github.com/prometheus/common/model"
 	"go.yaml.in/yaml/v3"
 
 	"github.com/cloudflare/pint/internal/diags"
@@ -99,7 +97,6 @@ func (p Parser) parseGroup(node *yaml.Node, offsetLine, offsetColumn int, conten
 		return group
 	}
 
-	var err error
 	setKeys := make(map[string]struct{}, len(node.Content))
 
 	for _, entry := range mappingNodes(node) {
@@ -128,15 +125,14 @@ func (p Parser) parseGroup(node *yaml.Node, offsetLine, offsetColumn int, conten
 				}
 				return group
 			}
-			var interval model.Duration
-			if interval, err = model.ParseDuration(entry.val.Value); err != nil {
+			group.Interval = newYamlDuration(entry.val, offsetLine, offsetColumn, contentLines, 1)
+			if group.Interval.Error != nil {
 				group.Error = ParseError{
 					Line: entry.key.Line,
-					Err:  fmt.Errorf("invalid %s value: %w", entry.key.Value, err),
+					Err:  fmt.Errorf("invalid %s value: %w", entry.key.Value, group.Interval.Error),
 				}
 				return group
 			}
-			group.Interval = time.Duration(interval)
 		case "query_offset":
 			if entry.val.Kind != yaml.ScalarNode || entry.val.ShortTag() != strTag {
 				group.Error = ParseError{
@@ -145,15 +141,14 @@ func (p Parser) parseGroup(node *yaml.Node, offsetLine, offsetColumn int, conten
 				}
 				return group
 			}
-			var queryOffset model.Duration
-			if queryOffset, err = model.ParseDuration(entry.val.Value); err != nil {
+			group.QueryOffset = newYamlDuration(entry.val, offsetLine, offsetColumn, contentLines, 1)
+			if group.QueryOffset.Error != nil {
 				group.Error = ParseError{
 					Line: entry.key.Line,
-					Err:  fmt.Errorf("invalid %s value: %w", entry.key.Value, err),
+					Err:  fmt.Errorf("invalid %s value: %w", entry.key.Value, group.QueryOffset.Error),
 				}
 				return group
 			}
-			group.QueryOffset = time.Duration(queryOffset)
 		case "limit":
 			if entry.val.Kind != yaml.ScalarNode || entry.val.ShortTag() != intTag {
 				group.Error = ParseError{
