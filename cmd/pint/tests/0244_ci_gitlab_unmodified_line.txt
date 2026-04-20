@@ -3,7 +3,7 @@ http method gitlab GET /api/v4/projects/1234/merge_requests/1/versions 200 [{"id
 http method gitlab GET /api/v4/projects/1234/merge_requests/1/discussions 200 []
 http method gitlab GET /api/v4/projects/1234/merge_requests 200 [{"iid": 1}]
 http method gitlab POST /api/v4/projects/1234/merge_requests/1/discussions 200 {}
-http start gitlab 127.0.0.1:6213
+http start gitlab 127.0.0.1:6244
 
 mkdir testrepo
 cd testrepo
@@ -31,19 +31,15 @@ cmp gitlab.got ../gitlab.expected
 groups:
 - name: foo
   rules:
-  - record: rule1
-    expr: sum(foo) by(job)
-  - record: rule2
-    expr: sum(rule1) by(job)
+  - record: foo
+    expr: count by (a, b, c) (bar)
 
 -- src/v2.yml --
 groups:
 - name: foo
   rules:
-  - record: rule3
-    expr: sum(foo) by(job)
-  - record: rule2
-    expr: sum(rule1) by(job)
+  - record: bar
+    expr: count by (a, b, c) (bar)
 
 -- src/.pint.hcl --
 ci {
@@ -51,9 +47,16 @@ ci {
 }
 repository {
   gitlab {
-    uri        = "http://127.0.0.1:6213"
+    uri        = "http://127.0.0.1:6244"
     timeout    = "30s"
     project    = "1234"
+  }
+}
+rule {
+  aggregate ".+" {
+    comment  = "Must keep job label"
+    severity = "warning"
+    keep     = ["job"]
   }
 }
 
@@ -85,24 +88,27 @@ POST /api/v4/projects/1234/merge_requests/1/discussions
   Private-Token: secret
 --- BODY ---
 body: |
-  :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **rule/dependency** check.
-
-  ------
-
-  rule results used by another rule
+  :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **promql/aggregate** check.
 
   <details>
-  <summary>More information</summary>
-  If you remove the recording rule generating `rule1`, and there is no other source of this metric, then any other rule depending on it will break.
-  List of found rules that are using `rule1`:
+  <summary>required label is being removed via aggregation</summary>
 
-  - `rule2` at `rules.yml:7`
+  ```yaml
+  5 |     expr: count by (a, b, c) (bar)
+                      ^^^ 
+  ```
+
+  Query is using aggregation with `by(a, b, c)`, only labels included inside `by(...)` will be present on the results.
+
+  `job` label is required and should be preserved when aggregating all rules.
+
+  Rule comment: Must keep job label
 
   </details>
 
   ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/rule/dependency.html).
+  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/aggregate.html).
 position:
   base_sha: base
   head_sha: head
@@ -110,6 +116,7 @@ position:
   new_path: rules.yml
   old_path: rules.yml
   position_type: text
-  old_line: 4
+  new_line: 5
+  old_line: 5
 --- END ---
 

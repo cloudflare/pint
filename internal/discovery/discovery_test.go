@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/diags"
+	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -107,7 +108,7 @@ func TestReadRules(t *testing.T) {
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines:  []int{4, 5},
+					Lines:          git.NewLineMap([]int{4, 5}),
 					Rule:           mustParse(3, "- record: foo\n  expr: bar\n"),
 					DisabledChecks: []string{"promql/series"},
 				},
@@ -136,7 +137,7 @@ groups:
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines:  []int{7, 8},
+					Lines:          git.NewLineMap([]int{7, 8}),
 					Rule:           mustParse(6, "  - record: foo\n    expr: bar\n"),
 					DisabledChecks: []string{"promql/series"},
 				},
@@ -162,8 +163,8 @@ groups:
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{4, 5},
-					Rule:          mustParse(3, "- record: foo\n  expr: bar\n"),
+					Lines: git.NewLineMap([]int{4, 5}),
+					Rule:  mustParse(3, "- record: foo\n  expr: bar\n"),
 				},
 			},
 		},
@@ -190,8 +191,8 @@ groups:
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{7, 8},
-					Rule:          mustParse(6, "  - record: foo\n    expr: bar\n"),
+					Lines: git.NewLineMap([]int{7, 8}),
+					Rule:  mustParse(6, "  - record: foo\n    expr: bar\n"),
 				},
 			},
 		},
@@ -215,7 +216,7 @@ groups:
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines:  []int{4, 5},
+					Lines:          git.NewLineMap([]int{4, 5}),
 					Rule:           mustParse(3, "- record: foo\n  expr: bar\n"),
 					DisabledChecks: []string{"promql/series"},
 				},
@@ -244,7 +245,7 @@ groups:
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines:  []int{7, 8},
+					Lines:          git.NewLineMap([]int{7, 8}),
 					Rule:           mustParse(6, "  - record: foo\n    expr: bar\n"),
 					DisabledChecks: []string{"promql/series"},
 				},
@@ -270,7 +271,7 @@ groups:
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{1, 2, 3, 4, 5},
+					Lines: git.NewLineMap([]int{1, 2, 3, 4, 5}),
 					PathError: FileIgnoreError{
 						Diagnostic: diags.Diagnostic{
 							Message: "This file was excluded from pint checks.",
@@ -308,7 +309,7 @@ groups:
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{1, 2, 3, 4, 5, 6, 7, 8},
+					Lines: git.NewLineMapFromRange(1, 8),
 					PathError: FileIgnoreError{
 						Diagnostic: diags.Diagnostic{
 							Message: "This file was excluded from pint checks.",
@@ -371,65 +372,76 @@ func TestPathString(t *testing.T) {
 	}
 }
 
-func TestCommonLines(t *testing.T) {
+func TestMergeLines(t *testing.T) {
 	testCases := []struct {
-		title    string
-		a        []int
-		b        []int
-		expected []int
+		diffLines git.LineMap
+		ruleLines git.LineMap
+		expected  git.LineMap
+		title     string
 	}{
 		{
-			title:    "both empty",
-			a:        nil,
-			b:        nil,
-			expected: nil,
+			// Both inputs empty, result is empty.
+			title:     "both empty",
+			diffLines: nil,
+			ruleLines: nil,
+			expected:  git.LineMap{},
 		},
 		{
-			title:    "a empty",
-			a:        nil,
-			b:        []int{1, 2, 3},
-			expected: nil,
+			// No diff lines, all rule lines are unmodified.
+			title:     "diff empty",
+			diffLines: nil,
+			ruleLines: git.NewLineMapFromRange(1, 3),
+			expected: git.LineMap{
+				1: git.LineMeta{Old: 1},
+				2: git.LineMeta{Old: 2},
+				3: git.LineMeta{Old: 3},
+			},
 		},
 		{
-			title:    "b empty",
-			a:        []int{1, 2, 3},
-			b:        nil,
-			expected: nil,
+			// No rule lines, result is empty regardless of diff.
+			title:     "rule empty",
+			diffLines: git.NewLineMapFromRange(1, 3),
+			ruleLines: nil,
+			expected:  git.LineMap{},
 		},
 		{
-			title:    "no overlap",
-			a:        []int{1, 2, 3},
-			b:        []int{4, 5, 6},
-			expected: nil,
+			// Diff touches lines outside the rule range.
+			title:     "no overlap",
+			diffLines: git.NewLineMapFromRange(1, 3),
+			ruleLines: git.NewLineMapFromRange(4, 6),
+			expected: git.LineMap{
+				4: git.LineMeta{Old: 4},
+				5: git.LineMeta{Old: 5},
+				6: git.LineMeta{Old: 6},
+			},
 		},
 		{
-			title:    "full overlap same order",
-			a:        []int{1, 2, 3},
-			b:        []int{1, 2, 3},
-			expected: []int{1, 2, 3},
+			// All rule lines are in the diff.
+			title:     "full overlap",
+			diffLines: git.NewLineMapFromRange(1, 3),
+			ruleLines: git.NewLineMapFromRange(1, 3),
+			expected: git.LineMap{
+				1: git.LineMeta{Old: 1, Modified: true},
+				2: git.LineMeta{Old: 2, Modified: true},
+				3: git.LineMeta{Old: 3, Modified: true},
+			},
 		},
 		{
-			title:    "partial overlap from a",
-			a:        []int{1, 2, 3},
-			b:        []int{2, 3, 4},
-			expected: []int{2, 3},
-		},
-		{
-			title:    "partial overlap b has extras",
-			a:        []int{2, 3},
-			b:        []int{1, 2, 3, 4},
-			expected: []int{2, 3},
-		},
-		{
-			title:    "b has element in a not yet in common",
-			a:        []int{1, 3},
-			b:        []int{3, 1},
-			expected: []int{1, 3},
+			// Diff covers some rule lines, rest are unmodified.
+			title:     "partial overlap",
+			diffLines: git.NewLineMapFromRange(2, 3),
+			ruleLines: git.NewLineMapFromRange(1, 4),
+			expected: git.LineMap{
+				1: git.LineMeta{Old: 1},
+				2: git.LineMeta{Old: 2, Modified: true},
+				3: git.LineMeta{Old: 3, Modified: true},
+				4: git.LineMeta{Old: 4},
+			},
 		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.title, func(t *testing.T) {
-			result := commonLines(tc.a, tc.b)
+			result := mergeLines(tc.diffLines, tc.ruleLines)
 			require.Equal(t, tc.expected, result)
 		})
 	}

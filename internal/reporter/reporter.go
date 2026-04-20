@@ -9,17 +9,18 @@ import (
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
 type Report struct {
-	Path          discovery.Path
-	Owner         string
-	ModifiedLines []int
-	Duplicates    []*Report
-	Rule          parser.Rule
-	Problem       checks.Problem
-	IsDuplicate   bool
+	Path        discovery.Path
+	Owner       string
+	Lines       git.LineMap
+	Duplicates  []*Report
+	Rule        parser.Rule
+	Problem     checks.Problem
+	IsDuplicate bool
 }
 
 func (r Report) isEqual(nr Report) bool {

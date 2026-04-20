@@ -8,12 +8,12 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
-	"slices"
 	"strings"
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/diags"
+	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/output"
 )
 
@@ -86,48 +86,6 @@ type bitBucketPR struct {
 	ID        int
 }
 
-type bitBucketPRChanges struct {
-	pathModifiedLines map[string][]int
-	pathLineMapping   map[string]map[int]int
-}
-
-type BitBucketPath struct {
-	ToString string `json:"toString"`
-}
-
-type BitBucketPullRequestChange struct {
-	Path BitBucketPath `json:"path"`
-}
-
-type BitBucketPullRequestChanges struct {
-	Values        []BitBucketPullRequestChange `json:"values"`
-	Start         int                          `json:"start"`
-	NextPageStart int                          `json:"nextPageStart"`
-	IsLastPage    bool                         `json:"isLastPage"`
-}
-
-type BitBucketDiffLine struct {
-	Source      int `json:"source"`
-	Destination int `json:"destination"`
-}
-
-type BitBucketDiffSegment struct {
-	Type  string              `json:"type"`
-	Lines []BitBucketDiffLine `json:"lines"`
-}
-
-type BitBucketDiffHunk struct {
-	Segments []BitBucketDiffSegment `json:"segments"`
-}
-
-type BitBucketFileDiff struct {
-	Hunks []BitBucketDiffHunk `json:"hunks"`
-}
-
-type BitBucketFileDiffs struct {
-	Diffs []BitBucketFileDiff `json:"diffs"`
-}
-
 type bitBucketComment struct {
 	text     string
 	severity string
@@ -196,9 +154,10 @@ type pendingComment struct {
 	path     string
 	line     int
 	anchor   checks.Anchor
+	lineMeta git.LineMeta
 }
 
-func (pc pendingComment) toBitBucketComment(changes *bitBucketPRChanges) BitBucketPendingComment {
+func (pc pendingComment) toBitBucketComment() BitBucketPendingComment {
 	c := BitBucketPendingComment{
 		Anchor: BitBucketPendingCommentAnchor{
 			Path:     pc.path,
@@ -211,19 +170,15 @@ func (pc pendingComment) toBitBucketComment(changes *bitBucketPRChanges) BitBuck
 		Severity: pc.severity,
 	}
 
-	if pc.anchor == checks.AnchorBefore {
+	switch {
+	case pc.anchor == checks.AnchorBefore:
 		c.Anchor.LineType = "REMOVED"
-	} else if changes != nil {
-		if lines, ok := changes.pathModifiedLines[pc.path]; ok && slices.Contains(lines, pc.line) {
-			c.Anchor.LineType = "ADDED"
-			c.Anchor.FileType = "TO"
-		}
-		if c.Anchor.FileType == "FROM" {
-			if m, ok := changes.pathLineMapping[pc.path]; ok {
-				if v, found := m[pc.line]; found {
-					c.Anchor.Line = v
-				}
-			}
+	case pc.lineMeta.Modified:
+		c.Anchor.LineType = "ADDED"
+		c.Anchor.FileType = "TO"
+	default:
+		if pc.lineMeta.Old > 0 {
+			c.Anchor.Line = pc.lineMeta.Old
 		}
 	}
 
@@ -379,7 +334,7 @@ func (bb bitBucketAPI) createAnnotations(summary Summary, commit string) error {
 	annotations := make([]BitBucketAnnotation, 0, len(summary.reports))
 	for _, report := range summary.reports {
 		ann := reportToAnnotation(report)
-		if !slices.Contains(report.ModifiedLines, ann.Line) {
+		if lm, ok := report.Lines[ann.Line]; !ok || !lm.Modified {
 			slog.LogAttrs(context.Background(), slog.LevelWarn, "Annotation for unmodified line, skipping", slog.String("path", ann.Path), slog.Int("line", ann.Line))
 			continue
 		}
@@ -451,87 +406,6 @@ func (bb bitBucketAPI) findPullRequestForBranch(branch, commit string) (*bitBuck
 	return nil, nil
 }
 
-func (bb bitBucketAPI) getPullRequestChanges(pr *bitBucketPR) (*bitBucketPRChanges, error) {
-	prChanges := bitBucketPRChanges{
-		pathModifiedLines: map[string][]int{},
-		pathLineMapping:   map[string]map[int]int{},
-	}
-
-	var start int
-	for {
-		resp, err := bb.request(
-			http.MethodGet,
-			fmt.Sprintf("/rest/api/1.0/projects/%s/repos/%s/pull-requests/%d/changes?start=%d", bb.project, bb.repo, pr.ID, start),
-			nil,
-		)
-		if err != nil {
-			return nil, err
-		}
-
-		var changes BitBucketPullRequestChanges
-		if err = json.Unmarshal(resp, &changes); err != nil {
-			return nil, err
-		}
-
-		for _, ch := range changes.Values {
-			modifiedLines, lineMap, err := bb.getFileDiff(pr, ch.Path.ToString)
-			if err != nil {
-				return nil, err
-			}
-			prChanges.pathModifiedLines[ch.Path.ToString] = modifiedLines
-			prChanges.pathLineMapping[ch.Path.ToString] = lineMap
-		}
-
-		if changes.IsLastPage || changes.NextPageStart == start {
-			break
-		}
-		start = changes.NextPageStart
-	}
-
-	return &prChanges, nil
-}
-
-func (bb bitBucketAPI) getFileDiff(pr *bitBucketPR, path string) ([]int, map[int]int, error) {
-	resp, err := bb.request(
-		http.MethodGet,
-		fmt.Sprintf(
-			"/rest/api/latest/projects/%s/repos/%s/commits/%s/diff/%s?contextLines=10000&since=%s&whitespace=show&withComments=false",
-			bb.project, bb.repo,
-			pr.srcHead,
-			path,
-			pr.dstHead,
-		),
-		nil,
-	)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	var fileDiffs BitBucketFileDiffs
-	if err = json.Unmarshal(resp, &fileDiffs); err != nil {
-		return nil, nil, err
-	}
-
-	modifiedLines := []int{}
-	lineMap := map[int]int{}
-	for _, diff := range fileDiffs.Diffs {
-		for _, hunk := range diff.Hunks {
-			for _, seg := range hunk.Segments {
-				for _, line := range seg.Lines {
-					if seg.Type == "ADDED" {
-						modifiedLines = append(modifiedLines, line.Destination)
-					}
-					if seg.Type == "CONTEXT" || seg.Type == "ADDED" {
-						lineMap[line.Destination] = line.Source
-					}
-				}
-			}
-		}
-	}
-
-	return modifiedLines, lineMap, nil
-}
-
 func (bb bitBucketAPI) getPullRequestComments(pr *bitBucketPR) ([]bitBucketComment, error) {
 	username, err := bb.whoami()
 	if err != nil {
@@ -599,13 +473,13 @@ func (bb bitBucketAPI) getPullRequestComments(pr *bitBucketPR) ([]bitBucketComme
 	return comments, nil
 }
 
-func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges) []BitBucketPendingComment {
+func (bb bitBucketAPI) makeComments(summary Summary) []BitBucketPendingComment {
 	var buf strings.Builder
 	var content string
 	var err error
 	comments := []BitBucketPendingComment{}
 	for _, reports := range dedupReports(summary.reports, bb.showDuplicates) {
-		if _, ok := changes.pathModifiedLines[reports[0].Path.SymlinkTarget]; !ok {
+		if len(reports[0].Lines) == 0 {
 			continue
 		}
 
@@ -689,14 +563,26 @@ func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges
 			text = buf.String()
 		}
 
+		// Find the last modified line in the problem range to anchor the comment on.
+		// This ensures comments land on actual diff lines rather than unmodified context.
+		// BitBucket only allows comments on modified lines.
+		line := reports[0].Problem.Lines.Last
+		for i := reports[0].Problem.Lines.Last; i >= reports[0].Problem.Lines.First; i-- {
+			if lm, ok := reports[0].Lines[i]; ok && lm.Modified {
+				line = i
+				break
+			}
+		}
+
 		pending := pendingComment{
 			severity: severity,
 			path:     reports[0].Path.SymlinkTarget,
-			line:     reports[0].Problem.Lines.Last,
+			line:     line,
 			text:     text,
 			anchor:   reports[0].Problem.Anchor,
+			lineMeta: reports[0].Lines[line],
 		}
-		comments = append(comments, pending.toBitBucketComment(changes))
+		comments = append(comments, pending.toBitBucketComment())
 	}
 	return comments
 }

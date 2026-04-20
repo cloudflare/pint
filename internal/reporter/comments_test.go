@@ -18,6 +18,7 @@ import (
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -88,13 +89,16 @@ func TestCommenter(t *testing.T) {
 			SymlinkTarget: "foo.txt",
 			Name:          "foo.txt",
 		},
-		ModifiedLines: []int{2},
-		Rule:          mockFile.Groups[0].Rules[0],
+		Lines: git.LineMap{
+			1: git.LineMeta{Old: 1},
+			2: git.LineMeta{Old: 2, Modified: true},
+		},
+		Rule: mockFile.Groups[0].Rules[0],
 		Problem: checks.Problem{
 			Reporter: "foo",
 			Summary:  "foo error",
 			Details:  "foo details",
-			Lines:    diags.LineRange{First: 1, Last: 3},
+			Lines:    diags.LineRange{First: 1, Last: 2},
 			Severity: checks.Fatal,
 			Anchor:   checks.AnchorAfter,
 		},
@@ -125,8 +129,11 @@ foo details
 			SymlinkTarget: "bar.txt",
 			Name:          "bar.txt",
 		},
-		ModifiedLines: []int{1},
-		Rule:          mockFile.Groups[0].Rules[0],
+		Lines: git.LineMap{
+			1: git.LineMeta{Old: 1, Modified: true},
+			2: git.LineMeta{Old: 2},
+		},
+		Rule: mockFile.Groups[0].Rules[0],
 		Problem: checks.Problem{
 			Reporter: "bar",
 			Summary:  "bar warning",
@@ -382,13 +389,16 @@ bar warning
 						SymlinkTarget: "bar.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 3, 4, 5},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Lines: git.LineMap{
+						1: git.LineMeta{Old: 1},
+						2: git.LineMeta{Old: 2, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter: "foo",
 						Summary:  "foo error 1",
 						Details:  "foo details",
-						Lines:    diags.LineRange{First: 1, Last: 3},
+						Lines:    diags.LineRange{First: 1, Last: 2},
 						Severity: checks.Bug,
 						Anchor:   checks.AnchorAfter,
 					},
@@ -398,13 +408,16 @@ bar warning
 						SymlinkTarget: "bar.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 3, 4, 5},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Lines: git.LineMap{
+						1: git.LineMeta{Old: 1},
+						2: git.LineMeta{Old: 2, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter: "foo",
 						Summary:  "foo error 2",
 						Details:  "foo details",
-						Lines:    diags.LineRange{First: 1, Last: 3},
+						Lines:    diags.LineRange{First: 1, Last: 2},
 						Severity: checks.Bug,
 						Anchor:   checks.AnchorAfter,
 					},
@@ -427,7 +440,7 @@ bar warning
 					if p.path != "bar.txt" {
 						return fmt.Errorf("wrong path: %s", p.path)
 					}
-					if p.line != 3 {
+					if p.line != 2 {
 						return fmt.Errorf("wrong line: %d", p.line)
 					}
 					expected := `:stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **foo** check.
@@ -485,13 +498,16 @@ foo details
 						SymlinkTarget: "bar.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 3, 4, 5},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Lines: git.LineMap{
+						1: git.LineMeta{Old: 1},
+						2: git.LineMeta{Old: 2, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter: "foo",
 						Summary:  "foo error",
 						Details:  "foo details",
-						Lines:    diags.LineRange{First: 1, Last: 3},
+						Lines:    diags.LineRange{First: 1, Last: 2},
 						Severity: checks.Bug,
 						Anchor:   checks.AnchorAfter,
 					},
@@ -514,7 +530,7 @@ foo details
 					if p.path != "bar.txt" {
 						return fmt.Errorf("wrong path: %s", p.path)
 					}
-					if p.line != 3 {
+					if p.line != 2 {
 						return fmt.Errorf("wrong line: %d", p.line)
 					}
 					expected := `:stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **foo** check.
@@ -561,13 +577,16 @@ foo details
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 3, 4, 5},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Lines: git.LineMap{
+						1: git.LineMeta{Old: 1},
+						2: git.LineMeta{Old: 2, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter: "foo",
 						Summary:  "foo error 1",
 						Details:  "foo details",
-						Lines:    diags.LineRange{First: 1, Last: 3},
+						Lines:    diags.LineRange{First: 1, Last: 2},
 						Severity: checks.Bug,
 						Anchor:   checks.AnchorAfter,
 					},
@@ -577,13 +596,16 @@ foo details
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 3, 4, 5},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Lines: git.LineMap{
+						1: git.LineMeta{Old: 1},
+						2: git.LineMeta{Old: 2, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter: "foo",
 						Summary:  "foo error 2",
 						Details:  "foo details",
-						Lines:    diags.LineRange{First: 2, Last: 2},
+						Lines:    diags.LineRange{First: 1, Last: 1},
 						Severity: checks.Bug,
 						Anchor:   checks.AnchorAfter,
 					},
@@ -606,7 +628,7 @@ foo details
 					if p.path != "foo.txt" {
 						return fmt.Errorf("wrong path: %s", p.path)
 					}
-					if p.line != 2 && p.line != 3 {
+					if p.line != 1 && p.line != 2 {
 						return fmt.Errorf("wrong line: %d", p.line)
 					}
 					expected := `:stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **foo** check.
@@ -624,7 +646,7 @@ foo details
 
 :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/foo.html).
 `
-					if p.line == 3 && p.text != expected {
+					if p.line == 2 && p.text != expected {
 						return fmt.Errorf("wrong text on first report: %s", cmp.Diff(expected, p.text))
 					}
 					expected2 := `:stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **foo** check.
@@ -642,7 +664,7 @@ foo details
 
 :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/foo.html).
 `
-					if p.line == 2 && p.text != expected2 {
+					if p.line == 1 && p.text != expected2 {
 						return fmt.Errorf("wrong text on second report: %s", cmp.Diff(expected2, p.text))
 					}
 					return nil
@@ -669,13 +691,16 @@ foo details
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 3, 4, 5},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Lines: git.LineMap{
+						1: git.LineMeta{Old: 1},
+						2: git.LineMeta{Old: 2, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter: "foo",
 						Summary:  "foo error 1",
 						Details:  "foo details",
-						Lines:    diags.LineRange{First: 1, Last: 3},
+						Lines:    diags.LineRange{First: 1, Last: 2},
 						Severity: checks.Bug,
 						Anchor:   checks.AnchorAfter,
 					},
@@ -685,13 +710,16 @@ foo details
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 3, 4, 5},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Lines: git.LineMap{
+						3: git.LineMeta{Old: 3},
+						4: git.LineMeta{Old: 4, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Reporter: "foo",
 						Summary:  "foo error 2",
 						Details:  "foo details",
-						Lines:    diags.LineRange{First: 1, Last: 5},
+						Lines:    diags.LineRange{First: 3, Last: 4},
 						Severity: checks.Bug,
 						Anchor:   checks.AnchorAfter,
 					},
@@ -714,7 +742,7 @@ foo details
 					if p.path != "foo.txt" {
 						return fmt.Errorf("wrong path: %s", p.path)
 					}
-					if p.line != 3 && p.line != 5 {
+					if p.line != 2 && p.line != 4 {
 						return fmt.Errorf("wrong line: %d", p.line)
 					}
 					return nil
@@ -861,13 +889,16 @@ func TestCommentsCommonPaths(t *testing.T) {
 			SymlinkTarget: "foo.txt",
 			Name:          "foo.txt",
 		},
-		ModifiedLines: []int{2},
-		Rule:          mockFile.Groups[0].Rules[0],
+		Lines: git.LineMap{
+			1: git.LineMeta{Old: 1},
+			2: git.LineMeta{Old: 2, Modified: true},
+		},
+		Rule: mockFile.Groups[0].Rules[0],
 		Problem: checks.Problem{
 			Reporter: "foo",
 			Summary:  "foo error",
 			Details:  "foo details",
-			Lines:    diags.LineRange{First: 1, Last: 3},
+			Lines:    diags.LineRange{First: 1, Last: 2},
 			Severity: checks.Fatal,
 			Anchor:   checks.AnchorAfter,
 		},

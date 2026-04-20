@@ -7,11 +7,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/go-github/v82/github"
 	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/git"
 )
 
 func TestGithubReporterDelete(t *testing.T) {
@@ -119,9 +119,7 @@ func TestGithubReporterIsEqual(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			// Use empty ghPR for simple path/text comparison tests
-			dst := ghPR{files: nil}
-			result := r.IsEqual(dst, tc.existing, tc.pending)
+			result := r.IsEqual(nil, tc.existing, tc.pending)
 			require.Equal(t, tc.expected, result)
 		})
 	}
@@ -153,64 +151,50 @@ func TestGithubReporterFixCommentLine(t *testing.T) {
 	testCases := []struct {
 		name         string
 		expectedSide string
-		files        []*github.CommitFile
 		pending      PendingComment
 		expectedLine int
 	}{
 		{
+			// Modified line with AnchorBefore returns LEFT side and old line number.
 			name: "anchor before returns LEFT side",
-			files: []*github.CommitFile{
-				{
-					Filename: new("file.go"),
-					Patch:    new("@@ -1,3 +1,4 @@\n line1\n+line2\n line3"),
-				},
-			},
 			pending: PendingComment{
-				path:   "file.go",
-				line:   2,
-				anchor: checks.AnchorBefore,
+				path:     "file.go",
+				line:     2,
+				anchor:   checks.AnchorBefore,
+				lineMeta: git.LineMeta{Old: 1, Modified: true},
 			},
 			expectedSide: "LEFT",
 			expectedLine: 1,
 		},
 		{
+			// Modified line with AnchorAfter returns RIGHT side and current line number.
 			name: "anchor after returns RIGHT side",
-			files: []*github.CommitFile{
-				{
-					Filename: new("file.go"),
-					Patch:    new("@@ -1,3 +1,4 @@\n line1\n+line2\n line3"),
-				},
-			},
 			pending: PendingComment{
-				path:   "file.go",
-				line:   2,
-				anchor: checks.AnchorAfter,
+				path:     "file.go",
+				line:     2,
+				anchor:   checks.AnchorAfter,
+				lineMeta: git.LineMeta{Old: 1, Modified: true},
 			},
 			expectedSide: "RIGHT",
 			expectedLine: 2,
 		},
 		{
-			name: "unmodified line finds first modified",
-			files: []*github.CommitFile{
-				{
-					Filename: new("file.go"),
-					Patch:    new("@@ -1,3 +1,4 @@\n line1\n+line2\n line3"),
-				},
-			},
+			// Unmodified line returns RIGHT side and current line number.
+			name: "unmodified line returns RIGHT side",
 			pending: PendingComment{
-				path:   "file.go",
-				line:   100,
-				anchor: checks.AnchorAfter,
+				path:     "file.go",
+				line:     100,
+				anchor:   checks.AnchorAfter,
+				lineMeta: git.LineMeta{Old: 100, Modified: false},
 			},
 			expectedSide: "RIGHT",
-			expectedLine: 2,
+			expectedLine: 100,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			dst := ghPR{files: tc.files}
-			side, line := r.fixCommentLine(dst, tc.pending)
+			side, line := r.fixCommentLine(tc.pending)
 			require.Equal(t, tc.expectedSide, side)
 			require.Equal(t, tc.expectedLine, line)
 		})

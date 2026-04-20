@@ -9,15 +9,17 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/diags"
+	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/output"
 )
 
 type PendingComment struct {
-	path         string
-	text         string
-	line         int
-	anchor       checks.Anchor
-	modifiedLine bool
+	path     string
+	oldPath  string
+	text     string
+	line     int
+	anchor   checks.Anchor
+	lineMeta git.LineMeta // Line metadata from git diff.
 }
 
 type ExistingComment struct {
@@ -154,18 +156,19 @@ func makeComments(summary Summary, showDuplicates bool) (comments []PendingComme
 
 		line := reports[0].Problem.Lines.Last
 		for i := reports[0].Problem.Lines.Last; i >= reports[0].Problem.Lines.First; i-- {
-			if slices.Contains(reports[0].ModifiedLines, i) {
+			if lm, ok := reports[0].Lines[i]; ok && lm.Modified {
 				line = i
 				break
 			}
 		}
 
 		comments = append(comments, PendingComment{
-			anchor:       reports[0].Problem.Anchor,
-			path:         reports[0].Path.SymlinkTarget,
-			line:         line,
-			text:         buf.String(),
-			modifiedLine: slices.Contains(reports[0].ModifiedLines, line),
+			anchor:   reports[0].Problem.Anchor,
+			path:     reports[0].Path.SymlinkTarget,
+			oldPath:  reports[0].Path.OldName,
+			line:     line,
+			lineMeta: reports[0].Lines[line],
+			text:     buf.String(),
 		})
 	}
 	return comments

@@ -78,8 +78,8 @@ func (f GlobFinder) Find() (entries []*Entry, err error) {
 		fd.Close()
 		for _, e := range el {
 			e.State = Noop
-			if len(e.ModifiedLines) == 0 {
-				e.ModifiedLines = e.Rule.Lines.Expand()
+			if len(e.Lines) == 0 {
+				e.Lines = git.NewLineMapFromRange(e.Rule.Lines.First, e.Rule.Lines.Last)
 			}
 			entries = append(entries, e)
 		}

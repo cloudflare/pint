@@ -91,27 +91,28 @@ func (f GitBranchFinder) Find(allEntries []*Entry) (entries []*Entry, err error)
 			slog.String("after.target", change.Path.After.SymlinkTarget),
 			slog.Any("after.type", change.Path.After.Type),
 			slog.Int("after.entries", len(entriesAfter)),
-			slog.Any("modifiedLines", change.Body.ModifiedLines),
+			slog.Any("lines", change.Body.Lines),
 		)
 		for _, me := range matchEntries(entriesBefore, entriesAfter) {
 			switch {
 			case !me.hasBefore && me.hasAfter:
 				me.after.State = Added
-				me.after.ModifiedLines = commonLines(change.Body.ModifiedLines, me.after.ModifiedLines)
+				me.after.Lines = mergeLines(change.Body.Lines, me.after.Lines)
 				slog.LogAttrs(context.Background(), slog.LevelDebug,
 					"Rule added on HEAD branch",
 					slog.String("name", me.after.Rule.Name()),
 					slog.String("state", me.after.State.String()),
 					slog.String("path", me.after.Path.Name),
 					slog.String("ruleLines", me.after.Rule.Lines.String()),
-					slog.String("modifiedLines", output.FormatLineRangeString(me.after.ModifiedLines)),
+					slog.String("lines", output.FormatLineRangeString(me.after.Lines.Keys())),
 				)
+				me.after.Path.OldName = change.Path.Before.Name
 				entries = append(entries, me.after)
 			case me.hasBefore && me.hasAfter:
 				switch {
 				case me.isIdentical && !me.wasMoved:
 					me.after.State = Noop
-					me.after.ModifiedLines = []int{}
+					me.after.Lines = git.LineMap{}
 					slog.LogAttrs(context.Background(), slog.LevelDebug,
 						"Rule content was not modified on HEAD, identical rule present before",
 						slog.String("name", me.after.Rule.Name()),
@@ -119,7 +120,7 @@ func (f GitBranchFinder) Find(allEntries []*Entry) (entries []*Entry, err error)
 					)
 				case me.wasMoved:
 					me.after.State = Moved
-					me.after.ModifiedLines = git.CountLines(change.Body.After)
+					me.after.Lines = git.CountLines(change.Body.After)
 					slog.LogAttrs(context.Background(), slog.LevelDebug,
 						"Rule content was not modified on HEAD but the file was moved or renamed",
 						slog.String("name", me.after.Rule.Name()),
@@ -127,22 +128,23 @@ func (f GitBranchFinder) Find(allEntries []*Entry) (entries []*Entry, err error)
 					)
 				default:
 					me.after.State = Modified
-					me.after.ModifiedLines = commonLines(change.Body.ModifiedLines, me.after.ModifiedLines)
+					me.after.Lines = mergeLines(change.Body.Lines, me.after.Lines)
 					slog.LogAttrs(context.Background(), slog.LevelDebug,
 						"Rule modified on HEAD branch",
 						slog.String("name", me.after.Rule.Name()),
 						slog.String("state", me.after.State.String()),
 						slog.String("path", me.after.Path.Name),
 						slog.String("ruleLines", me.after.Rule.Lines.String()),
-						slog.String("modifiedLines", output.FormatLineRangeString(me.after.ModifiedLines)),
+						slog.String("lines", output.FormatLineRangeString(me.after.Lines.Keys())),
 					)
 				}
+				me.after.Path.OldName = change.Path.Before.Name
 				entries = append(entries, me.after)
 			case me.hasBefore && !me.hasAfter && len(failedEntries) == 0:
 				me.before.State = Removed
-				ml := commonLines(change.Body.ModifiedLines, me.before.ModifiedLines)
+				ml := mergeLines(change.Body.Lines, me.before.Lines)
 				if len(ml) > 0 {
-					me.before.ModifiedLines = ml
+					me.before.Lines = ml
 				}
 				slog.LogAttrs(context.Background(), slog.LevelDebug,
 					"Rule removed on HEAD branch",
@@ -150,8 +152,9 @@ func (f GitBranchFinder) Find(allEntries []*Entry) (entries []*Entry, err error)
 					slog.String("state", me.before.State.String()),
 					slog.String("path", me.before.Path.Name),
 					slog.String("ruleLines", me.before.Rule.Lines.String()),
-					slog.String("modifiedLines", output.FormatLineRangeString(me.before.ModifiedLines)),
+					slog.String("lines", output.FormatLineRangeString(me.before.Lines.Keys())),
 				)
+				me.before.Path.OldName = change.Path.Before.Name
 				entries = append(entries, me.before)
 			case me.hasBefore && !me.hasAfter && len(failedEntries) > 0:
 				slog.LogAttrs(context.Background(), slog.LevelDebug,
@@ -160,7 +163,7 @@ func (f GitBranchFinder) Find(allEntries []*Entry) (entries []*Entry, err error)
 					slog.String("state", me.before.State.String()),
 					slog.String("path", me.before.Path.Name),
 					slog.String("ruleLines", me.before.Rule.Lines.String()),
-					slog.String("modifiedLines", output.FormatLineRangeString(me.before.ModifiedLines)),
+					slog.String("lines", output.FormatLineRangeString(me.before.Lines.Keys())),
 				)
 			}
 		}
@@ -186,7 +189,7 @@ func (f GitBranchFinder) Find(allEntries []*Entry) (entries []*Entry, err error)
 		for i, globEntry := range allEntries {
 			if entry.Path.Name == globEntry.Path.Name && entry.Rule.IsSame(globEntry.Rule) {
 				allEntries[i].State = entry.State
-				allEntries[i].ModifiedLines = entry.ModifiedLines
+				allEntries[i].Lines = entry.Lines
 				found = true
 				break
 			}
@@ -227,13 +230,18 @@ func (f GitBranchFinder) shouldSkipAllChecks(changes []*git.FileChange) (bool, e
 	return false, nil
 }
 
-func commonLines(a, b []int) (common []int) {
-	for _, ai := range a {
-		if slices.Contains(b, ai) {
-			common = append(common, ai)
+// mergeLines returns a LineMap covering all lines from ruleLines.
+// Lines present in diffLines are marked as Modified, the rest are not.
+func mergeLines(diffLines, ruleLines git.LineMap) git.LineMap {
+	merged := make(git.LineMap, len(ruleLines))
+	for k := range ruleLines {
+		if v, ok := diffLines[k]; ok {
+			merged[k] = v
+		} else {
+			merged[k] = git.LineMeta{Old: k, Modified: false}
 		}
 	}
-	return common
+	return merged
 }
 
 type matchedEntry struct {

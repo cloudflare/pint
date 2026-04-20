@@ -203,10 +203,10 @@ func verifyOwners(entries []*discovery.Entry, allowedOwners []*regexp.Regexp) (r
 		}
 		if entry.Owner == "" {
 			reports = append(reports, reporter.Report{
-				Path:          entry.Path,
-				ModifiedLines: entry.ModifiedLines,
-				Rule:          entry.Rule,
-				Owner:         "",
+				Path:  entry.Path,
+				Lines: entry.Lines,
+				Rule:  entry.Rule,
+				Owner: "",
 				Problem: checks.Problem{
 					Anchor:   checks.AnchorAfter,
 					Lines:    entry.Rule.Lines,
@@ -230,10 +230,10 @@ func verifyOwners(entries []*discovery.Entry, allowedOwners []*regexp.Regexp) (r
 			}
 		}
 		reports = append(reports, reporter.Report{
-			Path:          entry.Path,
-			ModifiedLines: entry.ModifiedLines,
-			Rule:          entry.Rule,
-			Owner:         "",
+			Path:  entry.Path,
+			Lines: entry.Lines,
+			Rule:  entry.Rule,
+			Owner: "",
 			Problem: checks.Problem{
 				Anchor:   checks.AnchorAfter,
 				Lines:    entry.Rule.Lines,

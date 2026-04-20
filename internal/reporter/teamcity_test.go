@@ -12,6 +12,7 @@ import (
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/reporter"
 )
@@ -44,12 +45,15 @@ func TestTeamCityReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4, 5},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Lines: git.LineMap{
+						1: git.LineMeta{Old: 1},
+						2: git.LineMeta{Old: 2, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
-							First: 5,
-							Last:  6,
+							First: 1,
+							Last:  2,
 						},
 						Reporter: "mock",
 						Summary:  "mock text",
@@ -60,9 +64,9 @@ func TestTeamCityReporter(t *testing.T) {
 			}),
 			output: `##teamcity[testSuiteStarted name='mock']
 ##teamcity[testSuiteStarted name='Information']
-##teamcity[testStarted name='foo.txt:5']
-##teamcity[testStdErr name='foo.txt:5' out='mock text']
-##teamcity[testFinished name='foo.txt:5']
+##teamcity[testStarted name='foo.txt:1']
+##teamcity[testStdErr name='foo.txt:1' out='mock text']
+##teamcity[testFinished name='foo.txt:1']
 ##teamcity[testSuiteFinished name='Information']
 ##teamcity[testSuiteFinished name='mock']
 `,
@@ -75,12 +79,15 @@ func TestTeamCityReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4, 5},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Lines: git.LineMap{
+						1: git.LineMeta{Old: 1},
+						2: git.LineMeta{Old: 2, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
-							First: 5,
-							Last:  6,
+							First: 1,
+							Last:  2,
 						},
 						Reporter: "mock",
 						Summary:  "mock text",
@@ -90,9 +97,9 @@ func TestTeamCityReporter(t *testing.T) {
 			}),
 			output: `##teamcity[testSuiteStarted name='mock']
 ##teamcity[testSuiteStarted name='Bug']
-##teamcity[testStarted name='foo.txt:5']
-##teamcity[testFailed name='foo.txt:5' message='' details='mock text']
-##teamcity[testFinished name='foo.txt:5']
+##teamcity[testStarted name='foo.txt:1']
+##teamcity[testFailed name='foo.txt:1' message='' details='mock text']
+##teamcity[testFinished name='foo.txt:1']
 ##teamcity[testSuiteFinished name='Bug']
 ##teamcity[testSuiteFinished name='mock']
 `,
@@ -105,12 +112,15 @@ func TestTeamCityReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4, 5},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Lines: git.LineMap{
+						1: git.LineMeta{Old: 1},
+						2: git.LineMeta{Old: 2, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
-							First: 5,
-							Last:  6,
+							First: 1,
+							Last:  2,
 						},
 						Reporter: "mock",
 						Summary: `mock text
@@ -122,9 +132,9 @@ with [new lines] and pipe| chars that are 'quoted'
 			}),
 			output: `##teamcity[testSuiteStarted name='mock']
 ##teamcity[testSuiteStarted name='Bug']
-##teamcity[testStarted name='foo.txt:5']
-##teamcity[testFailed name='foo.txt:5' message='' details='mock text|nwith |[new lines|] and pipe|| chars that are |'quoted|'|n']
-##teamcity[testFinished name='foo.txt:5']
+##teamcity[testStarted name='foo.txt:1']
+##teamcity[testFailed name='foo.txt:1' message='' details='mock text|nwith |[new lines|] and pipe|| chars that are |'quoted|'|n']
+##teamcity[testFinished name='foo.txt:1']
 ##teamcity[testSuiteFinished name='Bug']
 ##teamcity[testSuiteFinished name='mock']
 `,

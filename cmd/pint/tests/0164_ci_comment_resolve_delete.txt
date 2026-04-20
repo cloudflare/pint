@@ -1,8 +1,6 @@
 http response bitbucket /plugins/servlet/applinks/whoami 200 pint
 http response bitbucket /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint 200 OK
 http response bitbucket /rest/api/1.0/projects/prometheus/repos/rules/commits/.*/pull-requests 200 {"size":1,"isLastPage":true,"values":[{"id":123,"open":true,"fromRef":{"id":"refs/heads/modify","latestCommit":"fake-commit-id"},"toRef":{"id":"refs/heads/main","latestCommit":"fake-commit-id"}}]}
-http response bitbucket /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/123/changes 200 {"values":[{"path":{"toString":"rules.yml"}}],"size":1,"isLastPage":true}
-http response bitbucket /rest/api/latest/projects/prometheus/repos/rules/commits/fake-commit-id/diff/rules.yml 200 {"diffs":[{"hunks":[{"segments":[{"type":"ADDED", "lines":[{"source":5,"destination":5}]}]}]}]}
 http response bitbucket /rest/api/latest/projects/prometheus/repos/rules/pull-requests/123/activities 200 {"size":1,"isLastPage":true,"values":[{"action":"COMMENTED","commentAction":"ADDED","commentAnchor":{"diffType":"EFFECTIVE","lineType":"ADDED","path":"rules.yml","line":5},"comment":{"id":1,"state":"OPEN","severity":"NORMAL","author":{"name":"pint"},"comments":[{"id":2}]}}]}
 http response bitbucket /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/123/comments 200 {}
 http start bitbucket 127.0.0.1:7164
@@ -39,7 +37,6 @@ exec pint --no-color ci
 ! stdout .
 ! stderr 'msg="Problems found"'
 stderr 'msg="Found open pull request, reporting problems using comments" id=123 srcBranch=modify srcCommit=fake-commit-id dstBranch=main dstCommit=fake-commit-id'
-stderr 'msg="Getting pull request changes from BitBucket"'
 stderr 'msg="Got existing pull request comments from BitBucket" count=1'
 stderr 'msg="Generated comments to add to BitBucket" count=0'
 stderr 'msg="Added pull request comments to BitBucket" count=0'
@@ -115,16 +112,6 @@ data:
 --- END ---
 
 GET /rest/api/1.0/projects/prometheus/repos/rules/commits/.*/pull-requests
-  Accept-Encoding: gzip
-  Authorization: Bearer "12345"
-  Content-Type: application/json
-
-GET /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/123/changes
-  Accept-Encoding: gzip
-  Authorization: Bearer "12345"
-  Content-Type: application/json
-
-GET /rest/api/latest/projects/prometheus/repos/rules/commits/fake-commit-id/diff/rules.yml
   Accept-Encoding: gzip
   Authorization: Bearer "12345"
   Content-Type: application/json

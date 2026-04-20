@@ -222,11 +222,12 @@ groups:
 				{
 					State: discovery.Noop,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{},
-					Rule:          mustParse(4, "  - record: up:count\n    expr: count(up == 1)\n"),
+					Lines: git.LineMap{},
+					Rule:  mustParse(4, "  - record: up:count\n    expr: count(up == 1)\n"),
 				},
 			},
 		},
@@ -257,11 +258,15 @@ groups:
 				{
 					State: discovery.Modified,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{6},
-					Rule:          mustParse(4, "  - record: up:count\n    expr: count(up == 1)\n"),
+					Lines: git.LineMap{
+						5: git.LineMeta{Old: 5},
+						6: git.LineMeta{Old: 6, Modified: true},
+					},
+					Rule: mustParse(4, "  - record: up:count\n    expr: count(up == 1)\n"),
 				},
 			},
 		},
@@ -286,11 +291,15 @@ groups:
 				{
 					State: discovery.Modified,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{3},
-					Rule:          mustParse(1, "- record: up:count\n  expr: count(up == 1)\n"),
+					Lines: git.LineMap{
+						2: git.LineMeta{Old: 2},
+						3: git.LineMeta{Old: 3, Modified: true},
+					},
+					Rule: mustParse(1, "- record: up:count\n  expr: count(up == 1)\n"),
 				},
 			},
 		},
@@ -315,11 +324,15 @@ groups:
 				{
 					State: discovery.Modified,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{3},
-					Rule:          mustParse(1, "- record: up:count\n  expr: count(up == 1)\n"),
+					Lines: git.LineMap{
+						2: git.LineMeta{Old: 2},
+						3: git.LineMeta{Old: 3, Modified: true},
+					},
+					Rule: mustParse(1, "- record: up:count\n  expr: count(up == 1)\n"),
 				},
 			},
 		},
@@ -430,8 +443,8 @@ groups:
 						Name:          "symlink.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{2, 3},
-					Rule:          mustParse(1, "- record: up:count\n  expr: count(up)\n"),
+					Lines: git.NewLineMap([]int{2, 3}),
+					Rule:  mustParse(1, "- record: up:count\n  expr: count(up)\n"),
 				},
 			},
 		},
@@ -472,47 +485,61 @@ groups:
 				{
 					State: discovery.Modified,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{6},
-					Rule:          mustParse(4, "  - record: up:count:1\n    expr: count(up == 1)\n"),
+					Lines: git.LineMap{
+						5: git.LineMeta{Old: 5},
+						6: git.LineMeta{Old: 6, Modified: true},
+					},
+					Rule: mustParse(4, "  - record: up:count:1\n    expr: count(up == 1)\n"),
 				},
 				{
 					State: discovery.Added,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{7},
-					Rule:          mustParse(6, "  - record: up:count:2a\n    expr: count(up)\n"),
+					Lines: git.LineMap{
+						7: git.LineMeta{Old: 7, Modified: true},
+						8: git.LineMeta{Old: 8},
+					},
+					Rule: mustParse(6, "  - record: up:count:2a\n    expr: count(up)\n"),
 				},
 				{
 					State: discovery.Noop,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{},
-					Rule:          mustParse(8, "  - record: up:count:3\n    expr: count(up)\n"),
+					Lines: git.LineMap{},
+					Rule:  mustParse(8, "  - record: up:count:3\n    expr: count(up)\n"),
 				},
 				{
 					State: discovery.Added,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{11, 12},
-					Rule:          mustParse(10, "  - record: up:count:4\n    expr: count(up)\n"),
+					Lines: git.NewLineMap([]int{11, 12}),
+					Rule:  mustParse(10, "  - record: up:count:4\n    expr: count(up)\n"),
 				},
 				{
 					State: discovery.Removed,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{7},
-					Rule:          mustParse(6, "  - record: up:count:2\n    expr: count(up)\n"),
+					Lines: git.LineMap{
+						7: git.LineMeta{Old: 7, Modified: true},
+						8: git.LineMeta{Old: 8},
+					},
+					Rule: mustParse(6, "  - record: up:count:2\n    expr: count(up)\n"),
 				},
 			},
 		},
@@ -544,20 +571,26 @@ groups:
 				{
 					State: discovery.Modified,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{4},
-					Rule:          mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n  for: 0s\n"),
+					Lines: git.LineMap{
+						2: git.LineMeta{Old: 2},
+						3: git.LineMeta{Old: 3},
+						4: git.LineMeta{Old: 4, Modified: true},
+					},
+					Rule: mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n  for: 0s\n"),
 				},
 				{
 					State: discovery.Noop,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{},
-					Rule:          mustParse(4, "- alert: rule2\n  expr: sum(foo) by(job)\n  for: 0s\n"),
+					Lines: git.LineMap{},
+					Rule:  mustParse(4, "- alert: rule2\n  expr: sum(foo) by(job)\n  for: 0s\n"),
 				},
 			},
 		},
@@ -584,20 +617,25 @@ groups:
 				{
 					State: discovery.Noop,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{},
-					Rule:          mustParse(1, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
+					Lines: git.LineMap{},
+					Rule:  mustParse(1, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
 				},
 				{
 					State: discovery.Removed,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{2, 3},
-					Rule:          mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
+					Lines: git.LineMap{
+						2: git.LineMeta{Old: 2},
+						3: git.LineMeta{Old: 3},
+					},
+					Rule: mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
 				},
 			},
 		},
@@ -624,20 +662,25 @@ groups:
 				{
 					State: discovery.Noop,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{},
-					Rule:          mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
+					Lines: git.LineMap{},
+					Rule:  mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
 				},
 				{
 					State: discovery.Removed,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{4, 5},
-					Rule:          mustParse(3, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
+					Lines: git.LineMap{
+						4: git.LineMeta{Old: 4},
+						5: git.LineMeta{Old: 5},
+					},
+					Rule: mustParse(3, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
 				},
 			},
 		},
@@ -668,29 +711,35 @@ groups:
 				{
 					State: discovery.Noop,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{},
-					Rule:          mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
+					Lines: git.LineMap{},
+					Rule:  mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
 				},
 				{
 					State: discovery.Noop,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{},
-					Rule:          mustParse(3, "- alert: rule3\n  expr: sum(foo) by(job)\n"),
+					Lines: git.LineMap{},
+					Rule:  mustParse(3, "- alert: rule3\n  expr: sum(foo) by(job)\n"),
 				},
 				{
 					State: discovery.Removed,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{4, 5},
-					Rule:          mustParse(3, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
+					Lines: git.LineMap{
+						4: git.LineMeta{Old: 4},
+						5: git.LineMeta{Old: 5},
+					},
+					Rule: mustParse(3, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
 				},
 			},
 		},
@@ -722,19 +771,28 @@ groups:
 				{
 					State: discovery.Added,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: nil,
-					Rule:          mustParse(4, "  - record: up:count\n    expr: count(up)\n"),
+					Lines: git.LineMap{
+						5: git.LineMeta{Old: 5},
+						6: git.LineMeta{Old: 6},
+					},
+					Rule: mustParse(4, "  - record: up:count\n    expr: count(up)\n"),
 				},
 				{
 					State: discovery.Removed,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{5, 6, 7},
+					Lines: git.LineMap{
+						5: git.LineMeta{Old: 5},
+						6: git.LineMeta{Old: 6},
+						7: git.LineMeta{Old: 7},
+					},
 					Rule: parser.Rule{
 						Lines: diags.LineRange{First: 5, Last: 7},
 						Error: parser.ParseError{
@@ -774,38 +832,42 @@ groups:
 				{
 					State: discovery.Noop,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{},
-					Rule:          mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
+					Lines: git.LineMap{},
+					Rule:  mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
 				},
 				{
 					State: discovery.Noop,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{},
-					Rule:          mustParse(3, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
+					Lines: git.LineMap{},
+					Rule:  mustParse(3, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
 				},
 				{
 					State: discovery.Added,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{6, 7},
-					Rule:          mustParse(5, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
+					Lines: git.NewLineMap([]int{6, 7}),
+					Rule:  mustParse(5, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
 				},
 				{
 					State: discovery.Added,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{8, 9},
-					Rule:          mustParse(7, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
+					Lines: git.NewLineMap([]int{8, 9}),
+					Rule:  mustParse(7, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
 				},
 			},
 		},
@@ -836,38 +898,48 @@ groups:
 				{
 					State: discovery.Modified,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{3},
-					Rule:          mustParse(1, "- alert: rule1\n  expr: up == 0\n"),
+					Lines: git.LineMap{
+						2: git.LineMeta{Old: 2},
+						3: git.LineMeta{Old: 3, Modified: true},
+					},
+					Rule: mustParse(1, "- alert: rule1\n  expr: up == 0\n"),
 				},
 				{
 					State: discovery.Added,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{4, 5},
-					Rule:          mustParse(3, "- alert: rule1\n  expr: up == 1\n"),
+					Lines: git.NewLineMap([]int{4, 5}),
+					Rule:  mustParse(3, "- alert: rule1\n  expr: up == 1\n"),
 				},
 				{
 					State: discovery.Added,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{6, 7},
-					Rule:          mustParse(5, "- alert: rule1\n  expr: up != 0\n"),
+					Lines: git.NewLineMap([]int{6, 7}),
+					Rule:  mustParse(5, "- alert: rule1\n  expr: up != 0\n"),
 				},
 				{
 					State: discovery.Added,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{8},
-					Rule:          mustParse(7, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
+					Lines: git.LineMap{
+						8: git.LineMeta{Old: 8, Modified: true},
+						9: git.LineMeta{Old: 9},
+					},
+					Rule: mustParse(7, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
 				},
 			},
 		},
@@ -905,20 +977,31 @@ groups:
 				{
 					State: discovery.Noop,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{},
-					Rule:          mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n  for: 1s\n"),
+					Lines: git.LineMap{},
+					Rule:  mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n  for: 1s\n"),
 				},
 				{
 					State: discovery.Modified,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{7, 8, 9, 10, 11, 12},
-					Rule:          mustParse(4, "- alert: rule2\n  expr: sum(foo) by(job)\n  keep_firing_for: 5m\n  for: 0s\n  annotations:\n    foo: bar\n  labels:\n    foo: bar\n"),
+					Lines: git.LineMap{
+						5:  git.LineMeta{Old: 5},
+						6:  git.LineMeta{Old: 6},
+						7:  git.LineMeta{Old: 7, Modified: true},
+						8:  git.LineMeta{Old: 8, Modified: true},
+						9:  git.LineMeta{Old: 9, Modified: true},
+						10: git.LineMeta{Old: 10, Modified: true},
+						11: git.LineMeta{Old: 11, Modified: true},
+						12: git.LineMeta{Old: 12, Modified: true},
+					},
+					Rule: mustParse(4, "- alert: rule2\n  expr: sum(foo) by(job)\n  keep_firing_for: 5m\n  for: 0s\n  annotations:\n    foo: bar\n  labels:\n    foo: bar\n"),
 				},
 			},
 		},
@@ -943,11 +1026,12 @@ groups:
 				{
 					State: discovery.Moved,
 					Path: discovery.Path{
+						OldName:       "a.yml",
 						Name:          "b.yml",
 						SymlinkTarget: "b.yml",
 					},
-					ModifiedLines: []int{1, 2, 3},
-					Rule:          mustParse(1, "- alert: rule\n  expr: up == 0\n"),
+					Lines: git.NewLineMap([]int{1, 2, 3}),
+					Rule:  mustParse(1, "- alert: rule\n  expr: up == 0\n"),
 				},
 			},
 		},
@@ -978,11 +1062,12 @@ groups:
 				{
 					State: discovery.Moved,
 					Path: discovery.Path{
+						OldName:       "a.yml",
 						Name:          "b.yml",
 						SymlinkTarget: "b.yml",
 					},
-					ModifiedLines: []int{1, 2, 3},
-					Rule:          mustParse(1, "- alert: rule\n  expr: up == 0\n"),
+					Lines: git.NewLineMap([]int{1, 2, 3}),
+					Rule:  mustParse(1, "- alert: rule\n  expr: up == 0\n"),
 				},
 			},
 		},
@@ -1016,20 +1101,22 @@ groups:
 				{
 					State: discovery.Moved,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "new.yml",
 						SymlinkTarget: "new.yml",
 					},
-					ModifiedLines: []int{1, 2, 3},
-					Rule:          mustParse(1, "- alert: rule\n  expr: up == 0\n"),
+					Lines: git.NewLineMap([]int{1, 2, 3}),
+					Rule:  mustParse(1, "- alert: rule\n  expr: up == 0\n"),
 				},
 				{
 					State: discovery.Removed,
 					Path: discovery.Path{
+						OldName:       "symlink.yml",
 						Name:          "symlink.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{2, 3},
-					Rule:          mustParse(1, "- alert: rule\n  expr: up == 0\n"),
+					Lines: git.NewLineMap([]int{2, 3}),
+					Rule:  mustParse(1, "- alert: rule\n  expr: up == 0\n"),
 				},
 			},
 		},
@@ -1076,10 +1163,28 @@ groups:
 				{
 					State: discovery.Added,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{3, 11, 12, 15, 16},
+					Lines: git.LineMap{
+						1:  git.LineMeta{Old: 1},
+						2:  git.LineMeta{Old: 2},
+						3:  git.LineMeta{Old: 3, Modified: true},
+						4:  git.LineMeta{Old: 4},
+						5:  git.LineMeta{Old: 5},
+						6:  git.LineMeta{Old: 6},
+						7:  git.LineMeta{Old: 7},
+						8:  git.LineMeta{Old: 8},
+						9:  git.LineMeta{Old: 9},
+						10: git.LineMeta{Old: 10},
+						11: git.LineMeta{Old: 11, Modified: true},
+						12: git.LineMeta{Old: 12, Modified: true},
+						13: git.LineMeta{Old: 13},
+						14: git.LineMeta{Old: 14},
+						15: git.LineMeta{Old: 15, Modified: true},
+						16: git.LineMeta{Old: 16, Modified: true},
+					},
 					PathError: parser.ParseError{
 						Line: 11,
 						Err:  errors.New("could not find expected ':'"),
@@ -1120,24 +1225,39 @@ groups:
 				{
 					State: discovery.Modified,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
+					},
+					Lines: git.LineMap{
+						4: git.LineMeta{Old: 4},
+						5: git.LineMeta{Old: 5},
 					},
 					Rule: mustParse(3, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
 				},
 				{
 					State: discovery.Modified,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
+					},
+					Lines: git.LineMap{
+						6: git.LineMeta{Old: 6},
+						7: git.LineMeta{Old: 7},
 					},
 					Rule: mustParse(5, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
 				},
 				{
 					State: discovery.Modified,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
+					},
+					Lines: git.LineMap{
+						8: git.LineMeta{Old: 8},
+						9: git.LineMeta{Old: 9},
 					},
 					Rule: mustParse(7, "- alert: rule3\n  expr: sum(foo) by(job)\n"),
 				},
@@ -1176,47 +1296,52 @@ groups:
 				{
 					State: discovery.Noop,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{},
-					Rule:          mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
+					Lines: git.LineMap{},
+					Rule:  mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
 				},
 				{
 					State: discovery.Noop,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{},
-					Rule:          mustParse(3, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
+					Lines: git.LineMap{},
+					Rule:  mustParse(3, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
 				},
 				{
 					State: discovery.Noop,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{},
-					Rule:          mustParse(5, "- alert: rule3\n  expr: sum(foo) by(job)\n"),
+					Lines: git.LineMap{},
+					Rule:  mustParse(5, "- alert: rule3\n  expr: sum(foo) by(job)\n"),
 				},
 				{
 					State: discovery.Added,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{8, 9},
-					Rule:          mustParse(7, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
+					Lines: git.NewLineMap([]int{8, 9}),
+					Rule:  mustParse(7, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
 				},
 				{
 					State: discovery.Added,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{10, 11},
-					Rule:          mustParse(9, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
+					Lines: git.NewLineMap([]int{10, 11}),
+					Rule:  mustParse(9, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
 				},
 			},
 		},
@@ -1249,15 +1374,21 @@ groups:
 				{
 					State: discovery.Added,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{6},
-					Rule:          mustParse(4, "  - record: up:count\n    # pint disable promql/series(up)\n    expr: sum(up)\n"),
+					Lines: git.LineMap{
+						5: git.LineMeta{Old: 5},
+						6: git.LineMeta{Old: 6, Modified: true},
+						7: git.LineMeta{Old: 7},
+					},
+					Rule: mustParse(4, "  - record: up:count\n    # pint disable promql/series(up)\n    expr: sum(up)\n"),
 				},
 				{
 					State: discovery.Removed,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
@@ -1265,7 +1396,15 @@ groups:
 						Err:  errors.New("xxx"),
 						Line: 6,
 					},
-					ModifiedLines: []int{3, 6},
+					Lines: git.LineMap{
+						1: git.LineMeta{Old: 1},
+						2: git.LineMeta{Old: 2},
+						3: git.LineMeta{Old: 3, Modified: true},
+						4: git.LineMeta{Old: 4},
+						5: git.LineMeta{Old: 5},
+						6: git.LineMeta{Old: 6, Modified: true},
+						7: git.LineMeta{Old: 7},
+					},
 				},
 			},
 		},
@@ -1302,20 +1441,34 @@ groups:
 				{
 					State: discovery.Added,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{5, 7},
-					Rule:          mustParse(4, "  - record: up:count\n    expr: |\n      count(\n        up\n      )\n"),
+					Lines: git.LineMap{
+						5: git.LineMeta{Old: 5, Modified: true},
+						6: git.LineMeta{Old: 6},
+						7: git.LineMeta{Old: 7, Modified: true},
+						8: git.LineMeta{Old: 8},
+						9: git.LineMeta{Old: 9},
+					},
+					Rule: mustParse(4, "  - record: up:count\n    expr: |\n      count(\n        up\n      )\n"),
 				},
 				{
 					State: discovery.Removed,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{5, 7},
-					Rule:          mustParse(4, "  - record: up:sum\n    expr: |\n      sum(\n        up\n      )\n"),
+					Lines: git.LineMap{
+						5: git.LineMeta{Old: 5, Modified: true},
+						6: git.LineMeta{Old: 6},
+						7: git.LineMeta{Old: 7, Modified: true},
+						8: git.LineMeta{Old: 8},
+						9: git.LineMeta{Old: 9},
+					},
+					Rule: mustParse(4, "  - record: up:sum\n    expr: |\n      sum(\n        up\n      )\n"),
 				},
 			},
 		},
@@ -1370,29 +1523,96 @@ groups:
 				{
 					State: discovery.Added,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{3},
-					Rule:          mustParse(1, "- alert: rule1\n  expr: up != 0\n"),
+					Lines: git.LineMap{
+						2: git.LineMeta{Old: 2},
+						3: git.LineMeta{Old: 3, Modified: true},
+					},
+					Rule: mustParse(1, "- alert: rule1\n  expr: up != 0\n"),
 				},
 				{
 					State: discovery.Removed,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{3},
-					Rule:          mustParse(1, "- alert: rule1\n  expr: up == 0\n"),
+					Lines: git.LineMap{
+						2: git.LineMeta{Old: 2},
+						3: git.LineMeta{Old: 3, Modified: true},
+					},
+					Rule: mustParse(1, "- alert: rule1\n  expr: up == 0\n"),
 				},
 				{
 					State: discovery.Removed,
 					Path: discovery.Path{
+						OldName:       "rules.yml",
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{4, 5},
-					Rule:          mustParse(3, "- alert: rule1\n  expr: up == 1\n"),
+					Lines: git.LineMap{
+						4: git.LineMeta{Old: 4},
+						5: git.LineMeta{Old: 5},
+					},
+					Rule: mustParse(3, "- alert: rule1\n  expr: up == 1\n"),
+				},
+			},
+		},
+		{
+			// Scenario: first commit modifies a rule, second commit adds lines above it.
+			// This shifts the modified rule down, so Old (from git blame) != current line number.
+			title: "rule shifted by added lines above",
+			setup: func(t *testing.T) {
+				commitFile(t, "rules.yml", `
+- alert: rule1
+  expr: up == 0
+`, "v1")
+
+				_, err := git.RunGit("checkout", "-b", "v2")
+				require.NoError(t, err, "git checkout v2")
+
+				commitFile(t, "rules.yml", `
+- alert: rule1
+  expr: up != 0
+`, "v2 modify rule")
+
+				commitFile(t, "rules.yml", `
+- alert: rule0
+  expr: count(up)
+- alert: rule1
+  expr: up != 0
+`, "v2 add rule above")
+			},
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4, parser.DefaultOptions, nil),
+			entries: []*discovery.Entry{
+				{
+					State: discovery.Added,
+					Path: discovery.Path{
+						OldName:       "rules.yml",
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
+					Lines: git.LineMap{
+						2: git.LineMeta{Old: 2, Modified: true},
+						3: git.LineMeta{Old: 3, Modified: true},
+					},
+					Rule: mustParse(1, "- alert: rule0\n  expr: count(up)\n"),
+				},
+				{
+					State: discovery.Modified,
+					Path: discovery.Path{
+						OldName:       "rules.yml",
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
+					Lines: git.LineMap{
+						4: git.LineMeta{Old: 4},
+						5: git.LineMeta{Old: 3, Modified: true},
+					},
+					Rule: mustParse(3, "- alert: rule1\n  expr: up != 0\n"),
 				},
 			},
 		},

@@ -23,6 +23,7 @@ import (
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 	"github.com/cloudflare/pint/internal/reporter"
@@ -62,19 +63,20 @@ func TestGitLabReporter(t *testing.T) {
 			SymlinkTarget: "foo.txt",
 			Name:          "foo.txt",
 		},
-		ModifiedLines: []int{2},
-		Rule:          mockFile.Groups[0].Rules[0],
+		Lines: git.LineMap{
+			1: git.LineMeta{Old: 1},
+			2: git.LineMeta{Old: 2, Modified: true},
+		},
+		Rule: mockFile.Groups[0].Rules[0],
 		Problem: checks.Problem{
 			Reporter: "foo",
 			Summary:  "foo error",
 			Details:  "foo details",
-			Lines:    diags.LineRange{First: 1, Last: 3},
+			Lines:    diags.LineRange{First: 1, Last: 2},
 			Severity: checks.Fatal,
 			Anchor:   checks.AnchorAfter,
 		},
 	}
-	fooDiff := `@@ -1,4 +1,6 @@\n- record: target is down\n-  expr: up == 0\n+  expr: up == 1\n+  labels:\n+    foo: bar\n- record: sum errors\nexpr: sum(errors) by (job)\n`
-
 	summaryWithDetails := reporter.NewSummary([]reporter.Report{})
 	summaryWithDetails.MarkCheckDisabled("prom1", promapi.APIPathConfig, []string{"check1", "check3", "check2"})
 	summaryWithDetails.MarkCheckDisabled("prom2", promapi.APIPathMetadata, []string{"check1"})
@@ -85,13 +87,16 @@ func TestGitLabReporter(t *testing.T) {
 				SymlinkTarget: "foo.txt",
 				Name:          "foo.txt",
 			},
-			ModifiedLines: []int{1},
-			Rule:          mockFile.Groups[0].Rules[0],
+			Lines: git.LineMap{
+				1: git.LineMeta{Old: 1, Modified: true},
+				2: git.LineMeta{Old: 2},
+			},
+			Rule: mockFile.Groups[0].Rules[0],
 			Problem: checks.Problem{
 				Reporter: "a",
 				Summary:  "foo error1",
 				Details:  "foo details",
-				Lines:    diags.LineRange{First: 1, Last: 3},
+				Lines:    diags.LineRange{First: 1, Last: 2},
 				Severity: checks.Fatal,
 				Anchor:   checks.AnchorAfter,
 			},
@@ -101,13 +106,16 @@ func TestGitLabReporter(t *testing.T) {
 				SymlinkTarget: "foo.txt",
 				Name:          "foo.txt",
 			},
-			ModifiedLines: []int{2},
-			Rule:          mockFile.Groups[0].Rules[0],
+			Lines: git.LineMap{
+				1: git.LineMeta{Old: 1},
+				2: git.LineMeta{Old: 2, Modified: true},
+			},
+			Rule: mockFile.Groups[0].Rules[0],
 			Problem: checks.Problem{
 				Reporter: "b",
 				Summary:  "foo error2",
 				Details:  "foo details",
-				Lines:    diags.LineRange{First: 1, Last: 3},
+				Lines:    diags.LineRange{First: 1, Last: 2},
 				Severity: checks.Fatal,
 				Anchor:   checks.AnchorAfter,
 			},
@@ -117,13 +125,16 @@ func TestGitLabReporter(t *testing.T) {
 				SymlinkTarget: "foo.txt",
 				Name:          "foo.txt",
 			},
-			ModifiedLines: []int{3},
-			Rule:          mockFile.Groups[0].Rules[0],
+			Lines: git.LineMap{
+				3: git.LineMeta{Old: 3, Modified: true},
+				4: git.LineMeta{Old: 4},
+			},
+			Rule: mockFile.Groups[0].Rules[1],
 			Problem: checks.Problem{
 				Reporter: "c",
 				Summary:  "foo error3",
 				Details:  "foo details",
-				Lines:    diags.LineRange{First: 1, Last: 3},
+				Lines:    diags.LineRange{First: 3, Last: 4},
 				Severity: checks.Fatal,
 				Anchor:   checks.AnchorAfter,
 			},
@@ -134,9 +145,6 @@ func TestGitLabReporter(t *testing.T) {
 		apiUser              = "/api/v4/user"
 		apiOpenMergeRequests = "/api/v4/projects/123/merge_requests?page=1&source_branch=fakeBranch&state=opened"
 	)
-	apiDiffs := func(mrID int) string {
-		return fmt.Sprintf("/api/v4/projects/123/merge_requests/%d/diffs?page=1", mrID)
-	}
 	apiVersions := func(mrID int) string {
 		return fmt.Sprintf("/api/v4/projects/123/merge_requests/%d/versions?page=1", mrID)
 	}
@@ -193,7 +201,6 @@ func TestGitLabReporter(t *testing.T) {
 			NewPath:      new(path),
 			PositionType: new("text"),
 			NewLine:      new(line),
-			OldLine:      new(line),
 		})
 	}
 	notePos := func(oldPath, newPath string, newLine, oldLine int64) *gitlab.NotePosition {
@@ -241,7 +248,8 @@ func TestGitLabReporter(t *testing.T) {
 			summary:     reporter.NewSummary([]reporter.Report{fooReport}),
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectGet(apiUser).ReturnJSON(gitlab.User{ID: 123})
-				s.ExpectGet(regexp.MustCompile(".+")).Times(4).Return(`[{"iid": 333}]`)
+				s.ExpectGet(regexp.MustCompile(".+")).Times(3).Return(`[{"iid": 333}]`)
+				s.ExpectPost(regexp.MustCompile(".+")).Return(`{}`)
 			}),
 			errorHandler: func(err error) error {
 				return err
@@ -270,8 +278,11 @@ func TestGitLabReporter(t *testing.T) {
 						SymlinkTarget: mockPath,
 						Name:          mockPath,
 					},
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Lines: git.LineMap{
+						1: git.LineMeta{Old: 1},
+						2: git.LineMeta{Old: 2, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter: "a",
 						Summary:  "foo error1",
@@ -296,7 +307,7 @@ func TestGitLabReporter(t *testing.T) {
 								Kind:        diags.Issue,
 							},
 						},
-						Lines:    diags.LineRange{First: 1, Last: 3},
+						Lines:    diags.LineRange{First: 1, Last: 2},
 						Severity: checks.Fatal,
 						Anchor:   checks.AnchorAfter,
 					},
@@ -310,9 +321,6 @@ func TestGitLabReporter(t *testing.T) {
 				s.ExpectGet(apiVersions(1)).ReturnJSON([]gitlab.MergeRequestDiffVersion{
 					{ID: 2, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
 					{ID: 1, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
-				})
-				s.ExpectGet(apiDiffs(1)).ReturnJSON([]gitlab.MergeRequestDiff{
-					{OldPath: mockPath, NewPath: mockPath, Diff: fooDiff},
 				})
 				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{})
 				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
@@ -340,9 +348,6 @@ func TestGitLabReporter(t *testing.T) {
 					s.ExpectGet(apiVersions(i)).ReturnJSON([]gitlab.MergeRequestDiffVersion{
 						{ID: 2, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
 						{ID: 1, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
-					})
-					s.ExpectGet(apiDiffs(i)).ReturnJSON([]gitlab.MergeRequestDiff{
-						{OldPath: "foo.txt", NewPath: "foo.txt", Diff: fooDiff},
 					})
 					if i == 5 {
 						s.ExpectGet(apiDiscussions(i, true)).ReturnJSON([]gitlab.Discussion{})
@@ -430,9 +435,6 @@ func TestGitLabReporter(t *testing.T) {
 					{ID: 2, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
 					{ID: 1, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
 				})
-				s.ExpectGet(apiDiffs(1)).ReturnJSON([]gitlab.MergeRequestDiff{
-					{OldPath: "foo.txt", NewPath: "foo.txt", Diff: fooDiff},
-				})
 				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{
 					{
 						ID:    "100",
@@ -456,52 +458,6 @@ func TestGitLabReporter(t *testing.T) {
 				}).ReturnJSON(gitlab.Response{})
 			}),
 			errorHandler: func(err error) error {
-				return err
-			},
-		},
-		{
-			description: "no diff",
-			timeout:     time.Minute,
-			maxComments: 1,
-			summary:     reporter.NewSummary([]reporter.Report{fooReport}),
-			mock: httpmock.New(func(s *httpmock.Server) {
-				s.ExpectGet(apiUser).ReturnJSON(gitlab.User{ID: 123})
-				s.ExpectGet(apiOpenMergeRequests).ReturnJSON([]gitlab.BasicMergeRequest{
-					{IID: 1},
-				})
-				s.ExpectGet(apiVersions(1)).ReturnJSON([]gitlab.MergeRequestDiffVersion{
-					{ID: 2, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
-					{ID: 1, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
-				})
-				s.ExpectGet(apiDiffs(1)).ReturnJSON([]gitlab.MergeRequestDiff{})
-				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{})
-			}),
-			errorHandler: func(err error) error {
-				return err
-			},
-		},
-		{
-			description: "diff error",
-			timeout:     time.Minute,
-			maxComments: 1,
-			summary:     reporter.NewSummary([]reporter.Report{fooReport}),
-			mock: httpmock.New(func(s *httpmock.Server) {
-				s.ExpectGet(apiUser).ReturnJSON(gitlab.User{ID: 123})
-				s.ExpectGet(apiOpenMergeRequests).ReturnJSON([]gitlab.BasicMergeRequest{
-					{IID: 1},
-				})
-				s.ExpectGet(apiVersions(1)).ReturnJSON([]gitlab.MergeRequestDiffVersion{
-					{ID: 2, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
-					{ID: 1, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
-				})
-				s.ExpectGet(apiDiffs(1)).
-					ReturnCode(http.StatusForbidden).
-					ReturnJSON(map[string]string{"error": "Mock error"})
-			}),
-			errorHandler: func(err error) error {
-				if strings.HasSuffix(err.Error(), ": 403 {error: Mock error}") {
-					return nil
-				}
 				return err
 			},
 		},
@@ -560,9 +516,7 @@ func TestGitLabReporter(t *testing.T) {
 					{ID: 2, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
 					{ID: 1, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
 				})
-				s.ExpectGet(apiDiffs(1)).ReturnJSON([]gitlab.MergeRequestDiff{
-					{OldPath: "foo.txt", NewPath: "foo.txt", Diff: fooDiff},
-				})
+
 				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{})
 				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
 					Body: new(`Some checks were disabled because one or more configured Prometheus server doesn't seem to support all required Prometheus APIs.
@@ -599,9 +553,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 					{ID: 2, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
 					{ID: 1, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
 				})
-				s.ExpectGet(apiDiffs(1)).ReturnJSON([]gitlab.MergeRequestDiff{
-					{OldPath: "foo.txt", NewPath: "foo.txt", Diff: fooDiff},
-				})
+
 				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{})
 				s.ExpectPost(apiDiscussions(1, false)).
 					ReturnCode(http.StatusBadRequest).
@@ -628,9 +580,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 					{ID: 2, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
 					{ID: 1, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
 				})
-				s.ExpectGet(apiDiffs(1)).ReturnJSON([]gitlab.MergeRequestDiff{
-					{OldPath: "foo.txt", NewPath: "foo.txt", Diff: fooDiff},
-				})
+
 				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{
 					{
 						ID:    "100",
@@ -668,9 +618,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 					{ID: 2, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
 					{ID: 1, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
 				})
-				s.ExpectGet(apiDiffs(1)).ReturnJSON([]gitlab.MergeRequestDiff{
-					{OldPath: "foo.txt", NewPath: "foo.txt", Diff: fooDiff},
-				})
+
 				// Problem comment
 				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{})
 				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
@@ -704,9 +652,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 					{ID: 2, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
 					{ID: 1, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
 				})
-				s.ExpectGet(apiDiffs(1)).ReturnJSON([]gitlab.MergeRequestDiff{
-					{OldPath: "foo.txt", NewPath: "foo.txt", Diff: fooDiff},
-				})
+
 				// Problem comment
 				s.ExpectGet(apiDiscussions(1, true)).
 					ReturnCode(http.StatusBadRequest).
@@ -733,9 +679,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 					{ID: 2, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
 					{ID: 1, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
 				})
-				s.ExpectGet(apiDiffs(1)).ReturnJSON([]gitlab.MergeRequestDiff{
-					{OldPath: "foo.txt", NewPath: "foo.txt", Diff: fooDiff},
-				})
+
 				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{
 					{
 						ID: "100",
@@ -808,9 +752,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 					{ID: 2, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
 					{ID: 1, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
 				})
-				s.ExpectGet(apiDiffs(1)).ReturnJSON([]gitlab.MergeRequestDiff{
-					{OldPath: "foo.txt", NewPath: "foo.txt", Diff: fooDiff},
-				})
+
 				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{
 					{
 						ID: "100",
@@ -855,9 +797,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 					{ID: 2, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
 					{ID: 1, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
 				})
-				s.ExpectGet(apiDiffs(1)).ReturnJSON([]gitlab.MergeRequestDiff{
-					{OldPath: "foo.txt", NewPath: "foo.txt", Diff: fooDiff},
-				})
+
 				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{
 					{
 						ID: "100",
@@ -902,8 +842,11 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: mockPath,
 						Name:          mockPath,
 					},
-					ModifiedLines: []int{2, 3},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Lines: git.LineMap{
+						1: git.LineMeta{Old: 1},
+						2: git.LineMeta{Old: 2, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter: "a",
 						Summary:  "foo error1",
@@ -928,7 +871,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 								Kind:        diags.Issue,
 							},
 						},
-						Lines:    diags.LineRange{First: 1, Last: 3},
+						Lines:    diags.LineRange{First: 1, Last: 2},
 						Severity: checks.Fatal,
 						Anchor:   checks.AnchorAfter,
 					},
@@ -943,21 +886,6 @@ Below is the list of checks that were disabled for each Prometheus server define
 					{ID: 2, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
 					{ID: 1, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
 				})
-				s.ExpectGet(apiDiffs(1)).ReturnJSON([]gitlab.MergeRequestDiff{
-					{
-						Diff:        "",
-						NewPath:     mockPath,
-						OldPath:     "foo.old",
-						AMode:       "100644",
-						BMode:       "100644",
-						RenamedFile: true,
-					},
-					{
-						Diff:    fooDiff,
-						NewPath: "foo.txt",
-						OldPath: "foo.txt",
-					},
-				})
 				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{})
 				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
 					Body: discBodyWithDiag("a", "foo error1", "foo details", "```yaml\n2 | - record: target is down\n3 |   expr: up == 0\n      ^^ \n```", "Diagnostic message"),
@@ -965,96 +893,10 @@ Below is the list of checks that were disabled for each Prometheus server define
 						BaseSHA:      new("base"),
 						StartSHA:     new("start"),
 						HeadSHA:      new("head"),
-						OldPath:      new("foo.old"),
+						OldPath:      new(mockPath),
 						NewPath:      new(mockPath),
 						PositionType: new("text"),
-						NewLine:      new(int64(3)),
-						// Old file is gone so we don't have OldLine here at all
-					}),
-				}).ReturnJSON(gitlab.Response{})
-			}),
-			errorHandler: func(err error) error {
-				return err
-			},
-		},
-		{
-			description: "rule moved to a different file, old deleted, no diff",
-			timeout:     time.Minute,
-			maxComments: 1,
-			summary: reporter.NewSummary([]reporter.Report{
-				{
-					Path: discovery.Path{
-						SymlinkTarget: mockPath,
-						Name:          mockPath,
-					},
-					ModifiedLines: []int{2, 3},
-					Rule:          mockFile.Groups[0].Rules[0],
-					Problem: checks.Problem{
-						Reporter: "a",
-						Summary:  "foo error1",
-						Details:  "foo details",
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Diagnostic message",
-								Pos: diags.PositionRanges{
-									{
-										Line:        2,
-										FirstColumn: 3,
-										LastColumn:  24,
-									},
-									{
-										Line:        3,
-										FirstColumn: 3,
-										LastColumn:  15,
-									},
-								},
-								FirstColumn: 1,
-								LastColumn:  24,
-								Kind:        diags.Issue,
-							},
-						},
-						Lines:    diags.LineRange{First: 1, Last: 3},
-						Severity: checks.Fatal,
-						Anchor:   checks.AnchorAfter,
-					},
-				},
-			}),
-			mock: httpmock.New(func(s *httpmock.Server) {
-				s.ExpectGet(apiUser).ReturnJSON(gitlab.User{ID: 123})
-				s.ExpectGet(apiOpenMergeRequests).ReturnJSON([]gitlab.BasicMergeRequest{
-					{IID: 1},
-				})
-				s.ExpectGet(apiVersions(1)).ReturnJSON([]gitlab.MergeRequestDiffVersion{
-					{ID: 2, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
-					{ID: 1, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
-				})
-				s.ExpectGet(apiDiffs(1)).ReturnJSON([]gitlab.MergeRequestDiff{
-					{
-						Diff:        "",
-						NewPath:     mockPath,
-						OldPath:     "foo.old",
-						AMode:       "100644",
-						BMode:       "100644",
-						RenamedFile: true,
-					},
-					{
-						Diff:    "",
-						NewPath: "foo.txt",
-						OldPath: "foo.txt",
-					},
-				})
-				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{})
-				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
-					Body: discBodyWithDiag("a", "foo error1", "foo details", "```yaml\n2 | - record: target is down\n3 |   expr: up == 0\n      ^^ \n```", "Diagnostic message"),
-					Position: new(gitlab.PositionOptions{
-						BaseSHA:      new("base"),
-						StartSHA:     new("start"),
-						HeadSHA:      new("head"),
-						OldPath:      new("foo.old"),
-						NewPath:      new(mockPath),
-						PositionType: new("text"),
-						NewLine:      new(int64(3)),
-						// Old file is gone so we don't have OldLine here at all
+						NewLine:      new(int64(2)),
 					}),
 				}).ReturnJSON(gitlab.Response{})
 			}),
@@ -1072,14 +914,17 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: mockPath,
 						Name:          mockPath,
 					},
-					ModifiedLines: []int{2, 3},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Lines: git.LineMap{
+						1: git.LineMeta{Old: 1},
+						2: git.LineMeta{Old: 2, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter:    "a",
 						Summary:     "foo error1",
 						Details:     "foo details",
 						Diagnostics: []diags.Diagnostic{},
-						Lines:       diags.LineRange{First: 1, Last: 3},
+						Lines:       diags.LineRange{First: 1, Last: 2},
 						Severity:    checks.Fatal,
 						Anchor:      checks.AnchorBefore,
 					},
@@ -1094,13 +939,6 @@ Below is the list of checks that were disabled for each Prometheus server define
 					{ID: 2, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
 					{ID: 1, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
 				})
-				s.ExpectGet(apiDiffs(1)).ReturnJSON([]gitlab.MergeRequestDiff{
-					{
-						Diff:    "",
-						NewPath: mockPath,
-						OldPath: mockPath,
-					},
-				})
 				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{})
 				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
 					Body: discBody("a", "foo error1", "foo details"),
@@ -1111,7 +949,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 						OldPath:      new(mockPath),
 						NewPath:      new(mockPath),
 						PositionType: new("text"),
-						OldLine:      new(int64(3)),
+						OldLine:      new(int64(2)),
 					}),
 				}).ReturnJSON(gitlab.Response{})
 			}),
@@ -1129,14 +967,17 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: mockPath,
 						Name:          mockPath,
 					},
-					ModifiedLines: []int{4, 5},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Lines: git.LineMap{
+						1: git.LineMeta{Old: 1},
+						2: git.LineMeta{Old: 2},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter:    "a",
 						Summary:     "foo error1",
 						Details:     "foo details",
 						Diagnostics: []diags.Diagnostic{},
-						Lines:       diags.LineRange{First: 1, Last: 3},
+						Lines:       diags.LineRange{First: 1, Last: 2},
 						Severity:    checks.Fatal,
 						Anchor:      checks.AnchorAfter,
 					},
@@ -1151,13 +992,6 @@ Below is the list of checks that were disabled for each Prometheus server define
 					{ID: 2, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
 					{ID: 1, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
 				})
-				s.ExpectGet(apiDiffs(1)).ReturnJSON([]gitlab.MergeRequestDiff{
-					{
-						Diff:    "",
-						NewPath: mockPath,
-						OldPath: mockPath,
-					},
-				})
 				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{})
 				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
 					Body: discBody("a", "foo error1", "foo details"),
@@ -1168,8 +1002,8 @@ Below is the list of checks that were disabled for each Prometheus server define
 						OldPath:      new(mockPath),
 						NewPath:      new(mockPath),
 						PositionType: new("text"),
-						OldLine:      new(int64(3)),
-						NewLine:      new(int64(3)),
+						OldLine:      new(int64(2)),
+						NewLine:      new(int64(2)),
 					}),
 				}).ReturnJSON(gitlab.Response{})
 			}),
@@ -1204,6 +1038,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 
 func TestGitLabReporterCommentLine(t *testing.T) {
 	type testCaseT struct {
+		lines           git.LineMap
 		description     string
 		problemLine     int
 		expectedNewLine int
@@ -1220,79 +1055,40 @@ func TestGitLabReporterCommentLine(t *testing.T) {
   expr: sum(errors) by (job)
 `))
 
-	multipleDiffs := `@@ -15,6 +15,7 @@ spec:
-      annotations:
-	    foo: bar
-        description: some description
-+       runbook_url: https://runbook.url
-        summary: summary text
-      expr: up == 0
-      for: 10m
-@@ -141,6 +142,5 @@ spec:
-        description: some description
-        summary: some summary
-      expr: sum(errors) by (job)
--     for: 15m
-      labels:
-        severity: warning`
-	multipleDiffs = strings.ReplaceAll(multipleDiffs, "\n", "\\n")
-	multipleDiffs = strings.ReplaceAll(multipleDiffs, "\t", "\\t")
-
 	errorHandler := func(err error) error { return err }
 
 	testCases := []testCaseT{
 		{
-			description:     "comment on new line",
-			problemLine:     18,
-			expectedNewLine: 18,
+			// Comment on a modified/added line, should set NewLine only.
+			description: "comment on modified line",
+			problemLine: 4,
+			lines: git.LineMap{
+				3: git.LineMeta{Old: 3},
+				4: git.LineMeta{Old: 4, Modified: true},
+			},
+			expectedNewLine: 4,
 		},
 		{
-			description:     "comment on removed line",
-			problemLine:     145,
-			expectedOldLine: 145,
+			// Comment on a removed line (AnchorBefore), should set OldLine only.
+			description: "comment on removed line",
+			problemLine: 3,
+			lines: git.LineMap{
+				3: git.LineMeta{Old: 3, Modified: true},
+				4: git.LineMeta{Old: 4},
+			},
+			expectedOldLine: 3,
 			anchor:          checks.AnchorBefore,
 		},
 		{
-			description:     "unmodified line before existing line in the diff",
-			problemLine:     10,
-			expectedNewLine: 10,
-			expectedOldLine: 10,
-		},
-		{
-			description:     "unmodified line that exists in the diff",
-			problemLine:     16,
-			expectedNewLine: 16,
-			expectedOldLine: 16,
-		},
-		{
-			description:     "unmodified line after added line and exists in the diff",
-			problemLine:     19,
-			expectedNewLine: 19,
-			expectedOldLine: 18,
-		},
-		{
-			description:     "unmodified line after added line and not exists in the diff",
-			problemLine:     23,
-			expectedNewLine: 23,
-			expectedOldLine: 22,
-		},
-		{
-			description:     "unmodified line before removed line and exists in the diff",
-			problemLine:     143,
-			expectedNewLine: 143,
-			expectedOldLine: 142,
-		},
-		{
-			description:     "unmodified line after removed line and exists in the diff",
-			problemLine:     145,
-			expectedNewLine: 145,
-			expectedOldLine: 145,
-		},
-		{
-			description:     "unmodified line after removed line and not exists in the diff",
-			problemLine:     148,
-			expectedNewLine: 148,
-			expectedOldLine: 148,
+			// Comment on an unmodified line, should set both NewLine and OldLine.
+			description: "comment on unmodified line",
+			problemLine: 3,
+			lines: git.LineMap{
+				3: git.LineMeta{Old: 3},
+				4: git.LineMeta{Old: 4},
+			},
+			expectedNewLine: 3,
+			expectedOldLine: 3,
 		},
 	}
 
@@ -1301,7 +1097,7 @@ func TestGitLabReporterCommentLine(t *testing.T) {
 			slog.SetDefault(slogt.New(t))
 
 			srv := httptest.NewServer(getHTTPHandlerForCommentingLines(
-				tc.expectedNewLine, tc.expectedOldLine, multipleDiffs, t))
+				tc.expectedNewLine, tc.expectedOldLine, t))
 			t.Cleanup(srv.Close)
 
 			r, err := reporter.NewGitLabReporter(
@@ -1320,8 +1116,8 @@ func TestGitLabReporterCommentLine(t *testing.T) {
 							Name:          "foo.txt",
 							SymlinkTarget: "foo.txt",
 						},
-						ModifiedLines: []int{2},
-						Rule:          mockFile.Groups[0].Rules[1],
+						Lines: tc.lines,
+						Rule:  mockFile.Groups[0].Rules[1],
 						Problem: checks.Problem{
 							Lines: diags.LineRange{
 								First: tc.problemLine,
@@ -1342,7 +1138,7 @@ func TestGitLabReporterCommentLine(t *testing.T) {
 	}
 }
 
-func getHTTPHandlerForCommentingLines(expectedNewLine, expectedOldLine int, diff string, t *testing.T) http.HandlerFunc {
+func getHTTPHandlerForCommentingLines(expectedNewLine, expectedOldLine int, t *testing.T) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		switch r.URL.Path {
@@ -1353,10 +1149,6 @@ func getHTTPHandlerForCommentingLines(expectedNewLine, expectedOldLine int, diff
 		case "/api/v4/projects/123/merge_requests":
 			if r.Method == http.MethodGet {
 				_, _ = w.Write([]byte(`[{"iid":1}]`))
-			}
-		case "/api/v4/projects/123/merge_requests/1/diffs":
-			if r.Method == http.MethodGet {
-				_, _ = w.Write([]byte(`[{"diff":"` + diff + `","new_path":"foo.txt","old_path":"foo.txt"}]`))
 			}
 		case "/api/v4/projects/123/merge_requests/1/versions":
 			if r.Method == http.MethodGet {
