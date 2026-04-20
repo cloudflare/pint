@@ -13,11 +13,11 @@ level=DEBUG msg="Starting query workers" name=disabled uri=http://127.0.0.1:123 
 level=INFO msg="Checking Prometheus rules" entries=3 workers=10 online=true
 level=DEBUG msg="Generated all Prometheus servers" count=1
 level=DEBUG msg="Found alerting rule" path=rules/0001.yml alert=first lines=1-3 state=noop
-level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/impossible","group/interval"] path=rules/0001.yml rule=first
+level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","rule/dependency","promql/impossible","group/interval"] path=rules/0001.yml rule=first
 level=DEBUG msg="Found recording rule" path=rules/0001.yml record=second lines=5-6 state=noop
-level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/impossible","group/interval","promql/aggregate(job:true)"] path=rules/0001.yml rule=second
+level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","rule/dependency","promql/impossible","group/interval","promql/aggregate(job:true)"] path=rules/0001.yml rule=second
 level=DEBUG msg="Found alerting rule" path=rules/0001.yml alert=third lines=8-9 state=noop
-level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/impossible","group/interval"] path=rules/0001.yml rule=third
+level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","rule/dependency","promql/impossible","group/interval"] path=rules/0001.yml rule=third
 Warning: required label is being removed via aggregation (promql/aggregate)
   ---> rules/0001.yml:6 -> `second`
 6 |   expr: sum(bar)

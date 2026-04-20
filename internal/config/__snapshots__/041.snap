@@ -90,6 +90,7 @@ checks:
     - alerts/comparison
     - promql/fragile
     - promql/regexp
+    - rule/dependency
     - promql/impossible
     - group/interval
     - promql/features(prom1)

@@ -6,6 +6,9 @@
 
 - Added [promql/features](checks/promql/features.md) check.
 - Added [group/interval](checks/group/interval.md) check.
+- [rule/dependency](checks/rule/dependency.md) check will now warn when a rule
+  uses a metric produced by a recording rule from a different group, which can
+  introduce evaluation lag.
 
 ### Fixed
 

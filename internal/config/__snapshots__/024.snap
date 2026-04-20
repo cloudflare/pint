@@ -81,6 +81,7 @@ checks:
     - alerts/template
     - promql/fragile
     - promql/regexp
+    - rule/dependency
     - promql/impossible
     - group/interval
     - rule/label(priority=~^(1|2|3|4|5)$:true)
