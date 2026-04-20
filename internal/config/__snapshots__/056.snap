@@ -90,6 +90,7 @@ checks:
     - alerts/template
     - promql/fragile
     - promql/regexp
+    - rule/dependency
     - promql/impossible
     - group/interval
     - promql/aggregate(instance:false)

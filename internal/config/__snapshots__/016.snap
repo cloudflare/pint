@@ -150,6 +150,7 @@ checks:
     - alerts/for
     - alerts/comparison
     - alerts/template
+    - rule/dependency
     - group/interval
     - alerts/absent(prom1)
     - promql/features(prom1)

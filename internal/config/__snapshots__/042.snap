@@ -115,6 +115,7 @@ checks:
     - alerts/for
     - alerts/comparison
     - promql/fragile
+    - rule/dependency
     - promql/impossible
     - group/interval
     - labels/conflict(prom1)

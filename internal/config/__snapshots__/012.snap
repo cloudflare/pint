@@ -88,6 +88,7 @@ checks:
     - alerts/template
     - promql/fragile
     - promql/regexp
+    - rule/dependency
     - group/interval
     - promql/aggregate(job:true)
     - promql/aggregate(rack:false)

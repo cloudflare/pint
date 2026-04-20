@@ -218,7 +218,7 @@ body: |+
   | Number of rules parsed | 3 |
   | Number of rules checked | 3 |
   | Number of problems found | 3 |
-  | Number of offline checks | 17 |
+  | Number of offline checks | 19 |
   | Number of online checks | 0 |
   | Checks duration | 0 |
 

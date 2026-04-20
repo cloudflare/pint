@@ -151,7 +151,7 @@ body: |+
   | Number of rules parsed | 4 |
   | Number of rules checked | 4 |
   | Number of problems found | 2 |
-  | Number of offline checks | 32 |
+  | Number of offline checks | 36 |
   | Number of online checks | 0 |
   | Checks duration | 0 |
 

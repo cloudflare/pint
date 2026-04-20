@@ -48,6 +48,7 @@ checks:
     - alerts/template
     - promql/fragile
     - promql/regexp
+    - rule/dependency
     - promql/impossible
     - group/interval
     - promql/rate(prom1)

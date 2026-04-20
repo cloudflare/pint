@@ -103,7 +103,7 @@ data:
   - value: 1
     title: Number of problems found
     type: NUMBER
-  - value: 8
+  - value: 9
     title: Number of offline checks
     type: NUMBER
   - value: 0
