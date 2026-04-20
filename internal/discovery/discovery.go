@@ -12,6 +12,7 @@ import (
 
 	"github.com/cloudflare/pint/internal/comments"
 	"github.com/cloudflare/pint/internal/diags"
+	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -65,6 +66,7 @@ const (
 )
 
 type Path struct {
+	OldName       string // Previous file path before rename, empty if not renamed.
 	Name          string // File path, it can be symlink.
 	SymlinkTarget string // Symlink target, or the same as name if not a symlink.
 }
@@ -82,7 +84,7 @@ type Entry struct {
 	Group          *parser.Group `json:"-"`
 	Path           Path
 	Owner          string
-	ModifiedLines  []int
+	Lines          git.LineMap
 	DisabledChecks []string
 	Rule           parser.Rule
 	State          ChangeType
@@ -111,13 +113,13 @@ func (e *Entry) Labels() (ym parser.YamlMap) {
 	return ym
 }
 
+// readRules parses a file and returns entries for each rule found.
 func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, allowedOwners []*regexp.Regexp) (entries []*Entry) {
 	file := p.Parse(r)
 
-	contentLines := diags.LineRange{
-		First: min(file.TotalLines, 1),
-		Last:  file.TotalLines,
-	}
+	contentLines := git.NewLineMapFromRange(
+		min(file.TotalLines, 1), file.TotalLines,
+	)
 
 	var badOwners []comments.Comment
 	var fileOwner string
@@ -154,12 +156,14 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 		case comments.InvalidComment:
 			entries = append(entries, &Entry{
 				Path: Path{
+					OldName:       "", // Empty because readRules has no rename context.
 					Name:          sourcePath,
 					SymlinkTarget: reportedPath,
 				},
-				PathError:     comment.Value.(comments.Invalid).Err,
-				Owner:         fileOwner,
-				ModifiedLines: contentLines.Expand(),
+				PathError: comment.Value.(comments.Invalid).Err,
+				Owner:     fileOwner,
+				// No git history here, mark all lines as modified.
+				Lines: contentLines,
 			})
 		}
 	}
@@ -167,14 +171,16 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 	for _, d := range file.Diagnostics {
 		entries = append(entries, &Entry{
 			Path: Path{
+				OldName:       "", // Empty because readRules has no rename context.
 				Name:          sourcePath,
 				SymlinkTarget: reportedPath,
 			},
 			PathError: FileIgnoreError{
 				Diagnostic: d,
 			},
-			Owner:         fileOwner,
-			ModifiedLines: contentLines.Expand(),
+			Owner: fileOwner,
+			// No git history here, mark all lines as modified.
+			Lines: contentLines,
 		})
 		return entries
 	}
@@ -188,12 +194,14 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 		)
 		entries = append(entries, &Entry{
 			Path: Path{
+				OldName:       "", // Empty because readRules has no rename context.
 				Name:          sourcePath,
 				SymlinkTarget: reportedPath,
 			},
-			PathError:     file.Error,
-			Owner:         fileOwner,
-			ModifiedLines: contentLines.Expand(),
+			PathError: file.Error,
+			Owner:     fileOwner,
+			// No git history here, mark all lines as modified.
+			Lines: contentLines,
 		})
 		return entries
 	}
@@ -210,10 +218,11 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 				Path: Path{
 					Name:          sourcePath,
 					SymlinkTarget: reportedPath,
+					OldName:       "", // Empty because readRules has no rename context.
 				},
-				PathError:     group.Error,
-				Owner:         fileOwner,
-				ModifiedLines: []int{group.Error.Line},
+				PathError: group.Error,
+				Owner:     fileOwner,
+				Lines:     git.NewLineMapFromRange(group.Error.Line, group.Error.Line),
 			})
 		}
 		for _, rule := range group.Rules {
@@ -225,11 +234,12 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 				Path: Path{
 					Name:          sourcePath,
 					SymlinkTarget: reportedPath,
+					OldName:       "", // Empty because readRules has no rename context.
 				},
 				File:           &file,
 				Group:          &group,
 				Rule:           rule,
-				ModifiedLines:  rule.Lines.Expand(),
+				Lines:          git.NewLineMapFromRange(rule.Lines.First, rule.Lines.Last),
 				Owner:          ruleOwner,
 				DisabledChecks: disabledChecks,
 			})
@@ -243,6 +253,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 				Path: Path{
 					Name:          sourcePath,
 					SymlinkTarget: reportedPath,
+					OldName:       "", // Empty because readRules has no rename context.
 				},
 				PathError: comments.OwnerError{
 					Diagnostic: diags.Diagnostic{
@@ -259,7 +270,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 						Kind:        diags.Issue,
 					},
 				},
-				ModifiedLines: contentLines.Expand(),
+				Lines: contentLines,
 			})
 		}
 	}

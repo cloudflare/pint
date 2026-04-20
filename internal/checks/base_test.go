@@ -30,6 +30,7 @@ import (
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
@@ -294,10 +295,10 @@ func parseContent(content string, opts parser.Options) (entries []*discovery.Ent
 					Name:          "fake.yml",
 					SymlinkTarget: "fake.yml",
 				},
-				ModifiedLines: rule.Lines.Expand(),
-				Rule:          rule,
-				Group:         &group,
-				File:          &file,
+				Lines: git.NewLineMapFromRange(rule.Lines.First, rule.Lines.Last),
+				Rule:  rule,
+				Group: &group,
+				File:  &file,
 			})
 		}
 	}

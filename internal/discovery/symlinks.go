@@ -72,10 +72,11 @@ func addSymlinkedEntries(entries []*Entry) ([]*Entry, error) {
 				nentries = append(nentries, &Entry{
 					State: entry.State,
 					Path: Path{
+						OldName:       "", // No rename context available here.
 						Name:          sl.from,
 						SymlinkTarget: sl.to,
 					},
-					ModifiedLines:  entry.ModifiedLines,
+					Lines:          entry.Lines,
 					Rule:           entry.Rule,
 					Owner:          entry.Owner,
 					DisabledChecks: entry.DisabledChecks,

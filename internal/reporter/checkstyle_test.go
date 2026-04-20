@@ -13,6 +13,7 @@ import (
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/reporter"
 )
@@ -53,12 +54,15 @@ func TestCheckstyleReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4, 5},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Lines: git.LineMap{
+						1: git.LineMeta{Old: 1},
+						2: git.LineMeta{Old: 2, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
-							First: 5,
-							Last:  6,
+							First: 1,
+							Last:  2,
 						},
 						Reporter: "mock",
 						Summary:  "mock text",
@@ -70,7 +74,7 @@ func TestCheckstyleReporter(t *testing.T) {
 			output: `<?xml version="1.0" encoding="UTF-8"?>
 <checkstyle version="4.3">
   <file name="foo.txt">
-    <error line="5" severity="info" message="mock text&#xA;mock details" source="mock"></error>
+    <error line="1" severity="info" message="mock text&#xA;mock details" source="mock"></error>
   </file>
 </checkstyle>
 `,
@@ -83,12 +87,15 @@ func TestCheckstyleReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4, 5},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Lines: git.LineMap{
+						1: git.LineMeta{Old: 1},
+						2: git.LineMeta{Old: 2, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
-							First: 5,
-							Last:  6,
+							First: 1,
+							Last:  2,
 						},
 						Reporter: "mock",
 						Summary:  "mock text",
@@ -99,7 +106,7 @@ func TestCheckstyleReporter(t *testing.T) {
 			output: `<?xml version="1.0" encoding="UTF-8"?>
 <checkstyle version="4.3">
   <file name="foo.txt">
-    <error line="5" severity="error" message="mock text" source="mock"></error>
+    <error line="1" severity="error" message="mock text" source="mock"></error>
   </file>
 </checkstyle>
 `,
@@ -112,12 +119,15 @@ func TestCheckstyleReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4, 5},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Lines: git.LineMap{
+						1: git.LineMeta{Old: 1},
+						2: git.LineMeta{Old: 2, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
-							First: 5,
-							Last:  6,
+							First: 1,
+							Last:  2,
 						},
 						Reporter: "mock",
 						Summary: `mock text
@@ -130,7 +140,7 @@ func TestCheckstyleReporter(t *testing.T) {
 			output: `<?xml version="1.0" encoding="UTF-8"?>
 <checkstyle version="4.3">
   <file name="foo.txt">
-    <error line="5" severity="error" message="mock text&#xA;&#x9;&#x9;with [new lines] and pipe| chars that are &#39;quoted&#39;&#xA;&#x9;&#x9;" source="mock"></error>
+    <error line="1" severity="error" message="mock text&#xA;&#x9;&#x9;with [new lines] and pipe| chars that are &#39;quoted&#39;&#xA;&#x9;&#x9;" source="mock"></error>
   </file>
 </checkstyle>
 `,
@@ -143,8 +153,11 @@ func TestCheckstyleReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{1},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Lines: git.LineMap{
+						1: git.LineMeta{Old: 1, Modified: true},
+						2: git.LineMeta{Old: 2},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines:    diags.LineRange{First: 1, Last: 1},
 						Reporter: "mock",
@@ -157,8 +170,11 @@ func TestCheckstyleReporter(t *testing.T) {
 						SymlinkTarget: "bar.txt",
 						Name:          "bar.txt",
 					},
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Lines: git.LineMap{
+						1: git.LineMeta{Old: 1},
+						2: git.LineMeta{Old: 2, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines:    diags.LineRange{First: 2, Last: 2},
 						Reporter: "mock",
@@ -186,8 +202,11 @@ func TestCheckstyleReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{1, 5},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Lines: git.LineMap{
+						1: git.LineMeta{Old: 1, Modified: true},
+						2: git.LineMeta{Old: 2},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines:    diags.LineRange{First: 1, Last: 1},
 						Reporter: "mock1",
@@ -200,10 +219,13 @@ func TestCheckstyleReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{1, 5},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Lines: git.LineMap{
+						1: git.LineMeta{Old: 1, Modified: true},
+						2: git.LineMeta{Old: 2},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
-						Lines:    diags.LineRange{First: 5, Last: 5},
+						Lines:    diags.LineRange{First: 2, Last: 2},
 						Reporter: "mock2",
 						Summary:  "second problem",
 						Details:  "with details",
@@ -215,7 +237,7 @@ func TestCheckstyleReporter(t *testing.T) {
 <checkstyle version="4.3">
   <file name="foo.txt">
     <error line="1" severity="info" message="first problem" source="mock1"></error>
-    <error line="5" severity="error" message="second problem&#xA;with details" source="mock2"></error>
+    <error line="2" severity="error" message="second problem&#xA;with details" source="mock2"></error>
   </file>
 </checkstyle>
 `,

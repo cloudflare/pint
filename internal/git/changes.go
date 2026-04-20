@@ -37,10 +37,51 @@ type TypeDiff struct {
 	After  PathType
 }
 
+// LineMeta holds metadata about a single line in the current file version.
+type LineMeta struct {
+	// Old is the line number in the previous version of the file (from git blame).
+	// Zero if this is a newly added line with no previous version.
+	Old int
+	// Modified is true if this line was changed in the current branch.
+	Modified bool
+}
+
+// LineMap maps new line number (key) to its metadata (value).
+// Only modified lines are present in the map.
+type LineMap map[int]LineMeta
+
+// Keys returns sorted line numbers from the map.
+func (lm LineMap) Keys() []int {
+	keys := make([]int, 0, len(lm))
+	for k := range lm {
+		keys = append(keys, k)
+	}
+	slices.Sort(keys)
+	return keys
+}
+
+// NewLineMap creates a LineMap from a list of line numbers, all marked as modified.
+func NewLineMap(lines []int) LineMap {
+	m := make(LineMap, len(lines))
+	for _, l := range lines {
+		m[l] = LineMeta{Old: l, Modified: true}
+	}
+	return m
+}
+
+// NewLineMapFromRange creates a LineMap for all lines in [first, last], all marked as modified.
+func NewLineMapFromRange(first, last int) LineMap {
+	m := make(LineMap, max(0, last-first+1))
+	for i := first; i <= last; i++ {
+		m[i] = LineMeta{Old: i, Modified: true}
+	}
+	return m
+}
+
 type BodyDiff struct {
-	Before        []byte
-	After         []byte
-	ModifiedLines []int
+	Lines  LineMap
+	Before []byte
+	After  []byte
 }
 
 type Path struct {
@@ -193,41 +234,45 @@ func Changes(cmd CommandRunner, baseBranch string, filter PathFilter) ([]*FileCh
 			slog.String("after.target", change.Path.After.SymlinkTarget),
 			slog.Any("after.type", change.Path.After.Type),
 			slog.String("after.body", string(change.Body.After)),
-			slog.Any("modifiedLines", change.Body.ModifiedLines),
+			slog.Any("lines", change.Body.Lines),
 		)
 
 		switch {
 		case change.Path.Before.Type != Missing && change.Path.Before.Type != Symlink && change.Path.After.Type == Symlink:
 			slog.LogAttrs(context.Background(), slog.LevelDebug, "Path was turned into a symlink", slog.String("path", change.Path.After.Name))
-			change.Body.ModifiedLines = CountLines(change.Body.After)
+			change.Body.Lines = CountLines(change.Body.After)
 		case change.Path.Before.Type != Missing && change.Path.After.Type != Missing && change.Path.After.Type != Symlink:
-			change.Body.ModifiedLines, err = getModifiedLines(cmd, change.Commits, change.Path.After.EffectivePath(), lastCommit, change.Body.Before, change.Body.After)
+			change.Body.Lines, err = getModifiedLines(
+				cmd, change.Commits,
+				change.Path.After.EffectivePath(), lastCommit,
+				change.Body.Before, change.Body.After,
+			)
 			if err != nil {
 				return nil, fmt.Errorf("failed to run git blame for %s: %w", change.Path.After.EffectivePath(), err)
 			}
-			if len(change.Body.ModifiedLines) == 0 && change.Path.Before.EffectivePath() != change.Path.After.EffectivePath() {
+			if len(change.Body.Lines) == 0 && change.Path.Before.EffectivePath() != change.Path.After.EffectivePath() {
 				// File was moved or renamed. Mark it all as modified.
-				change.Body.ModifiedLines = CountLines(change.Body.After)
+				change.Body.Lines = CountLines(change.Body.After)
 				slog.LogAttrs(context.Background(), slog.LevelDebug, "File was moved or renamed", slog.String("path", change.Path.After.Name))
 			} else {
-				slog.LogAttrs(context.Background(), slog.LevelDebug, "File was modified", slog.String("path", change.Path.After.Name), slog.Any("lines", change.Body.ModifiedLines))
+				slog.LogAttrs(context.Background(), slog.LevelDebug, "File was modified", slog.String("path", change.Path.After.Name), slog.Any("lines", change.Body.Lines))
 			}
 		case change.Path.Before.Type == Symlink && change.Path.After.Type == Symlink:
 			slog.LogAttrs(context.Background(), slog.LevelDebug, "Symlink was modified", slog.String("path", change.Path.After.Name))
 			// symlink was modified, every source line is modification
-			change.Body.ModifiedLines = CountLines(change.Body.After)
+			change.Body.Lines = CountLines(change.Body.After)
 		case change.Path.Before.Type == Missing && change.Path.After.Type != Missing:
 			slog.LogAttrs(context.Background(), slog.LevelDebug, "File was added", slog.String("path", change.Path.After.Name))
 			// old file body is empty, meaning that every line was modified
-			change.Body.ModifiedLines = CountLines(change.Body.After)
+			change.Body.Lines = CountLines(change.Body.After)
 		case change.Path.Before.Type != Missing && change.Path.After.Type == Missing:
 			slog.LogAttrs(context.Background(), slog.LevelDebug, "File was removed", slog.String("path", change.Path.After.Name))
 			// new file body is empty, meaning that every line was modified
-			change.Body.ModifiedLines = CountLines(change.Body.Before)
+			change.Body.Lines = CountLines(change.Body.Before)
 		case change.Path.Before.Type == Missing && change.Path.After.Type == Missing:
 			slog.LogAttrs(context.Background(), slog.LevelDebug, "File was added and removed", slog.String("path", change.Path.After.Name))
 			// file was added and then removed
-			change.Body.ModifiedLines = []int{}
+			change.Body.Lines = LineMap{}
 		default:
 			slog.LogAttrs(context.Background(), slog.LevelWarn, "Unhandled change", slog.String("change", fmt.Sprintf("+%v", change)))
 		}
@@ -258,7 +303,11 @@ func getChangeByPath(changes []*FileChange, fpath string) *FileChange {
 	return nil
 }
 
-func getModifiedLines(cmd CommandRunner, commits []string, fpath, atCommit string, bodyBefore, bodyAfter []byte) ([]int, error) {
+func getModifiedLines(
+	cmd CommandRunner, commits []string,
+	fpath, atCommit string,
+	bodyBefore, bodyAfter []byte,
+) (LineMap, error) {
 	slog.LogAttrs(context.Background(), slog.LevelDebug, "Getting list of modified lines",
 		slog.Any("commits", commits),
 		slog.String("path", fpath),
@@ -272,7 +321,7 @@ func getModifiedLines(cmd CommandRunner, commits []string, fpath, atCommit strin
 	linesAfter := bytes.Split(bodyAfter, []byte("\n"))
 	slog.LogAttrs(context.Background(), slog.LevelDebug, "Number of lines", slog.Int("before", len(linesBefore)), slog.Int("after", len(linesAfter)))
 
-	modLines := make([]int, 0, len(lines))
+	result := make(LineMap, len(lines))
 	for _, line := range lines {
 		slog.LogAttrs(context.Background(), slog.LevelDebug, "Checking line", slog.String("commit", line.Commit), slog.Int("prev", line.PrevLine), slog.Int("line", line.Line))
 		if !slices.Contains(commits, line.Commit) {
@@ -286,14 +335,14 @@ func getModifiedLines(cmd CommandRunner, commits []string, fpath, atCommit strin
 			}
 		}
 
-		modLines = append(modLines, line.Line)
+		result[line.Line] = LineMeta{Old: line.PrevLine, Modified: true}
 	}
 	slog.LogAttrs(context.Background(), slog.LevelDebug, "List of modified lines",
 		slog.Any("commits", commits),
 		slog.String("path", fpath),
-		slog.Any("lines", modLines),
+		slog.Any("lines", result),
 	)
-	return modLines, nil
+	return result, nil
 }
 
 func getTypeForPath(cmd CommandRunner, commit, fpath string) PathType {
@@ -367,14 +416,15 @@ func getContentAtCommit(cmd CommandRunner, commit, fpath string) []byte {
 	return body
 }
 
-func CountLines(body []byte) (lines []int) {
-	var line int
-	s := bufio.NewScanner(bytes.NewReader(body))
-	for s.Scan() {
-		line++
-		lines = append(lines, line)
+func CountLines(body []byte) LineMap {
+	if len(body) == 0 {
+		return LineMap{}
 	}
-	return lines
+	n := bytes.Count(body, []byte("\n"))
+	if body[len(body)-1] != '\n' {
+		n++
+	}
+	return NewLineMapFromRange(1, n)
 }
 
 func isDirectoryPath(path string) (bool, error) {

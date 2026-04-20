@@ -108,9 +108,12 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[0],
-					Problem:       checks.Problem{},
+					Lines: git.LineMap{
+						1: git.LineMeta{Old: 1},
+						2: git.LineMeta{Old: 2, Modified: true},
+					},
+					Rule:    mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{},
 				},
 			},
 			mock: httpmock.New(func(s *httpmock.Server) {
@@ -137,9 +140,12 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[0],
-					Problem:       checks.Problem{},
+					Lines: git.LineMap{
+						1: git.LineMeta{Old: 1},
+						2: git.LineMeta{Old: 2, Modified: true},
+					},
+					Rule:    mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{},
 				},
 			},
 			mock: httpmock.New(func(s *httpmock.Server) {
@@ -169,9 +175,12 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[0],
-					Problem:       checks.Problem{},
+					Lines: git.LineMap{
+						1: git.LineMeta{Old: 1},
+						2: git.LineMeta{Old: 2, Modified: true},
+					},
+					Rule:    mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{},
 				},
 			},
 			mock: httpmock.New(func(s *httpmock.Server) {
@@ -245,12 +254,15 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Lines: git.LineMap{
+						3: git.LineMeta{Old: 3},
+						4: git.LineMeta{Old: 4, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
-							First: 1,
-							Last:  1,
+							First: 3,
+							Last:  3,
 						},
 						Reporter: "mock",
 						Summary:  "this should be ignored, line is not part of the diff",
@@ -262,12 +274,12 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "bar.txt",
 						Name:          "bar.txt",
 					},
-					ModifiedLines: []int{},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Lines: git.LineMap{},
+					Rule:  mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
-							First: 1,
-							Last:  1,
+							First: 3,
+							Last:  3,
 						},
 						Reporter: "mock",
 						Summary:  "this should be ignored, file is not part of the diff",
@@ -279,12 +291,15 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Lines: git.LineMap{
+						3: git.LineMeta{Old: 3},
+						4: git.LineMeta{Old: 4, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
-							First: 2,
-							Last:  2,
+							First: 4,
+							Last:  4,
 						},
 						Reporter: "mock",
 						Summary:  "bad name",
@@ -296,8 +311,11 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Lines: git.LineMap{
+						1: git.LineMeta{Old: 1},
+						2: git.LineMeta{Old: 2, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -313,8 +331,11 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Lines: git.LineMap{
+						3: git.LineMeta{Old: 3},
+						4: git.LineMeta{Old: 4, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 4,
@@ -372,45 +393,6 @@ func TestBitBucketReporter(t *testing.T) {
 			},
 		},
 		{
-			description: "pull request changes get fails",
-			gitCmd:      fakeGit,
-			mock: httpmock.New(func(s *httpmock.Server) {
-				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
-					ReturnJSON(reporter.BitBucketPullRequests{
-						IsLastPage: true,
-						Values: []reporter.BitBucketPullRequest{
-							{
-								ID:   102,
-								Open: true,
-								FromRef: reporter.BitBucketRef{
-									ID:     "refs/heads/fake-branch",
-									Commit: "fake-commit-id",
-								},
-								ToRef: reporter.BitBucketRef{
-									ID:     "refs/heads/main",
-									Commit: "main-commit-id",
-								},
-							},
-						},
-					}).
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes?start=0").
-					ReturnCode(http.StatusInternalServerError).
-					Return("Internal error").
-					Once()
-			}),
-			errorHandler: func(err error) error {
-				if err.Error() != "failed to get pull request changes from BitBucket: GET request failed" {
-					return fmt.Errorf("Unpexpected error: %w", err)
-				}
-				return nil
-			},
-		},
-		{
 			description: "pull request comments get fails",
 			gitCmd:      fakeGit,
 			mock: httpmock.New(func(s *httpmock.Server) {
@@ -435,12 +417,6 @@ func TestBitBucketReporter(t *testing.T) {
 								},
 							},
 						},
-					}).
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes?start=0").
-					ReturnJSON(reporter.BitBucketPullRequestChanges{
-						IsLastPage: true,
-						Values:     []reporter.BitBucketPullRequestChange{},
 					}).
 					Once()
 				s.ExpectGet("/plugins/servlet/applinks/whoami").
@@ -480,12 +456,15 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Lines: git.LineMap{
+						3: git.LineMeta{Old: 3},
+						4: git.LineMeta{Old: 4, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
-							First: 1,
-							Last:  1,
+							First: 3,
+							Last:  3,
 						},
 						Reporter: "mock",
 						Summary:  "line is not part of the diff",
@@ -497,12 +476,15 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Lines: git.LineMap{
+						3: git.LineMeta{Old: 3},
+						4: git.LineMeta{Old: 4, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
-							First: 2,
-							Last:  2,
+							First: 4,
+							Last:  4,
 						},
 						Reporter: "mock",
 						Summary:  "bad name",
@@ -514,8 +496,11 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Lines: git.LineMap{
+						1: git.LineMeta{Old: 1},
+						2: git.LineMeta{Old: 2, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -531,8 +516,11 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Lines: git.LineMap{
+						3: git.LineMeta{Old: 3},
+						4: git.LineMeta{Old: 4, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 4,
@@ -573,12 +561,15 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{3, 4},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Lines: git.LineMap{
+						3: git.LineMeta{Old: 3, Modified: true},
+						4: git.LineMeta{Old: 4, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
-							First: 1,
-							Last:  1,
+							First: 3,
+							Last:  3,
 						},
 						Reporter: "test/mock",
 						Summary:  "syntax error",
@@ -659,12 +650,15 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Rule:          mockFile.Groups[0].Rules[1],
-					ModifiedLines: []int{2, 4},
+					Rule: mockFile.Groups[0].Rules[1],
+					Lines: git.LineMap{
+						3: git.LineMeta{Old: 3},
+						4: git.LineMeta{Old: 4, Modified: true},
+					},
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
-							First: 1,
-							Last:  1,
+							First: 3,
+							Last:  3,
 						},
 						Reporter: "mock",
 						Summary:  "this line is not part of the diff",
@@ -676,12 +670,15 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Rule:          mockFile.Groups[0].Rules[1],
-					ModifiedLines: []int{2, 4},
+					Rule: mockFile.Groups[0].Rules[1],
+					Lines: git.LineMap{
+						3: git.LineMeta{Old: 3},
+						4: git.LineMeta{Old: 4, Modified: true},
+					},
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
-							First: 2,
-							Last:  2,
+							First: 4,
+							Last:  4,
 						},
 						Reporter: "mock",
 						Summary:  "bad name",
@@ -693,8 +690,11 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Rule:          mockFile.Groups[0].Rules[0],
-					ModifiedLines: []int{2, 4},
+					Rule: mockFile.Groups[0].Rules[0],
+					Lines: git.LineMap{
+						1: git.LineMeta{Old: 1},
+						2: git.LineMeta{Old: 2, Modified: true},
+					},
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -710,8 +710,11 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Rule:          mockFile.Groups[0].Rules[1],
-					ModifiedLines: []int{2, 4},
+					Rule: mockFile.Groups[0].Rules[1],
+					Lines: git.LineMap{
+						3: git.LineMeta{Old: 3},
+						4: git.LineMeta{Old: 4, Modified: true},
+					},
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 4,
@@ -769,9 +772,6 @@ func TestBitBucketReporter(t *testing.T) {
 						},
 					}).
 					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes?start=0").
-					ReturnJSON(reporter.BitBucketPullRequestChanges{IsLastPage: true}).
-					Once()
 				s.ExpectGet("/plugins/servlet/applinks/whoami").
 					Return("pint_user").
 					Once()
@@ -808,76 +808,6 @@ func TestBitBucketReporter(t *testing.T) {
 								ToRef: reporter.BitBucketRef{
 									ID:     "refs/heads/main",
 									Commit: "main-commit-id",
-								},
-							},
-						},
-					}).
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes?start=0").
-					ReturnJSON(reporter.BitBucketPullRequestChanges{
-						IsLastPage: true,
-						Values: []reporter.BitBucketPullRequestChange{
-							{Path: reporter.BitBucketPath{ToString: "index.txt"}},
-							{Path: reporter.BitBucketPath{ToString: "foo.txt"}},
-						},
-					}).
-					Once()
-				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/index.txt?contextLines=10000&since=main-commit-id&whitespace=show&withComments=false").
-					ReturnJSON(reporter.BitBucketFileDiffs{
-						Diffs: []reporter.BitBucketFileDiff{
-							{
-								Hunks: []reporter.BitBucketDiffHunk{
-									{
-										Segments: []reporter.BitBucketDiffSegment{
-											{
-												Type: "ADDED",
-												Lines: []reporter.BitBucketDiffLine{
-													{Source: 1, Destination: 1},
-													{Source: 5, Destination: 5},
-												},
-											},
-											{
-												Type: "CONTEXT",
-												Lines: []reporter.BitBucketDiffLine{
-													{Source: 10, Destination: 6},
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					}).
-					Once()
-				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/foo.txt?contextLines=10000&since=main-commit-id&whitespace=show&withComments=false").
-					ReturnJSON(reporter.BitBucketFileDiffs{
-						Diffs: []reporter.BitBucketFileDiff{
-							{
-								Hunks: []reporter.BitBucketDiffHunk{
-									{
-										Segments: []reporter.BitBucketDiffSegment{
-											{
-												Type: "ADDED",
-												Lines: []reporter.BitBucketDiffLine{
-													{Source: 2, Destination: 2},
-												},
-											},
-										},
-									},
-								},
-							},
-							{
-								Hunks: []reporter.BitBucketDiffHunk{
-									{
-										Segments: []reporter.BitBucketDiffSegment{
-											{
-												Type: "MODIFIED",
-												Lines: []reporter.BitBucketDiffLine{
-													{Source: 3, Destination: 4},
-												},
-											},
-										},
-									},
 								},
 							},
 						},
@@ -1005,12 +935,15 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Lines: git.LineMap{
+						3: git.LineMeta{Old: 3},
+						4: git.LineMeta{Old: 4, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
-							First: 1,
-							Last:  1,
+							First: 3,
+							Last:  3,
 						},
 						Reporter: "mock",
 						Summary:  "this should be ignored, line is not part of the diff",
@@ -1022,12 +955,15 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Lines: git.LineMap{
+						3: git.LineMeta{Old: 3},
+						4: git.LineMeta{Old: 4, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
-							First: 2,
-							Last:  2,
+							First: 4,
+							Last:  4,
 						},
 						Reporter: "mock",
 						Summary:  "bad name",
@@ -1039,8 +975,11 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Lines: git.LineMap{
+						1: git.LineMeta{Old: 1},
+						2: git.LineMeta{Old: 2, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -1057,8 +996,11 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "symlink.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Lines: git.LineMap{
+						3: git.LineMeta{Old: 3},
+						4: git.LineMeta{Old: 4, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 4,
@@ -1099,45 +1041,6 @@ func TestBitBucketReporter(t *testing.T) {
 								ToRef: reporter.BitBucketRef{
 									ID:     "refs/heads/main",
 									Commit: "main-commit-id",
-								},
-							},
-						},
-					}).
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes?start=0").
-					ReturnJSON(reporter.BitBucketPullRequestChanges{
-						IsLastPage: true,
-						Values: []reporter.BitBucketPullRequestChange{
-							{
-								Path: reporter.BitBucketPath{
-									ToString: "index.txt",
-								},
-							},
-						},
-					}).
-					Once()
-				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/index.txt?contextLines=10000&since=main-commit-id&whitespace=show&withComments=false").
-					ReturnJSON(reporter.BitBucketFileDiffs{
-						Diffs: []reporter.BitBucketFileDiff{
-							{
-								Hunks: []reporter.BitBucketDiffHunk{
-									{
-										Segments: []reporter.BitBucketDiffSegment{
-											{
-												Type: "ADDED",
-												Lines: []reporter.BitBucketDiffLine{
-													{Source: 1, Destination: 1},
-													{Source: 5, Destination: 5},
-												},
-											},
-											{
-												Type: "CONTEXT",
-												Lines: []reporter.BitBucketDiffLine{
-													{Source: 10, Destination: 6},
-												},
-											},
-										},
-									},
 								},
 							},
 						},
@@ -1231,45 +1134,6 @@ func TestBitBucketReporter(t *testing.T) {
 						},
 					}).
 					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes?start=0").
-					ReturnJSON(reporter.BitBucketPullRequestChanges{
-						IsLastPage: true,
-						Values: []reporter.BitBucketPullRequestChange{
-							{
-								Path: reporter.BitBucketPath{
-									ToString: "index.txt",
-								},
-							},
-						},
-					}).
-					Once()
-				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/index.txt?contextLines=10000&since=main-commit-id&whitespace=show&withComments=false").
-					ReturnJSON(reporter.BitBucketFileDiffs{
-						Diffs: []reporter.BitBucketFileDiff{
-							{
-								Hunks: []reporter.BitBucketDiffHunk{
-									{
-										Segments: []reporter.BitBucketDiffSegment{
-											{
-												Type: "ADDED",
-												Lines: []reporter.BitBucketDiffLine{
-													{Source: 1, Destination: 1},
-													{Source: 5, Destination: 5},
-												},
-											},
-											{
-												Type: "CONTEXT",
-												Lines: []reporter.BitBucketDiffLine{
-													{Source: 10, Destination: 6},
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					}).
-					Once()
 				s.ExpectGet("/plugins/servlet/applinks/whoami").
 					ReturnCode(http.StatusInternalServerError).
 					Once()
@@ -1290,12 +1154,15 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "index.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Lines: git.LineMap{
+						3: git.LineMeta{Old: 3},
+						4: git.LineMeta{Old: 4, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
-							First: 1,
-							Last:  1,
+							First: 3,
+							Last:  3,
 						},
 						Reporter: "mock",
 						Summary:  "this should be ignored, line is not part of the diff",
@@ -1322,45 +1189,6 @@ func TestBitBucketReporter(t *testing.T) {
 								ToRef: reporter.BitBucketRef{
 									ID:     "refs/heads/main",
 									Commit: "main-commit-id",
-								},
-							},
-						},
-					}).
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes?start=0").
-					ReturnJSON(reporter.BitBucketPullRequestChanges{
-						IsLastPage: true,
-						Values: []reporter.BitBucketPullRequestChange{
-							{
-								Path: reporter.BitBucketPath{
-									ToString: "index.txt",
-								},
-							},
-						},
-					}).
-					Once()
-				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/index.txt?contextLines=10000&since=main-commit-id&whitespace=show&withComments=false").
-					ReturnJSON(reporter.BitBucketFileDiffs{
-						Diffs: []reporter.BitBucketFileDiff{
-							{
-								Hunks: []reporter.BitBucketDiffHunk{
-									{
-										Segments: []reporter.BitBucketDiffSegment{
-											{
-												Type: "ADDED",
-												Lines: []reporter.BitBucketDiffLine{
-													{Source: 1, Destination: 1},
-													{Source: 5, Destination: 5},
-												},
-											},
-											{
-												Type: "CONTEXT",
-												Lines: []reporter.BitBucketDiffLine{
-													{Source: 10, Destination: 6},
-												},
-											},
-										},
-									},
 								},
 							},
 						},
@@ -1451,76 +1279,6 @@ func TestBitBucketReporter(t *testing.T) {
 								ToRef: reporter.BitBucketRef{
 									ID:     "refs/heads/main",
 									Commit: "main-commit-id",
-								},
-							},
-						},
-					}).
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes?start=0").
-					ReturnJSON(reporter.BitBucketPullRequestChanges{
-						IsLastPage: true,
-						Values: []reporter.BitBucketPullRequestChange{
-							{Path: reporter.BitBucketPath{ToString: "index.txt"}},
-							{Path: reporter.BitBucketPath{ToString: "foo.txt"}},
-						},
-					}).
-					Once()
-				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/index.txt?contextLines=10000&since=main-commit-id&whitespace=show&withComments=false").
-					ReturnJSON(reporter.BitBucketFileDiffs{
-						Diffs: []reporter.BitBucketFileDiff{
-							{
-								Hunks: []reporter.BitBucketDiffHunk{
-									{
-										Segments: []reporter.BitBucketDiffSegment{
-											{
-												Type: "ADDED",
-												Lines: []reporter.BitBucketDiffLine{
-													{Source: 1, Destination: 1},
-													{Source: 5, Destination: 5},
-												},
-											},
-											{
-												Type: "CONTEXT",
-												Lines: []reporter.BitBucketDiffLine{
-													{Source: 10, Destination: 6},
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					}).
-					Once()
-				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/foo.txt?contextLines=10000&since=main-commit-id&whitespace=show&withComments=false").
-					ReturnJSON(reporter.BitBucketFileDiffs{
-						Diffs: []reporter.BitBucketFileDiff{
-							{
-								Hunks: []reporter.BitBucketDiffHunk{
-									{
-										Segments: []reporter.BitBucketDiffSegment{
-											{
-												Type: "ADDED",
-												Lines: []reporter.BitBucketDiffLine{
-													{Source: 2, Destination: 2},
-												},
-											},
-										},
-									},
-								},
-							},
-							{
-								Hunks: []reporter.BitBucketDiffHunk{
-									{
-										Segments: []reporter.BitBucketDiffSegment{
-											{
-												Type: "MODIFIED",
-												Lines: []reporter.BitBucketDiffLine{
-													{Source: 3, Destination: 4},
-												},
-											},
-										},
-									},
 								},
 							},
 						},
@@ -1622,12 +1380,15 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Lines: git.LineMap{
+						3: git.LineMeta{Old: 3},
+						4: git.LineMeta{Old: 4, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
-							First: 1,
-							Last:  1,
+							First: 3,
+							Last:  3,
 						},
 						Reporter: "mock",
 						Summary:  "this should be ignored, line is not part of the diff",
@@ -1639,12 +1400,15 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Lines: git.LineMap{
+						3: git.LineMeta{Old: 3},
+						4: git.LineMeta{Old: 4, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
-							First: 1,
-							Last:  1,
+							First: 3,
+							Last:  3,
 						},
 						Reporter: "mock",
 						Summary:  "this should be ignored, line is not part of the diff",
@@ -1656,12 +1420,15 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Lines: git.LineMap{
+						3: git.LineMeta{Old: 3},
+						4: git.LineMeta{Old: 4, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
-							First: 2,
-							Last:  2,
+							First: 4,
+							Last:  4,
 						},
 						Reporter: "mock",
 						Summary:  "bad name",
@@ -1674,12 +1441,15 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Lines: git.LineMap{
+						3: git.LineMeta{Old: 3},
+						4: git.LineMeta{Old: 4, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
-							First: 2,
-							Last:  2,
+							First: 4,
+							Last:  4,
 						},
 						Reporter: "mock",
 						Summary:  "mock text 1",
@@ -1692,12 +1462,15 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "symlink.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Lines: git.LineMap{
+						3: git.LineMeta{Old: 3},
+						4: git.LineMeta{Old: 4, Modified: true},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
-							First: 2,
-							Last:  2,
+							First: 4,
+							Last:  4,
 						},
 						Reporter: "mock",
 						Summary:  "mock text 2",
@@ -1733,12 +1506,12 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Lines: git.LineMap{},
+					Rule:  mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
-							First: 1,
-							Last:  1,
+							First: 3,
+							Last:  3,
 						},
 						Reporter: "mock",
 						Summary:  "line is not part of the diff",
@@ -1763,8 +1536,11 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "index.txt",
 						Name:          diagFile,
 					},
-					ModifiedLines: []int{1},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Lines: git.LineMap{
+						1: git.LineMeta{Old: 1, Modified: true},
+						2: git.LineMeta{Old: 2},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 1,
@@ -1806,38 +1582,6 @@ func TestBitBucketReporter(t *testing.T) {
 								ToRef: reporter.BitBucketRef{
 									ID:     "refs/heads/main",
 									Commit: "main-commit-id",
-								},
-							},
-						},
-					}).
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes?start=0").
-					ReturnJSON(reporter.BitBucketPullRequestChanges{
-						IsLastPage: true,
-						Values: []reporter.BitBucketPullRequestChange{
-							{
-								Path: reporter.BitBucketPath{
-									ToString: "index.txt",
-								},
-							},
-						},
-					}).
-					Once()
-				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/index.txt?contextLines=10000&since=main-commit-id&whitespace=show&withComments=false").
-					ReturnJSON(reporter.BitBucketFileDiffs{
-						Diffs: []reporter.BitBucketFileDiff{
-							{
-								Hunks: []reporter.BitBucketDiffHunk{
-									{
-										Segments: []reporter.BitBucketDiffSegment{
-											{
-												Type: "ADDED",
-												Lines: []reporter.BitBucketDiffLine{
-													{Source: 1, Destination: 1},
-												},
-											},
-										},
-									},
 								},
 							},
 						},

@@ -13,11 +13,11 @@ import (
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/git"
 )
 
 func TestBitBucketMakeComments(t *testing.T) {
 	type testCaseT struct {
-		changes        *bitBucketPRChanges
 		description    string
 		comments       []BitBucketPendingComment
 		summary        Summary
@@ -47,13 +47,11 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
 					},
 				},
 			}},
-			changes:  &bitBucketPRChanges{},
 			comments: []BitBucketPendingComment{},
 		},
 		{
@@ -65,7 +63,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					ModifiedLines: []int{2, 3},
+					Lines: git.LineMap{
+						2: git.LineMeta{Old: 2, Modified: true},
+						3: git.LineMeta{Old: 3, Modified: true},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
 						Lines: diags.LineRange{
@@ -82,7 +83,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					ModifiedLines: []int{2, 3},
+					Lines: git.LineMap{
+						2: git.LineMeta{Old: 2, Modified: true},
+						3: git.LineMeta{Old: 3, Modified: true},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Warning,
 						Lines: diags.LineRange{
@@ -99,7 +103,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					ModifiedLines: []int{2, 3},
+					Lines: git.LineMap{
+						2: git.LineMeta{Old: 2, Modified: true},
+						3: git.LineMeta{Old: 3, Modified: true},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
 						Lines: diags.LineRange{
@@ -116,7 +123,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "symlink.yaml",
 					},
-					ModifiedLines: []int{2, 3},
+					Lines: git.LineMap{
+						2: git.LineMeta{Old: 2, Modified: true},
+						3: git.LineMeta{Old: 3, Modified: true},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
 						Lines: diags.LineRange{
@@ -133,7 +143,11 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "second.yaml",
 						Name:          "second.yaml",
 					},
-					ModifiedLines: []int{1, 2, 3},
+					Lines: git.LineMap{
+						1: git.LineMeta{Old: 1, Modified: true},
+						2: git.LineMeta{Old: 2, Modified: true},
+						3: git.LineMeta{Old: 3, Modified: true},
+					},
 					Problem: checks.Problem{
 						Anchor:   checks.AnchorBefore,
 						Severity: checks.Bug,
@@ -151,7 +165,11 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "second.yaml",
 						Name:          "second.yaml",
 					},
-					ModifiedLines: []int{1, 2, 3},
+					Lines: git.LineMap{
+						1: git.LineMeta{Old: 1, Modified: true},
+						2: git.LineMeta{Old: 2, Modified: true},
+						3: git.LineMeta{Old: 3, Modified: true},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
 						Lines: diags.LineRange{
@@ -164,16 +182,6 @@ func TestBitBucketMakeComments(t *testing.T) {
 					},
 				},
 			}},
-			changes: &bitBucketPRChanges{
-				pathModifiedLines: map[string][]int{
-					"rule.yaml":   {2, 3},
-					"second.yaml": {1, 2, 3},
-				},
-				pathLineMapping: map[string]map[int]int{
-					"rule.yaml":   {2: 2, 3: 3},
-					"second.yaml": {1: 5, 2: 6, 3: 7},
-				},
-			},
 			comments: []BitBucketPendingComment{
 				{
 					Text:     commentBody("stop_sign", "Bug", "r1", "first error\n\nfirst details"),
@@ -241,7 +249,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					ModifiedLines: []int{2, 3},
+					Lines: git.LineMap{
+						2: git.LineMeta{Old: 2, Modified: true},
+						3: git.LineMeta{Old: 3, Modified: true},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
 						Lines: diags.LineRange{
@@ -258,7 +269,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					ModifiedLines: []int{2, 3},
+					Lines: git.LineMap{
+						2: git.LineMeta{Old: 2, Modified: true},
+						3: git.LineMeta{Old: 3, Modified: true},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
 						Lines: diags.LineRange{
@@ -271,14 +285,6 @@ func TestBitBucketMakeComments(t *testing.T) {
 					},
 				},
 			}},
-			changes: &bitBucketPRChanges{
-				pathModifiedLines: map[string][]int{
-					"rule.yaml": {2, 3},
-				},
-				pathLineMapping: map[string]map[int]int{
-					"rule.yaml": {2: 2, 3: 3},
-				},
-			},
 			comments: []BitBucketPendingComment{
 				{
 					Text:     commentBody("stop_sign", "Bug", "r1", "first error\n\nfirst details\n\n------\n\nsecond error\n\nsecond details"),
@@ -302,7 +308,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					ModifiedLines: []int{2, 3},
+					Lines: git.LineMap{
+						2: git.LineMeta{Old: 2, Modified: true},
+						3: git.LineMeta{Old: 3, Modified: true},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
 						Lines: diags.LineRange{
@@ -319,7 +328,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					ModifiedLines: []int{2, 3},
+					Lines: git.LineMap{
+						2: git.LineMeta{Old: 2, Modified: true},
+						3: git.LineMeta{Old: 3, Modified: true},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
 						Lines: diags.LineRange{
@@ -332,14 +344,6 @@ func TestBitBucketMakeComments(t *testing.T) {
 					},
 				},
 			}},
-			changes: &bitBucketPRChanges{
-				pathModifiedLines: map[string][]int{
-					"rule.yaml": {2, 3},
-				},
-				pathLineMapping: map[string]map[int]int{
-					"rule.yaml": {2: 2, 3: 3},
-				},
-			},
 			comments: []BitBucketPendingComment{
 				{
 					Text:     commentBody("stop_sign", "Bug", "r1", "my error\n\nmy details"),
@@ -363,7 +367,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					ModifiedLines: []int{2, 3},
+					Lines: git.LineMap{
+						2: git.LineMeta{Old: 2, Modified: true},
+						3: git.LineMeta{Old: 3, Modified: true},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
 						Lines: diags.LineRange{
@@ -380,7 +387,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					ModifiedLines: []int{2, 3},
+					Lines: git.LineMap{
+						2: git.LineMeta{Old: 2, Modified: true},
+						3: git.LineMeta{Old: 3, Modified: true},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
 						Lines: diags.LineRange{
@@ -393,14 +403,6 @@ func TestBitBucketMakeComments(t *testing.T) {
 					},
 				},
 			}},
-			changes: &bitBucketPRChanges{
-				pathModifiedLines: map[string][]int{
-					"rule.yaml": {2, 3},
-				},
-				pathLineMapping: map[string]map[int]int{
-					"rule.yaml": {2: 2, 3: 3},
-				},
-			},
 			comments: []BitBucketPendingComment{
 				{
 					Text:     commentBody("stop_sign", "Bug", "r1", "first error\n\n------\n\nsecond error\n\n------\n\nshared details"),
@@ -424,7 +426,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					ModifiedLines: []int{2, 3},
+					Lines: git.LineMap{
+						2: git.LineMeta{Old: 2, Modified: true},
+						3: git.LineMeta{Old: 3, Modified: true},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
 						Lines: diags.LineRange{
@@ -441,7 +446,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					ModifiedLines: []int{2, 3},
+					Lines: git.LineMap{
+						2: git.LineMeta{Old: 2, Modified: true},
+						3: git.LineMeta{Old: 3, Modified: true},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Warning,
 						Lines: diags.LineRange{
@@ -458,7 +466,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					ModifiedLines: []int{2, 3},
+					Lines: git.LineMap{
+						2: git.LineMeta{Old: 2, Modified: true},
+						3: git.LineMeta{Old: 3, Modified: true},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
 						Lines: diags.LineRange{
@@ -475,7 +486,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "symlink.yaml",
 					},
-					ModifiedLines: []int{2, 3},
+					Lines: git.LineMap{
+						2: git.LineMeta{Old: 2, Modified: true},
+						3: git.LineMeta{Old: 3, Modified: true},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
 						Lines: diags.LineRange{
@@ -492,7 +506,11 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "second.yaml",
 						Name:          "second.yaml",
 					},
-					ModifiedLines: []int{1, 2, 3},
+					Lines: git.LineMap{
+						1: git.LineMeta{Old: 1, Modified: true},
+						2: git.LineMeta{Old: 2, Modified: true},
+						3: git.LineMeta{Old: 3, Modified: true},
+					},
 					Problem: checks.Problem{
 						Anchor:   checks.AnchorBefore,
 						Severity: checks.Bug,
@@ -510,7 +528,11 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "second.yaml",
 						Name:          "second.yaml",
 					},
-					ModifiedLines: []int{1, 2, 3},
+					Lines: git.LineMap{
+						1: git.LineMeta{Old: 1, Modified: true},
+						2: git.LineMeta{Old: 2, Modified: true},
+						3: git.LineMeta{Old: 3, Modified: true},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
 						Lines: diags.LineRange{
@@ -523,16 +545,6 @@ func TestBitBucketMakeComments(t *testing.T) {
 					},
 				},
 			}},
-			changes: &bitBucketPRChanges{
-				pathModifiedLines: map[string][]int{
-					"rule.yaml":   {2, 3},
-					"second.yaml": {1, 2, 3},
-				},
-				pathLineMapping: map[string]map[int]int{
-					"rule.yaml":   {2: 2, 3: 3},
-					"second.yaml": {1: 5, 2: 6, 3: 7},
-				},
-			},
 			comments: []BitBucketPendingComment{
 				{
 					Text:     commentBody("stop_sign", "Bug", "r1", "first error\n\nfirst details"),
@@ -574,7 +586,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					ModifiedLines: []int{2, 3},
+					Lines: git.LineMap{
+						2: git.LineMeta{Old: 2, Modified: true},
+						3: git.LineMeta{Old: 3, Modified: true},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
 						Lines: diags.LineRange{
@@ -586,14 +601,6 @@ func TestBitBucketMakeComments(t *testing.T) {
 					},
 				},
 			}},
-			changes: &bitBucketPRChanges{
-				pathModifiedLines: map[string][]int{
-					"rule.yaml": {2, 3},
-				},
-				pathLineMapping: map[string]map[int]int{
-					"rule.yaml": {2: 2, 3: 3},
-				},
-			},
 			comments: []BitBucketPendingComment{
 				{
 					Text:     ":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **r1** check.\n\n------\n\n" + strings.Repeat("X", maxCommentLength-98-4) + " ...",
@@ -624,7 +631,7 @@ func TestBitBucketMakeComments(t *testing.T) {
 				tc.showDuplicates,
 				nil,
 			)
-			comments := r.api.limitComments(r.api.makeComments(tc.summary, tc.changes))
+			comments := r.api.limitComments(r.api.makeComments(tc.summary))
 			if diff := cmp.Diff(tc.comments, comments); diff != "" {
 				t.Errorf("api.makeComments() returned wrong output (-want +got):\n%s", diff)
 				return

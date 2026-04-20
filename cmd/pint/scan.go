@@ -167,13 +167,13 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 			checkDuration.WithLabelValues(job.check.Reporter()).Observe(time.Since(start).Seconds())
 			for _, problem := range problems {
 				results <- reporter.Report{
-					Path:          job.entry.Path,
-					ModifiedLines: job.entry.ModifiedLines,
-					Rule:          job.entry.Rule,
-					Problem:       problem,
-					Owner:         job.entry.Owner,
-					IsDuplicate:   false, // unused
-					Duplicates:    nil,
+					Path:        job.entry.Path,
+					Lines:       job.entry.Lines,
+					Rule:        job.entry.Rule,
+					Problem:     problem,
+					Owner:       job.entry.Owner,
+					IsDuplicate: false, // unused
+					Duplicates:  nil,
 				}
 			}
 		}

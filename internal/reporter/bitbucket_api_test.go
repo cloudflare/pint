@@ -15,6 +15,7 @@ import (
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/git"
 )
 
 func TestBitBucketCommentAnchorIsEqual(t *testing.T) {
@@ -118,7 +119,6 @@ func TestBitBucketCommentAnchorIsEqual(t *testing.T) {
 
 func TestPendingCommentToBitBucketComment(t *testing.T) {
 	type testCaseT struct {
-		changes     *bitBucketPRChanges
 		description string
 		output      BitBucketPendingComment
 		input       pendingComment
@@ -126,7 +126,8 @@ func TestPendingCommentToBitBucketComment(t *testing.T) {
 
 	testCases := []testCaseT{
 		{
-			description: "nil changes",
+			// Unmodified line with zero lineMeta defaults to CONTEXT/FROM.
+			description: "zero lineMeta",
 			input: pendingComment{
 				severity: "NORMAL",
 				text:     "this is text",
@@ -144,39 +145,16 @@ func TestPendingCommentToBitBucketComment(t *testing.T) {
 					FileType: "FROM",
 				},
 			},
-			changes: nil,
 		},
 		{
-			description: "path not found in changes",
+			// Modified line uses ADDED/TO.
+			description: "modified line",
 			input: pendingComment{
 				severity: "NORMAL",
 				text:     "this is text",
 				path:     "foo.yaml",
 				line:     5,
-			},
-			output: BitBucketPendingComment{
-				Text:     "this is text",
-				Severity: "NORMAL",
-				Anchor: BitBucketPendingCommentAnchor{
-					Path:     "foo.yaml",
-					Line:     5,
-					DiffType: "EFFECTIVE",
-					LineType: "CONTEXT",
-					FileType: "FROM",
-				},
-			},
-			changes: &bitBucketPRChanges{
-				pathModifiedLines: map[string][]int{"bar.yaml": {1, 2, 3}},
-				pathLineMapping:   map[string]map[int]int{"bar.yaml": {1: 1, 2: 5, 3: 3}},
-			},
-		},
-		{
-			description: "path found in changes",
-			input: pendingComment{
-				severity: "NORMAL",
-				text:     "this is text",
-				path:     "foo.yaml",
-				line:     5,
+				lineMeta: git.LineMeta{Old: 4, Modified: true},
 			},
 			output: BitBucketPendingComment{
 				Text:     "this is text",
@@ -189,12 +167,9 @@ func TestPendingCommentToBitBucketComment(t *testing.T) {
 					FileType: "TO",
 				},
 			},
-			changes: &bitBucketPRChanges{
-				pathModifiedLines: map[string][]int{"foo.yaml": {1, 3, 5}},
-				pathLineMapping:   map[string]map[int]int{"foo.yaml": {1: 1, 3: 3, 5: 4}},
-			},
 		},
 		{
+			// AnchorBefore sets REMOVED lineType.
 			description: "anchor before sets REMOVED lineType",
 			input: pendingComment{
 				severity: "NORMAL",
@@ -214,15 +189,16 @@ func TestPendingCommentToBitBucketComment(t *testing.T) {
 					FileType: "FROM",
 				},
 			},
-			changes: nil,
 		},
 		{
-			description: "line not modified uses line mapping",
+			// Unmodified line with Old > 0 remaps to old line number.
+			description: "unmodified line uses old line number",
 			input: pendingComment{
 				severity: "NORMAL",
 				text:     "this is text",
 				path:     "foo.yaml",
 				line:     5,
+				lineMeta: git.LineMeta{Old: 10},
 			},
 			output: BitBucketPendingComment{
 				Text:     "this is text",
@@ -235,18 +211,16 @@ func TestPendingCommentToBitBucketComment(t *testing.T) {
 					FileType: "FROM",
 				},
 			},
-			changes: &bitBucketPRChanges{
-				pathModifiedLines: map[string][]int{"foo.yaml": {1, 3}},
-				pathLineMapping:   map[string]map[int]int{"foo.yaml": {5: 10}},
-			},
 		},
 		{
-			description: "line not in mapping keeps original line",
+			// Unmodified line with Old=0 keeps original line number.
+			description: "unmodified line with zero old keeps original line",
 			input: pendingComment{
 				severity: "NORMAL",
 				text:     "this is text",
 				path:     "foo.yaml",
 				line:     5,
+				lineMeta: git.LineMeta{Old: 0},
 			},
 			output: BitBucketPendingComment{
 				Text:     "this is text",
@@ -259,17 +233,13 @@ func TestPendingCommentToBitBucketComment(t *testing.T) {
 					FileType: "FROM",
 				},
 			},
-			changes: &bitBucketPRChanges{
-				pathModifiedLines: map[string][]int{"foo.yaml": {1, 3}},
-				pathLineMapping:   map[string]map[int]int{"foo.yaml": {1: 1, 3: 3}},
-			},
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
 			slog.SetDefault(slogt.New(t))
-			out := tc.input.toBitBucketComment(tc.changes)
+			out := tc.input.toBitBucketComment()
 			require.Equal(t, tc.output, out, "pendingComment.toBitBucketComment() returned wrong BitBucketPendingComment")
 		})
 	}
@@ -290,7 +260,11 @@ func TestReportToAnnotation(t *testing.T) {
 					SymlinkTarget: "foo.yaml",
 					Name:          "foo.yaml",
 				},
-				ModifiedLines: []int{4, 5, 6},
+				Lines: git.LineMap{
+					4: git.LineMeta{Old: 4},
+					5: git.LineMeta{Old: 5, Modified: true},
+					6: git.LineMeta{Old: 6},
+				},
 				Problem: checks.Problem{
 					Lines: diags.LineRange{
 						First: 5,
@@ -318,7 +292,11 @@ func TestReportToAnnotation(t *testing.T) {
 					SymlinkTarget: "foo.yaml",
 					Name:          "foo.yaml",
 				},
-				ModifiedLines: []int{4, 5, 6},
+				Lines: git.LineMap{
+					4: git.LineMeta{Old: 4},
+					5: git.LineMeta{Old: 5, Modified: true},
+					6: git.LineMeta{Old: 6},
+				},
 				Problem: checks.Problem{
 					Lines: diags.LineRange{
 						First: 5,
@@ -345,7 +323,11 @@ func TestReportToAnnotation(t *testing.T) {
 					SymlinkTarget: "foo.yaml",
 					Name:          "foo.yaml",
 				},
-				ModifiedLines: []int{4, 5, 6},
+				Lines: git.LineMap{
+					4: git.LineMeta{Old: 4},
+					5: git.LineMeta{Old: 5, Modified: true},
+					6: git.LineMeta{Old: 6},
+				},
 				Problem: checks.Problem{
 					Lines: diags.LineRange{
 						First: 5,
@@ -372,7 +354,11 @@ func TestReportToAnnotation(t *testing.T) {
 					SymlinkTarget: "foo.yaml",
 					Name:          "foo.yaml",
 				},
-				ModifiedLines: []int{4, 5, 6},
+				Lines: git.LineMap{
+					4: git.LineMeta{Old: 4},
+					5: git.LineMeta{Old: 5, Modified: true},
+					6: git.LineMeta{Old: 6},
+				},
 				Problem: checks.Problem{
 					Lines: diags.LineRange{
 						First: 5,
@@ -399,7 +385,11 @@ func TestReportToAnnotation(t *testing.T) {
 					SymlinkTarget: "foo.yaml",
 					Name:          "bar.yaml",
 				},
-				ModifiedLines: []int{4, 5, 6},
+				Lines: git.LineMap{
+					4: git.LineMeta{Old: 4},
+					5: git.LineMeta{Old: 5, Modified: true},
+					6: git.LineMeta{Old: 6},
+				},
 				Problem: checks.Problem{
 					Lines: diags.LineRange{
 						First: 5,
@@ -426,7 +416,11 @@ func TestReportToAnnotation(t *testing.T) {
 					SymlinkTarget: "foo.yaml",
 					Name:          "bar.yaml",
 				},
-				ModifiedLines: []int{4, 5, 6},
+				Lines: git.LineMap{
+					4: git.LineMeta{Old: 4, Modified: true},
+					5: git.LineMeta{Old: 5},
+					6: git.LineMeta{Old: 6},
+				},
 				Problem: checks.Problem{
 					Lines: diags.LineRange{
 						First: 7,
@@ -453,7 +447,11 @@ func TestReportToAnnotation(t *testing.T) {
 					SymlinkTarget: "foo.yaml",
 					Name:          "foo.yaml",
 				},
-				ModifiedLines: []int{4, 5, 6},
+				Lines: git.LineMap{
+					4: git.LineMeta{Old: 4, Modified: true},
+					5: git.LineMeta{Old: 5},
+					6: git.LineMeta{Old: 6},
+				},
 				Problem: checks.Problem{
 					Lines: diags.LineRange{
 						First: 1,
@@ -1004,116 +1002,6 @@ func TestFindPullRequestForBranchErrors(t *testing.T) {
 		require.NotNil(t, pr)
 		require.Equal(t, 2, pr.ID)
 	})
-}
-
-func TestGetPullRequestChangesErrors(t *testing.T) {
-	slog.SetDefault(slogt.New(t))
-
-	t.Run("returns error on invalid JSON", func(t *testing.T) {
-		srv := httpmock.New(func(s *httpmock.Server) {
-			s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/1/changes?start=0").
-				Return("invalid json").
-				Once()
-		})(t)
-
-		bb := bitBucketAPI{
-			uri:       srv.URL(),
-			authToken: "test-token",
-			timeout:   time.Second * 5,
-			project:   "proj",
-			repo:      "repo",
-		}
-
-		pr := &bitBucketPR{ID: 1}
-		_, err := bb.getPullRequestChanges(pr)
-		require.Error(t, err)
-	})
-
-	t.Run("returns error on getFileDiff failure", func(t *testing.T) {
-		changesJSON, _ := json.Marshal(BitBucketPullRequestChanges{
-			IsLastPage: true,
-			Values:     []BitBucketPullRequestChange{{Path: BitBucketPath{ToString: "file.yaml"}}},
-		})
-
-		srv := httpmock.New(func(s *httpmock.Server) {
-			s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/1/changes?start=0").
-				ReturnHeader("Content-Type", "application/json").
-				Return(string(changesJSON)).
-				Once()
-			s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/commits/abc/diff/file.yaml?contextLines=10000&since=def&whitespace=show&withComments=false").
-				ReturnCode(http.StatusInternalServerError).
-				Once()
-		})(t)
-
-		bb := bitBucketAPI{
-			uri:       srv.URL(),
-			authToken: "test-token",
-			timeout:   time.Second * 5,
-			project:   "proj",
-			repo:      "repo",
-		}
-
-		pr := &bitBucketPR{ID: 1, srcHead: "abc", dstHead: "def"}
-		_, err := bb.getPullRequestChanges(pr)
-		require.Error(t, err)
-	})
-
-	t.Run("paginates through results", func(t *testing.T) {
-		page1, _ := json.Marshal(BitBucketPullRequestChanges{
-			IsLastPage:    false,
-			NextPageStart: 1,
-			Values:        []BitBucketPullRequestChange{},
-		})
-		page2, _ := json.Marshal(BitBucketPullRequestChanges{
-			IsLastPage: true,
-			Values:     []BitBucketPullRequestChange{},
-		})
-
-		srv := httpmock.New(func(s *httpmock.Server) {
-			s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/1/changes?start=0").
-				ReturnHeader("Content-Type", "application/json").
-				Return(string(page1)).
-				Once()
-			s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/1/changes?start=1").
-				ReturnHeader("Content-Type", "application/json").
-				Return(string(page2)).
-				Once()
-		})(t)
-
-		bb := bitBucketAPI{
-			uri:       srv.URL(),
-			authToken: "test-token",
-			timeout:   time.Second * 5,
-			project:   "proj",
-			repo:      "repo",
-		}
-
-		pr := &bitBucketPR{ID: 1, srcHead: "abc", dstHead: "def"}
-		_, err := bb.getPullRequestChanges(pr)
-		require.NoError(t, err)
-	})
-}
-
-func TestGetFileDiffErrors(t *testing.T) {
-	slog.SetDefault(slogt.New(t))
-
-	srv := httpmock.New(func(s *httpmock.Server) {
-		s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/commits/abc/diff/file.yaml?contextLines=10000&since=def&whitespace=show&withComments=false").
-			Return("invalid json").
-			Once()
-	})(t)
-
-	bb := bitBucketAPI{
-		uri:       srv.URL(),
-		authToken: "test-token",
-		timeout:   time.Second * 5,
-		project:   "proj",
-		repo:      "repo",
-	}
-
-	pr := &bitBucketPR{ID: 1, srcHead: "abc", dstHead: "def"}
-	_, _, err := bb.getFileDiff(pr, "file.yaml")
-	require.Error(t, err)
 }
 
 func TestBitBucketAPIErrorHandling(t *testing.T) {

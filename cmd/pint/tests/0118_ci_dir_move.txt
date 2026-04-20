@@ -1,4 +1,3 @@
-http method github GET /api/v3/repos/cloudflare/pint/pulls/1/files 200 [{"filename":"rules.yml", "patch": "@@ -1,4 +1,4 @@ - record: target is down\n-  expr: up == 1\n+  expr: up == 0\n - record: sum errors\n   expr: sum(errors) by (job)"}]
 http method github GET /api/v3/repos/cloudflare/pint/pulls/1/reviews 200 []
 http method github POST /api/v3/repos/cloudflare/pint/pulls/1/reviews 200 {}
 http method github GET /api/v3/repos/cloudflare/pint/pulls/1/comments 200 []
@@ -55,12 +54,6 @@ repository {
 }
 
 -- github.expected --
-GET /api/v3/repos/cloudflare/pint/pulls/1/files
-  Accept: application/vnd.github.v3+json
-  Accept-Encoding: gzip
-  Authorization: Bearer 12345
-  X-Github-Api-Version: 2022-11-28
-
 GET /api/v3/repos/cloudflare/pint/pulls/1/comments
   Accept: application/vnd.github.squirrel-girl-preview, application/vnd.github.comfort-fade-preview+json
   Accept-Encoding: gzip

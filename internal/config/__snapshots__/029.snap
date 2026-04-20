@@ -47,6 +47,7 @@ config: |-
     }
 entry:
     path:
+        oldname: ""
         name: rules.yml
         symlinktarget: rules.yml
     filecomments: []

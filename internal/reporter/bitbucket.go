@@ -74,20 +74,13 @@ func (bb BitBucketReporter) Submit(ctx context.Context, summary Summary) (err er
 			slog.String("dstCommit", pr.dstHead),
 		)
 
-		slog.LogAttrs(ctx, slog.LevelInfo, "Getting pull request changes from BitBucket")
-		var changes *bitBucketPRChanges
-		if changes, err = bb.api.getPullRequestChanges(pr); err != nil {
-			return fmt.Errorf("failed to get pull request changes from BitBucket: %w", err)
-		}
-		slog.LogAttrs(ctx, slog.LevelDebug, "Got modified files from BitBucket", slog.Any("files", changes.pathModifiedLines))
-
 		var existingComments []bitBucketComment
 		if existingComments, err = bb.api.getPullRequestComments(pr); err != nil {
 			return fmt.Errorf("failed to get pull request comments from BitBucket: %w", err)
 		}
 		slog.LogAttrs(ctx, slog.LevelInfo, "Got existing pull request comments from BitBucket", slog.Int("count", len(existingComments)))
 
-		pendingComments := bb.api.makeComments(summary, changes)
+		pendingComments := bb.api.makeComments(summary)
 		slog.LogAttrs(ctx, slog.LevelInfo, "Generated comments to add to BitBucket", slog.Int("count", len(pendingComments)))
 
 		pendingComments = bb.api.limitComments(pendingComments)
@@ -141,16 +134,18 @@ func moveReportedLine(report Report) (reported, original int) {
 		if original < 0 {
 			original = pl
 		}
-		for _, ml := range report.ModifiedLines {
-			if pl == ml {
-				original = pl
-				reported = pl
-			}
+		if lm, ok := report.Lines[pl]; ok && lm.Modified {
+			original = pl
+			reported = pl
 		}
 	}
 
-	if reported < 0 && len(report.ModifiedLines) > 0 {
-		return report.ModifiedLines[0], original
+	if reported < 0 && len(report.Lines) > 0 {
+		for _, k := range report.Lines.Keys() {
+			if report.Lines[k].Modified {
+				return k, original
+			}
+		}
 	}
 
 	if reported < 0 {
