@@ -946,6 +946,9 @@ groups:
 						Name:          "b.yml",
 						SymlinkTarget: "b.yml",
 					},
+					Changes: discovery.Changes{
+						OldPath: "a.yml",
+					},
 					ModifiedLines: []int{1, 2, 3},
 					Rule:          mustParse(1, "- alert: rule\n  expr: up == 0\n"),
 				},
@@ -980,6 +983,9 @@ groups:
 					Path: discovery.Path{
 						Name:          "b.yml",
 						SymlinkTarget: "b.yml",
+					},
+					Changes: discovery.Changes{
+						OldPath: "a.yml",
 					},
 					ModifiedLines: []int{1, 2, 3},
 					Rule:          mustParse(1, "- alert: rule\n  expr: up == 0\n"),
@@ -1018,6 +1024,9 @@ groups:
 					Path: discovery.Path{
 						Name:          "new.yml",
 						SymlinkTarget: "new.yml",
+					},
+					Changes: discovery.Changes{
+						OldPath: "rules.yml",
 					},
 					ModifiedLines: []int{1, 2, 3},
 					Rule:          mustParse(1, "- alert: rule\n  expr: up == 0\n"),

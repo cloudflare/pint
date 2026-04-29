@@ -78,6 +78,11 @@ func (f GitBranchFinder) Find(allEntries []*Entry) (entries []*Entry, err error)
 			f.allowedOwners,
 		)
 
+		var oldPath string
+		if change.Path.Before.Name != change.Path.After.Name {
+			oldPath = change.Path.Before.Name
+		}
+
 		failedEntries := entriesWithPathErrors(entriesAfter)
 
 		slog.LogAttrs(context.Background(), slog.LevelDebug,
@@ -106,6 +111,7 @@ func (f GitBranchFinder) Find(allEntries []*Entry) (entries []*Entry, err error)
 					slog.String("ruleLines", me.after.Rule.Lines.String()),
 					slog.String("modifiedLines", output.FormatLineRangeString(me.after.ModifiedLines)),
 				)
+				me.after.Changes.OldPath = oldPath
 				entries = append(entries, me.after)
 			case me.hasBefore && me.hasAfter:
 				switch {
@@ -137,6 +143,7 @@ func (f GitBranchFinder) Find(allEntries []*Entry) (entries []*Entry, err error)
 						slog.String("modifiedLines", output.FormatLineRangeString(me.after.ModifiedLines)),
 					)
 				}
+				me.after.Changes.OldPath = oldPath
 				entries = append(entries, me.after)
 			case me.hasBefore && !me.hasAfter && len(failedEntries) == 0:
 				me.before.State = Removed
@@ -152,6 +159,7 @@ func (f GitBranchFinder) Find(allEntries []*Entry) (entries []*Entry, err error)
 					slog.String("ruleLines", me.before.Rule.Lines.String()),
 					slog.String("modifiedLines", output.FormatLineRangeString(me.before.ModifiedLines)),
 				)
+				me.before.Changes.OldPath = oldPath
 				entries = append(entries, me.before)
 			case me.hasBefore && !me.hasAfter && len(failedEntries) > 0:
 				slog.LogAttrs(context.Background(), slog.LevelDebug,
@@ -187,6 +195,7 @@ func (f GitBranchFinder) Find(allEntries []*Entry) (entries []*Entry, err error)
 			if entry.Path.Name == globEntry.Path.Name && entry.Rule.IsSame(globEntry.Rule) {
 				allEntries[i].State = entry.State
 				allEntries[i].ModifiedLines = entry.ModifiedLines
+				allEntries[i].Changes = entry.Changes
 				found = true
 				break
 			}

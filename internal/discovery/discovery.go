@@ -76,12 +76,19 @@ func (p Path) String() string {
 	return fmt.Sprintf("%s ~> %s", p.Name, p.SymlinkTarget)
 }
 
+type Changes struct {
+	// OldPath is non-empty if we have information about file changes
+	// and the file containing this rule was renamed or moved.
+	OldPath string
+}
+
 type Entry struct {
 	PathError      error
 	File           *parser.File  `json:"-"`
 	Group          *parser.Group `json:"-"`
 	Path           Path
 	Owner          string
+	Changes        Changes
 	ModifiedLines  []int
 	DisabledChecks []string
 	Rule           parser.Rule
