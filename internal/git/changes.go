@@ -75,6 +75,15 @@ func (lns LineNumbers) HasAfter(line int) bool {
 	return false
 }
 
+func (lns LineNumbers) BeforeForAfter(line int) int {
+	for _, ln := range lns {
+		if ln.After == line {
+			return ln.Before
+		}
+	}
+	return -1
+}
+
 type LineRangeSide uint8
 
 const (

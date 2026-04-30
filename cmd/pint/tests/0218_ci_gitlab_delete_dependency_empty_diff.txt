@@ -1,6 +1,5 @@
 http method gitlab GET /api/v4/user 200 {"id": 555}
 http method gitlab GET /api/v4/projects/1234/merge_requests/1/versions 200 [{"id": 2, "head_commit_sha": "head", "base_commit_sha": "base", "start_commit_sha": "start"},{"id": 1, "head_commit_sha": "head", "base_commit_sha": "base", "start_commit_sha": "start"}]
-http method gitlab GET /api/v4/projects/1234/merge_requests/1/diffs 200 [{"old_path":"alert.yml","new_path":"alert.yml","diff":""},{"old_path":"record.yml","new_path":"record.yml","diff":""}]
 http method gitlab GET /api/v4/projects/1234/merge_requests/1/discussions 200 []
 http method gitlab GET /api/v4/projects/1234/merge_requests 200 [{"iid": 1}]
 http method gitlab POST /api/v4/projects/1234/merge_requests/1/discussions 200 {}
@@ -112,11 +111,6 @@ GET /api/v4/projects/1234/merge_requests
   Private-Token: secret
 
 GET /api/v4/projects/1234/merge_requests/1/versions
-  Accept: application/json
-  Accept-Encoding: gzip
-  Private-Token: secret
-
-GET /api/v4/projects/1234/merge_requests/1/diffs
   Accept: application/json
   Accept-Encoding: gzip
   Private-Token: secret
