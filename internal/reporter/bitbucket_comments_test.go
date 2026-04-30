@@ -13,6 +13,7 @@ import (
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/git"
 )
 
 func TestBitBucketMakeComments(t *testing.T) {
@@ -47,7 +48,13 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					ModifiedLines: []int{2, 3},
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: git.LineNumbers{
+							{Before: 0, After: 2},
+							{Before: 0, After: 3},
+						},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
 					},
@@ -65,7 +72,13 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					ModifiedLines: []int{2, 3},
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: git.LineNumbers{
+							{Before: 0, After: 2},
+							{Before: 0, After: 3},
+						},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
 						Lines: diags.LineRange{
@@ -82,7 +95,13 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					ModifiedLines: []int{2, 3},
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: git.LineNumbers{
+							{Before: 0, After: 2},
+							{Before: 0, After: 3},
+						},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Warning,
 						Lines: diags.LineRange{
@@ -99,7 +118,13 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					ModifiedLines: []int{2, 3},
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: git.LineNumbers{
+							{Before: 0, After: 2},
+							{Before: 0, After: 3},
+						},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
 						Lines: diags.LineRange{
@@ -116,7 +141,13 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "symlink.yaml",
 					},
-					ModifiedLines: []int{2, 3},
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: git.LineNumbers{
+							{Before: 0, After: 2},
+							{Before: 0, After: 3},
+						},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
 						Lines: diags.LineRange{
@@ -133,7 +164,14 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "second.yaml",
 						Name:          "second.yaml",
 					},
-					ModifiedLines: []int{1, 2, 3},
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: git.LineNumbers{
+							{Before: 0, After: 1},
+							{Before: 0, After: 2},
+							{Before: 0, After: 3},
+						},
+					},
 					Problem: checks.Problem{
 						Anchor:   checks.AnchorBefore,
 						Severity: checks.Bug,
@@ -151,7 +189,14 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "second.yaml",
 						Name:          "second.yaml",
 					},
-					ModifiedLines: []int{1, 2, 3},
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: git.LineNumbers{
+							{Before: 0, After: 1},
+							{Before: 0, After: 2},
+							{Before: 0, After: 3},
+						},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
 						Lines: diags.LineRange{
@@ -241,7 +286,13 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					ModifiedLines: []int{2, 3},
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: git.LineNumbers{
+							{Before: 0, After: 2},
+							{Before: 0, After: 3},
+						},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
 						Lines: diags.LineRange{
@@ -258,7 +309,13 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					ModifiedLines: []int{2, 3},
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: git.LineNumbers{
+							{Before: 0, After: 2},
+							{Before: 0, After: 3},
+						},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
 						Lines: diags.LineRange{
@@ -302,7 +359,13 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					ModifiedLines: []int{2, 3},
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: git.LineNumbers{
+							{Before: 0, After: 2},
+							{Before: 0, After: 3},
+						},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
 						Lines: diags.LineRange{
@@ -319,7 +382,13 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					ModifiedLines: []int{2, 3},
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: git.LineNumbers{
+							{Before: 0, After: 2},
+							{Before: 0, After: 3},
+						},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
 						Lines: diags.LineRange{
@@ -363,7 +432,13 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					ModifiedLines: []int{2, 3},
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: git.LineNumbers{
+							{Before: 0, After: 2},
+							{Before: 0, After: 3},
+						},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
 						Lines: diags.LineRange{
@@ -380,7 +455,13 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					ModifiedLines: []int{2, 3},
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: git.LineNumbers{
+							{Before: 0, After: 2},
+							{Before: 0, After: 3},
+						},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
 						Lines: diags.LineRange{
@@ -424,7 +505,13 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					ModifiedLines: []int{2, 3},
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: git.LineNumbers{
+							{Before: 0, After: 2},
+							{Before: 0, After: 3},
+						},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
 						Lines: diags.LineRange{
@@ -441,7 +528,13 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					ModifiedLines: []int{2, 3},
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: git.LineNumbers{
+							{Before: 0, After: 2},
+							{Before: 0, After: 3},
+						},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Warning,
 						Lines: diags.LineRange{
@@ -458,7 +551,13 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					ModifiedLines: []int{2, 3},
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: git.LineNumbers{
+							{Before: 0, After: 2},
+							{Before: 0, After: 3},
+						},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
 						Lines: diags.LineRange{
@@ -475,7 +574,13 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "symlink.yaml",
 					},
-					ModifiedLines: []int{2, 3},
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: git.LineNumbers{
+							{Before: 0, After: 2},
+							{Before: 0, After: 3},
+						},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
 						Lines: diags.LineRange{
@@ -492,7 +597,14 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "second.yaml",
 						Name:          "second.yaml",
 					},
-					ModifiedLines: []int{1, 2, 3},
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: git.LineNumbers{
+							{Before: 0, After: 1},
+							{Before: 0, After: 2},
+							{Before: 0, After: 3},
+						},
+					},
 					Problem: checks.Problem{
 						Anchor:   checks.AnchorBefore,
 						Severity: checks.Bug,
@@ -510,7 +622,14 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "second.yaml",
 						Name:          "second.yaml",
 					},
-					ModifiedLines: []int{1, 2, 3},
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: git.LineNumbers{
+							{Before: 0, After: 1},
+							{Before: 0, After: 2},
+							{Before: 0, After: 3},
+						},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
 						Lines: diags.LineRange{
@@ -574,7 +693,13 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					ModifiedLines: []int{2, 3},
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: git.LineNumbers{
+							{Before: 0, After: 2},
+							{Before: 0, After: 3},
+						},
+					},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
 						Lines: diags.LineRange{

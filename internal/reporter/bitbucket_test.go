@@ -108,9 +108,12 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[0],
-					Problem:       checks.Problem{},
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+					},
+					Rule:    mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{},
 				},
 			},
 			mock: httpmock.New(func(s *httpmock.Server) {
@@ -137,9 +140,12 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[0],
-					Problem:       checks.Problem{},
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+					},
+					Rule:    mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{},
 				},
 			},
 			mock: httpmock.New(func(s *httpmock.Server) {
@@ -169,9 +175,12 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[0],
-					Problem:       checks.Problem{},
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+					},
+					Rule:    mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{},
 				},
 			},
 			mock: httpmock.New(func(s *httpmock.Server) {
@@ -245,8 +254,14 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: []git.LineNumber{
+							{Before: 0, After: 2},
+							{Before: 0, After: 4},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 1,
@@ -262,8 +277,11 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "bar.txt",
 						Name:          "bar.txt",
 					},
-					ModifiedLines: []int{},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 1,
@@ -279,8 +297,14 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: []git.LineNumber{
+							{Before: 0, After: 2},
+							{Before: 0, After: 4},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -296,8 +320,14 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: []git.LineNumber{
+							{Before: 0, After: 2},
+							{Before: 0, After: 4},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -313,8 +343,14 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: []git.LineNumber{
+							{Before: 0, After: 2},
+							{Before: 0, After: 4},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 4,
@@ -480,8 +516,14 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: []git.LineNumber{
+							{Before: 0, After: 2},
+							{Before: 0, After: 4},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 1,
@@ -497,8 +539,14 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: []git.LineNumber{
+							{Before: 0, After: 2},
+							{Before: 0, After: 4},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -514,8 +562,14 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: []git.LineNumber{
+							{Before: 0, After: 2},
+							{Before: 0, After: 4},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -531,8 +585,14 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: []git.LineNumber{
+							{Before: 0, After: 2},
+							{Before: 0, After: 4},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 4,
@@ -573,8 +633,14 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{3, 4},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: git.LineNumbers{
+							{Before: 0, After: 3},
+							{Before: 0, After: 4},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 1,
@@ -659,8 +725,14 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Rule:          mockFile.Groups[0].Rules[1],
-					ModifiedLines: []int{2, 4},
+					Rule: mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: []git.LineNumber{
+							{Before: 0, After: 2},
+							{Before: 0, After: 4},
+						},
+					},
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 1,
@@ -676,8 +748,14 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Rule:          mockFile.Groups[0].Rules[1],
-					ModifiedLines: []int{2, 4},
+					Rule: mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: []git.LineNumber{
+							{Before: 0, After: 2},
+							{Before: 0, After: 4},
+						},
+					},
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -693,8 +771,14 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Rule:          mockFile.Groups[0].Rules[0],
-					ModifiedLines: []int{2, 4},
+					Rule: mockFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: []git.LineNumber{
+							{Before: 0, After: 2},
+							{Before: 0, After: 4},
+						},
+					},
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -710,8 +794,14 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Rule:          mockFile.Groups[0].Rules[1],
-					ModifiedLines: []int{2, 4},
+					Rule: mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: []git.LineNumber{
+							{Before: 0, After: 2},
+							{Before: 0, After: 4},
+						},
+					},
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 4,
@@ -1005,8 +1095,14 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: []git.LineNumber{
+							{Before: 0, After: 2},
+							{Before: 0, After: 4},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 1,
@@ -1022,8 +1118,14 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: []git.LineNumber{
+							{Before: 0, After: 2},
+							{Before: 0, After: 4},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -1039,8 +1141,14 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: []git.LineNumber{
+							{Before: 0, After: 2},
+							{Before: 0, After: 4},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -1057,8 +1165,14 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "symlink.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: []git.LineNumber{
+							{Before: 0, After: 2},
+							{Before: 0, After: 4},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 4,
@@ -1290,8 +1404,14 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "index.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: []git.LineNumber{
+							{Before: 0, After: 2},
+							{Before: 0, After: 4},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 1,
@@ -1622,8 +1742,14 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: []git.LineNumber{
+							{Before: 0, After: 2},
+							{Before: 0, After: 4},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 1,
@@ -1639,8 +1765,14 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: []git.LineNumber{
+							{Before: 0, After: 2},
+							{Before: 0, After: 4},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 1,
@@ -1656,8 +1788,14 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: []git.LineNumber{
+							{Before: 0, After: 2},
+							{Before: 0, After: 4},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -1674,8 +1812,14 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: []git.LineNumber{
+							{Before: 0, After: 2},
+							{Before: 0, After: 4},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -1692,8 +1836,14 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "symlink.txt",
 					},
-					ModifiedLines: []int{2, 4},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: []git.LineNumber{
+							{Before: 0, After: 2},
+							{Before: 0, After: 4},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -1733,8 +1883,11 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 1,
@@ -1763,8 +1916,11 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "index.txt",
 						Name:          diagFile,
 					},
-					ModifiedLines: []int{1},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 1}},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 1,

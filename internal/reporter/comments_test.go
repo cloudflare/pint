@@ -18,6 +18,7 @@ import (
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -88,8 +89,11 @@ func TestCommenter(t *testing.T) {
 			SymlinkTarget: "foo.txt",
 			Name:          "foo.txt",
 		},
-		ModifiedLines: []int{2},
-		Rule:          mockFile.Groups[0].Rules[0],
+		Changes: discovery.Changes{
+			OldPath: "",
+			Lines:   git.LineNumbers{{Before: 0, After: 2}},
+		},
+		Rule: mockFile.Groups[0].Rules[0],
 		Problem: checks.Problem{
 			Reporter: "foo",
 			Summary:  "foo error",
@@ -125,8 +129,11 @@ foo details
 			SymlinkTarget: "bar.txt",
 			Name:          "bar.txt",
 		},
-		ModifiedLines: []int{1},
-		Rule:          mockFile.Groups[0].Rules[0],
+		Changes: discovery.Changes{
+			OldPath: "",
+			Lines:   git.LineNumbers{{Before: 0, After: 1}},
+		},
+		Rule: mockFile.Groups[0].Rules[0],
 		Problem: checks.Problem{
 			Reporter: "bar",
 			Summary:  "bar warning",
@@ -382,8 +389,16 @@ bar warning
 						SymlinkTarget: "bar.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 3, 4, 5},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: git.LineNumbers{
+							{Before: 0, After: 2},
+							{Before: 0, After: 3},
+							{Before: 0, After: 4},
+							{Before: 0, After: 5},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter: "foo",
 						Summary:  "foo error 1",
@@ -398,8 +413,16 @@ bar warning
 						SymlinkTarget: "bar.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 3, 4, 5},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: git.LineNumbers{
+							{Before: 0, After: 2},
+							{Before: 0, After: 3},
+							{Before: 0, After: 4},
+							{Before: 0, After: 5},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter: "foo",
 						Summary:  "foo error 2",
@@ -485,8 +508,16 @@ foo details
 						SymlinkTarget: "bar.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 3, 4, 5},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: git.LineNumbers{
+							{Before: 0, After: 2},
+							{Before: 0, After: 3},
+							{Before: 0, After: 4},
+							{Before: 0, After: 5},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter: "foo",
 						Summary:  "foo error",
@@ -561,8 +592,16 @@ foo details
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 3, 4, 5},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: git.LineNumbers{
+							{Before: 0, After: 2},
+							{Before: 0, After: 3},
+							{Before: 0, After: 4},
+							{Before: 0, After: 5},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter: "foo",
 						Summary:  "foo error 1",
@@ -577,8 +616,16 @@ foo details
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 3, 4, 5},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: git.LineNumbers{
+							{Before: 0, After: 2},
+							{Before: 0, After: 3},
+							{Before: 0, After: 4},
+							{Before: 0, After: 5},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter: "foo",
 						Summary:  "foo error 2",
@@ -669,8 +716,16 @@ foo details
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 3, 4, 5},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: git.LineNumbers{
+							{Before: 0, After: 2},
+							{Before: 0, After: 3},
+							{Before: 0, After: 4},
+							{Before: 0, After: 5},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter: "foo",
 						Summary:  "foo error 1",
@@ -685,8 +740,16 @@ foo details
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 3, 4, 5},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: git.LineNumbers{
+							{Before: 0, After: 2},
+							{Before: 0, After: 3},
+							{Before: 0, After: 4},
+							{Before: 0, After: 5},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter: "foo",
 						Summary:  "foo error 2",
@@ -861,8 +924,11 @@ func TestCommentsCommonPaths(t *testing.T) {
 			SymlinkTarget: "foo.txt",
 			Name:          "foo.txt",
 		},
-		ModifiedLines: []int{2},
-		Rule:          mockFile.Groups[0].Rules[0],
+		Changes: discovery.Changes{
+			OldPath: "",
+			Lines:   git.LineNumbers{{Before: 0, After: 2}},
+		},
+		Rule: mockFile.Groups[0].Rules[0],
 		Problem: checks.Problem{
 			Reporter: "foo",
 			Summary:  "foo error",

@@ -15,6 +15,7 @@ import (
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/git"
 )
 
 func TestBitBucketCommentAnchorIsEqual(t *testing.T) {
@@ -290,7 +291,14 @@ func TestReportToAnnotation(t *testing.T) {
 					SymlinkTarget: "foo.yaml",
 					Name:          "foo.yaml",
 				},
-				ModifiedLines: []int{4, 5, 6},
+				Changes: discovery.Changes{
+					OldPath: "",
+					Lines: git.LineNumbers{
+						{Before: 0, After: 4},
+						{Before: 0, After: 5},
+						{Before: 0, After: 6},
+					},
+				},
 				Problem: checks.Problem{
 					Lines: diags.LineRange{
 						First: 5,
@@ -318,7 +326,14 @@ func TestReportToAnnotation(t *testing.T) {
 					SymlinkTarget: "foo.yaml",
 					Name:          "foo.yaml",
 				},
-				ModifiedLines: []int{4, 5, 6},
+				Changes: discovery.Changes{
+					OldPath: "",
+					Lines: git.LineNumbers{
+						{Before: 0, After: 4},
+						{Before: 0, After: 5},
+						{Before: 0, After: 6},
+					},
+				},
 				Problem: checks.Problem{
 					Lines: diags.LineRange{
 						First: 5,
@@ -345,7 +360,14 @@ func TestReportToAnnotation(t *testing.T) {
 					SymlinkTarget: "foo.yaml",
 					Name:          "foo.yaml",
 				},
-				ModifiedLines: []int{4, 5, 6},
+				Changes: discovery.Changes{
+					OldPath: "",
+					Lines: git.LineNumbers{
+						{Before: 0, After: 4},
+						{Before: 0, After: 5},
+						{Before: 0, After: 6},
+					},
+				},
 				Problem: checks.Problem{
 					Lines: diags.LineRange{
 						First: 5,
@@ -372,7 +394,14 @@ func TestReportToAnnotation(t *testing.T) {
 					SymlinkTarget: "foo.yaml",
 					Name:          "foo.yaml",
 				},
-				ModifiedLines: []int{4, 5, 6},
+				Changes: discovery.Changes{
+					OldPath: "",
+					Lines: git.LineNumbers{
+						{Before: 0, After: 4},
+						{Before: 0, After: 5},
+						{Before: 0, After: 6},
+					},
+				},
 				Problem: checks.Problem{
 					Lines: diags.LineRange{
 						First: 5,
@@ -399,7 +428,14 @@ func TestReportToAnnotation(t *testing.T) {
 					SymlinkTarget: "foo.yaml",
 					Name:          "bar.yaml",
 				},
-				ModifiedLines: []int{4, 5, 6},
+				Changes: discovery.Changes{
+					OldPath: "",
+					Lines: git.LineNumbers{
+						{Before: 0, After: 4},
+						{Before: 0, After: 5},
+						{Before: 0, After: 6},
+					},
+				},
 				Problem: checks.Problem{
 					Lines: diags.LineRange{
 						First: 5,
@@ -426,7 +462,14 @@ func TestReportToAnnotation(t *testing.T) {
 					SymlinkTarget: "foo.yaml",
 					Name:          "bar.yaml",
 				},
-				ModifiedLines: []int{4, 5, 6},
+				Changes: discovery.Changes{
+					OldPath: "",
+					Lines: git.LineNumbers{
+						{Before: 0, After: 4},
+						{Before: 0, After: 5},
+						{Before: 0, After: 6},
+					},
+				},
 				Problem: checks.Problem{
 					Lines: diags.LineRange{
 						First: 7,
@@ -453,7 +496,14 @@ func TestReportToAnnotation(t *testing.T) {
 					SymlinkTarget: "foo.yaml",
 					Name:          "foo.yaml",
 				},
-				ModifiedLines: []int{4, 5, 6},
+				Changes: discovery.Changes{
+					OldPath: "",
+					Lines: git.LineNumbers{
+						{Before: 0, After: 4},
+						{Before: 0, After: 5},
+						{Before: 0, After: 6},
+					},
+				},
 				Problem: checks.Problem{
 					Lines: diags.LineRange{
 						First: 1,

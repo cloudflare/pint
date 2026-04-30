@@ -31,6 +31,7 @@ func TestGlobPathFinder(t *testing.T) {
 	testRuleBody := "# pint file/owner bob\n\n- record: foo\n  expr: sum(foo)\n"
 	testFile := p.Parse(strings.NewReader(testRuleBody))
 	require.NoError(t, testFile.Error.Err)
+	testRuleLineNumbers := git.MakeLineRangeFromTo(testFile.Groups[0].Rules[0].Lines.First, testFile.Groups[0].Rules[0].Lines.Last, git.LinesAfter)
 
 	testCases := []testCaseT{
 		{
@@ -56,9 +57,11 @@ func TestGlobPathFinder(t *testing.T) {
 						Name:          "bar.yml",
 						SymlinkTarget: "bar.yml",
 					},
-					Rule:          testFile.Groups[0].Rules[0],
-					ModifiedLines: testFile.Groups[0].Rules[0].Lines.Expand(),
-					Owner:         "bob",
+					Rule: testFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						Lines: testRuleLineNumbers,
+					},
+					Owner: "bob",
 				},
 			},
 		},
@@ -97,9 +100,11 @@ func TestGlobPathFinder(t *testing.T) {
 						Name:          "bar.yml",
 						SymlinkTarget: "bar.yml",
 					},
-					Rule:          testFile.Groups[0].Rules[0],
-					ModifiedLines: testFile.Groups[0].Rules[0].Lines.Expand(),
-					Owner:         "bob",
+					Rule: testFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						Lines: testRuleLineNumbers,
+					},
+					Owner: "bob",
 				},
 			},
 		},
@@ -113,9 +118,11 @@ func TestGlobPathFinder(t *testing.T) {
 						Name:          "foo/bar.yml",
 						SymlinkTarget: "foo/bar.yml",
 					},
-					Rule:          testFile.Groups[0].Rules[0],
-					ModifiedLines: testFile.Groups[0].Rules[0].Lines.Expand(),
-					Owner:         "alice",
+					Rule: testFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						Lines: testRuleLineNumbers,
+					},
+					Owner: "alice",
 				},
 			},
 		},
@@ -133,8 +140,10 @@ func TestGlobPathFinder(t *testing.T) {
 						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
 						Line: 3,
 					},
-					ModifiedLines: []int{1, 2, 3, 4},
-					Owner:         "bob",
+					Changes: discovery.Changes{
+						Lines: git.MakeLineRangeFromTo(1, 4, git.LinesAfter),
+					},
+					Owner: "bob",
 				},
 			},
 		},
@@ -152,8 +161,10 @@ func TestGlobPathFinder(t *testing.T) {
 						Err:  errors.New("mapping values are not allowed in this context"),
 						Line: 2,
 					},
-					ModifiedLines: []int{1, 2, 3, 4},
-					Owner:         "bob",
+					Changes: discovery.Changes{
+						Lines: git.MakeLineRangeFromTo(1, 4, git.LinesAfter),
+					},
+					Owner: "bob",
 				},
 			},
 		},
@@ -172,8 +183,10 @@ func TestGlobPathFinder(t *testing.T) {
 						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
 						Line: 3,
 					},
-					ModifiedLines: []int{1, 2, 3, 4},
-					Owner:         "bob",
+					Changes: discovery.Changes{
+						Lines: git.MakeLineRangeFromTo(1, 4, git.LinesAfter),
+					},
+					Owner: "bob",
 				},
 				{
 					State: discovery.Noop,
@@ -185,8 +198,10 @@ func TestGlobPathFinder(t *testing.T) {
 						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
 						Line: 3,
 					},
-					ModifiedLines: []int{1, 2, 3, 4},
-					Owner:         "bob",
+					Changes: discovery.Changes{
+						Lines: git.MakeLineRangeFromTo(1, 4, git.LinesAfter),
+					},
+					Owner: "bob",
 				},
 			},
 		},
@@ -208,8 +223,10 @@ func TestGlobPathFinder(t *testing.T) {
 						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
 						Line: 3,
 					},
-					ModifiedLines: []int{1, 2, 3, 4},
-					Owner:         "bob",
+					Changes: discovery.Changes{
+						Lines: git.MakeLineRangeFromTo(1, 4, git.LinesAfter),
+					},
+					Owner: "bob",
 				},
 				{
 					State: discovery.Noop,
@@ -221,8 +238,10 @@ func TestGlobPathFinder(t *testing.T) {
 						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
 						Line: 3,
 					},
-					ModifiedLines: []int{1, 2, 3, 4},
-					Owner:         "bob",
+					Changes: discovery.Changes{
+						Lines: git.MakeLineRangeFromTo(1, 4, git.LinesAfter),
+					},
+					Owner: "bob",
 				},
 				{
 					State: discovery.Noop,
@@ -234,8 +253,10 @@ func TestGlobPathFinder(t *testing.T) {
 						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
 						Line: 3,
 					},
-					ModifiedLines: []int{1, 2, 3, 4},
-					Owner:         "bob",
+					Changes: discovery.Changes{
+						Lines: git.MakeLineRangeFromTo(1, 4, git.LinesAfter),
+					},
+					Owner: "bob",
 				},
 			},
 		},
@@ -272,8 +293,10 @@ func TestGlobPathFinder(t *testing.T) {
 						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
 						Line: 1,
 					},
-					ModifiedLines: []int{1, 2},
-					Owner:         "",
+					Changes: discovery.Changes{
+						Lines: git.MakeLineRangeFromTo(1, 2, git.LinesAfter),
+					},
+					Owner: "",
 				},
 				{
 					State: discovery.Noop,
@@ -285,8 +308,10 @@ func TestGlobPathFinder(t *testing.T) {
 						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
 						Line: 1,
 					},
-					ModifiedLines: []int{1, 2},
-					Owner:         "",
+					Changes: discovery.Changes{
+						Lines: git.MakeLineRangeFromTo(1, 2, git.LinesAfter),
+					},
+					Owner: "",
 				},
 			},
 		},
@@ -321,8 +346,10 @@ func TestGlobPathFinder(t *testing.T) {
 						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
 						Line: 3,
 					},
-					ModifiedLines: []int{1, 2, 3, 4},
-					Owner:         "bob",
+					Changes: discovery.Changes{
+						Lines: git.MakeLineRangeFromTo(1, 4, git.LinesAfter),
+					},
+					Owner: "bob",
 				},
 				{
 					State: discovery.Noop,
@@ -334,8 +361,10 @@ func TestGlobPathFinder(t *testing.T) {
 						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
 						Line: 3,
 					},
-					ModifiedLines: []int{1, 2, 3, 4},
-					Owner:         "bob",
+					Changes: discovery.Changes{
+						Lines: git.MakeLineRangeFromTo(1, 4, git.LinesAfter),
+					},
+					Owner: "bob",
 				},
 			},
 		},

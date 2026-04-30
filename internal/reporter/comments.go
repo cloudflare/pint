@@ -154,7 +154,7 @@ func makeComments(summary Summary, showDuplicates bool) (comments []PendingComme
 
 		line := reports[0].Problem.Lines.Last
 		for i := reports[0].Problem.Lines.Last; i >= reports[0].Problem.Lines.First; i-- {
-			if slices.Contains(reports[0].ModifiedLines, i) {
+			if reports[0].Changes.Lines.HasAfter(i) {
 				line = i
 				break
 			}
@@ -165,7 +165,7 @@ func makeComments(summary Summary, showDuplicates bool) (comments []PendingComme
 			path:         reports[0].Path.SymlinkTarget,
 			line:         line,
 			text:         buf.String(),
-			modifiedLine: slices.Contains(reports[0].ModifiedLines, line),
+			modifiedLine: reports[0].Changes.Lines.HasAfter(line),
 		})
 	}
 	return comments

@@ -23,6 +23,7 @@ import (
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 	"github.com/cloudflare/pint/internal/reporter"
@@ -62,8 +63,11 @@ func TestGitLabReporter(t *testing.T) {
 			SymlinkTarget: "foo.txt",
 			Name:          "foo.txt",
 		},
-		ModifiedLines: []int{2},
-		Rule:          mockFile.Groups[0].Rules[0],
+		Changes: discovery.Changes{
+			OldPath: "",
+			Lines:   git.LineNumbers{{Before: 0, After: 2}},
+		},
+		Rule: mockFile.Groups[0].Rules[0],
 		Problem: checks.Problem{
 			Reporter: "foo",
 			Summary:  "foo error",
@@ -85,8 +89,11 @@ func TestGitLabReporter(t *testing.T) {
 				SymlinkTarget: "foo.txt",
 				Name:          "foo.txt",
 			},
-			ModifiedLines: []int{1},
-			Rule:          mockFile.Groups[0].Rules[0],
+			Changes: discovery.Changes{
+				OldPath: "",
+				Lines:   git.LineNumbers{{Before: 0, After: 1}},
+			},
+			Rule: mockFile.Groups[0].Rules[0],
 			Problem: checks.Problem{
 				Reporter: "a",
 				Summary:  "foo error1",
@@ -101,8 +108,11 @@ func TestGitLabReporter(t *testing.T) {
 				SymlinkTarget: "foo.txt",
 				Name:          "foo.txt",
 			},
-			ModifiedLines: []int{2},
-			Rule:          mockFile.Groups[0].Rules[0],
+			Changes: discovery.Changes{
+				OldPath: "",
+				Lines:   git.LineNumbers{{Before: 0, After: 2}},
+			},
+			Rule: mockFile.Groups[0].Rules[0],
 			Problem: checks.Problem{
 				Reporter: "b",
 				Summary:  "foo error2",
@@ -117,8 +127,11 @@ func TestGitLabReporter(t *testing.T) {
 				SymlinkTarget: "foo.txt",
 				Name:          "foo.txt",
 			},
-			ModifiedLines: []int{3},
-			Rule:          mockFile.Groups[0].Rules[0],
+			Changes: discovery.Changes{
+				OldPath: "",
+				Lines:   git.LineNumbers{{Before: 0, After: 3}},
+			},
+			Rule: mockFile.Groups[0].Rules[0],
 			Problem: checks.Problem{
 				Reporter: "c",
 				Summary:  "foo error3",
@@ -270,8 +283,13 @@ func TestGitLabReporter(t *testing.T) {
 						SymlinkTarget: mockPath,
 						Name:          mockPath,
 					},
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: git.LineNumbers{
+							{Before: 0, After: 2},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter: "a",
 						Summary:  "foo error1",
@@ -902,8 +920,14 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: mockPath,
 						Name:          mockPath,
 					},
-					ModifiedLines: []int{2, 3},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: git.LineNumbers{
+							{Before: 0, After: 2},
+							{Before: 0, After: 3},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter: "a",
 						Summary:  "foo error1",
@@ -987,8 +1011,14 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: mockPath,
 						Name:          mockPath,
 					},
-					ModifiedLines: []int{2, 3},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: git.LineNumbers{
+							{Before: 0, After: 2},
+							{Before: 0, After: 3},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter: "a",
 						Summary:  "foo error1",
@@ -1072,8 +1102,14 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: mockPath,
 						Name:          mockPath,
 					},
-					ModifiedLines: []int{2, 3},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: git.LineNumbers{
+							{Before: 0, After: 2},
+							{Before: 0, After: 3},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter:    "a",
 						Summary:     "foo error1",
@@ -1129,8 +1165,14 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: mockPath,
 						Name:          mockPath,
 					},
-					ModifiedLines: []int{4, 5},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: git.LineNumbers{
+							{Before: 0, After: 4},
+							{Before: 0, After: 5},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter:    "a",
 						Summary:     "foo error1",
@@ -1320,8 +1362,13 @@ func TestGitLabReporterCommentLine(t *testing.T) {
 							Name:          "foo.txt",
 							SymlinkTarget: "foo.txt",
 						},
-						ModifiedLines: []int{2},
-						Rule:          mockFile.Groups[0].Rules[1],
+						Changes: discovery.Changes{
+							OldPath: "",
+							Lines: git.LineNumbers{
+								{Before: 0, After: 2},
+							},
+						},
+						Rule: mockFile.Groups[0].Rules[1],
 						Problem: checks.Problem{
 							Lines: diags.LineRange{
 								First: tc.problemLine,

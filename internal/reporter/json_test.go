@@ -12,6 +12,7 @@ import (
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/reporter"
 )
@@ -53,9 +54,12 @@ func TestJSONReporter(t *testing.T) {
 					Name:          "test.yml",
 					SymlinkTarget: "test.yml",
 				},
-				Owner:         "team-a",
-				ModifiedLines: []int{2},
-				Rule:          mockFile.Groups[0].Rules[0],
+				Owner: "team-a",
+				Changes: discovery.Changes{
+					OldPath: "",
+					Lines:   git.LineNumbers{{Before: 0, After: 2}},
+				},
+				Rule: mockFile.Groups[0].Rules[0],
 				Problem: checks.Problem{
 					Lines: diags.LineRange{
 						First: 1,

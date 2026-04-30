@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/diags"
+	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -107,7 +108,9 @@ func TestReadRules(t *testing.T) {
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines:  []int{4, 5},
+					Changes: Changes{
+						Lines: git.MakeLineRangeFromTo(4, 5, git.LinesAfter),
+					},
 					Rule:           mustParse(3, "- record: foo\n  expr: bar\n"),
 					DisabledChecks: []string{"promql/series"},
 				},
@@ -136,7 +139,9 @@ groups:
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines:  []int{7, 8},
+					Changes: Changes{
+						Lines: git.MakeLineRangeFromTo(7, 8, git.LinesAfter),
+					},
 					Rule:           mustParse(6, "  - record: foo\n    expr: bar\n"),
 					DisabledChecks: []string{"promql/series"},
 				},
@@ -162,8 +167,10 @@ groups:
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{4, 5},
-					Rule:          mustParse(3, "- record: foo\n  expr: bar\n"),
+					Changes: Changes{
+						Lines: git.MakeLineRangeFromTo(4, 5, git.LinesAfter),
+					},
+					Rule: mustParse(3, "- record: foo\n  expr: bar\n"),
 				},
 			},
 		},
@@ -190,8 +197,10 @@ groups:
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{7, 8},
-					Rule:          mustParse(6, "  - record: foo\n    expr: bar\n"),
+					Changes: Changes{
+						Lines: git.MakeLineRangeFromTo(7, 8, git.LinesAfter),
+					},
+					Rule: mustParse(6, "  - record: foo\n    expr: bar\n"),
 				},
 			},
 		},
@@ -215,7 +224,9 @@ groups:
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines:  []int{4, 5},
+					Changes: Changes{
+						Lines: git.MakeLineRangeFromTo(4, 5, git.LinesAfter),
+					},
 					Rule:           mustParse(3, "- record: foo\n  expr: bar\n"),
 					DisabledChecks: []string{"promql/series"},
 				},
@@ -244,7 +255,9 @@ groups:
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines:  []int{7, 8},
+					Changes: Changes{
+						Lines: git.MakeLineRangeFromTo(7, 8, git.LinesAfter),
+					},
 					Rule:           mustParse(6, "  - record: foo\n    expr: bar\n"),
 					DisabledChecks: []string{"promql/series"},
 				},
@@ -270,7 +283,9 @@ groups:
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{1, 2, 3, 4, 5},
+					Changes: Changes{
+						Lines: git.MakeLineRangeFromTo(1, 5, git.LinesAfter),
+					},
 					PathError: FileIgnoreError{
 						Diagnostic: diags.Diagnostic{
 							Message: "This file was excluded from pint checks.",
@@ -308,7 +323,9 @@ groups:
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{1, 2, 3, 4, 5, 6, 7, 8},
+					Changes: Changes{
+						Lines: git.MakeLineRangeFromTo(1, 8, git.LinesAfter),
+					},
 					PathError: FileIgnoreError{
 						Diagnostic: diags.Diagnostic{
 							Message: "This file was excluded from pint checks.",

@@ -89,9 +89,9 @@ func TestChanges(t *testing.T) {
 						},
 					},
 					Body: git.BodyDiff{
-						Before:        []byte("foo"),
-						After:         []byte("foo"),
-						ModifiedLines: []int{},
+						Before: []byte("foo"),
+						After:  []byte("foo"),
+						Lines:  []git.LineNumber{},
 					},
 				},
 			},
@@ -128,9 +128,11 @@ func TestChanges(t *testing.T) {
 						},
 					},
 					Body: git.BodyDiff{
-						Before:        nil,
-						After:         []byte("foo"),
-						ModifiedLines: []int{1},
+						Before: nil,
+						After:  []byte("foo"),
+						Lines: []git.LineNumber{
+							{Before: 1, After: 1},
+						},
 					},
 				},
 				{
@@ -146,9 +148,11 @@ func TestChanges(t *testing.T) {
 						},
 					},
 					Body: git.BodyDiff{
-						Before:        []byte("keep"),
-						After:         nil,
-						ModifiedLines: []int{1},
+						Before: []byte("keep"),
+						After:  nil,
+						Lines: []git.LineNumber{
+							{Before: 1, After: 0},
+						},
 					},
 				},
 			},
@@ -186,9 +190,9 @@ func TestChanges(t *testing.T) {
 						},
 					},
 					Body: git.BodyDiff{
-						Before:        []byte("foo"),
-						After:         []byte("foo"),
-						ModifiedLines: []int{},
+						Before: []byte("foo"),
+						After:  []byte("foo"),
+						Lines:  []git.LineNumber{},
 					},
 				},
 			},
@@ -227,9 +231,12 @@ func TestChanges(t *testing.T) {
 						},
 					},
 					Body: git.BodyDiff{
-						Before:        []byte("bar\n1\n"),
-						After:         []byte("foo\n1\n"),
-						ModifiedLines: []int{1, 2},
+						Before: []byte("bar\n1\n"),
+						After:  []byte("foo\n1\n"),
+						Lines: []git.LineNumber{
+							{Before: 0, After: 1},
+							{Before: 0, After: 2},
+						},
 					},
 				},
 			},
@@ -265,9 +272,14 @@ func TestChanges(t *testing.T) {
 						},
 					},
 					Body: git.BodyDiff{
-						Before:        []byte("1\n2\n3\n4\n5\n6\n7\n8\n9\n"),
-						After:         []byte("1\n2\n3\n4\n5\nX\nX\nX\nX\n"),
-						ModifiedLines: []int{6, 7, 8, 9},
+						Before: []byte("1\n2\n3\n4\n5\n6\n7\n8\n9\n"),
+						After:  []byte("1\n2\n3\n4\n5\nX\nX\nX\nX\n"),
+						Lines: []git.LineNumber{
+							{Before: 6, After: 6},
+							{Before: 7, After: 7},
+							{Before: 8, After: 8},
+							{Before: 9, After: 9},
+						},
 					},
 				},
 			},
@@ -304,9 +316,11 @@ func TestChanges(t *testing.T) {
 						},
 					},
 					Body: git.BodyDiff{
-						Before:        []byte("1\n2\n3\n4\n5\n6\n7\n8\n9\n"),
-						After:         []byte("1\n2\n3\n4\n5\nX\n7\n8\n9\n"),
-						ModifiedLines: []int{6},
+						Before: []byte("1\n2\n3\n4\n5\n6\n7\n8\n9\n"),
+						After:  []byte("1\n2\n3\n4\n5\nX\n7\n8\n9\n"),
+						Lines: []git.LineNumber{
+							{Before: 6, After: 6},
+						},
 					},
 				},
 			},
@@ -343,8 +357,10 @@ func TestChanges(t *testing.T) {
 						},
 					},
 					Body: git.BodyDiff{
-						After:         []byte("second"),
-						ModifiedLines: []int{1},
+						After: []byte("second"),
+						Lines: []git.LineNumber{
+							{Before: 0, After: 1},
+						},
 					},
 				},
 				{
@@ -360,8 +376,10 @@ func TestChanges(t *testing.T) {
 						},
 					},
 					Body: git.BodyDiff{
-						After:         []byte("third"),
-						ModifiedLines: []int{1},
+						After: []byte("third"),
+						Lines: []git.LineNumber{
+							{Before: 0, After: 1},
+						},
 					},
 				},
 			},
@@ -398,8 +416,10 @@ func TestChanges(t *testing.T) {
 						},
 					},
 					Body: git.BodyDiff{
-						Before:        []byte("second"),
-						ModifiedLines: []int{1},
+						Before: []byte("second"),
+						Lines: []git.LineNumber{
+							{Before: 1, After: 0},
+						},
 					},
 				},
 			},
@@ -437,8 +457,10 @@ func TestChanges(t *testing.T) {
 						},
 					},
 					Body: git.BodyDiff{
-						Before:        []byte("foo"),
-						ModifiedLines: []int{1},
+						Before: []byte("foo"),
+						Lines: []git.LineNumber{
+							{Before: 1, After: 0},
+						},
 					},
 				},
 			},
@@ -478,8 +500,10 @@ func TestChanges(t *testing.T) {
 						},
 					},
 					Body: git.BodyDiff{
-						Before:        []byte("foo"),
-						ModifiedLines: []int{1},
+						Before: []byte("foo"),
+						Lines: []git.LineNumber{
+							{Before: 1, After: 0},
+						},
 					},
 				},
 				{
@@ -496,8 +520,10 @@ func TestChanges(t *testing.T) {
 						},
 					},
 					Body: git.BodyDiff{
-						Before:        []byte("foo"),
-						ModifiedLines: []int{1},
+						Before: []byte("foo"),
+						Lines: []git.LineNumber{
+							{Before: 1, After: 0},
+						},
 					},
 				},
 			},
@@ -541,9 +567,12 @@ func TestChanges(t *testing.T) {
 						},
 					},
 					Body: git.BodyDiff{
-						Before:        []byte("bar\n1\n"),
-						After:         []byte("foo\n1\n"),
-						ModifiedLines: []int{1, 2},
+						Before: []byte("bar\n1\n"),
+						After:  []byte("foo\n1\n"),
+						Lines: []git.LineNumber{
+							{Before: 0, After: 1},
+							{Before: 0, After: 2},
+						},
 					},
 				},
 			},
@@ -581,9 +610,13 @@ func TestChanges(t *testing.T) {
 						},
 					},
 					Body: git.BodyDiff{
-						Before:        []byte("l1\nl2\nl3\n"),
-						After:         []byte("l1\nl3\n"),
-						ModifiedLines: []int{1, 2},
+						Before: []byte("l1\nl2\nl3\n"),
+						After:  []byte("l1\nl3\n"),
+						Lines: []git.LineNumber{
+							{Before: 1, After: 1},
+							{Before: 3, After: 2},
+							{Before: 2, After: 0},
+						},
 					},
 				},
 			},
@@ -620,9 +653,13 @@ func TestChanges(t *testing.T) {
 						},
 					},
 					Body: git.BodyDiff{
-						Before:        []byte("a1\na2\na3\n"),
-						After:         []byte("a1\na2\na3\n"),
-						ModifiedLines: []int{1, 2, 3},
+						Before: []byte("a1\na2\na3\n"),
+						After:  []byte("a1\na2\na3\n"),
+						Lines: []git.LineNumber{
+							{Before: 1, After: 1},
+							{Before: 2, After: 2},
+							{Before: 3, After: 3},
+						},
 					},
 				},
 				{
@@ -638,9 +675,12 @@ func TestChanges(t *testing.T) {
 						},
 					},
 					Body: git.BodyDiff{
-						Before:        []byte("b1\nb2"),
-						After:         []byte("b1\nb2"),
-						ModifiedLines: []int{1, 2},
+						Before: []byte("b1\nb2"),
+						After:  []byte("b1\nb2"),
+						Lines: []git.LineNumber{
+							{Before: 1, After: 1},
+							{Before: 2, After: 2},
+						},
 					},
 				},
 			},
@@ -678,9 +718,13 @@ func TestChanges(t *testing.T) {
 						},
 					},
 					Body: git.BodyDiff{
-						Before:        []byte("l1\nl2\nl3\n"),
-						After:         []byte("l1\nl3\n"),
-						ModifiedLines: []int{1, 2},
+						Before: []byte("l1\nl2\nl3\n"),
+						After:  []byte("l1\nl3\n"),
+						Lines: []git.LineNumber{
+							{Before: 1, After: 1},
+							{Before: 3, After: 2},
+							{Before: 2, After: 0},
+						},
 					},
 				},
 			},
@@ -755,9 +799,9 @@ func TestChangesMocked(t *testing.T) {
 						},
 					},
 					Body: git.BodyDiff{
-						Before:        []byte("content"),
-						After:         []byte("content"),
-						ModifiedLines: []int{},
+						Before: []byte("content"),
+						After:  []byte("content"),
+						Lines:  []git.LineNumber{},
 					},
 				},
 			},
@@ -794,9 +838,9 @@ func TestChangesMocked(t *testing.T) {
 						},
 					},
 					Body: git.BodyDiff{
-						Before:        nil,
-						After:         []byte("content"),
-						ModifiedLines: []int{},
+						Before: nil,
+						After:  []byte("content"),
+						Lines:  []git.LineNumber{},
 					},
 				},
 			},
@@ -833,9 +877,9 @@ func TestChangesMocked(t *testing.T) {
 						},
 					},
 					Body: git.BodyDiff{
-						Before:        nil,
-						After:         []byte("content"),
-						ModifiedLines: []int{},
+						Before: nil,
+						After:  []byte("content"),
+						Lines:  []git.LineNumber{},
 					},
 				},
 			},
@@ -872,9 +916,9 @@ func TestChangesMocked(t *testing.T) {
 						},
 					},
 					Body: git.BodyDiff{
-						Before:        nil,
-						After:         []byte("content"),
-						ModifiedLines: []int{},
+						Before: nil,
+						After:  []byte("content"),
+						Lines:  []git.LineNumber{},
 					},
 				},
 			},
@@ -911,9 +955,9 @@ func TestChangesMocked(t *testing.T) {
 						},
 					},
 					Body: git.BodyDiff{
-						Before:        nil,
-						After:         []byte("content"),
-						ModifiedLines: []int{},
+						Before: nil,
+						After:  []byte("content"),
+						Lines:  []git.LineNumber{},
 					},
 				},
 			},

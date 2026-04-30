@@ -13,6 +13,7 @@ import (
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/reporter"
 )
@@ -53,8 +54,15 @@ func TestCheckstyleReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4, 5},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: []git.LineNumber{
+							{Before: 0, After: 2},
+							{Before: 0, After: 4},
+							{Before: 0, After: 5},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 5,
@@ -83,8 +91,15 @@ func TestCheckstyleReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4, 5},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: []git.LineNumber{
+							{Before: 0, After: 2},
+							{Before: 0, After: 4},
+							{Before: 0, After: 5},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 5,
@@ -112,8 +127,15 @@ func TestCheckstyleReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{2, 4, 5},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: []git.LineNumber{
+							{Before: 0, After: 2},
+							{Before: 0, After: 4},
+							{Before: 0, After: 5},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 5,
@@ -143,8 +165,11 @@ func TestCheckstyleReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{1},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 1}},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines:    diags.LineRange{First: 1, Last: 1},
 						Reporter: "mock",
@@ -157,8 +182,11 @@ func TestCheckstyleReporter(t *testing.T) {
 						SymlinkTarget: "bar.txt",
 						Name:          "bar.txt",
 					},
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines:    diags.LineRange{First: 2, Last: 2},
 						Reporter: "mock",
@@ -186,8 +214,14 @@ func TestCheckstyleReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{1, 5},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: []git.LineNumber{
+							{Before: 0, After: 1},
+							{Before: 0, After: 5},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines:    diags.LineRange{First: 1, Last: 1},
 						Reporter: "mock1",
@@ -200,8 +234,14 @@ func TestCheckstyleReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					ModifiedLines: []int{1, 5},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: []git.LineNumber{
+							{Before: 0, After: 1},
+							{Before: 0, After: 5},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines:    diags.LineRange{First: 5, Last: 5},
 						Reporter: "mock2",
