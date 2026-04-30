@@ -1033,7 +1033,8 @@ groups:
 					},
 					Changes: discovery.Changes{
 						OldPath: "a.yml",
-						Lines:   git.MakeLineRangeFromTo(2, 3, git.LinesBoth),
+						// Renamed without content changes.
+						Lines: git.LineNumbers{},
 					},
 					Rule: mustParse(1, "- alert: rule\n  expr: up == 0\n"),
 				},
@@ -1072,8 +1073,6 @@ groups:
 					Changes: discovery.Changes{
 						OldPath: "a.yml",
 						Lines: []git.LineNumber{
-							{Before: 2, After: 2},
-							{Before: 4, After: 3},
 							{Before: 3, After: 0},
 						},
 					},
@@ -1116,7 +1115,8 @@ groups:
 					},
 					Changes: discovery.Changes{
 						OldPath: "rules.yml",
-						Lines:   git.MakeLineRangeFromTo(2, 3, git.LinesBoth),
+						// Renamed without content changes.
+						Lines: git.LineNumbers{},
 					},
 					Rule: mustParse(1, "- alert: rule\n  expr: up == 0\n"),
 				},
@@ -1231,6 +1231,9 @@ groups:
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
+					Changes: discovery.Changes{
+						Lines: git.LineNumbers{},
+					},
 					Rule: mustParse(3, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
 				},
 				{
@@ -1239,6 +1242,9 @@ groups:
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
+					Changes: discovery.Changes{
+						Lines: git.LineNumbers{},
+					},
 					Rule: mustParse(5, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
 				},
 				{
@@ -1246,6 +1252,9 @@ groups:
 					Path: discovery.Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
+					},
+					Changes: discovery.Changes{
+						Lines: git.LineNumbers{},
 					},
 					Rule: mustParse(7, "- alert: rule3\n  expr: sum(foo) by(job)\n"),
 				},

@@ -250,7 +250,7 @@ func commonLineNumbers(bodyLines, ruleLines git.LineNumbers) git.LineNumbers {
 			ruleAfter[ln.After] = struct{}{}
 		}
 	}
-	var common git.LineNumbers
+	common := git.LineNumbers{}
 	for _, ln := range bodyLines {
 		if ln.After > 0 {
 			if _, ok := ruleAfter[ln.After]; ok {

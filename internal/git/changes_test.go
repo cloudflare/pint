@@ -613,8 +613,6 @@ func TestChanges(t *testing.T) {
 						Before: []byte("l1\nl2\nl3\n"),
 						After:  []byte("l1\nl3\n"),
 						Lines: []git.LineNumber{
-							{Before: 1, After: 1},
-							{Before: 3, After: 2},
 							{Before: 2, After: 0},
 						},
 					},
@@ -655,11 +653,8 @@ func TestChanges(t *testing.T) {
 					Body: git.BodyDiff{
 						Before: []byte("a1\na2\na3\n"),
 						After:  []byte("a1\na2\na3\n"),
-						Lines: []git.LineNumber{
-							{Before: 1, After: 1},
-							{Before: 2, After: 2},
-							{Before: 3, After: 3},
-						},
+						// Renamed without content changes.
+						Lines: []git.LineNumber{},
 					},
 				},
 				{
@@ -677,10 +672,8 @@ func TestChanges(t *testing.T) {
 					Body: git.BodyDiff{
 						Before: []byte("b1\nb2"),
 						After:  []byte("b1\nb2"),
-						Lines: []git.LineNumber{
-							{Before: 1, After: 1},
-							{Before: 2, After: 2},
-						},
+						// Renamed without content changes.
+						Lines: []git.LineNumber{},
 					},
 				},
 			},
@@ -721,8 +714,6 @@ func TestChanges(t *testing.T) {
 						Before: []byte("l1\nl2\nl3\n"),
 						After:  []byte("l1\nl3\n"),
 						Lines: []git.LineNumber{
-							{Before: 1, After: 1},
-							{Before: 3, After: 2},
 							{Before: 2, After: 0},
 						},
 					},
