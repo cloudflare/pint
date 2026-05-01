@@ -1,12 +1,10 @@
 package reporter
 
 import (
-	"bufio"
 	"context"
 	"errors"
 	"fmt"
 	"log/slog"
-	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -52,7 +50,6 @@ func keysAndValuesToAttrs(keysAndValues ...any) (attrs []slog.Attr) {
 
 type gitlabMR struct {
 	version     *gitlab.MergeRequestDiffVersion
-	diffs       []*gitlab.MergeRequestDiff
 	discussions []*gitlab.Discussion
 	userID      int64
 	mrID        int64
@@ -131,16 +128,12 @@ func (gl GitLabReporter) Destinations(ctx context.Context) ([]any, error) {
 		slog.LogAttrs(ctx, slog.LevelInfo, "Found open GitLab merge request", slog.String("branch", gl.branch), slog.Int64("id", id))
 		dst := gitlabMR{
 			version:     nil,
-			diffs:       nil,
 			discussions: nil,
 			userID:      userID,
 			mrID:        id,
 		}
 		if dst.version, err = gl.getVersions(ctx, id); err != nil {
 			return nil, fmt.Errorf("failed to get GitLab merge request versions: %w", err)
-		}
-		if dst.diffs, err = gl.getDiffs(ctx, id); err != nil {
-			return nil, fmt.Errorf("failed to get GitLab merge request changes: %w", err)
 		}
 		if dst.discussions, err = gl.getDiscussions(ctx, id); err != nil {
 			return nil, fmt.Errorf("failed to get GitLab merge request discussions: %w", err)
@@ -214,10 +207,7 @@ func (gl GitLabReporter) Create(ctx context.Context, dst any, comment PendingCom
 	}
 
 	mr := dst.(gitlabMR)
-	opt := reportToGitLabDiscussion(ctx, comment, mr.diffs, mr.version)
-	if opt == nil {
-		return nil
-	}
+	opt := reportToGitLabDiscussion(comment, mr.version)
 	slog.LogAttrs(ctx, slog.LevelDebug, "Creating a new merge request discussion", loggifyDiscussion(opt)...)
 	reqCtx, cancel := context.WithTimeout(ctx, gl.timeout)
 	defer cancel()
@@ -292,18 +282,6 @@ func (gl *GitLabReporter) getMRs(ctx context.Context) (ids []int64, err error) {
 		ids = append(ids, mr.IID)
 	}
 	return ids, nil
-}
-
-func (gl *GitLabReporter) getDiffs(ctx context.Context, mrNum int64) ([]*gitlab.MergeRequestDiff, error) {
-	slog.LogAttrs(ctx, slog.LevelDebug, "Getting the list of merge request diffs", slog.Int64("mr", mrNum))
-	diffs, err := getGitLabPaginated(func(pageNum int64) ([]*gitlab.MergeRequestDiff, *gitlab.Response, error) {
-		reqCtx, cancel := context.WithTimeout(ctx, gl.timeout)
-		defer cancel()
-		return gl.client.MergeRequests.ListMergeRequestDiffs(gl.project, mrNum, &gitlab.ListMergeRequestDiffsOptions{
-			ListOptions: gitlab.ListOptions{Page: pageNum},
-		}, gitlab.WithContext(reqCtx))
-	})
-	return diffs, err
 }
 
 func (gl *GitLabReporter) getVersions(ctx context.Context, mrNum int64) (*gitlab.MergeRequestDiffVersion, error) {
@@ -431,15 +409,14 @@ func (gl GitLabReporter) unresolveIfPresent(ctx context.Context, dst any, commen
 	return false, nil
 }
 
-func reportToGitLabDiscussion(ctx context.Context, pending PendingComment, diffs []*gitlab.MergeRequestDiff, ver *gitlab.MergeRequestDiffVersion) *gitlab.CreateMergeRequestDiscussionOptions {
-	pathDiffs := getDiffsForPath(diffs, pending.path)
-	if len(pathDiffs) == 0 {
-		slog.LogAttrs(ctx, slog.LevelDebug, "Skipping report for path with no GitLab diff",
-			slog.String("path", pending.path),
-		)
-		return nil
-	}
+func reportToGitLabDiscussion(pending PendingComment, ver *gitlab.MergeRequestDiffVersion) *gitlab.CreateMergeRequestDiscussionOptions {
+	// The generated comment must follow these rules:
+	// https://docs.gitlab.com/api/discussions/#create-a-new-thread-in-the-merge-request-diff
 
+	oldPath := pending.path
+	if pending.oldPath != "" {
+		oldPath = pending.oldPath
+	}
 	d := gitlab.CreateMergeRequestDiscussionOptions{
 		Body: new(pending.text),
 		Position: &gitlab.PositionOptions{
@@ -447,140 +424,47 @@ func reportToGitLabDiscussion(ctx context.Context, pending PendingComment, diffs
 			BaseSHA:      new(ver.BaseCommitSHA),
 			HeadSHA:      new(ver.HeadCommitSHA),
 			StartSHA:     new(ver.StartCommitSHA),
+			OldPath:      new(oldPath),
+			NewPath:      new(pending.path),
 		},
 	}
 
-	for _, diff := range pathDiffs {
-		d.Position.OldPath = new(diff.OldPath)
-		if d.Position.NewPath == nil {
-			d.Position.NewPath = new(diff.NewPath)
-		}
+	line := pending.line
+	oldLine := pending.changedLines.BeforeForAfter(pending.line)
 
-		// Diff is empty, decide if it was modified based on git history.
-		if diff.Diff == "" {
-			slog.LogAttrs(ctx, slog.LevelDebug, "Empty diff from GitLab",
-				slog.String("path", pending.path),
-				slog.Int("line", pending.line),
-				slog.Bool("modified", pending.modifiedLine))
-			switch {
-			case pending.anchor == checks.AnchorBefore:
-				d.Position.OldLine = new(int64(pending.line))
-				d.Position.NewLine = nil
-			case pending.modifiedLine:
-				d.Position.NewLine = new(int64(pending.line))
-			case !pending.modifiedLine:
-				d.Position.NewLine = new(int64(pending.line))
-				d.Position.OldLine = new(int64(pending.line))
+	// GitLab requires comments on lines present in the diff.
+	// If the target line is not in the diff, move it to the nearest changed line.
+	var useBefore bool
+	if pending.anchor == checks.AnchorBefore {
+		if pending.changedLines.HasBefore(line) {
+			useBefore = true
+		} else if nearest := pending.changedLines.NearestBefore(line); nearest > 0 {
+			line = nearest
+			useBefore = true
+		}
+		// No deleted lines in the diff, fall through to RIGHT side.
+	}
+	if !useBefore {
+		if !pending.changedLines.HasAfter(line) {
+			if nearest := pending.changedLines.NearestAfter(line); nearest > 0 {
+				line = nearest
+				oldLine = pending.changedLines.BeforeForAfter(line)
 			}
-			continue
 		}
+	}
 
-		dl, ok := diffLineFor(parseDiffLines(diff.Diff), int64(pending.line))
-		switch {
-		case !ok:
-			// No diffLine for this line, could be a file rename.
-			d.Position.NewLine = new(int64(pending.line))
-			d.Position.OldLine = new(int64(pending.line))
-		case pending.anchor == checks.AnchorBefore:
-			// Comment on removed line.
-			d.Position.OldLine = new(int64(pending.line))
-			d.Position.NewLine = nil
-		case ok && !dl.wasModified:
-			// Comment on unmodified line.
-			d.Position.NewLine = new(dl.new)
-			d.Position.OldLine = new(dl.old)
-		default:
-			// Comment on new or modified line.
-			d.Position.NewLine = new(dl.new)
-		}
+	switch {
+	case useBefore:
+		d.Position.OldLine = new(int64(line))
+		d.Position.NewLine = nil
+	case oldLine == 0:
+		d.Position.NewLine = new(int64(line))
+	case oldLine > 0:
+		d.Position.NewLine = new(int64(line))
+		d.Position.OldLine = new(int64(oldLine))
 	}
 
 	return &d
-}
-
-func getDiffsForPath(diffs []*gitlab.MergeRequestDiff, path string) (changes []*gitlab.MergeRequestDiff) {
-	for _, change := range diffs {
-		if change.NewPath == path {
-			changes = append(changes, change)
-		}
-	}
-	return changes
-}
-
-type diffLine struct {
-	old         int64
-	new         int64
-	wasModified bool
-}
-
-func diffLineFor(lines []diffLine, line int64) (diffLine, bool) {
-	if len(lines) == 0 {
-		return diffLine{old: 0, new: 0, wasModified: false}, false
-	}
-
-	for i, dl := range lines {
-		if dl.new == line {
-			return dl, true
-		}
-		// Calculate unmodified line that does not present in the diff
-		if dl.new > line {
-			lastLines := dl
-			if i > 0 {
-				lastLines = lines[i-1]
-			}
-			gap := line - lastLines.new
-			return diffLine{
-				old:         lastLines.old + gap,
-				new:         line,
-				wasModified: false,
-			}, true
-		}
-	}
-	// Calculate unmodified line that is greater than the last diff line
-	lastLines := lines[len(lines)-1]
-	if line > lastLines.new {
-		gap := line - lastLines.new
-		return diffLine{
-			old:         lastLines.old + gap,
-			new:         line,
-			wasModified: false,
-		}, true
-	}
-	return diffLine{old: 0, new: 0, wasModified: false}, false
-}
-
-var diffRe = regexp.MustCompile(`@@ \-(\d+),(\d+) \+(\d+),(\d+) @@`)
-
-func parseDiffLines(diff string) (lines []diffLine) {
-	var oldLine, newLine int64
-
-	sc := bufio.NewScanner(strings.NewReader(diff))
-	for sc.Scan() {
-		line := sc.Text()
-		switch {
-		case strings.HasPrefix(line, "@@"):
-			matches := diffRe.FindStringSubmatch(line)
-			if len(matches) == 5 {
-				oldLine, _ = strconv.ParseInt(matches[1], 10, 64)
-				oldLine--
-				newLine, _ = strconv.ParseInt(matches[3], 10, 64)
-				newLine--
-			}
-		case strings.HasPrefix(line, "--- "):
-		case strings.HasPrefix(line, "+++ "):
-		case strings.HasPrefix(line, "-"):
-			oldLine++
-		case strings.HasPrefix(line, "+"):
-			newLine++
-			lines = append(lines, diffLine{old: oldLine, new: newLine, wasModified: true})
-		default:
-			oldLine++
-			newLine++
-			lines = append(lines, diffLine{old: oldLine, new: newLine, wasModified: false})
-		}
-	}
-
-	return lines
 }
 
 func getGitLabPaginated[T any](searchFunc func(pageNum int64) ([]T, *gitlab.Response, error)) ([]T, error) {

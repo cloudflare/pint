@@ -8,7 +8,9 @@ import (
 	"log/slog"
 	"os"
 	"path"
+	"regexp"
 	"slices"
+	"strconv"
 	"strings"
 )
 
@@ -37,10 +39,149 @@ type TypeDiff struct {
 	After  PathType
 }
 
+type LineNumber struct {
+	Before int
+	After  int
+}
+
+func (ln LineNumber) String() string {
+	switch {
+	case ln.Before == 0 && ln.After > 0:
+		return fmt.Sprintf("+%d", ln.After)
+	case ln.Before > 0 && ln.After == 0:
+		return fmt.Sprintf("-%d", ln.Before)
+	case ln.Before == ln.After:
+		return strconv.Itoa(ln.Before)
+	default:
+		return fmt.Sprintf("%d->%d", ln.Before, ln.After)
+	}
+}
+
+type LineNumbers []LineNumber
+
+func (lns LineNumbers) String() string {
+	parts := make([]string, len(lns))
+	for i, ln := range lns {
+		parts[i] = ln.String()
+	}
+	return strings.Join(parts, " ")
+}
+
+func (lns LineNumbers) HasAfter(line int) bool {
+	for _, ln := range lns {
+		if ln.After == line {
+			return true
+		}
+	}
+	return false
+}
+
+func (lns LineNumbers) HasBefore(line int) bool {
+	for _, ln := range lns {
+		if ln.Before == line {
+			return true
+		}
+	}
+	return false
+}
+
+// NearestAfter returns the After line number closest to the given target.
+// Returns 0 if there are no entries with After > 0.
+func (lns LineNumbers) NearestAfter(target int) int {
+	best := 0
+	bestDist := -1
+	for _, ln := range lns {
+		if ln.After > 0 {
+			dist := ln.After - target
+			if dist < 0 {
+				dist = -dist
+			}
+			if bestDist < 0 || dist < bestDist {
+				best = ln.After
+				bestDist = dist
+			}
+		}
+	}
+	return best
+}
+
+// NearestBefore returns the Before line number closest to the given target.
+// Returns 0 if there are no entries with Before > 0.
+func (lns LineNumbers) NearestBefore(target int) int {
+	best := 0
+	bestDist := -1
+	for _, ln := range lns {
+		if ln.Before > 0 {
+			dist := ln.Before - target
+			if dist < 0 {
+				dist = -dist
+			}
+			if bestDist < 0 || dist < bestDist {
+				best = ln.Before
+				bestDist = dist
+			}
+		}
+	}
+	return best
+}
+
+// BeforeForAfter returns the old (before the change) line number for a given
+// new (after the change) line number.
+//
+// We only have line mappings for lines that were changed (added, removed, or
+// modified). Unchanged lines may or may not appear in the diff output.
+// Even if a line is unchanged, its old line number might differ from the
+// new one because additions or removals earlier in the file shift all
+// subsequent lines up or down.
+//
+// Returns:
+//   - Before value if the line is directly present in the diff.
+//   - 0 if the line is an added line (Before==0 in the diff).
+//   - Computed old line number for lines not in the diff, using the offset
+//     between old and new line numbers from the closest preceding diff entry.
+//     For example if the last known entry is {Before:5, After:10} and we
+//     query line 15, the offset is 10-5=5, so old line is 15-5=10.
+//   - Line itself if there are no preceding diff entries (no shift yet).
+func (lns LineNumbers) BeforeForAfter(line int) int {
+	for _, ln := range lns {
+		if ln.After == line {
+			return ln.Before
+		}
+	}
+
+	// Line is not directly in the diff -- find the closest preceding entry
+	// that has a valid old line number (Before > 0, meaning it's not a
+	// pure addition) and use its old->new offset to calculate old_line.
+	var (
+		nearest LineNumber
+		found   bool
+	)
+	for _, ln := range lns {
+		if ln.After > 0 && ln.After < line && ln.Before > 0 {
+			nearest = ln
+			found = true
+		}
+	}
+	if found {
+		return nearest.Before + (line - nearest.After)
+	}
+
+	// No preceding entry -- line is before any changes, old == new.
+	return line
+}
+
+type LineRangeSide uint8
+
+const (
+	LinesBefore LineRangeSide = iota
+	LinesAfter
+	LinesBoth
+)
+
 type BodyDiff struct {
-	Before        []byte
-	After         []byte
-	ModifiedLines []int
+	Before []byte
+	After  []byte
+	Lines  LineNumbers
 }
 
 type Path struct {
@@ -193,43 +334,35 @@ func Changes(cmd CommandRunner, baseBranch string, filter PathFilter) ([]*FileCh
 			slog.String("after.target", change.Path.After.SymlinkTarget),
 			slog.Any("after.type", change.Path.After.Type),
 			slog.String("after.body", string(change.Body.After)),
-			slog.Any("modifiedLines", change.Body.ModifiedLines),
+			slog.Any("lines", change.Body.Lines),
 		)
 
 		switch {
 		case change.Path.Before.Type != Missing && change.Path.Before.Type != Symlink && change.Path.After.Type == Symlink:
 			slog.LogAttrs(context.Background(), slog.LevelDebug, "Path was turned into a symlink", slog.String("path", change.Path.After.Name))
-			change.Body.ModifiedLines = CountLines(change.Body.After)
+			change.Body.Lines = MakeLineRange(CountLines(change.Body.After), LinesAfter)
 		case change.Path.Before.Type != Missing && change.Path.After.Type != Missing && change.Path.After.Type != Symlink:
-			change.Body.ModifiedLines, err = getModifiedLines(cmd, change.Commits, change.Path.After.EffectivePath(), lastCommit, change.Body.Before, change.Body.After)
+			change.Body.Lines, err = getModifiedLines(cmd, change.Commits, change.Path.Before.EffectivePath(), change.Path.After.EffectivePath())
 			if err != nil {
-				return nil, fmt.Errorf("failed to run git blame for %s: %w", change.Path.After.EffectivePath(), err)
+				return nil, fmt.Errorf("failed to run git diff for %s: %w", change.Path.After.EffectivePath(), err)
 			}
-			if len(change.Body.ModifiedLines) == 0 && change.Path.Before.EffectivePath() != change.Path.After.EffectivePath() {
-				// File was moved or renamed. Mark it all as modified.
-				change.Body.ModifiedLines = CountLines(change.Body.After)
-				slog.LogAttrs(context.Background(), slog.LevelDebug, "File was moved or renamed", slog.String("path", change.Path.After.Name))
-			} else {
-				slog.LogAttrs(context.Background(), slog.LevelDebug, "File was modified", slog.String("path", change.Path.After.Name), slog.Any("lines", change.Body.ModifiedLines))
-			}
+			slog.LogAttrs(context.Background(), slog.LevelDebug, "File was modified", slog.String("path", change.Path.After.Name), slog.Any("lines", change.Body.Lines))
 		case change.Path.Before.Type == Symlink && change.Path.After.Type == Symlink:
 			slog.LogAttrs(context.Background(), slog.LevelDebug, "Symlink was modified", slog.String("path", change.Path.After.Name))
 			// symlink was modified, every source line is modification
-			change.Body.ModifiedLines = CountLines(change.Body.After)
+			change.Body.Lines = MakeLineRange(CountLines(change.Body.After), LinesAfter)
 		case change.Path.Before.Type == Missing && change.Path.After.Type != Missing:
 			slog.LogAttrs(context.Background(), slog.LevelDebug, "File was added", slog.String("path", change.Path.After.Name))
 			// old file body is empty, meaning that every line was modified
-			change.Body.ModifiedLines = CountLines(change.Body.After)
+			change.Body.Lines = MakeLineRange(CountLines(change.Body.After), LinesAfter)
 		case change.Path.Before.Type != Missing && change.Path.After.Type == Missing:
 			slog.LogAttrs(context.Background(), slog.LevelDebug, "File was removed", slog.String("path", change.Path.After.Name))
 			// new file body is empty, meaning that every line was modified
-			change.Body.ModifiedLines = CountLines(change.Body.Before)
+			change.Body.Lines = MakeLineRange(CountLines(change.Body.Before), LinesBefore)
 		case change.Path.Before.Type == Missing && change.Path.After.Type == Missing:
 			slog.LogAttrs(context.Background(), slog.LevelDebug, "File was added and removed", slog.String("path", change.Path.After.Name))
 			// file was added and then removed
-			change.Body.ModifiedLines = []int{}
-		default:
-			slog.LogAttrs(context.Background(), slog.LevelWarn, "Unhandled change", slog.String("change", fmt.Sprintf("+%v", change)))
+			change.Body.Lines = []LineNumber{}
 		}
 
 		if change.Path.Before.Name == change.Path.Before.SymlinkTarget {
@@ -258,42 +391,141 @@ func getChangeByPath(changes []*FileChange, fpath string) *FileChange {
 	return nil
 }
 
-func getModifiedLines(cmd CommandRunner, commits []string, fpath, atCommit string, bodyBefore, bodyAfter []byte) ([]int, error) {
+func getModifiedLines(cmd CommandRunner, commits []string, beforePath, afterPath string) (LineNumbers, error) {
 	slog.LogAttrs(context.Background(), slog.LevelDebug, "Getting list of modified lines",
 		slog.Any("commits", commits),
-		slog.String("path", fpath),
+		slog.String("beforePath", beforePath),
+		slog.String("afterPath", afterPath),
 	)
-	lines, err := Blame(cmd, fpath, atCommit)
+
+	output, err := cmd("diff", "-M", commits[0]+"^.."+commits[len(commits)-1], "--", beforePath, afterPath)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("git diff for %s: %w", afterPath, err)
 	}
 
-	linesBefore := bytes.Split(bodyBefore, []byte("\n"))
-	linesAfter := bytes.Split(bodyAfter, []byte("\n"))
-	slog.LogAttrs(context.Background(), slog.LevelDebug, "Number of lines", slog.Int("before", len(linesBefore)), slog.Int("after", len(linesAfter)))
+	lineNumbers := parseDiff(output, afterPath)
 
-	modLines := make([]int, 0, len(lines))
-	for _, line := range lines {
-		slog.LogAttrs(context.Background(), slog.LevelDebug, "Checking line", slog.String("commit", line.Commit), slog.Int("prev", line.PrevLine), slog.Int("line", line.Line))
-		if !slices.Contains(commits, line.Commit) {
-			continue
-		}
-
-		if line.PrevLine <= len(linesBefore) && line.Line <= len(linesAfter) {
-			slog.LogAttrs(context.Background(), slog.LevelDebug, "Checking line content", slog.String("before", string(linesBefore[line.PrevLine-1])), slog.String("after", string(linesAfter[line.Line-1])))
-			if bytes.Equal(linesBefore[line.PrevLine-1], linesAfter[line.Line-1]) {
-				continue
-			}
-		}
-
-		modLines = append(modLines, line.Line)
-	}
 	slog.LogAttrs(context.Background(), slog.LevelDebug, "List of modified lines",
 		slog.Any("commits", commits),
-		slog.String("path", fpath),
-		slog.Any("lines", modLines),
+		slog.String("beforePath", beforePath),
+		slog.String("afterPath", afterPath),
+		slog.Any("lines", lineNumbers),
 	)
-	return modLines, nil
+	return lineNumbers, nil
+}
+
+var diffHunkRe = regexp.MustCompile(`^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@`)
+
+// parseDiff parses unified diff output from git and returns a list of line
+// number mappings between old and new file versions.
+//
+// A unified diff contains one or more hunks, each starting with a header:
+//
+//	@@ -oldStart,oldCount +newStart,newCount @@
+//
+// Lines in the hunk body are prefixed with:
+//   - " " (space) -- unchanged context line, present in both old and new file.
+//   - "-" -- line removed from the old file.
+//   - "+" -- line added in the new file.
+//
+// When a line is modified, git represents it as a deletion followed by an
+// addition. We pair consecutive delete/add sequences to detect modifications:
+//   - Paired delete+add -> modification: {Before: oldLine, After: newLine}.
+//   - Unpaired delete   -> pure removal: {Before: oldLine, After: 0}.
+//   - Unpaired add      -> pure addition: {Before: 0, After: newLine}.
+//
+// Context lines are not tracked because BeforeForAfter() can compute the
+// old line number for any untracked line using the offset from the nearest
+// tracked entry.
+//
+// When the diff contains multiple files (e.g. renames), only the block
+// matching targetPath is processed.
+func parseDiff(diff []byte, targetPath string) LineNumbers {
+	var (
+		oldLine, newLine int
+		lineNumbers      = LineNumbers{}
+		// Pending deleted lines waiting to be paired with additions.
+		pendingDeletes []int
+		// Only process hunks from the diff block matching targetPath.
+		inTargetBlock bool
+		// True once we've entered a hunk (after @@). Reset on "diff "
+		// which starts a new file. Inside a hunk, all lines are content
+		// -- we must not match diff/+++/--- headers.
+		inHunk bool
+	)
+
+	// flushDeletes emits any pending deleted lines that were not paired
+	// with a subsequent addition. Unpaired deletes are pure removals
+	// (Before set, After=0). This is called when we hit a boundary that
+	// ends a contiguous delete/add block: a new hunk, a context line,
+	// or a new diff section.
+	flushDeletes := func() {
+		for _, d := range pendingDeletes {
+			lineNumbers = append(lineNumbers, LineNumber{Before: d, After: 0})
+		}
+		pendingDeletes = pendingDeletes[:0]
+	}
+
+	sc := bufio.NewScanner(bytes.NewReader(diff))
+	for sc.Scan() {
+		line := sc.Text()
+		switch {
+		case strings.HasPrefix(line, "diff "):
+			flushDeletes()
+			inTargetBlock = false
+			inHunk = false
+		case !inHunk && strings.HasPrefix(line, "+++ "):
+			// +++ b/path or +++ /dev/null
+			p := strings.TrimPrefix(line, "+++ b/")
+			inTargetBlock = p == targetPath
+		case !inTargetBlock:
+			continue
+		case strings.HasPrefix(line, "@@"):
+			flushDeletes()
+			inHunk = true
+			// Parse hunk header: @@ -oldStart,oldCount +newStart,newCount @@
+			// We decrement by 1 because line numbers in the hunk body are
+			// incremented before use, so the first line processed will be
+			// at the correct starting offset.
+			matches := diffHunkRe.FindStringSubmatch(line)
+			if len(matches) >= 4 {
+				oldLine, _ = strconv.Atoi(matches[1])
+				oldLine--
+				newLine, _ = strconv.Atoi(matches[3])
+				newLine--
+			}
+		case strings.HasPrefix(line, "-"):
+			// Deleted line -- don't emit yet, queue it so it can be paired
+			// with a subsequent addition to form a modification.
+			oldLine++
+			pendingDeletes = append(pendingDeletes, oldLine)
+		case strings.HasPrefix(line, "+"):
+			// Added line -- if there's a pending delete, pair them as a
+			// modification (old line replaced by new line). Otherwise it's
+			// a pure addition (Before=0).
+			newLine++
+			if len(pendingDeletes) > 0 {
+				lineNumbers = append(lineNumbers, LineNumber{
+					Before: pendingDeletes[0],
+					After:  newLine,
+				})
+				pendingDeletes = pendingDeletes[1:]
+			} else {
+				lineNumbers = append(lineNumbers, LineNumber{Before: 0, After: newLine})
+			}
+		default:
+			// Context (unchanged) line -- flush any unpaired deletes and
+			// advance both counters. We don't emit context lines because
+			// BeforeForAfter() can interpolate old line numbers for any
+			// untracked line using the offset from the nearest entry.
+			flushDeletes()
+			oldLine++
+			newLine++
+		}
+	}
+	flushDeletes()
+
+	return lineNumbers
 }
 
 func getTypeForPath(cmd CommandRunner, commit, fpath string) PathType {
@@ -367,14 +599,48 @@ func getContentAtCommit(cmd CommandRunner, commit, fpath string) []byte {
 	return body
 }
 
-func CountLines(body []byte) (lines []int) {
-	var line int
+func CountLines(body []byte) int {
+	var count int
 	s := bufio.NewScanner(bytes.NewReader(body))
 	for s.Scan() {
-		line++
-		lines = append(lines, line)
+		count++
 	}
-	return lines
+	return count
+}
+
+func MakeLineRange(n int, side LineRangeSide) LineNumbers {
+	lineNumbers := make(LineNumbers, n)
+	for i := range n {
+		switch side {
+		case LinesBefore:
+			lineNumbers[i] = LineNumber{Before: i + 1, After: 0}
+		case LinesAfter:
+			lineNumbers[i] = LineNumber{Before: 0, After: i + 1}
+		case LinesBoth:
+			lineNumbers[i] = LineNumber{Before: i + 1, After: i + 1}
+		}
+	}
+	return lineNumbers
+}
+
+func MakeLineRangeFromTo(first, last int, side LineRangeSide) LineNumbers {
+	n := last - first + 1
+	if n <= 0 {
+		return LineNumbers{}
+	}
+	lineNumbers := make(LineNumbers, n)
+	for i := range n {
+		l := first + i
+		switch side {
+		case LinesBefore:
+			lineNumbers[i] = LineNumber{Before: l, After: 0}
+		case LinesAfter:
+			lineNumbers[i] = LineNumber{Before: 0, After: l}
+		case LinesBoth:
+			lineNumbers[i] = LineNumber{Before: l, After: l}
+		}
+	}
+	return lineNumbers
 }
 
 func isDirectoryPath(path string) (bool, error) {

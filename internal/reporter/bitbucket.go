@@ -141,16 +141,18 @@ func moveReportedLine(report Report) (reported, original int) {
 		if original < 0 {
 			original = pl
 		}
-		for _, ml := range report.ModifiedLines {
-			if pl == ml {
-				original = pl
-				reported = pl
-			}
+		if report.Changes.Lines.HasAfter(pl) {
+			original = pl
+			reported = pl
 		}
 	}
 
-	if reported < 0 && len(report.ModifiedLines) > 0 {
-		return report.ModifiedLines[0], original
+	if reported < 0 {
+		for _, ln := range report.Changes.Lines {
+			if ln.After > 0 {
+				return ln.After, original
+			}
+		}
 	}
 
 	if reported < 0 {

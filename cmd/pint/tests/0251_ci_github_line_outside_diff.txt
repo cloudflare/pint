@@ -1,15 +1,14 @@
-http method github GET /api/v3/repos/cloudflare/pint/pulls/1/reviews 200 []
-http method github POST /api/v3/repos/cloudflare/pint/pulls/1/reviews 200 {}
-http method github GET /api/v3/repos/cloudflare/pint/pulls/1/comments 200 []
-http method github POST /api/v3/repos/cloudflare/pint/pulls/1/comments 200 {}
-http start github 127.0.0.1:6098
+http method github GET /api/v3/repos/foo/bar/pulls/123/reviews 200 []
+http method github POST /api/v3/repos/foo/bar/pulls/123/reviews 200 {}
+http method github GET /api/v3/repos/foo/bar/pulls/123/comments 200 []
+http method github POST /api/v3/repos/foo/bar/pulls/123/comments 200 {}
+http start github 127.0.0.1:6251
 
 mkdir testrepo
 cd testrepo
 exec git init --initial-branch=main .
 
 cp ../src/v1.yml rules.yml
-exec ln -s rules.yml symlink.yml
 cp ../src/.pint.hcl .
 env GIT_AUTHOR_NAME=pint
 env GIT_AUTHOR_EMAIL=pint@example.com
@@ -23,8 +22,13 @@ cp ../src/v2.yml rules.yml
 exec git commit -am 'v2'
 
 env GITHUB_AUTH_TOKEN=12345
-env GITHUB_PULL_REQUEST_NUMBER=1
-exec pint -l debug -d promql/series --no-color ci
+env GITHUB_ACTION=YES
+env GITHUB_EVENT_NAME=pull_request
+env GITHUB_REF=refs/pull/123/merge
+env GITHUB_BASE_REF=main
+env GITHUB_REPOSITORY=foo/bar
+env GITHUB_API_URL=http://127.0.0.1:6251
+exec pint -l debug --offline --no-color ci
 ! stdout .
 stderr 'level=INFO msg="Pull request review created" status="200 OK"'
 cmp github.got ../github.expected
@@ -34,40 +38,48 @@ groups:
 - name: foo
   rules:
   - alert: rule1
-    expr: rate(errors_total[5m]) > 0
-  - alert: rule2
-    expr: rate(errors_total[5m]) > 0
+    expr: sum(foo) by(job)
+    for: 5m
+    labels:
+      priority: "1"
+      notify: "team-a"
+      env: "prod"
+      region: "us"
+      service: "web"
+      owner: "sre"
+      tier: "frontend"
+      component: "api"
+      cluster: dev
 
 -- src/v2.yml --
 groups:
 - name: foo
   rules:
   - alert: rule1
-    expr: rate(errors_total[2m]) > 0
-  - alert: rule2
-    expr: rate(errors_total[2m])
+    expr: sum(foo) by(job)
+    for: 5m
+    labels:
+      priority: "1"
+      notify: "team-a"
+      env: "prod"
+      region: "us"
+      service: "web"
+      owner: "sre"
+      tier: "frontend"
+      component: "api"
+      cluster: prod
 
 -- src/.pint.hcl --
-ci {
-  baseBranch = "main"
-}
-repository {
-  github {
-    baseuri   = "http://127.0.0.1:6098"
-    uploaduri = "http://127.0.0.1:6098"
-    owner     = "cloudflare"
-    repo      = "pint"
-  }
-}
+repository {}
 
 -- github.expected --
-GET /api/v3/repos/cloudflare/pint/pulls/1/comments
+GET /api/v3/repos/foo/bar/pulls/123/comments
   Accept: application/vnd.github.squirrel-girl-preview, application/vnd.github.comfort-fade-preview+json
   Accept-Encoding: gzip
   Authorization: Bearer 12345
   X-Github-Api-Version: 2022-11-28
 
-POST /api/v3/repos/cloudflare/pint/pulls/1/comments
+POST /api/v3/repos/foo/bar/pulls/123/comments
   Accept: application/vnd.github.squirrel-girl-preview, application/vnd.github.comfort-fade-preview+json
   Accept-Encoding: gzip
   Authorization: Bearer 12345
@@ -81,8 +93,8 @@ body: |
   <summary>always firing alert</summary>
 
   ```yaml
-  7 |     expr: rate(errors_total[2m])
-                     ^^^^^^^^^^^^^^^^ 
+  5 |     expr: sum(foo) by(job)
+                    ^^^ 
   ```
 
   This query doesn't have any condition and so this alert will always fire if it matches anything.
@@ -97,31 +109,20 @@ body: |
 
   ------
 
-  The same issue was reported 1 more time(s), duplicates where suppressed.
-
-  <details>
-  <summary>Show affected rules</summary>
-
-  - `rule2` at `symlink.yml:7`
-
-  </details>
-
-  ------
-
   :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/comparison.html).
 path: rules.yml
-line: 7
+line: 16
 side: RIGHT
 commit_id: <COMMIT ID>
 --- END ---
 
-GET /api/v3/repos/cloudflare/pint/pulls/1/reviews
+GET /api/v3/repos/foo/bar/pulls/123/reviews
   Accept: application/vnd.github.v3+json
   Accept-Encoding: gzip
   Authorization: Bearer 12345
   X-Github-Api-Version: 2022-11-28
 
-POST /api/v3/repos/cloudflare/pint/pulls/1/reviews
+POST /api/v3/repos/foo/bar/pulls/123/reviews
   Accept: application/vnd.github.v3+json
   Accept-Encoding: gzip
   Authorization: Bearer 12345
@@ -134,17 +135,17 @@ body: |+
   :heavy_exclamation_mark:	Problems found.
   | Severity | Number of problems |
   | --- | --- |
-  | Warning | 2 |
+  | Warning | 1 |
   <details><summary>Stats</summary>
   <p>
 
   | Stat | Value |
   | --- | --- |
   | Version | unknown |
-  | Number of rules parsed | 4 |
-  | Number of rules checked | 4 |
-  | Number of problems found | 2 |
-  | Number of offline checks | 36 |
+  | Number of rules parsed | 1 |
+  | Number of rules checked | 1 |
+  | Number of problems found | 1 |
+  | Number of offline checks | 9 |
   | Number of online checks | 0 |
   | Checks duration | 0 |
 
@@ -156,9 +157,9 @@ body: |+
 
   ```
   Warning: always firing alert (alerts/comparison)
-    ---> rules.yml:7 -> `rule2` [+1 duplicates]
-  7 |     expr: rate(errors_total[2m])
-                     ^^^^^^^^^^^^^^^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
+    ---> rules.yml:5 -> `rule1`
+  5 |     expr: sum(foo) by(job)
+                    ^^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
 
   ```
 

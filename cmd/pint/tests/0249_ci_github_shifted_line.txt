@@ -1,8 +1,8 @@
-http method github GET /api/v3/repos/cloudflare/pint/pulls/1/reviews 200 []
-http method github POST /api/v3/repos/cloudflare/pint/pulls/1/reviews 200 {}
-http method github GET /api/v3/repos/cloudflare/pint/pulls/1/comments 200 []
-http method github POST /api/v3/repos/cloudflare/pint/pulls/1/comments 200 {}
-http start github 127.0.0.1:6032
+http method github GET /api/v3/repos/foo/bar/pulls/123/reviews 200 []
+http method github POST /api/v3/repos/foo/bar/pulls/123/reviews 200 {}
+http method github GET /api/v3/repos/foo/bar/pulls/123/comments 200 []
+http method github POST /api/v3/repos/foo/bar/pulls/123/comments 200 {}
+http start github 127.0.0.1:6249
 
 mkdir testrepo
 cd testrepo
@@ -22,63 +22,45 @@ cp ../src/v2.yml rules.yml
 exec git commit -am 'v2'
 
 env GITHUB_AUTH_TOKEN=12345
-env GITHUB_PULL_REQUEST_NUMBER=1
+env GITHUB_ACTION=YES
+env GITHUB_EVENT_NAME=pull_request
+env GITHUB_REF=refs/pull/123/merge
+env GITHUB_BASE_REF=main
+env GITHUB_REPOSITORY=foo/bar
+env GITHUB_API_URL=http://127.0.0.1:6249
 exec pint -l debug --offline --no-color ci
 ! stdout .
 stderr 'level=INFO msg="Pull request review created" status="200 OK"'
 cmp github.got ../github.expected
 
 -- src/v1.yml --
-- alert: rule1
-  expr: sum(foo) by(job)
-- alert: rule2
-  expr: sum(foo) by(job)
-  for: 0s
+groups:
+- name: foo
+  rules:
+  - alert: rule1
+    expr: sum(foo) by(job)
 
 -- src/v2.yml --
-- alert: rule1
-  expr: sum(foo) by(job)
-  for: 0s
-- alert: rule2
-  expr: sum(foo) by(job)
-  for: 0s
-- record: foo
-  expr: sum without (instance, node_status, node_type) ((rate(http_responses[2m])) or vector(0))
+groups:
+- name: foo
+  rules:
+  - record: new_rule
+    expr: count(up)
+  - alert: rule1
+    expr: sum(foo) by(job)
+    for: 0s
 
 -- src/.pint.hcl --
-ci {
-  baseBranch = "main"
-}
-parser {
-  relaxed = [".*"]
-}
-repository {
-  github {
-    baseuri   = "http://127.0.0.1:6032"
-    uploaduri = "http://127.0.0.1:6032"
-    owner     = "cloudflare"
-    repo      = "pint"
-  }
-}
-rule {
-  match {
-    kind = "recording"
-  }
-  aggregate ".+" {
-    comment  = "job label is required to track ownership."
-    severity = "warning"
-    keep     = ["job"]
-  }
-}
+repository {}
 
 -- github.expected --
-GET /api/v3/repos/cloudflare/pint/pulls/1/comments
+GET /api/v3/repos/foo/bar/pulls/123/comments
   Accept: application/vnd.github.squirrel-girl-preview, application/vnd.github.comfort-fade-preview+json
   Accept-Encoding: gzip
   Authorization: Bearer 12345
   X-Github-Api-Version: 2022-11-28
 
-POST /api/v3/repos/cloudflare/pint/pulls/1/comments
+POST /api/v3/repos/foo/bar/pulls/123/comments
   Accept: application/vnd.github.squirrel-girl-preview, application/vnd.github.comfort-fade-preview+json
   Accept-Encoding: gzip
   Authorization: Bearer 12345
@@ -92,8 +74,8 @@ body: |
   <summary>always firing alert</summary>
 
   ```yaml
-  2 |   expr: sum(foo) by(job)
-                  ^^^ 
+  7 |     expr: sum(foo) by(job)
+                    ^^^ 
   ```
 
   This query doesn't have any condition and so this alert will always fire if it matches anything.
@@ -110,12 +92,12 @@ body: |
 
   :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/comparison.html).
 path: rules.yml
-line: 3
+line: 8
 side: RIGHT
 commit_id: <COMMIT ID>
 --- END ---
 
-POST /api/v3/repos/cloudflare/pint/pulls/1/comments
+POST /api/v3/repos/foo/bar/pulls/123/comments
   Accept: application/vnd.github.squirrel-girl-preview, application/vnd.github.comfort-fade-preview+json
   Accept-Encoding: gzip
   Authorization: Bearer 12345
@@ -129,8 +111,8 @@ body: |
   <summary>redundant field with default value</summary>
 
   ```yaml
-  3 |   for: 0s
-             ^^ 
+  8 |     for: 0s
+               ^^ 
   ```
 
   `0s` is the default value of `for`, this line is unnecessary.
@@ -141,53 +123,18 @@ body: |
 
   :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/for.html).
 path: rules.yml
-line: 3
-side: RIGHT
-commit_id: <COMMIT ID>
---- END ---
-
-POST /api/v3/repos/cloudflare/pint/pulls/1/comments
-  Accept: application/vnd.github.squirrel-girl-preview, application/vnd.github.comfort-fade-preview+json
-  Accept-Encoding: gzip
-  Authorization: Bearer 12345
-  Content-Type: application/json
-  X-Github-Api-Version: 2022-11-28
---- BODY ---
-body: |
-  :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **promql/aggregate** check.
-
-  <details>
-  <summary>required label is being removed via aggregation</summary>
-
-  ```yaml
-  8 |   expr: sum without (instance, node_status, node_type) ((rate(http_responses[2m])) or vector(0))
-                                                                                            ^^^^^^ 
-  ```
-
-  Calling `vector()` will return a vector value with no labels.
-
-  `job` label is required and should be preserved when aggregating all rules.
-
-  Rule comment: job label is required to track ownership.
-
-  </details>
-
-  ------
-
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/aggregate.html).
-path: rules.yml
 line: 8
 side: RIGHT
 commit_id: <COMMIT ID>
 --- END ---
 
-GET /api/v3/repos/cloudflare/pint/pulls/1/reviews
+GET /api/v3/repos/foo/bar/pulls/123/reviews
   Accept: application/vnd.github.v3+json
   Accept-Encoding: gzip
   Authorization: Bearer 12345
   X-Github-Api-Version: 2022-11-28
 
-POST /api/v3/repos/cloudflare/pint/pulls/1/reviews
+POST /api/v3/repos/foo/bar/pulls/123/reviews
   Accept: application/vnd.github.v3+json
   Accept-Encoding: gzip
   Authorization: Bearer 12345
@@ -200,7 +147,7 @@ body: |+
   :heavy_exclamation_mark:	Problems found.
   | Severity | Number of problems |
   | --- | --- |
-  | Warning | 2 |
+  | Warning | 1 |
   | Information | 1 |
   <details><summary>Stats</summary>
   <p>
@@ -208,10 +155,10 @@ body: |+
   | Stat | Value |
   | --- | --- |
   | Version | unknown |
-  | Number of rules parsed | 3 |
-  | Number of rules checked | 3 |
-  | Number of problems found | 3 |
-  | Number of offline checks | 19 |
+  | Number of rules parsed | 2 |
+  | Number of rules checked | 2 |
+  | Number of problems found | 2 |
+  | Number of offline checks | 18 |
   | Number of online checks | 0 |
   | Checks duration | 0 |
 
@@ -223,20 +170,14 @@ body: |+
 
   ```
   Warning: always firing alert (alerts/comparison)
-    ---> rules.yml:2 -> `rule1`
-  2 |   expr: sum(foo) by(job)
-                  ^^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
+    ---> rules.yml:7 -> `rule1`
+  7 |     expr: sum(foo) by(job)
+                    ^^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
 
   Information: redundant field with default value (alerts/for)
-    ---> rules.yml:3 -> `rule1`
-  3 |   for: 0s
-             ^^ `0s` is the default value of `for`, this line is unnecessary.
-
-  Warning: required label is being removed via aggregation (promql/aggregate)
-    ---> rules.yml:8 -> `foo`
-  8 |   expr: sum without (instance, node_status, node_type) ((rate(http_responses[2m])) or vector(0))
-                                                                                            ^^^^^^ Calling `vector()` will return a vector value with no labels.
-                                                                                                   `job` label is required and should be preserved when aggregating all rules.
+    ---> rules.yml:8 -> `rule1`
+  8 |     for: 0s
+               ^^ `0s` is the default value of `for`, this line is unnecessary.
 
   ```
 

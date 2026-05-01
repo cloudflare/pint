@@ -12,6 +12,7 @@ import (
 
 	"github.com/cloudflare/pint/internal/comments"
 	"github.com/cloudflare/pint/internal/diags"
+	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -76,13 +77,22 @@ func (p Path) String() string {
 	return fmt.Sprintf("%s ~> %s", p.Name, p.SymlinkTarget)
 }
 
+type Changes struct {
+	// OldPath is non-empty if we have information about file changes
+	// and the file containing this rule was renamed or moved.
+	OldPath string
+
+	// Modified lines.
+	Lines git.LineNumbers
+}
+
 type Entry struct {
 	PathError      error
 	File           *parser.File  `json:"-"`
 	Group          *parser.Group `json:"-"`
 	Path           Path
 	Owner          string
-	ModifiedLines  []int
+	Changes        Changes
 	DisabledChecks []string
 	Rule           parser.Rule
 	State          ChangeType
@@ -118,6 +128,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 		First: min(file.TotalLines, 1),
 		Last:  file.TotalLines,
 	}
+	contentLineNumbers := git.MakeLineRangeFromTo(contentLines.First, contentLines.Last, git.LinesAfter)
 
 	var badOwners []comments.Comment
 	var fileOwner string
@@ -153,19 +164,21 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 			)
 		case comments.InvalidComment:
 			entries = append(entries, &Entry{
+				State: Noop,
 				Path: Path{
 					Name:          sourcePath,
 					SymlinkTarget: reportedPath,
 				},
-				PathError:     comment.Value.(comments.Invalid).Err,
-				Owner:         fileOwner,
-				ModifiedLines: contentLines.Expand(),
+				PathError: comment.Value.(comments.Invalid).Err,
+				Owner:     fileOwner,
+				Changes:   Changes{OldPath: "", Lines: contentLineNumbers},
 			})
 		}
 	}
 
 	for _, d := range file.Diagnostics {
 		entries = append(entries, &Entry{
+			State: Noop,
 			Path: Path{
 				Name:          sourcePath,
 				SymlinkTarget: reportedPath,
@@ -173,8 +186,8 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 			PathError: FileIgnoreError{
 				Diagnostic: d,
 			},
-			Owner:         fileOwner,
-			ModifiedLines: contentLines.Expand(),
+			Owner:   fileOwner,
+			Changes: Changes{OldPath: "", Lines: contentLineNumbers},
 		})
 		return entries
 	}
@@ -187,13 +200,14 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 			slog.Int("line", file.Error.Line),
 		)
 		entries = append(entries, &Entry{
+			State: Noop,
 			Path: Path{
 				Name:          sourcePath,
 				SymlinkTarget: reportedPath,
 			},
-			PathError:     file.Error,
-			Owner:         fileOwner,
-			ModifiedLines: contentLines.Expand(),
+			PathError: file.Error,
+			Owner:     fileOwner,
+			Changes:   Changes{OldPath: "", Lines: contentLineNumbers},
 		})
 		return entries
 	}
@@ -207,13 +221,14 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 				slog.Int("line", group.Error.Line),
 			)
 			entries = append(entries, &Entry{
+				State: Noop,
 				Path: Path{
 					Name:          sourcePath,
 					SymlinkTarget: reportedPath,
 				},
-				PathError:     group.Error,
-				Owner:         fileOwner,
-				ModifiedLines: []int{group.Error.Line},
+				PathError: group.Error,
+				Owner:     fileOwner,
+				Changes:   Changes{OldPath: "", Lines: []git.LineNumber{{Before: 0, After: group.Error.Line}}},
 			})
 		}
 		for _, rule := range group.Rules {
@@ -221,7 +236,9 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 			for _, owner := range comments.Only[comments.Owner](rule.Comments, comments.RuleOwnerType) {
 				ruleOwner = owner.Name
 			}
+			ruleLineNumbers := git.MakeLineRangeFromTo(rule.Lines.First, rule.Lines.Last, git.LinesAfter)
 			entries = append(entries, &Entry{
+				State: Noop,
 				Path: Path{
 					Name:          sourcePath,
 					SymlinkTarget: reportedPath,
@@ -229,7 +246,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 				File:           &file,
 				Group:          &group,
 				Rule:           rule,
-				ModifiedLines:  rule.Lines.Expand(),
+				Changes:        Changes{OldPath: "", Lines: ruleLineNumbers},
 				Owner:          ruleOwner,
 				DisabledChecks: disabledChecks,
 			})
@@ -240,6 +257,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 		for _, comment := range badOwners {
 			owner := comment.Value.(comments.Owner)
 			entries = append(entries, &Entry{
+				State: Noop,
 				Path: Path{
 					Name:          sourcePath,
 					SymlinkTarget: reportedPath,
@@ -259,7 +277,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 						Kind:        diags.Issue,
 					},
 				},
-				ModifiedLines: contentLines.Expand(),
+				Changes: Changes{OldPath: "", Lines: contentLineNumbers},
 			})
 		}
 	}

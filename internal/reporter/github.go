@@ -37,21 +37,31 @@ type ghCommentMeta struct {
 	id int64
 }
 
-type ghPR struct {
-	files []*github.CommitFile
-}
+type ghPR struct{}
 
-func (pr ghPR) String() string {
-	return fmt.Sprintf("%d file(s)", len(pr.files))
-}
-
-func (pr ghPR) getFile(path string) *github.CommitFile {
-	for _, f := range pr.files {
-		if f.GetFilename() == path {
-			return f
+// commentPosition returns the side and line number for a GitHub PR review comment.
+// GitHub only accepts comments on lines present in the diff, so if the target
+// line is not in the diff we move it to the nearest changed line.
+// AnchorBefore targets the old (deleted) side if oldLine is known.
+// AnchorAfter (or fallback) targets the new (added/unchanged) side.
+func (gr GithubReporter) commentPosition(p PendingComment) (side string, line int) {
+	oldLine := p.changedLines.BeforeForAfter(p.line)
+	if p.anchor == checks.AnchorBefore && oldLine > 0 {
+		if p.changedLines.HasBefore(oldLine) {
+			return "LEFT", oldLine
 		}
+		if nearest := p.changedLines.NearestBefore(oldLine); nearest > 0 {
+			return "LEFT", nearest
+		}
+		// No deleted lines in the diff, fall through to RIGHT side.
 	}
-	return nil
+	if p.changedLines.HasAfter(p.line) {
+		return "RIGHT", p.line
+	}
+	if nearest := p.changedLines.NearestAfter(p.line); nearest > 0 {
+		return "RIGHT", nearest
+	}
+	return "RIGHT", p.line
 }
 
 // NewGithubReporter creates a new GitHub reporter that reports
@@ -110,10 +120,8 @@ func (gr GithubReporter) Describe() string {
 	return "GitHub"
 }
 
-func (gr GithubReporter) Destinations(ctx context.Context) (_ []any, err error) {
-	var pr ghPR
-	pr.files, err = gr.listPRFiles(ctx)
-	return []any{pr}, err
+func (gr GithubReporter) Destinations(_ context.Context) ([]any, error) {
+	return []any{ghPR{}}, nil
 }
 
 func (gr GithubReporter) Summary(ctx context.Context, _ any, s Summary, pendingComments []PendingComment, errs []error) error {
@@ -172,27 +180,20 @@ func (gr GithubReporter) List(ctx context.Context, _ any) ([]ExistingComment, er
 	return comments, nil
 }
 
-func (gr GithubReporter) Create(ctx context.Context, dst any, p PendingComment) error {
-	pr := dst.(ghPR)
+func (gr GithubReporter) Create(ctx context.Context, _ any, p PendingComment) error {
+	side, line := gr.commentPosition(p)
 
-	file := pr.getFile(p.path)
-	if file == nil {
-		slog.LogAttrs(ctx, slog.LevelDebug, "Skipping report for path with no changes",
-			slog.String("path", p.path),
-		)
-		return nil
-	}
-
-	diffs := parseDiffLines(file.GetPatch())
-	if len(diffs) == 0 {
-		slog.LogAttrs(ctx, slog.LevelDebug, "Skipping report for path with no diff",
-			slog.String("path", p.path),
-		)
-		return nil
-	}
-
-	side, line := gr.fixCommentLine(dst, p)
-
+	// The generated comment must follow these rules:
+	// https://docs.github.com/en/rest/pulls/comments#create-a-review-comment-for-a-pull-request
+	//
+	// Required fields:
+	//   - commit_id: SHA of the head commit. Using a stale SHA may render
+	//     the comment outdated if a later commit modifies the same line.
+	//   - path:      relative file path in the repository.
+	//   - line:      line number in the diff blob that the comment applies to.
+	//   - side:      which side of a split diff the comment targets:
+	//       "LEFT"  -- deletions (red lines in the diff).
+	//       "RIGHT" -- additions (green) or unchanged context lines (white).
 	comment := &github.PullRequestComment{
 		CommitID: new(gr.headCommit),
 		Path:     new(p.path),
@@ -228,11 +229,11 @@ func (gr GithubReporter) CanCreate(done int) bool {
 	return done < gr.maxComments
 }
 
-func (gr GithubReporter) IsEqual(dst any, existing ExistingComment, pending PendingComment) bool {
+func (gr GithubReporter) IsEqual(_ any, existing ExistingComment, pending PendingComment) bool {
 	if existing.path != pending.path {
 		return false
 	}
-	_, line := gr.fixCommentLine(dst, pending)
+	_, line := gr.commentPosition(pending)
 	if existing.line != line {
 		return false
 	}
@@ -301,18 +302,6 @@ func (gr GithubReporter) createReview(ctx context.Context, summary Summary) erro
 	}
 	slog.LogAttrs(ctx, slog.LevelInfo, "Pull request review created", slog.String("status", resp.Status))
 	return nil
-}
-
-func (gr GithubReporter) listPRFiles(ctx context.Context) ([]*github.CommitFile, error) {
-	reqCtx, cancel := gr.reqContext(ctx)
-	defer cancel()
-
-	slog.LogAttrs(ctx, slog.LevelDebug, "Getting the list of modified files", slog.Int("pr", gr.prNum))
-	files, _, err := gr.client.PullRequests.ListFiles(reqCtx, gr.owner, gr.repo, gr.prNum, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to list pull request files: %w", err)
-	}
-	return files, nil
 }
 
 func formatGHReviewBody(ctx context.Context, version string, summary Summary, showDuplicates bool) string {
@@ -413,41 +402,4 @@ func (gr GithubReporter) generalComment(ctx context.Context, body string) error 
 
 func (gr GithubReporter) reqContext(ctx context.Context) (context.Context, context.CancelFunc) {
 	return context.WithTimeout(context.WithValue(ctx, github.SleepUntilPrimaryRateLimitResetWhenRateLimited, true), gr.timeout)
-}
-
-func (gr GithubReporter) fixCommentLine(dst any, p PendingComment) (string, int) {
-	pr := dst.(ghPR)
-	file := pr.getFile(p.path)
-
-	var side string
-	if p.anchor == checks.AnchorBefore {
-		side = "LEFT"
-	} else {
-		side = "RIGHT"
-	}
-
-	line := p.line
-	diffs := parseDiffLines(file.GetPatch())
-	dl, ok := diffLineFor(diffs, int64(p.line))
-	switch {
-	case ok && dl.wasModified && p.anchor == checks.AnchorAfter:
-		// Comment on new or modified line.
-		line = int(dl.new) // FIXME int64 -> int
-	case ok && dl.wasModified && p.anchor == checks.AnchorBefore:
-		// Comment on new or modified line.
-		line = int(dl.old) // FIXME int64 -> int
-	default:
-		// Comment on unmodified line.
-		// Find first modified line and put it there.
-		for _, d := range diffs {
-			if !d.wasModified {
-				continue
-			}
-			line = int(d.new) // FIXME int64 -> int
-			side = "RIGHT"
-			break
-		}
-	}
-
-	return side, line
 }

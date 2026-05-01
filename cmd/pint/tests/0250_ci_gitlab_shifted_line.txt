@@ -3,7 +3,7 @@ http method gitlab GET /api/v4/projects/1234/merge_requests/1/versions 200 [{"id
 http method gitlab GET /api/v4/projects/1234/merge_requests/1/discussions 200 []
 http method gitlab GET /api/v4/projects/1234/merge_requests 200 [{"iid": 1}]
 http method gitlab POST /api/v4/projects/1234/merge_requests/1/discussions 200 {}
-http start gitlab 127.0.0.1:6222
+http start gitlab 127.0.0.1:6250
 
 mkdir testrepo
 cd testrepo
@@ -31,15 +31,18 @@ cmp gitlab.got ../gitlab.expected
 groups:
 - name: foo
   rules:
-  - record: foo
-    expr: count by (a, b, c, job) (bar)
+  - alert: rule1
+    expr: sum(foo) by(job)
 
 -- src/v2.yml --
 groups:
 - name: foo
   rules:
-  - record: foo
-    expr: count by (a, b, c) (bar)
+  - record: new_rule
+    expr: count(up)
+  - alert: rule1
+    expr: sum(foo) by(job)
+    for: 0s
 
 -- src/.pint.hcl --
 ci {
@@ -47,16 +50,9 @@ ci {
 }
 repository {
   gitlab {
-    uri        = "http://127.0.0.1:6222"
+    uri        = "http://127.0.0.1:6250"
     timeout    = "30s"
     project    = "1234"
-  }
-}
-rule {
-  aggregate ".+" {
-    comment  = "Must keep job label"
-    severity = "warning"
-    keep     = ["job"]
   }
 }
 
@@ -88,27 +84,29 @@ POST /api/v4/projects/1234/merge_requests/1/discussions
   Private-Token: secret
 --- BODY ---
 body: |
-  :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **promql/aggregate** check.
+  :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **alerts/comparison** check.
 
   <details>
-  <summary>required label is being removed via aggregation</summary>
+  <summary>always firing alert</summary>
 
   ```yaml
-  5 |     expr: count by (a, b, c) (bar)
-                      ^^^ 
+  7 |     expr: sum(foo) by(job)
+                    ^^^ 
   ```
 
-  Query is using aggregation with `by(a, b, c)`, only labels included inside `by(...)` will be present on the results.
+  This query doesn't have any condition and so this alert will always fire if it matches anything.
 
-  `job` label is required and should be preserved when aggregating all rules.
-
-  Rule comment: Must keep job label
+  Prometheus alerting rules will trigger an alert for each query that returns *any* result.
+  Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.
+  In most cases this can be achieved by having some condition in the query expression.
+  For example `up == 0` or `rate(error_total[2m]) > 0`.
+  Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
 
   </details>
 
   ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/aggregate.html).
+  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/comparison.html).
 position:
   base_sha: base
   head_sha: head
@@ -116,7 +114,40 @@ position:
   new_path: rules.yml
   old_path: rules.yml
   position_type: text
-  new_line: 5
-  old_line: 5
+  new_line: 8
+--- END ---
+
+POST /api/v4/projects/1234/merge_requests/1/discussions
+  Accept: application/json
+  Accept-Encoding: gzip
+  Content-Type: application/json
+  Private-Token: secret
+--- BODY ---
+body: |
+  :information_source: **Information** reported by [pint](https://cloudflare.github.io/pint/) **alerts/for** check.
+
+  <details>
+  <summary>redundant field with default value</summary>
+
+  ```yaml
+  8 |     for: 0s
+               ^^ 
+  ```
+
+  `0s` is the default value of `for`, this line is unnecessary.
+
+  </details>
+
+  ------
+
+  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/for.html).
+position:
+  base_sha: base
+  head_sha: head
+  start_sha: start
+  new_path: rules.yml
+  old_path: rules.yml
+  position_type: text
+  new_line: 8
 --- END ---
 

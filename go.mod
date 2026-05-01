@@ -3,7 +3,6 @@ module github.com/cloudflare/pint
 go 1.26.0
 
 require (
-	github.com/akedrou/textdiff v0.1.0
 	github.com/cespare/xxhash/v2 v2.3.0
 	github.com/gkampitakis/go-snaps v0.5.21
 	github.com/go-json-experiment/json v0.0.0-20260214004413-d219187c3433

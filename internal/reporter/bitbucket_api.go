@@ -379,7 +379,7 @@ func (bb bitBucketAPI) createAnnotations(summary Summary, commit string) error {
 	annotations := make([]BitBucketAnnotation, 0, len(summary.reports))
 	for _, report := range summary.reports {
 		ann := reportToAnnotation(report)
-		if !slices.Contains(report.ModifiedLines, ann.Line) {
+		if !report.Changes.Lines.HasAfter(ann.Line) {
 			slog.LogAttrs(context.Background(), slog.LevelWarn, "Annotation for unmodified line, skipping", slog.String("path", ann.Path), slog.Int("line", ann.Line))
 			continue
 		}

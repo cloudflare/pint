@@ -13,13 +13,13 @@ import (
 )
 
 type Report struct {
-	Path          discovery.Path
-	Owner         string
-	ModifiedLines []int
-	Duplicates    []*Report
-	Rule          parser.Rule
-	Problem       checks.Problem
-	IsDuplicate   bool
+	Path        discovery.Path
+	Owner       string
+	Changes     discovery.Changes
+	Duplicates  []*Report
+	Rule        parser.Rule
+	Problem     checks.Problem
+	IsDuplicate bool
 }
 
 func (r Report) isEqual(nr Report) bool {

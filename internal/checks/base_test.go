@@ -30,6 +30,7 @@ import (
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
@@ -289,15 +290,16 @@ func parseContent(content string, opts parser.Options) (entries []*discovery.Ent
 
 	for _, group := range file.Groups {
 		for _, rule := range group.Rules {
+			ruleLineNumbers := git.MakeLineRangeFromTo(rule.Lines.First, rule.Lines.Last, git.LinesAfter)
 			entries = append(entries, &discovery.Entry{
 				Path: discovery.Path{
 					Name:          "fake.yml",
 					SymlinkTarget: "fake.yml",
 				},
-				ModifiedLines: rule.Lines.Expand(),
-				Rule:          rule,
-				Group:         &group,
-				File:          &file,
+				Changes: discovery.Changes{Lines: ruleLineNumbers},
+				Rule:    rule,
+				Group:   &group,
+				File:    &file,
 			})
 		}
 	}

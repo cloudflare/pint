@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/diags"
+	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -102,12 +103,14 @@ func TestReadRules(t *testing.T) {
 			isStrict: false,
 			entries: []Entry{
 				{
-					State: Unknown,
+					State: Noop,
 					Path: Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines:  []int{4, 5},
+					Changes: Changes{
+						Lines: git.MakeLineRangeFromTo(4, 5, git.LinesAfter),
+					},
 					Rule:           mustParse(3, "- record: foo\n  expr: bar\n"),
 					DisabledChecks: []string{"promql/series"},
 				},
@@ -131,12 +134,14 @@ groups:
 			isStrict: true,
 			entries: []Entry{
 				{
-					State: Unknown,
+					State: Noop,
 					Path: Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines:  []int{7, 8},
+					Changes: Changes{
+						Lines: git.MakeLineRangeFromTo(7, 8, git.LinesAfter),
+					},
 					Rule:           mustParse(6, "  - record: foo\n    expr: bar\n"),
 					DisabledChecks: []string{"promql/series"},
 				},
@@ -157,13 +162,15 @@ groups:
 			isStrict: false,
 			entries: []Entry{
 				{
-					State: Unknown,
+					State: Noop,
 					Path: Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{4, 5},
-					Rule:          mustParse(3, "- record: foo\n  expr: bar\n"),
+					Changes: Changes{
+						Lines: git.MakeLineRangeFromTo(4, 5, git.LinesAfter),
+					},
+					Rule: mustParse(3, "- record: foo\n  expr: bar\n"),
 				},
 			},
 		},
@@ -185,13 +192,15 @@ groups:
 			isStrict: true,
 			entries: []Entry{
 				{
-					State: Unknown,
+					State: Noop,
 					Path: Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{7, 8},
-					Rule:          mustParse(6, "  - record: foo\n    expr: bar\n"),
+					Changes: Changes{
+						Lines: git.MakeLineRangeFromTo(7, 8, git.LinesAfter),
+					},
+					Rule: mustParse(6, "  - record: foo\n    expr: bar\n"),
 				},
 			},
 		},
@@ -210,12 +219,14 @@ groups:
 			isStrict: false,
 			entries: []Entry{
 				{
-					State: Unknown,
+					State: Noop,
 					Path: Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines:  []int{4, 5},
+					Changes: Changes{
+						Lines: git.MakeLineRangeFromTo(4, 5, git.LinesAfter),
+					},
 					Rule:           mustParse(3, "- record: foo\n  expr: bar\n"),
 					DisabledChecks: []string{"promql/series"},
 				},
@@ -239,12 +250,14 @@ groups:
 			isStrict: true,
 			entries: []Entry{
 				{
-					State: Unknown,
+					State: Noop,
 					Path: Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines:  []int{7, 8},
+					Changes: Changes{
+						Lines: git.MakeLineRangeFromTo(7, 8, git.LinesAfter),
+					},
 					Rule:           mustParse(6, "  - record: foo\n    expr: bar\n"),
 					DisabledChecks: []string{"promql/series"},
 				},
@@ -265,12 +278,14 @@ groups:
 			isStrict: false,
 			entries: []Entry{
 				{
-					State: Unknown,
+					State: Noop,
 					Path: Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{1, 2, 3, 4, 5},
+					Changes: Changes{
+						Lines: git.MakeLineRangeFromTo(1, 5, git.LinesAfter),
+					},
 					PathError: FileIgnoreError{
 						Diagnostic: diags.Diagnostic{
 							Message: "This file was excluded from pint checks.",
@@ -303,12 +318,14 @@ groups:
 			isStrict: true,
 			entries: []Entry{
 				{
-					State: Unknown,
+					State: Noop,
 					Path: Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{1, 2, 3, 4, 5, 6, 7, 8},
+					Changes: Changes{
+						Lines: git.MakeLineRangeFromTo(1, 8, git.LinesAfter),
+					},
 					PathError: FileIgnoreError{
 						Diagnostic: diags.Diagnostic{
 							Message: "This file was excluded from pint checks.",
@@ -367,70 +384,6 @@ func TestPathString(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.title, func(t *testing.T) {
 			require.Equal(t, tc.expected, tc.path.String())
-		})
-	}
-}
-
-func TestCommonLines(t *testing.T) {
-	testCases := []struct {
-		title    string
-		a        []int
-		b        []int
-		expected []int
-	}{
-		{
-			title:    "both empty",
-			a:        nil,
-			b:        nil,
-			expected: nil,
-		},
-		{
-			title:    "a empty",
-			a:        nil,
-			b:        []int{1, 2, 3},
-			expected: nil,
-		},
-		{
-			title:    "b empty",
-			a:        []int{1, 2, 3},
-			b:        nil,
-			expected: nil,
-		},
-		{
-			title:    "no overlap",
-			a:        []int{1, 2, 3},
-			b:        []int{4, 5, 6},
-			expected: nil,
-		},
-		{
-			title:    "full overlap same order",
-			a:        []int{1, 2, 3},
-			b:        []int{1, 2, 3},
-			expected: []int{1, 2, 3},
-		},
-		{
-			title:    "partial overlap from a",
-			a:        []int{1, 2, 3},
-			b:        []int{2, 3, 4},
-			expected: []int{2, 3},
-		},
-		{
-			title:    "partial overlap b has extras",
-			a:        []int{2, 3},
-			b:        []int{1, 2, 3, 4},
-			expected: []int{2, 3},
-		},
-		{
-			title:    "b has element in a not yet in common",
-			a:        []int{1, 3},
-			b:        []int{3, 1},
-			expected: []int{1, 3},
-		},
-	}
-	for _, tc := range testCases {
-		t.Run(tc.title, func(t *testing.T) {
-			result := commonLines(tc.a, tc.b)
-			require.Equal(t, tc.expected, result)
 		})
 	}
 }

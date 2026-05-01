@@ -31,6 +31,7 @@ type GlobFinder struct {
 }
 
 func (f GlobFinder) Find() (entries []*Entry, err error) {
+	// Collect unique file paths from all glob patterns.
 	paths := filePaths{}
 	for _, p := range f.patterns {
 		matches, err := filepath.Glob(p)
@@ -64,6 +65,7 @@ func (f GlobFinder) Find() (entries []*Entry, err error) {
 		return nil, errors.New("no matching files")
 	}
 
+	// Parse each allowed file and extract rule entries.
 	for _, fp := range paths {
 		if !f.filter.IsPathAllowed(fp.path) {
 			continue
@@ -74,15 +76,8 @@ func (f GlobFinder) Find() (entries []*Entry, err error) {
 			return nil, err
 		}
 		p := parser.NewParser(f.opts.WithStrict(!f.filter.IsRelaxed(fp.target)))
-		el := readRules(fp.target, fp.path, fd, p, f.allowedOwners)
+		entries = append(entries, readRules(fp.target, fp.path, fd, p, f.allowedOwners)...)
 		fd.Close()
-		for _, e := range el {
-			e.State = Noop
-			if len(e.ModifiedLines) == 0 {
-				e.ModifiedLines = e.Rule.Lines.Expand()
-			}
-			entries = append(entries, e)
-		}
 	}
 
 	slog.LogAttrs(context.Background(), slog.LevelDebug, "Glob finder completed", slog.Int("count", len(entries)))

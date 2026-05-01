@@ -18,6 +18,7 @@ import (
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 	"github.com/cloudflare/pint/internal/reporter"
@@ -54,59 +55,13 @@ func TestGitHubReporter(t *testing.T) {
 
 	for _, tc := range []testCaseT{
 		{
-			description: "list files error",
-			owner:       "foo",
-			repo:        "bar",
-			token:       "something",
-			prNum:       123,
-			maxComments: 50,
-			timeout:     time.Second,
-			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/files" {
-					w.WriteHeader(http.StatusBadRequest)
-					_, _ = w.Write([]byte("Error"))
-					return
-				}
-				_, _ = w.Write([]byte(""))
-			}),
-			error: func(uri string) string {
-				return fmt.Sprintf("failed to list pull request files: GET %s/api/v3/repos/foo/bar/pulls/123/files: 400  []", uri)
-			},
-			summary: reporter.NewSummary([]reporter.Report{
-				{
-					Path: discovery.Path{
-						Name:          "foo.txt",
-						SymlinkTarget: "foo.txt",
-					},
-
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[1],
-					Problem: checks.Problem{
-						Lines: diags.LineRange{
-							First: 2,
-							Last:  2,
-						},
-						Reporter: "mock",
-						Summary:  "syntax error",
-						Details:  "syntax details",
-						Severity: checks.Fatal,
-					},
-				},
-			}),
-		},
-		{
 			description: "list pull reviews timeout",
 			owner:       "foo",
 			repo:        "bar",
 			token:       "something",
 			prNum:       123,
 			maxComments: 50,
-			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/files" {
-					w.WriteHeader(http.StatusOK)
-					_, _ = w.Write([]byte("[]"))
-					return
-				}
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 				time.Sleep(1 * time.Second)
 				_, _ = w.Write([]byte("OK"))
 			}),
@@ -121,8 +76,11 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "$1",
 					},
 
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -161,8 +119,11 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -201,8 +162,11 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -242,8 +206,11 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -287,8 +254,11 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -328,8 +298,11 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -364,8 +337,8 @@ func TestGitHubReporter(t *testing.T) {
 					body, _ := io.ReadAll(r.Body)
 					b := strings.TrimSpace(strings.TrimRight(string(body), "\n\t\r"))
 					switch b {
-					case `{"body":":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock1** check.\n\n------\n\nsyntax error1\n\nsyntax details1\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock1.html).\n","path":"foo.txt","line":2,"side":"RIGHT","commit_id":"HEAD"}`:
-					case `{"body":":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock2** check.\n\n------\n\nsyntax error2\n\nsyntax details2\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock2.html).\n","path":"foo.txt","line":2,"side":"RIGHT","commit_id":"HEAD"}`:
+					case `{"body":":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock1** check.\n\n------\n\nsyntax error1\n\n<details>\n<summary>More information</summary>\nsyntax details1\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock1.html).\n","path":"foo.txt","line":2,"side":"RIGHT","commit_id":"HEAD"}`:
+					case `{"body":":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock2** check.\n\n------\n\nsyntax error2\n\n<details>\n<summary>More information</summary>\nsyntax details2\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock2.html).\n","path":"foo.txt","line":2,"side":"RIGHT","commit_id":"HEAD"}`:
 					case `{"body":"This pint run would create 4 comment(s), which is more than 2 limit configured for pint.\n2 comments were skipped and won't be visible on this PR."}`:
 					default:
 						t.Errorf("Unexpected comment: %s", b)
@@ -380,8 +353,11 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -399,8 +375,11 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -418,8 +397,11 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -437,8 +419,11 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -487,8 +472,11 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -506,8 +494,11 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -525,8 +516,11 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -544,8 +538,11 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -568,11 +565,6 @@ func TestGitHubReporter(t *testing.T) {
 			maxComments: 2,
 			timeout:     time.Second,
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/files" {
-					w.WriteHeader(http.StatusOK)
-					_, _ = w.Write([]byte(`[{"filename":"foo.txt"}]`))
-					return
-				}
 				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/reviews" {
 					_, _ = w.Write([]byte(`[{"id":1,"body":"### This pull request was validated by [pint](https://github.com/cloudflare/pint).\nxxxx"}]`))
 					return
@@ -598,8 +590,11 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -617,8 +612,11 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -636,8 +634,11 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -655,8 +656,11 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -687,11 +691,6 @@ func TestGitHubReporter(t *testing.T) {
 					_, _ = w.Write([]byte(`[]`))
 					return
 				}
-				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/files" {
-					w.WriteHeader(http.StatusOK)
-					_, _ = w.Write([]byte(`[{"filename":"foo.txt", "patch": "@@ -1,4 +1,4 @@ - record: target is down\n-  expr: up == 1\n+  expr: up == 0\n - record: sum errors\n   expr: sum(errors) by (job)"}]`))
-					return
-				}
 				if r.Method == http.MethodPost && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
 					body, _ := io.ReadAll(r.Body)
 					b := strings.TrimSpace(strings.TrimRight(string(body), "\n\t\r"))
@@ -709,8 +708,11 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					ModifiedLines: []int{1},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 1}},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 1,
@@ -741,15 +743,10 @@ func TestGitHubReporter(t *testing.T) {
 					_, _ = w.Write([]byte(`[]`))
 					return
 				}
-				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/files" {
-					w.WriteHeader(http.StatusOK)
-					_, _ = w.Write([]byte(`[{"filename":"foo.txt", "patch": "@@ -1,4 +1,4 @@ - record: target is down\n-  expr: up == 1\n+  expr: up == 0\n - record: sum errors\n   expr: sum(errors) by (job)"}]`))
-					return
-				}
 				if r.Method == http.MethodPost && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
 					body, _ := io.ReadAll(r.Body)
 					b := strings.TrimSpace(strings.TrimRight(string(body), "\n\t\r"))
-					if b != `{"body":":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n","path":"foo.txt","line":1,"side":"RIGHT","commit_id":"HEAD"}` {
+					if b != `{"body":":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n","path":"foo.txt","line":2,"side":"RIGHT","commit_id":"HEAD"}` {
 						t.Errorf("Unexpected comment: %s", b)
 						t.FailNow()
 					}
@@ -763,8 +760,11 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 2, After: 2}},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -795,11 +795,6 @@ func TestGitHubReporter(t *testing.T) {
 					_, _ = w.Write([]byte(`[]`))
 					return
 				}
-				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/files" {
-					w.WriteHeader(http.StatusOK)
-					_, _ = w.Write([]byte(`[{"filename":"foo.txt", "patch": "@@ -1,5 +1,4 @@\n - record: target is down\n   expr: up == 0\n-  labels: {}\n - record: sum errors\n   expr: sum(errors) by (job)"}]`))
-					return
-				}
 				if r.Method == http.MethodPost && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
 					body, _ := io.ReadAll(r.Body)
 					b := strings.TrimSpace(strings.TrimRight(string(body), "\n\t\r"))
@@ -817,8 +812,121 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					ModifiedLines: []int{3},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 3, After: 0}},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Lines: diags.LineRange{
+							First: 3,
+							Last:  3,
+						},
+						Reporter: "mock",
+						Summary:  "syntax error",
+						Details:  "syntax details",
+						Severity: checks.Fatal,
+						Anchor:   checks.AnchorBefore,
+					},
+				},
+			}),
+		},
+		{
+			description: "removed line moved to nearest deleted line",
+			owner:       "foo",
+			repo:        "bar",
+			token:       "something",
+			prNum:       123,
+			maxComments: 50,
+			timeout:     time.Second,
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/reviews" {
+					_, _ = w.Write([]byte(`[]`))
+					return
+				}
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
+					_, _ = w.Write([]byte(`[]`))
+					return
+				}
+				if r.Method == http.MethodPost && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
+					body, _ := io.ReadAll(r.Body)
+					b := strings.TrimSpace(strings.TrimRight(string(body), "\n\t\r"))
+					// Problem on old line 3, but only old line 5 is in the diff.
+					// Moved to nearest deleted line: 5.
+					if b != `{"body":":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n","path":"foo.txt","line":5,"side":"LEFT","commit_id":"HEAD"}` {
+						t.Errorf("Unexpected comment: %s", b)
+						t.FailNow()
+					}
+				}
+				_, _ = w.Write([]byte(""))
+			}),
+			summary: reporter.NewSummary([]reporter.Report{
+				{
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 5, After: 0}},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Lines: diags.LineRange{
+							First: 3,
+							Last:  3,
+						},
+						Reporter: "mock",
+						Summary:  "syntax error",
+						Details:  "syntax details",
+						Severity: checks.Fatal,
+						Anchor:   checks.AnchorBefore,
+					},
+				},
+			}),
+		},
+		{
+			description: "anchor before with only added lines in diff",
+			owner:       "foo",
+			repo:        "bar",
+			token:       "something",
+			prNum:       123,
+			maxComments: 50,
+			timeout:     time.Second,
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/reviews" {
+					_, _ = w.Write([]byte(`[]`))
+					return
+				}
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
+					_, _ = w.Write([]byte(`[]`))
+					return
+				}
+				if r.Method == http.MethodPost && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
+					body, _ := io.ReadAll(r.Body)
+					b := strings.TrimSpace(strings.TrimRight(string(body), "\n\t\r"))
+					// Diff only has added lines, no deleted lines to attach to.
+					// Falls through to RIGHT side, moved to nearest added line: 5.
+					if b != `{"body":":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n","path":"foo.txt","line":5,"side":"RIGHT","commit_id":"HEAD"}` {
+						t.Errorf("Unexpected comment: %s", b)
+						t.FailNow()
+					}
+				}
+				_, _ = w.Write([]byte(""))
+			}),
+			summary: reporter.NewSummary([]reporter.Report{
+				{
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 5}},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 3,
@@ -859,8 +967,11 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					ModifiedLines: []int{1},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 1}},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 1,
@@ -957,17 +1068,12 @@ Below is the list of checks that were disabled for each Prometheus server define
 					_, _ = w.Write([]byte(`[]`))
 					return
 				}
-				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/files" {
-					w.WriteHeader(http.StatusOK)
-					_, _ = w.Write([]byte(`[{"filename":"foo.txt", "patch": "@@ -1,5 +1,4 @@\n - record: target is down\n   expr: up == 0\n-  labels: {}\n - record: sum errors\n   expr: sum(errors) by (job)"}]`))
-					return
-				}
 				if r.Method == http.MethodPost && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
 					body, _ := io.ReadAll(r.Body)
 					b := strings.TrimSpace(strings.TrimRight(string(body), "\n\t\r"))
 					switch b {
 					case `{"body":":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n","path":"foo.txt","line":2,"side":"RIGHT","commit_id":"HEAD"}`:
-					case `{"body":":warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **different** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/different.html).\n","path":"foo.txt","line":3,"side":"RIGHT","commit_id":"HEAD"}`:
+					case `{"body":":warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **different** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/different.html).\n","path":"foo.txt","line":2,"side":"RIGHT","commit_id":"HEAD"}`:
 					case `{"body":":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n","path":"foo.txt","line":4,"side":"RIGHT","commit_id":"HEAD"}`:
 					case `{"body":":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n","path":"foo.txt","line":5,"side":"RIGHT","commit_id":"HEAD"}`:
 					default:
@@ -983,8 +1089,11 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: "foo.txt",
 					},
 
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -1002,8 +1111,11 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: "foo.txt",
 					},
 
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 4,
@@ -1021,8 +1133,11 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: "foo.txt",
 					},
 
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 3,
@@ -1040,8 +1155,11 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: "foo.txt",
 					},
 
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 5,
@@ -1072,17 +1190,12 @@ Below is the list of checks that were disabled for each Prometheus server define
 					_, _ = w.Write([]byte(`[]`))
 					return
 				}
-				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/files" {
-					w.WriteHeader(http.StatusOK)
-					_, _ = w.Write([]byte(`[{"filename":"foo.txt", "patch": "@@ -1,5 +1,4 @@\n - record: target is down\n   expr: up == 0\n-  labels: {}\n - record: sum errors\n   expr: sum(errors) by (job)"}]`))
-					return
-				}
 				if r.Method == http.MethodPost && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
 					body, _ := io.ReadAll(r.Body)
 					b := strings.TrimSpace(strings.TrimRight(string(body), "\n\t\r"))
 					switch b {
 					case `{"body":":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\nThe same issue was reported 2 more time(s), duplicates where suppressed.\n\n<details>\n<summary>Show affected rules</summary>\n\n- ` + "`sum errors` at `foo.txt:4`" + `\n` + "- `sum errors` at `foo.txt:5`" + `\n\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n","path":"foo.txt","line":2,"side":"RIGHT","commit_id":"HEAD"}`:
-					case `{"body":":warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **different** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/different.html).\n","path":"foo.txt","line":3,"side":"RIGHT","commit_id":"HEAD"}`:
+					case `{"body":":warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **different** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/different.html).\n","path":"foo.txt","line":2,"side":"RIGHT","commit_id":"HEAD"}`:
 					default:
 						t.Errorf("Unexpected comment: %s", b)
 					}
@@ -1096,8 +1209,11 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: "foo.txt",
 					},
 
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -1115,8 +1231,11 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: "foo.txt",
 					},
 
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 4,
@@ -1134,8 +1253,11 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: "foo.txt",
 					},
 
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[0],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 3,
@@ -1153,8 +1275,11 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: "foo.txt",
 					},
 
-					ModifiedLines: []int{2},
-					Rule:          mockFile.Groups[0].Rules[1],
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 5,

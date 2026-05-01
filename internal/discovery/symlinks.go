@@ -75,7 +75,7 @@ func addSymlinkedEntries(entries []*Entry) ([]*Entry, error) {
 						Name:          sl.from,
 						SymlinkTarget: sl.to,
 					},
-					ModifiedLines:  entry.ModifiedLines,
+					Changes:        entry.Changes,
 					Rule:           entry.Rule,
 					Owner:          entry.Owner,
 					DisabledChecks: entry.DisabledChecks,
