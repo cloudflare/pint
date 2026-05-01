@@ -193,6 +193,17 @@ func (gr GithubReporter) Create(ctx context.Context, dst any, p PendingComment) 
 
 	side, line := gr.fixCommentLine(dst, p)
 
+	// The generated comment must follow these rules:
+	// https://docs.github.com/en/rest/pulls/comments#create-a-review-comment-for-a-pull-request
+	//
+	// Required fields:
+	//   - commit_id: SHA of the head commit. Using a stale SHA may render
+	//     the comment outdated if a later commit modifies the same line.
+	//   - path:      relative file path in the repository.
+	//   - line:      line number in the diff blob that the comment applies to.
+	//   - side:      which side of a split diff the comment targets:
+	//       "LEFT"  -- deletions (red lines in the diff).
+	//       "RIGHT" -- additions (green) or unchanged context lines (white).
 	comment := &github.PullRequestComment{
 		CommitID: new(gr.headCommit),
 		Path:     new(p.path),
@@ -415,10 +426,24 @@ func (gr GithubReporter) reqContext(ctx context.Context) (context.Context, conte
 	return context.WithTimeout(context.WithValue(ctx, github.SleepUntilPrimaryRateLimitResetWhenRateLimited, true), gr.timeout)
 }
 
+// fixCommentLine determines the correct side and line number for a GitHub
+// pull request review comment.
+//
+// Side rules (from the GitHub API docs):
+//   - "LEFT"  -- comment targets a deleted line (shows in red).
+//   - "RIGHT" -- comment targets an added or unchanged line (green/white).
+//
+// Line selection:
+//   - If the line is in the diff and modified, use its old (LEFT) or new
+//     (RIGHT) line number depending on the anchor.
+//   - If the line is not in the diff or not modified, fall back to the
+//     first modified line on the RIGHT side. GitHub API rejects comments
+//     on lines that are not part of the diff.
 func (gr GithubReporter) fixCommentLine(dst any, p PendingComment) (string, int) {
 	pr := dst.(ghPR)
 	file := pr.getFile(p.path)
 
+	// AnchorBefore means the problem is on the old (deleted) side.
 	var side string
 	if p.anchor == checks.AnchorBefore {
 		side = "LEFT"
@@ -437,8 +462,9 @@ func (gr GithubReporter) fixCommentLine(dst any, p PendingComment) (string, int)
 		// Comment on new or modified line.
 		line = int(dl.old) // FIXME int64 -> int
 	default:
-		// Comment on unmodified line.
-		// Find first modified line and put it there.
+		// Line is not in the diff or not modified -- we can't comment on
+		// it directly. Fall back to the first modified line so the comment
+		// is still visible in the PR review.
 		for _, d := range diffs {
 			if !d.wasModified {
 				continue

@@ -1,9 +1,11 @@
 package git_test
 
 import (
+	"errors"
 	"fmt"
 	"log/slog"
 	"os"
+	"regexp"
 	"strings"
 	"testing"
 
@@ -131,7 +133,7 @@ func TestChanges(t *testing.T) {
 						Before: nil,
 						After:  []byte("foo"),
 						Lines: []git.LineNumber{
-							{Before: 1, After: 1},
+							{Before: 0, After: 1},
 						},
 					},
 				},
@@ -749,7 +751,7 @@ func TestChanges(t *testing.T) {
 	}
 }
 
-func TestChangesMocked(t *testing.T) {
+func TestChangesParseDiff(t *testing.T) {
 	type testCaseT struct {
 		title   string
 		err     string
@@ -771,8 +773,8 @@ func TestChangesMocked(t *testing.T) {
 				if args[0] == "cat-file" {
 					return []byte("content"), nil
 				}
-				if args[0] == "blame" {
-					return []byte("abc123 1 1 1\nfilename file.txt\n\tcontent\n"), nil
+				if args[0] == "diff" {
+					return nil, nil
 				}
 				return nil, nil
 			},
@@ -810,9 +812,6 @@ func TestChangesMocked(t *testing.T) {
 				if args[0] == "cat-file" {
 					return []byte("content"), nil
 				}
-				if args[0] == "blame" {
-					return []byte("abc123 1 1 1\nfilename newfile.txt\n\tcontent\n"), nil
-				}
 				return nil, nil
 			},
 			changes: []*git.FileChange{
@@ -848,9 +847,6 @@ func TestChangesMocked(t *testing.T) {
 				}
 				if args[0] == "cat-file" {
 					return []byte("content"), nil
-				}
-				if args[0] == "blame" {
-					return []byte("abc123 1 1 1\nfilename newfile.txt\n\tcontent\n"), nil
 				}
 				return nil, nil
 			},
@@ -888,9 +884,6 @@ func TestChangesMocked(t *testing.T) {
 				if args[0] == "cat-file" {
 					return []byte("content"), nil
 				}
-				if args[0] == "blame" {
-					return []byte("abc123 1 1 1\nfilename newfile.txt\n\tcontent\n"), nil
-				}
 				return nil, nil
 			},
 			changes: []*git.FileChange{
@@ -927,9 +920,6 @@ func TestChangesMocked(t *testing.T) {
 				if args[0] == "cat-file" {
 					return []byte("content"), nil
 				}
-				if args[0] == "blame" {
-					return []byte("abc123 1 1 1\nfilename newfile.txt\n\tcontent\n"), nil
-				}
 				return nil, nil
 			},
 			changes: []*git.FileChange{
@@ -953,6 +943,130 @@ func TestChangesMocked(t *testing.T) {
 				},
 			},
 		},
+		{
+			// git diff command returns an error for a modified file.
+			title: "git diff error",
+			err:   "failed to run git diff for file.txt: git diff for file.txt: mock diff error",
+			mock: func(args ...string) ([]byte, error) {
+				if args[0] == "log" {
+					return []byte("abc123\nM\tfile.txt\n"), nil
+				}
+				if args[0] == "ls-tree" {
+					return []byte("100644 blob abc123def456\tfile.txt\n"), nil
+				}
+				if args[0] == "cat-file" {
+					return []byte("content"), nil
+				}
+				if args[0] == "diff" {
+					return nil, errors.New("mock diff error")
+				}
+				return nil, nil
+			},
+		},
+		{
+			// ls-tree returns error when querying the before commit path.
+			title: "ls-tree error on before commit",
+			mock: func(args ...string) ([]byte, error) {
+				if args[0] == "log" {
+					return []byte("abc123\nM\tfile.txt\n"), nil
+				}
+				if args[0] == "ls-tree" {
+					if strings.Contains(strings.Join(args, " "), "abc123^") {
+						return nil, errors.New("mock ls-tree error")
+					}
+					return []byte("100644 blob abc123def456\tfile.txt\n"), nil
+				}
+				if args[0] == "cat-file" {
+					// Fail for the before commit blob ref.
+					if strings.Contains(args[2], "abc123^") {
+						return nil, errors.New("mock cat-file error")
+					}
+					return []byte("new content"), nil
+				}
+				if args[0] == "diff" {
+					return nil, nil
+				}
+				return nil, nil
+			},
+			changes: []*git.FileChange{
+				{
+					Commits: []string{"1"},
+					Path: git.PathDiff{
+						Before: git.Path{
+							Name: "file.txt",
+							Type: git.Missing,
+						},
+						After: git.Path{
+							Name: "file.txt",
+							Type: git.File,
+						},
+					},
+					Body: git.BodyDiff{
+						Before: nil,
+						After:  []byte("new content"),
+						Lines: []git.LineNumber{
+							{Before: 0, After: 1},
+						},
+					},
+				},
+			},
+		},
+		{
+			// File content lines starting with "--- " or "+++ " inside a hunk
+			// must be treated as deletions/additions, not as diff headers.
+			// The inHunk flag ensures headers are only matched outside hunks.
+			title: "hunk content with triple-dash and triple-plus lines",
+			mock: func(args ...string) ([]byte, error) {
+				if args[0] == "log" {
+					return []byte("abc123\nM\tfile.txt\n"), nil
+				}
+				if args[0] == "ls-tree" {
+					return []byte("100644 blob abc123def456\tfile.txt\n"), nil
+				}
+				if args[0] == "cat-file" {
+					if strings.Contains(args[2], "abc123^") {
+						return []byte("-- old\nkeep\n"), nil
+					}
+					return []byte("++ new\nkeep\n"), nil
+				}
+				if args[0] == "diff" {
+					return []byte(
+						"diff --git a/file.txt b/file.txt\n" +
+							"--- a/file.txt\n" +
+							"+++ b/file.txt\n" +
+							"@@ -1,2 +1,2 @@\n" +
+							"--- old\n" +
+							"+++ new\n" +
+							" keep\n",
+					), nil
+				}
+				return nil, nil
+			},
+			changes: []*git.FileChange{
+				{
+					Commits: []string{"1"},
+					Path: git.PathDiff{
+						Before: git.Path{
+							Name:          "file.txt",
+							SymlinkTarget: "",
+							Type:          git.File,
+						},
+						After: git.Path{
+							Name:          "file.txt",
+							SymlinkTarget: "",
+							Type:          git.File,
+						},
+					},
+					Body: git.BodyDiff{
+						Before: []byte("-- old\nkeep\n"),
+						After:  []byte("++ new\nkeep\n"),
+						Lines: git.LineNumbers{
+							{Before: 1, After: 1},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {
@@ -972,6 +1086,356 @@ func TestChangesMocked(t *testing.T) {
 					require.Equal(t, tc.changes[i].Body, changes[i].Body, "changes[%d].Body", i)
 				}
 			}
+		})
+	}
+}
+
+// Path filter excludes a file, so it should not appear in results.
+func TestChangesPathFilterExclusion(t *testing.T) {
+	slog.SetDefault(slogt.New(t))
+
+	mock := func(args ...string) ([]byte, error) {
+		if args[0] == "log" {
+			return []byte("abc123\nM\tfile.txt\nM\texcluded.txt\n"), nil
+		}
+		if args[0] == "ls-tree" {
+			return []byte("100644 blob abc123def456\t" + args[2] + "\n"), nil
+		}
+		if args[0] == "cat-file" {
+			return []byte("content"), nil
+		}
+		if args[0] == "diff" {
+			return nil, nil
+		}
+		return nil, nil
+	}
+
+	exclude := []*regexp.Regexp{regexp.MustCompile(`^excluded\.txt$`)}
+	filter := git.NewPathFilter(nil, exclude, nil)
+	changes, err := git.Changes(mock, "main", filter)
+	require.NoError(t, err)
+	require.Len(t, changes, 1)
+	require.Equal(t, "file.txt", changes[0].Path.After.Name)
+}
+
+// Directory path in git log output is skipped.
+func TestChangesSkipsDirectoryPath(t *testing.T) {
+	slog.SetDefault(slogt.New(t))
+
+	dir := t.TempDir()
+
+	mock := func(args ...string) ([]byte, error) {
+		if args[0] == "log" {
+			return []byte("abc123\nM\t" + dir + "\n"), nil
+		}
+		return nil, nil
+	}
+
+	changes, err := git.Changes(mock, "main", git.NewPathFilter(nil, nil, nil))
+	require.NoError(t, err)
+	require.Empty(t, changes)
+}
+
+func TestLineNumberString(t *testing.T) {
+	type testCaseT struct {
+		title    string
+		expected string
+		ln       git.LineNumber
+	}
+
+	testCases := []testCaseT{
+		{
+			// Added line: only After is set.
+			title:    "added line",
+			ln:       git.LineNumber{Before: 0, After: 5},
+			expected: "+5",
+		},
+		{
+			// Deleted line: only Before is set.
+			title:    "deleted line",
+			ln:       git.LineNumber{Before: 3, After: 0},
+			expected: "-3",
+		},
+		{
+			// Unmodified line: Before equals After.
+			title:    "same before and after",
+			ln:       git.LineNumber{Before: 7, After: 7},
+			expected: "7",
+		},
+		{
+			// Modified line moved to a different position: Before and After differ.
+			title:    "different before and after",
+			ln:       git.LineNumber{Before: 4, After: 9},
+			expected: "4->9",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.title, func(t *testing.T) {
+			require.Equal(t, tc.expected, tc.ln.String())
+		})
+	}
+}
+
+func TestHasAfter(t *testing.T) {
+	type testCaseT struct {
+		title    string
+		lns      git.LineNumbers
+		line     int
+		expected bool
+	}
+
+	testCases := []testCaseT{
+		{
+			// Matching line exists in the slice.
+			title: "match found",
+			lns: git.LineNumbers{
+				{Before: 1, After: 2},
+				{Before: 3, After: 5},
+			},
+			line:     5,
+			expected: true,
+		},
+		{
+			// No matching After value in the slice.
+			title: "no match",
+			lns: git.LineNumbers{
+				{Before: 1, After: 2},
+				{Before: 3, After: 4},
+			},
+			line:     99,
+			expected: false,
+		},
+		{
+			// Empty slice always returns false.
+			title:    "empty slice",
+			lns:      git.LineNumbers{},
+			line:     1,
+			expected: false,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.title, func(t *testing.T) {
+			require.Equal(t, tc.expected, tc.lns.HasAfter(tc.line))
+		})
+	}
+}
+
+func TestBeforeForAfter(t *testing.T) {
+	type testCaseT struct {
+		title    string
+		lns      git.LineNumbers
+		line     int
+		expected int
+	}
+
+	testCases := []testCaseT{
+		{
+			// Return the Before value for a matching After value.
+			title: "match found",
+			lns: git.LineNumbers{
+				{Before: 10, After: 20},
+				{Before: 30, After: 40},
+			},
+			line:     20,
+			expected: 10,
+		},
+		{
+			// Line past the last diff entry — compute from nearest preceding entry.
+			// Nearest is {Before:10, After:20}, offset = 99 - 20 = 79, so old = 10 + 79 = 89.
+			title: "line past last entry uses offset",
+			lns: git.LineNumbers{
+				{Before: 10, After: 20},
+			},
+			line:     99,
+			expected: 89,
+		},
+		{
+			// Empty slice — no diff entries, line is unshifted.
+			title:    "empty slice returns line itself",
+			lns:      git.LineNumbers{},
+			line:     5,
+			expected: 5,
+		},
+		{
+			// Line before any diff entry — no shift happened yet.
+			title: "line before first entry",
+			lns: git.LineNumbers{
+				{Before: 10, After: 20},
+			},
+			line:     5,
+			expected: 5,
+		},
+		{
+			// Line between two entries — compute from nearest preceding entry.
+			// Nearest is {Before:5, After:10}, offset = 15 - 10 = 5, so old = 5 + 5 = 10.
+			title: "line between entries",
+			lns: git.LineNumbers{
+				{Before: 5, After: 10},
+				{Before: 25, After: 30},
+			},
+			line:     15,
+			expected: 10,
+		},
+		{
+			// Added lines (Before==0) are skipped when finding nearest reference.
+			// Only {Before:5, After:10} is usable, offset = 20 - 10 = 10, so old = 5 + 10 = 15.
+			title: "skips added-only entries",
+			lns: git.LineNumbers{
+				{Before: 5, After: 10},
+				{Before: 0, After: 12},
+				{Before: 0, After: 13},
+			},
+			line:     20,
+			expected: 15,
+		},
+		{
+			// All entries are added lines — no valid reference point, returns line itself.
+			title: "all entries are added",
+			lns: git.LineNumbers{
+				{Before: 0, After: 3},
+				{Before: 0, After: 4},
+			},
+			line:     10,
+			expected: 10,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.title, func(t *testing.T) {
+			require.Equal(t, tc.expected, tc.lns.BeforeForAfter(tc.line))
+		})
+	}
+}
+
+func TestMakeLineRange(t *testing.T) {
+	type testCaseT struct {
+		title    string
+		expected git.LineNumbers
+		n        int
+		side     git.LineRangeSide
+	}
+
+	testCases := []testCaseT{
+		{
+			// LinesBefore sets Before=i+1 and After=0.
+			title: "before only",
+			n:     2,
+			side:  git.LinesBefore,
+			expected: git.LineNumbers{
+				{Before: 1, After: 0},
+				{Before: 2, After: 0},
+			},
+		},
+		{
+			// LinesAfter sets Before=0 and After=i+1.
+			title: "after only",
+			n:     2,
+			side:  git.LinesAfter,
+			expected: git.LineNumbers{
+				{Before: 0, After: 1},
+				{Before: 0, After: 2},
+			},
+		},
+		{
+			// LinesBoth sets Before=i+1 and After=i+1.
+			title: "both",
+			n:     3,
+			side:  git.LinesBoth,
+			expected: git.LineNumbers{
+				{Before: 1, After: 1},
+				{Before: 2, After: 2},
+				{Before: 3, After: 3},
+			},
+		},
+		{
+			// Zero count returns empty slice.
+			title:    "zero count",
+			n:        0,
+			side:     git.LinesBoth,
+			expected: git.LineNumbers{},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.title, func(t *testing.T) {
+			require.Equal(t, tc.expected, git.MakeLineRange(tc.n, tc.side))
+		})
+	}
+}
+
+func TestMakeLineRangeFromTo(t *testing.T) {
+	type testCaseT struct {
+		title    string
+		expected git.LineNumbers
+		first    int
+		last     int
+		side     git.LineRangeSide
+	}
+
+	testCases := []testCaseT{
+		{
+			// LinesBefore sets Before=l and After=0.
+			title: "before only",
+			first: 5,
+			last:  7,
+			side:  git.LinesBefore,
+			expected: git.LineNumbers{
+				{Before: 5, After: 0},
+				{Before: 6, After: 0},
+				{Before: 7, After: 0},
+			},
+		},
+		{
+			// LinesAfter sets Before=0 and After=l.
+			title: "after only",
+			first: 3,
+			last:  4,
+			side:  git.LinesAfter,
+			expected: git.LineNumbers{
+				{Before: 0, After: 3},
+				{Before: 0, After: 4},
+			},
+		},
+		{
+			// LinesBoth sets Before=l and After=l.
+			title: "both",
+			first: 10,
+			last:  12,
+			side:  git.LinesBoth,
+			expected: git.LineNumbers{
+				{Before: 10, After: 10},
+				{Before: 11, After: 11},
+				{Before: 12, After: 12},
+			},
+		},
+		{
+			// last < first returns empty slice.
+			title:    "negative range",
+			first:    5,
+			last:     3,
+			side:     git.LinesBoth,
+			expected: git.LineNumbers{},
+		},
+		{
+			// first == last returns single element.
+			title: "single element",
+			first: 4,
+			last:  4,
+			side:  git.LinesAfter,
+			expected: git.LineNumbers{
+				{Before: 0, After: 4},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.title, func(t *testing.T) {
+			require.Equal(
+				t, tc.expected,
+				git.MakeLineRangeFromTo(tc.first, tc.last, tc.side),
+			)
 		})
 	}
 }

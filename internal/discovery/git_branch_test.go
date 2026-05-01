@@ -156,7 +156,7 @@ func TestGitBranchFinder(t *testing.T) {
 			err:     "failed to get commit message for c1: mock git error: [show -s --format=%B c1]",
 		},
 		{
-			title: "git blame error",
+			title: "git diff error",
 			setup: func(_ *testing.T) {},
 			finder: discovery.NewGitBranchFinder(
 				func(args ...string) ([]byte, error) {
@@ -169,6 +169,10 @@ func TestGitBranchFinder(t *testing.T) {
 						return []byte("100644 blob c1\trules.yml"), nil
 					case "show -s --format=%B c1":
 						return []byte(""), nil
+					case "cat-file blob c0":
+						return []byte("# old\n"), nil
+					case "cat-file blob c1":
+						return []byte("# new\n"), nil
 					default:
 						return nil, fmt.Errorf("mock git error: %v", args)
 					}
@@ -180,7 +184,7 @@ func TestGitBranchFinder(t *testing.T) {
 				nil,
 			),
 			entries: nil,
-			err:     "failed to run git blame for rules.yml: mock git error: [blame --line-porcelain c1 -- rules.yml]",
+			err:     "failed to run git diff for rules.yml: git diff for rules.yml: mock git error: [diff -M c1^..c1 -- rules.yml rules.yml]",
 		},
 		{
 			title: "no rules in file",
@@ -529,7 +533,7 @@ groups:
 						SymlinkTarget: "rules.yml",
 					},
 					Changes: discovery.Changes{
-						Lines: git.MakeLineRangeFromTo(11, 12, git.LinesBoth),
+						Lines: git.MakeLineRangeFromTo(11, 12, git.LinesAfter),
 					},
 					Rule: mustParse(10, "  - record: up:count:4\n    expr: count(up)\n"),
 				},
@@ -581,7 +585,7 @@ groups:
 					},
 					Changes: discovery.Changes{
 						Lines: []git.LineNumber{
-							{Before: 4, After: 4},
+							{Before: 0, After: 4},
 						},
 					},
 					Rule: mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n  for: 0s\n"),
@@ -861,7 +865,7 @@ groups:
 						SymlinkTarget: "rules.yml",
 					},
 					Changes: discovery.Changes{
-						Lines: git.MakeLineRangeFromTo(6, 7, git.LinesBoth),
+						Lines: git.MakeLineRangeFromTo(6, 7, git.LinesAfter),
 					},
 					Rule: mustParse(5, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
 				},
@@ -872,7 +876,7 @@ groups:
 						SymlinkTarget: "rules.yml",
 					},
 					Changes: discovery.Changes{
-						Lines: git.MakeLineRangeFromTo(8, 9, git.LinesBoth),
+						Lines: git.MakeLineRangeFromTo(8, 9, git.LinesAfter),
 					},
 					Rule: mustParse(7, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
 				},
@@ -910,7 +914,7 @@ groups:
 					},
 					Changes: discovery.Changes{
 						Lines: []git.LineNumber{
-							{Before: 3, After: 3},
+							{Before: 0, After: 3},
 						},
 					},
 					Rule: mustParse(1, "- alert: rule1\n  expr: up == 0\n"),
@@ -922,7 +926,7 @@ groups:
 						SymlinkTarget: "rules.yml",
 					},
 					Changes: discovery.Changes{
-						Lines: git.MakeLineRangeFromTo(4, 5, git.LinesBoth),
+						Lines: git.MakeLineRangeFromTo(4, 5, git.LinesAfter),
 					},
 					Rule: mustParse(3, "- alert: rule1\n  expr: up == 1\n"),
 				},
@@ -933,7 +937,7 @@ groups:
 						SymlinkTarget: "rules.yml",
 					},
 					Changes: discovery.Changes{
-						Lines: git.MakeLineRangeFromTo(6, 7, git.LinesBoth),
+						Lines: git.MakeLineRangeFromTo(6, 7, git.LinesAfter),
 					},
 					Rule: mustParse(5, "- alert: rule1\n  expr: up != 0\n"),
 				},
@@ -945,7 +949,7 @@ groups:
 					},
 					Changes: discovery.Changes{
 						Lines: []git.LineNumber{
-							{Before: 8, After: 8},
+							{Before: 0, After: 8},
 						},
 					},
 					Rule: mustParse(7, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
@@ -1001,7 +1005,14 @@ groups:
 						SymlinkTarget: "rules.yml",
 					},
 					Changes: discovery.Changes{
-						Lines: git.MakeLineRangeFromTo(7, 12, git.LinesBoth),
+						Lines: []git.LineNumber{
+							{Before: 7, After: 7},
+							{Before: 0, After: 8},
+							{Before: 0, After: 9},
+							{Before: 0, After: 10},
+							{Before: 0, After: 11},
+							{Before: 0, After: 12},
+						},
 					},
 					Rule: mustParse(4, "- alert: rule2\n  expr: sum(foo) by(job)\n  keep_firing_for: 5m\n  for: 0s\n  annotations:\n    foo: bar\n  labels:\n    foo: bar\n"),
 				},
@@ -1182,10 +1193,10 @@ groups:
 					Changes: discovery.Changes{
 						Lines: []git.LineNumber{
 							{Before: 3, After: 3},
-							{Before: 11, After: 11},
-							{Before: 12, After: 12},
-							{Before: 15, After: 15},
-							{Before: 16, After: 16},
+							{Before: 0, After: 11},
+							{Before: 0, After: 12},
+							{Before: 0, After: 15},
+							{Before: 0, After: 16},
 						},
 					},
 					PathError: parser.ParseError{
@@ -1330,7 +1341,7 @@ groups:
 						SymlinkTarget: "rules.yml",
 					},
 					Changes: discovery.Changes{
-						Lines: git.MakeLineRangeFromTo(8, 9, git.LinesBoth),
+						Lines: git.MakeLineRangeFromTo(8, 9, git.LinesAfter),
 					},
 					Rule: mustParse(7, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
 				},
@@ -1341,7 +1352,7 @@ groups:
 						SymlinkTarget: "rules.yml",
 					},
 					Changes: discovery.Changes{
-						Lines: git.MakeLineRangeFromTo(10, 11, git.LinesBoth),
+						Lines: git.MakeLineRangeFromTo(10, 11, git.LinesAfter),
 					},
 					Rule: mustParse(9, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
 				},
