@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.81.0
+
+### Changed
+
+- When running `pint ci` pint will now use `git diff` to calculate modified lines
+  instead of `git blame`.
+
 ## v0.80.0
 
 ### Added
