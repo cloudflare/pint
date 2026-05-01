@@ -1,10 +1,12 @@
 package reporter
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"fmt"
 	"log/slog"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -476,4 +478,79 @@ func (gr GithubReporter) fixCommentLine(dst any, p PendingComment) (string, int)
 	}
 
 	return side, line
+}
+
+type diffLine struct {
+	old         int64
+	new         int64
+	wasModified bool
+}
+
+func diffLineFor(lines []diffLine, line int64) (diffLine, bool) {
+	if len(lines) == 0 {
+		return diffLine{old: 0, new: 0, wasModified: false}, false
+	}
+
+	for i, dl := range lines {
+		if dl.new == line {
+			return dl, true
+		}
+		// Calculate unmodified line that does not present in the diff
+		if dl.new > line {
+			lastLines := dl
+			if i > 0 {
+				lastLines = lines[i-1]
+			}
+			gap := line - lastLines.new
+			return diffLine{
+				old:         lastLines.old + gap,
+				new:         line,
+				wasModified: false,
+			}, true
+		}
+	}
+	// Calculate unmodified line that is greater than the last diff line.
+	// The loop above handles all cases where line <= some dl.new, so here
+	// line is always > lastLines.new.
+	lastLines := lines[len(lines)-1]
+	gap := line - lastLines.new
+	return diffLine{
+		old:         lastLines.old + gap,
+		new:         line,
+		wasModified: false,
+	}, true
+}
+
+var diffRe = regexp.MustCompile(`@@ \-(\d+),(\d+) \+(\d+),(\d+) @@`)
+
+func parseDiffLines(diff string) (lines []diffLine) {
+	var oldLine, newLine int64
+
+	sc := bufio.NewScanner(strings.NewReader(diff))
+	for sc.Scan() {
+		line := sc.Text()
+		switch {
+		case strings.HasPrefix(line, "@@"):
+			matches := diffRe.FindStringSubmatch(line)
+			if len(matches) == 5 {
+				oldLine, _ = strconv.ParseInt(matches[1], 10, 64)
+				oldLine--
+				newLine, _ = strconv.ParseInt(matches[3], 10, 64)
+				newLine--
+			}
+		case strings.HasPrefix(line, "--- "):
+		case strings.HasPrefix(line, "+++ "):
+		case strings.HasPrefix(line, "-"):
+			oldLine++
+		case strings.HasPrefix(line, "+"):
+			newLine++
+			lines = append(lines, diffLine{old: oldLine, new: newLine, wasModified: true})
+		default:
+			oldLine++
+			newLine++
+			lines = append(lines, diffLine{old: oldLine, new: newLine, wasModified: false})
+		}
+	}
+
+	return lines
 }

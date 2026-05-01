@@ -1,12 +1,10 @@
 package reporter
 
 import (
-	"bufio"
 	"context"
 	"errors"
 	"fmt"
 	"log/slog"
-	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -432,99 +430,20 @@ func reportToGitLabDiscussion(pending PendingComment, ver *gitlab.MergeRequestDi
 	}
 
 	switch {
+	// Deleted line: only old_line, no new_line.
 	case pending.anchor == checks.AnchorBefore:
 		d.Position.OldLine = new(int64(pending.line))
 		d.Position.NewLine = nil
 	// Added line (oldLine==0): only new_line, no old_line.
 	case pending.oldLine == 0:
 		d.Position.NewLine = new(int64(pending.line))
-	// Context line with known old↔new mapping: both old_line and new_line.
+	// Context line with known old->new mapping: both old_line and new_line.
 	case pending.oldLine > 0:
 		d.Position.NewLine = new(int64(pending.line))
 		d.Position.OldLine = new(int64(pending.oldLine))
-	// Line not found in the diff (oldLine==-1): assume old_line == new_line.
-	default:
-		d.Position.NewLine = new(int64(pending.line))
-		d.Position.OldLine = new(int64(pending.line))
 	}
 
 	return &d
-}
-
-type diffLine struct {
-	old         int64
-	new         int64
-	wasModified bool
-}
-
-func diffLineFor(lines []diffLine, line int64) (diffLine, bool) {
-	if len(lines) == 0 {
-		return diffLine{old: 0, new: 0, wasModified: false}, false
-	}
-
-	for i, dl := range lines {
-		if dl.new == line {
-			return dl, true
-		}
-		// Calculate unmodified line that does not present in the diff
-		if dl.new > line {
-			lastLines := dl
-			if i > 0 {
-				lastLines = lines[i-1]
-			}
-			gap := line - lastLines.new
-			return diffLine{
-				old:         lastLines.old + gap,
-				new:         line,
-				wasModified: false,
-			}, true
-		}
-	}
-	// Calculate unmodified line that is greater than the last diff line
-	lastLines := lines[len(lines)-1]
-	if line > lastLines.new {
-		gap := line - lastLines.new
-		return diffLine{
-			old:         lastLines.old + gap,
-			new:         line,
-			wasModified: false,
-		}, true
-	}
-	return diffLine{old: 0, new: 0, wasModified: false}, false
-}
-
-var diffRe = regexp.MustCompile(`@@ \-(\d+),(\d+) \+(\d+),(\d+) @@`)
-
-func parseDiffLines(diff string) (lines []diffLine) {
-	var oldLine, newLine int64
-
-	sc := bufio.NewScanner(strings.NewReader(diff))
-	for sc.Scan() {
-		line := sc.Text()
-		switch {
-		case strings.HasPrefix(line, "@@"):
-			matches := diffRe.FindStringSubmatch(line)
-			if len(matches) == 5 {
-				oldLine, _ = strconv.ParseInt(matches[1], 10, 64)
-				oldLine--
-				newLine, _ = strconv.ParseInt(matches[3], 10, 64)
-				newLine--
-			}
-		case strings.HasPrefix(line, "--- "):
-		case strings.HasPrefix(line, "+++ "):
-		case strings.HasPrefix(line, "-"):
-			oldLine++
-		case strings.HasPrefix(line, "+"):
-			newLine++
-			lines = append(lines, diffLine{old: oldLine, new: newLine, wasModified: true})
-		default:
-			oldLine++
-			newLine++
-			lines = append(lines, diffLine{old: oldLine, new: newLine, wasModified: false})
-		}
-	}
-
-	return lines
 }
 
 func getGitLabPaginated[T any](searchFunc func(pageNum int64) ([]T, *gitlab.Response, error)) ([]T, error) {

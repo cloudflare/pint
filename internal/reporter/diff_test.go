@@ -8,6 +8,7 @@ import (
 	"github.com/akedrou/textdiff"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+	"github.com/stretchr/testify/require"
 )
 
 func TestParseDiffLines(t *testing.T) {
@@ -133,6 +134,75 @@ func TestParseDiffLines(t *testing.T) {
 					}
 				})
 			}
+		})
+	}
+}
+
+func TestDiffLineFor(t *testing.T) {
+	testCases := []struct {
+		name     string
+		lines    []diffLine
+		line     int64
+		expected diffLine
+		found    bool
+	}{
+		{
+			name:     "empty lines slice",
+			lines:    []diffLine{},
+			line:     5,
+			expected: diffLine{old: 0, new: 0, wasModified: false},
+			found:    false,
+		},
+		{
+			name: "exact match",
+			lines: []diffLine{
+				{old: 10, new: 10, wasModified: true},
+				{old: 11, new: 12, wasModified: false},
+			},
+			line:     10,
+			expected: diffLine{old: 10, new: 10, wasModified: true},
+			found:    true,
+		},
+		{
+			// Line before first diff entry -- gap is computed from
+			// the first entry itself (i==0 so lastLines == dl).
+			name: "line in gap - before first diff line",
+			lines: []diffLine{
+				{old: 10, new: 10, wasModified: true},
+			},
+			line:     5,
+			expected: diffLine{old: 5, new: 5, wasModified: false},
+			found:    true,
+		},
+		{
+			name: "line in gap - between diff lines",
+			lines: []diffLine{
+				{old: 5, new: 5, wasModified: true},
+				{old: 10, new: 12, wasModified: true},
+			},
+			line:     8,
+			expected: diffLine{old: 8, new: 8, wasModified: false},
+			found:    true,
+		},
+		{
+			// Line past the last entry -- gap is computed from the
+			// last entry after the loop.
+			name: "line after all diff lines",
+			lines: []diffLine{
+				{old: 5, new: 5, wasModified: true},
+				{old: 10, new: 10, wasModified: false},
+			},
+			line:     15,
+			expected: diffLine{old: 15, new: 15, wasModified: false},
+			found:    true,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result, found := diffLineFor(tc.lines, tc.line)
+			require.Equal(t, tc.found, found)
+			require.Equal(t, tc.expected, result)
 		})
 	}
 }
