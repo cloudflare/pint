@@ -1,0 +1,19 @@
+! exec pint --no-color lint --checkstyle=/dev/full rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=INFO msg="Finding all rules to check" paths=["rules"]
+level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
+Warning: always firing alert (alerts/comparison)
+  ---> rules/0001.yml:5 -> `foo`
+5 |     expr: up
+              ^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
+
+level=ERROR msg="Execution completed with error(s)" err="submitting reports: write /dev/full: no space left on device"
+-- rules/0001.yml --
+groups:
+- name: foo
+  rules:
+  - alert: foo
+    expr: up
