@@ -964,7 +964,6 @@ func TestChangesParseDiff(t *testing.T) {
 			},
 		},
 		{
-			// ls-tree returns error when querying the before commit path.
 			title: "ls-tree error on before commit",
 			mock: func(args ...string) ([]byte, error) {
 				if args[0] == "log" {
@@ -1145,25 +1144,21 @@ func TestLineNumberString(t *testing.T) {
 
 	testCases := []testCaseT{
 		{
-			// Added line: only After is set.
 			title:    "added line",
 			ln:       git.LineNumber{Before: 0, After: 5},
 			expected: "+5",
 		},
 		{
-			// Deleted line: only Before is set.
 			title:    "deleted line",
 			ln:       git.LineNumber{Before: 3, After: 0},
 			expected: "-3",
 		},
 		{
-			// Unmodified line: Before equals After.
 			title:    "same before and after",
 			ln:       git.LineNumber{Before: 7, After: 7},
 			expected: "7",
 		},
 		{
-			// Modified line moved to a different position: Before and After differ.
 			title:    "different before and after",
 			ln:       git.LineNumber{Before: 4, After: 9},
 			expected: "4->9",
@@ -1187,7 +1182,6 @@ func TestHasAfter(t *testing.T) {
 
 	testCases := []testCaseT{
 		{
-			// Matching line exists in the slice.
 			title: "match found",
 			lns: git.LineNumbers{
 				{Before: 1, After: 2},
@@ -1197,7 +1191,6 @@ func TestHasAfter(t *testing.T) {
 			expected: true,
 		},
 		{
-			// No matching After value in the slice.
 			title: "no match",
 			lns: git.LineNumbers{
 				{Before: 1, After: 2},
@@ -1207,7 +1200,6 @@ func TestHasAfter(t *testing.T) {
 			expected: false,
 		},
 		{
-			// Empty slice always returns false.
 			title:    "empty slice",
 			lns:      git.LineNumbers{},
 			line:     1,
@@ -1222,6 +1214,222 @@ func TestHasAfter(t *testing.T) {
 	}
 }
 
+func TestHasBefore(t *testing.T) {
+	type testCaseT struct {
+		title    string
+		lns      git.LineNumbers
+		line     int
+		expected bool
+	}
+
+	testCases := []testCaseT{
+		{
+			title: "match found",
+			lns: git.LineNumbers{
+				{Before: 1, After: 2},
+				{Before: 3, After: 5},
+			},
+			line:     3,
+			expected: true,
+		},
+		{
+			title: "no match",
+			lns: git.LineNumbers{
+				{Before: 1, After: 2},
+				{Before: 3, After: 4},
+			},
+			line:     99,
+			expected: false,
+		},
+		{
+			title:    "empty slice",
+			lns:      git.LineNumbers{},
+			line:     1,
+			expected: false,
+		},
+		{
+			title: "additions only, no match",
+			lns: git.LineNumbers{
+				{Before: 0, After: 3},
+				{Before: 0, After: 4},
+			},
+			line:     3,
+			expected: false,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.title, func(t *testing.T) {
+			require.Equal(t, tc.expected, tc.lns.HasBefore(tc.line))
+		})
+	}
+}
+
+func TestNearestAfter(t *testing.T) {
+	type testCaseT struct {
+		title    string
+		lns      git.LineNumbers
+		target   int
+		expected int
+	}
+
+	testCases := []testCaseT{
+		{
+			title: "exact match",
+			lns: git.LineNumbers{
+				{Before: 0, After: 5},
+				{Before: 0, After: 10},
+			},
+			target:   10,
+			expected: 10,
+		},
+		{
+			title: "closer to lower",
+			lns: git.LineNumbers{
+				{Before: 0, After: 5},
+				{Before: 0, After: 20},
+			},
+			target:   8,
+			expected: 5,
+		},
+		{
+			title: "closer to higher",
+			lns: git.LineNumbers{
+				{Before: 0, After: 5},
+				{Before: 0, After: 20},
+			},
+			target:   18,
+			expected: 20,
+		},
+		{
+			title: "target below all",
+			lns: git.LineNumbers{
+				{Before: 0, After: 10},
+				{Before: 0, After: 20},
+			},
+			target:   2,
+			expected: 10,
+		},
+		{
+			title: "target above all",
+			lns: git.LineNumbers{
+				{Before: 0, After: 10},
+				{Before: 0, After: 20},
+			},
+			target:   99,
+			expected: 20,
+		},
+		{
+			title: "skips deletions",
+			lns: git.LineNumbers{
+				{Before: 5, After: 0},
+				{Before: 0, After: 20},
+			},
+			target:   3,
+			expected: 20,
+		},
+		{
+			title:    "empty slice",
+			lns:      git.LineNumbers{},
+			target:   5,
+			expected: 0,
+		},
+		{
+			title: "all deletions",
+			lns: git.LineNumbers{
+				{Before: 3, After: 0},
+				{Before: 5, After: 0},
+			},
+			target:   4,
+			expected: 0,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.title, func(t *testing.T) {
+			require.Equal(t, tc.expected, tc.lns.NearestAfter(tc.target))
+		})
+	}
+}
+
+func TestNearestBefore(t *testing.T) {
+	type testCaseT struct {
+		title    string
+		lns      git.LineNumbers
+		target   int
+		expected int
+	}
+
+	testCases := []testCaseT{
+		{
+			title: "exact match",
+			lns: git.LineNumbers{
+				{Before: 5, After: 0},
+				{Before: 10, After: 0},
+			},
+			target:   10,
+			expected: 10,
+		},
+		{
+			title: "closer to lower",
+			lns: git.LineNumbers{
+				{Before: 5, After: 0},
+				{Before: 20, After: 0},
+			},
+			target:   8,
+			expected: 5,
+		},
+		{
+			title: "closer to higher",
+			lns: git.LineNumbers{
+				{Before: 5, After: 0},
+				{Before: 20, After: 0},
+			},
+			target:   18,
+			expected: 20,
+		},
+		{
+			title: "target below all",
+			lns: git.LineNumbers{
+				{Before: 10, After: 0},
+				{Before: 20, After: 0},
+			},
+			target:   2,
+			expected: 10,
+		},
+		{
+			title: "skips additions",
+			lns: git.LineNumbers{
+				{Before: 0, After: 5},
+				{Before: 20, After: 0},
+			},
+			target:   3,
+			expected: 20,
+		},
+		{
+			title:    "empty slice",
+			lns:      git.LineNumbers{},
+			target:   5,
+			expected: 0,
+		},
+		{
+			title: "all additions",
+			lns: git.LineNumbers{
+				{Before: 0, After: 3},
+				{Before: 0, After: 5},
+			},
+			target:   4,
+			expected: 0,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.title, func(t *testing.T) {
+			require.Equal(t, tc.expected, tc.lns.NearestBefore(tc.target))
+		})
+	}
+}
+
 func TestBeforeForAfter(t *testing.T) {
 	type testCaseT struct {
 		title    string
@@ -1232,7 +1440,6 @@ func TestBeforeForAfter(t *testing.T) {
 
 	testCases := []testCaseT{
 		{
-			// Return the Before value for a matching After value.
 			title: "match found",
 			lns: git.LineNumbers{
 				{Before: 10, After: 20},
@@ -1252,14 +1459,12 @@ func TestBeforeForAfter(t *testing.T) {
 			expected: 89,
 		},
 		{
-			// Empty slice — no diff entries, line is unshifted.
 			title:    "empty slice returns line itself",
 			lns:      git.LineNumbers{},
 			line:     5,
 			expected: 5,
 		},
 		{
-			// Line before any diff entry — no shift happened yet.
 			title: "line before first entry",
 			lns: git.LineNumbers{
 				{Before: 10, After: 20},
@@ -1291,7 +1496,6 @@ func TestBeforeForAfter(t *testing.T) {
 			expected: 15,
 		},
 		{
-			// All entries are added lines — no valid reference point, returns line itself.
 			title: "all entries are added",
 			lns: git.LineNumbers{
 				{Before: 0, After: 3},
@@ -1319,7 +1523,6 @@ func TestMakeLineRange(t *testing.T) {
 
 	testCases := []testCaseT{
 		{
-			// LinesBefore sets Before=i+1 and After=0.
 			title: "before only",
 			n:     2,
 			side:  git.LinesBefore,
@@ -1329,7 +1532,6 @@ func TestMakeLineRange(t *testing.T) {
 			},
 		},
 		{
-			// LinesAfter sets Before=0 and After=i+1.
 			title: "after only",
 			n:     2,
 			side:  git.LinesAfter,
@@ -1339,7 +1541,6 @@ func TestMakeLineRange(t *testing.T) {
 			},
 		},
 		{
-			// LinesBoth sets Before=i+1 and After=i+1.
 			title: "both",
 			n:     3,
 			side:  git.LinesBoth,
@@ -1350,7 +1551,6 @@ func TestMakeLineRange(t *testing.T) {
 			},
 		},
 		{
-			// Zero count returns empty slice.
 			title:    "zero count",
 			n:        0,
 			side:     git.LinesBoth,
@@ -1376,7 +1576,6 @@ func TestMakeLineRangeFromTo(t *testing.T) {
 
 	testCases := []testCaseT{
 		{
-			// LinesBefore sets Before=l and After=0.
 			title: "before only",
 			first: 5,
 			last:  7,
@@ -1388,7 +1587,6 @@ func TestMakeLineRangeFromTo(t *testing.T) {
 			},
 		},
 		{
-			// LinesAfter sets Before=0 and After=l.
 			title: "after only",
 			first: 3,
 			last:  4,
@@ -1399,7 +1597,6 @@ func TestMakeLineRangeFromTo(t *testing.T) {
 			},
 		},
 		{
-			// LinesBoth sets Before=l and After=l.
 			title: "both",
 			first: 10,
 			last:  12,
@@ -1411,7 +1608,6 @@ func TestMakeLineRangeFromTo(t *testing.T) {
 			},
 		},
 		{
-			// last < first returns empty slice.
 			title:    "negative range",
 			first:    5,
 			last:     3,
@@ -1419,7 +1615,6 @@ func TestMakeLineRangeFromTo(t *testing.T) {
 			expected: git.LineNumbers{},
 		},
 		{
-			// first == last returns single element.
 			title: "single element",
 			first: 4,
 			last:  4,

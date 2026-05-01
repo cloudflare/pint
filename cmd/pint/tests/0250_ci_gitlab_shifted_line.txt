@@ -3,7 +3,7 @@ http method gitlab GET /api/v4/projects/1234/merge_requests/1/versions 200 [{"id
 http method gitlab GET /api/v4/projects/1234/merge_requests/1/discussions 200 []
 http method gitlab GET /api/v4/projects/1234/merge_requests 200 [{"iid": 1}]
 http method gitlab POST /api/v4/projects/1234/merge_requests/1/discussions 200 {}
-http start gitlab 127.0.0.1:6244
+http start gitlab 127.0.0.1:6250
 
 mkdir testrepo
 cd testrepo
@@ -19,9 +19,8 @@ exec git add .
 exec git commit -am 'import rules and config'
 
 exec git checkout -b v2
-exec git mv rules.yml renamed.yml
-cp ../src/v2.yml renamed.yml
-exec git commit -am 'rename and modify rules'
+cp ../src/v2.yml rules.yml
+exec git commit -am 'v2'
 
 env GITLAB_AUTH_TOKEN=secret
 exec pint -l debug --offline --no-color ci
@@ -39,6 +38,8 @@ groups:
 groups:
 - name: foo
   rules:
+  - record: new_rule
+    expr: count(up)
   - alert: rule1
     expr: sum(foo) by(job)
     for: 0s
@@ -49,7 +50,7 @@ ci {
 }
 repository {
   gitlab {
-    uri        = "http://127.0.0.1:6244"
+    uri        = "http://127.0.0.1:6250"
     timeout    = "30s"
     project    = "1234"
   }
@@ -89,7 +90,7 @@ body: |
   <summary>always firing alert</summary>
 
   ```yaml
-  5 |     expr: sum(foo) by(job)
+  7 |     expr: sum(foo) by(job)
                     ^^^ 
   ```
 
@@ -110,10 +111,10 @@ position:
   base_sha: base
   head_sha: head
   start_sha: start
-  new_path: renamed.yml
+  new_path: rules.yml
   old_path: rules.yml
   position_type: text
-  new_line: 6
+  new_line: 8
 --- END ---
 
 POST /api/v4/projects/1234/merge_requests/1/discussions
@@ -129,7 +130,7 @@ body: |
   <summary>redundant field with default value</summary>
 
   ```yaml
-  6 |     for: 0s
+  8 |     for: 0s
                ^^ 
   ```
 
@@ -144,9 +145,9 @@ position:
   base_sha: base
   head_sha: head
   start_sha: start
-  new_path: renamed.yml
+  new_path: rules.yml
   old_path: rules.yml
   position_type: text
-  new_line: 6
+  new_line: 8
 --- END ---
 

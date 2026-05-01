@@ -9,16 +9,17 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/diags"
+	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/output"
 )
 
 type PendingComment struct {
-	path    string
-	oldPath string
-	text    string
-	line    int
-	oldLine int
-	anchor  checks.Anchor
+	path         string
+	oldPath      string
+	text         string
+	changedLines git.LineNumbers
+	line         int
+	anchor       checks.Anchor
 }
 
 type ExistingComment struct {
@@ -162,12 +163,12 @@ func makeComments(summary Summary, showDuplicates bool) (comments []PendingComme
 		}
 
 		comments = append(comments, PendingComment{
-			anchor:  reports[0].Problem.Anchor,
-			path:    reports[0].Path.SymlinkTarget,
-			oldPath: reports[0].Changes.OldPath,
-			line:    line,
-			oldLine: reports[0].Changes.Lines.BeforeForAfter(line),
-			text:    buf.String(),
+			anchor:       reports[0].Problem.Anchor,
+			path:         reports[0].Path.SymlinkTarget,
+			oldPath:      reports[0].Changes.OldPath,
+			line:         line,
+			changedLines: reports[0].Changes.Lines,
+			text:         buf.String(),
 		})
 	}
 	return comments

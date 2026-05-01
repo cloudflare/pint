@@ -76,6 +76,55 @@ func (lns LineNumbers) HasAfter(line int) bool {
 	return false
 }
 
+func (lns LineNumbers) HasBefore(line int) bool {
+	for _, ln := range lns {
+		if ln.Before == line {
+			return true
+		}
+	}
+	return false
+}
+
+// NearestAfter returns the After line number closest to the given target.
+// Returns 0 if there are no entries with After > 0.
+func (lns LineNumbers) NearestAfter(target int) int {
+	best := 0
+	bestDist := -1
+	for _, ln := range lns {
+		if ln.After > 0 {
+			dist := ln.After - target
+			if dist < 0 {
+				dist = -dist
+			}
+			if bestDist < 0 || dist < bestDist {
+				best = ln.After
+				bestDist = dist
+			}
+		}
+	}
+	return best
+}
+
+// NearestBefore returns the Before line number closest to the given target.
+// Returns 0 if there are no entries with Before > 0.
+func (lns LineNumbers) NearestBefore(target int) int {
+	best := 0
+	bestDist := -1
+	for _, ln := range lns {
+		if ln.Before > 0 {
+			dist := ln.Before - target
+			if dist < 0 {
+				dist = -dist
+			}
+			if bestDist < 0 || dist < bestDist {
+				best = ln.Before
+				bestDist = dist
+			}
+		}
+	}
+	return best
+}
+
 // BeforeForAfter returns the old (before the change) line number for a given
 // new (after the change) line number.
 //

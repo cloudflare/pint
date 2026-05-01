@@ -429,18 +429,38 @@ func reportToGitLabDiscussion(pending PendingComment, ver *gitlab.MergeRequestDi
 		},
 	}
 
+	line := pending.line
+	oldLine := pending.changedLines.BeforeForAfter(pending.line)
+
+	// GitLab requires comments on lines present in the diff.
+	// If the target line is not in the diff, move it to the nearest changed line.
+	if pending.anchor == checks.AnchorBefore {
+		if !pending.changedLines.HasBefore(line) {
+			if nearest := pending.changedLines.NearestBefore(line); nearest > 0 {
+				line = nearest
+			}
+		}
+	} else {
+		if !pending.changedLines.HasAfter(line) {
+			if nearest := pending.changedLines.NearestAfter(line); nearest > 0 {
+				line = nearest
+				oldLine = pending.changedLines.BeforeForAfter(line)
+			}
+		}
+	}
+
 	switch {
 	// Deleted line: only old_line, no new_line.
 	case pending.anchor == checks.AnchorBefore:
-		d.Position.OldLine = new(int64(pending.line))
+		d.Position.OldLine = new(int64(line))
 		d.Position.NewLine = nil
 	// Added line (oldLine==0): only new_line, no old_line.
-	case pending.oldLine == 0:
-		d.Position.NewLine = new(int64(pending.line))
+	case oldLine == 0:
+		d.Position.NewLine = new(int64(line))
 	// Context line with known old->new mapping: both old_line and new_line.
-	case pending.oldLine > 0:
-		d.Position.NewLine = new(int64(pending.line))
-		d.Position.OldLine = new(int64(pending.oldLine))
+	case oldLine > 0:
+		d.Position.NewLine = new(int64(line))
+		d.Position.OldLine = new(int64(oldLine))
 	}
 
 	return &d

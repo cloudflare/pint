@@ -1,12 +1,10 @@
 package reporter
 
 import (
-	"bufio"
 	"bytes"
 	"context"
 	"fmt"
 	"log/slog"
-	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -39,21 +37,31 @@ type ghCommentMeta struct {
 	id int64
 }
 
-type ghPR struct {
-	files []*github.CommitFile
-}
+type ghPR struct{}
 
-func (pr ghPR) String() string {
-	return fmt.Sprintf("%d file(s)", len(pr.files))
-}
-
-func (pr ghPR) getFile(path string) *github.CommitFile {
-	for _, f := range pr.files {
-		if f.GetFilename() == path {
-			return f
+// commentPosition returns the side and line number for a GitHub PR review comment.
+// GitHub only accepts comments on lines present in the diff, so if the target
+// line is not in the diff we move it to the nearest changed line.
+// AnchorBefore targets the old (deleted) side if oldLine is known.
+// AnchorAfter (or fallback) targets the new (added/unchanged) side.
+func (gr GithubReporter) commentPosition(p PendingComment) (side string, line int) {
+	oldLine := p.changedLines.BeforeForAfter(p.line)
+	if p.anchor == checks.AnchorBefore && oldLine > 0 {
+		if p.changedLines.HasBefore(oldLine) {
+			return "LEFT", oldLine
 		}
+		if nearest := p.changedLines.NearestBefore(oldLine); nearest > 0 {
+			return "LEFT", nearest
+		}
+		return "LEFT", oldLine
 	}
-	return nil
+	if p.changedLines.HasAfter(p.line) {
+		return "RIGHT", p.line
+	}
+	if nearest := p.changedLines.NearestAfter(p.line); nearest > 0 {
+		return "RIGHT", nearest
+	}
+	return "RIGHT", p.line
 }
 
 // NewGithubReporter creates a new GitHub reporter that reports
@@ -112,10 +120,8 @@ func (gr GithubReporter) Describe() string {
 	return "GitHub"
 }
 
-func (gr GithubReporter) Destinations(ctx context.Context) (_ []any, err error) {
-	var pr ghPR
-	pr.files, err = gr.listPRFiles(ctx)
-	return []any{pr}, err
+func (gr GithubReporter) Destinations(_ context.Context) ([]any, error) {
+	return []any{ghPR{}}, nil
 }
 
 func (gr GithubReporter) Summary(ctx context.Context, _ any, s Summary, pendingComments []PendingComment, errs []error) error {
@@ -174,26 +180,8 @@ func (gr GithubReporter) List(ctx context.Context, _ any) ([]ExistingComment, er
 	return comments, nil
 }
 
-func (gr GithubReporter) Create(ctx context.Context, dst any, p PendingComment) error {
-	pr := dst.(ghPR)
-
-	file := pr.getFile(p.path)
-	if file == nil {
-		slog.LogAttrs(ctx, slog.LevelDebug, "Skipping report for path with no changes",
-			slog.String("path", p.path),
-		)
-		return nil
-	}
-
-	diffs := parseDiffLines(file.GetPatch())
-	if len(diffs) == 0 {
-		slog.LogAttrs(ctx, slog.LevelDebug, "Skipping report for path with no diff",
-			slog.String("path", p.path),
-		)
-		return nil
-	}
-
-	side, line := gr.fixCommentLine(dst, p)
+func (gr GithubReporter) Create(ctx context.Context, _ any, p PendingComment) error {
+	side, line := gr.commentPosition(p)
 
 	// The generated comment must follow these rules:
 	// https://docs.github.com/en/rest/pulls/comments#create-a-review-comment-for-a-pull-request
@@ -241,11 +229,11 @@ func (gr GithubReporter) CanCreate(done int) bool {
 	return done < gr.maxComments
 }
 
-func (gr GithubReporter) IsEqual(dst any, existing ExistingComment, pending PendingComment) bool {
+func (gr GithubReporter) IsEqual(_ any, existing ExistingComment, pending PendingComment) bool {
 	if existing.path != pending.path {
 		return false
 	}
-	_, line := gr.fixCommentLine(dst, pending)
+	_, line := gr.commentPosition(pending)
 	if existing.line != line {
 		return false
 	}
@@ -314,18 +302,6 @@ func (gr GithubReporter) createReview(ctx context.Context, summary Summary) erro
 	}
 	slog.LogAttrs(ctx, slog.LevelInfo, "Pull request review created", slog.String("status", resp.Status))
 	return nil
-}
-
-func (gr GithubReporter) listPRFiles(ctx context.Context) ([]*github.CommitFile, error) {
-	reqCtx, cancel := gr.reqContext(ctx)
-	defer cancel()
-
-	slog.LogAttrs(ctx, slog.LevelDebug, "Getting the list of modified files", slog.Int("pr", gr.prNum))
-	files, _, err := gr.client.PullRequests.ListFiles(reqCtx, gr.owner, gr.repo, gr.prNum, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to list pull request files: %w", err)
-	}
-	return files, nil
 }
 
 func formatGHReviewBody(ctx context.Context, version string, summary Summary, showDuplicates bool) string {
@@ -426,131 +402,4 @@ func (gr GithubReporter) generalComment(ctx context.Context, body string) error 
 
 func (gr GithubReporter) reqContext(ctx context.Context) (context.Context, context.CancelFunc) {
 	return context.WithTimeout(context.WithValue(ctx, github.SleepUntilPrimaryRateLimitResetWhenRateLimited, true), gr.timeout)
-}
-
-// fixCommentLine determines the correct side and line number for a GitHub
-// pull request review comment.
-//
-// Side rules (from the GitHub API docs):
-//   - "LEFT"  -- comment targets a deleted line (shows in red).
-//   - "RIGHT" -- comment targets an added or unchanged line (green/white).
-//
-// Line selection:
-//   - If the line is in the diff and modified, use its old (LEFT) or new
-//     (RIGHT) line number depending on the anchor.
-//   - If the line is not in the diff or not modified, fall back to the
-//     first modified line on the RIGHT side. GitHub API rejects comments
-//     on lines that are not part of the diff.
-func (gr GithubReporter) fixCommentLine(dst any, p PendingComment) (string, int) {
-	pr := dst.(ghPR)
-	file := pr.getFile(p.path)
-
-	// AnchorBefore means the problem is on the old (deleted) side.
-	var side string
-	if p.anchor == checks.AnchorBefore {
-		side = "LEFT"
-	} else {
-		side = "RIGHT"
-	}
-
-	line := p.line
-	diffs := parseDiffLines(file.GetPatch())
-	dl, ok := diffLineFor(diffs, int64(p.line))
-	switch {
-	case ok && dl.wasModified && p.anchor == checks.AnchorAfter:
-		// Comment on new or modified line.
-		line = int(dl.new) // FIXME int64 -> int
-	case ok && dl.wasModified && p.anchor == checks.AnchorBefore:
-		// Comment on new or modified line.
-		line = int(dl.old) // FIXME int64 -> int
-	default:
-		// Line is not in the diff or not modified -- we can't comment on
-		// it directly. Fall back to the first modified line so the comment
-		// is still visible in the PR review.
-		for _, d := range diffs {
-			if !d.wasModified {
-				continue
-			}
-			line = int(d.new) // FIXME int64 -> int
-			side = "RIGHT"
-			break
-		}
-	}
-
-	return side, line
-}
-
-type diffLine struct {
-	old         int64
-	new         int64
-	wasModified bool
-}
-
-func diffLineFor(lines []diffLine, line int64) (diffLine, bool) {
-	if len(lines) == 0 {
-		return diffLine{old: 0, new: 0, wasModified: false}, false
-	}
-
-	for i, dl := range lines {
-		if dl.new == line {
-			return dl, true
-		}
-		// Calculate unmodified line that does not present in the diff
-		if dl.new > line {
-			lastLines := dl
-			if i > 0 {
-				lastLines = lines[i-1]
-			}
-			gap := line - lastLines.new
-			return diffLine{
-				old:         lastLines.old + gap,
-				new:         line,
-				wasModified: false,
-			}, true
-		}
-	}
-	// Calculate unmodified line that is greater than the last diff line.
-	// The loop above handles all cases where line <= some dl.new, so here
-	// line is always > lastLines.new.
-	lastLines := lines[len(lines)-1]
-	gap := line - lastLines.new
-	return diffLine{
-		old:         lastLines.old + gap,
-		new:         line,
-		wasModified: false,
-	}, true
-}
-
-var diffRe = regexp.MustCompile(`@@ \-(\d+),(\d+) \+(\d+),(\d+) @@`)
-
-func parseDiffLines(diff string) (lines []diffLine) {
-	var oldLine, newLine int64
-
-	sc := bufio.NewScanner(strings.NewReader(diff))
-	for sc.Scan() {
-		line := sc.Text()
-		switch {
-		case strings.HasPrefix(line, "@@"):
-			matches := diffRe.FindStringSubmatch(line)
-			if len(matches) == 5 {
-				oldLine, _ = strconv.ParseInt(matches[1], 10, 64)
-				oldLine--
-				newLine, _ = strconv.ParseInt(matches[3], 10, 64)
-				newLine--
-			}
-		case strings.HasPrefix(line, "--- "):
-		case strings.HasPrefix(line, "+++ "):
-		case strings.HasPrefix(line, "-"):
-			oldLine++
-		case strings.HasPrefix(line, "+"):
-			newLine++
-			lines = append(lines, diffLine{old: oldLine, new: newLine, wasModified: true})
-		default:
-			oldLine++
-			newLine++
-			lines = append(lines, diffLine{old: oldLine, new: newLine, wasModified: false})
-		}
-	}
-
-	return lines
 }

@@ -1035,7 +1035,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 			},
 		},
 		{
-			description: "unmodified rule, no diff",
+			description: "problem line outside diff, moved to nearest changed line",
 			timeout:     time.Minute,
 			maxComments: 1,
 			summary: reporter.NewSummary([]reporter.Report{
@@ -1082,8 +1082,64 @@ Below is the list of checks that were disabled for each Prometheus server define
 						OldPath:      new(mockPath),
 						NewPath:      new(mockPath),
 						PositionType: new("text"),
-						OldLine:      new(int64(3)),
-						NewLine:      new(int64(3)),
+						NewLine:      new(int64(4)),
+					}),
+				}).ReturnJSON(gitlab.Response{})
+			}),
+			errorHandler: func(err error) error {
+				return err
+			},
+		},
+		{
+			description: "deleted line moved to nearest deleted line",
+			timeout:     time.Minute,
+			maxComments: 1,
+			summary: reporter.NewSummary([]reporter.Report{
+				{
+					Path: discovery.Path{
+						SymlinkTarget: mockPath,
+						Name:          mockPath,
+					},
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines: git.LineNumbers{
+							{Before: 5, After: 0},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Reporter:    "a",
+						Summary:     "foo error1",
+						Details:     "foo details",
+						Diagnostics: []diags.Diagnostic{},
+						Lines:       diags.LineRange{First: 3, Last: 3},
+						Severity:    checks.Fatal,
+						Anchor:      checks.AnchorBefore,
+					},
+				},
+			}),
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(apiUser).ReturnJSON(gitlab.User{ID: 123})
+				s.ExpectGet(apiOpenMergeRequests).ReturnJSON([]gitlab.BasicMergeRequest{
+					{IID: 1},
+				})
+				s.ExpectGet(apiVersions(1)).ReturnJSON([]gitlab.MergeRequestDiffVersion{
+					{ID: 2, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
+					{ID: 1, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
+				})
+				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{})
+				// Problem on old line 3, but only old line 5 is in the diff.
+				// Moved to nearest deleted line: 5.
+				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
+					Body: discBody("a", "foo error1", "foo details"),
+					Position: new(gitlab.PositionOptions{
+						BaseSHA:      new("base"),
+						StartSHA:     new("start"),
+						HeadSHA:      new("head"),
+						OldPath:      new(mockPath),
+						NewPath:      new(mockPath),
+						PositionType: new("text"),
+						OldLine:      new(int64(5)),
 					}),
 				}).ReturnJSON(gitlab.Response{})
 			}),
@@ -1138,14 +1194,12 @@ func TestGitLabReporterCommentLine(t *testing.T) {
 
 	testCases := []testCaseT{
 		{
-			// Modified line: only NewLine is set.
 			description:     "comment on new line",
 			problemLine:     18,
 			changes:         git.LineNumbers{{Before: 0, After: 18}},
 			expectedNewLine: 18,
 		},
 		{
-			// Deleted line with AnchorBefore: only OldLine is set.
 			description:     "comment on removed line",
 			problemLine:     145,
 			changes:         git.LineNumbers{{Before: 145, After: 145}},
@@ -1153,7 +1207,6 @@ func TestGitLabReporterCommentLine(t *testing.T) {
 			anchor:          checks.AnchorBefore,
 		},
 		{
-			// Unmodified line with Before==After: both OldLine and NewLine are set.
 			description:     "unmodified line with same old and new",
 			problemLine:     10,
 			changes:         git.LineNumbers{{Before: 10, After: 10}},
@@ -1161,7 +1214,6 @@ func TestGitLabReporterCommentLine(t *testing.T) {
 			expectedOldLine: 10,
 		},
 		{
-			// Unmodified line where old line differs from new (e.g. after an insertion).
 			description:     "unmodified line after added line",
 			problemLine:     19,
 			changes:         git.LineNumbers{{Before: 18, After: 19}},
@@ -1169,7 +1221,6 @@ func TestGitLabReporterCommentLine(t *testing.T) {
 			expectedOldLine: 18,
 		},
 		{
-			// Unmodified line in context of a deletion.
 			description:     "unmodified line before removed line",
 			problemLine:     143,
 			changes:         git.LineNumbers{{Before: 142, After: 143}},
