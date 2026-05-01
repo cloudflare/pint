@@ -10,7 +10,7 @@ require (
 	github.com/google/go-github/v82 v82.0.0
 	github.com/hashicorp/hcl/v2 v2.24.0
 	github.com/itchyny/json2yaml v0.1.5
-	github.com/klauspost/compress v1.18.5
+	github.com/klauspost/compress v1.18.6
 	github.com/neilotoole/slogt v1.1.0
 	github.com/prometheus/client_golang v1.23.2
 	github.com/prometheus/client_model v0.6.2
