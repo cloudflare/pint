@@ -1026,7 +1026,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 						OldPath:      new(mockPath),
 						NewPath:      new(mockPath),
 						PositionType: new("text"),
-						OldLine:      new(int64(3)),
+						NewLine:      new(int64(3)),
 					}),
 				}).ReturnJSON(gitlab.Response{})
 			}),

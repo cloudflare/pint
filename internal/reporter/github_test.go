@@ -887,6 +887,61 @@ func TestGitHubReporter(t *testing.T) {
 			}),
 		},
 		{
+			description: "anchor before with only added lines in diff",
+			owner:       "foo",
+			repo:        "bar",
+			token:       "something",
+			prNum:       123,
+			maxComments: 50,
+			timeout:     time.Second,
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/reviews" {
+					_, _ = w.Write([]byte(`[]`))
+					return
+				}
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
+					_, _ = w.Write([]byte(`[]`))
+					return
+				}
+				if r.Method == http.MethodPost && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
+					body, _ := io.ReadAll(r.Body)
+					b := strings.TrimSpace(strings.TrimRight(string(body), "\n\t\r"))
+					// Diff only has added lines, no deleted lines to attach to.
+					// Falls through to RIGHT side, moved to nearest added line: 5.
+					if b != `{"body":":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n","path":"foo.txt","line":5,"side":"RIGHT","commit_id":"HEAD"}` {
+						t.Errorf("Unexpected comment: %s", b)
+						t.FailNow()
+					}
+				}
+				_, _ = w.Write([]byte(""))
+			}),
+			summary: reporter.NewSummary([]reporter.Report{
+				{
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
+					Changes: discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 5}},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Lines: diags.LineRange{
+							First: 3,
+							Last:  3,
+						},
+						Reporter: "mock",
+						Summary:  "syntax error",
+						Details:  "syntax details",
+						Severity: checks.Fatal,
+						Anchor:   checks.AnchorBefore,
+					},
+				},
+			}),
+		},
+		{
 			description: "review comment",
 			owner:       "foo",
 			repo:        "bar",

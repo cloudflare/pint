@@ -53,7 +53,7 @@ func (gr GithubReporter) commentPosition(p PendingComment) (side string, line in
 		if nearest := p.changedLines.NearestBefore(oldLine); nearest > 0 {
 			return "LEFT", nearest
 		}
-		return "LEFT", oldLine
+		// No deleted lines in the diff, fall through to RIGHT side.
 	}
 	if p.changedLines.HasAfter(p.line) {
 		return "RIGHT", p.line
