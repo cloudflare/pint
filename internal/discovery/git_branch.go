@@ -95,7 +95,7 @@ func (f GitBranchFinder) Find(allEntries []*Entry) (entries []*Entry, err error)
 			slog.String("after.target", change.Path.After.SymlinkTarget),
 			slog.Any("after.type", change.Path.After.Type),
 			slog.Int("after.entries", len(entriesAfter)),
-			slog.String("modifiedLines", change.Body.Lines.String()),
+			slog.Any("modifiedLines", change.Body.Lines),
 		)
 		for _, me := range matchEntries(entriesBefore, entriesAfter) {
 			switch {
@@ -107,8 +107,8 @@ func (f GitBranchFinder) Find(allEntries []*Entry) (entries []*Entry, err error)
 					slog.String("name", me.after.Rule.Name()),
 					slog.String("state", me.after.State.String()),
 					slog.String("path", me.after.Path.Name),
-					slog.String("ruleLines", me.after.Rule.Lines.String()),
-					slog.String("modifiedLines", me.after.Changes.Lines.String()),
+					slog.Any("ruleLines", me.after.Rule.Lines),
+					slog.Any("modifiedLines", me.after.Changes.Lines),
 				)
 				me.after.Changes.OldPath = oldPath
 				entries = append(entries, me.after)
@@ -120,7 +120,7 @@ func (f GitBranchFinder) Find(allEntries []*Entry) (entries []*Entry, err error)
 					slog.LogAttrs(context.Background(), slog.LevelDebug,
 						"Rule content was not modified on HEAD, identical rule present before",
 						slog.String("name", me.after.Rule.Name()),
-						slog.String("lines", me.after.Rule.Lines.String()),
+						slog.Any("lines", me.after.Rule.Lines),
 					)
 				case me.wasMoved:
 					me.after.State = Moved
@@ -128,7 +128,7 @@ func (f GitBranchFinder) Find(allEntries []*Entry) (entries []*Entry, err error)
 					slog.LogAttrs(context.Background(), slog.LevelDebug,
 						"Rule content was not modified on HEAD but the file was moved or renamed",
 						slog.String("name", me.after.Rule.Name()),
-						slog.String("lines", me.after.Rule.Lines.String()),
+						slog.Any("lines", me.after.Rule.Lines),
 					)
 				default:
 					me.after.State = Modified
@@ -138,8 +138,8 @@ func (f GitBranchFinder) Find(allEntries []*Entry) (entries []*Entry, err error)
 						slog.String("name", me.after.Rule.Name()),
 						slog.String("state", me.after.State.String()),
 						slog.String("path", me.after.Path.Name),
-						slog.String("ruleLines", me.after.Rule.Lines.String()),
-						slog.String("modifiedLines", me.after.Changes.Lines.String()),
+						slog.Any("ruleLines", me.after.Rule.Lines),
+						slog.Any("modifiedLines", me.after.Changes.Lines),
 					)
 				}
 				me.after.Changes.OldPath = oldPath
@@ -155,8 +155,8 @@ func (f GitBranchFinder) Find(allEntries []*Entry) (entries []*Entry, err error)
 					slog.String("name", me.before.Rule.Name()),
 					slog.String("state", me.before.State.String()),
 					slog.String("path", me.before.Path.Name),
-					slog.String("ruleLines", me.before.Rule.Lines.String()),
-					slog.String("modifiedLines", me.before.Changes.Lines.String()),
+					slog.Any("ruleLines", me.before.Rule.Lines),
+					slog.Any("modifiedLines", me.before.Changes.Lines),
 				)
 				me.before.Changes.OldPath = oldPath
 				entries = append(entries, me.before)
@@ -166,8 +166,8 @@ func (f GitBranchFinder) Find(allEntries []*Entry) (entries []*Entry, err error)
 					slog.String("name", me.before.Rule.Name()),
 					slog.String("state", me.before.State.String()),
 					slog.String("path", me.before.Path.Name),
-					slog.String("ruleLines", me.before.Rule.Lines.String()),
-					slog.String("modifiedLines", me.before.Changes.Lines.String()),
+					slog.Any("ruleLines", me.before.Rule.Lines),
+					slog.Any("modifiedLines", me.before.Changes.Lines),
 				)
 			}
 		}
@@ -234,26 +234,24 @@ func (f GitBranchFinder) shouldSkipAllChecks(changes []*git.FileChange) (bool, e
 	return false, nil
 }
 
-func commonLines(a, b []int) (common []int) {
-	for _, ai := range a {
-		if slices.Contains(b, ai) {
-			common = append(common, ai)
-		}
-	}
-	return common
-}
-
 func commonLineNumbers(bodyLines, ruleLines git.LineNumbers) git.LineNumbers {
-	ruleAfter := make(map[int]struct{}, len(ruleLines))
+	// ruleLines is always a contiguous range produced by MakeLineRangeFromTo,
+	// so we only need the min/max After values for a range check.
+	var minAfter, maxAfter int
 	for _, ln := range ruleLines {
 		if ln.After > 0 {
-			ruleAfter[ln.After] = struct{}{}
+			if minAfter == 0 || ln.After < minAfter {
+				minAfter = ln.After
+			}
+			if ln.After > maxAfter {
+				maxAfter = ln.After
+			}
 		}
 	}
 	common := git.LineNumbers{}
 	for _, ln := range bodyLines {
 		if ln.After > 0 {
-			if _, ok := ruleAfter[ln.After]; ok {
+			if ln.After >= minAfter && ln.After <= maxAfter {
 				common = append(common, ln)
 			}
 		} else if ln.Before > 0 {
