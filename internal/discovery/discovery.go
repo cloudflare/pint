@@ -164,6 +164,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 			)
 		case comments.InvalidComment:
 			entries = append(entries, &Entry{
+				State: Noop,
 				Path: Path{
 					Name:          sourcePath,
 					SymlinkTarget: reportedPath,
@@ -177,6 +178,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 
 	for _, d := range file.Diagnostics {
 		entries = append(entries, &Entry{
+			State: Noop,
 			Path: Path{
 				Name:          sourcePath,
 				SymlinkTarget: reportedPath,
@@ -198,6 +200,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 			slog.Int("line", file.Error.Line),
 		)
 		entries = append(entries, &Entry{
+			State: Noop,
 			Path: Path{
 				Name:          sourcePath,
 				SymlinkTarget: reportedPath,
@@ -218,6 +221,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 				slog.Int("line", group.Error.Line),
 			)
 			entries = append(entries, &Entry{
+				State: Noop,
 				Path: Path{
 					Name:          sourcePath,
 					SymlinkTarget: reportedPath,
@@ -234,6 +238,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 			}
 			ruleLineNumbers := git.MakeLineRangeFromTo(rule.Lines.First, rule.Lines.Last, git.LinesAfter)
 			entries = append(entries, &Entry{
+				State: Noop,
 				Path: Path{
 					Name:          sourcePath,
 					SymlinkTarget: reportedPath,
@@ -252,6 +257,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 		for _, comment := range badOwners {
 			owner := comment.Value.(comments.Owner)
 			entries = append(entries, &Entry{
+				State: Noop,
 				Path: Path{
 					Name:          sourcePath,
 					SymlinkTarget: reportedPath,

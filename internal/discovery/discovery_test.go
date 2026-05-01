@@ -103,7 +103,7 @@ func TestReadRules(t *testing.T) {
 			isStrict: false,
 			entries: []Entry{
 				{
-					State: Unknown,
+					State: Noop,
 					Path: Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
@@ -134,7 +134,7 @@ groups:
 			isStrict: true,
 			entries: []Entry{
 				{
-					State: Unknown,
+					State: Noop,
 					Path: Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
@@ -162,7 +162,7 @@ groups:
 			isStrict: false,
 			entries: []Entry{
 				{
-					State: Unknown,
+					State: Noop,
 					Path: Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
@@ -192,7 +192,7 @@ groups:
 			isStrict: true,
 			entries: []Entry{
 				{
-					State: Unknown,
+					State: Noop,
 					Path: Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
@@ -219,7 +219,7 @@ groups:
 			isStrict: false,
 			entries: []Entry{
 				{
-					State: Unknown,
+					State: Noop,
 					Path: Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
@@ -250,7 +250,7 @@ groups:
 			isStrict: true,
 			entries: []Entry{
 				{
-					State: Unknown,
+					State: Noop,
 					Path: Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
@@ -278,7 +278,7 @@ groups:
 			isStrict: false,
 			entries: []Entry{
 				{
-					State: Unknown,
+					State: Noop,
 					Path: Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
@@ -318,7 +318,7 @@ groups:
 			isStrict: true,
 			entries: []Entry{
 				{
-					State: Unknown,
+					State: Noop,
 					Path: Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
