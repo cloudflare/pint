@@ -202,6 +202,39 @@ func TestQuery(t *testing.T) {
 					UnlimitedTimes()
 			}),
 		},
+		{
+			name:    "badMetricKind",
+			timeout: time.Second,
+			err:     `bad_response: JSON parse error: json: cannot unmarshal JSON array into Go promapi.SampleLabels within "/data/result/0/metric"`,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPost(promapi.APIPathQuery).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"resultType":"vector","result":[{"metric":[],"value":[1614859502.068,"1"]}]}}`).
+					UnlimitedTimes()
+			}),
+		},
+		{
+			name:    "badValueKind",
+			timeout: time.Second,
+			err:     `bad_response: JSON parse error: json: cannot unmarshal JSON object into Go promapi.SampleTimestampValue within "/data/result/0/value"`,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPost(promapi.APIPathQuery).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"resultType":"vector","result":[{"metric":{},"value":{}}]}}`).
+					UnlimitedTimes()
+			}),
+		},
+		{
+			name:    "badValueClosingToken",
+			timeout: time.Second,
+			err:     `bad_response: JSON parse error: json: cannot unmarshal JSON object into Go promapi.SampleTimestampValue within "/data/result/0/value"`,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPost(promapi.APIPathQuery).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"resultType":"vector","result":[{"metric":{},"value":{"ts":1}}]}}`).
+					UnlimitedTimes()
+			}),
+		},
 	}
 
 	for _, tc := range testCases {
