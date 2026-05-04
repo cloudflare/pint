@@ -268,7 +268,7 @@ groups:
 					},
 					Changes: discovery.Changes{
 						Lines: []git.LineNumber{
-							{Before: 6, After: 6},
+							{Before: 6, After: 6, Modified: true},
 						},
 					},
 					Rule: mustParse(4, "  - record: up:count\n    expr: count(up == 1)\n"),
@@ -301,7 +301,7 @@ groups:
 					},
 					Changes: discovery.Changes{
 						Lines: []git.LineNumber{
-							{Before: 3, After: 3},
+							{Before: 3, After: 3, Modified: true},
 						},
 					},
 					Rule: mustParse(1, "- record: up:count\n  expr: count(up == 1)\n"),
@@ -334,7 +334,7 @@ groups:
 					},
 					Changes: discovery.Changes{
 						Lines: []git.LineNumber{
-							{Before: 3, After: 3},
+							{Before: 3, After: 3, Modified: true},
 						},
 					},
 					Rule: mustParse(1, "- record: up:count\n  expr: count(up == 1)\n"),
@@ -497,7 +497,7 @@ groups:
 					},
 					Changes: discovery.Changes{
 						Lines: []git.LineNumber{
-							{Before: 6, After: 6},
+							{Before: 6, After: 6, Modified: true},
 						},
 					},
 					Rule: mustParse(4, "  - record: up:count:1\n    expr: count(up == 1)\n"),
@@ -510,7 +510,7 @@ groups:
 					},
 					Changes: discovery.Changes{
 						Lines: []git.LineNumber{
-							{Before: 7, After: 7},
+							{Before: 7, After: 7, Modified: true},
 						},
 					},
 					Rule: mustParse(6, "  - record: up:count:2a\n    expr: count(up)\n"),
@@ -545,7 +545,7 @@ groups:
 					},
 					Changes: discovery.Changes{
 						Lines: []git.LineNumber{
-							{Before: 7, After: 7},
+							{Before: 7, After: 7, Modified: true},
 						},
 					},
 					Rule: mustParse(6, "  - record: up:count:2\n    expr: count(up)\n"),
@@ -585,7 +585,7 @@ groups:
 					},
 					Changes: discovery.Changes{
 						Lines: []git.LineNumber{
-							{Before: 0, After: 4},
+							{Before: 0, After: 4, Modified: true},
 						},
 					},
 					Rule: mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n  for: 0s\n"),
@@ -641,7 +641,12 @@ groups:
 						SymlinkTarget: "rules.yml",
 					},
 					Changes: discovery.Changes{
-						Lines: git.MakeLineRangeFromTo(2, 3, git.LinesBefore),
+						Lines: []git.LineNumber{
+							{Before: 2, After: 0},
+							{Before: 3, After: 0},
+							{Before: 4, After: 2},
+							{Before: 5, After: 3},
+						},
 					},
 					Rule: mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
 				},
@@ -744,7 +749,12 @@ groups:
 						SymlinkTarget: "rules.yml",
 					},
 					Changes: discovery.Changes{
-						Lines: git.MakeLineRangeFromTo(4, 5, git.LinesBefore),
+						Lines: []git.LineNumber{
+							{Before: 4, After: 0},
+							{Before: 5, After: 0},
+							{Before: 6, After: 4},
+							{Before: 7, After: 5},
+						},
 					},
 					Rule: mustParse(3, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
 				},
@@ -914,7 +924,7 @@ groups:
 					},
 					Changes: discovery.Changes{
 						Lines: []git.LineNumber{
-							{Before: 0, After: 3},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Rule: mustParse(1, "- alert: rule1\n  expr: up == 0\n"),
@@ -949,7 +959,8 @@ groups:
 					},
 					Changes: discovery.Changes{
 						Lines: []git.LineNumber{
-							{Before: 0, After: 8},
+							{Before: 0, After: 8, Modified: true},
+							{Before: 3, After: 9},
 						},
 					},
 					Rule: mustParse(7, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
@@ -1006,12 +1017,12 @@ groups:
 					},
 					Changes: discovery.Changes{
 						Lines: []git.LineNumber{
-							{Before: 7, After: 7},
-							{Before: 0, After: 8},
-							{Before: 0, After: 9},
-							{Before: 0, After: 10},
-							{Before: 0, After: 11},
-							{Before: 0, After: 12},
+							{Before: 7, After: 7, Modified: true},
+							{Before: 0, After: 8, Modified: true},
+							{Before: 0, After: 9, Modified: true},
+							{Before: 0, After: 10, Modified: true},
+							{Before: 0, After: 11, Modified: true},
+							{Before: 0, After: 12, Modified: true},
 						},
 					},
 					Rule: mustParse(4, "- alert: rule2\n  expr: sum(foo) by(job)\n  keep_firing_for: 5m\n  for: 0s\n  annotations:\n    foo: bar\n  labels:\n    foo: bar\n"),
@@ -1085,6 +1096,7 @@ groups:
 						OldPath: "a.yml",
 						Lines: []git.LineNumber{
 							{Before: 3, After: 0},
+							{Before: 4, After: 3},
 						},
 					},
 					Rule: mustParse(1, "- alert: rule\n  expr: up == 0\n"),
@@ -1192,11 +1204,13 @@ groups:
 					},
 					Changes: discovery.Changes{
 						Lines: []git.LineNumber{
-							{Before: 3, After: 3},
-							{Before: 0, After: 11},
-							{Before: 0, After: 12},
-							{Before: 0, After: 15},
-							{Before: 0, After: 16},
+							{Before: 3, After: 3, Modified: true},
+							{Before: 0, After: 11, Modified: true},
+							{Before: 0, After: 12, Modified: true},
+							{Before: 11, After: 13},
+							{Before: 12, After: 14},
+							{Before: 0, After: 15, Modified: true},
+							{Before: 0, After: 16, Modified: true},
 						},
 					},
 					PathError: parser.ParseError{
@@ -1392,7 +1406,7 @@ groups:
 					},
 					Changes: discovery.Changes{
 						Lines: []git.LineNumber{
-							{Before: 6, After: 6},
+							{Before: 6, After: 6, Modified: true},
 						},
 					},
 					Rule: mustParse(4, "  - record: up:count\n    # pint disable promql/series(up)\n    expr: sum(up)\n"),
@@ -1405,8 +1419,8 @@ groups:
 					},
 					Changes: discovery.Changes{
 						Lines: []git.LineNumber{
-							{Before: 3, After: 3},
-							{Before: 6, After: 6},
+							{Before: 3, After: 3, Modified: true},
+							{Before: 6, After: 6, Modified: true},
 						},
 					},
 					PathError: parser.ParseError{
@@ -1454,8 +1468,8 @@ groups:
 					},
 					Changes: discovery.Changes{
 						Lines: []git.LineNumber{
-							{Before: 5, After: 5},
-							{Before: 7, After: 7},
+							{Before: 5, After: 5, Modified: true},
+							{Before: 7, After: 7, Modified: true},
 						},
 					},
 					Rule: mustParse(4, "  - record: up:count\n    expr: |\n      count(\n        up\n      )\n"),
@@ -1468,8 +1482,8 @@ groups:
 					},
 					Changes: discovery.Changes{
 						Lines: []git.LineNumber{
-							{Before: 5, After: 5},
-							{Before: 7, After: 7},
+							{Before: 5, After: 5, Modified: true},
+							{Before: 7, After: 7, Modified: true},
 						},
 					},
 					Rule: mustParse(4, "  - record: up:sum\n    expr: |\n      sum(\n        up\n      )\n"),
@@ -1532,7 +1546,7 @@ groups:
 					},
 					Changes: discovery.Changes{
 						Lines: []git.LineNumber{
-							{Before: 3, After: 3},
+							{Before: 3, After: 3, Modified: true},
 							{Before: 4, After: 0},
 							{Before: 5, After: 0},
 						},
@@ -1547,7 +1561,7 @@ groups:
 					},
 					Changes: discovery.Changes{
 						Lines: []git.LineNumber{
-							{Before: 3, After: 3},
+							{Before: 3, After: 3, Modified: true},
 							{Before: 4, After: 0},
 							{Before: 5, After: 0},
 						},

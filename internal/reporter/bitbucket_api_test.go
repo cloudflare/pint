@@ -294,9 +294,9 @@ func TestReportToAnnotation(t *testing.T) {
 				Changes: discovery.Changes{
 					OldPath: "",
 					Lines: git.LineNumbers{
-						{Before: 0, After: 4},
-						{Before: 0, After: 5},
-						{Before: 0, After: 6},
+						{Before: 0, After: 4, Modified: true},
+						{Before: 0, After: 5, Modified: true},
+						{Before: 0, After: 6, Modified: true},
 					},
 				},
 				Problem: checks.Problem{
@@ -329,9 +329,9 @@ func TestReportToAnnotation(t *testing.T) {
 				Changes: discovery.Changes{
 					OldPath: "",
 					Lines: git.LineNumbers{
-						{Before: 0, After: 4},
-						{Before: 0, After: 5},
-						{Before: 0, After: 6},
+						{Before: 0, After: 4, Modified: true},
+						{Before: 0, After: 5, Modified: true},
+						{Before: 0, After: 6, Modified: true},
 					},
 				},
 				Problem: checks.Problem{
@@ -363,9 +363,9 @@ func TestReportToAnnotation(t *testing.T) {
 				Changes: discovery.Changes{
 					OldPath: "",
 					Lines: git.LineNumbers{
-						{Before: 0, After: 4},
-						{Before: 0, After: 5},
-						{Before: 0, After: 6},
+						{Before: 0, After: 4, Modified: true},
+						{Before: 0, After: 5, Modified: true},
+						{Before: 0, After: 6, Modified: true},
 					},
 				},
 				Problem: checks.Problem{
@@ -397,9 +397,9 @@ func TestReportToAnnotation(t *testing.T) {
 				Changes: discovery.Changes{
 					OldPath: "",
 					Lines: git.LineNumbers{
-						{Before: 0, After: 4},
-						{Before: 0, After: 5},
-						{Before: 0, After: 6},
+						{Before: 0, After: 4, Modified: true},
+						{Before: 0, After: 5, Modified: true},
+						{Before: 0, After: 6, Modified: true},
 					},
 				},
 				Problem: checks.Problem{
@@ -431,9 +431,9 @@ func TestReportToAnnotation(t *testing.T) {
 				Changes: discovery.Changes{
 					OldPath: "",
 					Lines: git.LineNumbers{
-						{Before: 0, After: 4},
-						{Before: 0, After: 5},
-						{Before: 0, After: 6},
+						{Before: 0, After: 4, Modified: true},
+						{Before: 0, After: 5, Modified: true},
+						{Before: 0, After: 6, Modified: true},
 					},
 				},
 				Problem: checks.Problem{
@@ -465,9 +465,9 @@ func TestReportToAnnotation(t *testing.T) {
 				Changes: discovery.Changes{
 					OldPath: "",
 					Lines: git.LineNumbers{
-						{Before: 0, After: 4},
-						{Before: 0, After: 5},
-						{Before: 0, After: 6},
+						{Before: 0, After: 4, Modified: true},
+						{Before: 0, After: 5, Modified: true},
+						{Before: 0, After: 6, Modified: true},
 					},
 				},
 				Problem: checks.Problem{
@@ -499,9 +499,9 @@ func TestReportToAnnotation(t *testing.T) {
 				Changes: discovery.Changes{
 					OldPath: "",
 					Lines: git.LineNumbers{
-						{Before: 0, After: 4},
-						{Before: 0, After: 5},
-						{Before: 0, After: 6},
+						{Before: 0, After: 4, Modified: true},
+						{Before: 0, After: 5, Modified: true},
+						{Before: 0, After: 6, Modified: true},
 					},
 				},
 				Problem: checks.Problem{

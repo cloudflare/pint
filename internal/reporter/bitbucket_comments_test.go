@@ -51,8 +51,8 @@ func TestBitBucketMakeComments(t *testing.T) {
 					Changes: discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -75,8 +75,8 @@ func TestBitBucketMakeComments(t *testing.T) {
 					Changes: discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -98,8 +98,8 @@ func TestBitBucketMakeComments(t *testing.T) {
 					Changes: discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -121,8 +121,8 @@ func TestBitBucketMakeComments(t *testing.T) {
 					Changes: discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -144,8 +144,8 @@ func TestBitBucketMakeComments(t *testing.T) {
 					Changes: discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -167,9 +167,9 @@ func TestBitBucketMakeComments(t *testing.T) {
 					Changes: discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 1},
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 1, Modified: true},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -192,9 +192,9 @@ func TestBitBucketMakeComments(t *testing.T) {
 					Changes: discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 1},
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 1, Modified: true},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -289,8 +289,8 @@ func TestBitBucketMakeComments(t *testing.T) {
 					Changes: discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -312,8 +312,8 @@ func TestBitBucketMakeComments(t *testing.T) {
 					Changes: discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -362,8 +362,8 @@ func TestBitBucketMakeComments(t *testing.T) {
 					Changes: discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -385,8 +385,8 @@ func TestBitBucketMakeComments(t *testing.T) {
 					Changes: discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -435,8 +435,8 @@ func TestBitBucketMakeComments(t *testing.T) {
 					Changes: discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -458,8 +458,8 @@ func TestBitBucketMakeComments(t *testing.T) {
 					Changes: discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -508,8 +508,8 @@ func TestBitBucketMakeComments(t *testing.T) {
 					Changes: discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -531,8 +531,8 @@ func TestBitBucketMakeComments(t *testing.T) {
 					Changes: discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -554,8 +554,8 @@ func TestBitBucketMakeComments(t *testing.T) {
 					Changes: discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -577,8 +577,8 @@ func TestBitBucketMakeComments(t *testing.T) {
 					Changes: discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -600,9 +600,9 @@ func TestBitBucketMakeComments(t *testing.T) {
 					Changes: discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 1},
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 1, Modified: true},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -625,9 +625,9 @@ func TestBitBucketMakeComments(t *testing.T) {
 					Changes: discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 1},
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 1, Modified: true},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -696,8 +696,8 @@ func TestBitBucketMakeComments(t *testing.T) {
 					Changes: discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{

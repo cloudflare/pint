@@ -40,8 +40,9 @@ type TypeDiff struct {
 }
 
 type LineNumber struct {
-	Before int
-	After  int
+	Before   int
+	After    int
+	Modified bool
 }
 
 func (ln LineNumber) String() string {
@@ -69,7 +70,7 @@ func (lns LineNumbers) String() string {
 
 func (lns LineNumbers) HasAfter(line int) bool {
 	for _, ln := range lns {
-		if ln.After == line {
+		if ln.After == line && ln.Modified {
 			return true
 		}
 	}
@@ -85,13 +86,14 @@ func (lns LineNumbers) HasBefore(line int) bool {
 	return false
 }
 
-// NearestAfter returns the After line number closest to the given target.
-// Returns 0 if there are no entries with After > 0.
+// NearestAfter returns the Modified After line number closest to the given target.
+// Only considers entries where Modified is true, consistent with HasAfter.
+// Returns 0 if there are no modified entries with After > 0.
 func (lns LineNumbers) NearestAfter(target int) int {
 	best := 0
 	bestDist := -1
 	for _, ln := range lns {
-		if ln.After > 0 {
+		if ln.After > 0 && ln.Modified {
 			dist := ln.After - target
 			if dist < 0 {
 				dist = -dist
@@ -128,45 +130,18 @@ func (lns LineNumbers) NearestBefore(target int) int {
 // BeforeForAfter returns the old (before the change) line number for a given
 // new (after the change) line number.
 //
-// We only have line mappings for lines that were changed (added, removed, or
-// modified). Unchanged lines may or may not appear in the diff output.
-// Even if a line is unchanged, its old line number might differ from the
-// new one because additions or removals earlier in the file shift all
-// subsequent lines up or down.
+// LineNumbers contains explicit mappings for changed, deleted, added,
+// and shifted lines. Unchanged lines that were not shifted are not stored.
 //
 // Returns:
-//   - Before value if the line is directly present in the diff.
-//   - 0 if the line is an added line (Before==0 in the diff).
-//   - Computed old line number for lines not in the diff, using the offset
-//     between old and new line numbers from the closest preceding diff entry.
-//     For example if the last known entry is {Before:5, After:10} and we
-//     query line 15, the offset is 10-5=5, so old line is 15-5=10.
-//   - Line itself if there are no preceding diff entries (no shift yet).
+//   - Before value if the line is present in LineNumbers.
+//   - Line itself if no mapping exists (unchanged and unshifted).
 func (lns LineNumbers) BeforeForAfter(line int) int {
 	for _, ln := range lns {
 		if ln.After == line {
 			return ln.Before
 		}
 	}
-
-	// Line is not directly in the diff -- find the closest preceding entry
-	// that has a valid old line number (Before > 0, meaning it's not a
-	// pure addition) and use its old->new offset to calculate old_line.
-	var (
-		nearest LineNumber
-		found   bool
-	)
-	for _, ln := range lns {
-		if ln.After > 0 && ln.After < line && ln.Before > 0 {
-			nearest = ln
-			found = true
-		}
-	}
-	if found {
-		return nearest.Before + (line - nearest.After)
-	}
-
-	// No preceding entry -- line is before any changes, old == new.
 	return line
 }
 
@@ -340,7 +315,7 @@ func Changes(cmd CommandRunner, baseBranch string, filter PathFilter) ([]*FileCh
 		switch {
 		case change.Path.Before.Type != Missing && change.Path.Before.Type != Symlink && change.Path.After.Type == Symlink:
 			slog.LogAttrs(context.Background(), slog.LevelDebug, "Path was turned into a symlink", slog.String("path", change.Path.After.Name))
-			change.Body.Lines = MakeLineRange(CountLines(change.Body.After), LinesAfter)
+			change.Body.Lines = MakeLineRangeFromTo(1, CountLines(change.Body.After), LinesAfter)
 		case change.Path.Before.Type != Missing && change.Path.After.Type != Missing && change.Path.After.Type != Symlink:
 			change.Body.Lines, err = getModifiedLines(cmd, change.Commits, change.Path.Before.EffectivePath(), change.Path.After.EffectivePath())
 			if err != nil {
@@ -350,15 +325,15 @@ func Changes(cmd CommandRunner, baseBranch string, filter PathFilter) ([]*FileCh
 		case change.Path.Before.Type == Symlink && change.Path.After.Type == Symlink:
 			slog.LogAttrs(context.Background(), slog.LevelDebug, "Symlink was modified", slog.String("path", change.Path.After.Name))
 			// symlink was modified, every source line is modification
-			change.Body.Lines = MakeLineRange(CountLines(change.Body.After), LinesAfter)
+			change.Body.Lines = MakeLineRangeFromTo(1, CountLines(change.Body.After), LinesAfter)
 		case change.Path.Before.Type == Missing && change.Path.After.Type != Missing:
 			slog.LogAttrs(context.Background(), slog.LevelDebug, "File was added", slog.String("path", change.Path.After.Name))
 			// old file body is empty, meaning that every line was modified
-			change.Body.Lines = MakeLineRange(CountLines(change.Body.After), LinesAfter)
+			change.Body.Lines = MakeLineRangeFromTo(1, CountLines(change.Body.After), LinesAfter)
 		case change.Path.Before.Type != Missing && change.Path.After.Type == Missing:
 			slog.LogAttrs(context.Background(), slog.LevelDebug, "File was removed", slog.String("path", change.Path.After.Name))
 			// new file body is empty, meaning that every line was modified
-			change.Body.Lines = MakeLineRange(CountLines(change.Body.Before), LinesBefore)
+			change.Body.Lines = MakeLineRangeFromTo(1, CountLines(change.Body.Before), LinesBefore)
 		case change.Path.Before.Type == Missing && change.Path.After.Type == Missing:
 			slog.LogAttrs(context.Background(), slog.LevelDebug, "File was added and removed", slog.String("path", change.Path.After.Name))
 			// file was added and then removed
@@ -430,13 +405,11 @@ var diffHunkRe = regexp.MustCompile(`^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@
 //
 // When a line is modified, git represents it as a deletion followed by an
 // addition. We pair consecutive delete/add sequences to detect modifications:
-//   - Paired delete+add -> modification: {Before: oldLine, After: newLine}.
-//   - Unpaired delete   -> pure removal: {Before: oldLine, After: 0}.
-//   - Unpaired add      -> pure addition: {Before: 0, After: newLine}.
+//   - Paired delete+add -> edited line: {Before: oldLine, After: newLine}.
+//   - Unpaired delete   -> removed line: {Before: oldLine, After: 0}.
+//   - Unpaired add      -> added line: {Before: 0, After: newLine}.
 //
-// Context lines are not tracked because BeforeForAfter() can compute the
-// old line number for any untracked line using the offset from the nearest
-// tracked entry.
+// Context lines are tracked so shifted lines appear in the output.
 //
 // When the diff contains multiple files (e.g. renames), only the block
 // matching targetPath is processed.
@@ -455,13 +428,13 @@ func parseDiff(diff []byte, targetPath string) LineNumbers {
 	)
 
 	// flushDeletes emits any pending deleted lines that were not paired
-	// with a subsequent addition. Unpaired deletes are pure removals
+	// with a subsequent addition. Unpaired deletes are line removals
 	// (Before set, After=0). This is called when we hit a boundary that
 	// ends a contiguous delete/add block: a new hunk, a context line,
 	// or a new diff section.
 	flushDeletes := func() {
 		for _, d := range pendingDeletes {
-			lineNumbers = append(lineNumbers, LineNumber{Before: d, After: 0})
+			lineNumbers = append(lineNumbers, LineNumber{Before: d, After: 0, Modified: false})
 		}
 		pendingDeletes = pendingDeletes[:0]
 	}
@@ -482,11 +455,8 @@ func parseDiff(diff []byte, targetPath string) LineNumbers {
 			continue
 		case strings.HasPrefix(line, "@@"):
 			flushDeletes()
+			pendingDeletes = pendingDeletes[:0]
 			inHunk = true
-			// Parse hunk header: @@ -oldStart,oldCount +newStart,newCount @@
-			// We decrement by 1 because line numbers in the hunk body are
-			// incremented before use, so the first line processed will be
-			// at the correct starting offset.
 			matches := diffHunkRe.FindStringSubmatch(line)
 			if len(matches) >= 4 {
 				oldLine, _ = strconv.Atoi(matches[1])
@@ -494,33 +464,45 @@ func parseDiff(diff []byte, targetPath string) LineNumbers {
 				newLine, _ = strconv.Atoi(matches[3])
 				newLine--
 			}
+
+		case strings.HasPrefix(line, `\ `):
+			// Diff metadata like "\ No newline at end of file".
+			// Not a real file line — skip without touching counters
+			// or pending state.
+			continue
+
 		case strings.HasPrefix(line, "-"):
-			// Deleted line -- don't emit yet, queue it so it can be paired
-			// with a subsequent addition to form a modification.
 			oldLine++
 			pendingDeletes = append(pendingDeletes, oldLine)
+
 		case strings.HasPrefix(line, "+"):
 			// Added line -- if there's a pending delete, pair them as a
 			// modification (old line replaced by new line). Otherwise it's
-			// a pure addition (Before=0).
+			// a new line (Before=0).
 			newLine++
 			if len(pendingDeletes) > 0 {
 				lineNumbers = append(lineNumbers, LineNumber{
-					Before: pendingDeletes[0],
-					After:  newLine,
+					Before:   pendingDeletes[0],
+					After:    newLine,
+					Modified: true,
 				})
 				pendingDeletes = pendingDeletes[1:]
 			} else {
-				lineNumbers = append(lineNumbers, LineNumber{Before: 0, After: newLine})
+				lineNumbers = append(lineNumbers, LineNumber{
+					Before:   0,
+					After:    newLine,
+					Modified: true,
+				})
 			}
 		default:
 			// Context (unchanged) line -- flush any unpaired deletes and
-			// advance both counters. We don't emit context lines because
-			// BeforeForAfter() can interpolate old line numbers for any
-			// untracked line using the offset from the nearest entry.
+			// emit the line mapping only if it is shifted.
 			flushDeletes()
 			oldLine++
 			newLine++
+			if oldLine != newLine {
+				lineNumbers = append(lineNumbers, LineNumber{Before: oldLine, After: newLine, Modified: false})
+			}
 		}
 	}
 	flushDeletes()
@@ -608,21 +590,6 @@ func CountLines(body []byte) int {
 	return count
 }
 
-func MakeLineRange(n int, side LineRangeSide) LineNumbers {
-	lineNumbers := make(LineNumbers, n)
-	for i := range n {
-		switch side {
-		case LinesBefore:
-			lineNumbers[i] = LineNumber{Before: i + 1, After: 0}
-		case LinesAfter:
-			lineNumbers[i] = LineNumber{Before: 0, After: i + 1}
-		case LinesBoth:
-			lineNumbers[i] = LineNumber{Before: i + 1, After: i + 1}
-		}
-	}
-	return lineNumbers
-}
-
 func MakeLineRangeFromTo(first, last int, side LineRangeSide) LineNumbers {
 	n := last - first + 1
 	if n <= 0 {
@@ -633,11 +600,11 @@ func MakeLineRangeFromTo(first, last int, side LineRangeSide) LineNumbers {
 		l := first + i
 		switch side {
 		case LinesBefore:
-			lineNumbers[i] = LineNumber{Before: l, After: 0}
+			lineNumbers[i] = LineNumber{Before: l, After: 0, Modified: false}
 		case LinesAfter:
-			lineNumbers[i] = LineNumber{Before: 0, After: l}
+			lineNumbers[i] = LineNumber{Before: 0, After: l, Modified: true}
 		case LinesBoth:
-			lineNumbers[i] = LineNumber{Before: l, After: l}
+			lineNumbers[i] = LineNumber{Before: l, After: l, Modified: false}
 		}
 	}
 	return lineNumbers

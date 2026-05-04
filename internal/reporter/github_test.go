@@ -78,7 +78,7 @@ func TestGitHubReporter(t *testing.T) {
 
 					Changes: discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -121,7 +121,7 @@ func TestGitHubReporter(t *testing.T) {
 
 					Changes: discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -164,7 +164,7 @@ func TestGitHubReporter(t *testing.T) {
 
 					Changes: discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -208,7 +208,7 @@ func TestGitHubReporter(t *testing.T) {
 
 					Changes: discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -256,7 +256,7 @@ func TestGitHubReporter(t *testing.T) {
 
 					Changes: discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -300,7 +300,7 @@ func TestGitHubReporter(t *testing.T) {
 
 					Changes: discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -355,7 +355,7 @@ func TestGitHubReporter(t *testing.T) {
 
 					Changes: discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -377,7 +377,7 @@ func TestGitHubReporter(t *testing.T) {
 
 					Changes: discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -399,7 +399,7 @@ func TestGitHubReporter(t *testing.T) {
 
 					Changes: discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -421,7 +421,7 @@ func TestGitHubReporter(t *testing.T) {
 
 					Changes: discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -474,7 +474,7 @@ func TestGitHubReporter(t *testing.T) {
 
 					Changes: discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -496,7 +496,7 @@ func TestGitHubReporter(t *testing.T) {
 
 					Changes: discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -518,7 +518,7 @@ func TestGitHubReporter(t *testing.T) {
 
 					Changes: discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -540,7 +540,7 @@ func TestGitHubReporter(t *testing.T) {
 
 					Changes: discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -592,7 +592,7 @@ func TestGitHubReporter(t *testing.T) {
 
 					Changes: discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -614,7 +614,7 @@ func TestGitHubReporter(t *testing.T) {
 
 					Changes: discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -636,7 +636,7 @@ func TestGitHubReporter(t *testing.T) {
 
 					Changes: discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -658,7 +658,7 @@ func TestGitHubReporter(t *testing.T) {
 
 					Changes: discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -710,7 +710,7 @@ func TestGitHubReporter(t *testing.T) {
 
 					Changes: discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 1}},
+						Lines:   git.LineNumbers{{Before: 0, After: 1, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
@@ -924,7 +924,7 @@ func TestGitHubReporter(t *testing.T) {
 
 					Changes: discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 5}},
+						Lines:   git.LineNumbers{{Before: 0, After: 5, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
@@ -969,7 +969,7 @@ func TestGitHubReporter(t *testing.T) {
 
 					Changes: discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 1}},
+						Lines:   git.LineNumbers{{Before: 0, After: 1, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
@@ -1091,7 +1091,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 
 					Changes: discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
@@ -1113,7 +1113,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 
 					Changes: discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -1135,7 +1135,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 
 					Changes: discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
@@ -1157,7 +1157,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 
 					Changes: discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -1211,7 +1211,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 
 					Changes: discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
@@ -1233,7 +1233,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 
 					Changes: discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -1255,7 +1255,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 
 					Changes: discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
@@ -1277,7 +1277,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 
 					Changes: discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{

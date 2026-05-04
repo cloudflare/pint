@@ -65,7 +65,7 @@ func TestGitLabReporter(t *testing.T) {
 		},
 		Changes: discovery.Changes{
 			OldPath: "",
-			Lines:   git.LineNumbers{{Before: 0, After: 2}},
+			Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 		},
 		Rule: mockFile.Groups[0].Rules[0],
 		Problem: checks.Problem{
@@ -89,7 +89,7 @@ func TestGitLabReporter(t *testing.T) {
 			},
 			Changes: discovery.Changes{
 				OldPath: "",
-				Lines:   git.LineNumbers{{Before: 0, After: 1}},
+				Lines:   git.LineNumbers{{Before: 0, After: 1, Modified: true}},
 			},
 			Rule: mockFile.Groups[0].Rules[0],
 			Problem: checks.Problem{
@@ -108,7 +108,7 @@ func TestGitLabReporter(t *testing.T) {
 			},
 			Changes: discovery.Changes{
 				OldPath: "",
-				Lines:   git.LineNumbers{{Before: 0, After: 2}},
+				Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 			},
 			Rule: mockFile.Groups[0].Rules[0],
 			Problem: checks.Problem{
@@ -127,7 +127,7 @@ func TestGitLabReporter(t *testing.T) {
 			},
 			Changes: discovery.Changes{
 				OldPath: "",
-				Lines:   git.LineNumbers{{Before: 0, After: 3}},
+				Lines:   git.LineNumbers{{Before: 0, After: 3, Modified: true}},
 			},
 			Rule: mockFile.Groups[0].Rules[0],
 			Problem: checks.Problem{
@@ -284,7 +284,7 @@ func TestGitLabReporter(t *testing.T) {
 					Changes: discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
+							{Before: 0, After: 2, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
@@ -839,8 +839,8 @@ Below is the list of checks that were disabled for each Prometheus server define
 					Changes: discovery.Changes{
 						OldPath: "foo.old",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
@@ -915,8 +915,8 @@ Below is the list of checks that were disabled for each Prometheus server define
 					Changes: discovery.Changes{
 						OldPath: "foo.old",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
@@ -991,8 +991,8 @@ Below is the list of checks that were disabled for each Prometheus server define
 					Changes: discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
@@ -1047,8 +1047,8 @@ Below is the list of checks that were disabled for each Prometheus server define
 					Changes: discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 4},
-							{Before: 0, After: 5},
+							{Before: 0, After: 4, Modified: true},
+							{Before: 0, After: 5, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
@@ -1196,7 +1196,7 @@ func TestGitLabReporterCommentLine(t *testing.T) {
 		{
 			description:     "comment on new line",
 			problemLine:     18,
-			changes:         git.LineNumbers{{Before: 0, After: 18}},
+			changes:         git.LineNumbers{{Before: 0, After: 18, Modified: true}},
 			expectedNewLine: 18,
 		},
 		{

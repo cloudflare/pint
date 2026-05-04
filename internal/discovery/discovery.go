@@ -228,7 +228,12 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 				},
 				PathError: group.Error,
 				Owner:     fileOwner,
-				Changes:   Changes{OldPath: "", Lines: []git.LineNumber{{Before: 0, After: group.Error.Line}}},
+				Changes: Changes{
+					OldPath: "",
+					Lines: []git.LineNumber{
+						{Before: 0, After: group.Error.Line, Modified: true},
+					},
+				},
 			})
 		}
 		for _, rule := range group.Rules {
