@@ -26,6 +26,7 @@ ba = "ba"
 
 [files]
 extend-exclude = [
+    "go.mod",
     "go.sum",
     # Test rules file contains intentional typos from real-world Prometheus rules
     "internal/parser/testrules.yml",
