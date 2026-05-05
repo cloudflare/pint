@@ -77,6 +77,15 @@ func (p Parser) parseGroups(doc *yaml.Node, offsetLine, offsetColumn int, conten
 					return nil, ParseError{
 						Line: group.Line,
 						Err:  errors.New("duplicated group name"),
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message:     "duplicated group name",
+								Pos:         g.Name.Pos,
+								FirstColumn: 1,
+								LastColumn:  g.Name.Pos.Len(),
+								Kind:        diags.Issue,
+							},
+						},
 					}
 				}
 				names[g.Name.Value] = struct{}{}

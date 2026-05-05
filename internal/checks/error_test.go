@@ -146,6 +146,7 @@ This usually means that it's missing some required fields.`,
 			},
 		},
 		{
+			// ParseError without Diagnostic uses fallback rendering.
 			description: "parse error",
 			entry: &discovery.Entry{
 				PathError: parser.ParseError{
@@ -164,6 +165,45 @@ If this file is a template that will be rendered into valid YAML then you can in
 					Lines:    diags.LineRange{First: 10, Last: 10},
 					Severity: checks.Fatal,
 					Anchor:   checks.AnchorAfter,
+				},
+			},
+		},
+		{
+			// ParseError with Diagnostic passes column info to Problem.
+			description: "parse error with diagnostic",
+			entry: &discovery.Entry{
+				PathError: parser.ParseError{
+					Err:  errors.New("duplicated group name"),
+					Line: 6,
+					Diagnostics: []diags.Diagnostic{
+						{
+							Message:     "duplicated group name",
+							Pos:         diags.PositionRanges{{Line: 6, FirstColumn: 9, LastColumn: 15}},
+							FirstColumn: 1,
+							LastColumn:  7,
+						},
+					},
+				},
+			},
+			problems: []checks.Problem{
+				{
+					Reporter: "yaml/parse",
+					Summary:  "duplicated group name",
+					Details: `pint cannot read this file because YAML parser returned an error.
+This usually means that you have an indention error or the file doesn't have the YAML structure required by Prometheus for [recording](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/) and [alerting](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/) rules.
+If this file is a template that will be rendered into valid YAML then you can instruct pint to ignore some lines using comments, see [pint docs](https://cloudflare.github.io/pint/ignoring.html).
+`,
+					Lines:    diags.LineRange{First: 6, Last: 6},
+					Severity: checks.Fatal,
+					Anchor:   checks.AnchorAfter,
+					Diagnostics: []diags.Diagnostic{
+						{
+							Message:     "duplicated group name",
+							Pos:         diags.PositionRanges{{Line: 6, FirstColumn: 9, LastColumn: 15}},
+							FirstColumn: 1,
+							LastColumn:  7,
+						},
+					},
 				},
 			},
 		},
