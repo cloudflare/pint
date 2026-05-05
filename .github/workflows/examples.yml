@@ -28,9 +28,18 @@ jobs:
       - name: Build binary
         run: make
 
-      - name: Verify examples
+      - name: Generate dummy TLS certificates
         run: |
-          export AUTH_KEY=12345
+          sudo mkdir -p /etc/pint/certs
+          sudo chmod 777 /etc/pint/certs
+          openssl req -x509 -newkey rsa:2048 -keyout /dev/null -out /etc/pint/certs/ca.pem -days 1 -nodes -subj "/CN=test-ca"
+          openssl req -x509 -newkey rsa:2048 -keyout /etc/pint/certs/client.key -out /etc/pint/certs/client.pem -days 1 -nodes -subj "/CN=test-client"
+
+      - name: Verify examples
+        env:
+          AUTH_KEY: "12345"
+          PROMETHEUS_AUTH_TOKEN: "abcdef"
+        run: |
           for CFG in docs/examples/* ; do
             echo ">>> $CFG"
             ./pint -c "$CFG" config
