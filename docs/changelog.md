@@ -6,6 +6,8 @@
 
 - When running `pint ci` pint will now use `git diff` to calculate modified lines
   instead of `git blame`.
+- BitBucket reporter no longer creates Code Insight reports and annotations.
+  All problems are now reported exclusively via pull request comments.
 
 ## v0.80.0
 

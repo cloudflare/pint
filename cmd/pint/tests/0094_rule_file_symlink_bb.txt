@@ -12,7 +12,6 @@ http response prometheus5m /api/v1/query_range 200 {"status":"success","data":{"
 http response prometheus5m /api/v1/query 200 {"status":"success","data":{"resultType":"vector","result":[]}}
 http start prometheus5m 127.0.0.1:2094
 
-http response bitbucket /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint 200 OK
 http response bitbucket /rest/api/1.0/projects/prometheus/repos/rules/commits/.*/pull-requests 200 {}
 http start bitbucket 127.0.0.1:6094
 
@@ -49,7 +48,6 @@ stderr 'path=double.yml rule=rule2'
 ! stderr 'path=ignored.yml'
 
 stderr 'level=INFO msg="Problems found" Bug=4'
-stderr 'result":"FAIL"'
 
 ! stderr '---> rules.yml:5 Bug: Duration for `rate'
 ! stderr '---> rules.yml:7 Bug: Duration for `rate'
@@ -57,16 +55,6 @@ stderr '---> symlink.yml ~> rules.yml:5'
 stderr '---> symlink.yml ~> rules.yml:7'
 stderr '---> double.yml ~> rules.yml:5'
 stderr '---> double.yml ~> rules.yml:7'
-
-stderr '{"path":"rules.yml","message":"Problem detected on symlinked file symlink.yml: .*","line":5}'
-stderr '{"path":"rules.yml","message":"Problem detected on symlinked file double.yml: .*","line":5}'
-stderr '{"path":"rules.yml","message":"Problem detected on symlinked file symlink.yml: .*","line":7}'
-stderr '{"path":"rules.yml","message":"Problem detected on symlinked file double.yml: .*","line":7}'
-! stderr '{"path":"symlink.yml"'
-! stderr '{"path":"double.yml"'
-
-stderr 'Problem detected on symlinked file symlink.yml:'
-stderr 'Problem detected on symlinked file double.yml:'
 
 cmp bitbucket.got ../bitbucket.expected
 
@@ -114,84 +102,8 @@ prometheus "5m" {
 }
 
 -- bitbucket.expected --
-DELETE /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
-  Accept-Encoding: gzip
-  Authorization: Bearer "12345"
-  Content-Type: application/json
-
-PUT /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
-  Accept-Encoding: gzip
-  Authorization: Bearer "12345"
-  Content-Type: application/json
---- BODY ---
-reporter: Prometheus rule linter
-title: pint unknown
-result: FAIL
-details: |-
-  pint is a Prometheus rule linter/validator.
-  It will inspect all Prometheus recording and alerting rules for problems that could prevent these from working correctly.
-  Checks can be either offline (static checks using only rule definition) or online (validate rule against live Prometheus server).
-link: https://cloudflare.github.io/pint/
-data:
-  - value: 6
-    title: Number of rules parsed
-    type: NUMBER
-  - value: 6
-    title: Number of rules checked
-    type: NUMBER
-  - value: 4
-    title: Number of problems found
-    type: NUMBER
-  - value: 60
-    title: Number of offline checks
-    type: NUMBER
-  - value: 48
-    title: Number of online checks
-    type: NUMBER
-  - value: 0
-    title: Checks duration
-    type: DURATION
---- END ---
-
 GET /rest/api/1.0/projects/prometheus/repos/rules/commits/.*/pull-requests
   Accept-Encoding: gzip
   Authorization: Bearer "12345"
   Content-Type: application/json
-
-DELETE /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
-  Accept-Encoding: gzip
-  Authorization: Bearer "12345"
-  Content-Type: application/json
-
-POST /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
-  Accept-Encoding: gzip
-  Authorization: Bearer "12345"
-  Content-Type: application/json
---- BODY ---
-annotations:
-  - path: rules.yml
-    message: "Problem detected on symlinked file double.yml: promql/rate: duration too small"
-    severity: MEDIUM
-    type: BUG
-    link: https://cloudflare.github.io/pint/checks/promql/rate.html
-    line: 5
-  - path: rules.yml
-    message: "Problem detected on symlinked file double.yml: promql/rate: duration too small"
-    severity: MEDIUM
-    type: BUG
-    link: https://cloudflare.github.io/pint/checks/promql/rate.html
-    line: 7
-  - path: rules.yml
-    message: "Problem detected on symlinked file symlink.yml: promql/rate: duration too small"
-    severity: MEDIUM
-    type: BUG
-    link: https://cloudflare.github.io/pint/checks/promql/rate.html
-    line: 5
-  - path: rules.yml
-    message: "Problem detected on symlinked file symlink.yml: promql/rate: duration too small"
-    severity: MEDIUM
-    type: BUG
-    link: https://cloudflare.github.io/pint/checks/promql/rate.html
-    line: 7
---- END ---
 

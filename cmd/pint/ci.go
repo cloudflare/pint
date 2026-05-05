@@ -165,17 +165,15 @@ func actionCI(ctx context.Context, c *cli.Command) error {
 
 		timeout, _ := time.ParseDuration(meta.cfg.Repository.BitBucket.Timeout)
 		br := reporter.NewBitBucketReporter(
-			version,
 			meta.cfg.Repository.BitBucket.URI,
 			timeout,
 			token,
 			meta.cfg.Repository.BitBucket.Project,
 			meta.cfg.Repository.BitBucket.Repository,
 			meta.cfg.Repository.BitBucket.MaxComments,
-			c.Bool(showDupsFlag),
 			git.RunGit,
 		)
-		reps = append(reps, br)
+		reps = append(reps, reporter.NewCommentReporter(br, c.Bool(showDupsFlag)))
 	}
 
 	if meta.cfg.Repository != nil && meta.cfg.Repository.GitLab != nil {
