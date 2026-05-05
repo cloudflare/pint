@@ -515,6 +515,14 @@ func unpackNodes(node *yaml.Node) []*yaml.Node {
 			continue
 		}
 		if isMerge {
+			if part.Kind == yaml.SequenceNode {
+				for _, seqItem := range part.Content {
+					if seqItem.Alias != nil {
+						nodes = append(nodes, resolveMapAlias(seqItem, node).Content...)
+					}
+				}
+				isMerge = false
+			}
 			continue
 		}
 		nodes = append(nodes, part)

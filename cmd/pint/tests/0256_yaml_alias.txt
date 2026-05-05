@@ -1,0 +1,37 @@
+# Second alert uses *e alias on expr, problem is reported on the alias line.
+
+exec pint --no-color lint --show-duplicates rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=INFO msg="Loading configuration file" path=.pint.hcl
+level=INFO msg="Finding all rules to check" paths=["rules"]
+level=INFO msg="Checking Prometheus rules" entries=3 workers=10 online=true
+Warning: always firing alert (alerts/comparison)
+  ---> rules/rules.yml:2 -> `first`
+2 |   expr: &e up
+               ^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
+
+Warning: always firing alert (alerts/comparison)
+  ---> rules/rules.yml:4 -> `second`
+4 |   expr: *e
+             ^ This query doesn't have any condition and so this alert will always fire if it matches anything.
+
+Warning: always firing alert (alerts/comparison)
+  ---> rules/rules.yml:6 -> `third`
+6 |   expr: up
+            ^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
+
+level=INFO msg="Problems found" Warning=3
+-- rules/rules.yml --
+- alert: first
+  expr: &e up
+- alert: second
+  expr: *e
+- alert: third
+  expr: up
+-- .pint.hcl --
+parser {
+  relaxed = ["rules/.*"]
+}

@@ -15,6 +15,13 @@ import (
 	"github.com/cloudflare/pint/internal/diags"
 )
 
+func resolveNode(node *yaml.Node) *yaml.Node {
+	if node.Alias != nil {
+		return node.Alias
+	}
+	return node
+}
+
 func nodeValue(node *yaml.Node) string {
 	if node.Alias != nil {
 		return node.Alias.Value
