@@ -1,6 +1,7 @@
 package parser_test
 
 import (
+	"errors"
 	"strconv"
 	"strings"
 	"testing"
@@ -284,13 +285,29 @@ func TestRuleIsSame(t *testing.T) {
 			},
 			same: false,
 		},
-		// Different errors
+		// Different error lines
 		{
 			a: parser.Rule{
 				Error: parser.ParseError{Line: 1, Err: nil},
 			},
 			b: parser.Rule{
 				Error: parser.ParseError{Line: 2, Err: nil},
+			},
+			same: false,
+		},
+		// Different error values
+		{
+			a: parser.Rule{
+				Error: parser.ParseError{
+					Line: 1,
+					Err:  errors.New("foo"),
+				},
+			},
+			b: parser.Rule{
+				Error: parser.ParseError{
+					Line: 1,
+					Err:  errors.New("bar"),
+				},
 			},
 			same: false,
 		},

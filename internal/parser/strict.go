@@ -77,6 +77,15 @@ func (p Parser) parseGroups(doc *yaml.Node, offsetLine, offsetColumn int, conten
 					return nil, ParseError{
 						Line: group.Line,
 						Err:  errors.New("duplicated group name"),
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message:     "duplicated group name",
+								Pos:         g.Name.Pos,
+								FirstColumn: 1,
+								LastColumn:  g.Name.Pos.Len(),
+								Kind:        diags.Issue,
+							},
+						},
 					}
 				}
 				names[g.Name.Value] = struct{}{}
@@ -101,14 +110,15 @@ func (p Parser) parseGroup(node *yaml.Node, offsetLine, offsetColumn int, conten
 	for _, entry := range mappingNodes(node) {
 		switch entry.key.Value {
 		case "name":
-			if entry.val.Kind != yaml.ScalarNode || entry.val.ShortTag() != strTag {
+			resolved := resolveNode(entry.val)
+			if resolved.Kind != yaml.ScalarNode || resolved.ShortTag() != strTag {
 				group.Error = ParseError{
 					Line: entry.key.Line,
-					Err:  fmt.Errorf("group name must be a %s, got %s", describeTag(strTag), describeTag(entry.val.ShortTag())),
+					Err:  fmt.Errorf("group name must be a %s, got %s", describeTag(strTag), describeTag(resolved.ShortTag())),
 				}
 				return group
 			}
-			if entry.val.Value == "" {
+			if nodeValue(entry.val) == "" {
 				group.Error = ParseError{
 					Line: entry.key.Line,
 					Err:  errors.New("group name cannot be empty"),
@@ -116,14 +126,15 @@ func (p Parser) parseGroup(node *yaml.Node, offsetLine, offsetColumn int, conten
 				return group
 			}
 			group.Name = YamlNode{
-				Value: entry.val.Value,
+				Value: nodeValue(entry.val),
 				Pos:   diags.NewPositionRange(contentLines, entry.val, 1),
 			}
 		case "interval":
-			if entry.val.Kind != yaml.ScalarNode || entry.val.ShortTag() != strTag {
+			resolved := resolveNode(entry.val)
+			if resolved.Kind != yaml.ScalarNode || resolved.ShortTag() != strTag {
 				group.Error = ParseError{
 					Line: entry.key.Line,
-					Err:  fmt.Errorf("group %s must be a %s, got %s", entry.key.Value, describeTag(strTag), describeTag(entry.val.ShortTag())),
+					Err:  fmt.Errorf("group %s must be a %s, got %s", entry.key.Value, describeTag(strTag), describeTag(resolved.ShortTag())),
 				}
 				return group
 			}
@@ -136,10 +147,11 @@ func (p Parser) parseGroup(node *yaml.Node, offsetLine, offsetColumn int, conten
 				return group
 			}
 		case "query_offset":
-			if entry.val.Kind != yaml.ScalarNode || entry.val.ShortTag() != strTag {
+			resolved := resolveNode(entry.val)
+			if resolved.Kind != yaml.ScalarNode || resolved.ShortTag() != strTag {
 				group.Error = ParseError{
 					Line: entry.key.Line,
-					Err:  fmt.Errorf("group %s must be a %s, got %s", entry.key.Value, describeTag(strTag), describeTag(entry.val.ShortTag())),
+					Err:  fmt.Errorf("group %s must be a %s, got %s", entry.key.Value, describeTag(strTag), describeTag(resolved.ShortTag())),
 				}
 				return group
 			}
@@ -152,19 +164,21 @@ func (p Parser) parseGroup(node *yaml.Node, offsetLine, offsetColumn int, conten
 				return group
 			}
 		case "limit":
-			if entry.val.Kind != yaml.ScalarNode || entry.val.ShortTag() != intTag {
+			resolved := resolveNode(entry.val)
+			if resolved.Kind != yaml.ScalarNode || resolved.ShortTag() != intTag {
 				group.Error = ParseError{
 					Line: entry.key.Line,
-					Err:  fmt.Errorf("group limit must be a %s, got %s", describeTag(intTag), describeTag(entry.val.ShortTag())),
+					Err:  fmt.Errorf("group limit must be a %s, got %s", describeTag(intTag), describeTag(resolved.ShortTag())),
 				}
 				return group
 			}
 			group.Limit = newYamlInt(entry.val, offsetLine, offsetColumn, contentLines, 1)
 		case "labels":
-			if entry.val.ShortTag() != mapTag {
+			resolved := resolveNode(entry.val)
+			if resolved.ShortTag() != mapTag {
 				group.Error = ParseError{
 					Line: entry.key.Line,
-					Err:  fmt.Errorf("group labels must be a %s, got %s", describeTag(mapTag), describeTag(entry.val.ShortTag())),
+					Err:  fmt.Errorf("group labels must be a %s, got %s", describeTag(mapTag), describeTag(resolved.ShortTag())),
 				}
 				return group
 			}
@@ -180,10 +194,11 @@ func (p Parser) parseGroup(node *yaml.Node, offsetLine, offsetColumn int, conten
 			}
 			group.Labels = newYamlMap(entry.key, entry.val, offsetLine, offsetColumn, contentLines)
 		case "rules":
-			if !isTag(entry.val.ShortTag(), seqTag) {
+			resolved := resolveNode(entry.val)
+			if !isTag(resolved.ShortTag(), seqTag) {
 				group.Error = ParseError{
 					Line: entry.key.Line,
-					Err:  fmt.Errorf("rules must be a %s, got %s", describeTag(seqTag), describeTag(entry.val.ShortTag())),
+					Err:  fmt.Errorf("rules must be a %s, got %s", describeTag(seqTag), describeTag(resolved.ShortTag())),
 				}
 				return group
 			}
@@ -198,10 +213,11 @@ func (p Parser) parseGroup(node *yaml.Node, offsetLine, offsetColumn int, conten
 				}
 				return group
 			}
-			if !isTag(entry.val.ShortTag(), strTag) {
+			resolved := resolveNode(entry.val)
+			if !isTag(resolved.ShortTag(), strTag) {
 				group.Error = ParseError{
 					Line: entry.key.Line,
-					Err:  fmt.Errorf("partial_response_strategy must be a %s, got %s", describeTag(strTag), describeTag(entry.val.ShortTag())),
+					Err:  fmt.Errorf("partial_response_strategy must be a %s, got %s", describeTag(strTag), describeTag(resolved.ShortTag())),
 				}
 				return group
 			}

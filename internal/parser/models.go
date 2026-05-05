@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"errors"
 	"fmt"
 	"slices"
 	"strconv"
@@ -14,6 +15,13 @@ import (
 	"github.com/cloudflare/pint/internal/comments"
 	"github.com/cloudflare/pint/internal/diags"
 )
+
+func resolveNode(node *yaml.Node) *yaml.Node {
+	if node.Alias != nil {
+		return node.Alias
+	}
+	return node
+}
 
 func nodeValue(node *yaml.Node) string {
 	if node.Alias != nil {
@@ -296,9 +304,10 @@ func (rr *RecordingRule) IsIdentical(b *RecordingRule) bool {
 
 // Use insread of StrictError.
 type ParseError struct {
-	Err     error
-	Details string
-	Line    int
+	Err         error
+	Details     string
+	Diagnostics []diags.Diagnostic
+	Line        int
 }
 
 func (pe ParseError) Error() string {
@@ -321,8 +330,8 @@ type Group struct {
 	QueryOffset *YamlDuration
 	Limit       *YamlInt
 	Name        YamlNode
-	Error       ParseError
 	Rules       []Rule
+	Error       ParseError
 }
 
 type Rule struct {
@@ -376,7 +385,10 @@ func (r Rule) IsSame(nr Rule) bool {
 	if (r.RecordingRule != nil) != (nr.RecordingRule != nil) {
 		return false
 	}
-	if r.Error != nr.Error {
+	if r.Error.Line != nr.Error.Line {
+		return false
+	}
+	if !errors.Is(r.Error.Err, nr.Error.Err) {
 		return false
 	}
 	if r.Lines.First != nr.Lines.First {

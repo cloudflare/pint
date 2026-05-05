@@ -1948,6 +1948,584 @@ data:
 			},
 		},
 		{
+			// YAML alias on record value is resolved correctly
+			input: []byte(`
+- record: &name foo
+  expr: expr1
+- record: *name
+  expr: expr2
+`),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 3},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "foo",
+										Pos: diags.PositionRanges{
+											{Line: 2, FirstColumn: 17, LastColumn: 19},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "expr1",
+											Pos: diags.PositionRanges{
+												{Line: 3, FirstColumn: 9, LastColumn: 13},
+											},
+										},
+									},
+								},
+							},
+							{
+								Lines: diags.LineRange{First: 4, Last: 5},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "foo",
+										Pos: diags.PositionRanges{
+											{Line: 4, FirstColumn: 12, LastColumn: 15},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "expr2",
+											Pos: diags.PositionRanges{
+												{Line: 5, FirstColumn: 9, LastColumn: 13},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			// YAML alias on alert value is resolved correctly
+			input: []byte(`
+- alert: &aname MyAlert
+  expr: up == 0
+- alert: *aname
+  expr: up == 1
+`),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 3},
+								AlertingRule: &parser.AlertingRule{
+									Alert: parser.YamlNode{
+										Value: "MyAlert",
+										Pos: diags.PositionRanges{
+											{Line: 2, FirstColumn: 17, LastColumn: 23},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "up == 0",
+											Pos: diags.PositionRanges{
+												{Line: 3, FirstColumn: 9, LastColumn: 15},
+											},
+										},
+									},
+								},
+							},
+							{
+								Lines: diags.LineRange{First: 4, Last: 5},
+								AlertingRule: &parser.AlertingRule{
+									Alert: parser.YamlNode{
+										Value: "MyAlert",
+										Pos: diags.PositionRanges{
+											{Line: 4, FirstColumn: 11, LastColumn: 15},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "up == 1",
+											Pos: diags.PositionRanges{
+												{Line: 5, FirstColumn: 9, LastColumn: 15},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			// YAML alias on for duration is resolved correctly
+			input: []byte(`
+- alert: alert1
+  expr: up == 0
+  for: &dur 5m
+- alert: alert2
+  expr: up == 1
+  for: *dur
+`),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 4},
+								AlertingRule: &parser.AlertingRule{
+									Alert: parser.YamlNode{
+										Value: "alert1",
+										Pos: diags.PositionRanges{
+											{Line: 2, FirstColumn: 10, LastColumn: 15},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "up == 0",
+											Pos: diags.PositionRanges{
+												{Line: 3, FirstColumn: 9, LastColumn: 15},
+											},
+										},
+									},
+									For: &parser.YamlDuration{
+										Raw:   "5m",
+										Value: 5 * time.Minute,
+										Pos: diags.PositionRanges{
+											{Line: 4, FirstColumn: 13, LastColumn: 14},
+										},
+									},
+								},
+							},
+							{
+								Lines: diags.LineRange{First: 5, Last: 7},
+								AlertingRule: &parser.AlertingRule{
+									Alert: parser.YamlNode{
+										Value: "alert2",
+										Pos: diags.PositionRanges{
+											{Line: 5, FirstColumn: 10, LastColumn: 15},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "up == 1",
+											Pos: diags.PositionRanges{
+												{Line: 6, FirstColumn: 9, LastColumn: 15},
+											},
+										},
+									},
+									For: &parser.YamlDuration{
+										Raw:   "5m",
+										Value: 5 * time.Minute,
+										Pos: diags.PositionRanges{
+											{Line: 7, FirstColumn: 9, LastColumn: 11},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			// YAML alias on keep_firing_for duration is resolved correctly
+			input: []byte(`
+- alert: alert1
+  expr: up == 0
+  keep_firing_for: &kff 10m
+- alert: alert2
+  expr: up == 1
+  keep_firing_for: *kff
+`),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 4},
+								AlertingRule: &parser.AlertingRule{
+									Alert: parser.YamlNode{
+										Value: "alert1",
+										Pos: diags.PositionRanges{
+											{Line: 2, FirstColumn: 10, LastColumn: 15},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "up == 0",
+											Pos: diags.PositionRanges{
+												{Line: 3, FirstColumn: 9, LastColumn: 15},
+											},
+										},
+									},
+									KeepFiringFor: &parser.YamlDuration{
+										Raw:   "10m",
+										Value: 10 * time.Minute,
+										Pos: diags.PositionRanges{
+											{Line: 4, FirstColumn: 25, LastColumn: 27},
+										},
+									},
+								},
+							},
+							{
+								Lines: diags.LineRange{First: 5, Last: 7},
+								AlertingRule: &parser.AlertingRule{
+									Alert: parser.YamlNode{
+										Value: "alert2",
+										Pos: diags.PositionRanges{
+											{Line: 5, FirstColumn: 10, LastColumn: 15},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "up == 1",
+											Pos: diags.PositionRanges{
+												{Line: 6, FirstColumn: 9, LastColumn: 15},
+											},
+										},
+									},
+									KeepFiringFor: &parser.YamlDuration{
+										Raw:   "10m",
+										Value: 10 * time.Minute,
+										Pos: diags.PositionRanges{
+											{Line: 7, FirstColumn: 21, LastColumn: 23},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			// YAML alias on annotations map is resolved correctly
+			input: []byte(`
+- alert: alert1
+  expr: up == 0
+  annotations: &ann
+    summary: foo is down
+- alert: alert2
+  expr: up == 1
+  annotations: *ann
+`),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 5},
+								AlertingRule: &parser.AlertingRule{
+									Alert: parser.YamlNode{
+										Value: "alert1",
+										Pos: diags.PositionRanges{
+											{Line: 2, FirstColumn: 10, LastColumn: 15},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "up == 0",
+											Pos: diags.PositionRanges{
+												{Line: 3, FirstColumn: 9, LastColumn: 15},
+											},
+										},
+									},
+									Annotations: &parser.YamlMap{
+										Key: &parser.YamlNode{
+											Value: "annotations",
+											Pos: diags.PositionRanges{
+												{Line: 4, FirstColumn: 3, LastColumn: 13},
+											},
+										},
+										Items: []*parser.YamlKeyValue{
+											{
+												Key: &parser.YamlNode{
+													Value: "summary",
+													Pos: diags.PositionRanges{
+														{Line: 5, FirstColumn: 5, LastColumn: 11},
+													},
+												},
+												Value: &parser.YamlNode{
+													Value: "foo is down",
+													Pos: diags.PositionRanges{
+														{Line: 5, FirstColumn: 14, LastColumn: 24},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+							{
+								Lines: diags.LineRange{First: 6, Last: 8},
+								AlertingRule: &parser.AlertingRule{
+									Alert: parser.YamlNode{
+										Value: "alert2",
+										Pos: diags.PositionRanges{
+											{Line: 6, FirstColumn: 10, LastColumn: 15},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "up == 1",
+											Pos: diags.PositionRanges{
+												{Line: 7, FirstColumn: 9, LastColumn: 15},
+											},
+										},
+									},
+									Annotations: &parser.YamlMap{
+										Key: &parser.YamlNode{
+											Value: "annotations",
+											Pos: diags.PositionRanges{
+												{Line: 8, FirstColumn: 3, LastColumn: 13},
+											},
+										},
+										Items: []*parser.YamlKeyValue{
+											{
+												Key: &parser.YamlNode{
+													Value: "summary",
+													Pos: diags.PositionRanges{
+														{Line: 5, FirstColumn: 5, LastColumn: 11},
+													},
+												},
+												Value: &parser.YamlNode{
+													Value: "foo is down",
+													Pos: diags.PositionRanges{
+														{Line: 5, FirstColumn: 14, LastColumn: 24},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			// Merge key merges default alert options into alert rules
+			input: []byte(`
+- &defaults
+  for: 5m
+  labels:
+    severity: warning
+- alert: foo
+  expr: up == 0
+  <<: *defaults
+`),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 3, Last: 7},
+								AlertingRule: &parser.AlertingRule{
+									Alert: parser.YamlNode{
+										Value: "foo",
+										Pos: diags.PositionRanges{
+											{Line: 6, FirstColumn: 10, LastColumn: 12},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "up == 0",
+											Pos: diags.PositionRanges{
+												{Line: 7, FirstColumn: 9, LastColumn: 15},
+											},
+										},
+									},
+									For: &parser.YamlDuration{
+										Raw:   "5m",
+										Value: 5 * time.Minute,
+										Pos: diags.PositionRanges{
+											{Line: 3, FirstColumn: 8, LastColumn: 9},
+										},
+									},
+									Labels: &parser.YamlMap{
+										Key: &parser.YamlNode{
+											Value: "labels",
+											Pos: diags.PositionRanges{
+												{Line: 4, FirstColumn: 3, LastColumn: 8},
+											},
+										},
+										Items: []*parser.YamlKeyValue{
+											{
+												Key: &parser.YamlNode{
+													Value: "severity",
+													Pos: diags.PositionRanges{
+														{Line: 5, FirstColumn: 5, LastColumn: 12},
+													},
+												},
+												Value: &parser.YamlNode{
+													Value: "warning",
+													Pos: diags.PositionRanges{
+														{Line: 5, FirstColumn: 15, LastColumn: 21},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			// Merge key with local override - local for value takes precedence over merged for
+			input: []byte(`
+- &defaults
+  for: 5m
+  labels:
+    severity: warning
+- alert: foo
+  expr: up == 0
+  for: 10m
+  <<: *defaults
+`),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 4, Last: 8},
+								AlertingRule: &parser.AlertingRule{
+									Alert: parser.YamlNode{
+										Value: "foo",
+										Pos: diags.PositionRanges{
+											{Line: 6, FirstColumn: 10, LastColumn: 12},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "up == 0",
+											Pos: diags.PositionRanges{
+												{Line: 7, FirstColumn: 9, LastColumn: 15},
+											},
+										},
+									},
+									For: &parser.YamlDuration{
+										Raw:   "10m",
+										Value: 10 * time.Minute,
+										Pos: diags.PositionRanges{
+											{Line: 8, FirstColumn: 8, LastColumn: 10},
+										},
+									},
+									Labels: &parser.YamlMap{
+										Key: &parser.YamlNode{
+											Value: "labels",
+											Pos: diags.PositionRanges{
+												{Line: 4, FirstColumn: 3, LastColumn: 8},
+											},
+										},
+										Items: []*parser.YamlKeyValue{
+											{
+												Key: &parser.YamlNode{
+													Value: "severity",
+													Pos: diags.PositionRanges{
+														{Line: 5, FirstColumn: 5, LastColumn: 12},
+													},
+												},
+												Value: &parser.YamlNode{
+													Value: "warning",
+													Pos: diags.PositionRanges{
+														{Line: 5, FirstColumn: 15, LastColumn: 21},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			// Sequence merge key <<: [*a, *b] merges defaults from both aliases
+			input: []byte(`
+- &defaults_a
+  for: 5m
+- &defaults_b
+  labels:
+    severity: warning
+- alert: foo
+  expr: up == 0
+  <<: [*defaults_a, *defaults_b]
+`),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 3, Last: 8},
+								AlertingRule: &parser.AlertingRule{
+									Alert: parser.YamlNode{
+										Value: "foo",
+										Pos: diags.PositionRanges{
+											{Line: 7, FirstColumn: 10, LastColumn: 12},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "up == 0",
+											Pos: diags.PositionRanges{
+												{Line: 8, FirstColumn: 9, LastColumn: 15},
+											},
+										},
+									},
+									For: &parser.YamlDuration{
+										Raw:   "5m",
+										Value: 5 * time.Minute,
+										Pos: diags.PositionRanges{
+											{Line: 3, FirstColumn: 8, LastColumn: 9},
+										},
+									},
+									Labels: &parser.YamlMap{
+										Key: &parser.YamlNode{
+											Value: "labels",
+											Pos: diags.PositionRanges{
+												{Line: 5, FirstColumn: 3, LastColumn: 8},
+											},
+										},
+										Items: []*parser.YamlKeyValue{
+											{
+												Key: &parser.YamlNode{
+													Value: "severity",
+													Pos: diags.PositionRanges{
+														{Line: 6, FirstColumn: 5, LastColumn: 12},
+													},
+												},
+												Value: &parser.YamlNode{
+													Value: "warning",
+													Pos: diags.PositionRanges{
+														{Line: 6, FirstColumn: 15, LastColumn: 21},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			input: []byte(`
 - record: invalid metric name
   expr: bar
@@ -3343,6 +3921,79 @@ groups:
 						Error: parser.ParseError{
 							Err:  errors.New("group name must be a string, got null"),
 							Line: 3,
+						},
+					},
+				},
+			},
+		},
+		{
+			// YAML alias on group name in strict mode is resolved correctly
+			input: []byte(`
+groups:
+- name: &gname mygroup
+  rules:
+  - record: foo
+    expr: sum(up)
+- name: *gname
+  rules:
+  - record: bar
+    expr: sum(down)
+`),
+			strict: true,
+			output: parser.File{
+				Error: parser.ParseError{
+					Err:  errors.New("duplicated group name"),
+					Line: 7,
+				},
+			},
+		},
+		{
+			// YAML alias on group interval in strict mode is resolved correctly
+			input: []byte(`
+groups:
+- name: mygroup
+  interval: &ivl 1m
+  rules:
+  - record: foo
+    expr: sum(up)
+`),
+			strict: true,
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: parser.YamlNode{
+							Value: "mygroup",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 15},
+							},
+						},
+						Interval: &parser.YamlDuration{
+							Raw:   "1m",
+							Value: 1 * time.Minute,
+							Pos: diags.PositionRanges{
+								{Line: 4, FirstColumn: 18, LastColumn: 19},
+							},
+						},
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 6, Last: 7},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "foo",
+										Pos: diags.PositionRanges{
+											{Line: 6, FirstColumn: 13, LastColumn: 15},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "sum(up)",
+											Pos: diags.PositionRanges{
+												{Line: 7, FirstColumn: 11, LastColumn: 17},
+											},
+										},
+									},
+								},
+							},
 						},
 					},
 				},
@@ -4893,6 +5544,86 @@ groups:
 						Error: parser.ParseError{
 							Err:  errors.New("invalid partial_response_strategy value: bob"),
 							Line: 4,
+						},
+					},
+				},
+			},
+		},
+		{
+			// YAML alias on partial_response_strategy in Thanos strict mode is resolved correctly
+			input: []byte(`
+groups:
+- name: group1
+  partial_response_strategy: &prs warn
+  rules:
+  - record: up:count
+    expr: count(up)
+- name: group2
+  partial_response_strategy: *prs
+  rules:
+  - record: down:count
+    expr: count(down)
+`),
+			strict: true,
+			schema: parser.ThanosSchema,
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: parser.YamlNode{
+							Value: "group1",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 14},
+							},
+						},
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 6, Last: 7},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "up:count",
+										Pos: diags.PositionRanges{
+											{Line: 6, FirstColumn: 13, LastColumn: 20},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "count(up)",
+											Pos: diags.PositionRanges{
+												{Line: 7, FirstColumn: 11, LastColumn: 19},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						Name: parser.YamlNode{
+							Value: "group2",
+							Pos: diags.PositionRanges{
+								{Line: 8, FirstColumn: 9, LastColumn: 14},
+							},
+						},
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 11, Last: 12},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "down:count",
+										Pos: diags.PositionRanges{
+											{Line: 11, FirstColumn: 13, LastColumn: 22},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "count(down)",
+											Pos: diags.PositionRanges{
+												{Line: 12, FirstColumn: 11, LastColumn: 21},
+											},
+										},
+									},
+								},
+							},
 						},
 					},
 				},

@@ -128,7 +128,7 @@ This usually means that you have an indention error or the file doesn't have the
 If this file is a template that will be rendered into valid YAML then you can instruct pint to ignore some lines using comments, see [pint docs](https://cloudflare.github.io/pint/ignoring.html).
 `,
 			Severity:    Fatal,
-			Diagnostics: nil,
+			Diagnostics: parseErr.Diagnostics,
 		}
 	}
 

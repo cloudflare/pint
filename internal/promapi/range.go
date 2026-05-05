@@ -260,20 +260,28 @@ func sliceRange(start, end time.Time, resolution, sliceSize time.Duration) (slic
 }
 
 func NewRelativeRange(lookback, step time.Duration) RelativeRange {
-	return RelativeRange{lookback: lookback, step: step}
+	now := time.Now()
+	return RelativeRange{
+		lookback: lookback,
+		step:     step,
+		start:    now.Add(lookback * -1),
+		end:      now,
+	}
 }
 
 type RelativeRange struct {
+	start    time.Time
+	end      time.Time
 	lookback time.Duration
 	step     time.Duration
 }
 
 func (rr RelativeRange) Start() time.Time {
-	return time.Now().Add(rr.lookback * -1)
+	return rr.start
 }
 
 func (rr RelativeRange) End() time.Time {
-	return time.Now()
+	return rr.end
 }
 
 func (rr RelativeRange) Dur() time.Duration {
