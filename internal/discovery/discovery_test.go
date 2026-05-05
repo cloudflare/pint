@@ -406,6 +406,35 @@ groups:
 	}
 }
 
+func TestChangeTypeMarshalJSON(t *testing.T) {
+	type testCaseT struct {
+		name     string
+		expected string
+		ct       ChangeType
+	}
+
+	testCases := []testCaseT{
+		{
+			name:     "noop",
+			ct:       Noop,
+			expected: `"noop"`,
+		},
+		{
+			name:     "undefined value",
+			ct:       ChangeType(255),
+			expected: `"---"`,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			b, err := tc.ct.MarshalJSON()
+			require.NoError(t, err)
+			require.Equal(t, tc.expected, string(b))
+		})
+	}
+}
+
 func TestIsValidOwner(t *testing.T) {
 	type testCaseT struct {
 		name     string
