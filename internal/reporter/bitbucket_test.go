@@ -108,9 +108,9 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule:    mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{},
@@ -140,9 +140,9 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule:    mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{},
@@ -175,9 +175,9 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule:    mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{},
@@ -254,11 +254,11 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
-							{Before: 0, After: 2},
-							{Before: 0, After: 4},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 4, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
@@ -277,7 +277,7 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "bar.txt",
 						Name:          "bar.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{},
 					},
@@ -297,11 +297,11 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
-							{Before: 0, After: 2},
-							{Before: 0, After: 4},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 4, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
@@ -320,11 +320,11 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
-							{Before: 0, After: 2},
-							{Before: 0, After: 4},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 4, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
@@ -343,11 +343,11 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
-							{Before: 0, After: 2},
-							{Before: 0, After: 4},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 4, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
@@ -516,11 +516,11 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
-							{Before: 0, After: 2},
-							{Before: 0, After: 4},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 4, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
@@ -539,11 +539,11 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
-							{Before: 0, After: 2},
-							{Before: 0, After: 4},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 4, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
@@ -562,11 +562,11 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
-							{Before: 0, After: 2},
-							{Before: 0, After: 4},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 4, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
@@ -585,11 +585,11 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
-							{Before: 0, After: 2},
-							{Before: 0, After: 4},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 4, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
@@ -633,11 +633,11 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 3},
-							{Before: 0, After: 4},
+							{Before: 0, After: 3, Modified: true},
+							{Before: 0, After: 4, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
@@ -726,11 +726,11 @@ func TestBitBucketReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					Rule: mockFile.Groups[0].Rules[1],
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
-							{Before: 0, After: 2},
-							{Before: 0, After: 4},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 4, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -749,11 +749,11 @@ func TestBitBucketReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					Rule: mockFile.Groups[0].Rules[1],
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
-							{Before: 0, After: 2},
-							{Before: 0, After: 4},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 4, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -772,11 +772,11 @@ func TestBitBucketReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					Rule: mockFile.Groups[0].Rules[0],
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
-							{Before: 0, After: 2},
-							{Before: 0, After: 4},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 4, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -795,11 +795,11 @@ func TestBitBucketReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					Rule: mockFile.Groups[0].Rules[1],
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
-							{Before: 0, After: 2},
-							{Before: 0, After: 4},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 4, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -1095,11 +1095,11 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
-							{Before: 0, After: 2},
-							{Before: 0, After: 4},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 4, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
@@ -1118,11 +1118,11 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
-							{Before: 0, After: 2},
-							{Before: 0, After: 4},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 4, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
@@ -1141,11 +1141,11 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
-							{Before: 0, After: 2},
-							{Before: 0, After: 4},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 4, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
@@ -1165,11 +1165,11 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "symlink.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
-							{Before: 0, After: 2},
-							{Before: 0, After: 4},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 4, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
@@ -1404,11 +1404,11 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "index.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
-							{Before: 0, After: 2},
-							{Before: 0, After: 4},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 4, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
@@ -1742,11 +1742,11 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
-							{Before: 0, After: 2},
-							{Before: 0, After: 4},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 4, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
@@ -1765,11 +1765,11 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
-							{Before: 0, After: 2},
-							{Before: 0, After: 4},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 4, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
@@ -1788,11 +1788,11 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
-							{Before: 0, After: 2},
-							{Before: 0, After: 4},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 4, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
@@ -1812,11 +1812,11 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
-							{Before: 0, After: 2},
-							{Before: 0, After: 4},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 4, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
@@ -1836,11 +1836,11 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "symlink.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
-							{Before: 0, After: 2},
-							{Before: 0, After: 4},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 4, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
@@ -1883,7 +1883,7 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{},
 					},
@@ -1916,9 +1916,9 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "index.txt",
 						Name:          diagFile,
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 1}},
+						Lines:   git.LineNumbers{{Before: 0, After: 1, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{

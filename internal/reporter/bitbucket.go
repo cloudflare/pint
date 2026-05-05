@@ -137,6 +137,10 @@ func (bb BitBucketReporter) Submit(ctx context.Context, summary Summary) (err er
 func moveReportedLine(report Report) (reported, original int) {
 	reported = -1
 	original = -1
+	// No changes data, nothing to move.
+	if report.Changes == nil {
+		return report.Problem.Lines.Last, report.Problem.Lines.Last
+	}
 	for pl := report.Problem.Lines.First; pl <= report.Problem.Lines.Last; pl++ {
 		if original < 0 {
 			original = pl
@@ -148,10 +152,8 @@ func moveReportedLine(report Report) (reported, original int) {
 	}
 
 	if reported < 0 {
-		for _, ln := range report.Changes.Lines {
-			if ln.After > 0 {
-				return ln.After, original
-			}
+		if bestLine := report.Changes.Lines.NearestAfter(report.Problem.Lines.First); bestLine > 0 {
+			return bestLine, original
 		}
 	}
 

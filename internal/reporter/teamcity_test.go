@@ -45,12 +45,12 @@ func TestTeamCityReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
-							{Before: 0, After: 2},
-							{Before: 0, After: 4},
-							{Before: 0, After: 5},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 4, Modified: true},
+							{Before: 0, After: 5, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
@@ -83,12 +83,12 @@ func TestTeamCityReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
-							{Before: 0, After: 2},
-							{Before: 0, After: 4},
-							{Before: 0, After: 5},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 4, Modified: true},
+							{Before: 0, After: 5, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
@@ -120,12 +120,12 @@ func TestTeamCityReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
-							{Before: 0, After: 2},
-							{Before: 0, After: 4},
-							{Before: 0, After: 5},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 4, Modified: true},
+							{Before: 0, After: 5, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[0],

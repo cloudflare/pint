@@ -89,9 +89,9 @@ func TestCommenter(t *testing.T) {
 			SymlinkTarget: "foo.txt",
 			Name:          "foo.txt",
 		},
-		Changes: discovery.Changes{
+		Changes: &discovery.Changes{
 			OldPath: "",
-			Lines:   git.LineNumbers{{Before: 0, After: 2}},
+			Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 		},
 		Rule: mockFile.Groups[0].Rules[0],
 		Problem: checks.Problem{
@@ -129,9 +129,9 @@ foo details
 			SymlinkTarget: "bar.txt",
 			Name:          "bar.txt",
 		},
-		Changes: discovery.Changes{
+		Changes: &discovery.Changes{
 			OldPath: "",
-			Lines:   git.LineNumbers{{Before: 0, After: 1}},
+			Lines:   git.LineNumbers{{Before: 0, After: 1, Modified: true}},
 		},
 		Rule: mockFile.Groups[0].Rules[0],
 		Problem: checks.Problem{
@@ -389,13 +389,13 @@ bar warning
 						SymlinkTarget: "bar.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
-							{Before: 0, After: 4},
-							{Before: 0, After: 5},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
+							{Before: 0, After: 4, Modified: true},
+							{Before: 0, After: 5, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
@@ -413,13 +413,13 @@ bar warning
 						SymlinkTarget: "bar.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
-							{Before: 0, After: 4},
-							{Before: 0, After: 5},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
+							{Before: 0, After: 4, Modified: true},
+							{Before: 0, After: 5, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
@@ -508,13 +508,13 @@ foo details
 						SymlinkTarget: "bar.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
-							{Before: 0, After: 4},
-							{Before: 0, After: 5},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
+							{Before: 0, After: 4, Modified: true},
+							{Before: 0, After: 5, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
@@ -592,13 +592,13 @@ foo details
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
-							{Before: 0, After: 4},
-							{Before: 0, After: 5},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
+							{Before: 0, After: 4, Modified: true},
+							{Before: 0, After: 5, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
@@ -616,13 +616,13 @@ foo details
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
-							{Before: 0, After: 4},
-							{Before: 0, After: 5},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
+							{Before: 0, After: 4, Modified: true},
+							{Before: 0, After: 5, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
@@ -716,13 +716,13 @@ foo details
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
-							{Before: 0, After: 4},
-							{Before: 0, After: 5},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
+							{Before: 0, After: 4, Modified: true},
+							{Before: 0, After: 5, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
@@ -740,13 +740,13 @@ foo details
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
-							{Before: 0, After: 4},
-							{Before: 0, After: 5},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
+							{Before: 0, After: 4, Modified: true},
+							{Before: 0, After: 5, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
@@ -924,9 +924,9 @@ func TestCommentsCommonPaths(t *testing.T) {
 			SymlinkTarget: "foo.txt",
 			Name:          "foo.txt",
 		},
-		Changes: discovery.Changes{
+		Changes: &discovery.Changes{
 			OldPath: "",
-			Lines:   git.LineNumbers{{Before: 0, After: 2}},
+			Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 		},
 		Rule: mockFile.Groups[0].Rules[0],
 		Problem: checks.Problem{

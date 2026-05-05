@@ -45,12 +45,11 @@ type ghPR struct{}
 // AnchorBefore targets the old (deleted) side if oldLine is known.
 // AnchorAfter (or fallback) targets the new (added/unchanged) side.
 func (gr GithubReporter) commentPosition(p PendingComment) (side string, line int) {
-	oldLine := p.changedLines.BeforeForAfter(p.line)
-	if p.anchor == checks.AnchorBefore && oldLine > 0 {
-		if p.changedLines.HasBefore(oldLine) {
-			return "LEFT", oldLine
+	if p.anchor == checks.AnchorBefore {
+		if p.changedLines.HasBefore(p.line) {
+			return "LEFT", p.line
 		}
-		if nearest := p.changedLines.NearestBefore(oldLine); nearest > 0 {
+		if nearest := p.changedLines.NearestBefore(p.line); nearest > 0 {
 			return "LEFT", nearest
 		}
 		// No deleted lines in the diff, fall through to RIGHT side.

@@ -54,12 +54,12 @@ func TestCheckstyleReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
-							{Before: 0, After: 2},
-							{Before: 0, After: 4},
-							{Before: 0, After: 5},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 4, Modified: true},
+							{Before: 0, After: 5, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
@@ -91,12 +91,12 @@ func TestCheckstyleReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
-							{Before: 0, After: 2},
-							{Before: 0, After: 4},
-							{Before: 0, After: 5},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 4, Modified: true},
+							{Before: 0, After: 5, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
@@ -127,12 +127,12 @@ func TestCheckstyleReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
-							{Before: 0, After: 2},
-							{Before: 0, After: 4},
-							{Before: 0, After: 5},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 4, Modified: true},
+							{Before: 0, After: 5, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
@@ -165,9 +165,9 @@ func TestCheckstyleReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 1}},
+						Lines:   git.LineNumbers{{Before: 0, After: 1, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
@@ -182,9 +182,9 @@ func TestCheckstyleReporter(t *testing.T) {
 						SymlinkTarget: "bar.txt",
 						Name:          "bar.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
@@ -214,11 +214,11 @@ func TestCheckstyleReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
-							{Before: 0, After: 1},
-							{Before: 0, After: 5},
+							{Before: 0, After: 1, Modified: true},
+							{Before: 0, After: 5, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
@@ -234,11 +234,11 @@ func TestCheckstyleReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
-							{Before: 0, After: 1},
-							{Before: 0, After: 5},
+							{Before: 0, After: 1, Modified: true},
+							{Before: 0, After: 5, Modified: true},
 						},
 					},
 					Rule: mockFile.Groups[0].Rules[0],

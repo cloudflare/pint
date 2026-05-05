@@ -133,7 +133,7 @@ func TestChanges(t *testing.T) {
 						Before: nil,
 						After:  []byte("foo"),
 						Lines: []git.LineNumber{
-							{Before: 0, After: 1},
+							{Before: 0, After: 1, Modified: true},
 						},
 					},
 				},
@@ -153,7 +153,7 @@ func TestChanges(t *testing.T) {
 						Before: []byte("keep"),
 						After:  nil,
 						Lines: []git.LineNumber{
-							{Before: 1, After: 0},
+							{Before: 1, After: 0, Modified: false},
 						},
 					},
 				},
@@ -236,8 +236,8 @@ func TestChanges(t *testing.T) {
 						Before: []byte("bar\n1\n"),
 						After:  []byte("foo\n1\n"),
 						Lines: []git.LineNumber{
-							{Before: 0, After: 1},
-							{Before: 0, After: 2},
+							{Before: 0, After: 1, Modified: true},
+							{Before: 0, After: 2, Modified: true},
 						},
 					},
 				},
@@ -277,10 +277,10 @@ func TestChanges(t *testing.T) {
 						Before: []byte("1\n2\n3\n4\n5\n6\n7\n8\n9\n"),
 						After:  []byte("1\n2\n3\n4\n5\nX\nX\nX\nX\n"),
 						Lines: []git.LineNumber{
-							{Before: 6, After: 6},
-							{Before: 7, After: 7},
-							{Before: 8, After: 8},
-							{Before: 9, After: 9},
+							{Before: 6, After: 6, Modified: true},
+							{Before: 7, After: 7, Modified: true},
+							{Before: 8, After: 8, Modified: true},
+							{Before: 9, After: 9, Modified: true},
 						},
 					},
 				},
@@ -321,7 +321,7 @@ func TestChanges(t *testing.T) {
 						Before: []byte("1\n2\n3\n4\n5\n6\n7\n8\n9\n"),
 						After:  []byte("1\n2\n3\n4\n5\nX\n7\n8\n9\n"),
 						Lines: []git.LineNumber{
-							{Before: 6, After: 6},
+							{Before: 6, After: 6, Modified: true},
 						},
 					},
 				},
@@ -361,7 +361,7 @@ func TestChanges(t *testing.T) {
 					Body: git.BodyDiff{
 						After: []byte("second"),
 						Lines: []git.LineNumber{
-							{Before: 0, After: 1},
+							{Before: 0, After: 1, Modified: true},
 						},
 					},
 				},
@@ -380,7 +380,7 @@ func TestChanges(t *testing.T) {
 					Body: git.BodyDiff{
 						After: []byte("third"),
 						Lines: []git.LineNumber{
-							{Before: 0, After: 1},
+							{Before: 0, After: 1, Modified: true},
 						},
 					},
 				},
@@ -420,7 +420,7 @@ func TestChanges(t *testing.T) {
 					Body: git.BodyDiff{
 						Before: []byte("second"),
 						Lines: []git.LineNumber{
-							{Before: 1, After: 0},
+							{Before: 1, After: 0, Modified: false},
 						},
 					},
 				},
@@ -461,7 +461,7 @@ func TestChanges(t *testing.T) {
 					Body: git.BodyDiff{
 						Before: []byte("foo"),
 						Lines: []git.LineNumber{
-							{Before: 1, After: 0},
+							{Before: 1, After: 0, Modified: false},
 						},
 					},
 				},
@@ -504,7 +504,7 @@ func TestChanges(t *testing.T) {
 					Body: git.BodyDiff{
 						Before: []byte("foo"),
 						Lines: []git.LineNumber{
-							{Before: 1, After: 0},
+							{Before: 1, After: 0, Modified: false},
 						},
 					},
 				},
@@ -524,7 +524,7 @@ func TestChanges(t *testing.T) {
 					Body: git.BodyDiff{
 						Before: []byte("foo"),
 						Lines: []git.LineNumber{
-							{Before: 1, After: 0},
+							{Before: 1, After: 0, Modified: false},
 						},
 					},
 				},
@@ -572,8 +572,8 @@ func TestChanges(t *testing.T) {
 						Before: []byte("bar\n1\n"),
 						After:  []byte("foo\n1\n"),
 						Lines: []git.LineNumber{
-							{Before: 0, After: 1},
-							{Before: 0, After: 2},
+							{Before: 0, After: 1, Modified: true},
+							{Before: 0, After: 2, Modified: true},
 						},
 					},
 				},
@@ -615,7 +615,8 @@ func TestChanges(t *testing.T) {
 						Before: []byte("l1\nl2\nl3\n"),
 						After:  []byte("l1\nl3\n"),
 						Lines: []git.LineNumber{
-							{Before: 2, After: 0},
+							{Before: 2, After: 0, Modified: false},
+							{Before: 3, After: 2, Modified: false},
 						},
 					},
 				},
@@ -716,7 +717,8 @@ func TestChanges(t *testing.T) {
 						Before: []byte("l1\nl2\nl3\n"),
 						After:  []byte("l1\nl3\n"),
 						Lines: []git.LineNumber{
-							{Before: 2, After: 0},
+							{Before: 2, After: 0, Modified: false},
+							{Before: 3, After: 2, Modified: false},
 						},
 					},
 				},
@@ -1004,7 +1006,7 @@ func TestChangesParseDiff(t *testing.T) {
 						Before: nil,
 						After:  []byte("new content"),
 						Lines: []git.LineNumber{
-							{Before: 0, After: 1},
+							{Before: 0, After: 1, Modified: true},
 						},
 					},
 				},
@@ -1060,7 +1062,7 @@ func TestChangesParseDiff(t *testing.T) {
 						Before: []byte("-- old\nkeep\n"),
 						After:  []byte("++ new\nkeep\n"),
 						Lines: git.LineNumbers{
-							{Before: 1, After: 1},
+							{Before: 1, After: 1, Modified: true},
 						},
 					},
 				},
@@ -1145,22 +1147,22 @@ func TestLineNumberString(t *testing.T) {
 	testCases := []testCaseT{
 		{
 			title:    "added line",
-			ln:       git.LineNumber{Before: 0, After: 5},
+			ln:       git.LineNumber{Before: 0, After: 5, Modified: false},
 			expected: "+5",
 		},
 		{
 			title:    "deleted line",
-			ln:       git.LineNumber{Before: 3, After: 0},
+			ln:       git.LineNumber{Before: 3, After: 0, Modified: false},
 			expected: "-3",
 		},
 		{
 			title:    "same before and after",
-			ln:       git.LineNumber{Before: 7, After: 7},
+			ln:       git.LineNumber{Before: 7, After: 7, Modified: false},
 			expected: "7",
 		},
 		{
 			title:    "different before and after",
-			ln:       git.LineNumber{Before: 4, After: 9},
+			ln:       git.LineNumber{Before: 4, After: 9, Modified: false},
 			expected: "4->9",
 		},
 	}
@@ -1184,8 +1186,8 @@ func TestHasAfter(t *testing.T) {
 		{
 			title: "match found",
 			lns: git.LineNumbers{
-				{Before: 1, After: 2},
-				{Before: 3, After: 5},
+				{Before: 1, After: 2, Modified: true},
+				{Before: 3, After: 5, Modified: true},
 			},
 			line:     5,
 			expected: true,
@@ -1193,8 +1195,8 @@ func TestHasAfter(t *testing.T) {
 		{
 			title: "no match",
 			lns: git.LineNumbers{
-				{Before: 1, After: 2},
-				{Before: 3, After: 4},
+				{Before: 1, After: 2, Modified: true},
+				{Before: 3, After: 4, Modified: true},
 			},
 			line:     99,
 			expected: false,
@@ -1203,6 +1205,16 @@ func TestHasAfter(t *testing.T) {
 			title:    "empty slice",
 			lns:      git.LineNumbers{},
 			line:     1,
+			expected: false,
+		},
+		{
+			// Shifted context lines have After set but Modified=false,
+			// so HasAfter must return false for them.
+			title: "shifted line not modified",
+			lns: git.LineNumbers{
+				{Before: 3, After: 5, Modified: false},
+			},
+			line:     5,
 			expected: false,
 		},
 	}
@@ -1226,8 +1238,8 @@ func TestHasBefore(t *testing.T) {
 		{
 			title: "match found",
 			lns: git.LineNumbers{
-				{Before: 1, After: 2},
-				{Before: 3, After: 5},
+				{Before: 1, After: 2, Modified: false},
+				{Before: 3, After: 5, Modified: false},
 			},
 			line:     3,
 			expected: true,
@@ -1235,8 +1247,8 @@ func TestHasBefore(t *testing.T) {
 		{
 			title: "no match",
 			lns: git.LineNumbers{
-				{Before: 1, After: 2},
-				{Before: 3, After: 4},
+				{Before: 1, After: 2, Modified: false},
+				{Before: 3, After: 4, Modified: false},
 			},
 			line:     99,
 			expected: false,
@@ -1250,8 +1262,8 @@ func TestHasBefore(t *testing.T) {
 		{
 			title: "additions only, no match",
 			lns: git.LineNumbers{
-				{Before: 0, After: 3},
-				{Before: 0, After: 4},
+				{Before: 0, After: 3, Modified: false},
+				{Before: 0, After: 4, Modified: false},
 			},
 			line:     3,
 			expected: false,
@@ -1277,8 +1289,8 @@ func TestNearestAfter(t *testing.T) {
 		{
 			title: "exact match",
 			lns: git.LineNumbers{
-				{Before: 0, After: 5},
-				{Before: 0, After: 10},
+				{Before: 0, After: 5, Modified: true},
+				{Before: 0, After: 10, Modified: true},
 			},
 			target:   10,
 			expected: 10,
@@ -1286,8 +1298,8 @@ func TestNearestAfter(t *testing.T) {
 		{
 			title: "closer to lower",
 			lns: git.LineNumbers{
-				{Before: 0, After: 5},
-				{Before: 0, After: 20},
+				{Before: 0, After: 5, Modified: true},
+				{Before: 0, After: 20, Modified: true},
 			},
 			target:   8,
 			expected: 5,
@@ -1295,8 +1307,8 @@ func TestNearestAfter(t *testing.T) {
 		{
 			title: "closer to higher",
 			lns: git.LineNumbers{
-				{Before: 0, After: 5},
-				{Before: 0, After: 20},
+				{Before: 0, After: 5, Modified: true},
+				{Before: 0, After: 20, Modified: true},
 			},
 			target:   18,
 			expected: 20,
@@ -1304,8 +1316,8 @@ func TestNearestAfter(t *testing.T) {
 		{
 			title: "target below all",
 			lns: git.LineNumbers{
-				{Before: 0, After: 10},
-				{Before: 0, After: 20},
+				{Before: 0, After: 10, Modified: true},
+				{Before: 0, After: 20, Modified: true},
 			},
 			target:   2,
 			expected: 10,
@@ -1313,8 +1325,8 @@ func TestNearestAfter(t *testing.T) {
 		{
 			title: "target above all",
 			lns: git.LineNumbers{
-				{Before: 0, After: 10},
-				{Before: 0, After: 20},
+				{Before: 0, After: 10, Modified: true},
+				{Before: 0, After: 20, Modified: true},
 			},
 			target:   99,
 			expected: 20,
@@ -1322,8 +1334,8 @@ func TestNearestAfter(t *testing.T) {
 		{
 			title: "skips deletions",
 			lns: git.LineNumbers{
-				{Before: 5, After: 0},
-				{Before: 0, After: 20},
+				{Before: 5, After: 0, Modified: false},
+				{Before: 0, After: 20, Modified: true},
 			},
 			target:   3,
 			expected: 20,
@@ -1337,8 +1349,8 @@ func TestNearestAfter(t *testing.T) {
 		{
 			title: "all deletions",
 			lns: git.LineNumbers{
-				{Before: 3, After: 0},
-				{Before: 5, After: 0},
+				{Before: 3, After: 0, Modified: false},
+				{Before: 5, After: 0, Modified: false},
 			},
 			target:   4,
 			expected: 0,
@@ -1364,8 +1376,8 @@ func TestNearestBefore(t *testing.T) {
 		{
 			title: "exact match",
 			lns: git.LineNumbers{
-				{Before: 5, After: 0},
-				{Before: 10, After: 0},
+				{Before: 5, After: 0, Modified: false},
+				{Before: 10, After: 0, Modified: false},
 			},
 			target:   10,
 			expected: 10,
@@ -1373,8 +1385,8 @@ func TestNearestBefore(t *testing.T) {
 		{
 			title: "closer to lower",
 			lns: git.LineNumbers{
-				{Before: 5, After: 0},
-				{Before: 20, After: 0},
+				{Before: 5, After: 0, Modified: false},
+				{Before: 20, After: 0, Modified: false},
 			},
 			target:   8,
 			expected: 5,
@@ -1382,8 +1394,8 @@ func TestNearestBefore(t *testing.T) {
 		{
 			title: "closer to higher",
 			lns: git.LineNumbers{
-				{Before: 5, After: 0},
-				{Before: 20, After: 0},
+				{Before: 5, After: 0, Modified: false},
+				{Before: 20, After: 0, Modified: false},
 			},
 			target:   18,
 			expected: 20,
@@ -1391,8 +1403,8 @@ func TestNearestBefore(t *testing.T) {
 		{
 			title: "target below all",
 			lns: git.LineNumbers{
-				{Before: 10, After: 0},
-				{Before: 20, After: 0},
+				{Before: 10, After: 0, Modified: false},
+				{Before: 20, After: 0, Modified: false},
 			},
 			target:   2,
 			expected: 10,
@@ -1400,8 +1412,8 @@ func TestNearestBefore(t *testing.T) {
 		{
 			title: "skips additions",
 			lns: git.LineNumbers{
-				{Before: 0, After: 5},
-				{Before: 20, After: 0},
+				{Before: 0, After: 5, Modified: false},
+				{Before: 20, After: 0, Modified: false},
 			},
 			target:   3,
 			expected: 20,
@@ -1415,8 +1427,8 @@ func TestNearestBefore(t *testing.T) {
 		{
 			title: "all additions",
 			lns: git.LineNumbers{
-				{Before: 0, After: 3},
-				{Before: 0, After: 5},
+				{Before: 0, After: 3, Modified: false},
+				{Before: 0, After: 5, Modified: false},
 			},
 			target:   4,
 			expected: 0,
@@ -1442,21 +1454,20 @@ func TestBeforeForAfter(t *testing.T) {
 		{
 			title: "match found",
 			lns: git.LineNumbers{
-				{Before: 10, After: 20},
-				{Before: 30, After: 40},
+				{Before: 10, After: 20, Modified: false},
+				{Before: 30, After: 40, Modified: false},
 			},
 			line:     20,
 			expected: 10,
 		},
 		{
-			// Line past the last diff entry — compute from nearest preceding entry.
-			// Nearest is {Before:10, After:20}, offset = 99 - 20 = 79, so old = 10 + 79 = 89.
-			title: "line past last entry uses offset",
+			// Line past the last diff entry — not in the map, so return line itself.
+			title: "line past last entry returns itself",
 			lns: git.LineNumbers{
-				{Before: 10, After: 20},
+				{Before: 10, After: 20, Modified: false},
 			},
 			line:     99,
-			expected: 89,
+			expected: 99,
 		},
 		{
 			title:    "empty slice returns line itself",
@@ -1467,39 +1478,37 @@ func TestBeforeForAfter(t *testing.T) {
 		{
 			title: "line before first entry",
 			lns: git.LineNumbers{
-				{Before: 10, After: 20},
+				{Before: 10, After: 20, Modified: false},
 			},
 			line:     5,
 			expected: 5,
 		},
 		{
-			// Line between two entries — compute from nearest preceding entry.
-			// Nearest is {Before:5, After:10}, offset = 15 - 10 = 5, so old = 5 + 5 = 10.
+			// Line between two entries — not in the map, so return line itself.
 			title: "line between entries",
 			lns: git.LineNumbers{
-				{Before: 5, After: 10},
-				{Before: 25, After: 30},
+				{Before: 5, After: 10, Modified: false},
+				{Before: 25, After: 30, Modified: false},
 			},
 			line:     15,
-			expected: 10,
+			expected: 15,
 		},
 		{
-			// Added lines (Before==0) are skipped when finding nearest reference.
-			// Only {Before:5, After:10} is usable, offset = 20 - 10 = 10, so old = 5 + 10 = 15.
+			// Line not in the map — return line itself regardless of added-only entries.
 			title: "skips added-only entries",
 			lns: git.LineNumbers{
-				{Before: 5, After: 10},
-				{Before: 0, After: 12},
-				{Before: 0, After: 13},
+				{Before: 5, After: 10, Modified: false},
+				{Before: 0, After: 12, Modified: false},
+				{Before: 0, After: 13, Modified: false},
 			},
 			line:     20,
-			expected: 15,
+			expected: 20,
 		},
 		{
 			title: "all entries are added",
 			lns: git.LineNumbers{
-				{Before: 0, After: 3},
-				{Before: 0, After: 4},
+				{Before: 0, After: 3, Modified: false},
+				{Before: 0, After: 4, Modified: false},
 			},
 			line:     10,
 			expected: 10,
@@ -1509,58 +1518,6 @@ func TestBeforeForAfter(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.title, func(t *testing.T) {
 			require.Equal(t, tc.expected, tc.lns.BeforeForAfter(tc.line))
-		})
-	}
-}
-
-func TestMakeLineRange(t *testing.T) {
-	type testCaseT struct {
-		title    string
-		expected git.LineNumbers
-		n        int
-		side     git.LineRangeSide
-	}
-
-	testCases := []testCaseT{
-		{
-			title: "before only",
-			n:     2,
-			side:  git.LinesBefore,
-			expected: git.LineNumbers{
-				{Before: 1, After: 0},
-				{Before: 2, After: 0},
-			},
-		},
-		{
-			title: "after only",
-			n:     2,
-			side:  git.LinesAfter,
-			expected: git.LineNumbers{
-				{Before: 0, After: 1},
-				{Before: 0, After: 2},
-			},
-		},
-		{
-			title: "both",
-			n:     3,
-			side:  git.LinesBoth,
-			expected: git.LineNumbers{
-				{Before: 1, After: 1},
-				{Before: 2, After: 2},
-				{Before: 3, After: 3},
-			},
-		},
-		{
-			title:    "zero count",
-			n:        0,
-			side:     git.LinesBoth,
-			expected: git.LineNumbers{},
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.title, func(t *testing.T) {
-			require.Equal(t, tc.expected, git.MakeLineRange(tc.n, tc.side))
 		})
 	}
 }
@@ -1581,9 +1538,9 @@ func TestMakeLineRangeFromTo(t *testing.T) {
 			last:  7,
 			side:  git.LinesBefore,
 			expected: git.LineNumbers{
-				{Before: 5, After: 0},
-				{Before: 6, After: 0},
-				{Before: 7, After: 0},
+				{Before: 5, After: 0, Modified: false},
+				{Before: 6, After: 0, Modified: false},
+				{Before: 7, After: 0, Modified: false},
 			},
 		},
 		{
@@ -1592,8 +1549,8 @@ func TestMakeLineRangeFromTo(t *testing.T) {
 			last:  4,
 			side:  git.LinesAfter,
 			expected: git.LineNumbers{
-				{Before: 0, After: 3},
-				{Before: 0, After: 4},
+				{Before: 0, After: 3, Modified: true},
+				{Before: 0, After: 4, Modified: true},
 			},
 		},
 		{
@@ -1602,9 +1559,9 @@ func TestMakeLineRangeFromTo(t *testing.T) {
 			last:  12,
 			side:  git.LinesBoth,
 			expected: git.LineNumbers{
-				{Before: 10, After: 10},
-				{Before: 11, After: 11},
-				{Before: 12, After: 12},
+				{Before: 10, After: 10, Modified: false},
+				{Before: 11, After: 11, Modified: false},
+				{Before: 12, After: 12, Modified: false},
 			},
 		},
 		{
@@ -1620,7 +1577,7 @@ func TestMakeLineRangeFromTo(t *testing.T) {
 			last:  4,
 			side:  git.LinesAfter,
 			expected: git.LineNumbers{
-				{Before: 0, After: 4},
+				{Before: 0, After: 4, Modified: true},
 			},
 		},
 	}

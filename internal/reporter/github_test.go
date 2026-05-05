@@ -76,9 +76,9 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "$1",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -119,9 +119,9 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -162,9 +162,9 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -206,9 +206,9 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -254,9 +254,9 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -298,9 +298,9 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -353,9 +353,9 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -375,9 +375,9 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -397,9 +397,9 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -419,9 +419,9 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -472,9 +472,9 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -494,9 +494,9 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -516,9 +516,9 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -538,9 +538,9 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -590,9 +590,9 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -612,9 +612,9 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -634,9 +634,9 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -656,9 +656,9 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -708,9 +708,9 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 1}},
+						Lines:   git.LineNumbers{{Before: 0, After: 1, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
@@ -760,7 +760,7 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 2, After: 2}},
 					},
@@ -812,7 +812,7 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 3, After: 0}},
 					},
@@ -867,7 +867,7 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 5, After: 0}},
 					},
@@ -922,9 +922,9 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 5}},
+						Lines:   git.LineNumbers{{Before: 0, After: 5, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
@@ -967,9 +967,9 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 1}},
+						Lines:   git.LineNumbers{{Before: 0, After: 1, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
@@ -1089,9 +1089,9 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
@@ -1111,9 +1111,9 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -1133,9 +1133,9 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
@@ -1155,9 +1155,9 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -1209,9 +1209,9 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
@@ -1231,9 +1231,9 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
@@ -1253,9 +1253,9 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
@@ -1275,9 +1275,9 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2}},
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{

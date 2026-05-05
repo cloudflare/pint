@@ -76,7 +76,7 @@ func (f GlobFinder) Find() (entries []*Entry, err error) {
 			return nil, err
 		}
 		p := parser.NewParser(f.opts.WithStrict(!f.filter.IsRelaxed(fp.target)))
-		entries = append(entries, readRules(fp.target, fp.path, fd, p, f.allowedOwners)...)
+		entries = append(entries, readRules(fp.target, fp.path, fd, p, f.allowedOwners, nil)...)
 		fd.Close()
 	}
 

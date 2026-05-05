@@ -48,11 +48,11 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -72,11 +72,11 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -95,11 +95,11 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -118,11 +118,11 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -141,11 +141,11 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "symlink.yaml",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -164,12 +164,12 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "second.yaml",
 						Name:          "second.yaml",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 1},
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 1, Modified: true},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -189,12 +189,12 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "second.yaml",
 						Name:          "second.yaml",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 1},
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 1, Modified: true},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -286,11 +286,11 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -309,11 +309,11 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -359,11 +359,11 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -382,11 +382,11 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -432,11 +432,11 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -455,11 +455,11 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -505,11 +505,11 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -528,11 +528,11 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -551,11 +551,11 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -574,11 +574,11 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "symlink.yaml",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -597,12 +597,12 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "second.yaml",
 						Name:          "second.yaml",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 1},
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 1, Modified: true},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -622,12 +622,12 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "second.yaml",
 						Name:          "second.yaml",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 1},
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 1, Modified: true},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
@@ -693,11 +693,11 @@ func TestBitBucketMakeComments(t *testing.T) {
 						SymlinkTarget: "rule.yaml",
 						Name:          "rule.yaml",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
-							{Before: 0, After: 2},
-							{Before: 0, After: 3},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
 						},
 					},
 					Problem: checks.Problem{
