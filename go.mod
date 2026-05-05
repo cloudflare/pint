@@ -7,7 +7,7 @@ require (
 	github.com/gkampitakis/go-snaps v0.5.21
 	github.com/go-json-experiment/json v0.0.0-20260214004413-d219187c3433
 	github.com/google/go-cmp v0.7.0
-	github.com/google/go-github/v82 v82.0.0
+	github.com/google/go-github/v85 v85.0.0
 	github.com/hashicorp/hcl/v2 v2.24.0
 	github.com/itchyny/json2yaml v0.1.5
 	github.com/klauspost/compress v1.18.6
