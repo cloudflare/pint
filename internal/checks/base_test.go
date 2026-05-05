@@ -30,7 +30,6 @@ import (
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
@@ -209,7 +208,7 @@ func runTests(t *testing.T, testCases []checkTest) {
 			}
 
 			ctx, cancel := context.WithCancel(t.Context())
-			entries, err := parseContent(tc.content, parser.DefaultOptions.WithStrict(tc.contentStrict))
+			entries, err := parseContent(tc.content, parser.DefaultOptions.WithStrict(tc.contentStrict), nil)
 			require.NoError(t, err, "cannot parse rule content")
 			for _, entry := range entries {
 				if tc.ctx != nil {
@@ -271,7 +270,7 @@ func runTests(t *testing.T, testCases []checkTest) {
 
 - record: foo
   expr: 'foo{}{}'
-`, parser.DefaultOptions)
+`, parser.DefaultOptions, nil)
 		require.NoError(t, err, "cannot parse rule content")
 		t.Run(tc.description+" (bogus rules)", func(_ *testing.T) {
 			for _, entry := range entries {
@@ -281,7 +280,7 @@ func runTests(t *testing.T, testCases []checkTest) {
 	}
 }
 
-func parseContent(content string, opts parser.Options) (entries []*discovery.Entry, _ error) {
+func parseContent(content string, opts parser.Options, changes *discovery.Changes) (entries []*discovery.Entry, _ error) {
 	p := parser.NewParser(opts)
 	file := p.Parse(strings.NewReader(content))
 	if file.Error.Err != nil {
@@ -290,13 +289,12 @@ func parseContent(content string, opts parser.Options) (entries []*discovery.Ent
 
 	for _, group := range file.Groups {
 		for _, rule := range group.Rules {
-			ruleLineNumbers := git.MakeLineRangeFromTo(rule.Lines.First, rule.Lines.Last, git.LinesAfter)
 			entries = append(entries, &discovery.Entry{
 				Path: discovery.Path{
 					Name:          "fake.yml",
 					SymlinkTarget: "fake.yml",
 				},
-				Changes: discovery.Changes{Lines: ruleLineNumbers},
+				Changes: changes,
 				Rule:    rule,
 				Group:   &group,
 				File:    &file,
@@ -308,7 +306,7 @@ func parseContent(content string, opts parser.Options) (entries []*discovery.Ent
 }
 
 func mustParseContent(content string) (entries []*discovery.Entry) {
-	entries, err := parseContent(content, parser.DefaultOptions)
+	entries, err := parseContent(content, parser.DefaultOptions, nil)
 	if err != nil {
 		panic(err)
 	}

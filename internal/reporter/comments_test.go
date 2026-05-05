@@ -89,7 +89,7 @@ func TestCommenter(t *testing.T) {
 			SymlinkTarget: "foo.txt",
 			Name:          "foo.txt",
 		},
-		Changes: discovery.Changes{
+		Changes: &discovery.Changes{
 			OldPath: "",
 			Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 		},
@@ -129,7 +129,7 @@ foo details
 			SymlinkTarget: "bar.txt",
 			Name:          "bar.txt",
 		},
-		Changes: discovery.Changes{
+		Changes: &discovery.Changes{
 			OldPath: "",
 			Lines:   git.LineNumbers{{Before: 0, After: 1, Modified: true}},
 		},
@@ -389,7 +389,7 @@ bar warning
 						SymlinkTarget: "bar.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
 							{Before: 0, After: 2, Modified: true},
@@ -413,7 +413,7 @@ bar warning
 						SymlinkTarget: "bar.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
 							{Before: 0, After: 2, Modified: true},
@@ -508,7 +508,7 @@ foo details
 						SymlinkTarget: "bar.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
 							{Before: 0, After: 2, Modified: true},
@@ -592,7 +592,7 @@ foo details
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
 							{Before: 0, After: 2, Modified: true},
@@ -616,7 +616,7 @@ foo details
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
 							{Before: 0, After: 2, Modified: true},
@@ -716,7 +716,7 @@ foo details
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
 							{Before: 0, After: 2, Modified: true},
@@ -740,7 +740,7 @@ foo details
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
 							{Before: 0, After: 2, Modified: true},
@@ -924,7 +924,7 @@ func TestCommentsCommonPaths(t *testing.T) {
 			SymlinkTarget: "foo.txt",
 			Name:          "foo.txt",
 		},
-		Changes: discovery.Changes{
+		Changes: &discovery.Changes{
 			OldPath: "",
 			Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 		},

@@ -63,7 +63,7 @@ func TestGitLabReporter(t *testing.T) {
 			SymlinkTarget: "foo.txt",
 			Name:          "foo.txt",
 		},
-		Changes: discovery.Changes{
+		Changes: &discovery.Changes{
 			OldPath: "",
 			Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 		},
@@ -87,7 +87,7 @@ func TestGitLabReporter(t *testing.T) {
 				SymlinkTarget: "foo.txt",
 				Name:          "foo.txt",
 			},
-			Changes: discovery.Changes{
+			Changes: &discovery.Changes{
 				OldPath: "",
 				Lines:   git.LineNumbers{{Before: 0, After: 1, Modified: true}},
 			},
@@ -106,7 +106,7 @@ func TestGitLabReporter(t *testing.T) {
 				SymlinkTarget: "foo.txt",
 				Name:          "foo.txt",
 			},
-			Changes: discovery.Changes{
+			Changes: &discovery.Changes{
 				OldPath: "",
 				Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 			},
@@ -125,7 +125,7 @@ func TestGitLabReporter(t *testing.T) {
 				SymlinkTarget: "foo.txt",
 				Name:          "foo.txt",
 			},
-			Changes: discovery.Changes{
+			Changes: &discovery.Changes{
 				OldPath: "",
 				Lines:   git.LineNumbers{{Before: 0, After: 3, Modified: true}},
 			},
@@ -281,7 +281,7 @@ func TestGitLabReporter(t *testing.T) {
 						SymlinkTarget: mockPath,
 						Name:          mockPath,
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
 							{Before: 0, After: 2, Modified: true},
@@ -836,7 +836,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: mockPath,
 						Name:          mockPath,
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "foo.old",
 						Lines: git.LineNumbers{
 							{Before: 0, After: 2, Modified: true},
@@ -912,7 +912,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: mockPath,
 						Name:          mockPath,
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "foo.old",
 						Lines: git.LineNumbers{
 							{Before: 0, After: 2, Modified: true},
@@ -988,7 +988,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: mockPath,
 						Name:          mockPath,
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
 							{Before: 0, After: 2, Modified: true},
@@ -1044,7 +1044,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: mockPath,
 						Name:          mockPath,
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
 							{Before: 0, After: 4, Modified: true},
@@ -1100,7 +1100,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: mockPath,
 						Name:          mockPath,
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
 							{Before: 5, After: 0},
@@ -1253,7 +1253,7 @@ func TestGitLabReporterCommentLine(t *testing.T) {
 							Name:          "foo.txt",
 							SymlinkTarget: "foo.txt",
 						},
-						Changes: discovery.Changes{
+						Changes: &discovery.Changes{
 							OldPath: "",
 							Lines:   tc.changes,
 						},

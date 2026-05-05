@@ -54,7 +54,7 @@ func TestCheckstyleReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
 							{Before: 0, After: 2, Modified: true},
@@ -91,7 +91,7 @@ func TestCheckstyleReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
 							{Before: 0, After: 2, Modified: true},
@@ -127,7 +127,7 @@ func TestCheckstyleReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
 							{Before: 0, After: 2, Modified: true},
@@ -165,7 +165,7 @@ func TestCheckstyleReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 1, Modified: true}},
 					},
@@ -182,7 +182,7 @@ func TestCheckstyleReporter(t *testing.T) {
 						SymlinkTarget: "bar.txt",
 						Name:          "bar.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
@@ -214,7 +214,7 @@ func TestCheckstyleReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
 							{Before: 0, After: 1, Modified: true},
@@ -234,7 +234,7 @@ func TestCheckstyleReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
 							{Before: 0, After: 1, Modified: true},

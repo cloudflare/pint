@@ -55,7 +55,7 @@ func TestJSONReporter(t *testing.T) {
 					SymlinkTarget: "test.yml",
 				},
 				Owner: "team-a",
-				Changes: discovery.Changes{
+				Changes: &discovery.Changes{
 					OldPath: "",
 					Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 				},

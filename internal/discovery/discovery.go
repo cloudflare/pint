@@ -92,7 +92,7 @@ type Entry struct {
 	Group          *parser.Group `json:"-"`
 	Path           Path
 	Owner          string
-	Changes        Changes
+	Changes        *Changes
 	DisabledChecks []string
 	Rule           parser.Rule
 	State          ChangeType
@@ -121,14 +121,8 @@ func (e *Entry) Labels() (ym parser.YamlMap) {
 	return ym
 }
 
-func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, allowedOwners []*regexp.Regexp) (entries []*Entry) {
+func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, allowedOwners []*regexp.Regexp, changes *Changes) (entries []*Entry) {
 	file := p.Parse(r)
-
-	contentLines := diags.LineRange{
-		First: min(file.TotalLines, 1),
-		Last:  file.TotalLines,
-	}
-	contentLineNumbers := git.MakeLineRangeFromTo(contentLines.First, contentLines.Last, git.LinesAfter)
 
 	var badOwners []comments.Comment
 	var fileOwner string
@@ -171,7 +165,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 				},
 				PathError: comment.Value.(comments.Invalid).Err,
 				Owner:     fileOwner,
-				Changes:   Changes{OldPath: "", Lines: contentLineNumbers},
+				Changes:   changes,
 			})
 		}
 	}
@@ -187,7 +181,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 				Diagnostic: d,
 			},
 			Owner:   fileOwner,
-			Changes: Changes{OldPath: "", Lines: contentLineNumbers},
+			Changes: changes,
 		})
 		return entries
 	}
@@ -207,7 +201,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 			},
 			PathError: file.Error,
 			Owner:     fileOwner,
-			Changes:   Changes{OldPath: "", Lines: contentLineNumbers},
+			Changes:   changes,
 		})
 		return entries
 	}
@@ -228,12 +222,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 				},
 				PathError: group.Error,
 				Owner:     fileOwner,
-				Changes: Changes{
-					OldPath: "",
-					Lines: []git.LineNumber{
-						{Before: 0, After: group.Error.Line, Modified: true},
-					},
-				},
+				Changes:   changes,
 			})
 		}
 		for _, rule := range group.Rules {
@@ -241,7 +230,6 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 			for _, owner := range comments.Only[comments.Owner](rule.Comments, comments.RuleOwnerType) {
 				ruleOwner = owner.Name
 			}
-			ruleLineNumbers := git.MakeLineRangeFromTo(rule.Lines.First, rule.Lines.Last, git.LinesAfter)
 			entries = append(entries, &Entry{
 				State: Noop,
 				Path: Path{
@@ -251,7 +239,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 				File:           &file,
 				Group:          &group,
 				Rule:           rule,
-				Changes:        Changes{OldPath: "", Lines: ruleLineNumbers},
+				Changes:        changes,
 				Owner:          ruleOwner,
 				DisabledChecks: disabledChecks,
 			})
@@ -282,7 +270,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 						Kind:        diags.Issue,
 					},
 				},
-				Changes: Changes{OldPath: "", Lines: contentLineNumbers},
+				Changes: changes,
 			})
 		}
 	}

@@ -45,7 +45,7 @@ func TestTeamCityReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
 							{Before: 0, After: 2, Modified: true},
@@ -83,7 +83,7 @@ func TestTeamCityReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
 							{Before: 0, After: 2, Modified: true},
@@ -120,7 +120,7 @@ func TestTeamCityReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
 							{Before: 0, After: 2, Modified: true},

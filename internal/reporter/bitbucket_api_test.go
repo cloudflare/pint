@@ -291,7 +291,7 @@ func TestReportToAnnotation(t *testing.T) {
 					SymlinkTarget: "foo.yaml",
 					Name:          "foo.yaml",
 				},
-				Changes: discovery.Changes{
+				Changes: &discovery.Changes{
 					OldPath: "",
 					Lines: git.LineNumbers{
 						{Before: 0, After: 4, Modified: true},
@@ -326,7 +326,7 @@ func TestReportToAnnotation(t *testing.T) {
 					SymlinkTarget: "foo.yaml",
 					Name:          "foo.yaml",
 				},
-				Changes: discovery.Changes{
+				Changes: &discovery.Changes{
 					OldPath: "",
 					Lines: git.LineNumbers{
 						{Before: 0, After: 4, Modified: true},
@@ -360,7 +360,7 @@ func TestReportToAnnotation(t *testing.T) {
 					SymlinkTarget: "foo.yaml",
 					Name:          "foo.yaml",
 				},
-				Changes: discovery.Changes{
+				Changes: &discovery.Changes{
 					OldPath: "",
 					Lines: git.LineNumbers{
 						{Before: 0, After: 4, Modified: true},
@@ -394,7 +394,7 @@ func TestReportToAnnotation(t *testing.T) {
 					SymlinkTarget: "foo.yaml",
 					Name:          "foo.yaml",
 				},
-				Changes: discovery.Changes{
+				Changes: &discovery.Changes{
 					OldPath: "",
 					Lines: git.LineNumbers{
 						{Before: 0, After: 4, Modified: true},
@@ -428,7 +428,7 @@ func TestReportToAnnotation(t *testing.T) {
 					SymlinkTarget: "foo.yaml",
 					Name:          "bar.yaml",
 				},
-				Changes: discovery.Changes{
+				Changes: &discovery.Changes{
 					OldPath: "",
 					Lines: git.LineNumbers{
 						{Before: 0, After: 4, Modified: true},
@@ -462,7 +462,7 @@ func TestReportToAnnotation(t *testing.T) {
 					SymlinkTarget: "foo.yaml",
 					Name:          "bar.yaml",
 				},
-				Changes: discovery.Changes{
+				Changes: &discovery.Changes{
 					OldPath: "",
 					Lines: git.LineNumbers{
 						{Before: 0, After: 4, Modified: true},
@@ -482,7 +482,7 @@ func TestReportToAnnotation(t *testing.T) {
 			},
 			output: BitBucketAnnotation{
 				Path:     "foo.yaml",
-				Line:     4,
+				Line:     6,
 				Message:  "Problem detected on symlinked file bar.yaml. Problem reported on unmodified line 7, annotation moved here: mock: report text",
 				Severity: "HIGH",
 				Type:     "BUG",
@@ -496,7 +496,7 @@ func TestReportToAnnotation(t *testing.T) {
 					SymlinkTarget: "foo.yaml",
 					Name:          "foo.yaml",
 				},
-				Changes: discovery.Changes{
+				Changes: &discovery.Changes{
 					OldPath: "",
 					Lines: git.LineNumbers{
 						{Before: 0, After: 4, Modified: true},
@@ -518,6 +518,34 @@ func TestReportToAnnotation(t *testing.T) {
 				Path:     "foo.yaml",
 				Line:     4,
 				Message:  "Problem reported on unmodified line 1, annotation moved here: mock: report text",
+				Severity: "LOW",
+				Type:     "CODE_SMELL",
+				Link:     "https://cloudflare.github.io/pint/checks/mock.html",
+			},
+		},
+		{
+			// Verify that nil Changes doesn't panic and returns
+			// the problem line as-is.
+			description: "nil changes",
+			input: Report{
+				Path: discovery.Path{
+					SymlinkTarget: "foo.yaml",
+					Name:          "foo.yaml",
+				},
+				Problem: checks.Problem{
+					Lines: diags.LineRange{
+						First: 5,
+						Last:  5,
+					},
+					Reporter: "mock",
+					Summary:  "report text",
+					Severity: checks.Warning,
+				},
+			},
+			output: BitBucketAnnotation{
+				Path:     "foo.yaml",
+				Line:     5,
+				Message:  "mock: report text",
 				Severity: "LOW",
 				Type:     "CODE_SMELL",
 				Link:     "https://cloudflare.github.io/pint/checks/mock.html",

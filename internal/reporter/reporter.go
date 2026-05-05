@@ -15,7 +15,7 @@ import (
 type Report struct {
 	Path        discovery.Path
 	Owner       string
-	Changes     discovery.Changes
+	Changes     *discovery.Changes
 	Duplicates  []*Report
 	Rule        parser.Rule
 	Problem     checks.Problem

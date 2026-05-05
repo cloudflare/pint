@@ -76,7 +76,7 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "$1",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
@@ -119,7 +119,7 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
@@ -162,7 +162,7 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
@@ -206,7 +206,7 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
@@ -254,7 +254,7 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
@@ -298,7 +298,7 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
@@ -353,7 +353,7 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
@@ -375,7 +375,7 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
@@ -397,7 +397,7 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
@@ -419,7 +419,7 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
@@ -472,7 +472,7 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
@@ -494,7 +494,7 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
@@ -516,7 +516,7 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
@@ -538,7 +538,7 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
@@ -590,7 +590,7 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
@@ -612,7 +612,7 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
@@ -634,7 +634,7 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
@@ -656,7 +656,7 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
@@ -708,7 +708,7 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 1, Modified: true}},
 					},
@@ -760,7 +760,7 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 2, After: 2}},
 					},
@@ -812,7 +812,7 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 3, After: 0}},
 					},
@@ -867,7 +867,7 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 5, After: 0}},
 					},
@@ -922,7 +922,7 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 5, Modified: true}},
 					},
@@ -967,7 +967,7 @@ func TestGitHubReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 1, Modified: true}},
 					},
@@ -1089,7 +1089,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
@@ -1111,7 +1111,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
@@ -1133,7 +1133,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
@@ -1155,7 +1155,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
@@ -1209,7 +1209,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
@@ -1231,7 +1231,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
@@ -1253,7 +1253,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
@@ -1275,7 +1275,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 						SymlinkTarget: "foo.txt",
 					},
 
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},

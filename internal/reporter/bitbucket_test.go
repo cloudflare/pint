@@ -108,7 +108,7 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
@@ -140,7 +140,7 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
@@ -175,7 +175,7 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
@@ -254,7 +254,7 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
 							{Before: 0, After: 2, Modified: true},
@@ -277,7 +277,7 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "bar.txt",
 						Name:          "bar.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{},
 					},
@@ -297,7 +297,7 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
 							{Before: 0, After: 2, Modified: true},
@@ -320,7 +320,7 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
 							{Before: 0, After: 2, Modified: true},
@@ -343,7 +343,7 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
 							{Before: 0, After: 2, Modified: true},
@@ -516,7 +516,7 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
 							{Before: 0, After: 2, Modified: true},
@@ -539,7 +539,7 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
 							{Before: 0, After: 2, Modified: true},
@@ -562,7 +562,7 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
 							{Before: 0, After: 2, Modified: true},
@@ -585,7 +585,7 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
 							{Before: 0, After: 2, Modified: true},
@@ -633,7 +633,7 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: git.LineNumbers{
 							{Before: 0, After: 3, Modified: true},
@@ -726,7 +726,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					Rule: mockFile.Groups[0].Rules[1],
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
 							{Before: 0, After: 2, Modified: true},
@@ -749,7 +749,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					Rule: mockFile.Groups[0].Rules[1],
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
 							{Before: 0, After: 2, Modified: true},
@@ -772,7 +772,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					Rule: mockFile.Groups[0].Rules[0],
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
 							{Before: 0, After: 2, Modified: true},
@@ -795,7 +795,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					Rule: mockFile.Groups[0].Rules[1],
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
 							{Before: 0, After: 2, Modified: true},
@@ -1095,7 +1095,7 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
 							{Before: 0, After: 2, Modified: true},
@@ -1118,7 +1118,7 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
 							{Before: 0, After: 2, Modified: true},
@@ -1141,7 +1141,7 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
 							{Before: 0, After: 2, Modified: true},
@@ -1165,7 +1165,7 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "symlink.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
 							{Before: 0, After: 2, Modified: true},
@@ -1404,7 +1404,7 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "index.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
 							{Before: 0, After: 2, Modified: true},
@@ -1742,7 +1742,7 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
 							{Before: 0, After: 2, Modified: true},
@@ -1765,7 +1765,7 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
 							{Before: 0, After: 2, Modified: true},
@@ -1788,7 +1788,7 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
 							{Before: 0, After: 2, Modified: true},
@@ -1812,7 +1812,7 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
 							{Before: 0, After: 2, Modified: true},
@@ -1836,7 +1836,7 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "symlink.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines: []git.LineNumber{
 							{Before: 0, After: 2, Modified: true},
@@ -1883,7 +1883,7 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{},
 					},
@@ -1916,7 +1916,7 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "index.txt",
 						Name:          diagFile,
 					},
-					Changes: discovery.Changes{
+					Changes: &discovery.Changes{
 						OldPath: "",
 						Lines:   git.LineNumbers{{Before: 0, After: 1, Modified: true}},
 					},

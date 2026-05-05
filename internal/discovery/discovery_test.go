@@ -7,13 +7,13 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"regexp"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/diags"
-	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -34,12 +34,14 @@ func TestReadRules(t *testing.T) {
 	}
 
 	type testCaseT struct {
-		sourceFunc   func(t *testing.T) io.Reader
-		title        string
-		reportedPath string
-		sourcePath   string
-		entries      []Entry
-		isStrict     bool
+		sourceFunc    func(t *testing.T) io.Reader
+		check         func(t *testing.T, entries []*Entry)
+		title         string
+		reportedPath  string
+		sourcePath    string
+		entries       []Entry
+		allowedOwners []*regexp.Regexp
+		isStrict      bool
 	}
 
 	testCases := []testCaseT{
@@ -108,9 +110,6 @@ func TestReadRules(t *testing.T) {
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					Changes: Changes{
-						Lines: git.MakeLineRangeFromTo(4, 5, git.LinesAfter),
-					},
 					Rule:           mustParse(3, "- record: foo\n  expr: bar\n"),
 					DisabledChecks: []string{"promql/series"},
 				},
@@ -139,9 +138,6 @@ groups:
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					Changes: Changes{
-						Lines: git.MakeLineRangeFromTo(7, 8, git.LinesAfter),
-					},
 					Rule:           mustParse(6, "  - record: foo\n    expr: bar\n"),
 					DisabledChecks: []string{"promql/series"},
 				},
@@ -166,9 +162,6 @@ groups:
 					Path: Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
-					},
-					Changes: Changes{
-						Lines: git.MakeLineRangeFromTo(4, 5, git.LinesAfter),
 					},
 					Rule: mustParse(3, "- record: foo\n  expr: bar\n"),
 				},
@@ -197,9 +190,6 @@ groups:
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					Changes: Changes{
-						Lines: git.MakeLineRangeFromTo(7, 8, git.LinesAfter),
-					},
 					Rule: mustParse(6, "  - record: foo\n    expr: bar\n"),
 				},
 			},
@@ -223,9 +213,6 @@ groups:
 					Path: Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
-					},
-					Changes: Changes{
-						Lines: git.MakeLineRangeFromTo(4, 5, git.LinesAfter),
 					},
 					Rule:           mustParse(3, "- record: foo\n  expr: bar\n"),
 					DisabledChecks: []string{"promql/series"},
@@ -255,9 +242,6 @@ groups:
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					Changes: Changes{
-						Lines: git.MakeLineRangeFromTo(7, 8, git.LinesAfter),
-					},
 					Rule:           mustParse(6, "  - record: foo\n    expr: bar\n"),
 					DisabledChecks: []string{"promql/series"},
 				},
@@ -282,9 +266,6 @@ groups:
 					Path: Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
-					},
-					Changes: Changes{
-						Lines: git.MakeLineRangeFromTo(1, 5, git.LinesAfter),
 					},
 					PathError: FileIgnoreError{
 						Diagnostic: diags.Diagnostic{
@@ -323,9 +304,6 @@ groups:
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					Changes: Changes{
-						Lines: git.MakeLineRangeFromTo(1, 8, git.LinesAfter),
-					},
 					PathError: FileIgnoreError{
 						Diagnostic: diags.Diagnostic{
 							Message: "This file was excluded from pint checks.",
@@ -340,6 +318,72 @@ groups:
 				},
 			},
 		},
+		{
+			title:         "invalid owner",
+			reportedPath:  "rules.yml",
+			sourcePath:    "rules.yml",
+			allowedOwners: []*regexp.Regexp{regexp.MustCompile("^team-")},
+			sourceFunc: func(_ *testing.T) io.Reader {
+				return bytes.NewBufferString("# pint file/owner bob\n")
+			},
+			check: func(t *testing.T, entries []*Entry) {
+				t.Helper()
+				require.Len(t, entries, 1)
+				require.Error(t, entries[0].PathError)
+				require.Contains(t, entries[0].PathError.Error(), "doesn't match any of the allowed owner values")
+			},
+		},
+		{
+			title:        "invalid comment",
+			reportedPath: "rules.yml",
+			sourcePath:   "rules.yml",
+			sourceFunc: func(_ *testing.T) io.Reader {
+				return bytes.NewBufferString("# pint file/owner\n\n- record: foo\n  expr: sum(foo)\n")
+			},
+			check: func(t *testing.T, entries []*Entry) {
+				t.Helper()
+				var found bool
+				for _, e := range entries {
+					if e.PathError != nil {
+						found = true
+						require.Contains(t, e.PathError.Error(), "pint control comment")
+					}
+				}
+				require.True(t, found, "expected at least one entry with PathError from invalid comment")
+			},
+		},
+		{
+			title:        "group error",
+			reportedPath: "rules.yml",
+			sourcePath:   "rules.yml",
+			isStrict:     true,
+			sourceFunc: func(_ *testing.T) io.Reader {
+				return bytes.NewBufferString("groups:\n- name: foo\n  interval: bad\n  rules:\n  - record: foo\n    expr: bar\n")
+			},
+			check: func(t *testing.T, entries []*Entry) {
+				t.Helper()
+				var found bool
+				for _, e := range entries {
+					if e.PathError != nil {
+						found = true
+					}
+				}
+				require.True(t, found, "expected at least one entry with PathError from group error")
+			},
+		},
+		{
+			title:        "rule owner override",
+			reportedPath: "rules.yml",
+			sourcePath:   "rules.yml",
+			sourceFunc: func(_ *testing.T) io.Reader {
+				return bytes.NewBufferString("# pint file/owner alice\n\n- record: foo\n  # pint rule/owner bob\n  expr: sum(foo)\n")
+			},
+			check: func(t *testing.T, entries []*Entry) {
+				t.Helper()
+				require.Len(t, entries, 1)
+				require.Equal(t, "bob", entries[0].Owner)
+			},
+		},
 	}
 
 	for _, tc := range testCases {
@@ -348,19 +392,150 @@ groups:
 			func(t *testing.T) {
 				r := tc.sourceFunc(t)
 				p := parser.NewParser(parser.DefaultOptions.WithStrict(tc.isStrict))
-				entries := readRules(tc.reportedPath, tc.sourcePath, r, p, nil)
-				expected, err := json.MarshalIndent(tc.entries, "", "  ")
-				require.NoError(t, err, "json(expected)")
-				got, err := json.MarshalIndent(entries, "", "  ")
-				require.NoError(t, err, "json(got)")
-				require.Equal(t, string(expected), string(got))
+				entries := readRules(tc.reportedPath, tc.sourcePath, r, p, tc.allowedOwners, nil)
+				if tc.check != nil {
+					tc.check(t, entries)
+				} else {
+					expected, err := json.MarshalIndent(tc.entries, "", "  ")
+					require.NoError(t, err, "json(expected)")
+					got, err := json.MarshalIndent(entries, "", "  ")
+					require.NoError(t, err, "json(got)")
+					require.Equal(t, string(expected), string(got))
+				}
 			})
 	}
 }
 
-func TestChangeTypeStringDefault(t *testing.T) {
-	c := ChangeType(255)
-	require.Equal(t, "---", c.String())
+func TestIsValidOwner(t *testing.T) {
+	type testCaseT struct {
+		name     string
+		owner    string
+		valid    []*regexp.Regexp
+		expected bool
+	}
+
+	testCases := []testCaseT{
+		{
+			name:     "no restrictions",
+			owner:    "anyone",
+			expected: true,
+		},
+		{
+			name:     "matching owner",
+			owner:    "team-sre",
+			valid:    []*regexp.Regexp{regexp.MustCompile("^team-")},
+			expected: true,
+		},
+		{
+			name:     "non-matching owner",
+			owner:    "bob",
+			valid:    []*regexp.Regexp{regexp.MustCompile("^team-")},
+			expected: false,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			require.Equal(t, tc.expected, isValidOwner(tc.owner, tc.valid))
+		})
+	}
+}
+
+func TestEntryLabels(t *testing.T) {
+	makeKey := func() *parser.YamlNode {
+		return &parser.YamlNode{Value: "labels"}
+	}
+	makeItems := func(keys ...string) []*parser.YamlKeyValue {
+		items := make([]*parser.YamlKeyValue, len(keys))
+		for i, k := range keys {
+			items[i] = &parser.YamlKeyValue{
+				Key:   &parser.YamlNode{Value: k},
+				Value: &parser.YamlNode{Value: "v"},
+			}
+		}
+		return items
+	}
+
+	type testCaseT struct {
+		name     string
+		entry    Entry
+		expected int
+	}
+
+	testCases := []testCaseT{
+		{
+			name:     "empty entry",
+			entry:    Entry{},
+			expected: 0,
+		},
+		{
+			name: "alerting rule labels only",
+			entry: Entry{
+				Rule: parser.Rule{
+					AlertingRule: &parser.AlertingRule{
+						Labels: &parser.YamlMap{Key: makeKey(), Items: makeItems("severity")},
+					},
+				},
+			},
+			expected: 1,
+		},
+		{
+			name: "alerting rule labels with group",
+			entry: Entry{
+				Rule: parser.Rule{
+					AlertingRule: &parser.AlertingRule{
+						Labels: &parser.YamlMap{Key: makeKey(), Items: makeItems("severity")},
+					},
+				},
+				Group: &parser.Group{
+					Labels: &parser.YamlMap{Key: makeKey(), Items: makeItems("env")},
+				},
+			},
+			expected: 2,
+		},
+		{
+			name: "recording rule labels only",
+			entry: Entry{
+				Rule: parser.Rule{
+					RecordingRule: &parser.RecordingRule{
+						Labels: &parser.YamlMap{Key: makeKey(), Items: makeItems("job")},
+					},
+				},
+			},
+			expected: 1,
+		},
+		{
+			name: "recording rule labels with group",
+			entry: Entry{
+				Rule: parser.Rule{
+					RecordingRule: &parser.RecordingRule{
+						Labels: &parser.YamlMap{Key: makeKey(), Items: makeItems("job")},
+					},
+				},
+				Group: &parser.Group{
+					Labels: &parser.YamlMap{Key: makeKey(), Items: makeItems("env")},
+				},
+			},
+			expected: 2,
+		},
+		{
+			name: "group labels only",
+			entry: Entry{
+				Rule: parser.Rule{},
+				Group: &parser.Group{
+					Labels: &parser.YamlMap{Key: makeKey(), Items: makeItems("env")},
+				},
+			},
+			expected: 1,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			ym := tc.entry.Labels()
+			require.Len(t, ym.Items, tc.expected)
+		})
+	}
 }
 
 func TestPathString(t *testing.T) {
@@ -432,10 +607,11 @@ func TestFindSymlinks(t *testing.T) {
 
 func TestAddSymlinkedEntries(t *testing.T) {
 	testCases := []struct {
-		setup   func(t *testing.T)
-		title   string
-		err     string
-		entries []*Entry
+		setup     func(t *testing.T)
+		title     string
+		err       string
+		entries   []*Entry
+		resultLen int
 	}{
 		{
 			title: "error from findSymlinks",
@@ -485,6 +661,21 @@ func TestAddSymlinkedEntries(t *testing.T) {
 				},
 			},
 		},
+		{
+			title: "symlink matches entry",
+			setup: func(t *testing.T) {
+				require.NoError(t, os.WriteFile("real.yml", []byte("test"), 0o644))
+				require.NoError(t, os.Symlink("real.yml", "link.yml"))
+			},
+			entries: []*Entry{
+				{
+					State: Noop,
+					Path:  Path{Name: "real.yml", SymlinkTarget: "real.yml"},
+					Owner: "alice",
+				},
+			},
+			resultLen: 1,
+		},
 	}
 
 	for _, tc := range testCases {
@@ -499,7 +690,7 @@ func TestAddSymlinkedEntries(t *testing.T) {
 				require.EqualError(t, err, tc.err)
 			} else {
 				require.NoError(t, err)
-				require.Empty(t, result)
+				require.Len(t, result, tc.resultLen)
 			}
 		})
 	}
