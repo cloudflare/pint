@@ -273,7 +273,8 @@ func (c CostCheck) suggestRecordingRules(
 					}
 
 					sq := c.rewriteRuleFragment(expr.Value.Value, op.PositionRange(), other.Rule.RecordingRule.Record.Value+extra)
-					slog.LogAttrs(ctx, slog.LevelDebug, "Found a possible replacement",
+					slog.LogAttrs(
+						ctx, slog.LevelDebug, "Found a possible replacement",
 						slog.String("original", source.GetQueryFragment(expr.Value.Value, s.Position)),
 						slog.String("replacement", other.Rule.RecordingRule.Record.Value+extra),
 					)

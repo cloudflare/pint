@@ -2,71 +2,76 @@ package discovery
 
 import (
 	"context"
-	"fmt"
 	"io/fs"
 	"log/slog"
-	"os"
 	"path/filepath"
 )
 
 type symlink struct {
+	err  error
 	from string
 	to   string
 }
 
-func findSymlinks() (slinks []symlink, err error) {
-	err = filepath.WalkDir(".",
+func findSymlinks() []symlink {
+	var slinks []symlink
+	_ = filepath.WalkDir(".",
 		func(path string, d fs.DirEntry, err error) error {
 			if err != nil {
-				return err
+				slinks = append(slinks, symlink{from: path, to: "", err: err})
+				return nil
 			}
 
 			if d.Type() != fs.ModeSymlink {
 				return nil
 			}
 
-			dest, err := filepath.EvalSymlinks(path)
+			dest, info, err := resolveFileInfo(path, path)
 			if err != nil {
-				return fmt.Errorf("%s is a symlink but target file cannot be evaluated: %w", path, err)
-			}
-
-			info, err := os.Stat(dest)
-			if err != nil {
-				return fmt.Errorf("%s is a symlink but target file cannot be read: %w", path, err)
+				slinks = append(slinks, symlink{from: path, to: "", err: err})
+				return nil
 			}
 
 			if !info.IsDir() {
-				slinks = append(slinks, symlink{from: path, to: dest})
+				slinks = append(slinks, symlink{from: path, to: dest, err: nil})
 			}
 
 			return nil
 		})
 
-	return slinks, err
+	return slinks
 }
 
-func addSymlinkedEntries(entries []*Entry) ([]*Entry, error) {
-	slinks, err := findSymlinks()
-	if err != nil {
-		return nil, err
-	}
+func addSymlinkedEntries(entries []*Entry) []*Entry {
+	slinks := findSymlinks()
 
 	nentries := []*Entry{}
-	for _, entry := range entries {
-		if entry.State == Removed {
+	for _, sl := range slinks {
+		// Broken symlink or unreadable target, report as a file error.
+		if sl.err != nil {
+			nentries = append(nentries, &Entry{
+				State: Modified,
+				Path: Path{
+					Name:          sl.from,
+					SymlinkTarget: sl.from,
+				},
+				PathError: sl.err,
+			})
 			continue
 		}
-		if entry.PathError != nil {
-			continue
-		}
-		if entry.Rule.Error.Err != nil {
-			continue
-		}
-		if entry.Path.Name != entry.Path.SymlinkTarget {
-			continue
-		}
-
-		for _, sl := range slinks {
+		for _, entry := range entries {
+			if entry.State == Removed {
+				continue
+			}
+			if entry.PathError != nil {
+				continue
+			}
+			if entry.Rule.Error.Err != nil {
+				continue
+			}
+			if entry.Path.Name != entry.Path.SymlinkTarget {
+				continue
+			}
 			if sl.to == entry.Path.Name {
 				slog.LogAttrs(context.Background(), slog.LevelDebug, "Found a symlink", slog.String("to", sl.to), slog.String("from", sl.from))
 				nentries = append(nentries, &Entry{
@@ -84,5 +89,5 @@ func addSymlinkedEntries(entries []*Entry) ([]*Entry, error) {
 		}
 	}
 
-	return nentries, nil
+	return nentries
 }

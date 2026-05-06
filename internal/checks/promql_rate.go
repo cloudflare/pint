@@ -205,7 +205,8 @@ func (c RateCheck) checkNode(ctx context.Context, rule parser.Rule, expr *parser
 										"You can only calculate `rate()` directly from a counter metric. "+
 											"Calling `rate()` on `%s()` results will return bogus results because `%s()` will hide information on when each counter resets. "+
 											"You must first calculate `rate()` before calling any aggregation function. Always `sum(rate(counter))`, never `rate(sum(counter))`",
-										src.Operation(), src.Operation()),
+										src.Operation(), src.Operation(),
+									),
 									Severity: severity,
 									Diagnostics: []diags.Diagnostic{
 										{

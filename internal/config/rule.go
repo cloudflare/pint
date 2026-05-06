@@ -166,7 +166,8 @@ func matchesTag(comment, name string, tags []string) bool {
 func isDisabledForRule(rule parser.Rule, name string, check checks.RuleChecker, promTags []string) bool {
 	for _, disable := range comments.Only[comments.Disable](rule.Comments, comments.DisableType) {
 		if disable.Match == name || disable.Match == check.String() || matchesTag(disable.Match, name, promTags) {
-			slog.LogAttrs(context.Background(), slog.LevelDebug,
+			slog.LogAttrs(
+				context.Background(), slog.LevelDebug,
 				"Check disabled by comment",
 				slog.String("check", check.String()),
 				slog.String("match", disable.Match),
@@ -179,7 +180,8 @@ func isDisabledForRule(rule parser.Rule, name string, check checks.RuleChecker, 
 			continue
 		}
 		if snooze.Match == name || snooze.Match == check.String() || matchesTag(snooze.Match, name, promTags) {
-			slog.LogAttrs(context.Background(), slog.LevelDebug,
+			slog.LogAttrs(
+				context.Background(), slog.LevelDebug,
 				"Check snoozed by comment",
 				slog.String("check", check.String()),
 				slog.String("match", snooze.Match),

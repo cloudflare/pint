@@ -185,7 +185,8 @@ func (prom *Prometheus) Close() {
 }
 
 func (prom *Prometheus) StartWorkers() {
-	slog.LogAttrs(context.Background(), slog.LevelDebug,
+	slog.LogAttrs(
+		context.Background(), slog.LevelDebug,
 		"Starting query workers",
 		slog.String("name", prom.name),
 		slog.String("uri", prom.safeURI),
@@ -265,7 +266,8 @@ func processJob(prom *Prometheus, job queryRequest) queryResult {
 		prometheusQueryErrorsTotal.WithLabelValues(prom.name, job.query.Endpoint(), errReason(result.err)).Inc()
 		if isUnsupportedError(result.err) {
 			prom.apis.disable(job.query.Endpoint())
-			slog.LogAttrs(context.Background(), slog.LevelWarn,
+			slog.LogAttrs(
+				context.Background(), slog.LevelWarn,
 				"Looks like this server doesn't support some Prometheus API endpoints, all checks using this API will be disabled",
 				slog.String("name", prom.name),
 				slog.String("uri", prom.safeURI),
@@ -273,7 +275,8 @@ func processJob(prom *Prometheus, job queryRequest) queryResult {
 			)
 			return queryResult{err: ErrUnsupported} // nolint: exhaustruct
 		}
-		slog.LogAttrs(context.Background(), slog.LevelError,
+		slog.LogAttrs(
+			context.Background(), slog.LevelError,
 			"Query returned an error",
 			slog.Any("err", result.err),
 			slog.String("uri", prom.safeURI),

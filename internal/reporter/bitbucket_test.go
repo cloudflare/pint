@@ -2033,7 +2033,8 @@ func TestBitBucketReporter(t *testing.T) {
 				"repo",
 				50,
 				tc.showDuplicates,
-				tc.gitCmd)
+				tc.gitCmd,
+			)
 			summary := reporter.NewSummary(tc.reports)
 			err := r.Submit(t.Context(), summary)
 

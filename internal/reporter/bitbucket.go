@@ -18,7 +18,8 @@ const (
 )
 
 func NewBitBucketReporter(version, uri string, timeout time.Duration, token, project, repo string, maxComments int, showDuplicates bool, gitCmd git.CommandRunner) BitBucketReporter {
-	slog.LogAttrs(context.Background(), slog.LevelInfo,
+	slog.LogAttrs(
+		context.Background(), slog.LevelInfo,
 		"Will report problems to BitBucket",
 		slog.String("uri", uri),
 		slog.String("timeout", output.HumanizeDuration(timeout)),
@@ -65,7 +66,8 @@ func (bb BitBucketReporter) Submit(ctx context.Context, summary Summary) (err er
 	}
 
 	if pr != nil {
-		slog.LogAttrs(ctx, slog.LevelInfo,
+		slog.LogAttrs(
+			ctx, slog.LevelInfo,
 			"Found open pull request, reporting problems using comments",
 			slog.Int("id", pr.ID),
 			slog.String("srcBranch", pr.srcBranch),
@@ -91,7 +93,8 @@ func (bb BitBucketReporter) Submit(ctx context.Context, summary Summary) (err er
 		slog.LogAttrs(ctx, slog.LevelInfo, "Generated comments to add to BitBucket", slog.Int("count", len(pendingComments)))
 
 		pendingComments = bb.api.limitComments(pendingComments)
-		slog.LogAttrs(ctx, slog.LevelInfo, "Will add comments to BitBucket",
+		slog.LogAttrs(
+			ctx, slog.LevelInfo, "Will add comments to BitBucket",
 			slog.Int("count", len(pendingComments)),
 			slog.Int("limit", bb.api.maxComments),
 		)
@@ -105,7 +108,8 @@ func (bb BitBucketReporter) Submit(ctx context.Context, summary Summary) (err er
 		}
 
 	} else {
-		slog.LogAttrs(ctx, slog.LevelInfo,
+		slog.LogAttrs(
+			ctx, slog.LevelInfo,
 			"No open pull request found, reporting problems using code insight annotations",
 			slog.String("branch", headBranch),
 			slog.String("commit", headCommit),

@@ -11,6 +11,9 @@ Prometheus rules to check doesn't parse as valid [YAML](https://yaml.org/),
 meaning that pint is unable to read any rules from that file or when
 some fields are using the wrong type.
 
+This check will also report errors for files that cannot be read at all,
+for example broken symlinks or files with insufficient permissions.
+
 This includes basic YAML parser checks but will also fail if a rule
 block contains duplicate keys, example:
 

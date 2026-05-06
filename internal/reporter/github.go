@@ -74,7 +74,8 @@ func NewGithubReporter(
 	headCommit string,
 	showDuplicates bool,
 ) (_ GithubReporter, err error) {
-	slog.LogAttrs(ctx, slog.LevelInfo,
+	slog.LogAttrs(
+		ctx, slog.LevelInfo,
 		"Will report problems to GitHub",
 		slog.String("baseURL", baseURL),
 		slog.String("uploadURL", uploadURL),
@@ -201,7 +202,8 @@ func (gr GithubReporter) Create(ctx context.Context, _ any, p PendingComment) er
 		Side:     new(side),
 	}
 
-	slog.LogAttrs(ctx, slog.LevelDebug, "Creating a pr comment",
+	slog.LogAttrs(
+		ctx, slog.LevelDebug, "Creating a pr comment",
 		slog.String("commit", comment.GetCommitID()),
 		slog.String("path", comment.GetPath()),
 		slog.Int("line", comment.GetLine()),
@@ -285,7 +287,8 @@ func (gr GithubReporter) createReview(ctx context.Context, summary Summary) erro
 		Body:     new(formatGHReviewBody(ctx, gr.version, summary, gr.showDuplicates)),
 		Event:    new("COMMENT"),
 	}
-	slog.LogAttrs(ctx, slog.LevelDebug, "Creating a review",
+	slog.LogAttrs(
+		ctx, slog.LevelDebug, "Creating a review",
 		slog.String("commit", review.GetCommitID()),
 		slog.String("body", review.GetBody()),
 	)

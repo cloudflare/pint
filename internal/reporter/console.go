@@ -46,10 +46,7 @@ func (cr ConsoleReporter) Submit(ctx context.Context, summary Summary) (err erro
 				continue
 			}
 			if content == "" && report.Problem.Anchor == checks.AnchorAfter {
-				content, err = readFile(report.Path.Name)
-				if err != nil {
-					return err
-				}
+				content, _ = readFile(report.Path.Name)
 			}
 			buf.Reset()
 
@@ -88,25 +85,28 @@ func (cr ConsoleReporter) Submit(ctx context.Context, summary Summary) (err erro
 			}
 			buf.WriteRune('\n')
 
-			if report.Problem.Anchor == checks.AnchorAfter {
-				if len(report.Problem.Diagnostics) > 0 {
-					body := diags.InjectDiagnostics(
-						content,
-						report.Problem.Diagnostics,
-						color,
-					)
-					buf.WriteString(output.MaybeColor(output.White, cr.noColor, body))
-				} else {
-					digits := countDigits(report.Problem.Lines.Last) + 1
-					lines := strings.Split(content, "\n")
-					nrFmt := fmt.Sprintf("%%%dd", digits)
-					for i := report.Problem.Lines.First; i <= report.Problem.Lines.Last; i++ {
-						buf.WriteString(output.MaybeColor(output.White, cr.noColor, fmt.Sprintf(nrFmt+" | %s\n", i, lines[i-1])))
-					}
-					buf.WriteString(strings.Repeat(" ", digits+3))
-					buf.WriteString(output.MaybeColor(color, cr.noColor, "^^^ "+report.Problem.Summary))
-					buf.WriteRune('\n')
+			switch {
+			case report.Problem.Anchor != checks.AnchorAfter:
+			case content != "" && len(report.Problem.Diagnostics) > 0:
+				body := diags.InjectDiagnostics(
+					content,
+					report.Problem.Diagnostics,
+					color,
+				)
+				buf.WriteString(output.MaybeColor(output.White, cr.noColor, body))
+			case content != "":
+				digits := countDigits(report.Problem.Lines.Last) + 1
+				lines := strings.Split(content, "\n")
+				nrFmt := fmt.Sprintf("%%%dd", digits)
+				for i := report.Problem.Lines.First; i <= report.Problem.Lines.Last; i++ {
+					buf.WriteString(output.MaybeColor(output.White, cr.noColor, fmt.Sprintf(nrFmt+" | %s\n", i, lines[i-1])))
 				}
+				buf.WriteString(strings.Repeat(" ", digits+3))
+				buf.WriteString(output.MaybeColor(color, cr.noColor, "^^^ "+report.Problem.Summary))
+				buf.WriteRune('\n')
+			case report.Problem.Details != "":
+				buf.WriteString(output.MaybeColor(color, cr.noColor, "       ^^^ "+report.Problem.Details))
+				buf.WriteRune('\n')
 			}
 
 			fmt.Fprintln(cr.output, buf.String())
@@ -114,7 +114,8 @@ func (cr ConsoleReporter) Submit(ctx context.Context, summary Summary) (err erro
 	}
 
 	if hiddenDupes > 0 {
-		slog.LogAttrs(ctx, slog.LevelInfo,
+		slog.LogAttrs(
+			ctx, slog.LevelInfo,
 			"Some problems are duplicated between rules and all the duplicates were hidden, pass `--show-duplicates` to see them",
 			slog.Int("total", allReports),
 			slog.Int("duplicates", hiddenDupes),

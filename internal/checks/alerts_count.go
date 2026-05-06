@@ -111,7 +111,8 @@ func (c AlertsCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*dis
 	}
 
 	delta := qr.Series.Until.Sub(qr.Series.From).Round(time.Minute)
-	details := fmt.Sprintf(`To get a preview of the alerts that would fire please [click here](%s/graph?g0.expr=%s&g0.tab=0&g0.range_input=%s).`,
+	details := fmt.Sprintf(
+		`To get a preview of the alerts that would fire please [click here](%s/graph?g0.expr=%s&g0.tab=0&g0.range_input=%s).`,
 		qr.URI, url.QueryEscape(entry.Rule.AlertingRule.Expr.Value.Value), output.HumanizeDuration(delta),
 	)
 	if c.comment != "" {

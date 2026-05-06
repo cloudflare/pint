@@ -6821,7 +6821,8 @@ data:
 			p := parser.NewParser(parser.Options{IsStrict: tc.strict, Schema: tc.schema, Names: tc.names})
 			file := p.Parse(bytes.NewReader(tc.input))
 
-			if diff := cmp.Diff(tc.output, file,
+			if diff := cmp.Diff(
+				tc.output, file,
 				ignorePrometheusExpr,
 				sameErrorText,
 				cmpopts.IgnoreUnexported(parser.PromQLExpr{}),

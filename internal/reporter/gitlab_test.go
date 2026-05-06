@@ -190,7 +190,8 @@ func TestGitLabReporter(t *testing.T) {
 ------
 
 :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/a.html).
-`, reporter, summary, yml, diag, details))
+`, reporter, summary, yml, diag, details,
+		))
 	}
 	discPosition := func(path string, line int64) *gitlab.PositionOptions {
 		return new(gitlab.PositionOptions{
@@ -1234,7 +1235,8 @@ func TestGitLabReporterCommentLine(t *testing.T) {
 			slog.SetDefault(slogt.New(t))
 
 			srv := httptest.NewServer(getHTTPHandlerForCommentingLines(
-				tc.expectedNewLine, tc.expectedOldLine, t))
+				tc.expectedNewLine, tc.expectedOldLine, t,
+			))
 			t.Cleanup(srv.Close)
 
 			r, err := reporter.NewGitLabReporter(

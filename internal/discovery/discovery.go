@@ -150,7 +150,8 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 			if !slices.Contains(disabledChecks, snooze.Match) {
 				disabledChecks = append(disabledChecks, snooze.Match)
 			}
-			slog.LogAttrs(context.Background(), slog.LevelDebug,
+			slog.LogAttrs(
+				context.Background(), slog.LevelDebug,
 				"Check snoozed by comment",
 				slog.String("check", snooze.Match),
 				slog.String("match", snooze.Match),
@@ -187,7 +188,8 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 	}
 
 	if file.Error.Err != nil {
-		slog.LogAttrs(context.Background(), slog.LevelWarn,
+		slog.LogAttrs(
+			context.Background(), slog.LevelWarn,
 			"Failed to parse file content",
 			slog.Any("err", file.Error.Err),
 			slog.String("path", sourcePath),
@@ -208,7 +210,8 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 
 	for _, group := range file.Groups {
 		if group.Error.Err != nil {
-			slog.LogAttrs(context.Background(), slog.LevelWarn,
+			slog.LogAttrs(
+				context.Background(), slog.LevelWarn,
 				"Failed to parse group entry",
 				slog.Any("err", group.Error.Err),
 				slog.String("path", sourcePath),

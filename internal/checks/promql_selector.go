@@ -138,7 +138,8 @@ func (c SelectorCheck) checkSource(keyRe, callRe *regexp.Regexp, s source.Source
 					LastColumn:  int(vs.PosRange.End),
 					Message: fmt.Sprintf(
 						"%s must specify `%s` label. Please add a `{%s=\"...\"} matcher.",
-						prefix, c.requiredName, c.requiredName),
+						prefix, c.requiredName, c.requiredName,
+					),
 					Kind: diags.Issue,
 				},
 			},

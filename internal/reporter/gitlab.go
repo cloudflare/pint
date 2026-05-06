@@ -77,7 +77,8 @@ type GitLabReporter struct {
 }
 
 func NewGitLabReporter(version, branch, uri string, timeout time.Duration, token string, project int64, maxComments int) (_ GitLabReporter, err error) {
-	slog.LogAttrs(context.Background(), slog.LevelInfo,
+	slog.LogAttrs(
+		context.Background(), slog.LevelInfo,
 		"Will report problems to GitLab",
 		slog.String("uri", uri),
 		slog.String("timeout", output.HumanizeDuration(timeout)),
@@ -195,7 +196,8 @@ func (gl GitLabReporter) List(_ context.Context, dst any) ([]ExistingComment, er
 func (gl GitLabReporter) Create(ctx context.Context, dst any, comment PendingComment) error {
 	unresolved, err := gl.unresolveIfPresent(ctx, dst, comment)
 	if err != nil {
-		slog.LogAttrs(ctx, slog.LevelWarn, "Failed to un-resolved existing comment, will create a new one",
+		slog.LogAttrs(
+			ctx, slog.LevelWarn, "Failed to un-resolved existing comment, will create a new one",
 			slog.String("path", comment.path),
 			slog.Int("line", comment.line),
 			slog.Any("err", err),
@@ -218,7 +220,8 @@ func (gl GitLabReporter) Create(ctx context.Context, dst any, comment PendingCom
 func (gl GitLabReporter) Delete(ctx context.Context, dst any, comment ExistingComment) error {
 	mr := dst.(gitlabMR)
 	c := comment.meta.(gitlabComment)
-	slog.LogAttrs(ctx, slog.LevelDebug, "Deleting stale merge request discussion note",
+	slog.LogAttrs(
+		ctx, slog.LevelDebug, "Deleting stale merge request discussion note",
 		slog.String("discussion", c.discussionID),
 		slog.Int64("note", c.noteID),
 	)
@@ -388,7 +391,8 @@ func (gl GitLabReporter) unresolveIfPresent(ctx context.Context, dst any, commen
 			c = gl.noteToExisting(disc.ID, note)
 			if gl.IsEqual(dst, c, comment) {
 				meta := c.meta.(gitlabComment)
-				slog.LogAttrs(ctx, slog.LevelDebug, "Un-resolving merge request discussion note",
+				slog.LogAttrs(
+					ctx, slog.LevelDebug, "Un-resolving merge request discussion note",
 					slog.String("discussion", meta.discussionID),
 					slog.Int64("note", meta.noteID),
 				)

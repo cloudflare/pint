@@ -3,6 +3,8 @@ package checks_test
 import (
 	"context"
 	"errors"
+	"fmt"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -204,6 +206,23 @@ If this file is a template that will be rendered into valid YAML then you can in
 							LastColumn:  7,
 						},
 					},
+				},
+			},
+		},
+		{
+			// File-level error with no rule parse error, e.g. broken symlink or permission denied.
+			description: "file level error without rule error",
+			entry: &discovery.Entry{
+				PathError: fmt.Errorf("this is a symlink but target cannot be evaluated: %w", os.ErrNotExist),
+			},
+			problems: []checks.Problem{
+				{
+					Reporter: "yaml/parse",
+					Summary:  "cannot read file",
+					Details:  "this is a symlink but target cannot be evaluated: file does not exist",
+					Lines:    diags.LineRange{First: 1, Last: 1},
+					Severity: checks.Fatal,
+					Anchor:   checks.AnchorAfter,
 				},
 			},
 		},

@@ -121,7 +121,8 @@ type instantQuery struct {
 }
 
 func (q instantQuery) Run() queryResult {
-	slog.LogAttrs(q.ctx, slog.LevelDebug,
+	slog.LogAttrs(
+		q.ctx, slog.LevelDebug,
 		"Running prometheus query",
 		slog.String("uri", q.prom.safeURI),
 		slog.String("query", q.expr),

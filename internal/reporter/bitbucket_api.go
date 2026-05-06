@@ -312,7 +312,8 @@ func (bb bitBucketAPI) request(method, path string, body io.Reader) ([]byte, err
 	slog.LogAttrs(context.Background(), slog.LevelInfo, "BitBucket request completed", slog.Int("status", resp.StatusCode))
 	slog.LogAttrs(context.Background(), slog.LevelDebug, "BitBucket response body", slog.Int("code", resp.StatusCode), slog.String("body", string(data)))
 	if resp.StatusCode >= 300 {
-		slog.LogAttrs(context.Background(), slog.LevelError,
+		slog.LogAttrs(
+			context.Background(), slog.LevelError,
 			"Got a non 2xx response",
 			slog.String("body", string(data)),
 			slog.String("path", path),
@@ -719,7 +720,8 @@ func (bb bitBucketAPI) limitComments(src []BitBucketPendingComment) []BitBucketP
 
 func (bb bitBucketAPI) pruneComments(pr *bitBucketPR, currentComments []bitBucketComment, pendingComments []BitBucketPendingComment) {
 	for _, cur := range currentComments {
-		slog.LogAttrs(context.Background(), slog.LevelDebug,
+		slog.LogAttrs(
+			context.Background(), slog.LevelDebug,
 			"Existing comment",
 			slog.Int("id", cur.id),
 			slog.Int("version", cur.version),
@@ -756,7 +758,8 @@ func (bb bitBucketAPI) pruneComments(pr *bitBucketPR, currentComments []bitBucke
 }
 
 func (bb bitBucketAPI) deleteComment(pr *bitBucketPR, cur bitBucketComment) {
-	slog.LogAttrs(context.Background(), slog.LevelDebug,
+	slog.LogAttrs(
+		context.Background(), slog.LevelDebug,
 		"Deleting stale comment",
 		slog.Int("id", cur.id),
 		slog.String("path", cur.anchor.Path),
@@ -764,7 +767,8 @@ func (bb bitBucketAPI) deleteComment(pr *bitBucketPR, cur bitBucketComment) {
 	)
 	_, err := bb.request(
 		http.MethodDelete,
-		fmt.Sprintf("/rest/api/1.0/projects/%s/repos/%s/pull-requests/%d/comments/%d?version=%d",
+		fmt.Sprintf(
+			"/rest/api/1.0/projects/%s/repos/%s/pull-requests/%d/comments/%d?version=%d",
 			bb.project, bb.repo,
 			pr.ID,
 			cur.id, cur.version,
@@ -772,7 +776,8 @@ func (bb bitBucketAPI) deleteComment(pr *bitBucketPR, cur bitBucketComment) {
 		nil,
 	)
 	if err != nil {
-		slog.LogAttrs(context.Background(), slog.LevelError,
+		slog.LogAttrs(
+			context.Background(), slog.LevelError,
 			"Failed to delete stale BitBucket pull request comment",
 			slog.Int("id", cur.id),
 			slog.Any("err", err),
@@ -781,7 +786,8 @@ func (bb bitBucketAPI) deleteComment(pr *bitBucketPR, cur bitBucketComment) {
 }
 
 func (bb bitBucketAPI) resolveTask(pr *bitBucketPR, cur bitBucketComment) {
-	slog.LogAttrs(context.Background(), slog.LevelDebug,
+	slog.LogAttrs(
+		context.Background(), slog.LevelDebug,
 		"Resolving stale blocker comment",
 		slog.Int("id", cur.id),
 		slog.String("path", cur.anchor.Path),
@@ -793,7 +799,8 @@ func (bb bitBucketAPI) resolveTask(pr *bitBucketPR, cur bitBucketComment) {
 	})
 	_, err := bb.request(
 		http.MethodPut,
-		fmt.Sprintf("/rest/api/1.0/projects/%s/repos/%s/pull-requests/%d/comments/%d",
+		fmt.Sprintf(
+			"/rest/api/1.0/projects/%s/repos/%s/pull-requests/%d/comments/%d",
 			bb.project, bb.repo,
 			pr.ID,
 			cur.id,
@@ -801,7 +808,8 @@ func (bb bitBucketAPI) resolveTask(pr *bitBucketPR, cur bitBucketComment) {
 		bytes.NewReader(payload),
 	)
 	if err != nil {
-		slog.LogAttrs(context.Background(), slog.LevelError,
+		slog.LogAttrs(
+			context.Background(), slog.LevelError,
 			"Failed to resolve stale blocker BitBucket pull request comment",
 			slog.Int("id", cur.id),
 			slog.Any("err", err),
@@ -810,7 +818,8 @@ func (bb bitBucketAPI) resolveTask(pr *bitBucketPR, cur bitBucketComment) {
 }
 
 func (bb bitBucketAPI) updateSeverity(pr *bitBucketPR, cur bitBucketComment, severity string) {
-	slog.LogAttrs(context.Background(), slog.LevelDebug,
+	slog.LogAttrs(
+		context.Background(), slog.LevelDebug,
 		"Updating comment severity",
 		slog.Int("id", cur.id),
 		slog.String("path", cur.anchor.Path),
@@ -824,7 +833,8 @@ func (bb bitBucketAPI) updateSeverity(pr *bitBucketPR, cur bitBucketComment, sev
 	})
 	_, err := bb.request(
 		http.MethodPut,
-		fmt.Sprintf("/rest/api/1.0/projects/%s/repos/%s/pull-requests/%d/comments/%d",
+		fmt.Sprintf(
+			"/rest/api/1.0/projects/%s/repos/%s/pull-requests/%d/comments/%d",
 			bb.project, bb.repo,
 			pr.ID,
 			cur.id,
@@ -832,7 +842,8 @@ func (bb bitBucketAPI) updateSeverity(pr *bitBucketPR, cur bitBucketComment, sev
 		bytes.NewReader(payload),
 	)
 	if err != nil {
-		slog.LogAttrs(context.Background(), slog.LevelError,
+		slog.LogAttrs(
+			context.Background(), slog.LevelError,
 			"Failed to update BitBucket pull request comment severity",
 			slog.Int("id", cur.id),
 			slog.Any("err", err),
@@ -853,7 +864,8 @@ func (bb bitBucketAPI) addComments(pr *bitBucketPR, currentComments []bitBucketC
 			}
 		}
 		if add {
-			slog.LogAttrs(context.Background(), slog.LevelDebug,
+			slog.LogAttrs(
+				context.Background(), slog.LevelDebug,
 				"Adding missing comment",
 				slog.String("path", pend.Anchor.Path),
 				slog.Int("line", pend.Anchor.Line),
@@ -864,7 +876,8 @@ func (bb bitBucketAPI) addComments(pr *bitBucketPR, currentComments []bitBucketC
 			payload, _ := json.Marshal(pend)
 			_, err := bb.request(
 				http.MethodPost,
-				fmt.Sprintf("/rest/api/1.0/projects/%s/repos/%s/pull-requests/%d/comments",
+				fmt.Sprintf(
+					"/rest/api/1.0/projects/%s/repos/%s/pull-requests/%d/comments",
 					bb.project, bb.repo,
 					pr.ID,
 				),

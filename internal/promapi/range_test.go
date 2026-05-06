@@ -49,7 +49,8 @@ func (ar absoluteRange) String() string {
 		"%s-%s/%s",
 		ar.start.Format(time.RFC3339),
 		ar.end.Format(time.RFC3339),
-		output.HumanizeDuration(ar.step))
+		output.HumanizeDuration(ar.step),
+	)
 }
 
 func TestRange(t *testing.T) {
@@ -216,7 +217,8 @@ func TestRange(t *testing.T) {
 						for i := start; i < end; i += 300 {
 							values = append(values, fmt.Sprintf(`[%3f,"1"]`, i))
 						}
-						return fmt.Appendf(nil,
+						return fmt.Appendf(
+							nil,
 							`{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]},{"metric":{"instance":"2"}, "values":[%s]},{"metric":{"instance":"3"}, "values":[%s]}]}}`,
 							strings.Join(values, ","), strings.Join(values, ","), strings.Join(values, ","),
 						), nil
@@ -314,7 +316,8 @@ func TestRange(t *testing.T) {
 						for i := start; i < end; i += 60 {
 							values = append(values, fmt.Sprintf(`[%3f,"1"]`, i))
 						}
-						return fmt.Appendf(nil,
+						return fmt.Appendf(
+							nil,
 							`{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]}]}}`,
 							strings.Join(values, ","),
 						), nil
@@ -348,7 +351,8 @@ func TestRange(t *testing.T) {
 						for i := start; i < end; i += 300 {
 							values = append(values, fmt.Sprintf(`[%d,"1"]`, i))
 						}
-						return fmt.Appendf(nil,
+						return fmt.Appendf(
+							nil,
 							`{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]}]}}`,
 							strings.Join(values, ","),
 						), nil
@@ -374,7 +378,8 @@ func TestRange(t *testing.T) {
 						for i := start; i <= end; i += 300 {
 							values = append(values, fmt.Sprintf(`[%3f,"1"]`, i))
 						}
-						return fmt.Appendf(nil,
+						return fmt.Appendf(
+							nil,
 							`{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]}]}}`,
 							strings.Join(values, ","),
 						), nil
@@ -483,7 +488,8 @@ func TestRange(t *testing.T) {
 						for i := start; i < end; i += 60 {
 							values = append(values, fmt.Sprintf(`[%3f,"1"]`, i))
 						}
-						return fmt.Appendf(nil,
+						return fmt.Appendf(
+							nil,
 							`{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]}],"stats":{"timings":{"evalTotalTime":10.1,"resultSortTime":0.5,"queryPreparationTime":1.5,"innerEvalTime":0.7,"execQueueTime":0.01,"execTotalTime":5.1},"samples":{"totalQueryableSamples":1000,"peakSamples":500}}}}`,
 							strings.Join(values, ","),
 						), nil

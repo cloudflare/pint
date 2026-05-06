@@ -51,7 +51,8 @@ func (d checkstyleReport) MarshalXML(e *xml.Encoder, _ xml.StartElement) (err er
 						Value: reports[0].Path.Name,
 					},
 				},
-			}); err != nil {
+			},
+		); err != nil {
 			return err
 		}
 		for _, report := range reports {

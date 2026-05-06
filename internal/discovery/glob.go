@@ -41,7 +41,8 @@ func (f GlobFinder) Find() (entries []*Entry, err error) {
 
 		for _, path := range matches {
 			if path == ".git" && isDir(path) {
-				slog.LogAttrs(context.Background(), slog.LevelDebug,
+				slog.LogAttrs(
+					context.Background(), slog.LevelDebug,
 					"Excluding git directory from glob results",
 					slog.String("path", path),
 					slog.String("glob", p),
@@ -71,9 +72,29 @@ func (f GlobFinder) Find() (entries []*Entry, err error) {
 			continue
 		}
 
+		if fp.err != nil {
+			entries = append(entries, &Entry{
+				State: Noop,
+				Path: Path{
+					Name:          fp.path,
+					SymlinkTarget: fp.path,
+				},
+				PathError: fp.err,
+			})
+			continue
+		}
+
 		fd, err := os.Open(fp.path)
 		if err != nil {
-			return nil, err
+			entries = append(entries, &Entry{
+				State: Noop,
+				Path: Path{
+					Name:          fp.path,
+					SymlinkTarget: fp.path,
+				},
+				PathError: err,
+			})
+			continue
 		}
 		p := parser.NewParser(f.opts.WithStrict(!f.filter.IsRelaxed(fp.target)))
 		entries = append(entries, readRules(fp.target, fp.path, fd, p, f.allowedOwners, nil)...)
@@ -93,6 +114,7 @@ func isDir(path string) bool {
 }
 
 type filePath struct {
+	err    error
 	path   string
 	target string
 }
@@ -108,27 +130,46 @@ func (fps filePaths) hasPath(p string) bool {
 	return false
 }
 
-func findFiles(path string) (paths filePaths, err error) {
-	target, err := filepath.EvalSymlinks(path)
+// resolveFileInfo resolves symlinks and stats the given path.
+// Returns the resolved target path and file info.
+// statPath is the path to os.Stat — it can differ from the EvalSymlinks input
+// (e.g. walkDir stats the resolved dest, findFiles stats the original path).
+func resolveFileInfo(evalPath, statPath string) (target string, info os.FileInfo, err error) {
+	target, err = filepath.EvalSymlinks(evalPath)
 	if err != nil {
-		return nil, fmt.Errorf("%s is a symlink but target file cannot be evaluated: %w", path, err)
+		return "", nil, fmt.Errorf("this is a symlink but target file cannot be evaluated: %w", err)
 	}
 
-	s, err := os.Stat(path)
+	info, err = os.Stat(statPath)
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
+
+	return target, info, nil
+}
+
+func findFiles(path string) (filePaths, error) {
+	target, info, err := resolveFileInfo(path, path)
+	if err != nil {
+		return filePaths{{
+			err:    err,
+			path:   path,
+			target: "",
+		}}, nil
+	}
+
+	var paths filePaths
 
 	// nolint: exhaustive
 	switch {
-	case s.IsDir():
+	case info.IsDir():
 		subpaths, err := walkDir(path)
 		if err != nil {
 			return nil, err
 		}
 		paths = append(paths, subpaths...)
 	default:
-		paths = append(paths, filePath{path: path, target: target})
+		paths = append(paths, filePath{err: nil, path: path, target: target})
 	}
 
 	return paths, nil
@@ -141,29 +182,29 @@ func walkDir(dirname string) (paths filePaths, err error) {
 				return err
 			}
 
-			// nolint: exhaustive
-			switch d.Type() {
-			case fs.ModeDir:
+			// Skip directories - WalkDir recurses into them automatically.
+			if d.Type() == fs.ModeDir {
 				return nil
-			default:
-				dest, err := filepath.EvalSymlinks(path)
-				if err != nil {
-					return fmt.Errorf("%s is a symlink but target file cannot be evaluated: %w", path, err)
-				}
+			}
 
-				s, err := os.Stat(dest)
+			dest, info, err := resolveFileInfo(path, path)
+			if err != nil {
+				paths = append(paths, filePath{
+					err:    err,
+					path:   path,
+					target: "",
+				})
+				return nil
+			}
+			// Symlink pointing to a directory, recurse manually since WalkDir won't follow symlinks.
+			if info.IsDir() {
+				subpaths, err := findFiles(dest)
 				if err != nil {
 					return err
 				}
-				if s.IsDir() {
-					subpaths, err := findFiles(dest)
-					if err != nil {
-						return err
-					}
-					paths = append(paths, subpaths...)
-				} else {
-					paths = append(paths, filePath{path: path, target: dest})
-				}
+				paths = append(paths, subpaths...)
+			} else {
+				paths = append(paths, filePath{err: nil, path: path, target: dest})
 			}
 
 			return nil
