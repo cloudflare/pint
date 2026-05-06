@@ -72,7 +72,7 @@ func (r *ContentReader) readNextLine() (err error) {
 
 	r.lineno++
 	r.parseComments()
-	r.lines = append(r.lines, strings.TrimSuffix(string(r.buf), "\n"))
+	r.lines = append(r.lines, strings.TrimRight(string(r.buf), "\r\n"))
 	return err
 }
 
@@ -176,7 +176,7 @@ func (r *ContentReader) emptyCurrentLine(comments []comments.Comment) {
 		break
 	}
 	for i := range r.buf {
-		if r.buf[i] == '\n' {
+		if r.buf[i] == '\n' || r.buf[i] == '\r' {
 			continue
 		}
 		if i < offset || r.inBegin {

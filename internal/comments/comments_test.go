@@ -717,6 +717,58 @@ func TestParse(t *testing.T) {
 				},
 			},
 		},
+		// CRLF line endings must be handled the same as LF.
+		{
+			input: "# pint ignore/file\r\n",
+			output: []comments.Comment{
+				{Type: comments.IgnoreFileType},
+			},
+		},
+		{
+			input: "# pint file/owner bob\r\n",
+			output: []comments.Comment{
+				{
+					Type: comments.FileOwnerType,
+					Value: comments.Owner{
+						Name: "bob",
+						Line: 1,
+					},
+				},
+			},
+		},
+		{
+			input: "code # pint disable xxx\r\n # pint\tfile/owner bob\r\n",
+			output: []comments.Comment{
+				{
+					Type:   comments.DisableType,
+					Value:  comments.Disable{Match: "xxx"},
+					Offset: len("code "),
+				},
+				{
+					Type: comments.FileOwnerType,
+					Value: comments.Owner{
+						Name: "bob",
+						Line: 2,
+					},
+					Offset: 1,
+				},
+			},
+		},
+		{
+			input: "# pint rule/set promql/series(found)\r\n",
+			output: []comments.Comment{
+				{
+					Type:  comments.RuleSetType,
+					Value: comments.RuleSet{Value: "promql/series(found)"},
+				},
+			},
+		},
+		{
+			input: "# pint ignore/line\r",
+			output: []comments.Comment{
+				{Type: comments.IgnoreLineType},
+			},
+		},
 	}
 
 	for _, tc := range testCases {
