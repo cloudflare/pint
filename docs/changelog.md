@@ -9,6 +9,10 @@
 - Broken symlinks and unreadable files in the rules directory are now reported
   as [yaml/parse](checks/yaml/parse.md) problems instead of causing a fatal error.
 
+### Fixed
+
+- Fixed parser not handling `\r\n` line endings correctly.
+
 ## v0.80.0
 
 ### Added

@@ -296,6 +296,46 @@ func TestReadContent(t *testing.T) {
 			input:  []byte(strings.Repeat("A", 518)),
 			output: []byte(strings.Repeat("A", 518)),
 		},
+		// CRLF line endings must be handled the same as LF.
+		{
+			input:  []byte("foo bar\r\n"),
+			output: []byte("foo bar\r\n"),
+		},
+		{
+			input:  []byte("line1\r\nline2\r\n"),
+			output: []byte("line1\r\nline2\r\n"),
+		},
+		{
+			input:  []byte("# pint ignore/next-line\r\nfoo\r\n"),
+			output: []byte("# pint ignore/next-line\r\n   \r\n"),
+		},
+		{
+			input:  []byte("# pint ignore/next-line\r\nfoo\r\nbar\r\n"),
+			output: []byte("# pint ignore/next-line\r\n   \r\n" + "bar\r\n"),
+		},
+		{
+			input:  []byte("# pint ignore/begin\r\nfoo\r\nbar\r\n# pint ignore/end\r\n"),
+			output: []byte("# pint ignore/begin\r\n   \r\n   \r\n# pint ignore/end\r\n"),
+		},
+		{
+			input:  []byte("line1\r\nline2 # pint ignore/line\r\n"),
+			output: []byte("line1\r\n      # pint ignore/line\r\n"),
+		},
+		{
+			input:  []byte("# pint file/owner bob\r\n"),
+			output: []byte("# pint file/owner bob\r\n"),
+			comments: []comments.Comment{
+				{
+					Type:  comments.FileOwnerType,
+					Value: comments.Owner{Name: "bob", Line: 1},
+				},
+			},
+		},
+		{
+			input:   []byte("# pint ignore/file\r\nfoo\r\nbar\r\n"),
+			output:  []byte("# pint ignore/file\r\n   \r\n   \r\n"),
+			ignored: true,
+		},
 	}
 
 	cmpErrorText := cmp.Comparer(func(x, y any) bool {
