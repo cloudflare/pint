@@ -157,7 +157,8 @@ func (p *Parser) parseNode(node, parent *yaml.Node, group *Group, offsetLine, of
 			// Then we need to get the offset of `groups` inside the FILE, not inside the YAML node value.
 			// Right now we read the line where it's in the file and count leading spaces.
 			if err := yaml.Unmarshal([]byte(node.Value), &n); err == nil {
-				groups = append(groups,
+				groups = append(
+					groups,
 					p.parseNode(
 						&n,
 						node,

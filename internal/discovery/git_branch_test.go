@@ -4,9 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"regexp"
 	"strings"
+	"syscall"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -1630,7 +1632,7 @@ groups:
 			},
 		},
 		{
-			title: "addSymlinkedEntries error",
+			title: "broken symlink does not prevent rule discovery",
 			setup: func(t *testing.T) {
 				commitFile(t, "rules.yml", `
 groups:
@@ -1653,9 +1655,37 @@ groups:
 
 				require.NoError(t, os.Symlink("/nonexistent/path", "broken.yml"))
 			},
-			finder:  discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4, parser.DefaultOptions, nil),
-			entries: nil,
-			err:     "broken.yml is a symlink but target file cannot be evaluated: lstat /nonexistent: no such file or directory",
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4, parser.DefaultOptions, nil),
+			entries: []*discovery.Entry{
+				{
+					State: discovery.Modified,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
+					Changes: &discovery.Changes{
+						Lines: []git.LineNumber{
+							{Before: 6, After: 6, Modified: true},
+						},
+					},
+					Rule: mustParse(4, "  - record: foo\n    expr: sum(bar)\n"),
+				},
+				{
+					State: discovery.Modified,
+					Path: discovery.Path{
+						Name:          "broken.yml",
+						SymlinkTarget: "broken.yml",
+					},
+					PathError: fmt.Errorf(
+						"this is a symlink but target file cannot be evaluated: %w",
+						&fs.PathError{
+							Op:   "lstat",
+							Path: "/nonexistent",
+							Err:  syscall.ENOENT,
+						},
+					),
+				},
+			},
 		},
 		{
 			title: "multiple rules with same name in before",

@@ -402,7 +402,8 @@ groups:
 					require.NoError(t, err, "json(got)")
 					require.Equal(t, string(expected), string(got))
 				}
-			})
+			},
+		)
 	}
 }
 
@@ -433,6 +434,34 @@ func TestChangeTypeMarshalJSON(t *testing.T) {
 			require.Equal(t, tc.expected, string(b))
 		})
 	}
+}
+
+func TestChangeTypeString(t *testing.T) {
+	testCases := []struct {
+		expected string
+		ct       ChangeType
+	}{
+		{ct: Unknown, expected: "unknown"},
+		{ct: Noop, expected: "noop"},
+		{ct: Added, expected: "added"},
+		{ct: Modified, expected: "modified"},
+		{ct: Removed, expected: "removed"},
+		{ct: Moved, expected: "moved"},
+		{ct: ChangeType(255), expected: "---"},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.expected, func(t *testing.T) {
+			require.Equal(t, tc.expected, tc.ct.String())
+		})
+	}
+}
+
+func TestFileIgnoreErrorError(t *testing.T) {
+	fe := FileIgnoreError{
+		Diagnostic: diags.Diagnostic{Message: "file ignored by comment"},
+	}
+	require.Equal(t, "file ignored by comment", fe.Error())
 }
 
 func TestIsValidOwner(t *testing.T) {
@@ -594,29 +623,35 @@ func TestPathString(t *testing.T) {
 
 func TestFindSymlinks(t *testing.T) {
 	testCases := []struct {
-		title   string
-		setup   func(t *testing.T)
-		cleanup func(t *testing.T)
-		err     string
+		setup    func(t *testing.T)
+		cleanup  func(t *testing.T)
+		title    string
+		expected []symlink
 	}{
 		{
-			title: "walkdir error on unreadable directory",
+			// Unreadable directory produces a symlink entry with err set.
+			title: "unreadable directory is captured as error",
 			setup: func(t *testing.T) {
 				require.NoError(t, os.Mkdir("noread", 0o000))
 			},
 			cleanup: func(_ *testing.T) {
 				_ = os.Chmod("noread", 0o755)
 			},
-			err: "open noread: permission denied",
+			expected: []symlink{
+				{from: "noread", to: ""},
+			},
 		},
 		{
-			title: "eval symlinks error on broken symlink",
+			// Broken symlink (target deleted) produces a symlink entry with err set.
+			title: "broken symlink is captured as error",
 			setup: func(t *testing.T) {
 				require.NoError(t, os.WriteFile("target.txt", []byte("test"), 0o644))
 				require.NoError(t, os.Symlink("target.txt", "link.txt"))
 				require.NoError(t, os.Remove("target.txt"))
 			},
-			err: "link.txt is a symlink but target file cannot be evaluated: lstat target.txt: no such file or directory",
+			expected: []symlink{
+				{from: "link.txt", to: ""},
+			},
 		},
 	}
 
@@ -628,39 +663,64 @@ func TestFindSymlinks(t *testing.T) {
 				t.Cleanup(func() { tc.cleanup(t) })
 			}
 
-			_, err := findSymlinks()
-			require.EqualError(t, err, tc.err)
+			slinks := findSymlinks()
+			require.Len(t, slinks, len(tc.expected))
+			for i, got := range slinks {
+				require.Equal(t, tc.expected[i].from, got.from)
+				require.Equal(t, tc.expected[i].to, got.to)
+				require.Error(t, got.err)
+			}
 		})
 	}
 }
 
 func TestAddSymlinkedEntries(t *testing.T) {
 	testCases := []struct {
-		setup     func(t *testing.T)
-		title     string
-		err       string
-		entries   []*Entry
-		resultLen int
+		setup    func(t *testing.T)
+		title    string
+		entries  []*Entry
+		expected []*Entry
 	}{
 		{
-			title: "error from findSymlinks",
+			// Broken symlink produces an entry with PathError set.
+			title: "broken symlink is reported as path error",
 			setup: func(t *testing.T) {
 				require.NoError(t, os.Symlink("/nonexistent/path", "broken.yml"))
 			},
 			entries: []*Entry{},
-			err:     "broken.yml is a symlink but target file cannot be evaluated: lstat /nonexistent: no such file or directory",
+			expected: []*Entry{
+				{
+					State: Modified,
+					Path: Path{
+						Name:          "broken.yml",
+						SymlinkTarget: "broken.yml",
+					},
+					PathError: errors.New("placeholder"),
+				},
+			},
 		},
 		{
+			// Removed entries are not matched against symlinks.
 			title: "skip removed entry",
+			setup: func(t *testing.T) {
+				require.NoError(t, os.WriteFile("a.yml", []byte("test"), 0o644))
+				require.NoError(t, os.Symlink("a.yml", "link.yml"))
+			},
 			entries: []*Entry{
 				{
 					State: Removed,
 					Path:  Path{Name: "a.yml", SymlinkTarget: "a.yml"},
 				},
 			},
+			expected: []*Entry{},
 		},
 		{
+			// Entries with existing PathError are not duplicated through symlinks.
 			title: "skip entry with path error",
+			setup: func(t *testing.T) {
+				require.NoError(t, os.WriteFile("b.yml", []byte("test"), 0o644))
+				require.NoError(t, os.Symlink("b.yml", "link.yml"))
+			},
 			entries: []*Entry{
 				{
 					State:     Noop,
@@ -668,9 +728,15 @@ func TestAddSymlinkedEntries(t *testing.T) {
 					PathError: errors.New("some error"),
 				},
 			},
+			expected: []*Entry{},
 		},
 		{
+			// Entries with rule parse errors are not duplicated through symlinks.
 			title: "skip entry with rule error",
+			setup: func(t *testing.T) {
+				require.NoError(t, os.WriteFile("c.yml", []byte("test"), 0o644))
+				require.NoError(t, os.Symlink("c.yml", "link.yml"))
+			},
 			entries: []*Entry{
 				{
 					State: Noop,
@@ -680,17 +746,25 @@ func TestAddSymlinkedEntries(t *testing.T) {
 					},
 				},
 			},
+			expected: []*Entry{},
 		},
 		{
+			// Entries that are already symlink targets are not duplicated.
 			title: "skip entry that is already a symlink",
+			setup: func(t *testing.T) {
+				require.NoError(t, os.WriteFile("d.yml", []byte("test"), 0o644))
+				require.NoError(t, os.Symlink("d.yml", "link.yml"))
+			},
 			entries: []*Entry{
 				{
 					State: Noop,
 					Path:  Path{Name: "link.yml", SymlinkTarget: "d.yml"},
 				},
 			},
+			expected: []*Entry{},
 		},
 		{
+			// Valid symlink creates a new entry pointing from the link to the target.
 			title: "symlink matches entry",
 			setup: func(t *testing.T) {
 				require.NoError(t, os.WriteFile("real.yml", []byte("test"), 0o644))
@@ -703,7 +777,16 @@ func TestAddSymlinkedEntries(t *testing.T) {
 					Owner: "alice",
 				},
 			},
-			resultLen: 1,
+			expected: []*Entry{
+				{
+					State: Noop,
+					Path: Path{
+						Name:          "link.yml",
+						SymlinkTarget: "real.yml",
+					},
+					Owner: "alice",
+				},
+			},
 		},
 	}
 
@@ -714,12 +797,91 @@ func TestAddSymlinkedEntries(t *testing.T) {
 				tc.setup(t)
 			}
 
-			result, err := addSymlinkedEntries(tc.entries)
-			if tc.err != "" {
-				require.EqualError(t, err, tc.err)
+			result := addSymlinkedEntries(tc.entries)
+			require.Len(t, result, len(tc.expected))
+			for i, got := range result {
+				require.Equal(t, tc.expected[i].State, got.State)
+				require.Equal(t, tc.expected[i].Path, got.Path)
+				require.Equal(t, tc.expected[i].Owner, got.Owner)
+				if tc.expected[i].PathError != nil {
+					require.Error(t, got.PathError)
+				} else {
+					require.NoError(t, got.PathError)
+				}
+			}
+		})
+	}
+}
+
+func TestResolveFileInfo(t *testing.T) {
+	type testCaseT struct {
+		setup  func(t *testing.T) (evalPath, statPath string)
+		title  string
+		errMsg string
+		isDir  bool
+	}
+
+	testCases := []testCaseT{
+		{
+			// Regular file resolves and stats without error.
+			title: "regular file",
+			setup: func(t *testing.T) (string, string) {
+				require.NoError(t, os.WriteFile("file.txt", []byte("x"), 0o644))
+				return "file.txt", "file.txt"
+			},
+		},
+		{
+			// Symlink resolves through to the target file.
+			title: "valid symlink to file",
+			setup: func(t *testing.T) (string, string) {
+				require.NoError(t, os.WriteFile("target.txt", []byte("x"), 0o644))
+				require.NoError(t, os.Symlink("target.txt", "link.txt"))
+				return "link.txt", "link.txt"
+			},
+		},
+		{
+			// Directory resolves and stats as directory.
+			title: "directory",
+			setup: func(t *testing.T) (string, string) {
+				require.NoError(t, os.Mkdir("subdir", 0o755))
+				return "subdir", "subdir"
+			},
+			isDir: true,
+		},
+		{
+			// Broken symlink causes EvalSymlinks to fail with descriptive error.
+			title: "broken symlink fails EvalSymlinks",
+			setup: func(t *testing.T) (string, string) {
+				require.NoError(t, os.Symlink("/nonexistent/target", "broken.txt"))
+				return "broken.txt", "broken.txt"
+			},
+			errMsg: "this is a symlink but target file cannot be evaluated: lstat /nonexistent: no such file or directory",
+		},
+		{
+			// EvalSymlinks resolves but stat path does not exist.
+			title: "stat path does not exist",
+			setup: func(t *testing.T) (string, string) {
+				require.NoError(t, os.WriteFile("real.txt", []byte("x"), 0o644))
+				return "real.txt", "missing.txt"
+			},
+			errMsg: "stat missing.txt: no such file or directory",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.title, func(t *testing.T) {
+			t.Chdir(t.TempDir())
+			evalPath, statPath := tc.setup(t)
+			target, info, err := resolveFileInfo(evalPath, statPath)
+			if tc.errMsg != "" {
+				require.EqualError(t, err, tc.errMsg)
+				require.Empty(t, target)
+				require.Nil(t, info)
 			} else {
 				require.NoError(t, err)
-				require.Len(t, result, tc.resultLen)
+				require.NotEmpty(t, target)
+				require.NotNil(t, info)
+				require.Equal(t, tc.isDir, info.IsDir())
 			}
 		})
 	}

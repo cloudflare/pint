@@ -374,7 +374,8 @@ func (c *problemCollector) Collect(ch chan<- prometheus.Metric) {
 
 	for _, report := range c.summary.Reports() {
 		if report.Problem.Severity < c.minSeverity {
-			slog.LogAttrs(context.Background(), slog.LevelDebug,
+			slog.LogAttrs(
+				context.Background(), slog.LevelDebug,
 				"Skipping report with severity lower than minimum configured",
 				slog.String("severity", report.Problem.Severity.String()),
 				slog.String("minimum", c.minSeverity.String()),

@@ -232,13 +232,15 @@ func Changes(cmd CommandRunner, baseBranch string, filter PathFilter) ([]*FileCh
 		}
 
 		prev := getChangeByPath(changes, srcPath)
-		slog.LogAttrs(context.Background(), slog.LevelDebug, "Looking for previous changes",
+		slog.LogAttrs(
+			context.Background(), slog.LevelDebug, "Looking for previous changes",
 			slog.String("src", srcPath),
 			slog.String("dst", dstPath),
 			slog.String("commit", commit),
 		)
 		if prev != nil {
-			slog.LogAttrs(context.Background(), slog.LevelDebug, "Found a previous change",
+			slog.LogAttrs(
+				context.Background(), slog.LevelDebug, "Found a previous change",
 				slog.Any("commits", prev.Commits),
 				slog.String("status", string(prev.Status)),
 				slog.String("path", prev.Path.Before.Name),
@@ -277,7 +279,8 @@ func Changes(cmd CommandRunner, baseBranch string, filter PathFilter) ([]*FileCh
 	slog.LogAttrs(context.Background(), slog.LevelDebug, "Parsed git log", slog.Int("changes", len(changes)))
 
 	for _, change := range changes {
-		slog.LogAttrs(context.Background(), slog.LevelDebug,
+		slog.LogAttrs(
+			context.Background(), slog.LevelDebug,
 			"File change",
 			slog.Any("commits", change.Commits),
 			slog.String("status", string(change.Status)),
@@ -298,7 +301,8 @@ func Changes(cmd CommandRunner, baseBranch string, filter PathFilter) ([]*FileCh
 			change.Body.After = getContentAtCommit(cmd, lastCommit, change.Path.After.EffectivePath())
 		}
 
-		slog.LogAttrs(context.Background(), slog.LevelDebug,
+		slog.LogAttrs(
+			context.Background(), slog.LevelDebug,
 			"Updated file change",
 			slog.Any("commits", change.Commits),
 			slog.String("before.path", change.Path.Before.Name),
@@ -367,7 +371,8 @@ func getChangeByPath(changes []*FileChange, fpath string) *FileChange {
 }
 
 func getModifiedLines(cmd CommandRunner, commits []string, beforePath, afterPath string) (LineNumbers, error) {
-	slog.LogAttrs(context.Background(), slog.LevelDebug, "Getting list of modified lines",
+	slog.LogAttrs(
+		context.Background(), slog.LevelDebug, "Getting list of modified lines",
 		slog.Any("commits", commits),
 		slog.String("beforePath", beforePath),
 		slog.String("afterPath", afterPath),
@@ -380,7 +385,8 @@ func getModifiedLines(cmd CommandRunner, commits []string, beforePath, afterPath
 
 	lineNumbers := parseDiff(output, afterPath)
 
-	slog.LogAttrs(context.Background(), slog.LevelDebug, "List of modified lines",
+	slog.LogAttrs(
+		context.Background(), slog.LevelDebug, "List of modified lines",
 		slog.Any("commits", commits),
 		slog.String("beforePath", beforePath),
 		slog.String("afterPath", afterPath),
@@ -532,7 +538,8 @@ func getTypeForPath(cmd CommandRunner, commit, fpath string) PathType {
 			continue
 		}
 		objpath := parts[1]
-		slog.LogAttrs(context.Background(), slog.LevelDebug, "ls-tree line",
+		slog.LogAttrs(
+			context.Background(), slog.LevelDebug, "ls-tree line",
 			slog.String("mode", objmode),
 			slog.String("type", objtype),
 			slog.String("path", objpath),

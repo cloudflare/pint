@@ -235,7 +235,8 @@ func (pg *PrometheusGenerator) ServerWithName(name string) *promapi.FailoverGrou
 
 func (pg *PrometheusGenerator) addServer(server *promapi.FailoverGroup) {
 	pg.servers = append(pg.servers, server)
-	slog.LogAttrs(context.Background(), slog.LevelInfo,
+	slog.LogAttrs(
+		context.Background(), slog.LevelInfo,
 		"Configured new Prometheus server",
 		slog.String("name", server.Name()),
 		slog.Int("uris", server.ServerCount()),

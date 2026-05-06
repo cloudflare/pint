@@ -132,6 +132,20 @@ If this file is a template that will be rendered into valid YAML then you can in
 		}
 	}
 
+	// File-level error (e.g. broken symlink, permission denied) with no rule-level parse error.
+	if rule.Error.Err == nil {
+		slog.LogAttrs(context.Background(), slog.LevelDebug, "file error report", slog.Any("err", err))
+		return Problem{
+			Anchor:      AnchorAfter,
+			Lines:       diags.LineRange{First: 1, Last: 1},
+			Reporter:    yamlParseReporter,
+			Summary:     "cannot read file",
+			Details:     err.Error(),
+			Severity:    Fatal,
+			Diagnostics: nil,
+		}
+	}
+
 	slog.LogAttrs(context.Background(), slog.LevelDebug, "rule error report", slog.Any("err", rule.Error.Err))
 	details := yamlDetails
 	if rule.Error.Details != "" {

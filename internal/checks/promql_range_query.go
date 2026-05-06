@@ -73,14 +73,15 @@ func (c RangeQueryCheck) Check(ctx context.Context, entry *discovery.Entry, _ []
 	}
 
 	if c.limit > 0 {
-		problems = append(problems, c.checkNode(
-			ctx,
-			expr,
-			expr.Query(),
-			c.limit,
-			fmt.Sprintf("%s is the maximum allowed range query.", model.Duration(c.limit)),
-			c.severity,
-		)...,
+		problems = append(
+			problems, c.checkNode(
+				ctx,
+				expr,
+				expr.Query(),
+				c.limit,
+				fmt.Sprintf("%s is the maximum allowed range query.", model.Duration(c.limit)),
+				c.severity,
+			)...,
 		)
 	}
 
@@ -129,15 +130,16 @@ func (c RangeQueryCheck) Check(ctx context.Context, entry *discovery.Entry, _ []
 		retention = time.Hour * 24 * 15
 	}
 
-	problems = append(problems, c.checkNode(
-		ctx,
-		expr,
-		expr.Query(),
-		retention,
-		fmt.Sprintf("%s is configured to only keep %s of metrics history.", promText(c.prom.Name(), flags.URI),
-			model.Duration(retention)),
-		Warning,
-	)...,
+	problems = append(
+		problems, c.checkNode(
+			ctx,
+			expr,
+			expr.Query(),
+			retention,
+			fmt.Sprintf("%s is configured to only keep %s of metrics history.", promText(c.prom.Name(), flags.URI),
+				model.Duration(retention)),
+			Warning,
+		)...,
 	)
 
 	return problems

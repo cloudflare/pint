@@ -205,7 +205,8 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 					}
 				}
 				if arEntry != nil {
-					slog.LogAttrs(ctx, slog.LevelDebug,
+					slog.LogAttrs(
+						ctx, slog.LevelDebug,
 						"Metric is provided by alerting rule",
 						slog.String("selector", s),
 						slog.String("path", arEntry.Path.Name),
@@ -265,14 +266,16 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 			slog.LogAttrs(ctx, slog.LevelWarn, "Cannot detect Prometheus uptime gaps", slog.Any("err", err), slog.String("name", c.prom.Name()))
 		}
 		if promUptime != nil && len(promUptime.Series.Ranges) == 0 {
-			slog.LogAttrs(ctx, slog.LevelWarn,
+			slog.LogAttrs(
+				ctx, slog.LevelWarn,
 				"No results for Prometheus uptime metric, you might have set uptime config option to a missing metric, please check your config",
 				slog.String("name", c.prom.Name()),
 				slog.String("metric", c.prom.UptimeMetric()),
 			)
 		}
 		if promUptime == nil || len(promUptime.Series.Ranges) == 0 {
-			slog.LogAttrs(ctx, slog.LevelWarn,
+			slog.LogAttrs(
+				ctx, slog.LevelWarn,
 				"Using dummy Prometheus uptime metric results with no gaps",
 				slog.String("name", c.prom.Name()),
 				slog.String("metric", c.prom.UptimeMetric()),
@@ -349,7 +352,8 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 			text, severity := c.textAndSeverity(
 				settings,
 				bareSelectorString,
-				fmt.Sprintf("%s didn't have any series for `%s` metric in the last %s.",
+				fmt.Sprintf(
+					"%s didn't have any series for `%s` metric in the last %s.",
 					promText(c.prom.Name(), trs.URI),
 					bareSelectorString,
 					sinceDesc(trs.Series.From),
@@ -417,7 +421,8 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 						{
 							Message: fmt.Sprintf(
 								"%s has `%s` metric but there are no series with `%s` label in the last %s.",
-								promText(c.prom.Name(), trsLabelCount.URI), bareSelectorString, name, sinceDesc(trsLabelCount.Series.From)),
+								promText(c.prom.Name(), trsLabelCount.URI), bareSelectorString, name, sinceDesc(trsLabelCount.Series.From),
+							),
 							Pos:         expr.Value.Pos,
 							FirstColumn: int(selector.PosRange.Start) + 1,
 							LastColumn:  int(selector.PosRange.End),
@@ -443,7 +448,8 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 			}
 
 			if !newest(trs.Series.Ranges).Before(trs.Series.Until.Add(minAge * -1)) {
-				slog.LogAttrs(ctx, slog.LevelDebug,
+				slog.LogAttrs(
+					ctx, slog.LevelDebug,
 					"Series disappeared from prometheus but for less then configured min-age",
 					slog.String("check", c.Reporter()),
 					slog.String("selector", s),
@@ -458,7 +464,8 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 				bareSelectorString,
 				fmt.Sprintf(
 					"%s doesn't currently have `%s`, it was last present %s ago.",
-					promText(c.prom.Name(), trs.URI), bareSelectorString, sinceDesc(newest(trs.Series.Ranges))),
+					promText(c.prom.Name(), trs.URI), bareSelectorString, sinceDesc(newest(trs.Series.Ranges)),
+				),
 				Bug,
 			)
 			problems = append(problems, Problem{
@@ -519,7 +526,8 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 					bareSelectorString,
 					fmt.Sprintf(
 						"%s has `%s` metric with `%s` label but there are no series matching `{%s}` in the last %s.",
-						promText(c.prom.Name(), trsLabel.URI), bareSelectorString, lm.Name, lms, sinceDesc(trs.Series.From)),
+						promText(c.prom.Name(), trsLabel.URI), bareSelectorString, lm.Name, lms, sinceDesc(trs.Series.From),
+					),
 					Bug,
 				)
 				problems = append(problems, Problem{
@@ -575,7 +583,8 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 				}
 
 				if !newest(trsLabel.Series.Ranges).Before(trsLabel.Series.Until.Add(minAge * -1)) {
-					slog.LogAttrs(ctx, slog.LevelDebug,
+					slog.LogAttrs(
+						ctx, slog.LevelDebug,
 						"Series disappeared from prometheus but for less then configured min-age",
 						slog.String("check", c.Reporter()),
 						slog.String("selector", s),
@@ -590,7 +599,8 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 					bareSelectorString,
 					fmt.Sprintf(
 						"%s has `%s` metric but doesn't currently have series matching `{%s}`, such series was last present %s ago.",
-						promText(c.prom.Name(), trs.URI), bareSelectorString, lms, sinceDesc(newest(trsLabel.Series.Ranges))),
+						promText(c.prom.Name(), trs.URI), bareSelectorString, lms, sinceDesc(newest(trsLabel.Series.Ranges)),
+					),
 					Bug,
 				)
 				problems = append(problems, Problem{
@@ -610,7 +620,8 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 						},
 					},
 				})
-				slog.LogAttrs(ctx, slog.LevelDebug,
+				slog.LogAttrs(
+					ctx, slog.LevelDebug,
 					"Series matching filter disappeared from prometheus",
 					slog.String("check", c.Reporter()),
 					slog.String("selector", s),
@@ -633,7 +644,8 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 							Message: fmt.Sprintf(
 								"Metric `%s` with label `{%s}` is only sometimes present on %s with average life span of %s.",
 								bareSelectorString, lms, promText(c.prom.Name(), trs.URI),
-								output.HumanizeDuration(avgLife(trsLabel.Series.Ranges))),
+								output.HumanizeDuration(avgLife(trsLabel.Series.Ranges)),
+							),
 							Pos:         expr.Value.Pos,
 							FirstColumn: int(pos.Start) + 1,
 							LastColumn:  int(pos.End) + 1,
@@ -641,7 +653,8 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 						},
 					},
 				})
-				slog.LogAttrs(ctx, slog.LevelDebug,
+				slog.LogAttrs(
+					ctx, slog.LevelDebug,
 					"Series matching filter are only sometimes present",
 					slog.String("check", c.Reporter()),
 					slog.String("selector", s),
@@ -666,7 +679,8 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 					{
 						Message: fmt.Sprintf(
 							"Metric `%s` is only sometimes present on %s with average life span of %s in the last %s.",
-							bareSelectorString, promText(c.prom.Name(), trs.URI), output.HumanizeDuration(avgLife(trs.Series.Ranges)), sinceDesc(trs.Series.From)),
+							bareSelectorString, promText(c.prom.Name(), trs.URI), output.HumanizeDuration(avgLife(trs.Series.Ranges)), sinceDesc(trs.Series.From),
+						),
 						Pos:         expr.Value.Pos,
 						FirstColumn: int(selector.PosRange.Start) + 1,
 						LastColumn:  int(selector.PosRange.End),
@@ -674,7 +688,8 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 					},
 				},
 			})
-			slog.LogAttrs(ctx, slog.LevelDebug,
+			slog.LogAttrs(
+				ctx, slog.LevelDebug,
 				"Metric only sometimes present",
 				slog.String("check", c.Reporter()),
 				slog.String("selector", bareSelectorString),
@@ -755,7 +770,8 @@ func (c SeriesCheck) checkOtherServer(ctx context.Context, query string, setting
 	var tested, matches, skipped int
 	for _, prom := range servers {
 		if time.Since(start) >= settings.fallbackTimeout {
-			slog.LogAttrs(ctx, slog.LevelDebug, "Time limit reached for checking if metric exists on any other Prometheus server",
+			slog.LogAttrs(
+				ctx, slog.LevelDebug, "Time limit reached for checking if metric exists on any other Prometheus server",
 				slog.String("check", c.Reporter()),
 				slog.String("selector", query),
 			)
@@ -764,7 +780,8 @@ func (c SeriesCheck) checkOtherServer(ctx context.Context, query string, setting
 			break
 		}
 
-		slog.LogAttrs(ctx, slog.LevelDebug, "Checking if metric exists on any other Prometheus server",
+		slog.LogAttrs(
+			ctx, slog.LevelDebug, "Checking if metric exists on any other Prometheus server",
 			slog.String("check", c.Reporter()),
 			slog.String("name", prom.Name()),
 			slog.String("selector", query),

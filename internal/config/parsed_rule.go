@@ -123,7 +123,8 @@ func baseRules(staticRules []staticRule, proms []*promapi.FailoverGroup, match [
 	}
 
 	for _, p := range proms {
-		rules = append(rules,
+		rules = append(
+			rules,
 			baseParsedRule(match, checks.RateCheckName, checks.NewRateCheck(p), p.Tags()),
 			baseParsedRule(match, checks.SeriesCheckName, checks.NewSeriesCheck(p), p.Tags()),
 			baseParsedRule(match, checks.VectorMatchingCheckName, checks.NewVectorMatchingCheck(p), p.Tags()),

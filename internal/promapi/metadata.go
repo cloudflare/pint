@@ -35,7 +35,8 @@ type metadataQuery struct {
 }
 
 func (q metadataQuery) Run() queryResult {
-	slog.LogAttrs(q.ctx, slog.LevelDebug,
+	slog.LogAttrs(
+		q.ctx, slog.LevelDebug,
 		"Getting prometheus metrics metadata",
 		slog.String("uri", q.prom.safeURI),
 		slog.String("metric", q.metric),

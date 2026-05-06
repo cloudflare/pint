@@ -1,10 +1,16 @@
 mkdir rules
 exec ln -s ../bad.yml rules/symlink.yml
 
-! exec pint -l debug --no-color lint rules
+! exec pint --no-color lint rules
 ! stdout .
 cmp stderr stderr.txt
 
 -- stderr.txt --
 level=INFO msg="Finding all rules to check" paths=["rules"]
-level=ERROR msg="Execution completed with error(s)" err="rules/symlink.yml is a symlink but target file cannot be evaluated: lstat rules/../bad.yml: no such file or directory"
+level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
+Fatal: cannot read file (yaml/parse)
+  ---> rules/symlink.yml:1
+       ^^^ this is a symlink but target file cannot be evaluated: lstat rules/../bad.yml: no such file or directory
+
+level=INFO msg="Problems found" Fatal=1
+level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"

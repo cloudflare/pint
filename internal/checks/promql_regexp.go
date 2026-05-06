@@ -185,7 +185,8 @@ func (c RegexpCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*dis
 			switch {
 			case b.badAnchor:
 				summary = "redundant regexp anchors"
-				text = fmt.Sprintf("Prometheus regexp matchers are automatically fully anchored so match for `%s` will result in `%s%s\"^%s$\"`, remove regexp anchors `^` and/or `$`.",
+				text = fmt.Sprintf(
+					"Prometheus regexp matchers are automatically fully anchored so match for `%s` will result in `%s%s\"^%s$\"`, remove regexp anchors `^` and/or `$`.",
 					b.lm, b.lm.Name, b.lm.Type, b.lm.Value,
 				)
 			case b.isWildcard && b.op == labels.MatchEqual:

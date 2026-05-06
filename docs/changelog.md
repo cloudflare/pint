@@ -6,6 +6,8 @@
 
 - When running `pint ci` pint will now use `git diff` to calculate modified lines
   instead of `git blame`.
+- Broken symlinks and unreadable files in the rules directory are now reported
+  as [yaml/parse](checks/yaml/parse.md) problems instead of causing a fatal error.
 
 ## v0.80.0
 

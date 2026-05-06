@@ -106,7 +106,8 @@ func (cfg *Config) GetChecksForEntry(ctx context.Context, gen *PrometheusGenerat
 		}
 	}
 
-	slog.LogAttrs(ctx, slog.LevelDebug, "Configured checks for rule",
+	slog.LogAttrs(
+		ctx, slog.LevelDebug, "Configured checks for rule",
 		slog.Any("enabled", func() []string {
 			el := make([]string, 0, len(enabled))
 			for _, e := range enabled {
@@ -224,7 +225,8 @@ func Load(path string, failOnMissing bool) (cfg Config, fromFile bool, err error
 		}
 	}
 
-	cfg.staticRules = append(cfg.staticRules,
+	cfg.staticRules = append(
+		cfg.staticRules,
 		staticRule{name: checks.SyntaxCheckName, checker: checks.NewSyntaxCheck()},
 		staticRule{name: checks.AlertForCheckName, checker: checks.NewAlertsForCheck()},
 		staticRule{name: checks.ComparisonCheckName, checker: checks.NewComparisonCheck()},

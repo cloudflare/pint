@@ -3,11 +3,13 @@ package discovery_test
 import (
 	"encoding/json"
 	"errors"
+	"io/fs"
 	"os"
 	"path"
 	"regexp"
 	"strconv"
 	"strings"
+	"syscall"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -68,7 +70,28 @@ func TestGlobPathFinder(t *testing.T) {
 				".git": "/nonexistent/target",
 			},
 			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.DefaultOptions, nil),
-			err:    ".git is a symlink but target file cannot be evaluated: lstat /nonexistent: no such file or directory",
+			entries: []*discovery.Entry{
+				{
+					State: discovery.Noop,
+					Path: discovery.Path{
+						Name:          ".git",
+						SymlinkTarget: ".git",
+					},
+					PathError: errors.New("this is a symlink but target file cannot be evaluated: lstat /nonexistent: no such file or directory"),
+				},
+				{
+					State: discovery.Noop,
+					Path: discovery.Path{
+						Name:          "bar.yml",
+						SymlinkTarget: "bar.yml",
+					},
+					PathError: parser.ParseError{
+						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
+						Line: 3,
+					},
+					Owner: "bob",
+				},
+			},
 		},
 		{
 			files:  map[string]string{},
@@ -235,7 +258,40 @@ func TestGlobPathFinder(t *testing.T) {
 				"b/c/link.yml": "../a/bar.yml",
 			},
 			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.DefaultOptions, nil),
-			err:    "b/c/link.yml is a symlink but target file cannot be evaluated: lstat b/a: no such file or directory",
+			entries: []*discovery.Entry{
+				{
+					State: discovery.Noop,
+					Path: discovery.Path{
+						Name:          "a/bar.yml",
+						SymlinkTarget: "a/bar.yml",
+					},
+					PathError: parser.ParseError{
+						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
+						Line: 3,
+					},
+					Owner: "bob",
+				},
+				{
+					State: discovery.Noop,
+					Path: discovery.Path{
+						Name:          "b/c/link.yml",
+						SymlinkTarget: "b/c/link.yml",
+					},
+					PathError: errors.New("this is a symlink but target file cannot be evaluated: lstat b/a: no such file or directory"),
+				},
+				{
+					State: discovery.Noop,
+					Path: discovery.Path{
+						Name:          "b/link.yml",
+						SymlinkTarget: "a/bar.yml",
+					},
+					PathError: parser.ParseError{
+						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
+						Line: 3,
+					},
+					Owner: "bob",
+				},
+			},
 		},
 		{
 			files: map[string]string{"a/bar.yml": "xxx:\n"},
@@ -329,7 +385,16 @@ func TestGlobPathFinder(t *testing.T) {
 				"input.yml": "/xx/ccc/fdd",
 			},
 			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.DefaultOptions, nil),
-			err:    "input.yml is a symlink but target file cannot be evaluated: lstat /xx: no such file or directory",
+			entries: []*discovery.Entry{
+				{
+					State: discovery.Noop,
+					Path: discovery.Path{
+						Name:          "input.yml",
+						SymlinkTarget: "input.yml",
+					},
+					PathError: errors.New("this is a symlink but target file cannot be evaluated: lstat /xx: no such file or directory"),
+				},
+			},
 		},
 		{
 			files: map[string]string{
@@ -339,7 +404,16 @@ func TestGlobPathFinder(t *testing.T) {
 				_ = os.Chmod("bar.yml", 0o000)
 			},
 			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.DefaultOptions, nil),
-			err:    "open bar.yml: permission denied",
+			entries: []*discovery.Entry{
+				{
+					State: discovery.Noop,
+					Path: discovery.Path{
+						Name:          "bar.yml",
+						SymlinkTarget: "bar.yml",
+					},
+					PathError: &fs.PathError{Op: "open", Path: "bar.yml", Err: syscall.EACCES},
+				},
+			},
 		},
 		{
 			files: map[string]string{
@@ -349,7 +423,28 @@ func TestGlobPathFinder(t *testing.T) {
 				"subdir/broken.yml": "/nonexistent/target",
 			},
 			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.DefaultOptions, nil),
-			err:    "subdir/broken.yml is a symlink but target file cannot be evaluated: lstat /nonexistent: no such file or directory",
+			entries: []*discovery.Entry{
+				{
+					State: discovery.Noop,
+					Path: discovery.Path{
+						Name:          "subdir/bar.yml",
+						SymlinkTarget: "subdir/bar.yml",
+					},
+					PathError: parser.ParseError{
+						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
+						Line: 3,
+					},
+					Owner: "bob",
+				},
+				{
+					State: discovery.Noop,
+					Path: discovery.Path{
+						Name:          "subdir/broken.yml",
+						SymlinkTarget: "subdir/broken.yml",
+					},
+					PathError: errors.New("this is a symlink but target file cannot be evaluated: lstat /nonexistent: no such file or directory"),
+				},
+			},
 		},
 		{
 			files: map[string]string{
@@ -361,6 +456,22 @@ func TestGlobPathFinder(t *testing.T) {
 			},
 			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.DefaultOptions, nil),
 			err:    "open subdir: permission denied",
+		},
+		{
+			// Symlink inside walked dir points to an unreadable directory.
+			// walkDir encounters the symlink, EvalSymlinks and os.Stat succeed,
+			// but recursive findFiles fails because the target dir is unreadable.
+			files: map[string]string{
+				"topdir/foo.yml": testRuleBody,
+			},
+			setup: func(t *testing.T) {
+				require.NoError(t, os.MkdirAll("targetdir", 0o755))
+				require.NoError(t, os.Symlink("../targetdir", "topdir/link"))
+				require.NoError(t, os.Chmod("targetdir", 0o000))
+				t.Cleanup(func() { _ = os.Chmod("targetdir", 0o755) })
+			},
+			finder: discovery.NewGlobFinder([]string{"topdir"}, git.NewPathFilter(nil, nil, nil), parser.DefaultOptions, nil),
+			err:    "open targetdir: permission denied",
 		},
 		{
 			// File exists but path filter excludes it, no entries returned.
