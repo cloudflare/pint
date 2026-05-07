@@ -77,8 +77,7 @@ func actionCI(ctx context.Context, c *cli.Command) error {
 		return err
 	}
 
-	meta.cfg.CI = detectCI(meta.cfg.CI)
-	baseBranch := meta.cfg.CI.BaseBranch
+	baseBranch := detectBaseBranch(meta.cfg.CI.BaseBranch)
 	if c.String(baseBranchFlag) != "" {
 		baseBranch = c.String(baseBranchFlag)
 	}
@@ -86,6 +85,7 @@ func actionCI(ctx context.Context, c *cli.Command) error {
 	if err != nil {
 		return errors.New("failed to get the name of current branch")
 	}
+	currentBranch = detectCurrentBranch(currentBranch)
 	slog.LogAttrs(ctx, slog.LevelDebug, "Got branch information", slog.String("base", baseBranch), slog.String("current", currentBranch))
 	if currentBranch == strings.Split(baseBranch, "/")[len(strings.Split(baseBranch, "/"))-1] {
 		slog.LogAttrs(ctx, slog.LevelInfo, "Running from base branch, skipping checks", slog.String("branch", currentBranch))
@@ -286,12 +286,51 @@ func logSeverityCounters(src map[checks.Severity]int) (attrs []slog.Attr) {
 	return attrs
 }
 
-func detectCI(cfg *config.CI) *config.CI {
-	if bb := os.Getenv("GITHUB_BASE_REF"); bb != "" {
-		cfg.BaseBranch = bb
-		slog.LogAttrs(context.Background(), slog.LevelDebug, "got base branch from GITHUB_BASE_REF env variable", slog.String("branch", bb))
+// Normally we get the branch name from the config, but when running in CI
+// we might have a git checkout that lacks branch information, so we need
+// to get that name from ENV variables.
+func detectCurrentBranch(branch string) string {
+	if branch != "HEAD" {
+		return branch
 	}
-	return cfg
+	for _, key := range []string{
+		"GITHUB_HEAD_REF",                     // GitHub
+		"CI_MERGE_REQUEST_SOURCE_BRANCH_NAME", // GitLab
+		"CI_COMMIT_BRANCH",                    // GitLab
+	} {
+		if val := os.Getenv(key); val != "" {
+			slog.LogAttrs(
+				context.Background(), slog.LevelDebug,
+				"Got current branch from environment variable",
+				slog.String("key", key),
+				slog.String("branch", val),
+			)
+			return val
+		}
+	}
+	return branch
+}
+
+// Normally PRs would target the base branch (main) and that's what we assume,
+// but we might have a pull request that is between two feature branches where the target
+// is not the repos base branch (main), we can detect that from the ENV and set the
+// base (target) branch accordingly.
+func detectBaseBranch(branch string) string {
+	for _, key := range []string{
+		"GITHUB_BASE_REF",                     // GitHub
+		"CI_MERGE_REQUEST_TARGET_BRANCH_NAME", // GitLab
+	} {
+		if val := os.Getenv(key); val != "" {
+			slog.LogAttrs(
+				context.Background(), slog.LevelDebug,
+				"Got base branch from environment variable",
+				slog.String("key", key),
+				slog.String("branch", val),
+			)
+			return val
+		}
+	}
+	return branch
 }
 
 func detectRepository(ctx context.Context, cfg *config.Repository) *config.Repository {
