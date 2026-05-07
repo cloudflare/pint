@@ -84,8 +84,8 @@ func (c AlertsCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*dis
 		if err != nil {
 			slog.LogAttrs(ctx, slog.LevelWarn, "Cannot detect Prometheus uptime gaps", slog.Any("err", err), slog.String("name", c.prom.Name()))
 		} else {
-			// FIXME: gaps are not used
 			qr.Series.FindGaps(promUptime.Series, qr.Series.From, qr.Series.Until)
+			qr.Series.Ranges = promapi.MergeRangesWithoutGaps(qr.Series.Ranges, qr.Series.Gaps)
 		}
 	}
 

@@ -12,6 +12,7 @@
 ### Fixed
 
 - Fixed parser not handling `\r\n` line endings correctly.
+- [alerts/count](checks/alerts/count.md) check will now more accurately estimate alert counts.
 
 ## v0.80.0
 
