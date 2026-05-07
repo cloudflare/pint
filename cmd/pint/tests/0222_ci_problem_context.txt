@@ -117,6 +117,5 @@ position:
   old_path: rules.yml
   position_type: text
   new_line: 5
-  old_line: 5
 --- END ---
 
