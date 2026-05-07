@@ -1228,6 +1228,15 @@ func TestGitLabReporterCommentLine(t *testing.T) {
 			expectedNewLine: 143,
 			expectedOldLine: 142,
 		},
+		{
+			description: "moved to modified replacement line sets only NewLine",
+			problemLine: 17,
+			changes: git.LineNumbers{
+				{Before: 24, After: 17, Modified: false},
+				{Before: 27, After: 20, Modified: true},
+			},
+			expectedNewLine: 20,
+		},
 	}
 
 	for _, tc := range testCases {

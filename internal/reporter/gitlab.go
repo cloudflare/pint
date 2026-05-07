@@ -463,6 +463,8 @@ func reportToGitLabDiscussion(pending PendingComment, ver *gitlab.MergeRequestDi
 		d.Position.NewLine = nil
 	case oldLine == 0:
 		d.Position.NewLine = new(int64(line))
+	case pending.changedLines.HasAfter(line):
+		d.Position.NewLine = new(int64(line))
 	case oldLine > 0:
 		d.Position.NewLine = new(int64(line))
 		d.Position.OldLine = new(int64(oldLine))

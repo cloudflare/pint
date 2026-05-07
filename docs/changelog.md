@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.81.1
+
+### Fixed
+
+- Fixed GitLab reporter sending invalid line position when a comment is placed
+  on a modified line in the diff, causing a 400 error from GitLab API.
+
 ## v0.81.0
 
 ### Changed
