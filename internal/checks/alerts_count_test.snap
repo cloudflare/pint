@@ -323,3 +323,55 @@
     anchor: 0
 
 ---
+
+[TestAlertsCountCheck/ranges_merge_when_separated_by_Prometheus_downtime - 1]
+- description: ranges merge when separated by Prometheus downtime
+  content: |
+    - alert: Foo Is Down
+      for: 10m
+      expr: up{job="foo"} == 0
+  output: |
+    3 |   expr: up{job="foo"} == 0
+                ^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com would trigger 1 alert(s) in the last 1d.
+  problem:
+    reporter: alerts/count
+    summary: alert count estimate
+    details: To get a preview of the alerts that would fire please [click here](https://simple.example.com/graph?g0.expr=up%7Bjob%3D%22foo%22%7D+%3D%3D+0&g0.tab=0&g0.range_input=1d).
+    diagnostics:
+        - message: '`prom` Prometheus server at https://simple.example.com would trigger 1 alert(s) in the last 1d.'
+          firstcolumn: 1
+          lastcolumn: 18
+          kind: 0
+    lines:
+        first: 3
+        last: 3
+    severity: 0
+    anchor: 0
+
+---
+
+[TestAlertsCountCheck/ranges_stay_separate_when_gap_is_confirmed_by_uptime - 1]
+- description: ranges stay separate when gap is confirmed by uptime
+  content: |
+    - alert: Foo Is Down
+      for: 10m
+      expr: up{job="foo"} == 0
+  output: |
+    3 |   expr: up{job="foo"} == 0
+                ^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com would trigger 0 alert(s) in the last 1d.
+  problem:
+    reporter: alerts/count
+    summary: alert count estimate
+    details: To get a preview of the alerts that would fire please [click here](https://simple.example.com/graph?g0.expr=up%7Bjob%3D%22foo%22%7D+%3D%3D+0&g0.tab=0&g0.range_input=1d).
+    diagnostics:
+        - message: '`prom` Prometheus server at https://simple.example.com would trigger 0 alert(s) in the last 1d.'
+          firstcolumn: 1
+          lastcolumn: 18
+          kind: 0
+    lines:
+        first: 3
+        last: 3
+    severity: 0
+    anchor: 0
+
+---

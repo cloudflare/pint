@@ -661,6 +661,117 @@ func TestAlertsCountCheck(t *testing.T) {
 			},
 			problems: true,
 		},
+		{
+			// Two 7m ranges separated by 3m, Prometheus was down during those 3m.
+			// Since Prometheus was down there's no gap, so ranges merge into ~17m, exceeding for: 10m.
+			description: "ranges merge when separated by Prometheus downtime",
+			content:     "- alert: Foo Is Down\n  for: 10m\n  expr: up{job=\"foo\"} == 0\n",
+			checker:     newAlertsCheck,
+			prometheus:  newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `up{job="foo"} == 0`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							// 7m range starting at -20h
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*-20),
+								time.Now().Add(time.Hour*-20).Add(time.Minute*6),
+								time.Minute,
+							),
+							// 7m range starting at -20h+10m (3m gap between ranges)
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*-20).Add(time.Minute*10),
+								time.Now().Add(time.Hour*-20).Add(time.Minute*16),
+								time.Minute,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(\nup\n)"},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							// Uptime from -24h to -20h+6m (covers first range)
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*-24),
+								time.Now().Add(time.Hour*-20).Add(time.Minute*6),
+								time.Minute,
+							),
+							// Uptime from -20h+10m to now (covers second range)
+							// Prometheus was down from -20h+6m to -20h+10m
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*-20).Add(time.Minute*10),
+								time.Now(),
+								time.Minute,
+							),
+						},
+					},
+				},
+			},
+			problems: true,
+		},
+		{
+			// Two 7m ranges but Prometheus was up the entire time.
+			// There's a gap between them, so they don't merge.
+			description: "ranges stay separate when gap is confirmed by uptime",
+			content:     "- alert: Foo Is Down\n  for: 10m\n  expr: up{job=\"foo\"} == 0\n",
+			checker:     newAlertsCheck,
+			prometheus:  newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `up{job="foo"} == 0`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							// 7m range starting at -20h
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*-20),
+								time.Now().Add(time.Hour*-20).Add(time.Minute*6),
+								time.Minute,
+							),
+							// 7m range starting at -20h+10m (3m gap between ranges)
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*-20).Add(time.Minute*10),
+								time.Now().Add(time.Hour*-20).Add(time.Minute*16),
+								time.Minute,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(\nup\n)"},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*-24),
+								time.Now(),
+								time.Minute,
+							),
+						},
+					},
+				},
+			},
+			problems: true,
+		},
 	}
 
 	runTests(t, testCases)

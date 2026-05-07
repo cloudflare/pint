@@ -21,6 +21,7 @@ type MetricTimeRange struct {
 	Fingerprint uint64
 }
 
+// Overlaps returns the union of two ranges if they overlap or are within one step of each other.
 func Overlaps(a, b MetricTimeRange, step time.Duration) (c TimeRange, ok bool) {
 	// Different labels cannot overlap.
 	if a.Fingerprint != b.Fingerprint {
@@ -63,6 +64,7 @@ func (mtr MetricTimeRanges) String() string {
 	return strings.Join(sl, " ** ")
 }
 
+// CompareMetricTimeRanges sorts by labels first, then by start time.
 func CompareMetricTimeRanges(a, b MetricTimeRange) int {
 	if a.Fingerprint != b.Fingerprint {
 		return labels.Compare(a.Labels, b.Labels)
@@ -78,6 +80,7 @@ type SeriesTimeRanges struct {
 	Step   time.Duration
 }
 
+// covers returns true if any range contains the given timestamp.
 func (str SeriesTimeRanges) covers(ts time.Time) bool {
 	for _, r := range str.Ranges {
 		if !r.Start.After(ts) && !r.End.Before(ts) {
@@ -87,6 +90,9 @@ func (str SeriesTimeRanges) covers(ts time.Time) bool {
 	return false
 }
 
+// FindGaps records time periods where str has no data but baseline does.
+// If baseline has data at a timestamp but str doesn't, the metric was genuinely absent.
+// If baseline also has no data, the source was down and we can't tell.
 func (str *SeriesTimeRanges) FindGaps(baseline SeriesTimeRanges, from, until time.Time) {
 	for !from.After(until) {
 		if str.covers(from) || !baseline.covers(from) {
@@ -111,8 +117,8 @@ func (str *SeriesTimeRanges) FindGaps(baseline SeriesTimeRanges, from, until tim
 	}
 }
 
-// merge [t1:t2] [t2:t3] together.
-// This will sort the source slice.
+// MergeRanges merges overlapping or adjacent (within one step) ranges.
+// Sorts the source slice as a side effect.
 func MergeRanges(source MetricTimeRanges, step time.Duration) (MetricTimeRanges, bool) {
 	slices.SortStableFunc(source, CompareMetricTimeRanges)
 
@@ -141,12 +147,55 @@ L:
 	return merged, hadMerged
 }
 
+// MergeRangesWithoutGaps merges consecutive same-fingerprint ranges unless
+// a gap (from FindGaps) separates them. Ranges separated only by periods
+// where the source was down get merged because the condition might have been true.
+func MergeRangesWithoutGaps(
+	ranges MetricTimeRanges,
+	gaps []TimeRange,
+) MetricTimeRanges {
+	if len(gaps) == 0 || len(ranges) < 2 {
+		return ranges
+	}
+
+	merged := make(MetricTimeRanges, 0, len(ranges))
+	merged = append(merged, ranges[0])
+	for i := 1; i < len(ranges); i++ {
+		last := &merged[len(merged)-1]
+		if last.Fingerprint != ranges[i].Fingerprint {
+			merged = append(merged, ranges[i])
+			continue
+		}
+		if HasGapBetween(last.End, ranges[i].Start, gaps) {
+			merged = append(merged, ranges[i])
+			continue
+		}
+		if ranges[i].End.After(last.End) {
+			last.End = ranges[i].End
+		}
+	}
+	return merged
+}
+
+// HasGapBetween returns true if any gap from FindGaps overlaps the interval [a, b].
+func HasGapBetween(a, b time.Time, gaps []TimeRange) bool {
+	for _, g := range gaps {
+		if !g.End.Before(a) && !g.Start.After(b) {
+			return true
+		}
+	}
+	return false
+}
+
+// ExpandRangesEnd extends each range's end by step-1s to cover the full sample interval.
 func ExpandRangesEnd(src MetricTimeRanges, step time.Duration) {
 	for i := range src {
 		src[i].End = src[i].End.Add(step - time.Second)
 	}
 }
 
+// AppendSampleToRanges adds sample timestamps to existing ranges or creates new ones.
+// Samples within one step of an existing range extend it; otherwise a new range is created.
 func AppendSampleToRanges(dst MetricTimeRanges, ls labels.Labels, vals []model.SamplePair, step time.Duration) MetricTimeRanges {
 	fp := ls.Hash()
 
@@ -187,6 +236,7 @@ func AppendSampleToRanges(dst MetricTimeRanges, ls labels.Labels, vals []model.S
 	return dst
 }
 
+// MetricToLabels converts a Prometheus model.Metric to a labels.Labels.
 func MetricToLabels(m model.Metric) labels.Labels {
 	lset := make([]string, 0, len(m)*2)
 	for k, v := range m {

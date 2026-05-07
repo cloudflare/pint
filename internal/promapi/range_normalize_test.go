@@ -790,3 +790,195 @@ func TestMetricTimeRangesString(t *testing.T) {
 		})
 	}
 }
+
+func TestMergeRangesWithoutGaps(t *testing.T) {
+	timeParse := func(s string) time.Time {
+		v, err := time.Parse(time.RFC3339, s)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return v.UTC()
+	}
+
+	fpA := labels.FromStrings("job", "a").Hash()
+	fpB := labels.FromStrings("job", "b").Hash()
+	labelsA := labels.FromStrings("job", "a")
+	labelsB := labels.FromStrings("job", "b")
+
+	type testCaseT struct {
+		desc   string
+		ranges promapi.MetricTimeRanges
+		gaps   []promapi.TimeRange
+		out    promapi.MetricTimeRanges
+	}
+
+	testCases := []testCaseT{
+		{
+			// No gaps at all, ranges returned as-is.
+			desc: "no gaps returns ranges unchanged",
+			ranges: promapi.MetricTimeRanges{
+				{Fingerprint: fpA, Labels: labelsA, Start: timeParse("2024-01-01T00:00:00Z"), End: timeParse("2024-01-01T00:07:00Z")},
+				{Fingerprint: fpA, Labels: labelsA, Start: timeParse("2024-01-01T00:10:00Z"), End: timeParse("2024-01-01T00:17:00Z")},
+			},
+			gaps: nil,
+			out: promapi.MetricTimeRanges{
+				{Fingerprint: fpA, Labels: labelsA, Start: timeParse("2024-01-01T00:00:00Z"), End: timeParse("2024-01-01T00:07:00Z")},
+				{Fingerprint: fpA, Labels: labelsA, Start: timeParse("2024-01-01T00:10:00Z"), End: timeParse("2024-01-01T00:17:00Z")},
+			},
+		},
+		{
+			// Single range, nothing to merge.
+			desc: "single range returns as-is",
+			ranges: promapi.MetricTimeRanges{
+				{Fingerprint: fpA, Labels: labelsA, Start: timeParse("2024-01-01T00:00:00Z"), End: timeParse("2024-01-01T00:07:00Z")},
+			},
+			gaps: []promapi.TimeRange{
+				{Start: timeParse("2024-01-01T00:07:00Z"), End: timeParse("2024-01-01T00:10:00Z")},
+			},
+			out: promapi.MetricTimeRanges{
+				{Fingerprint: fpA, Labels: labelsA, Start: timeParse("2024-01-01T00:00:00Z"), End: timeParse("2024-01-01T00:07:00Z")},
+			},
+		},
+		{
+			// Two ranges with no gap between them merge.
+			desc: "ranges without gap between them merge",
+			ranges: promapi.MetricTimeRanges{
+				{Fingerprint: fpA, Labels: labelsA, Start: timeParse("2024-01-01T00:00:00Z"), End: timeParse("2024-01-01T00:07:00Z")},
+				{Fingerprint: fpA, Labels: labelsA, Start: timeParse("2024-01-01T00:10:00Z"), End: timeParse("2024-01-01T00:17:00Z")},
+			},
+			gaps: []promapi.TimeRange{
+				{Start: timeParse("2024-01-01T00:20:00Z"), End: timeParse("2024-01-01T00:25:00Z")},
+			},
+			out: promapi.MetricTimeRanges{
+				{Fingerprint: fpA, Labels: labelsA, Start: timeParse("2024-01-01T00:00:00Z"), End: timeParse("2024-01-01T00:17:00Z")},
+			},
+		},
+		{
+			// Two ranges with a gap between them stay separate.
+			desc: "ranges with gap between them stay separate",
+			ranges: promapi.MetricTimeRanges{
+				{Fingerprint: fpA, Labels: labelsA, Start: timeParse("2024-01-01T00:00:00Z"), End: timeParse("2024-01-01T00:07:00Z")},
+				{Fingerprint: fpA, Labels: labelsA, Start: timeParse("2024-01-01T00:10:00Z"), End: timeParse("2024-01-01T00:17:00Z")},
+			},
+			gaps: []promapi.TimeRange{
+				{Start: timeParse("2024-01-01T00:07:00Z"), End: timeParse("2024-01-01T00:10:00Z")},
+			},
+			out: promapi.MetricTimeRanges{
+				{Fingerprint: fpA, Labels: labelsA, Start: timeParse("2024-01-01T00:00:00Z"), End: timeParse("2024-01-01T00:07:00Z")},
+				{Fingerprint: fpA, Labels: labelsA, Start: timeParse("2024-01-01T00:10:00Z"), End: timeParse("2024-01-01T00:17:00Z")},
+			},
+		},
+		{
+			// Different fingerprints are never merged.
+			desc: "different fingerprints stay separate even without gap",
+			ranges: promapi.MetricTimeRanges{
+				{Fingerprint: fpA, Labels: labelsA, Start: timeParse("2024-01-01T00:00:00Z"), End: timeParse("2024-01-01T00:07:00Z")},
+				{Fingerprint: fpB, Labels: labelsB, Start: timeParse("2024-01-01T00:10:00Z"), End: timeParse("2024-01-01T00:17:00Z")},
+			},
+			gaps: []promapi.TimeRange{
+				{Start: timeParse("2024-01-01T00:20:00Z"), End: timeParse("2024-01-01T00:25:00Z")},
+			},
+			out: promapi.MetricTimeRanges{
+				{Fingerprint: fpA, Labels: labelsA, Start: timeParse("2024-01-01T00:00:00Z"), End: timeParse("2024-01-01T00:07:00Z")},
+				{Fingerprint: fpB, Labels: labelsB, Start: timeParse("2024-01-01T00:10:00Z"), End: timeParse("2024-01-01T00:17:00Z")},
+			},
+		},
+		{
+			// Second range is fully inside first range, no extension needed.
+			desc: "overlapping range does not extend end",
+			ranges: promapi.MetricTimeRanges{
+				{Fingerprint: fpA, Labels: labelsA, Start: timeParse("2024-01-01T00:00:00Z"), End: timeParse("2024-01-01T00:20:00Z")},
+				{Fingerprint: fpA, Labels: labelsA, Start: timeParse("2024-01-01T00:05:00Z"), End: timeParse("2024-01-01T00:15:00Z")},
+			},
+			gaps: []promapi.TimeRange{
+				{Start: timeParse("2024-01-01T00:25:00Z"), End: timeParse("2024-01-01T00:30:00Z")},
+			},
+			out: promapi.MetricTimeRanges{
+				{Fingerprint: fpA, Labels: labelsA, Start: timeParse("2024-01-01T00:00:00Z"), End: timeParse("2024-01-01T00:20:00Z")},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			result := promapi.MergeRangesWithoutGaps(tc.ranges, tc.gaps)
+			require.Equal(t, tc.out, result)
+		})
+	}
+}
+
+func TestHasGapBetween(t *testing.T) {
+	timeParse := func(s string) time.Time {
+		v, err := time.Parse(time.RFC3339, s)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return v.UTC()
+	}
+
+	type testCaseT struct {
+		desc string
+		a    time.Time
+		b    time.Time
+		gaps []promapi.TimeRange
+		out  bool
+	}
+
+	testCases := []testCaseT{
+		{
+			// No gaps at all.
+			desc: "no gaps",
+			a:    timeParse("2024-01-01T00:00:00Z"),
+			b:    timeParse("2024-01-01T01:00:00Z"),
+			gaps: nil,
+			out:  false,
+		},
+		{
+			// Gap fully inside the interval.
+			desc: "gap inside interval",
+			a:    timeParse("2024-01-01T00:00:00Z"),
+			b:    timeParse("2024-01-01T01:00:00Z"),
+			gaps: []promapi.TimeRange{
+				{Start: timeParse("2024-01-01T00:20:00Z"), End: timeParse("2024-01-01T00:40:00Z")},
+			},
+			out: true,
+		},
+		{
+			// Gap ends before the interval starts.
+			desc: "gap before interval",
+			a:    timeParse("2024-01-01T01:00:00Z"),
+			b:    timeParse("2024-01-01T02:00:00Z"),
+			gaps: []promapi.TimeRange{
+				{Start: timeParse("2024-01-01T00:00:00Z"), End: timeParse("2024-01-01T00:30:00Z")},
+			},
+			out: false,
+		},
+		{
+			// Gap starts after the interval ends.
+			desc: "gap after interval",
+			a:    timeParse("2024-01-01T00:00:00Z"),
+			b:    timeParse("2024-01-01T01:00:00Z"),
+			gaps: []promapi.TimeRange{
+				{Start: timeParse("2024-01-01T02:00:00Z"), End: timeParse("2024-01-01T03:00:00Z")},
+			},
+			out: false,
+		},
+		{
+			// Gap partially overlaps the interval.
+			desc: "gap partially overlaps interval",
+			a:    timeParse("2024-01-01T00:00:00Z"),
+			b:    timeParse("2024-01-01T01:00:00Z"),
+			gaps: []promapi.TimeRange{
+				{Start: timeParse("2024-01-01T00:30:00Z"), End: timeParse("2024-01-01T01:30:00Z")},
+			},
+			out: true,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			result := promapi.HasGapBetween(tc.a, tc.b, tc.gaps)
+			require.Equal(t, tc.out, result)
+		})
+	}
+}
