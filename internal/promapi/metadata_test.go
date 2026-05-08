@@ -16,11 +16,11 @@ import (
 
 func TestMetadata(t *testing.T) {
 	type testCaseT struct {
-		mock     httpmock.Mocker
-		name     string
-		err      string
-		metadata []v1.Metadata
-		timeout  time.Duration
+		mock      httpmock.Mocker
+		name      string
+		assertErr func(t *testing.T, err error)
+		metadata  []v1.Metadata
+		timeout   time.Duration
 	}
 
 	testCases := []testCaseT{
@@ -28,6 +28,9 @@ func TestMetadata(t *testing.T) {
 			name:     "gauge",
 			timeout:  time.Second,
 			metadata: []v1.Metadata{{Type: "gauge", Help: "Text", Unit: ""}},
+			assertErr: func(t *testing.T, err error) {
+				require.NoError(t, err)
+			},
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectGet(regexp.MustCompile("^"+promapi.APIPathMetadata)).
 					ReturnHeader("Content-Type", "application/json").
@@ -39,6 +42,9 @@ func TestMetadata(t *testing.T) {
 			name:     "counter",
 			timeout:  time.Second,
 			metadata: []v1.Metadata{{Type: "counter", Help: "Text", Unit: ""}},
+			assertErr: func(t *testing.T, err error) {
+				require.NoError(t, err)
+			},
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectGet(regexp.MustCompile("^"+promapi.APIPathMetadata)).
 					ReturnHeader("Content-Type", "application/json").
@@ -53,6 +59,9 @@ func TestMetadata(t *testing.T) {
 				{Type: "gauge", Help: "Text1", Unit: "abc"},
 				{Type: "counter", Help: "Text2", Unit: ""},
 			},
+			assertErr: func(t *testing.T, err error) {
+				require.NoError(t, err)
+			},
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectGet(regexp.MustCompile("^"+promapi.APIPathMetadata)).
 					ReturnHeader("Content-Type", "application/json").
@@ -63,7 +72,9 @@ func TestMetadata(t *testing.T) {
 		{
 			name:    "slow",
 			timeout: time.Millisecond * 10,
-			err:     "connection timeout",
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(t, err, "connection timeout")
+			},
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectGet(regexp.MustCompile("^" + promapi.APIPathMetadata)).
 					Run(func(_ *http.Request) ([]byte, error) {
@@ -76,7 +87,9 @@ func TestMetadata(t *testing.T) {
 		{
 			name:    "empty",
 			timeout: time.Second,
-			err:     "unknown: empty response object",
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(t, err, "unknown: empty response object")
+			},
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectGet(regexp.MustCompile("^"+promapi.APIPathMetadata)).
 					ReturnHeader("Content-Type", "application/json").
@@ -87,7 +100,9 @@ func TestMetadata(t *testing.T) {
 		{
 			name:    "error",
 			timeout: time.Second,
-			err:     "server_error: 500 Internal Server Error",
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(t, err, "server_error: 500 Internal Server Error")
+			},
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectGet(regexp.MustCompile("^" + promapi.APIPathMetadata)).
 					ReturnCode(http.StatusInternalServerError).
@@ -99,6 +114,9 @@ func TestMetadata(t *testing.T) {
 			name:     "once",
 			timeout:  time.Second,
 			metadata: []v1.Metadata{{Type: "gauge", Help: "Text", Unit: ""}},
+			assertErr: func(t *testing.T, err error) {
+				require.NoError(t, err)
+			},
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectGet(regexp.MustCompile("^"+promapi.APIPathMetadata)).
 					ReturnHeader("Content-Type", "application/json").
@@ -109,7 +127,9 @@ func TestMetadata(t *testing.T) {
 		{
 			name:    "apiError",
 			timeout: time.Second,
-			err:     "bad_data: custom error message",
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(t, err, "bad_data: custom error message")
+			},
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectGet(regexp.MustCompile("^"+promapi.APIPathMetadata)).
 					ReturnHeader("Content-Type", "application/json").
@@ -120,7 +140,12 @@ func TestMetadata(t *testing.T) {
 		{
 			name:    "badJson",
 			timeout: time.Second,
-			err:     `bad_response: JSON parse error: invalid character '}' after object key`,
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(
+					t, err,
+					`bad_response: JSON parse error: invalid character '}' after object key`,
+				)
+			},
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectGet(regexp.MustCompile("^"+promapi.APIPathMetadata)).
 					ReturnHeader("Content-Type", "application/json").
@@ -131,7 +156,9 @@ func TestMetadata(t *testing.T) {
 		{
 			name:    "emptyError",
 			timeout: time.Second,
-			err:     `bad_data: empty response object`,
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(t, err, "bad_data: empty response object")
+			},
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectGet(regexp.MustCompile("^"+promapi.APIPathMetadata)).
 					ReturnHeader("Content-Type", "application/json").
@@ -153,11 +180,7 @@ func TestMetadata(t *testing.T) {
 			defer fg.Close(reg)
 
 			metadata, err := fg.Metadata(t.Context(), tc.name)
-			if tc.err != "" {
-				require.EqualError(t, err, tc.err, tc)
-			} else {
-				require.NoError(t, err)
-			}
+			tc.assertErr(t, err)
 			if metadata != nil {
 				require.Equal(t, tc.metadata, metadata.Metadata)
 			}

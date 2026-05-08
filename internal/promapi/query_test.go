@@ -1,12 +1,16 @@
 package promapi_test
 
 import (
+	"errors"
+	"io"
 	"net/http"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/go-json-experiment/json"
+	"github.com/go-json-experiment/json/jsontext"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/prometheus/model/labels"
 	"github.com/stretchr/testify/require"
@@ -19,7 +23,6 @@ func TestQuery(t *testing.T) {
 	type testCaseT struct {
 		mock      httpmock.Mocker
 		name      string
-		err       string
 		assertErr func(t *testing.T, err error)
 		series    []promapi.Sample
 		stats     promapi.QueryStats
@@ -31,6 +34,9 @@ func TestQuery(t *testing.T) {
 			name:    "empty",
 			timeout: time.Second,
 			series:  []promapi.Sample{},
+			assertErr: func(t *testing.T, err error) {
+				require.NoError(t, err)
+			},
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectPost(promapi.APIPathQuery).
 					ReturnHeader("Content-Type", "application/json").
@@ -46,6 +52,9 @@ func TestQuery(t *testing.T) {
 					Labels: labels.EmptyLabels(),
 					Value:  1,
 				},
+			},
+			assertErr: func(t *testing.T, err error) {
+				require.NoError(t, err)
 			},
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectPost(promapi.APIPathQuery).
@@ -71,6 +80,9 @@ func TestQuery(t *testing.T) {
 					Value:  3,
 				},
 			},
+			assertErr: func(t *testing.T, err error) {
+				require.NoError(t, err)
+			},
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectPost(promapi.APIPathQuery).
 					ReturnHeader("Content-Type", "application/json").
@@ -81,7 +93,9 @@ func TestQuery(t *testing.T) {
 		{
 			name:    "error",
 			timeout: time.Second,
-			err:     "bad_data: unhandled query",
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(t, err, "bad_data: unhandled query")
+			},
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectPost(promapi.APIPathQuery).
 					ReturnCode(http.StatusBadRequest).
@@ -93,7 +107,9 @@ func TestQuery(t *testing.T) {
 		{
 			name:    "matrix",
 			timeout: time.Second,
-			err:     "bad_response: invalid result type, expected vector, got matrix",
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(t, err, "bad_response: invalid result type, expected vector, got matrix")
+			},
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectPost(promapi.APIPathQuery).
 					ReturnHeader("Content-Type", "application/json").
@@ -104,7 +120,9 @@ func TestQuery(t *testing.T) {
 		{
 			name:    "timeout",
 			timeout: time.Millisecond * 20,
-			err:     "connection timeout",
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(t, err, "connection timeout")
+			},
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectPost(promapi.APIPathQuery).
 					Run(func(_ *http.Request) ([]byte, error) {
@@ -123,6 +141,9 @@ func TestQuery(t *testing.T) {
 					Value:  1,
 				},
 			},
+			assertErr: func(t *testing.T, err error) {
+				require.NoError(t, err)
+			},
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectPost(promapi.APIPathQuery).
 					ReturnHeader("Content-Type", "application/json").
@@ -133,7 +154,12 @@ func TestQuery(t *testing.T) {
 		{
 			name:    "overload",
 			timeout: time.Second,
-			err:     "execution: query processing would load too many samples into memory in query execution",
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(
+					t, err,
+					"execution: query processing would load too many samples into memory in query execution",
+				)
+			},
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectPost(promapi.APIPathQuery).
 					ReturnCode(http.StatusUnprocessableEntity).
@@ -150,6 +176,9 @@ func TestQuery(t *testing.T) {
 					Labels: labels.EmptyLabels(),
 					Value:  1,
 				},
+			},
+			assertErr: func(t *testing.T, err error) {
+				require.NoError(t, err)
 			},
 			stats: promapi.QueryStats{
 				Timings: promapi.QueryTimings{
@@ -175,7 +204,9 @@ func TestQuery(t *testing.T) {
 		{
 			name:    "apiError",
 			timeout: time.Second,
-			err:     "bad_data: custom error message",
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(t, err, "bad_data: custom error message")
+			},
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectPost(promapi.APIPathQuery).
 					ReturnHeader("Content-Type", "application/json").
@@ -186,7 +217,12 @@ func TestQuery(t *testing.T) {
 		{
 			name:    "badJson",
 			timeout: time.Second,
-			err:     `bad_response: JSON parse error: jsontext: invalid character '}' after object name (expecting ':') within "/data/resultType" after offset 40`,
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(
+					t, err,
+					`bad_response: JSON parse error: jsontext: invalid character '}' after object name (expecting ':') within "/data/resultType" after offset 40`,
+				)
+			},
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectPost(promapi.APIPathQuery).
 					ReturnHeader("Content-Type", "application/json").
@@ -197,7 +233,9 @@ func TestQuery(t *testing.T) {
 		{
 			name:    "emptyError",
 			timeout: time.Second,
-			err:     `bad_data: empty response object`,
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(t, err, "bad_data: empty response object")
+			},
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectPost(promapi.APIPathQuery).
 					ReturnHeader("Content-Type", "application/json").
@@ -259,7 +297,13 @@ func TestQuery(t *testing.T) {
 		{
 			name:    "badTimestampNotANumber",
 			timeout: time.Second,
-			err:     `bad_response: JSON parse error: json: cannot unmarshal into Go promapi.SampleTimestampValue within "/data/result/0/value": strconv.ParseFloat: parsing "notanumber": invalid syntax`,
+			assertErr: func(t *testing.T, err error) {
+				var se *json.SemanticError
+				require.ErrorAs(t, err, &se)
+				require.Equal(t, reflect.TypeFor[promapi.SampleTimestampValue](), se.GoType)
+				require.Equal(t, "/data/result/0/value", string(se.JSONPointer))
+				require.Contains(t, err.Error(), `strconv.ParseFloat: parsing "notanumber": invalid syntax`)
+			},
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectPost(promapi.APIPathQuery).
 					ReturnHeader("Content-Type", "application/json").
@@ -298,18 +342,98 @@ func TestQuery(t *testing.T) {
 			defer fg.Close(reg)
 
 			qr, err := fg.Query(t.Context(), tc.name)
-			switch {
-			case tc.assertErr != nil:
-				tc.assertErr(t, err)
-			case tc.err != "":
-				require.EqualError(t, err, tc.err, tc)
-			default:
-				require.NoError(t, err)
-			}
+			tc.assertErr(t, err)
 			if qr != nil {
 				require.Equal(t, tc.series, qr.Series)
 				require.Equal(t, tc.stats, qr.Stats)
 			}
+		})
+	}
+}
+
+// errReader returns the provided data, then an error on the next read.
+type errReader struct {
+	r   io.Reader
+	err error
+}
+
+func (e *errReader) Read(p []byte) (int, error) {
+	n, err := e.r.Read(p)
+	if errors.Is(err, io.EOF) {
+		return n, e.err
+	}
+	return n, err
+}
+
+func TestSampleLabelsUnmarshalJSONFromReadTokenErrors(t *testing.T) {
+	type testCaseT struct {
+		input io.Reader
+		name  string
+	}
+
+	testCases := []testCaseT{
+		{
+			// PeekKind sees '{' but ReadToken fails reading it.
+			name:  "error reading opening brace",
+			input: &errReader{r: strings.NewReader("{"), err: io.ErrUnexpectedEOF},
+		},
+		{
+			// Opening '{' is read but ReadToken fails on the first key.
+			name:  "error reading key inside object",
+			input: &errReader{r: strings.NewReader(`{"k`), err: io.ErrUnexpectedEOF},
+		},
+		{
+			// All keys read but ReadToken fails on closing '}'.
+			name:  "error reading closing brace",
+			input: &errReader{r: strings.NewReader(`{"a":"b"`), err: io.ErrUnexpectedEOF},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			dec := jsontext.NewDecoder(tc.input)
+			var s promapi.SampleLabels
+			err := s.UnmarshalJSONFrom(dec)
+			require.Error(t, err)
+		})
+	}
+}
+
+func TestSampleTimestampValueUnmarshalJSONFromReadTokenErrors(t *testing.T) {
+	type testCaseT struct {
+		input io.Reader
+		name  string
+	}
+
+	testCases := []testCaseT{
+		{
+			// PeekKind sees '[' but ReadToken fails reading it.
+			name:  "error reading opening bracket",
+			input: &errReader{r: strings.NewReader("["), err: io.ErrUnexpectedEOF},
+		},
+		{
+			// Opening '[' is read but ReadToken fails on the timestamp.
+			name:  "error reading timestamp token",
+			input: &errReader{r: strings.NewReader(`[1`), err: io.ErrUnexpectedEOF},
+		},
+		{
+			// Timestamp read but ReadToken fails on the value string.
+			name:  "error reading value token",
+			input: &errReader{r: strings.NewReader(`[1614859502.068,"1`), err: io.ErrUnexpectedEOF},
+		},
+		{
+			// Value read but ReadToken fails on closing ']'.
+			name:  "error reading closing bracket",
+			input: &errReader{r: strings.NewReader(`[1614859502.068,"1"`), err: io.ErrUnexpectedEOF},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			dec := jsontext.NewDecoder(tc.input)
+			var s promapi.SampleTimestampValue
+			err := s.UnmarshalJSONFrom(dec)
+			require.Error(t, err)
 		})
 	}
 }
