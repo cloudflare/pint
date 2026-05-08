@@ -35,10 +35,10 @@ func IsQueryTooExpensive(err error) bool {
 		if e1.ErrorType != v1.ErrExec {
 			return false
 		}
-		if strings.HasPrefix(e1.Err, "query processing would load too many samples into memory in ") {
+		if strings.HasPrefix(e1.Err.Error(), "query processing would load too many samples into memory in ") {
 			return true
 		}
-		if strings.HasSuffix(e1.Err, "expanding series: context deadline exceeded") {
+		if strings.HasSuffix(e1.Err.Error(), "expanding series: context deadline exceeded") {
 			return true
 		}
 	}
@@ -46,12 +46,16 @@ func IsQueryTooExpensive(err error) bool {
 }
 
 type APIError struct {
+	Err       error        `json:"error"`
 	Status    string       `json:"status"`
 	ErrorType v1.ErrorType `json:"errorType"`
-	Err       string       `json:"error"`
 }
 
 func (e APIError) Error() string {
+	return e.Err.Error()
+}
+
+func (e APIError) Unwrap() error {
 	return e.Err
 }
 
@@ -101,7 +105,7 @@ func decodeError(err error) string {
 	}
 
 	if e1, ok := errors.AsType[APIError](err); ok {
-		return string(e1.ErrorType) + ": " + e1.Err
+		return string(e1.ErrorType) + ": " + e1.Err.Error()
 	}
 
 	return err.Error()
@@ -136,7 +140,7 @@ func tryDecodingAPIError(resp *http.Response) error {
 			return APIError{
 				Status:    "",
 				ErrorType: ErrAPIUnsupported,
-				Err:       "this server doesn't seem to support " + msg,
+				Err:       errors.New("this server doesn't seem to support " + msg),
 			}
 		}
 	}
@@ -145,12 +149,12 @@ func tryDecodingAPIError(resp *http.Response) error {
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		switch resp.StatusCode / 100 {
 		case 4:
-			return APIError{Status: "error", ErrorType: v1.ErrClient, Err: resp.Status}
+			return APIError{Status: "error", ErrorType: v1.ErrClient, Err: errors.New(resp.Status)}
 		case 5:
-			return APIError{Status: "error", ErrorType: v1.ErrServer, Err: resp.Status}
+			return APIError{Status: "error", ErrorType: v1.ErrServer, Err: errors.New(resp.Status)}
 		}
-		return APIError{Status: "error", ErrorType: v1.ErrBadResponse, Err: resp.Status}
+		return APIError{Status: "error", ErrorType: v1.ErrBadResponse, Err: errors.New(resp.Status)}
 	}
 
-	return APIError{Status: data.Status, ErrorType: decodeErrorType(data.ErrorType), Err: data.Error}
+	return APIError{Status: data.Status, ErrorType: decodeErrorType(data.ErrorType), Err: errors.New(data.Error)}
 }

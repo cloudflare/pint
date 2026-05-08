@@ -2,6 +2,7 @@ package promapi
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
@@ -126,14 +127,22 @@ func parseConfig(r io.Reader) (cfg PrometheusConfig, err error) {
 
 	var data PrometheusConfigResponse
 	if err = json.UnmarshalRead(r, &data); err != nil {
-		return cfg, APIError{Status: data.Status, ErrorType: v1.ErrBadResponse, Err: "JSON parse error: " + err.Error()}
+		return cfg, APIError{
+			Status:    data.Status,
+			ErrorType: v1.ErrBadResponse,
+			Err:       fmt.Errorf("JSON parse error: %w", err),
+		}
 	}
 
 	if data.Status != "success" {
 		if data.Error == "" {
 			data.Error = "empty response object"
 		}
-		return cfg, APIError{Status: data.Status, ErrorType: decodeErrorType(data.ErrorType), Err: data.Error}
+		return cfg, APIError{
+			Status:    data.Status,
+			ErrorType: decodeErrorType(data.ErrorType),
+			Err:       errors.New(data.Error),
+		}
 	}
 
 	if err = yaml.Unmarshal([]byte(data.Data.YAML), &cfg); err != nil {

@@ -3,6 +3,7 @@ package promapi
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
@@ -109,7 +110,7 @@ func parseBuildInfo(r io.Reader) (_ v1.BuildinfoResult, err error) {
 		return data.Data, APIError{
 			Status:    data.Status,
 			ErrorType: v1.ErrBadResponse,
-			Err:       "JSON parse error: " + err.Error(),
+			Err:       fmt.Errorf("JSON parse error: %w", err),
 		}
 	}
 
@@ -120,7 +121,7 @@ func parseBuildInfo(r io.Reader) (_ v1.BuildinfoResult, err error) {
 		return data.Data, APIError{
 			Status:    data.Status,
 			ErrorType: decodeErrorType(data.ErrorType),
-			Err:       data.Error,
+			Err:       errors.New(data.Error),
 		}
 	}
 
