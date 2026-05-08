@@ -3,6 +3,7 @@ package promapi
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
@@ -113,14 +114,22 @@ func parseMetadata(r io.Reader) (meta map[string][]v1.Metadata, err error) {
 
 	var data PrometheusMetadataResponse
 	if err = json.NewDecoder(r).Decode(&data); err != nil {
-		return data.Data, APIError{Status: data.Status, ErrorType: v1.ErrBadResponse, Err: "JSON parse error: " + err.Error()}
+		return data.Data, APIError{
+			Status:    data.Status,
+			ErrorType: v1.ErrBadResponse,
+			Err:       fmt.Errorf("JSON parse error: %w", err),
+		}
 	}
 
 	if data.Status != "success" {
 		if data.Error == "" {
 			data.Error = "empty response object"
 		}
-		return data.Data, APIError{Status: data.Status, ErrorType: decodeErrorType(data.ErrorType), Err: data.Error}
+		return data.Data, APIError{
+			Status:    data.Status,
+			ErrorType: decodeErrorType(data.ErrorType),
+			Err:       errors.New(data.Error),
+		}
 	}
 
 	return data.Data, nil

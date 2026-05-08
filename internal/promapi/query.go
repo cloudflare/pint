@@ -2,6 +2,8 @@ package promapi
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"io"
 	"log/slog"
 	"net/http"
@@ -79,7 +81,11 @@ func (s *SampleTimestampValue) UnmarshalJSONFrom(dec *jsontext.Decoder) (err err
 	if err != nil {
 		return err
 	}
-	s.Timestamp = model.Time(tok.Int() * 1000)
+	f, err = strconv.ParseFloat(tok.String(), 64)
+	if err != nil {
+		return err
+	}
+	s.Timestamp = model.Time(int64(f * 1000))
 
 	tok, err = dec.ReadToken()
 	if err != nil {
@@ -207,18 +213,30 @@ func parseVectorSamples(r io.Reader) (samples []Sample, _ QueryStats, err error)
 
 	var data PrometheusQueryResponse
 	if err = json.UnmarshalRead(r, &data); err != nil {
-		return samples, data.Data.Stats, APIError{Status: data.Status, ErrorType: v1.ErrBadResponse, Err: "JSON parse error: " + err.Error()}
+		return samples, data.Data.Stats, APIError{
+			Status:    data.Status,
+			ErrorType: v1.ErrBadResponse,
+			Err:       fmt.Errorf("JSON parse error: %w", err),
+		}
 	}
 
 	if data.Status != "success" {
 		if data.Error == "" {
 			data.Error = "empty response object"
 		}
-		return samples, data.Data.Stats, APIError{Status: data.Status, ErrorType: decodeErrorType(data.ErrorType), Err: data.Error}
+		return samples, data.Data.Stats, APIError{
+			Status:    data.Status,
+			ErrorType: decodeErrorType(data.ErrorType),
+			Err:       errors.New(data.Error),
+		}
 	}
 
 	if data.Data.ResultType != "vector" {
-		return nil, data.Data.Stats, APIError{Status: data.Status, ErrorType: v1.ErrBadResponse, Err: "invalid result type, expected vector, got " + data.Data.ResultType}
+		return nil, data.Data.Stats, APIError{
+			Status:    data.Status,
+			ErrorType: v1.ErrBadResponse,
+			Err:       errors.New("invalid result type, expected vector, got " + data.Data.ResultType),
+		}
 	}
 
 	samples = make([]Sample, 0, len(data.Data.Result))

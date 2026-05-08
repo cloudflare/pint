@@ -2,9 +2,11 @@ package promapi_test
 
 import (
 	"net/http"
+	"reflect"
 	"testing"
 	"time"
 
+	"github.com/go-json-experiment/json"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/prometheus/model/labels"
 	"github.com/stretchr/testify/require"
@@ -15,12 +17,13 @@ import (
 
 func TestQuery(t *testing.T) {
 	type testCaseT struct {
-		mock    httpmock.Mocker
-		name    string
-		err     string
-		series  []promapi.Sample
-		stats   promapi.QueryStats
-		timeout time.Duration
+		mock      httpmock.Mocker
+		name      string
+		err       string
+		assertErr func(t *testing.T, err error)
+		series    []promapi.Sample
+		stats     promapi.QueryStats
+		timeout   time.Duration
 	}
 
 	testCases := []testCaseT{
@@ -205,7 +208,13 @@ func TestQuery(t *testing.T) {
 		{
 			name:    "badMetricKind",
 			timeout: time.Second,
-			err:     `bad_response: JSON parse error: json: cannot unmarshal JSON array into Go promapi.SampleLabels within "/data/result/0/metric"`,
+			assertErr: func(t *testing.T, err error) {
+				var se *json.SemanticError
+				require.ErrorAs(t, err, &se)
+				require.Equal(t, reflect.TypeFor[promapi.SampleLabels](), se.GoType)
+				require.Equal(t, byte('['), byte(se.JSONKind))
+				require.Equal(t, "/data/result/0/metric", string(se.JSONPointer))
+			},
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectPost(promapi.APIPathQuery).
 					ReturnHeader("Content-Type", "application/json").
@@ -216,7 +225,13 @@ func TestQuery(t *testing.T) {
 		{
 			name:    "badValueKind",
 			timeout: time.Second,
-			err:     `bad_response: JSON parse error: json: cannot unmarshal JSON object into Go promapi.SampleTimestampValue within "/data/result/0/value"`,
+			assertErr: func(t *testing.T, err error) {
+				var se *json.SemanticError
+				require.ErrorAs(t, err, &se)
+				require.Equal(t, reflect.TypeFor[promapi.SampleTimestampValue](), se.GoType)
+				require.Equal(t, byte('{'), byte(se.JSONKind))
+				require.Equal(t, "/data/result/0/value", string(se.JSONPointer))
+			},
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectPost(promapi.APIPathQuery).
 					ReturnHeader("Content-Type", "application/json").
@@ -227,11 +242,45 @@ func TestQuery(t *testing.T) {
 		{
 			name:    "badValueClosingToken",
 			timeout: time.Second,
-			err:     `bad_response: JSON parse error: json: cannot unmarshal JSON object into Go promapi.SampleTimestampValue within "/data/result/0/value"`,
+			assertErr: func(t *testing.T, err error) {
+				var se *json.SemanticError
+				require.ErrorAs(t, err, &se)
+				require.Equal(t, reflect.TypeFor[promapi.SampleTimestampValue](), se.GoType)
+				require.Equal(t, byte('{'), byte(se.JSONKind))
+				require.Equal(t, "/data/result/0/value", string(se.JSONPointer))
+			},
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectPost(promapi.APIPathQuery).
 					ReturnHeader("Content-Type", "application/json").
 					Return(`{"status":"success","data":{"resultType":"vector","result":[{"metric":{},"value":{"ts":1}}]}}`).
+					UnlimitedTimes()
+			}),
+		},
+		{
+			name:    "badTimestampNotANumber",
+			timeout: time.Second,
+			err:     `bad_response: JSON parse error: json: cannot unmarshal into Go promapi.SampleTimestampValue within "/data/result/0/value": strconv.ParseFloat: parsing "notanumber": invalid syntax`,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPost(promapi.APIPathQuery).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"resultType":"vector","result":[{"metric":{},"value":["notanumber","1"]}]}}`).
+					UnlimitedTimes()
+			}),
+		},
+		{
+			name:    "badValueExtraElements",
+			timeout: time.Second,
+			assertErr: func(t *testing.T, err error) {
+				var se *json.SemanticError
+				require.ErrorAs(t, err, &se)
+				require.Equal(t, reflect.TypeFor[promapi.SampleTimestampValue](), se.GoType)
+				require.Equal(t, byte('"'), byte(se.JSONKind))
+				require.Equal(t, "/data/result/0/value", string(se.JSONPointer))
+			},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPost(promapi.APIPathQuery).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"resultType":"vector","result":[{"metric":{},"value":[1614859502.068,"1","extra"]}]}}`).
 					UnlimitedTimes()
 			}),
 		},
@@ -249,9 +298,12 @@ func TestQuery(t *testing.T) {
 			defer fg.Close(reg)
 
 			qr, err := fg.Query(t.Context(), tc.name)
-			if tc.err != "" {
+			switch {
+			case tc.assertErr != nil:
+				tc.assertErr(t, err)
+			case tc.err != "":
 				require.EqualError(t, err, tc.err, tc)
-			} else {
+			default:
 				require.NoError(t, err)
 			}
 			if qr != nil {
