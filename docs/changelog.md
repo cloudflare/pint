@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.82.1
+
+### Fixed
+
+- GitHub and GitLab reporter was trying to create comments on unmodified files, which is not allowed.
+
 ## v0.82.0
 
 ### Changed

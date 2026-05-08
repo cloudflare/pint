@@ -62,6 +62,14 @@ func makeComments(summary Summary, showDuplicates bool) (comments []PendingComme
 	var content string
 	var err error
 	for _, reports := range dedupReports(summary.reports, showDuplicates) {
+		if reports[0].Changes == nil {
+			slog.LogAttrs(
+				context.Background(), slog.LevelDebug,
+				"Skipping report for path with no changes",
+				slog.String("path", reports[0].Path.SymlinkTarget),
+			)
+			continue
+		}
 		if reports[0].Problem.Anchor == checks.AnchorAfter {
 			content, err = readFile(reports[0].Path.Name)
 			if err != nil {
