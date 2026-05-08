@@ -146,6 +146,13 @@ func (c RuleDependencyCheck) checkRemovedDependency(entry *discovery.Entry, entr
 }
 
 func (c RuleDependencyCheck) checkCrossGroupDependency(entry *discovery.Entry, entries []*discovery.Entry) (problems []Problem) {
+	if entry.Rule.RecordingRule == nil {
+		// We only check recording rules here.
+		// Alerting rules using recording rules in a different file are usually fine, there is still
+		// a lag but that's usually ok and it's often impractical to change that.
+		return problems
+	}
+
 	expr := entry.Rule.Expr()
 	if expr.SyntaxError() != nil {
 		return problems
