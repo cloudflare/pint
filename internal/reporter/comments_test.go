@@ -585,7 +585,7 @@ foo details
 			},
 		},
 		{
-			description: "Create() handles nil Changes",
+			description: "skips reports with nil Changes",
 			reports: []Report{
 				{
 					Path: discovery.Path{
@@ -618,19 +618,7 @@ foo details
 					return nil, nil
 				},
 				create: func(_ context.Context, _ any, p PendingComment) error {
-					if p.path != "foo.txt" {
-						return fmt.Errorf("wrong path: %s", p.path)
-					}
-					if p.line != 3 {
-						return fmt.Errorf("wrong line: %d", p.line)
-					}
-					if p.oldPath != "" {
-						return fmt.Errorf("wrong oldPath: %s", p.oldPath)
-					}
-					if len(p.changedLines) != 0 {
-						return fmt.Errorf("wrong changedLines: %v", p.changedLines)
-					}
-					return nil
+					return fmt.Errorf("shouldn't try to create %s:%d", p.path, p.line)
 				},
 				delete: func(_ context.Context, _ any, e ExistingComment) error {
 					return fmt.Errorf("shouldn't try to delete %s:%d", e.path, e.line)
