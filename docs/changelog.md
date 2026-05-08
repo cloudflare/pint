@@ -7,6 +7,10 @@
 - [rule/dependency](checks/rule/dependency.md) cross-group dependency check now
   only reports problems for recording rules.
 
+### Fixed
+
+- Fixed a panic when running `pint ci`.
+
 ## v0.81.1
 
 ### Fixed
