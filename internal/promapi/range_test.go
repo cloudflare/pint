@@ -55,15 +55,15 @@ func (ar absoluteRange) String() string {
 
 func TestRange(t *testing.T) {
 	type testCaseT struct {
-		start   time.Time
-		end     time.Time
-		mock    httpmock.Mocker
-		query   string
-		err     string
-		out     promapi.SeriesTimeRanges
-		stats   promapi.QueryStats
-		step    time.Duration
-		timeout time.Duration
+		start     time.Time
+		end       time.Time
+		mock      httpmock.Mocker
+		query     string
+		assertErr func(t *testing.T, err error)
+		out       promapi.SeriesTimeRanges
+		stats     promapi.QueryStats
+		step      time.Duration
+		timeout   time.Duration
 	}
 
 	timeParse := func(s string) time.Time {
@@ -90,6 +90,9 @@ func TestRange(t *testing.T) {
 			step:    time.Minute,
 			timeout: time.Second,
 			out:     promapi.SeriesTimeRanges{},
+			assertErr: func(t *testing.T, err error) {
+				require.NoError(t, err)
+			},
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectPost(promapi.APIPathQueryRange).
 					ReturnHeader("Content-Type", "application/json").
@@ -103,6 +106,9 @@ func TestRange(t *testing.T) {
 			end:     timeParse("2022-06-14T03:00:00Z"),
 			step:    time.Minute * 5,
 			timeout: time.Second,
+			assertErr: func(t *testing.T, err error) {
+				require.NoError(t, err)
+			},
 			out: promapi.SeriesTimeRanges{
 				Ranges: promapi.MetricTimeRanges{
 					{
@@ -131,6 +137,9 @@ func TestRange(t *testing.T) {
 			step:    time.Minute,
 			timeout: time.Second,
 			out:     promapi.SeriesTimeRanges{},
+			assertErr: func(t *testing.T, err error) {
+				require.NoError(t, err)
+			},
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectPost(promapi.APIPathQueryRange).
 					ReturnHeader("Content-Type", "application/json").
@@ -145,6 +154,9 @@ func TestRange(t *testing.T) {
 			step:    time.Minute,
 			timeout: time.Second,
 			out:     promapi.SeriesTimeRanges{},
+			assertErr: func(t *testing.T, err error) {
+				require.NoError(t, err)
+			},
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectPost(promapi.APIPathQueryRange).
 					ReturnHeader("Content-Type", "application/json").
@@ -158,6 +170,9 @@ func TestRange(t *testing.T) {
 			end:     timeParse("2022-06-14T18:35:00Z"),
 			step:    time.Minute,
 			timeout: time.Second,
+			assertErr: func(t *testing.T, err error) {
+				require.NoError(t, err)
+			},
 			out: promapi.SeriesTimeRanges{
 				Ranges: promapi.MetricTimeRanges{
 					{
@@ -187,6 +202,9 @@ func TestRange(t *testing.T) {
 			end:     timeParse("2022-06-14T03:00:00Z"),
 			step:    time.Minute * 5,
 			timeout: time.Second,
+			assertErr: func(t *testing.T, err error) {
+				require.NoError(t, err)
+			},
 			out: promapi.SeriesTimeRanges{
 				Ranges: promapi.MetricTimeRanges{
 					{
@@ -232,6 +250,9 @@ func TestRange(t *testing.T) {
 			end:     time.Unix(1677786840, 0),
 			step:    time.Minute * 5,
 			timeout: time.Second,
+			assertErr: func(t *testing.T, err error) {
+				require.NoError(t, err)
+			},
 			out: promapi.SeriesTimeRanges{
 				Ranges: promapi.MetricTimeRanges{
 					{
@@ -296,6 +317,9 @@ func TestRange(t *testing.T) {
 			end:     timeParse("2022-06-14T07:00:00Z"),
 			step:    time.Minute,
 			timeout: time.Second,
+			assertErr: func(t *testing.T, err error) {
+				require.NoError(t, err)
+			},
 			out: promapi.SeriesTimeRanges{
 				Ranges: promapi.MetricTimeRanges{
 					{
@@ -331,6 +355,9 @@ func TestRange(t *testing.T) {
 			end:     timeParse("2022-06-14T07:30:00Z"),
 			step:    time.Minute * 5,
 			timeout: time.Second,
+			assertErr: func(t *testing.T, err error) {
+				require.NoError(t, err)
+			},
 			out: promapi.SeriesTimeRanges{
 				Ranges: promapi.MetricTimeRanges{
 					{
@@ -366,7 +393,9 @@ func TestRange(t *testing.T) {
 			end:     timeParse("2022-06-14T03:00:00Z"),
 			step:    time.Minute * 5,
 			timeout: time.Second,
-			err:     "timeout: query timed out in expression evaluation",
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(t, err, "timeout: query timed out in expression evaluation")
+			},
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectPost(promapi.APIPathQueryRange).
 					ReturnHeader("Content-Type", "application/json").
@@ -398,7 +427,9 @@ func TestRange(t *testing.T) {
 			end:     timeParse("2022-06-14T00:01:00Z"),
 			step:    time.Minute,
 			timeout: time.Second,
-			err:     "bad_data: custom error message",
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(t, err, "bad_data: custom error message")
+			},
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectPost(promapi.APIPathQueryRange).
 					ReturnHeader("Content-Type", "application/json").
@@ -412,7 +443,12 @@ func TestRange(t *testing.T) {
 			end:     timeParse("2022-06-14T00:01:00Z"),
 			step:    time.Minute,
 			timeout: time.Second,
-			err:     `bad_response: JSON parse error: jsontext: invalid character '}' after object name (expecting ':') within "/data/resultType" after offset 40`,
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(
+					t, err,
+					`bad_response: JSON parse error: jsontext: invalid character '}' after object name (expecting ':') within "/data/resultType" after offset 40`,
+				)
+			},
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectPost(promapi.APIPathQueryRange).
 					ReturnHeader("Content-Type", "application/json").
@@ -426,7 +462,9 @@ func TestRange(t *testing.T) {
 			end:     timeParse("2022-06-14T00:01:00Z"),
 			step:    time.Minute,
 			timeout: time.Second,
-			err:     `bad_data: empty response object`,
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(t, err, "bad_data: empty response object")
+			},
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectPost(promapi.APIPathQueryRange).
 					ReturnHeader("Content-Type", "application/json").
@@ -440,7 +478,9 @@ func TestRange(t *testing.T) {
 			end:     timeParse("2022-06-14T00:05:00Z"),
 			step:    time.Second,
 			timeout: time.Second,
-			err:     "bad_response: invalid result type, expected matrix, got vector",
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(t, err, "bad_response: invalid result type, expected matrix, got vector")
+			},
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectPost(promapi.APIPathQueryRange).
 					ReturnHeader("Content-Type", "application/json").
@@ -454,6 +494,9 @@ func TestRange(t *testing.T) {
 			end:     timeParse("2022-06-14T07:00:00Z"),
 			step:    time.Minute,
 			timeout: time.Second,
+			assertErr: func(t *testing.T, err error) {
+				require.NoError(t, err)
+			},
 			out: promapi.SeriesTimeRanges{
 				Ranges: promapi.MetricTimeRanges{
 					{
@@ -513,10 +556,8 @@ func TestRange(t *testing.T) {
 			for i := 1; i < 5; i++ {
 				t.Run(tc.query, func(t *testing.T) {
 					qr, err := fg.RangeQuery(t.Context(), tc.query, newAbsoluteRange(tc.start, tc.end, tc.step))
-					if tc.err != "" {
-						require.EqualError(t, err, tc.err, tc)
-					} else {
-						require.NoError(t, err)
+					tc.assertErr(t, err)
+					if qr != nil {
 						require.Equal(t, printRange(tc.out.Ranges), printRange(qr.Series.Ranges), tc)
 						require.Equal(t, tc.stats, qr.Stats)
 					}
