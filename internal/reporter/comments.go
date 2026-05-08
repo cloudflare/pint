@@ -155,19 +155,25 @@ func makeComments(summary Summary, showDuplicates bool) (comments []PendingComme
 		buf.WriteString(".html).\n")
 
 		line := reports[0].Problem.Lines.Last
-		for i := reports[0].Problem.Lines.Last; i >= reports[0].Problem.Lines.First; i-- {
-			if reports[0].Changes.Lines.HasAfter(i) {
-				line = i
-				break
+		oldPath := ""
+		changedLines := git.LineNumbers{}
+		if reports[0].Changes != nil {
+			oldPath = reports[0].Changes.OldPath
+			changedLines = reports[0].Changes.Lines
+			for i := reports[0].Problem.Lines.Last; i >= reports[0].Problem.Lines.First; i-- {
+				if changedLines.HasAfter(i) {
+					line = i
+					break
+				}
 			}
 		}
 
 		comments = append(comments, PendingComment{
 			anchor:       reports[0].Problem.Anchor,
 			path:         reports[0].Path.SymlinkTarget,
-			oldPath:      reports[0].Changes.OldPath,
+			oldPath:      oldPath,
 			line:         line,
-			changedLines: reports[0].Changes.Lines,
+			changedLines: changedLines,
 			text:         buf.String(),
 		})
 	}
