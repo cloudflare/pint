@@ -48,8 +48,9 @@ files.
 
 ## Cross-group dependencies
 
-This check warns when a rule uses a metric produced by a recording rule
-in a different group.
+This check warns when a recording rule uses a metric produced by another
+recording rule in a different group. Alerting rules are ignored by this check
+because the small lag is usually acceptable.
 
 Each group is evaluated independently with no guaranteed execution order.
 During evaluation, recording rules write results to a transaction that is
@@ -57,35 +58,35 @@ committed to TSDB at the end of the group run. Queries within the same group
 can see uncommitted results from earlier rules in that group, but queries in
 other groups can only see values that have been committed to TSDB.
 
-In practice, if rule B depends on rule A, they should be in the same group.
-Otherwise, B will see a stale value of A from the previous evaluation cycle,
-adding up to one evaluation interval of lag.
+In practice, if recording rule B depends on recording rule A, they should be
+in the same group. Otherwise, B will see a stale value of A from the previous
+evaluation cycle, adding up to one evaluation interval of lag.
 
 Example:
 
 ```yaml
 groups:
-- name: recordings
+- name: base
   rules:
   - record: error:rate5m
     expr: rate(errors_total[5m])
 
-- name: alerts
+- name: aggregations
   rules:
-  - alert: HighErrorRate
-    expr: error:rate5m > 0.1
+  - record: error:rate5m:avg
+    expr: avg(error:rate5m)
 ```
 
-The `HighErrorRate` alert uses `error:rate5m` from a different group.
+The `error:rate5m:avg` recording rule uses `error:rate5m` from a different group.
 Both groups run at fixed intervals but start at different times.
 With a one-minute interval:
 
-- **0s** - `recordings` evaluates `error:rate5m` and commits to TSDB.
-- **55s** - `alerts` queries `error:rate5m` and sees a 55-second-old value.
-- **60s** - `recordings` runs again.
-- **115s** - `alerts` runs again, still seeing stale data.
+- **0s** - `base` evaluates `error:rate5m` and commits to TSDB.
+- **55s** - `aggregations` queries `error:rate5m` and sees a 55-second-old value.
+- **60s** - `base` runs again.
+- **115s** - `aggregations` runs again, still seeing stale data.
 
-Each time `alerts` runs, it sees a value that is already up to one interval old.
+Each time `aggregations` runs, it sees a value that is already up to one interval old.
 
 Moving both rules to the same group eliminates this lag:
 
@@ -95,15 +96,15 @@ groups:
   rules:
   - record: error:rate5m
     expr: rate(errors_total[5m])
-  - alert: HighErrorRate
-    expr: error:rate5m > 0.1
+  - record: error:rate5m:avg
+    expr: avg(error:rate5m)
 ```
 
 - **0s** - `errors` evaluates `error:rate5m` and writes to the transaction.
-- **0s** - `errors` evaluates `HighErrorRate`, which sees the value from the
+- **0s** - `errors` evaluates `error:rate5m:avg`, which sees the value from the
   previous step with no lag.
 
-Now the alert always sees the freshly computed value.
+Now the aggregation always sees the freshly computed value.
 
 ## Configuration
 

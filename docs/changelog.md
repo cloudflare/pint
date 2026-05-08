@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.82.0
+
+### Changed
+
+- [rule/dependency](checks/rule/dependency.md) cross-group dependency check now
+  only reports problems for recording rules.
+
 ## v0.81.1
 
 ### Fixed

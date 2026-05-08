@@ -237,8 +237,8 @@ func TestRuleDependencyCheck(t *testing.T) {
 			},
 		},
 		{
-			// Alert uses metric from recording rule in a different group - should warn.
-			description: "warns about cross-group dependency / different groups in same file",
+			// Alert uses metric from recording rule in a different group - no warning for alerting rules.
+			description: "ignores cross-group dependency for alerting rules / different groups in same file",
 			content: `groups:
 - name: alerts
   rules:
@@ -249,7 +249,6 @@ func TestRuleDependencyCheck(t *testing.T) {
 				return checks.NewRuleDependencyCheck()
 			},
 			prometheus: newSimpleProm,
-			problems:   true,
 			entries: parseWithState(`groups:
 - name: recordings
   rules:
@@ -296,8 +295,31 @@ func TestRuleDependencyCheck(t *testing.T) {
 `, discovery.Noop, "base.yaml", "base.yaml"),
 		},
 		{
-			// Cross-group dependency across different files - should warn.
-			description: "warns about cross-group dependency / different files",
+			// Recording rule uses multiple metrics from recording rules in a different group.
+			description: "warns about multiple cross-group dependencies for recording rules",
+			content: `groups:
+- name: aggregations
+  rules:
+  - record: combined:sum
+    expr: foo:sum + bar:sum
+`,
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewRuleDependencyCheck()
+			},
+			prometheus: newSimpleProm,
+			problems:   true,
+			entries: parseWithState(`groups:
+- name: base
+  rules:
+  - record: bar:sum
+    expr: sum(bar)
+  - record: foo:sum
+    expr: sum(foo)
+`, discovery.Noop, "base.yaml", "base.yaml"),
+		},
+		{
+			// Alert with cross-group dependency across different files - no warning for alerting rules.
+			description: "ignores cross-group dependency for alerting rules / different files",
 			content: `groups:
 - name: alerts
   rules:
@@ -308,7 +330,6 @@ func TestRuleDependencyCheck(t *testing.T) {
 				return checks.NewRuleDependencyCheck()
 			},
 			prometheus: newSimpleProm,
-			problems:   true,
 			entries: parseWithState(`groups:
 - name: recordings
   rules:
@@ -317,8 +338,8 @@ func TestRuleDependencyCheck(t *testing.T) {
 `, discovery.Noop, "other.yaml", "other.yaml"),
 		},
 		{
-			// Multiple cross-group dependencies - tests sorting.
-			description: "warns about multiple cross-group dependencies",
+			// Alert with multiple cross-group dependencies - no warning for alerting rules.
+			description: "ignores multiple cross-group dependencies for alerting rules",
 			content: `groups:
 - name: alerts
   rules:
@@ -329,7 +350,6 @@ func TestRuleDependencyCheck(t *testing.T) {
 				return checks.NewRuleDependencyCheck()
 			},
 			prometheus: newSimpleProm,
-			problems:   true,
 			entries: parseWithState(`groups:
 - name: recordings
   rules:
