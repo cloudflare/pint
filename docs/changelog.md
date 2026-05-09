@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.82.2
+
+### Fixed
+
+- [rule/dependency](checks/rule/dependency.md) won't report warnings when one
+  query uses a recording rules that produce a static value (`vector(1)`).
+  If the value is always the same the lag doesn't matter and it's a false positive.
+
 ## v0.82.1
 
 ### Fixed
