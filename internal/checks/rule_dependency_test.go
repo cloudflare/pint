@@ -416,6 +416,85 @@ func TestRuleDependencyCheck(t *testing.T) {
     expr: sum(foo)
 `, discovery.Noop, "rules.yaml", "rules.yaml"),
 		},
+		{
+			description: "ignores cross-group dependency when other rule produces a static value",
+			content: `groups:
+- name: aggregations
+  rules:
+  - record: foo:rate
+    expr: rate(foo:sum[5m])
+`,
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewRuleDependencyCheck()
+			},
+			prometheus: newSimpleProm,
+			entries: parseWithState(`groups:
+- name: base
+  rules:
+  - record: foo:sum
+    expr: vector(1)
+`, discovery.Noop, "base.yaml", "base.yaml"),
+		},
+		{
+			description: "ignores cross-group dependency when other rule produces a computed static value",
+			content: `groups:
+- name: aggregations
+  rules:
+  - record: foo:rate
+    expr: rate(foo:sum[5m])
+`,
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewRuleDependencyCheck()
+			},
+			prometheus: newSimpleProm,
+			entries: parseWithState(`groups:
+- name: base
+  rules:
+  - record: foo:sum
+    expr: vector(1) + vector(2)
+`, discovery.Noop, "base.yaml", "base.yaml"),
+		},
+		{
+			description: "ignores cross-group dependency when other rule has syntax error",
+			content: `groups:
+- name: aggregations
+  rules:
+  - record: foo:rate
+    expr: rate(foo:sum[5m])
+`,
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewRuleDependencyCheck()
+			},
+			prometheus: newSimpleProm,
+			entries: parseWithState(`groups:
+- name: base
+  rules:
+  - record: foo:sum
+    expr: foo !=! bar
+`, discovery.Noop, "base.yaml", "base.yaml"),
+		},
+		{
+			description: "warns about non-static cross-group dependency but ignores static one",
+			content: `groups:
+- name: aggregations
+  rules:
+  - record: combined:rate
+    expr: foo:sum + bar:sum
+`,
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewRuleDependencyCheck()
+			},
+			prometheus: newSimpleProm,
+			problems:   true,
+			entries: parseWithState(`groups:
+- name: base
+  rules:
+  - record: bar:sum
+    expr: vector(0)
+  - record: foo:sum
+    expr: sum(foo)
+`, discovery.Noop, "base.yaml", "base.yaml"),
+		},
 	}
 
 	runTests(t, testCases)
