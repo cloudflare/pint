@@ -1472,12 +1472,12 @@
 
 ---
 
-[TestTemplateCheck/invalid_syntax_in_annotations - 1]
-- description: invalid syntax in annotations
+[TestTemplateCheck/invalid_syntax_in_labels - 1]
+- description: invalid syntax in labels
   content: |
     - alert: Foo Is Down
       expr: up{job="foo"} == 0
-      annotations:
+      labels:
         summary: 'Instance {{ $label.instance }} down'
   output: |
     4 |     summary: 'Instance {{ $label.instance }} down'
@@ -1499,24 +1499,24 @@
 
 ---
 
-[TestTemplateCheck/invalid_syntax_in_labels - 1]
-- description: invalid syntax in labels
+[TestTemplateCheck/invalid_template_syntax_with_humanize_in_annotations - 1]
+- description: invalid template syntax with humanize in annotations
   content: |
     - alert: Foo Is Down
       expr: up{job="foo"} == 0
-      labels:
-        summary: 'Instance {{ $label.instance }} down'
+      annotations:
+        summary: '{{ .Value | humanize }'
   output: |
-    4 |     summary: 'Instance {{ $label.instance }} down'
-                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Template failed to parse with this error: `undefined variable "$label"`.
+    4 |     summary: '{{ .Value | humanize }'
+                      ^^^^^^^^^^^^^^^^^^^^^^ Template failed to parse with this error: `unexpected "}" in operand`.
   problem:
     reporter: alerts/template
     summary: template syntax error
     details: Supported template syntax is documented [here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#templating).
     diagnostics:
-        - message: 'Template failed to parse with this error: `undefined variable "$label"`.'
+        - message: 'Template failed to parse with this error: `unexpected "}" in operand`.'
           firstcolumn: 1
-          lastcolumn: 35
+          lastcolumn: 22
           kind: 0
     lines:
         first: 4
@@ -2331,6 +2331,41 @@
         first: 5
         last: 6
     severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/humanize_still_needed_when_value_is_wrapped_by_another_function - 1]
+- description: humanize still needed when value is wrapped by another function
+  content: |4
+
+    - alert: Foo
+      expr: rate(errors_total[5m]) > 0
+      annotations:
+        summary: Seeing {{ len (printf "%v" $value) }} / {{ $value }} instances with errors
+  output: |
+    3 |   expr: rate(errors_total[5m]) > 0
+                ^^^^^^^^^^^^^^^^^^^^^^ `rate()` will produce results that are hard to read for humans.
+      | [...]
+    5 |     summary: Seeing {{ len (printf "%v" $value) }} / {{ $value }} instances with errors
+                                                                ^^^^^^^ Use one of humanize template functions to make the result more readable.
+  problem:
+    reporter: alerts/template
+    summary: use humanize filters for the results
+    details: '[Click here](https://prometheus.io/docs/prometheus/latest/configuration/template_reference/) for a full list of all available template functions.'
+    diagnostics:
+        - message: '`rate()` will produce results that are hard to read for humans.'
+          firstcolumn: 1
+          lastcolumn: 22
+          kind: 1
+        - message: Use one of humanize template functions to make the result more readable.
+          firstcolumn: 44
+          lastcolumn: 50
+          kind: 0
+    lines:
+        first: 3
+        last: 5
+    severity: 0
     anchor: 0
 
 ---

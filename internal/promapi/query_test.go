@@ -367,25 +367,39 @@ func (e *errReader) Read(p []byte) (int, error) {
 
 func TestSampleLabelsUnmarshalJSONFromReadTokenErrors(t *testing.T) {
 	type testCaseT struct {
-		input io.Reader
-		name  string
+		assertErr func(t *testing.T, err error)
+		input     io.Reader
+		name      string
 	}
 
 	testCases := []testCaseT{
 		{
-			// PeekKind sees '{' but ReadToken fails reading it.
+			name:  "wrong opening kind",
+			input: strings.NewReader("[]"),
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(t, err, "json: cannot handle JSON array")
+			},
+		},
+		{
 			name:  "error reading opening brace",
 			input: &errReader{r: strings.NewReader("{"), err: io.ErrUnexpectedEOF},
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(t, err, "jsontext: read error: unexpected EOF")
+			},
 		},
 		{
-			// Opening '{' is read but ReadToken fails on the first key.
 			name:  "error reading key inside object",
 			input: &errReader{r: strings.NewReader(`{"k`), err: io.ErrUnexpectedEOF},
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(t, err, "jsontext: read error: unexpected EOF")
+			},
 		},
 		{
-			// All keys read but ReadToken fails on closing '}'.
 			name:  "error reading closing brace",
 			input: &errReader{r: strings.NewReader(`{"a":"b"`), err: io.ErrUnexpectedEOF},
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(t, err, "jsontext: read error: unexpected EOF")
+			},
 		},
 	}
 
@@ -394,37 +408,60 @@ func TestSampleLabelsUnmarshalJSONFromReadTokenErrors(t *testing.T) {
 			dec := jsontext.NewDecoder(tc.input)
 			var s promapi.SampleLabels
 			err := s.UnmarshalJSONFrom(dec)
-			require.Error(t, err)
+			tc.assertErr(t, err)
 		})
 	}
 }
 
 func TestSampleTimestampValueUnmarshalJSONFromReadTokenErrors(t *testing.T) {
 	type testCaseT struct {
-		input io.Reader
-		name  string
+		assertErr func(t *testing.T, err error)
+		input     io.Reader
+		name      string
 	}
 
 	testCases := []testCaseT{
 		{
-			// PeekKind sees '[' but ReadToken fails reading it.
 			name:  "error reading opening bracket",
 			input: &errReader{r: strings.NewReader("["), err: io.ErrUnexpectedEOF},
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(t, err, "jsontext: read error: unexpected EOF")
+			},
 		},
 		{
-			// Opening '[' is read but ReadToken fails on the timestamp.
 			name:  "error reading timestamp token",
 			input: &errReader{r: strings.NewReader(`[1`), err: io.ErrUnexpectedEOF},
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(t, err, "jsontext: read error: unexpected EOF")
+			},
 		},
 		{
-			// Timestamp read but ReadToken fails on the value string.
+			name:  "timestamp is not a float",
+			input: strings.NewReader(`["notanumber","1"]`),
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(t, err, `strconv.ParseFloat: parsing "notanumber": invalid syntax`)
+			},
+		},
+		{
 			name:  "error reading value token",
 			input: &errReader{r: strings.NewReader(`[1614859502.068,"1`), err: io.ErrUnexpectedEOF},
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(t, err, "jsontext: read error: unexpected EOF")
+			},
 		},
 		{
-			// Value read but ReadToken fails on closing ']'.
+			name:  "wrong closing token kind",
+			input: strings.NewReader(`[1614859502.068,"1",{}]`),
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(t, err, "json: cannot handle JSON object")
+			},
+		},
+		{
 			name:  "error reading closing bracket",
 			input: &errReader{r: strings.NewReader(`[1614859502.068,"1"`), err: io.ErrUnexpectedEOF},
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(t, err, "json: cannot handle")
+			},
 		},
 	}
 
@@ -433,7 +470,7 @@ func TestSampleTimestampValueUnmarshalJSONFromReadTokenErrors(t *testing.T) {
 			dec := jsontext.NewDecoder(tc.input)
 			var s promapi.SampleTimestampValue
 			err := s.UnmarshalJSONFrom(dec)
-			require.Error(t, err)
+			tc.assertErr(t, err)
 		})
 	}
 }

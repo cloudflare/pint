@@ -26,15 +26,15 @@ func TestTemplateCheck(t *testing.T) {
 			prometheus:  noProm,
 		},
 		{
-			description: "invalid syntax in annotations",
-			content:     "- alert: Foo Is Down\n  expr: up{job=\"foo\"} == 0\n  annotations:\n    summary: 'Instance {{ $label.instance }} down'\n",
+			description: "invalid function in annotations",
+			content:     "- alert: Foo Is Down\n  expr: up{job=\"foo\"} == 0\n  annotations:\n    summary: '{{ $value | xxx }}'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
 			problems:    true,
 		},
 		{
-			description: "invalid function in annotations",
-			content:     "- alert: Foo Is Down\n  expr: up{job=\"foo\"} == 0\n  annotations:\n    summary: '{{ $value | xxx }}'\n",
+			description: "invalid template syntax with humanize in annotations",
+			content:     "- alert: Foo Is Down\n  expr: up{job=\"foo\"} == 0\n  annotations:\n    summary: '{{ .Value | humanize }'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
 			problems:    true,
@@ -495,6 +495,18 @@ func TestTemplateCheck(t *testing.T) {
   expr: rate(errors_total[5m]) > 0
   annotations:
     summary: Seeing {{ printf "%f" 2 }}{{ $value }} instances with errors
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   true,
+		},
+		{
+			description: "humanize still needed when value is wrapped by another function",
+			content: `
+- alert: Foo
+  expr: rate(errors_total[5m]) > 0
+  annotations:
+    summary: Seeing {{ len (printf "%v" $value) }} / {{ $value }} instances with errors
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,

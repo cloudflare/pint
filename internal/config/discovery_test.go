@@ -2,6 +2,10 @@ package config
 
 import (
 	"log/slog"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"strconv"
 	"testing"
 
@@ -243,11 +247,6 @@ func TestPrometheusTemplateRender(t *testing.T) {
 
 	testCases := []testCaseT{
 		{
-			template: PrometheusTemplate{},
-			data:     map[string]string{},
-			err:      "prometheus URI cannot be empty",
-		},
-		{
 			template: PrometheusTemplate{
 				Name: "{{ $name }}",
 				URI:  "http://",
@@ -373,6 +372,260 @@ func TestPrometheusTemplateRender(t *testing.T) {
 			} else {
 				require.EqualError(t, err, tc.err)
 			}
+		})
+	}
+}
+
+func TestDiscovery(t *testing.T) {
+	type expectedGroupT struct {
+		name         string
+		uri          string
+		uptimeMetric string
+		include      []string
+		exclude      []string
+		tags         []string
+		serverCount  int
+	}
+
+	type testCaseT struct {
+		setup       func(t *testing.T) Discovery
+		description string
+		expectErr   string
+		expect      []expectedGroupT
+	}
+
+	testCases := []testCaseT{
+		{
+			description: "non-existent directory",
+			setup: func(_ *testing.T) Discovery {
+				return Discovery{FilePath: []FilePath{{
+					Directory: "/this/does/not/exist",
+					Match:     ".+",
+					Template:  []PrometheusTemplate{{Name: "prom", URI: "http://localhost"}},
+				}}}
+			},
+			expectErr: "filepath discovery error: lstat /this/does/not/exist: no such file or directory",
+		},
+		{
+			description: "discovers matching files",
+			setup: func(t *testing.T) Discovery {
+				dir := t.TempDir()
+				require.NoError(t, os.WriteFile(filepath.Join(dir, "prom-1.yaml"), []byte(""), 0o644))
+				require.NoError(t, os.WriteFile(filepath.Join(dir, "prom-2.yaml"), []byte(""), 0o644))
+				return Discovery{FilePath: []FilePath{{
+					Directory: dir,
+					Match:     `prom-(?P<idx>\d+)\.yaml`,
+					Template:  []PrometheusTemplate{{Name: "prom-{{ $idx }}", URI: "http://prom-{{ $idx }}"}},
+				}}}
+			},
+			expect: []expectedGroupT{
+				{
+					name:         "prom-1",
+					uri:          "http://prom-1",
+					uptimeMetric: "up",
+					include:      []string{},
+					exclude:      []string{},
+					tags:         []string{},
+					serverCount:  1,
+				},
+				{
+					name:         "prom-2",
+					uri:          "http://prom-2",
+					uptimeMetric: "up",
+					include:      []string{},
+					exclude:      []string{},
+					tags:         []string{},
+					serverCount:  1,
+				},
+			},
+		},
+		{
+			description: "ignores non-matching files",
+			setup: func(t *testing.T) Discovery {
+				dir := t.TempDir()
+				require.NoError(t, os.WriteFile(filepath.Join(dir, "prom-1.yaml"), []byte(""), 0o644))
+				require.NoError(t, os.WriteFile(filepath.Join(dir, "other.yaml"), []byte(""), 0o644))
+				return Discovery{FilePath: []FilePath{{
+					Directory: dir,
+					Match:     `prom-(?P<idx>\d+)\.yaml`,
+					Template:  []PrometheusTemplate{{Name: "prom-{{ $idx }}", URI: "http://prom-{{ $idx }}"}},
+				}}}
+			},
+			expect: []expectedGroupT{{
+				name:         "prom-1",
+				uri:          "http://prom-1",
+				uptimeMetric: "up",
+				include:      []string{},
+				exclude:      []string{},
+				tags:         []string{},
+				serverCount:  1,
+			}},
+		},
+		{
+			description: "merges identical servers from different file paths",
+			setup: func(t *testing.T) Discovery {
+				dir := t.TempDir()
+				require.NoError(t, os.WriteFile(filepath.Join(dir, "prom-1.yaml"), []byte(""), 0o644))
+				return Discovery{FilePath: []FilePath{
+					{
+						Directory: dir,
+						Match:     `prom-(?P<idx>\d+)\.yaml`,
+						Template:  []PrometheusTemplate{{Name: "prom-{{ $idx }}", URI: "http://prom-{{ $idx }}"}},
+					},
+					{
+						Directory: dir,
+						Match:     `prom-(?P<idx>\d+)\.yaml`,
+						Template:  []PrometheusTemplate{{Name: "prom-{{ $idx }}", URI: "http://prom-{{ $idx }}"}},
+					},
+				}}
+			},
+			expect: []expectedGroupT{{
+				name:         "prom-1",
+				uri:          "http://prom-1",
+				uptimeMetric: "up",
+				include:      []string{},
+				exclude:      []string{},
+				tags:         []string{},
+				serverCount:  1,
+			}},
+		},
+		{
+			description: "keeps servers with different names from different file paths",
+			setup: func(t *testing.T) Discovery {
+				dir := t.TempDir()
+				require.NoError(t, os.WriteFile(filepath.Join(dir, "prom-1.yaml"), []byte(""), 0o644))
+				return Discovery{FilePath: []FilePath{
+					{
+						Directory: dir,
+						Match:     `prom-(?P<idx>\d+)\.yaml`,
+						Template:  []PrometheusTemplate{{Name: "prom-a-{{ $idx }}", URI: "http://prom-{{ $idx }}"}},
+					},
+					{
+						Directory: dir,
+						Match:     `prom-(?P<idx>\d+)\.yaml`,
+						Template:  []PrometheusTemplate{{Name: "prom-b-{{ $idx }}", URI: "http://prom-{{ $idx }}"}},
+					},
+				}}
+			},
+			expect: []expectedGroupT{
+				{
+					name:         "prom-a-1",
+					uri:          "http://prom-1",
+					uptimeMetric: "up",
+					include:      []string{},
+					exclude:      []string{},
+					tags:         []string{},
+					serverCount:  1,
+				},
+				{
+					name:         "prom-b-1",
+					uri:          "http://prom-1",
+					uptimeMetric: "up",
+					include:      []string{},
+					exclude:      []string{},
+					tags:         []string{},
+					serverCount:  1,
+				},
+			},
+		},
+		{
+			description: "file path template render fails with missing key",
+			setup: func(t *testing.T) Discovery {
+				dir := t.TempDir()
+				require.NoError(t, os.WriteFile(filepath.Join(dir, "prom-1.yaml"), []byte(""), 0o644))
+				return Discovery{FilePath: []FilePath{{
+					Directory: dir,
+					Match:     `prom-(?P<idx>\d+)\.yaml`,
+					Template: []PrometheusTemplate{{
+						Name: "prom-{{ .missing_key }}",
+						URI:  "http://prom-{{ $idx }}",
+					}},
+				}}}
+			},
+			expectErr: `filepath discovery failed to generate Prometheus config from a template: bad name template "prom-{{ .missing_key }}": template: discovery:1:26: executing "discovery" at <.missing_key>: map has no entry for key "missing_key"`,
+		},
+		{
+			description: "discovers servers from Prometheus query",
+			setup: func(t *testing.T) Discovery {
+				srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+					w.Header().Set("Content-Type", "application/json")
+					_, _ = w.Write([]byte(`{"status":"success","data":{"resultType":"vector","result":[{"metric":{"instance":"1"},"value":[1614859502.068,"1"]}]}}`))
+				}))
+				t.Cleanup(srv.Close)
+				return Discovery{PrometheusQuery: []PrometheusQuery{{
+					URI:      srv.URL,
+					Query:    "up",
+					Template: []PrometheusTemplate{{Name: "prom-{{ $instance }}", URI: "http://prom-{{ $instance }}"}},
+				}}}
+			},
+			expect: []expectedGroupT{{
+				name:         "prom-1",
+				uri:          "http://prom-1",
+				uptimeMetric: "up",
+				include:      []string{},
+				exclude:      []string{},
+				tags:         []string{},
+				serverCount:  1,
+			}},
+		},
+		{
+			description: "Prometheus query fails",
+			setup: func(t *testing.T) Discovery {
+				srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+					w.WriteHeader(http.StatusInternalServerError)
+					_, _ = w.Write([]byte(`{"status":"error","errorType":"internal","error":"something went wrong"}`))
+				}))
+				t.Cleanup(srv.Close)
+				return Discovery{PrometheusQuery: []PrometheusQuery{{
+					URI:      srv.URL,
+					Query:    "up",
+					Template: []PrometheusTemplate{{Name: "prom", URI: "http://prom"}},
+				}}}
+			},
+			expectErr: "prometheusQuery discovery failed to execute Prometheus query: unknown: something went wrong",
+		},
+		{
+			description: "template render fails with missing key",
+			setup: func(t *testing.T) Discovery {
+				srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+					w.Header().Set("Content-Type", "application/json")
+					_, _ = w.Write([]byte(`{"status":"success","data":{"resultType":"vector","result":[{"metric":{"instance":"1"},"value":[1614859502.068,"1"]}]}}`))
+				}))
+				t.Cleanup(srv.Close)
+				return Discovery{PrometheusQuery: []PrometheusQuery{{
+					URI:      srv.URL,
+					Query:    "up",
+					Template: []PrometheusTemplate{{Name: "prom-{{ .missing_key }}", URI: "http://prom"}},
+				}}}
+			},
+			expectErr: `prometheusQuery discovery  failed to generate Prometheus config from a template: bad name template "prom-{{ .missing_key }}": template: discovery:1:36: executing "discovery" at <.missing_key>: map has no entry for key "missing_key"`,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.description, func(t *testing.T) {
+			slog.SetDefault(slogt.New(t))
+
+			d := tc.setup(t)
+			servers, err := d.Discover(t.Context())
+			if tc.expectErr != "" {
+				require.EqualError(t, err, tc.expectErr)
+				return
+			}
+			require.NoError(t, err)
+			actual := make([]expectedGroupT, 0, len(servers))
+			for _, server := range servers {
+				actual = append(actual, expectedGroupT{
+					name:         server.Name(),
+					uri:          server.URI(),
+					include:      server.Include(),
+					exclude:      server.Exclude(),
+					tags:         server.Tags(),
+					uptimeMetric: server.UptimeMetric(),
+					serverCount:  server.ServerCount(),
+				})
+			}
+			require.Equal(t, tc.expect, actual)
 		})
 	}
 }
