@@ -268,6 +268,45 @@ func TestRegexpCheck(t *testing.T) {
 			prometheus:  noProm,
 			problems:    true,
 		},
+		{
+			// One selector has a redundant static regexp and another has a valid regexp.
+			description: "mixed redundant and valid regexp",
+			content:     "- record: foo\n  expr: foo{job=~\"bar\", cluster=~\"us-east-.*\"}\n",
+			checker:     newRegexpCheck,
+			prometheus:  noProm,
+			problems:    true,
+		},
+		{
+			// Smelly regexp alongside a non-smelly valid regexp.
+			description: "smelly and valid regexp",
+			content:     "- record: foo\n  expr: foo{job=~\"service_.*_prod\", code=~\"5..\"}\n",
+			checker:     newRegexpCheck,
+			prometheus:  noProm,
+			problems:    true,
+		},
+		{
+			// Redundant wildcard regexp alongside a redundant static regexp.
+			description: "wildcard and static redundant regexp",
+			content:     "- record: foo\n  expr: foo{job=~\".*\", cluster=~\"prod\"}\n",
+			checker:     newRegexpCheck,
+			prometheus:  noProm,
+			problems:    true,
+		},
+		{
+			// Digit-only literal adjacent to wildcard is not flagged as smelly.
+			description: "digit only smelly pattern",
+			content:     "- record: foo\n  expr: foo{code=~\"5.*0\"}\n",
+			checker:     newRegexpCheck,
+			prometheus:  noProm,
+		},
+		{
+			// Regex with an empty non-capturing group produces OpEmptyMatch.
+			description: "empty non-capturing group regexp",
+			content:     "- record: foo\n  expr: foo{job=~\"(?:)\"}\n",
+			checker:     newRegexpCheck,
+			prometheus:  noProm,
+			problems:    true,
+		},
 	}
 	runTests(t, testCases)
 }
