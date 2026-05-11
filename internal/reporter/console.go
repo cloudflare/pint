@@ -30,7 +30,7 @@ type ConsoleReporter struct {
 	showDuplicates bool
 }
 
-func (cr ConsoleReporter) Submit(ctx context.Context, summary Summary) (err error) {
+func (cr ConsoleReporter) Submit(ctx context.Context, summary Summary) error {
 	var buf strings.Builder
 	var content string
 	var allReports, hiddenDupes int
