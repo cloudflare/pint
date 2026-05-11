@@ -107,20 +107,17 @@ func (c RegexpCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*dis
 			// If the matcher string is a literal match then we keep it as is.
 			// If it's not then it's a regexp match and we need to wrap it in ^...$.
 			re := lm.GetRegexString()
-			if regexp.QuoteMeta(re) != re {
+			isWrapped := regexp.QuoteMeta(re) != re
+			if isWrapped {
 				re = "^(?s:" + re + ")$"
 			}
 
 			var hasFlags, isUseful, isWildcard, isLiteral, isBad, isSmelly, hasNonDigits bool
 			var beginText, endText int
 			var lastOp syntax.Op
+			var literalValue strings.Builder
 			r, _ := syntax.Parse(re, syntax.Perl)
 			for _, s := range r.Sub {
-				// If effective flags are different from default flags then we assume regexp is useful.
-				// It could be case sensitive match.
-				if s.Flags > 0 && s.Flags != syntax.Perl {
-					hasFlags = true
-				}
 				if isOpSmelly(s.Op, lastOp) && hasNonDigits {
 					isSmelly = true
 				}
@@ -131,7 +128,13 @@ func (c RegexpCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*dis
 				case syntax.OpEndText:
 					endText++
 				case syntax.OpLiteral:
+					// If effective flags are different from default flags then we assume regexp is useful.
+					// It could be case sensitive match.
+					if s.Flags > 0 && s.Flags != syntax.Perl {
+						hasFlags = true
+					}
 					for _, r := range s.Rune {
+						literalValue.WriteRune(r)
 						if !unicode.IsDigit(r) {
 							hasNonDigits = true
 						}
@@ -166,7 +169,17 @@ func (c RegexpCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*dis
 				case labels.MatchNotRegexp:
 					op = labels.MatchNotEqual
 				}
-				bad = append(bad, badMatcher{pos: selector.PosRange, lm: lm, op: op, isWildcard: isWildcard})
+				lv := literalValue.String()
+				if !isWrapped {
+					lv = lm.Value
+				}
+				bad = append(bad, badMatcher{
+					pos:          selector.PosRange,
+					lm:           lm,
+					op:           op,
+					isWildcard:   isWildcard,
+					literalValue: lv,
+				})
 				isBad = true
 			}
 			if beginText > 1 || endText > 1 {
@@ -203,7 +216,7 @@ func (c RegexpCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*dis
 			default:
 				summary = "redundant regexp"
 				text = fmt.Sprintf("Unnecessary regexp match on static string `%s`, use `%s%s%q` instead.",
-					b.lm, b.lm.Name, b.op, b.lm.Value)
+					b.lm, b.lm.Name, b.op, b.literalValue)
 
 			}
 			pos := findMatcherPos(expr.Value.Value, b.pos, b.lm)
@@ -231,12 +244,13 @@ func (c RegexpCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*dis
 }
 
 type badMatcher struct {
-	lm         *labels.Matcher
-	pos        posrange.PositionRange
-	op         labels.MatchType
-	isWildcard bool
-	isSmelly   bool
-	badAnchor  bool
+	lm           *labels.Matcher
+	literalValue string
+	pos          posrange.PositionRange
+	op           labels.MatchType
+	isWildcard   bool
+	isSmelly     bool
+	badAnchor    bool
 }
 
 func makeLabel(name string, matchers ...*labels.Matcher) string {

@@ -4,6 +4,11 @@
 
 ---
 
+[TestRegexpCheck/digit_only_smelly_pattern - 1]
+[]
+
+---
+
 [TestRegexpCheck/duplicated_unnecessary_regexp - 1]
 - description: duplicated unnecessary regexp
   content: |
@@ -85,6 +90,31 @@
 
 ---
 
+[TestRegexpCheck/empty_non-capturing_group_regexp - 1]
+- description: empty non-capturing group regexp
+  content: |
+    - record: foo
+      expr: foo{job=~"(?:)"}
+  output: |
+    2 |   expr: foo{job=~"(?:)"}
+                    ^^^^^^^^^^^ Unnecessary regexp match on static string `job=~"(?:)"`, use `job=""` instead.
+  problem:
+    reporter: promql/regexp
+    summary: redundant regexp
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    diagnostics:
+        - message: Unnecessary regexp match on static string `job=~"(?:)"`, use `job=""` instead.
+          firstcolumn: 5
+          lastcolumn: 15
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
 [TestRegexpCheck/empty_regexp - 1]
 - description: empty regexp
   content: |
@@ -120,6 +150,52 @@
 
 ---
 
+[TestRegexpCheck/mixed_redundant_and_valid_regexp - 1]
+- description: mixed redundant and valid regexp
+  content: |
+    - record: foo
+      expr: foo{job=~"bar", cluster=~"us-east-.*"}
+  output: |
+    2 |   expr: foo{job=~"bar", cluster=~"us-east-.*"}
+                    ^^^^^^^^^^ Unnecessary regexp match on static string `job=~"bar"`, use `job="bar"` instead.
+  problem:
+    reporter: promql/regexp
+    summary: redundant regexp
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    diagnostics:
+        - message: Unnecessary regexp match on static string `job=~"bar"`, use `job="bar"` instead.
+          firstcolumn: 5
+          lastcolumn: 14
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+- description: mixed redundant and valid regexp
+  content: |
+    - record: foo
+      expr: foo{job=~"bar", cluster=~"us-east-.*"}
+  output: |
+    2 |   expr: foo{job=~"bar", cluster=~"us-east-.*"}
+                                ^^^^^^^^^^^^^^^^^^^^^ `{cluster=~"us-east-.*"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels
+  problem:
+    reporter: promql/regexp
+    summary: smelly regexp selector
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    diagnostics:
+        - message: '`{cluster=~"us-east-.*"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels'
+          firstcolumn: 17
+          lastcolumn: 37
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
 [TestRegexpCheck/needed_wildcard_regexp - 1]
 []
 
@@ -137,6 +213,31 @@
 
 [TestRegexpCheck/regexp_with_a_modifier - 1]
 []
+
+---
+
+[TestRegexpCheck/smelly_and_valid_regexp - 1]
+- description: smelly and valid regexp
+  content: |
+    - record: foo
+      expr: foo{job=~"service_.*_prod", code=~"5.."}
+  output: |
+    2 |   expr: foo{job=~"service_.*_prod", code=~"5.."}
+                    ^^^^^^^^^^^^^^^^^^^^^^ `{job=~"service_.*_prod"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels
+  problem:
+    reporter: promql/regexp
+    summary: smelly regexp selector
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    diagnostics:
+        - message: '`{job=~"service_.*_prod"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels'
+          firstcolumn: 5
+          lastcolumn: 26
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
 
 ---
 
@@ -639,5 +740,51 @@
 
 [TestRegexpCheck/valid_regexp#02 - 1]
 []
+
+---
+
+[TestRegexpCheck/wildcard_and_static_redundant_regexp - 1]
+- description: wildcard and static redundant regexp
+  content: |
+    - record: foo
+      expr: foo{job=~".*", cluster=~"prod"}
+  output: |
+    2 |   expr: foo{job=~".*", cluster=~"prod"}
+                    ^^^^^^^^^ Use `foo` if you want to match on all `job` values.
+  problem:
+    reporter: promql/regexp
+    summary: unnecessary wildcard regexp
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    diagnostics:
+        - message: Use `foo` if you want to match on all `job` values.
+          firstcolumn: 5
+          lastcolumn: 13
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+- description: wildcard and static redundant regexp
+  content: |
+    - record: foo
+      expr: foo{job=~".*", cluster=~"prod"}
+  output: |
+    2 |   expr: foo{job=~".*", cluster=~"prod"}
+                               ^^^^^^^^^^^^^^^ Unnecessary regexp match on static string `cluster=~"prod"`, use `cluster="prod"` instead.
+  problem:
+    reporter: promql/regexp
+    summary: redundant regexp
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    diagnostics:
+        - message: Unnecessary regexp match on static string `cluster=~"prod"`, use `cluster="prod"` instead.
+          firstcolumn: 16
+          lastcolumn: 30
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
 
 ---

@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.82.3
+
+### Fixed
+
+- Fixed incorrect reports from [promql/regexp](checks/promql/regexp.md) when empty match group is used.
+
 ## v0.82.2
 
 ### Fixed
