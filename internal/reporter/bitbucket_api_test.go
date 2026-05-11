@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log/slog"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
@@ -595,6 +596,27 @@ func TestBitBucketAPIRequest(t *testing.T) {
 
 		_, err := bb.request(http.MethodGet, "/test", nil)
 		require.Error(t, err)
+	})
+
+	// Server declares Content-Length larger than actual body, causing
+	// io.ReadAll to fail with unexpected EOF when reading the response.
+	t.Run("response body read error", func(t *testing.T) {
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+			w.Header().Set("Content-Length", "10000")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte("short"))
+		}))
+		t.Cleanup(srv.Close)
+
+		bb := bitBucketAPI{
+			uri:       srv.URL,
+			authToken: "test-token",
+			timeout:   time.Second * 5,
+		}
+
+		data, err := bb.request(http.MethodGet, "/test", nil)
+		require.Error(t, err)
+		require.Equal(t, "short", string(data))
 	})
 
 	t.Run("non-2xx response returns error", func(t *testing.T) {

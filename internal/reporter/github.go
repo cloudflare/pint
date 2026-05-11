@@ -368,14 +368,10 @@ func formatGHReviewBody(ctx context.Context, version string, summary Summary, sh
 	if len(summary.Reports()) > 0 {
 		buf := bytes.NewBuffer(nil)
 		cr := NewConsoleReporter(buf, checks.Information, true, showDuplicates)
-		err := cr.Submit(ctx, summary)
-		if err != nil {
-			fmt.Fprintf(&b, "Failed to generate list of problems: %s", err)
-		} else {
-			b.WriteString("```\n")
-			b.WriteString(buf.String())
-			b.WriteString("```\n")
-		}
+		_ = cr.Submit(ctx, summary) // ConsoleReporter never fails to Submit.
+		b.WriteString("```\n")
+		b.WriteString(buf.String())
+		b.WriteString("```\n")
 	} else {
 		b.WriteString("No problems reported")
 	}

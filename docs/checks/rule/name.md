@@ -103,7 +103,7 @@ You can disable this check until given time by adding a comment to it. Example:
 # pint snooze $TIMESTAMP rule/name
 ```
 
-Where `$TIMESTAMP` is either use [RFC3339](https://www.rfc-editor.org/rfc/rfc3339)
+Where `$TIMESTAMP` is either [RFC3339](https://www.rfc-editor.org/rfc/rfc3339)
 formatted or `YYYY-MM-DD`.
 Adding this comment will disable `rule/name` _until_ `$TIMESTAMP`, after that
 check will be re-enabled.

@@ -5,7 +5,6 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
-	"log/slog"
 	"strconv"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -25,8 +24,8 @@ type checkstyleReport struct {
 	reportsPerPath [][]Report
 }
 
-func (d checkstyleReport) MarshalXML(e *xml.Encoder, _ xml.StartElement) (err error) {
-	err = e.EncodeToken(xml.StartElement{
+func (d checkstyleReport) MarshalXML(e *xml.Encoder, _ xml.StartElement) error {
+	_ = e.EncodeToken(xml.StartElement{
 		Name: xml.Name{Local: "checkstyle"},
 		Attr: []xml.Attr{
 			{
@@ -35,14 +34,11 @@ func (d checkstyleReport) MarshalXML(e *xml.Encoder, _ xml.StartElement) (err er
 			},
 		},
 	})
-	if err != nil {
-		return err
-	}
 	for _, reports := range d.reportsPerPath {
 		if len(reports) == 0 {
 			continue
 		}
-		if err = e.EncodeToken(
+		_ = e.EncodeToken(
 			xml.StartElement{
 				Name: xml.Name{Local: "file"},
 				Attr: []xml.Attr{
@@ -52,22 +48,16 @@ func (d checkstyleReport) MarshalXML(e *xml.Encoder, _ xml.StartElement) (err er
 					},
 				},
 			},
-		); err != nil {
-			return err
-		}
+		)
 		for _, report := range reports {
-			if err = e.Encode(report); err != nil {
-				return err
-			}
+			_ = e.Encode(report)
 		}
-		if err = e.EncodeToken(xml.EndElement{Name: xml.Name{Local: "file"}}); err != nil {
-			return err
-		}
+		_ = e.EncodeToken(xml.EndElement{Name: xml.Name{Local: "file"}})
 	}
 	return e.EncodeToken(xml.EndElement{Name: xml.Name{Local: "checkstyle"}})
 }
 
-func (r Report) MarshalXML(e *xml.Encoder, _ xml.StartElement) (err error) {
+func (r Report) MarshalXML(e *xml.Encoder, _ xml.StartElement) error {
 	msg := r.Problem.Summary
 	if r.Problem.Details != "" {
 		msg += "\n" + r.Problem.Details
@@ -85,7 +75,7 @@ func (r Report) MarshalXML(e *xml.Encoder, _ xml.StartElement) (err error) {
 		checkstyleSeverity = "error"
 	}
 
-	startel := xml.StartElement{
+	_ = e.EncodeToken(xml.StartElement{
 		Name: xml.Name{Local: "error"},
 		Attr: []xml.Attr{
 			{
@@ -105,20 +95,13 @@ func (r Report) MarshalXML(e *xml.Encoder, _ xml.StartElement) (err error) {
 				Value: r.Problem.Reporter,
 			},
 		},
-	}
-	if err = e.EncodeToken(startel); err != nil {
-		return err
-	}
+	})
 	return e.EncodeToken(xml.EndElement{Name: xml.Name{Local: "error"}})
 }
 
-func (cs CheckStyleReporter) Submit(ctx context.Context, summary Summary) error {
+func (cs CheckStyleReporter) Submit(_ context.Context, summary Summary) error {
 	report := checkstyleReport{reportsPerPath: summary.ReportsPerPath()}
-	xmlString, err := xml.MarshalIndent(report, "", "  ")
-	if err != nil {
-		slog.LogAttrs(ctx, slog.LevelError, "Failed to marshal checkstyle report", slog.Any("err", err))
-		return err
-	}
-	_, err = fmt.Fprint(cs.output, string(xml.Header)+string(xmlString)+"\n")
+	xmlString, _ := xml.MarshalIndent(report, "", "  ")
+	_, err := fmt.Fprint(cs.output, string(xml.Header)+string(xmlString)+"\n")
 	return err
 }

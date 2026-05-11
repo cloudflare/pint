@@ -308,6 +308,9 @@ func (fp FilePath) isIgnored(path string) bool {
 	return false
 }
 
+// Discover walks the configured directory recursively, finds all entries
+// that satisfy configured regex match/ignore filters, and renders
+// Prometheus server configs from matching paths.
 func (fp FilePath) Discover(ctx context.Context) ([]*promapi.FailoverGroup, error) {
 	re := strictRegex(fp.Match)
 	servers := []*promapi.FailoverGroup{}
@@ -317,15 +320,25 @@ func (fp FilePath) Discover(ctx context.Context) ([]*promapi.FailoverGroup, erro
 		slog.String("dir", fp.Directory),
 		slog.String("match", re.String()),
 	)
+	// Normalize the directory path once so we can strip it from walked paths.
+	cleanDir := filepath.Clean(fp.Directory)
 	err := filepath.WalkDir(fp.Directory,
-		func(path string, _ fs.DirEntry, err error) error {
+		func(path string, d fs.DirEntry, err error) error {
 			if err != nil {
 				return fmt.Errorf("filepath discovery error: %w", err)
 			}
-			path, err = filepath.Rel(fp.Directory, path)
-			if err != nil {
-				// This should never fail since filepath.Rel only really errors on Windows.
-				return fmt.Errorf("filepath discovery error: %w", err)
+			cleanPath := filepath.Clean(path)
+			if cleanPath == cleanDir {
+				// Skip the root directory, only process its children.
+				if d.IsDir() {
+					return nil
+				}
+				// Root is a file, use "." as relative path.
+				path = "."
+			} else {
+				// Strip the directory prefix to get a relative path for matching.
+				// /etc/prometheus/rules/foo/bar.yml -> foo/bar.yml
+				path, _ = strings.CutPrefix(cleanPath, cleanDir+string(filepath.Separator))
 			}
 			if fp.isIgnored(path) {
 				return nil
@@ -337,6 +350,7 @@ func (fp FilePath) Discover(ctx context.Context) ([]*promapi.FailoverGroup, erro
 					slog.String("match", re.String()),
 					slog.String("path", path),
 				)
+				// Extract named capture groups and render server configs.
 				data := findNamedMatches(re, path)
 				for _, t := range fp.Template {
 					server, err := t.Render(data)
