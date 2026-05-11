@@ -1,0 +1,21 @@
+http start mock 127.0.0.1:6264
+
+exec bash -x ./test.sh &
+
+exec pint --no-color -l error watch --interval=5s --listen=127.0.0.1:6264 --pidfile=pint.pid glob rules
+cmp stderr stderr.txt
+
+-- test.sh --
+sleep 5
+cat pint.pid | xargs kill
+
+-- rules/1.yml --
+- record: rule1
+  expr: sum(foo) by(job)
+
+-- stderr.txt --
+level=ERROR msg="HTTP server returned an error" err="listen tcp 127.0.0.1:6264: bind: address already in use" listen=127.0.0.1:6264
+-- .pint.hcl --
+parser {
+  relaxed = [".*"]
+}

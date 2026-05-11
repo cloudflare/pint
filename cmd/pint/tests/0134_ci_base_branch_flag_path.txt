@@ -22,6 +22,7 @@ cmp stderr ../stderr.txt
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=DEBUG msg="Adding pint config to the parser exclude list" path=.pint.hcl
+level=DEBUG msg="Running git command" args=["rev-parse","--verify","HEAD"]
 level=DEBUG msg="Running git command" args=["rev-parse","--abbrev-ref","HEAD"]
 level=DEBUG msg="Got branch information" base=origin/main current=v2
 level=INFO msg="Finding all rules to check on current git branch" base=origin/main

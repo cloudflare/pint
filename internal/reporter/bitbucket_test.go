@@ -69,7 +69,7 @@ func TestBitBucketReporter(t *testing.T) {
 			},
 			mock: httpmock.New(func(_ *httpmock.Server) {}),
 			errorHandler: func(err error) error {
-				if err != nil && err.Error() == "failed to get HEAD commit: git head error" {
+				if err != nil && err.Error() == "failed to get git info: git head error" {
 					return nil
 				}
 				return fmt.Errorf("Expected git head error, got %w", err)
@@ -86,14 +86,9 @@ func TestBitBucketReporter(t *testing.T) {
 				}
 				return nil, nil
 			},
-			mock: httpmock.New(func(s *httpmock.Server) {
-				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-			}),
+			mock: httpmock.New(func(_ *httpmock.Server) {}),
 			errorHandler: func(err error) error {
-				if err != nil && err.Error() == "failed to get current branch: git branch error" {
+				if err != nil && err.Error() == "failed to get git info: git branch error" {
 					return nil
 				}
 				return fmt.Errorf("Expected git branch error, got %w", err)

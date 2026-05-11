@@ -1,0 +1,29 @@
+exec bash -x ./test.sh &
+
+exec pint --no-color -l error watch --interval=5s --listen=127.0.0.1:6263 --pidfile=pint.pid glob rules
+cmp stderr stderr.txt
+
+-- test.sh --
+sleep 5
+cat pint.pid | xargs kill
+
+-- rules/1.yml --
+- record: rule1
+  expr: sum(foo) by(job)
+
+-- stderr.txt --
+level=ERROR msg="Got an error when running checks" err="filepath discovery error: lstat notfound: no such file or directory"
+-- .pint.hcl --
+parser {
+  relaxed = [".*"]
+}
+discovery {
+  filepath {
+    directory = "notfound"
+    match = "(?P<name>\\w+).ya?ml"
+    template {
+      name     = "{{ $name }}"
+      uri      = "https://{{ $name }}.example.com"
+    }
+  }
+}

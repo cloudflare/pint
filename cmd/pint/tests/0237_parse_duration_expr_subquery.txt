@@ -16,8 +16,22 @@ cmp stdout stdout.txt
               * Expr: rate(foo[5m])
               * Step: 0s
               * StepExpr: 5m + 1m
+                ++ node: 5m + 1m
+                  DurationExpr:
+                    * Type: scalar
+                    * Op: +
+                    * LHS: 5m
+                    * RHS: 1m
+                    * Wrapped: false
               * Range: 0s
               * RangeExpr: 1h + 10m
+                ++ node: 1h + 10m
+                  DurationExpr:
+                    * Type: scalar
+                    * Op: +
+                    * LHS: 1h
+                    * RHS: 10m
+                    * Wrapped: false
               * Offset: 0s
                 ++ node: rate(foo[5m])
                   Call:

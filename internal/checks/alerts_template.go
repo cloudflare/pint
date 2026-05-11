@@ -207,14 +207,23 @@ func (c TemplateCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*d
 }
 
 func (c TemplateCheck) checkHumanizeIsNeeded(expr parser.PromQLExpr, ann *parser.YamlKeyValue) (problems []Problem) {
-	if !hasValue(ann.Value.Value) {
+	t := templatePool.Get().(*textTemplate.Template)
+	defer templatePool.Put(t)
+
+	tt, err := t.Parse(templateDefsString + ann.Value.Value)
+	if err != nil {
 		return problems
 	}
-	if hasHumanize(ann.Value.Value) {
+	aliases := aliasesForTemplate(tt)
+
+	if !hasValue(tt, aliases) {
 		return problems
 	}
-	// parsing always works, if template is broken hasValue would exit early
-	vars, aliases, _ := findTemplateVariables(ann.Key.Value, ann.Value.Value)
+	if hasHumanize(tt, aliases) {
+		return problems
+	}
+
+	vars, tmplAliases, _ := findTemplateVariables(ann.Key.Value, ann.Value.Value)
 	for _, src := range expr.Source() {
 		call := isRateResult(src)
 		if call != nil {
@@ -227,7 +236,7 @@ func (c TemplateCheck) checkHumanizeIsNeeded(expr parser.PromQLExpr, ann *parser
 					Kind:        diags.Context,
 				},
 			}
-			labelsAliases := aliases.varAliases(".Value")
+			labelsAliases := tmplAliases.varAliases(".Value")
 			for _, v := range vars {
 				for _, a := range labelsAliases {
 					if v.value[0] == a {
@@ -358,16 +367,7 @@ func containsAliasedNode(am aliasMap, node parse.Node, alias string) (string, bo
 	return "", false
 }
 
-func hasValue(text string) bool {
-	t := templatePool.Get().(*textTemplate.Template)
-	defer templatePool.Put(t)
-
-	tt, err := t.Parse(templateDefsString + text)
-	if err != nil {
-		// no need to double report errors
-		return false
-	}
-	aliases := aliasesForTemplate(tt)
+func hasValue(tt *textTemplate.Template, aliases aliasMap) bool {
 	for _, node := range tt.Root.Nodes {
 		if _, ok := containsAliasedNode(aliases, node, ".Value"); ok {
 			return true
@@ -376,17 +376,7 @@ func hasValue(text string) bool {
 	return false
 }
 
-func hasHumanize(text string) bool {
-	t := templatePool.Get().(*textTemplate.Template)
-	defer templatePool.Put(t)
-
-	tt, err := t.Parse(templateDefsString + text)
-	if err != nil {
-		// no need to double report errors
-		return false
-	}
-	aliases := aliasesForTemplate(tt)
-
+func hasHumanize(tt *textTemplate.Template, aliases aliasMap) bool {
 	for _, node := range tt.Root.Nodes {
 		if _, ok := containsAliasedNode(aliases, node, ".Value"); !ok {
 			continue
