@@ -1,0 +1,29 @@
+! exec pint --no-color lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=INFO msg="Loading configuration file" path=.pint.hcl
+level=INFO msg="Finding all rules to check" paths=["rules"]
+level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
+level=INFO msg="Finding Prometheus servers using file paths" dir=servers match=^(?P<name>\w+).ya?ml$
+level=ERROR msg="Execution completed with error(s)" err="filepath discovery failed to generate Prometheus config from a template: bad uri template \"https://{{ $missing }}.example.com\": template: discovery:1: undefined variable \"$missing\""
+-- rules/0001.yml --
+groups:
+- name: foo
+  rules:
+  - record: sum:up
+    expr: sum(up)
+-- servers/prom1.yaml --
+-- .pint.hcl --
+discovery {
+  filepath {
+    directory = "servers"
+    match = "(?P<name>\\w+).ya?ml"
+    template {
+      name     = "foo"
+      uri      = "https://{{ $missing }}.example.com"
+      exclude  = [".*"]
+    }
+  }
+}

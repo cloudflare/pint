@@ -26,20 +26,26 @@ func RunGit(args ...string) (content []byte, err error) {
 	return stdout.Bytes(), nil
 }
 
-func HeadCommit(cmd CommandRunner) (string, error) {
-	commit, err := cmd("rev-parse", "--verify", "HEAD")
-	if err != nil {
-		return "", err
-	}
-	return strings.Trim(string(commit), "\n"), nil
+type Info struct {
+	HeadCommit    string
+	CurrentBranch string
 }
 
-func CurrentBranch(cmd CommandRunner) (string, error) {
-	commit, err := cmd("rev-parse", "--abbrev-ref", "HEAD")
+func Describe(cmd CommandRunner) (Info, error) {
+	commit, err := cmd("rev-parse", "--verify", "HEAD")
 	if err != nil {
-		return "", err
+		return Info{}, err
 	}
-	return strings.Trim(string(commit), "\n"), nil
+
+	branch, err := cmd("rev-parse", "--abbrev-ref", "HEAD")
+	if err != nil {
+		return Info{}, err
+	}
+
+	return Info{
+		HeadCommit:    strings.Trim(string(commit), "\n"),
+		CurrentBranch: strings.Trim(string(branch), "\n"),
+	}, nil
 }
 
 func CommitMessage(cmd CommandRunner, sha string) (string, error) {

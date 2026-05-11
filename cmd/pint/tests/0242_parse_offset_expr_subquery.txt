@@ -18,6 +18,13 @@ cmp stdout stdout.txt
               * Range: 1h0m0s
               * Offset: 0s
               * OriginalOffsetExpr: (5m + 1m)
+                ++ node: (5m + 1m)
+                  DurationExpr:
+                    * Type: scalar
+                    * Op: +
+                    * LHS: 5m
+                    * RHS: 1m
+                    * Wrapped: true
                 ++ node: foo
                   VectorSelector:
                     * Type: vector

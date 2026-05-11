@@ -81,11 +81,11 @@ func actionCI(ctx context.Context, c *cli.Command) error {
 	if c.String(baseBranchFlag) != "" {
 		baseBranch = c.String(baseBranchFlag)
 	}
-	currentBranch, err := git.CurrentBranch(git.RunGit)
+	gitInfo, err := git.Describe(git.RunGit)
 	if err != nil {
-		return errors.New("failed to get the name of current branch")
+		return fmt.Errorf("failed to get git info: %w", err)
 	}
-	currentBranch = detectCurrentBranch(currentBranch)
+	currentBranch := detectCurrentBranch(gitInfo.CurrentBranch)
 	slog.LogAttrs(ctx, slog.LevelDebug, "Got branch information", slog.String("base", baseBranch), slog.String("current", currentBranch))
 	if currentBranch == strings.Split(baseBranch, "/")[len(strings.Split(baseBranch, "/"))-1] {
 		slog.LogAttrs(ctx, slog.LevelInfo, "Running from base branch, skipping checks", slog.String("branch", currentBranch))
@@ -217,12 +217,6 @@ func actionCI(ctx context.Context, c *cli.Command) error {
 			return fmt.Errorf("got not a valid number via GITHUB_PULL_REQUEST_NUMBER: %w", err)
 		}
 
-		var headCommit string
-		headCommit, err = git.HeadCommit(git.RunGit)
-		if err != nil {
-			return errors.New("failed to get the HEAD commit")
-		}
-
 		timeout, _ := time.ParseDuration(meta.cfg.Repository.GitHub.Timeout)
 		var gr reporter.GithubReporter
 		if gr, err = reporter.NewGithubReporter(
@@ -236,7 +230,7 @@ func actionCI(ctx context.Context, c *cli.Command) error {
 			meta.cfg.Repository.GitHub.Repo,
 			prNum,
 			meta.cfg.Repository.GitHub.MaxComments,
-			headCommit,
+			gitInfo.HeadCommit,
 			c.Bool(showDupsFlag),
 		); err != nil {
 			return err

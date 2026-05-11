@@ -227,9 +227,7 @@ func actionWatch(c *cli.Command, meta actionMeta, f pathFinderFunc) error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
-	if err = server.Shutdown(ctx); err != nil {
-		slog.LogAttrs(ctx, slog.LevelError, "HTTP server returned an error while shutting down", slog.Any("err", err))
-	}
+	_ = server.Shutdown(ctx)
 
 	return nil
 }

@@ -9,4 +9,11 @@ cmp stdout stdout.txt
     * Name: foo
     * Offset: 0s
     * OriginalOffsetExpr: (5m + 1m)
+      ++ node: (5m + 1m)
+        DurationExpr:
+          * Type: scalar
+          * Op: +
+          * LHS: 5m
+          * RHS: 1m
+          * Wrapped: true
     * LabelMatchers: [__name__="foo"]

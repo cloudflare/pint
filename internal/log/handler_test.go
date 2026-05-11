@@ -132,3 +132,17 @@ func TestHandler(t *testing.T) {
 		})
 	}
 }
+
+type failWriter struct{}
+
+func (w failWriter) Write(_ []byte) (int, error) {
+	return 0, errors.New("write error")
+}
+
+// Verify that Handle returns an error when the underlying writer fails.
+func TestHandlerWriteError(t *testing.T) {
+	h := newHandler(failWriter{}, slog.LevelDebug.Level(), true)
+	r := slog.NewRecord(time.Now(), slog.LevelInfo, "bar", 0)
+	err := h.Handle(context.Background(), r)
+	require.EqualError(t, err, "failed to write buffer: write error")
+}

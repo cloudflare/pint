@@ -41,27 +41,22 @@ type BitBucketReporter struct {
 }
 
 func (bb BitBucketReporter) Submit(ctx context.Context, summary Summary) (err error) {
-	var headCommit string
-	if headCommit, err = git.HeadCommit(bb.gitCmd); err != nil {
-		return fmt.Errorf("failed to get HEAD commit: %w", err)
+	gitInfo, err := git.Describe(bb.gitCmd)
+	if err != nil {
+		return fmt.Errorf("failed to get git info: %w", err)
 	}
-	slog.LogAttrs(ctx, slog.LevelInfo, "Got HEAD commit from git", slog.String("commit", headCommit))
+	slog.LogAttrs(ctx, slog.LevelInfo, "Got HEAD commit from git", slog.String("commit", gitInfo.HeadCommit))
 
-	if err = bb.api.deleteReport(headCommit); err != nil {
+	if err = bb.api.deleteReport(gitInfo.HeadCommit); err != nil {
 		slog.LogAttrs(ctx, slog.LevelError, "Failed to delete old BitBucket report", slog.Any("err", err))
 	}
 
-	if err = bb.api.createReport(summary, headCommit); err != nil {
+	if err = bb.api.createReport(summary, gitInfo.HeadCommit); err != nil {
 		return fmt.Errorf("failed to create BitBucket report: %w", err)
 	}
 
-	var headBranch string
-	if headBranch, err = git.CurrentBranch(bb.gitCmd); err != nil {
-		return fmt.Errorf("failed to get current branch: %w", err)
-	}
-
 	var pr *bitBucketPR
-	if pr, err = bb.api.findPullRequestForBranch(headBranch, headCommit); err != nil {
+	if pr, err = bb.api.findPullRequestForBranch(gitInfo.CurrentBranch, gitInfo.HeadCommit); err != nil {
 		return fmt.Errorf("failed to get open pull requests from BitBucket: %w", err)
 	}
 
@@ -111,15 +106,15 @@ func (bb BitBucketReporter) Submit(ctx context.Context, summary Summary) (err er
 		slog.LogAttrs(
 			ctx, slog.LevelInfo,
 			"No open pull request found, reporting problems using code insight annotations",
-			slog.String("branch", headBranch),
-			slog.String("commit", headCommit),
+			slog.String("branch", gitInfo.CurrentBranch),
+			slog.String("commit", gitInfo.HeadCommit),
 		)
 
-		if err = bb.api.deleteAnnotations(headCommit); err != nil {
+		if err = bb.api.deleteAnnotations(gitInfo.HeadCommit); err != nil {
 			return fmt.Errorf("failed to delete existing BitBucket code insight annotations: %w", err)
 		}
 
-		if err = bb.api.createAnnotations(summary, headCommit); err != nil {
+		if err = bb.api.createAnnotations(summary, gitInfo.HeadCommit); err != nil {
 			return fmt.Errorf("failed to create BitBucket code insight annotations: %w", err)
 		}
 	}
