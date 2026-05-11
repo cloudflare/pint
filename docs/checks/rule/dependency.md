@@ -81,12 +81,18 @@ The `error:rate5m:avg` recording rule uses `error:rate5m` from a different group
 Both groups run at fixed intervals but start at different times.
 With a one-minute interval:
 
-- **0s** - `base` evaluates `error:rate5m` and commits to TSDB.
-- **55s** - `aggregations` queries `error:rate5m` and sees a 55-second-old value.
-- **60s** - `base` runs again.
-- **115s** - `aggregations` runs again, still seeing stale data.
+- `@ 0s` - `base` evaluates `error:rate5m` and commits to TSDB.
+- `@ 55s` - `aggregations` queries `error:rate5m` and sees a 55-second-old value.
+- `@ 60s` - `base` runs again.
+- `@ 115s` - `aggregations` runs again and sees value from `@ 60s` which is 55 seconds old.
 
 Each time `aggregations` runs, it sees a value that is already up to one interval old.
+If you query for both metrics at `@ 70s` you'll get:
+
+- `error:rate5m` sample calculated `@ 60s` with value from `@ 60s`.
+- `error:rate5m:avg` sample calculated `@ 55s` with value from `@ 0s`.
+
+This means there will be a confusing mismatch between these two metrics.
 
 Moving both rules to the same group eliminates this lag:
 
@@ -100,11 +106,14 @@ groups:
     expr: avg(error:rate5m)
 ```
 
-- **0s** - `errors` evaluates `error:rate5m` and writes to the transaction.
-- **0s** - `errors` evaluates `error:rate5m:avg`, which sees the value from the
+- `@ 0s` - `errors` evaluates `error:rate5m` and writes to the transaction.
+- `@ 0s` - `errors` evaluates `error:rate5m:avg`, which sees the value from the
   previous step with no lag.
+- `@ 60s` - `errors` runs again, new value for `error:rate5m` is calculated.
+- `@ 60s` - `error:rate5m:avg` runs again and sees most recent value for `error:rate5m`, no lag.
 
-Now the aggregation always sees the freshly computed value.
+Now the aggregation always sees the freshly computed value, querying both metrics at `@ 70s`
+will produce results that are consistent between them and there will be no confusion due to lag.
 
 ## Configuration
 
@@ -145,7 +154,7 @@ You can disable this check until given time by adding a comment to it. Example:
 # pint snooze $TIMESTAMP rule/dependency
 ```
 
-Where `$TIMESTAMP` is either use [RFC3339](https://www.rfc-editor.org/rfc/rfc3339)
-formatted  or `YYYY-MM-DD`.
+Where `$TIMESTAMP` is either [RFC3339](https://www.rfc-editor.org/rfc/rfc3339)
+formatted or `YYYY-MM-DD`.
 Adding this comment will disable `rule/dependency` *until* `$TIMESTAMP`, after that
 check will be re-enabled.
