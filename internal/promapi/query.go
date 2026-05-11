@@ -31,30 +31,26 @@ type QueryResult struct {
 type SampleLabels labels.Labels
 
 func (s *SampleLabels) UnmarshalJSONFrom(dec *jsontext.Decoder) (err error) {
-	var (
-		tok jsontext.Token
-		k   jsontext.Kind
-	)
+	var tok jsontext.Token
 
-	if k = dec.PeekKind(); k != '{' {
-		return &json.SemanticError{JSONKind: k} // nolint: exhaustruct
-	}
-	if _, err = dec.ReadToken(); err != nil {
+	if tok, err = dec.ReadToken(); err != nil {
 		return err
+	}
+	if tok.Kind() != '{' {
+		return &json.SemanticError{JSONKind: tok.Kind()} // nolint: exhaustruct
 	}
 
 	var parts []string
-	for dec.PeekKind() != '}' {
+	for {
 		if tok, err = dec.ReadToken(); err != nil {
 			return err
+		}
+		if tok.Kind() == '}' {
+			break
 		}
 		parts = append(parts, tok.String())
 	}
 	*s = SampleLabels(labels.FromStrings(parts...))
-
-	if _, err = dec.ReadToken(); err != nil {
-		return err
-	}
 	return nil
 }
 
@@ -66,15 +62,14 @@ type SampleTimestampValue struct {
 func (s *SampleTimestampValue) UnmarshalJSONFrom(dec *jsontext.Decoder) (err error) {
 	var (
 		tok jsontext.Token
-		k   jsontext.Kind
 		f   float64
 	)
 
-	if k = dec.PeekKind(); k != '[' {
-		return &json.SemanticError{JSONKind: k} // nolint: exhaustruct
-	}
-	if _, err = dec.ReadToken(); err != nil {
+	if tok, err = dec.ReadToken(); err != nil {
 		return err
+	}
+	if tok.Kind() != '[' {
+		return &json.SemanticError{JSONKind: tok.Kind()} // nolint: exhaustruct
 	}
 
 	tok, err = dec.ReadToken()
@@ -96,11 +91,11 @@ func (s *SampleTimestampValue) UnmarshalJSONFrom(dec *jsontext.Decoder) (err err
 		s.Value = model.SampleValue(f)
 	}
 
-	if k = dec.PeekKind(); k != ']' {
-		return &json.SemanticError{JSONKind: k} // nolint: exhaustruct
-	}
-	if _, err = dec.ReadToken(); err != nil {
+	if tok, err = dec.ReadToken(); err != nil {
 		return err
+	}
+	if tok.Kind() != ']' {
+		return &json.SemanticError{JSONKind: tok.Kind()} // nolint: exhaustruct
 	}
 	return nil
 }
