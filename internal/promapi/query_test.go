@@ -369,23 +369,27 @@ func TestSampleLabelsUnmarshalJSONFromReadTokenErrors(t *testing.T) {
 	type testCaseT struct {
 		input io.Reader
 		name  string
+		err   string
 	}
 
 	testCases := []testCaseT{
 		{
-			// PeekKind sees '{' but ReadToken fails reading it.
-			name:  "error reading opening brace",
-			input: &errReader{r: strings.NewReader("{"), err: io.ErrUnexpectedEOF},
+			// Reader fails immediately so the first ReadToken returns an error.
+			name:  "error on first read",
+			input: &errReader{r: strings.NewReader(""), err: io.ErrUnexpectedEOF},
+			err:   "jsontext: read error: unexpected EOF",
 		},
 		{
 			// Opening '{' is read but ReadToken fails on the first key.
 			name:  "error reading key inside object",
 			input: &errReader{r: strings.NewReader(`{"k`), err: io.ErrUnexpectedEOF},
+			err:   "jsontext: read error: unexpected EOF",
 		},
 		{
 			// All keys read but ReadToken fails on closing '}'.
 			name:  "error reading closing brace",
 			input: &errReader{r: strings.NewReader(`{"a":"b"`), err: io.ErrUnexpectedEOF},
+			err:   "jsontext: read error: unexpected EOF",
 		},
 	}
 
@@ -394,7 +398,7 @@ func TestSampleLabelsUnmarshalJSONFromReadTokenErrors(t *testing.T) {
 			dec := jsontext.NewDecoder(tc.input)
 			var s promapi.SampleLabels
 			err := s.UnmarshalJSONFrom(dec)
-			require.Error(t, err)
+			require.EqualError(t, err, tc.err)
 		})
 	}
 }
@@ -403,28 +407,33 @@ func TestSampleTimestampValueUnmarshalJSONFromReadTokenErrors(t *testing.T) {
 	type testCaseT struct {
 		input io.Reader
 		name  string
+		err   string
 	}
 
 	testCases := []testCaseT{
 		{
-			// PeekKind sees '[' but ReadToken fails reading it.
-			name:  "error reading opening bracket",
-			input: &errReader{r: strings.NewReader("["), err: io.ErrUnexpectedEOF},
+			// Reader fails immediately so the first ReadToken returns an error.
+			name:  "error on first read",
+			input: &errReader{r: strings.NewReader(""), err: io.ErrUnexpectedEOF},
+			err:   "jsontext: read error: unexpected EOF",
 		},
 		{
 			// Opening '[' is read but ReadToken fails on the timestamp.
 			name:  "error reading timestamp token",
 			input: &errReader{r: strings.NewReader(`[1`), err: io.ErrUnexpectedEOF},
+			err:   "jsontext: read error: unexpected EOF",
 		},
 		{
 			// Timestamp read but ReadToken fails on the value string.
 			name:  "error reading value token",
 			input: &errReader{r: strings.NewReader(`[1614859502.068,"1`), err: io.ErrUnexpectedEOF},
+			err:   "jsontext: read error: unexpected EOF",
 		},
 		{
 			// Value read but ReadToken fails on closing ']'.
 			name:  "error reading closing bracket",
 			input: &errReader{r: strings.NewReader(`[1614859502.068,"1"`), err: io.ErrUnexpectedEOF},
+			err:   "jsontext: read error: unexpected EOF",
 		},
 	}
 
@@ -433,7 +442,7 @@ func TestSampleTimestampValueUnmarshalJSONFromReadTokenErrors(t *testing.T) {
 			dec := jsontext.NewDecoder(tc.input)
 			var s promapi.SampleTimestampValue
 			err := s.UnmarshalJSONFrom(dec)
-			require.Error(t, err)
+			require.EqualError(t, err, tc.err)
 		})
 	}
 }
