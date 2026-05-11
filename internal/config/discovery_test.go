@@ -385,7 +385,7 @@ func TestFilePathDiscover(t *testing.T) {
 	type testCaseT struct {
 		setup       func(t *testing.T) (FilePath, string)
 		description string
-		servers     int
+		names       []string
 	}
 
 	testCases := []testCaseT{
@@ -429,7 +429,7 @@ func TestFilePathDiscover(t *testing.T) {
 					},
 				}, ""
 			},
-			servers: 1,
+			names: []string{"rules"},
 		},
 		{
 			description: "non-matching file produces no servers",
@@ -451,7 +451,7 @@ func TestFilePathDiscover(t *testing.T) {
 					},
 				}, ""
 			},
-			servers: 0,
+			names: []string{},
 		},
 		{
 			description: "ignored file produces no servers",
@@ -474,7 +474,7 @@ func TestFilePathDiscover(t *testing.T) {
 					},
 				}, ""
 			},
-			servers: 0,
+			names: []string{},
 		},
 		{
 			description: "template render error",
@@ -519,7 +519,60 @@ func TestFilePathDiscover(t *testing.T) {
 					},
 				}, ""
 			},
-			servers: 1,
+			names: []string{"rules"},
+		},
+		{
+			description: "multiple matching files",
+			setup: func(t *testing.T) (FilePath, string) {
+				t.Helper()
+				dir := t.TempDir()
+				for _, name := range []string{"bar.yaml", "baz.yaml", "foo.yaml"} {
+					require.NoError(t, os.WriteFile(
+						filepath.Join(dir, name),
+						[]byte("x"), 0o644,
+					))
+				}
+				return FilePath{
+					Directory: dir,
+					Match:     "(?P<name>.+)\\.yaml",
+					Template: []PrometheusTemplate{
+						{
+							Name: "{{ $name }}",
+							URI:  "http://localhost",
+						},
+					},
+				}, ""
+			},
+			names: []string{"bar", "baz", "foo"},
+		},
+		{
+			description: "multiple templates per match",
+			setup: func(t *testing.T) (FilePath, string) {
+				t.Helper()
+				dir := t.TempDir()
+				require.NoError(t, os.WriteFile(
+					filepath.Join(dir, "rules.yaml"),
+					[]byte("x"), 0o644,
+				))
+				return FilePath{
+					Directory: dir,
+					Match:     "(?P<name>.+)\\.yaml",
+					Template: []PrometheusTemplate{
+						{
+							Name: "{{ $name }}-primary",
+							URI:  "http://primary",
+						},
+						{
+							Name: "{{ $name }}-secondary",
+							URI:  "http://secondary",
+						},
+					},
+				}, ""
+			},
+			names: []string{
+				"rules-primary",
+				"rules-secondary",
+			},
 		},
 		{
 			description: "directory is a file",
@@ -539,7 +592,7 @@ func TestFilePathDiscover(t *testing.T) {
 					},
 				}, ""
 			},
-			servers: 1,
+			names: []string{"test"},
 		},
 	}
 
@@ -552,7 +605,11 @@ func TestFilePathDiscover(t *testing.T) {
 				require.EqualError(t, err, expectedErr)
 			} else {
 				require.NoError(t, err)
-				require.Len(t, servers, tc.servers)
+				names := make([]string, len(servers))
+				for i, s := range servers {
+					names[i] = s.Name()
+				}
+				require.Equal(t, tc.names, names)
 			}
 		})
 	}
