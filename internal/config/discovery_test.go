@@ -1,7 +1,11 @@
 package config
 
 import (
+	"context"
+	"fmt"
 	"log/slog"
+	"os"
+	"path/filepath"
 	"strconv"
 	"testing"
 
@@ -372,6 +376,183 @@ func TestPrometheusTemplateRender(t *testing.T) {
 				require.NoError(t, err)
 			} else {
 				require.EqualError(t, err, tc.err)
+			}
+		})
+	}
+}
+
+func TestFilePathDiscover(t *testing.T) {
+	type testCaseT struct {
+		setup       func(t *testing.T) (FilePath, string)
+		description string
+		servers     int
+	}
+
+	testCases := []testCaseT{
+		{
+			description: "walk error on non-existent directory",
+			setup: func(t *testing.T) (FilePath, string) {
+				t.Helper()
+				dir := filepath.Join(t.TempDir(), "missing")
+				return FilePath{
+						Directory: dir,
+						Match:     ".+",
+						Template: []PrometheusTemplate{
+							{
+								Name: "test",
+								URI:  "http://localhost",
+							},
+						},
+					}, fmt.Sprintf(
+						"filepath discovery error: lstat %s: no such file or directory",
+						dir,
+					)
+			},
+		},
+		{
+			description: "matching file produces a server",
+			setup: func(t *testing.T) (FilePath, string) {
+				t.Helper()
+				dir := t.TempDir()
+				require.NoError(t, os.WriteFile(
+					filepath.Join(dir, "rules.yaml"),
+					[]byte("x"), 0o644,
+				))
+				return FilePath{
+					Directory: dir,
+					Match:     "(?P<name>.+)\\.yaml",
+					Template: []PrometheusTemplate{
+						{
+							Name: "{{ $name }}",
+							URI:  "http://localhost",
+						},
+					},
+				}, ""
+			},
+			servers: 1,
+		},
+		{
+			description: "non-matching file produces no servers",
+			setup: func(t *testing.T) (FilePath, string) {
+				t.Helper()
+				dir := t.TempDir()
+				require.NoError(t, os.WriteFile(
+					filepath.Join(dir, "readme.txt"),
+					[]byte("x"), 0o644,
+				))
+				return FilePath{
+					Directory: dir,
+					Match:     ".*\\.yaml",
+					Template: []PrometheusTemplate{
+						{
+							Name: "test",
+							URI:  "http://localhost",
+						},
+					},
+				}, ""
+			},
+			servers: 0,
+		},
+		{
+			description: "ignored file produces no servers",
+			setup: func(t *testing.T) (FilePath, string) {
+				t.Helper()
+				dir := t.TempDir()
+				require.NoError(t, os.WriteFile(
+					filepath.Join(dir, "rules.yaml"),
+					[]byte("x"), 0o644,
+				))
+				return FilePath{
+					Directory: dir,
+					Match:     ".+\\.yaml",
+					Ignore:    []string{"rules\\.yaml"},
+					Template: []PrometheusTemplate{
+						{
+							Name: "test",
+							URI:  "http://localhost",
+						},
+					},
+				}, ""
+			},
+			servers: 0,
+		},
+		{
+			description: "template render error",
+			setup: func(t *testing.T) (FilePath, string) {
+				t.Helper()
+				dir := t.TempDir()
+				require.NoError(t, os.WriteFile(
+					filepath.Join(dir, "rules.yaml"),
+					[]byte("x"), 0o644,
+				))
+				return FilePath{
+					Directory: dir,
+					Match:     ".+\\.yaml",
+					Template: []PrometheusTemplate{
+						{
+							Name: "{{ $missing }}",
+							URI:  "http://localhost",
+						},
+					},
+				}, `filepath discovery failed to generate Prometheus config from a template: bad name template "{{ $missing }}": template: discovery:1: undefined variable "$missing"`
+			},
+		},
+		{
+			description: "nested file produces a server",
+			setup: func(t *testing.T) (FilePath, string) {
+				t.Helper()
+				dir := t.TempDir()
+				sub := filepath.Join(dir, "sub")
+				require.NoError(t, os.Mkdir(sub, 0o755))
+				require.NoError(t, os.WriteFile(
+					filepath.Join(sub, "rules.yaml"),
+					[]byte("x"), 0o644,
+				))
+				return FilePath{
+					Directory: dir,
+					Match:     "sub/(?P<name>.+)\\.yaml",
+					Template: []PrometheusTemplate{
+						{
+							Name: "{{ $name }}",
+							URI:  "http://localhost",
+						},
+					},
+				}, ""
+			},
+			servers: 1,
+		},
+		{
+			description: "directory is a file",
+			setup: func(t *testing.T) (FilePath, string) {
+				t.Helper()
+				dir := t.TempDir()
+				f := filepath.Join(dir, "rules.yaml")
+				require.NoError(t, os.WriteFile(f, []byte("x"), 0o644))
+				return FilePath{
+					Directory: f,
+					Match:     "\\.",
+					Template: []PrometheusTemplate{
+						{
+							Name: "test",
+							URI:  "http://localhost",
+						},
+					},
+				}, ""
+			},
+			servers: 1,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.description, func(t *testing.T) {
+			slog.SetDefault(slogt.New(t))
+			fp, expectedErr := tc.setup(t)
+			servers, err := fp.Discover(context.Background())
+			if expectedErr != "" {
+				require.EqualError(t, err, expectedErr)
+			} else {
+				require.NoError(t, err)
+				require.Len(t, servers, tc.servers)
 			}
 		})
 	}
