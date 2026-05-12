@@ -52,6 +52,15 @@ func TestRuleName(t *testing.T) {
 			prometheus: noProm,
 			problems:   true,
 		},
+		{
+			description: "alerting rule name doesn't match snake_case regex",
+			content:     "- alert: CockroachDB_High_CPU_Usage\n  expr: sum(foo) without()\n",
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewRuleNameCheck(checks.MustTemplatedRegexp("[a-z_]+"), "Alert names must use snake_case", checks.Warning)
+			},
+			prometheus: noProm,
+			problems:   true,
+		},
 	}
 	runTests(t, testCases)
 }

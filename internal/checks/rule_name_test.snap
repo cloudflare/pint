@@ -6,7 +6,7 @@
       expr: sum(foo) without(
   output: |
     1 | - alert: foo
-                 ^^ alerting rule name must match `^total:.+$`.
+                 ^^^ alerting rule name must match `^total:.+$`.
   problem:
     reporter: rule/name
     summary: name not allowed
@@ -14,7 +14,32 @@
     diagnostics:
         - message: alerting rule name must match `^total:.+$`.
           firstcolumn: 1
-          lastcolumn: 2
+          lastcolumn: 3
+          kind: 0
+    lines:
+        first: 1
+        last: 1
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRuleName/alerting_rule_name_doesn't_match_snake_case_regex - 1]
+- description: alerting rule name doesn't match snake_case regex
+  content: |
+    - alert: CockroachDB_High_CPU_Usage
+      expr: sum(foo) without()
+  output: |
+    1 | - alert: CockroachDB_High_CPU_Usage
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^ alerting rule name must match `^[a-z_]+$`.
+  problem:
+    reporter: rule/name
+    summary: name not allowed
+    details: 'Rule comment: Alert names must use snake_case'
+    diagnostics:
+        - message: alerting rule name must match `^[a-z_]+$`.
+          firstcolumn: 1
+          lastcolumn: 26
           kind: 0
     lines:
         first: 1
@@ -36,7 +61,7 @@
       expr: sum(foo) without(
   output: |
     1 | - record: foo
-                  ^^ recording rule name must match `^total:.+$`.
+                  ^^^ recording rule name must match `^total:.+$`.
   problem:
     reporter: rule/name
     summary: name not allowed
@@ -44,7 +69,7 @@
     diagnostics:
         - message: recording rule name must match `^total:.+$`.
           firstcolumn: 1
-          lastcolumn: 2
+          lastcolumn: 3
           kind: 0
     lines:
         first: 1
@@ -61,7 +86,7 @@
       expr: sum(foo)
   output: |
     1 | - record: foo
-                  ^^ recording rule name must match `^total:.+$`.
+                  ^^^ recording rule name must match `^total:.+$`.
   problem:
     reporter: rule/name
     summary: name not allowed
@@ -69,7 +94,7 @@
     diagnostics:
         - message: recording rule name must match `^total:.+$`.
           firstcolumn: 1
-          lastcolumn: 2
+          lastcolumn: 3
           kind: 0
     lines:
         first: 1

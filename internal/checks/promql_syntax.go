@@ -44,16 +44,19 @@ func (c SyntaxCheck) Reporter() string {
 
 func (c SyntaxCheck) Check(_ context.Context, entry *discovery.Entry, _ []*discovery.Entry) (problems []Problem) {
 	expr := entry.Rule.Expr()
-	if expr.SyntaxError() != nil {
+	if err := expr.SyntaxError(); err != nil {
+		// This is pretty much dead code because PromQL always returns ParseErrors.
+		// The only exception is if it panics and recover gives as a generic error,
+		// which would require a bug in the parser itself.
 		diag := diags.Diagnostic{
-			Message:     expr.SyntaxError().Error(),
+			Message:     err.Error(),
 			Pos:         expr.Value.Pos,
 			FirstColumn: 1,
-			LastColumn:  len(expr.Value.Value) - 1,
+			LastColumn:  len(expr.Value.Value),
 			Kind:        diags.Issue,
 		}
 
-		perrs, ok := errors.AsType[promParser.ParseErrors](expr.SyntaxError())
+		perrs, ok := errors.AsType[promParser.ParseErrors](err)
 		if ok {
 			for _, perr := range perrs { // Use only the last error.
 				diag = diags.Diagnostic{

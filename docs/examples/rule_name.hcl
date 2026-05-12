@@ -19,7 +19,7 @@ rule {
     kind = "alerting"
   }
 
-  name "^[a-z_]+$" {
+  name "[a-zA-Z0-9_]+" {
     comment  = "Alert names must use snake_case (lowercase letters and underscores only)"
     severity = "warning"
   }
