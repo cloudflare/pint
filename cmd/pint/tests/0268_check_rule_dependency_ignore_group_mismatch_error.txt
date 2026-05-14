@@ -1,0 +1,25 @@
+! exec pint --no-color lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=INFO msg="Loading configuration file" path=.pint.hcl
+level=ERROR msg="Execution completed with error(s)" err="failed to load config file \".pint.hcl\": error parsing regexp: invalid nested repetition operator: `++`"
+-- rules/base.yml --
+groups:
+- name: base
+  rules:
+  - record: foo:sum
+    expr: sum(foo)
+  - record: bar:sum
+    expr: sum(bar)
+-- rules/agg.yml --
+groups:
+- name: aggregations
+  rules:
+  - record: combined:rate
+    expr: foo:sum + bar:sum
+-- .pint.hcl --
+check "rule/dependency" {
+  ignoreGroupMismatch = ["bar:sum", "foo:....++++"]
+}

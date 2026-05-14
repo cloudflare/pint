@@ -1,6 +1,7 @@
 package checks_test
 
 import (
+	"context"
 	"errors"
 	"regexp"
 	"testing"
@@ -495,7 +496,155 @@ func TestRuleDependencyCheck(t *testing.T) {
     expr: sum(foo)
 `, discovery.Noop, "base.yaml", "base.yaml"),
 		},
+		{
+			description: "ignores foo:sum cross-group dependency when foo:sum is in ignoreGroupMismatch",
+			content: `groups:
+- name: aggregations
+  rules:
+  - record: foo:rate
+    expr: rate(foo:sum[5m])
+`,
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewRuleDependencyCheck()
+			},
+			ctx: func(ctx context.Context, _ string) context.Context {
+				s := checks.RuleDependencySettings{
+					IgnoreGroupMismatch: []string{"foo:sum"},
+				}
+				if err := s.Validate(); err != nil {
+					t.Error(err)
+					t.FailNow()
+				}
+				return context.WithValue(ctx, checks.SettingsKey(checks.RuleDependencyCheckName), &s)
+			},
+			prometheus: newSimpleProm,
+			entries: parseWithState(`groups:
+- name: base
+  rules:
+  - record: foo:sum
+    expr: sum(foo)
+`, discovery.Noop, "base.yaml", "base.yaml"),
+		},
+		{
+			description: "warns about bar:sum but ignores foo:sum when only foo:.* is in ignoreGroupMismatch",
+			content: `groups:
+- name: aggregations
+  rules:
+  - record: combined:rate
+    expr: rate(foo:sum[5m]) + rate(bar:sum[5m])
+`,
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewRuleDependencyCheck()
+			},
+			ctx: func(ctx context.Context, _ string) context.Context {
+				s := checks.RuleDependencySettings{
+					IgnoreGroupMismatch: []string{"foo:.*"},
+				}
+				if err := s.Validate(); err != nil {
+					t.Error(err)
+					t.FailNow()
+				}
+				return context.WithValue(ctx, checks.SettingsKey(checks.RuleDependencyCheckName), &s)
+			},
+			prometheus: newSimpleProm,
+			problems:   true,
+			entries: parseWithState(`groups:
+- name: base
+  rules:
+  - record: foo:sum
+    expr: sum(foo)
+  - record: bar:sum
+    expr: sum(bar)
+`, discovery.Noop, "base.yaml", "base.yaml"),
+		},
+		{
+			description: "ignores foo:sum cross-group dependency when foo:.* is in ignoreGroupMismatch",
+			content: `groups:
+- name: aggregations
+  rules:
+  - record: foo:rate
+    expr: rate(foo:sum[5m])
+`,
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewRuleDependencyCheck()
+			},
+			ctx: func(ctx context.Context, _ string) context.Context {
+				s := checks.RuleDependencySettings{
+					IgnoreGroupMismatch: []string{"foo:.*"},
+				}
+				if err := s.Validate(); err != nil {
+					t.Error(err)
+					t.FailNow()
+				}
+				return context.WithValue(ctx, checks.SettingsKey(checks.RuleDependencyCheckName), &s)
+			},
+			prometheus: newSimpleProm,
+			entries: parseWithState(`groups:
+- name: base
+  rules:
+  - record: foo:sum
+    expr: sum(foo)
+`, discovery.Noop, "base.yaml", "base.yaml"),
+		},
+		{
+			description: "ignores recording rule with vector(1) - no VectorSelector",
+			content: `groups:
+- name: aggregations
+  rules:
+  - record: static:value
+    expr: vector(1)
+`,
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewRuleDependencyCheck()
+			},
+			prometheus: newSimpleProm,
+			entries: parseWithState(`groups:
+- name: base
+  rules:
+  - record: foo:sum
+    expr: sum(foo)
+`, discovery.Noop, "base.yaml", "base.yaml"),
+		},
 	}
 
 	runTests(t, testCases)
+}
+
+func TestRuleDependencySettings(t *testing.T) {
+	t.Run("valid regex", func(t *testing.T) {
+		s := checks.RuleDependencySettings{
+			IgnoreGroupMismatch: []string{"foo:.*", "bar:sum"},
+		}
+		err := s.Validate()
+		if err != nil {
+			t.Errorf("Validate() returned an error: %v", err)
+		}
+	})
+
+	t.Run("invalid regex", func(t *testing.T) {
+		s := checks.RuleDependencySettings{
+			IgnoreGroupMismatch: []string{"foo:["},
+		}
+		err := s.Validate()
+		if err == nil {
+			t.Error("Validate() did not return an error for invalid regex")
+		}
+	})
+}
+
+func TestRuleDependencyCheck_Interface(t *testing.T) {
+	c := checks.NewRuleDependencyCheck()
+	if c.String() != checks.RuleDependencyCheckName {
+		t.Errorf("String() = %q, want %q", c.String(), checks.RuleDependencyCheckName)
+	}
+	if c.Reporter() != checks.RuleDependencyCheckName {
+		t.Errorf("Reporter() = %q, want %q", c.Reporter(), checks.RuleDependencyCheckName)
+	}
+	meta := c.Meta()
+	if meta.Online {
+		t.Error("Meta().Online = true, want false")
+	}
+	if meta.AlwaysEnabled {
+		t.Error("Meta().AlwaysEnabled = true, want false")
+	}
 }
