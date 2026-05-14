@@ -57,7 +57,7 @@ Checks are run only on modified rules but they require the full list of all rule
 cross-rule dependencies.
 
 Running `pint ci` doesn't require any configuration but it's recommended to add a pint config file
-with `ci` section containing at least the `include` option. This will ensure that pint validates
+with `parser` section containing at least the `include` option. This will ensure that pint validates
 only Prometheus rules and ignores other files.
 
 Results can optionally be reported as comments on a pull request when using one of supported platforms:
@@ -175,7 +175,7 @@ Example:
 pint watch glob /etc/prometheus/rules-*.yml /etc/prometheus/rules.d
 ```
 
-If provide a config file for pint with some Prometheus server definitions
+If you provide a config file for pint with some Prometheus server definitions
 then pint will also run "online" checks for it to, for example, ensure all
 time series used inside your alerting rules are still present.
 Example config:

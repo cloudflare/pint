@@ -10,10 +10,11 @@ This check will find and report any duplicated recording rules.
 
 When Prometheus is configured with two identical recording rules that
 are producing the exact time series it will discard results from one
-of them. When that happens you will see warnings in logs, example:
+of them. When that happens Prometheus will log a warning counting
+discarded samples, example:
 
 ```text
-msg="Rule evaluation result discarded" err="duplicate sample for timestamp"
+msg="Error on ingesting results from rule evaluation with different value but same timestamp" num_dropped=...
 ```
 
 Duplicated rule itself is not catastrophic but it will cause constant unnecessary

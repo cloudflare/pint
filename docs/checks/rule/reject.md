@@ -34,7 +34,7 @@ reject "$pattern" {
 - `label_values` - if true label values for recording and alerting rules will
   be checked.
 - `annotation_keys` - if true annotation keys for alerting rules will be checked.
-- `annotation_values` - if true label values for alerting rules will be checked.
+- `annotation_values` - if true annotation values for alerting rules will be checked.
 
 ## How to enable it
 

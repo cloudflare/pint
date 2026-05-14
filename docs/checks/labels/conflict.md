@@ -24,7 +24,7 @@ Consider this recording rule:
 
 ```yaml
 groups:
-  name: recording rules
+- name: recording rules
   rules:
   - record: prometheus_http_requests_total:rate2m
     expr: rate(prometheus_http_requests_total[2m])

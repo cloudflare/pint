@@ -10,7 +10,7 @@ This check will find rules with invalid use of counters.
 [Counters](https://prometheus.io/docs/concepts/metric_types/#counter) track the number of events over time and so the value of a counter can only grow and never decrease.
 This means that the absolute value of a counter doesn't matter, it will be a random number that depends on the number of events that happened since your application was started.
 To use the value of a counter in PromQL you most likely want to calculate the rate of events using the [rate()](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) function, or any other function that is safe to use with counters.
-Once you calculate the rate you can use that result in other functions or aggregations that are not counter safe, like [sum()](https://prometheus.io/docs/prometheus/latest/querying/operators/#aggregation-operators).`
+Once you calculate the rate you can use that result in other functions or aggregations that are not counter safe, like [sum()](https://prometheus.io/docs/prometheus/latest/querying/operators/#aggregation-operators).
 
 Here's an example of invalid alerting rules that uses a counter metric called `errors_total`.
 This metric will be incremented every time there's an error.
@@ -53,7 +53,7 @@ This can cause a few potential problems:
 - You might have the same metric reported with multiple different types and Prometheus or pint won't know
   which time series is which type, because all we have to match a metric to a type is its name.
   Best solution here is to never export same name as multiple metrics with different types.
-- If you change the typo of some exported metric then the old type will still show up in metadata,
+- If you change the type of some exported metric then the old type will still show up in metadata,
   plus the new one, as long as there's at least one target still exporting old metric type.
   If you accidentally exported some metric with wrong type, then fixed it, but pint is still complaining,
   then it's very likely that you didn't release your fix to all targets yet.

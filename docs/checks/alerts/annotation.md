@@ -125,7 +125,7 @@ You can disable this check globally by adding this config block:
 
 ```js
 checks {
-  disabled = ["alerts/annotations"]
+  disabled = ["alerts/annotation"]
 }
 ```
 

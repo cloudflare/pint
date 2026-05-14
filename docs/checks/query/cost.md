@@ -32,7 +32,7 @@ used by given query:
 
 - `totalQueryableSamples` - the total number of samples read during the query execution.
 - `peakSamples` - the max samples kept in memory during the query execution and shows
-how close the query was to reach the `--query.max-samples`` limit.
+how close the query was to reach the `--query.max-samples` limit.
 
 In general higher `totalQueryableSamples` means that a query either reads a lot of
 time series and/or queries a large time range, both translating into longer query

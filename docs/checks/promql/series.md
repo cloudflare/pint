@@ -283,7 +283,7 @@ so pint decided NOT to report that `foo` is missing on `promB`.
 
 ### min-age
 
-But default this check will report a problem if a metric was present
+By default this check will report a problem if a metric was present
 in Prometheus but disappeared at least two hours ago.
 You can change this duration per Prometheus rule by adding a comment around it.
 Syntax:
@@ -412,7 +412,7 @@ a comment anywhere in that file. Example:
 Or you can disable it per rule by adding a comment to it. Example:
 
 ```yaml
-# pint disable promql/series`
+# pint disable promql/series
 ```
 
 If you want to disable only individual instances of this check
