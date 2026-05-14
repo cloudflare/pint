@@ -385,7 +385,7 @@ prometheus "$name" {
   patterns will use this Prometheus server for checks.
 - `exclude` - optional path filter, if specified any path matching one of listed regexp
   patterns will never use this Prometheus server for checks.
-  `exclude` takes precedence over `include.
+  `exclude` takes precedence over `include`.
 - `tls` - optional TLS configuration for HTTP requests sent to this Prometheus server.
 - `tls:serverName` - server name (SNI) for TLS handshakes. Optional, default is unset.
 - `tls:caCert` - path for CA certificate to use. Optional, default is unset.
@@ -516,7 +516,6 @@ Fields that are allowed to be templated are:
 ```js
 template {
   name        = "..."
-  uri         = "https://..."
   uri         = "https://..."
   failover    = ["https://...", ...]
   tags        = ["...", ...]
@@ -739,5 +738,22 @@ rule {
   }
   // This will enable promql/rate only for Prometheus rules matching all our match conditions above.
   enable = [ "promql/rate" ]
+}
+```
+
+Lock a rule so it cannot be disabled via comments:
+
+```js
+rule {
+  locked = true
+
+  match {
+    kind = "alerting"
+  }
+
+  // This check cannot be disabled using # pint disable ... or # pint snooze ... comments.
+  for {
+    min = "5m"
+  }
 }
 ```

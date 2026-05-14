@@ -53,14 +53,14 @@ recording rule in a different group. Alerting rules are ignored by this check
 because the small lag is usually acceptable.
 
 Each group is evaluated independently with no guaranteed execution order.
-During evaluation, recording rules write results to a transaction that is
-committed to TSDB at the end of the group run. Queries within the same group
-can see uncommitted results from earlier rules in that group, but queries in
-other groups can only see values that have been committed to TSDB.
+Rules inside the same group run sequentially by default. As soon as a rule
+finishes evaluating, its samples are committed to the TSDB. This means later
+rules in the same group will see freshly written data from earlier rules.
 
-In practice, if recording rule B depends on recording rule A, they should be
-in the same group. Otherwise, B will see a stale value of A from the previous
-evaluation cycle, adding up to one evaluation interval of lag.
+If recording rule B depends on recording rule A but they are in different
+groups, B will see a stale value of A from the previous evaluation cycle,
+adding up to one evaluation interval of lag. This happens because both groups
+run at fixed intervals but start at different times.
 
 Example:
 
@@ -106,7 +106,7 @@ groups:
     expr: avg(error:rate5m)
 ```
 
-- `@ 0s` - `errors` evaluates `error:rate5m` and writes to the transaction.
+- `@ 0s` - `errors` evaluates `error:rate5m` and commits to TSDB.
 - `@ 0s` - `errors` evaluates `error:rate5m:avg`, which sees the value from the
   previous step with no lag.
 - `@ 60s` - `errors` runs again, new value for `error:rate5m` is calculated.

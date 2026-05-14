@@ -31,7 +31,7 @@ Consider this rule:
 
 ```yaml
 - alert: oops
-  expr: sum(foo{job="a"}) / sum(bar{job="b}) > 0.1
+  expr: sum(foo{job="a"}) / sum(bar{job="b"}) > 0.1
 ```
 
 It calculates a ratio using a sum of `foo` that comes from scrape job `a` and a sum of `bar` that comes from a scrape job `b`.
@@ -55,7 +55,7 @@ scrape interval, for example:
 
 ```yaml
 - alert: oops
-  expr: sum(foo{job="a"}) / sum(bar{job="b}) > 0.1
+  expr: sum(foo{job="a"}) / sum(bar{job="b"}) > 0.1
   for: 2m
 ```
 

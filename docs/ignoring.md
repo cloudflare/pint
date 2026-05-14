@@ -177,3 +177,16 @@ Just like with `# pint disable ...` you can also use tags with snooze comments.
 
 If you want to snooze some checks for the entire file then you can use
 `# pint file/snooze ...` comment anywhere in given file.
+
+Example:
+
+```yaml
+# pint file/snooze 2025-06-01 promql/series
+# pint file/snooze 2025-06-01 promql/rate
+
+groups:
+- name: example
+  rules:
+  - alert: ...
+    expr: ...
+```
