@@ -4,6 +4,7 @@ import (
 	"cmp"
 	"context"
 	"fmt"
+	"regexp"
 	"slices"
 	"strconv"
 	"strings"
@@ -20,6 +21,22 @@ import (
 const (
 	RuleDependencyCheckName = "rule/dependency"
 )
+
+type RuleDependencySettings struct {
+	IgnoreGroupMismatch   []string `hcl:"ignoreGroupMismatch,optional" json:"ignoreGroupMismatch,omitempty"`
+	ignoreGroupMismatchRe []*regexp.Regexp
+}
+
+func (c *RuleDependencySettings) Validate() error {
+	for _, re := range c.IgnoreGroupMismatch {
+		re, err := regexp.Compile("^" + re + "$")
+		if err != nil {
+			return err
+		}
+		c.ignoreGroupMismatchRe = append(c.ignoreGroupMismatchRe, re)
+	}
+	return nil
+}
 
 func NewRuleDependencyCheck() RuleDependencyCheck {
 	return RuleDependencyCheck{}
@@ -48,9 +65,19 @@ func (c RuleDependencyCheck) Reporter() string {
 	return RuleDependencyCheckName
 }
 
-func (c RuleDependencyCheck) Check(_ context.Context, entry *discovery.Entry, entries []*discovery.Entry) (problems []Problem) {
+func (c RuleDependencyCheck) Check(ctx context.Context, entry *discovery.Entry, entries []*discovery.Entry) (problems []Problem) {
 	problems = append(problems, c.checkRemovedDependency(entry, entries)...)
-	problems = append(problems, c.checkCrossGroupDependency(entry, entries)...)
+
+	var settings *RuleDependencySettings
+	if s := ctx.Value(SettingsKey(c.Reporter())); s != nil {
+		settings = s.(*RuleDependencySettings)
+	}
+	if settings == nil {
+		settings = &RuleDependencySettings{}
+		_ = settings.Validate()
+	}
+
+	problems = append(problems, c.checkCrossGroupDependency(entry, entries, settings.ignoreGroupMismatchRe)...)
 	return problems
 }
 
@@ -145,7 +172,7 @@ func (c RuleDependencyCheck) checkRemovedDependency(entry *discovery.Entry, entr
 	return problems
 }
 
-func (c RuleDependencyCheck) checkCrossGroupDependency(entry *discovery.Entry, entries []*discovery.Entry) (problems []Problem) {
+func (c RuleDependencyCheck) checkCrossGroupDependency(entry *discovery.Entry, entries []*discovery.Entry, ignoreGroupMismatchRe []*regexp.Regexp) (problems []Problem) {
 	if entry.Rule.RecordingRule == nil {
 		// We only check recording rules here.
 		// Alerting rules using recording rules in a different file are usually fine, there is still
@@ -166,6 +193,11 @@ func (c RuleDependencyCheck) checkCrossGroupDependency(entry *discovery.Entry, e
 			vs, ok := source.MostOuterOperation[*promParser.VectorSelector](s)
 			if !ok {
 				return
+			}
+			for _, re := range ignoreGroupMismatchRe {
+				if re.MatchString(vs.Name) {
+					return
+				}
 			}
 			for _, other := range filtered {
 				if other.Rule.RecordingRule == nil {

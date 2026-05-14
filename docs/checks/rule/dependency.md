@@ -117,7 +117,27 @@ will produce results that are consistent between them and there will be no confu
 
 ## Configuration
 
-This check doesn't have any configuration options.
+This check can be configured to ignore specific metrics when checking for
+ cross-group dependencies.
+
+### `ignoreGroupMismatch`
+
+A list of regular expressions matching metric names that should be ignored
+when checking for cross-group dependencies. Metrics matching any of these
+patterns won't trigger a warning when used by a recording rule from a different
+group.
+
+Example:
+
+```js
+check "rule/dependency" {
+  ignoreGroupMismatch = ["foo:.*", "bar:sum"]
+}
+```
+
+This is useful when you have recording rules that depend on other recording
+rules in different groups, but you know the lag is acceptable for specific
+metrics.
 
 ## How to enable it
 
