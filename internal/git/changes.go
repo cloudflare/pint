@@ -77,6 +77,15 @@ func (lns LineNumbers) HasAfter(line int) bool {
 	return false
 }
 
+func (lns LineNumbers) HasAnyAfter(line int) bool {
+	for _, ln := range lns {
+		if ln.After == line {
+			return true
+		}
+	}
+	return false
+}
+
 func (lns LineNumbers) HasBefore(line int) bool {
 	for _, ln := range lns {
 		if ln.Before == line {
@@ -86,45 +95,62 @@ func (lns LineNumbers) HasBefore(line int) bool {
 	return false
 }
 
-// NearestAfter returns the Modified After line number closest to the given target.
-// Only considers entries where Modified is true, consistent with HasAfter.
-// Returns 0 if there are no modified entries with After > 0.
-func (lns LineNumbers) NearestAfter(target int) int {
-	best := 0
-	bestDist := -1
-	for _, ln := range lns {
+// Nearest finds the closest line to the target within changedLines.
+// It prefers lines after the target over lines before and lines within the range,
+// but can select nearest line outside of the range if needed.
+// Returns (0, false) if there are no usable entries.
+func (lns LineNumbers) Nearest(target, rangeFirst, rangeLast int) (int, bool) {
+	// Prefer modified After lines — these are added/changed lines on the new side of the diff.
+	if line := lns.nearestFrom(target, rangeFirst, rangeLast, func(ln LineNumber) int {
 		if ln.After > 0 && ln.Modified {
-			dist := ln.After - target
-			if dist < 0 {
-				dist = -dist
-			}
-			if bestDist < 0 || dist < bestDist {
-				best = ln.After
-				bestDist = dist
-			}
+			return ln.After
 		}
+		return 0
+	}); line > 0 {
+		return line, false
 	}
-	return best
+	// Fall back to Before lines — deleted lines on the old side of the diff.
+	if line := lns.nearestFrom(target, rangeFirst, rangeLast, func(ln LineNumber) int {
+		return ln.Before
+	}); line > 0 {
+		return line, true
+	}
+	return 0, false
 }
 
-// NearestBefore returns the Before line number closest to the given target.
-// Returns 0 if there are no entries with Before > 0.
-func (lns LineNumbers) NearestBefore(target int) int {
-	best := 0
-	bestDist := -1
+// nearestFrom finds the line closest to target among candidates returned by lineFunc.
+// It prefers in-range lines over out-of-range lines, and among each group picks
+// the one with the smallest distance to target.
+func (lns LineNumbers) nearestFrom(target, rangeFirst, rangeLast int, lineFunc func(LineNumber) int) int {
+	var bestInRange, bestOutRange int
+	bestInRangeDist := -1
+	bestOutRangeDist := -1
+
 	for _, ln := range lns {
-		if ln.Before > 0 {
-			dist := ln.Before - target
-			if dist < 0 {
-				dist = -dist
+		v := lineFunc(ln)
+		if v <= 0 {
+			continue
+		}
+		dist := v - target
+		if dist < 0 {
+			dist = -dist
+		}
+		if v >= rangeFirst && v <= rangeLast {
+			if bestInRangeDist < 0 || dist < bestInRangeDist {
+				bestInRange = v
+				bestInRangeDist = dist
 			}
-			if bestDist < 0 || dist < bestDist {
-				best = ln.Before
-				bestDist = dist
-			}
+		} else if bestOutRangeDist < 0 || dist < bestOutRangeDist {
+			bestOutRange = v
+			bestOutRangeDist = dist
 		}
 	}
-	return best
+
+	// Prefer in-range match, fall back to closest out-of-range match.
+	if bestInRange > 0 {
+		return bestInRange
+	}
+	return bestOutRange
 }
 
 // BeforeForAfter returns the old (before the change) line number for a given

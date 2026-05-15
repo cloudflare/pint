@@ -11,7 +11,6 @@ import (
 
 	gitlab "gitlab.com/gitlab-org/api/client-go"
 
-	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/output"
 )
 
@@ -433,41 +432,24 @@ func reportToGitLabDiscussion(pending PendingComment, ver *gitlab.MergeRequestDi
 		},
 	}
 
-	line := pending.line
-	oldLine := pending.changedLines.BeforeForAfter(pending.line)
-
-	// GitLab requires comments on lines present in the diff.
-	// If the target line is not in the diff, move it to the nearest changed line.
-	var useBefore bool
-	if pending.anchor == checks.AnchorBefore {
-		if pending.changedLines.HasBefore(line) {
-			useBefore = true
-		} else if nearest := pending.changedLines.NearestBefore(line); nearest > 0 {
-			line = nearest
-			useBefore = true
-		}
-		// No deleted lines in the diff, fall through to RIGHT side.
-	}
-	if !useBefore {
-		if !pending.changedLines.HasAfter(line) {
-			if nearest := pending.changedLines.NearestAfter(line); nearest > 0 {
-				line = nearest
-				oldLine = pending.changedLines.BeforeForAfter(line)
-			}
-		}
-	}
-
 	switch {
-	case useBefore:
-		d.Position.OldLine = new(int64(line))
+	case pending.isGeneral:
+		// No suitable diff line found, post as a general comment.
+		d.Position = nil
+	case pending.isBefore:
+		// Deleted line, comment on the old side.
+		d.Position.OldLine = new(int64(pending.line))
 		d.Position.NewLine = nil
-	case oldLine == 0:
-		d.Position.NewLine = new(int64(line))
-	case pending.changedLines.HasAfter(line):
-		d.Position.NewLine = new(int64(line))
-	case oldLine > 0:
-		d.Position.NewLine = new(int64(line))
-		d.Position.OldLine = new(int64(oldLine))
+	case pending.oldLine == 0:
+		// Added line, no old-side mapping.
+		d.Position.NewLine = new(int64(pending.line))
+	case pending.isModified:
+		// Modified line, comment on the new side only.
+		d.Position.NewLine = new(int64(pending.line))
+	default:
+		// Unmodified context line, both sides needed.
+		d.Position.NewLine = new(int64(pending.line))
+		d.Position.OldLine = new(int64(pending.oldLine))
 	}
 
 	return &d

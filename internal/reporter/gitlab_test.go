@@ -1092,6 +1092,50 @@ Below is the list of checks that were disabled for each Prometheus server define
 			},
 		},
 		{
+			description: "no diff lines at all, falls back to general comment",
+			timeout:     time.Minute,
+			maxComments: 1,
+			summary: reporter.NewSummary([]reporter.Report{
+				{
+					Path: discovery.Path{
+						SymlinkTarget: mockPath,
+						Name:          mockPath,
+					},
+					Changes: &discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Reporter:    "a",
+						Summary:     "foo error1",
+						Details:     "foo details",
+						Diagnostics: []diags.Diagnostic{},
+						Lines:       diags.LineRange{First: 22, Last: 22},
+						Severity:    checks.Fatal,
+						Anchor:      checks.AnchorAfter,
+					},
+				},
+			}),
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(apiUser).ReturnJSON(gitlab.User{ID: 123})
+				s.ExpectGet(apiOpenMergeRequests).ReturnJSON([]gitlab.BasicMergeRequest{
+					{IID: 1},
+				})
+				s.ExpectGet(apiVersions(1)).ReturnJSON([]gitlab.MergeRequestDiffVersion{
+					{ID: 2, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
+					{ID: 1, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
+				})
+				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{})
+				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
+					Body: discBody("a", "foo error1", "foo details"),
+				}).ReturnJSON(gitlab.Response{})
+			}),
+			errorHandler: func(err error) error {
+				return err
+			},
+		},
+		{
 			description: "deleted line moved to nearest deleted line",
 			timeout:     time.Minute,
 			maxComments: 1,
@@ -1236,6 +1280,12 @@ func TestGitLabReporterCommentLine(t *testing.T) {
 				{Before: 27, After: 20, Modified: true},
 			},
 			expectedNewLine: 20,
+		},
+		{
+			description:     "no After lines, falls back to Before line",
+			problemLine:     22,
+			changes:         git.LineNumbers{{Before: 10, After: 0}},
+			expectedOldLine: 10,
 		},
 	}
 
