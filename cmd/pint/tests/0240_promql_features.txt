@@ -16,7 +16,9 @@ level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
 Bug: required feature flag not enabled (promql/features)
   ---> rules/1.yml:2 -> `foo`
 2 |   expr: mad_over_time(bar[5m])
-            ^^^^^^^^^^^^^ `mad_over_time` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at http://127.0.0.1:7240.
+            ^^^^^^^^^^^^^
+            `mad_over_time` requires `--enable-feature=promql-experimental-functions` to be set on
+            `prom` Prometheus server at http://127.0.0.1:7240.
 
 level=INFO msg="Problems found" Bug=1
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"

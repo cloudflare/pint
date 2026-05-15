@@ -43,7 +43,8 @@
         alert: foo
   output: |
     4 |     alert: foo
-                   ^^^ value is not allowed to match `^{{ $alert }}$`.
+                   ^^^
+                   value is not allowed to match `^{{ $alert }}$`.
   problem:
     reporter: rule/reject
     summary: value not allowed
@@ -75,7 +76,8 @@
         bad: bar
   output: |
     4 |     bad: bar
-            ^^^ key is not allowed to match `^bad$`.
+            ^^^
+            key is not allowed to match `^bad$`.
   problem:
     reporter: rule/reject
     summary: key not allowed
@@ -102,7 +104,8 @@
         foo: bad
   output: |
     4 |     foo: bad
-                 ^^^ value is not allowed to match `^bad$`.
+                 ^^^
+                 value is not allowed to match `^bad$`.
   problem:
     reporter: rule/reject
     summary: value not allowed
@@ -129,7 +132,8 @@
         bad: bar
   output: |
     4 |     bad: bar
-            ^^^ key is not allowed to match `^bad$`.
+            ^^^
+            key is not allowed to match `^bad$`.
   problem:
     reporter: rule/reject
     summary: key not allowed
@@ -160,7 +164,8 @@
         expr: rate(foo[1m])
   output: |
     5 |     bad: bogus
-            ^^^ key is not allowed to match `^bad$`.
+            ^^^
+            key is not allowed to match `^bad$`.
   problem:
     reporter: rule/reject
     summary: key not allowed
@@ -197,7 +202,8 @@
         bad: bar
   output: |
     4 |     bad: bar
-            ^^^ key is not allowed to match `^bad$`.
+            ^^^
+            key is not allowed to match `^bad$`.
   problem:
     reporter: rule/reject
     summary: key not allowed
@@ -228,7 +234,8 @@
         expr: rate(foo[1m])
   output: |
     5 |     bad: bogus
-            ^^^ key is not allowed to match `^bad$`.
+            ^^^
+            key is not allowed to match `^bad$`.
   problem:
     reporter: rule/reject
     summary: key not allowed
@@ -265,7 +272,8 @@
         foo: bad
   output: |
     4 |     foo: bad
-                 ^^^ value is not allowed to match `^bad$`.
+                 ^^^
+                 value is not allowed to match `^bad$`.
   problem:
     reporter: rule/reject
     summary: value not allowed
@@ -292,7 +300,8 @@
         foo: bad
   output: |
     4 |     foo: bad
-                 ^^^ value is not allowed to match `^bad$`.
+                 ^^^
+                 value is not allowed to match `^bad$`.
   problem:
     reporter: rule/reject
     summary: value not allowed

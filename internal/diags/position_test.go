@@ -146,6 +146,31 @@ expr: |
 	}
 }
 
+func TestNewPositionRangeEmptyValue(t *testing.T) {
+	// When val.Value is empty, NewPositionRange should return a single
+	// position at the node's column.
+	node := &yaml.Node{Line: 3, Column: 5, Value: ""}
+	lines := []string{"", "", `foo: ""`}
+	pos := NewPositionRange(lines, node, 1)
+	require.Equal(t, PositionRanges{{Line: 3, FirstColumn: 5, LastColumn: 5}}, pos)
+}
+
+func TestNewPositionRangeEmptyLine(t *testing.T) {
+	// When a line in the middle is empty, NewPositionRange should skip it
+	// and continue with the next line.
+	input := "foo: |\n  line1\n\n  line3"
+	key, val := parseYaml(input)
+	require.NotNil(t, key)
+	require.NotNil(t, val)
+	pos := NewPositionRange(strings.Split(input, "\n"), val, key.Column+2)
+	// The empty line 3 gets a continuation position from the appendPosition
+	// call before the empty-line check, so we expect 3 entries.
+	require.Len(t, pos, 3)
+	require.Equal(t, 2, pos[0].Line)
+	require.Equal(t, 3, pos[1].Line)
+	require.Equal(t, 4, pos[2].Line)
+}
+
 func TestReadRange(t *testing.T) {
 	type testCaseT struct {
 		input  string

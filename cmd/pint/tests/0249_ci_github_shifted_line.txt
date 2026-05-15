@@ -75,7 +75,7 @@ body: |
 
   ```yaml
   7 |     expr: sum(foo) by(job)
-                    ^^^ 
+                    ^^^
   ```
 
   This query doesn't have any condition and so this alert will always fire if it matches anything.
@@ -112,7 +112,7 @@ body: |
 
   ```yaml
   8 |     for: 0s
-               ^^ 
+               ^^
   ```
 
   `0s` is the default value of `for`, this line is unnecessary.
@@ -172,12 +172,15 @@ body: |+
   Warning: always firing alert (alerts/comparison)
     ---> rules.yml:7 -> `rule1`
   7 |     expr: sum(foo) by(job)
-                    ^^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
+                    ^^^
+                    This query doesn't have any condition and so this alert will always fire if it matches
+                    anything.
 
   Information: redundant field with default value (alerts/for)
     ---> rules.yml:8 -> `rule1`
   8 |     for: 0s
-               ^^ `0s` is the default value of `for`, this line is unnecessary.
+               ^^
+               `0s` is the default value of `for`, this line is unnecessary.
 
   ```
 

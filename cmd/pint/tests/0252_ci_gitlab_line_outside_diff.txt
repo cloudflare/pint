@@ -110,7 +110,7 @@ body: |
 
   ```yaml
   5 |     expr: sum(foo) by(job)
-                    ^^^ 
+                    ^^^
   ```
 
   This query doesn't have any condition and so this alert will always fire if it matches anything.

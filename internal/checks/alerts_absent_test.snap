@@ -11,7 +11,9 @@
       expr: absent(foo)
   output: |
     1 | - alert: foo
-                 ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `bad_response: 600 status code 600`.
+                 ^^^
+                 Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX
+                 error: `bad_response: 600 status code 600`.
   problem:
     reporter: alerts/absent
     summary: unable to run checks
@@ -37,9 +39,11 @@
       for: 1m
   output: |
     2 |   expr: absent(foo)
-                ^^^^^^^^^^^ Using `absent()` might cause false positive alerts when Prometheus restarts.
+                ^^^^^^^^^^^
+                Using `absent()` might cause false positive alerts when Prometheus restarts.
     3 |   for: 1m
-               ^^ Use a value that's at least twice Prometheus scrape interval (`1m`).
+               ^^
+               Use a value that's at least twice Prometheus scrape interval (`1m`).
   problem:
     reporter: alerts/absent
     summary: absent() based alert with insufficient for
@@ -71,9 +75,11 @@
       for: 1m
   output: |
     2 |   expr: absent(foo)
-                ^^^^^^^^^^^ Using `absent()` might cause false positive alerts when Prometheus restarts.
+                ^^^^^^^^^^^
+                Using `absent()` might cause false positive alerts when Prometheus restarts.
     3 |   for: 1m
-               ^^ Use a value that's at least twice Prometheus scrape interval (`53s`).
+               ^^
+               Use a value that's at least twice Prometheus scrape interval (`53s`).
   problem:
     reporter: alerts/absent
     summary: absent() based alert with insufficient for
@@ -105,9 +111,11 @@
       for: 30s
   output: |
     2 |   expr: absent(foo)
-                ^^^^^^^^^^^ Using `absent()` might cause false positive alerts when Prometheus restarts.
+                ^^^^^^^^^^^
+                Using `absent()` might cause false positive alerts when Prometheus restarts.
     3 |   for: 30s
-               ^^^ Use a value that's at least twice Prometheus scrape interval (`1m`).
+               ^^^
+               Use a value that's at least twice Prometheus scrape interval (`1m`).
   problem:
     reporter: alerts/absent
     summary: absent() based alert with insufficient for
@@ -143,7 +151,8 @@
       expr: absent(foo)
   output: |
     2 |   expr: absent(foo)
-                ^^^^^^^^^^^ Using `absent()` might cause false positive alerts when Prometheus restarts.
+                ^^^^^^^^^^^
+                Using `absent()` might cause false positive alerts when Prometheus restarts.
   problem:
     reporter: alerts/absent
     summary: absent() based alert without for
@@ -171,7 +180,9 @@
       for: 5m
   output: |
     2 |   expr: absent(vector(1))
-                ^^^^^^^^^^^^^^^^^ Query passed inside `absent()` will always return some results, so absent will never return anything.
+                ^^^^^^^^^^^^^^^^^
+                Query passed inside `absent()` will always return some results, so absent will never return
+                anything.
   problem:
     reporter: alerts/absent
     summary: never firing alert
@@ -196,7 +207,9 @@
       expr: absent(foo)
   output: |
     1 | - alert: foo
-                 ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 error: `connection refused`.
+                 ^^^
+                 Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111
+                 error: `connection refused`.
   problem:
     reporter: alerts/absent
     summary: unable to run checks
@@ -221,7 +234,9 @@
       expr: count(foo) > 5 or absent(foo)
   output: |
     2 |   expr: count(foo) > 5 or absent(foo)
-                                  ^^^^^^^^^^^ Using `absent()` might cause false positive alerts when Prometheus restarts.
+                                  ^^^^^^^^^^^
+                                  Using `absent()` might cause false positive alerts when Prometheus
+                                  restarts.
   problem:
     reporter: alerts/absent
     summary: absent() based alert without for
@@ -268,7 +283,10 @@
       expr: absent(foo)
   output: |
     1 | - alert: foo
-                 ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `failed to decode config data in http://127.0.0.1:XXXXX response: yaml: line 2: could not find expected ':'`.
+                 ^^^
+                 Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX
+                 error: `failed to decode config data in http://127.0.0.1:XXXXX response: yaml: line 2:
+                 could not find expected ':'`.
   problem:
     reporter: alerts/absent
     summary: unable to run checks
@@ -293,7 +311,9 @@
       expr: absent(foo)
   output: |
     1 | - alert: foo
-                 ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `bad_data: bad input data`.
+                 ^^^
+                 Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX
+                 error: `bad_data: bad input data`.
   problem:
     reporter: alerts/absent
     summary: unable to run checks

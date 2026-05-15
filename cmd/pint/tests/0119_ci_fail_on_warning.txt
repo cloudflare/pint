@@ -88,7 +88,7 @@ body: |
 
   ```yaml
   3 |   for: 0s
-             ^^ 
+             ^^
   ```
 
   `severity` label is required.
@@ -121,7 +121,7 @@ body: |
 
   ```yaml
   2 |   expr: sum(foo) by(job)
-                  ^^^ 
+                  ^^^
   ```
 
   This query doesn't have any condition and so this alert will always fire if it matches anything.
@@ -158,7 +158,7 @@ body: |
 
   ```yaml
   3 |   for: 0s
-             ^^ 
+             ^^
   ```
 
   `0s` is the default value of `for`, this line is unnecessary.
@@ -218,17 +218,21 @@ body: |+
   Warning: required label not set (rule/label)
     ---> rules.yml:1-3 -> `rule1`
   3 |   for: 0s
-             ^^ `severity` label is required.
+             ^^
+             `severity` label is required.
 
   Warning: always firing alert (alerts/comparison)
     ---> rules.yml:2 -> `rule1`
   2 |   expr: sum(foo) by(job)
-                  ^^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
+                  ^^^
+                  This query doesn't have any condition and so this alert will always fire if it matches
+                  anything.
 
   Information: redundant field with default value (alerts/for)
     ---> rules.yml:3 -> `rule1`
   3 |   for: 0s
-             ^^ `0s` is the default value of `for`, this line is unnecessary.
+             ^^
+             `0s` is the default value of `for`, this line is unnecessary.
 
   ```
 

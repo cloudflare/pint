@@ -6,7 +6,9 @@
       expr: (foo > 0) or vector(0)
   output: |
     2 |   expr: (foo > 0) or vector(0)
-                             ^^^^^^^^^ If other parts of this query don't return anything then this part will always return a result and so this alert will fire.
+                             ^^^^^^^^^
+                             If other parts of this query don't return anything then this part will always
+                             return a result and so this alert will fire.
   problem:
     reporter: alerts/comparison
     summary: always firing alert
@@ -51,7 +53,9 @@
       expr: (foo > 0) or vector(0)
   output: |
     2 |   expr: (foo > 0) or vector(0)
-                             ^^^^^^^^^ If other parts of this query don't return anything then this part will always return a result and so this alert will fire.
+                             ^^^^^^^^^
+                             If other parts of this query don't return anything then this part will always
+                             return a result and so this alert will fire.
   problem:
     reporter: alerts/comparison
     summary: always firing alert
@@ -106,7 +110,9 @@
       expr: rate(error_count[5m]) > bool 5
   output: |
     2 |   expr: rate(error_count[5m]) > bool 5
-                     ^^^^^^^^^^^^^^^ Results of this query are using the `bool` modifier, which means it will always return a result and the alert will always fire.
+                     ^^^^^^^^^^^^^^^
+                     Results of this query are using the `bool` modifier, which means it will always return
+                     a result and the alert will always fire.
   problem:
     reporter: alerts/comparison
     summary: always firing alert
@@ -141,7 +147,9 @@
       expr: up{job="foo"}
   output: |
     2 |   expr: up{job="foo"}
-                ^^^^^^^^^^^^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
+                ^^^^^^^^^^^^^
+                This query doesn't have any condition and so this alert will always fire if it matches
+                anything.
   problem:
     reporter: alerts/comparison
     summary: always firing alert
@@ -199,7 +207,9 @@
             rate(node_netstat_Udp_RcvbufErrors[5m])+rate(node_netstat_Udp6_RcvbufErrors[5m])
   output: |
     3 |   expr: quantile_over_time(0.7,(irate(udp_packets_drops[2m]))[10m:2m])
-                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                       This query doesn't have any condition and so this alert will always
+                                       fire if it matches anything.
     4 |         AND ON (instance)
     5 |         rate(node_netstat_Udp_RcvbufErrors[5m])+rate(node_netstat_Udp6_RcvbufErrors[5m])
   problem:
@@ -246,7 +256,8 @@
       expr: vector(0)
   output: |
     2 |   expr: vector(0)
-                ^^^^^^^^^ This query will always return a result and so this alert will always fire.
+                ^^^^^^^^^
+                This query will always return a result and so this alert will always fire.
   problem:
     reporter: alerts/comparison
     summary: always firing alert
@@ -276,7 +287,9 @@
       expr: (foo > 0) or vector(0)
   output: |
     2 |   expr: (foo > 0) or vector(0)
-                             ^^^^^^^^^ If other parts of this query don't return anything then this part will always return a result and so this alert will fire.
+                             ^^^^^^^^^
+                             If other parts of this query don't return anything then this part will always
+                             return a result and so this alert will fire.
   problem:
     reporter: alerts/comparison
     summary: always firing alert

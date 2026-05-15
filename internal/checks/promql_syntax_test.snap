@@ -6,7 +6,8 @@
       expr: sum(
   output: |
     2 |   expr: sum(
-                   ^ unclosed left parenthesis
+                   ^
+                   unclosed left parenthesis
   problem:
     reporter: promql/syntax
     summary: PromQL syntax error
@@ -31,7 +32,8 @@
       expr: sum(foo) by(
   output: |
     2 |   expr: sum(foo) by(
-                           ^ unclosed left parenthesis
+                           ^
+                           unclosed left parenthesis
   problem:
     reporter: promql/syntax
     summary: PromQL syntax error

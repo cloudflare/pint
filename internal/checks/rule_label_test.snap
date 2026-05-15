@@ -6,7 +6,8 @@
       expr: sum(foo) without(
   output: |
     2 |   expr: sum(foo) without(
-                ^^^ `severity` label is required.
+                ^^^
+                `severity` label is required.
   problem:
     reporter: rule/label
     summary: required label not set
@@ -36,7 +37,8 @@
         level: warning
   output: |
     7 |     level: warning
-            ^^^ `severity` label is required.
+            ^^^
+            `severity` label is required.
   problem:
     reporter: rule/label
     summary: required label not set
@@ -66,7 +68,8 @@
         level: warning
   output: |
     4 |   labels:
-          ^^^^^^ `severity` label is required.
+          ^^^^^^
+          `severity` label is required.
   problem:
     reporter: rule/label
     summary: required label not set
@@ -93,7 +96,8 @@
         severity: warning
   output: |
     4 |     severity: warning
-                      ^^^^^^^ `severity` label value must match `^critical|info$`.
+                      ^^^^^^^
+                      `severity` label value must match `^critical|info$`.
   problem:
     reporter: rule/label
     summary: invalid label value
@@ -124,7 +128,8 @@
         expr: rate(foo[1m])
   output: |
     5 |     severity: bogus
-                      ^^^^^ `severity` label value must match `^critical|info$`.
+                      ^^^^^
+                      `severity` label value must match `^critical|info$`.
   problem:
     reporter: rule/label
     summary: invalid label value
@@ -151,7 +156,8 @@
         severity: warning
   output: |
     4 |     severity: warning
-                      ^^^^^^^ `severity` label value must match `^critical|info$`.
+                      ^^^^^^^
+                      `severity` label value must match `^critical|info$`.
   problem:
     reporter: rule/label
     summary: invalid label value
@@ -182,7 +188,8 @@
         expr: rate(foo[1m])
   output: |
     5 |     severity: bogus
-                      ^^^^^ `severity` label value must match `^critical|info$`.
+                      ^^^^^
+                      `severity` label value must match `^critical|info$`.
   problem:
     reporter: rule/label
     summary: invalid label value
@@ -209,7 +216,8 @@
         components: api db
   output: |
     4 |     components: api db
-                        ^^^^^^ `components` label value must match `^api|memcached$`.
+                        ^^^^^^
+                        `components` label value must match `^api|memcached$`.
   problem:
     reporter: rule/label
     summary: invalid label value
@@ -236,7 +244,8 @@
         components: api db
   output: |
     4 |     components: api db
-                        ^^^^^^ `components` label value is not one of valid values.
+                        ^^^^^^
+                        `components` label value is not one of valid values.
   problem:
     reporter: rule/label
     summary: invalid label value
@@ -273,7 +282,8 @@
         severity: warning
   output: |
     4 |     severity: warning
-                      ^^^^^^^ `severity` label value must match `^critical$`.
+                      ^^^^^^^
+                      `severity` label value must match `^critical$`.
   problem:
     reporter: rule/label
     summary: invalid label value
@@ -304,7 +314,8 @@
         expr: rate(foo[1m])
   output: |
     5 |     severity: bogus
-                      ^^^^^ `severity` label value must match `^critical|info$`.
+                      ^^^^^
+                      `severity` label value must match `^critical|info$`.
   problem:
     reporter: rule/label
     summary: invalid label value
@@ -331,7 +342,8 @@
         severity: warning
   output: |
     4 |     severity: warning
-                      ^^^^^^^ `severity` label value must match `^critical$`.
+                      ^^^^^^^
+                      `severity` label value must match `^critical$`.
   problem:
     reporter: rule/label
     summary: invalid label value
@@ -362,7 +374,8 @@
         expr: rate(foo[1m])
   output: |
     5 |     severity: bogus
-                      ^^^^^ `severity` label value must match `^critical|info$`.
+                      ^^^^^
+                      `severity` label value must match `^critical|info$`.
   problem:
     reporter: rule/label
     summary: invalid label value
@@ -389,7 +402,8 @@
         components: api db
   output: |
     4 |     components: api db
-                        ^^^^^^ `components` label value must match `^api|memcached$`.
+                        ^^^^^^
+                        `components` label value must match `^api|memcached$`.
   problem:
     reporter: rule/label
     summary: invalid label value
@@ -416,7 +430,8 @@
         components: api db
   output: |
     4 |     components: api db
-                        ^^^^^^ `components` label value is not one of valid values.
+                        ^^^^^^
+                        `components` label value is not one of valid values.
   problem:
     reporter: rule/label
     summary: invalid label value
@@ -460,7 +475,8 @@
         foo: bar
   output: |
     4 |     foo: bar
-            ^^^ `severity` label is required.
+            ^^^
+            `severity` label is required.
   problem:
     reporter: rule/label
     summary: required label not set
@@ -493,7 +509,8 @@
         bob: alice
   output: |
     3 |   labels:
-          ^^^^^^ `sev.+` label is required.
+          ^^^^^^
+          `sev.+` label is required.
   problem:
     reporter: rule/label
     summary: required label not set
@@ -528,7 +545,8 @@
       expr: rate(foo[1m])
   output: |
     2 |   expr: rate(foo[1m])
-                ^^^ `severity` label is required.
+                ^^^
+                `severity` label is required.
   problem:
     reporter: rule/label
     summary: required label not set
@@ -568,7 +586,8 @@
       expr: rate(foo[1m])
   output: |
     2 |   expr: rate(foo[1m])
-                ^^^ `severity` label is required.
+                ^^^
+                `severity` label is required.
   problem:
     reporter: rule/label
     summary: required label not set
@@ -601,7 +620,8 @@
         for: 'must wait 5m to fire'
   output: |
     5 |     for: 'must wait 5m to fire'
-                  ^^^^^^^^^^^^^^^^^^^^ `for` label value must match `^must wait {{$for}} to fire$`.
+                  ^^^^^^^^^^^^^^^^^^^^
+                  `for` label value must match `^must wait {{$for}} to fire$`.
   problem:
     reporter: rule/label
     summary: invalid label value
@@ -633,7 +653,8 @@
         priority: 2a
   output: |
     4 |     priority: 2a
-                      ^^ `priority` label value must match `^(1|2|3)$`.
+                      ^^
+                      `priority` label value must match `^(1|2|3)$`.
   problem:
     reporter: rule/label
     summary: invalid label value
@@ -660,7 +681,8 @@
         priority: 2a
   output: |
     4 |     priority: 2a
-                      ^^ `priority` label value must match `^(1|2|3)$`.
+                      ^^
+                      `priority` label value must match `^(1|2|3)$`.
   problem:
     reporter: rule/label
     summary: invalid label value

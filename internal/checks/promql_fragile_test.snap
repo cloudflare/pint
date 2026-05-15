@@ -22,7 +22,10 @@
       expr: sum(rate(metric_a[30m])) / sum(max_over_time(metric_b[30m])) >= 0.02
   output: |
     3 |   expr: sum(rate(metric_a[30m])) / sum(max_over_time(metric_b[30m])) >= 0.02
-                                                             ^^^^^^^^^^^^^ This query can cause false positives when Prometheus restarts, add `for` option to avoid that.
+                                                             ^^^^^^^^^^^^^
+                                                             This query can cause false positives when
+                                                             Prometheus restarts, add `for` option to avoid
+                                                             that.
   problem:
     reporter: promql/fragile
     summary: fragile query
@@ -53,7 +56,9 @@
       expr: sum(selector{job="foo"}) % sum(selector{job="foo"} offset 30m) > 5
   output: |
     3 |   expr: sum(selector{job="foo"}) % sum(selector{job="foo"} offset 30m) > 5
-                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This query can cause false positives when Prometheus restarts, add `for` option to avoid that.
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                               This query can cause false positives when Prometheus
+                                               restarts, add `for` option to avoid that.
   problem:
     reporter: promql/fragile
     summary: fragile query
@@ -84,7 +89,9 @@
       expr: sum(selector{job="foo"}) * sum(selector{job="foo"} offset 30m) > 5
   output: |
     3 |   expr: sum(selector{job="foo"}) * sum(selector{job="foo"} offset 30m) > 5
-                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This query can cause false positives when Prometheus restarts, add `for` option to avoid that.
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                               This query can cause false positives when Prometheus
+                                               restarts, add `for` option to avoid that.
   problem:
     reporter: promql/fragile
     summary: fragile query
@@ -115,7 +122,9 @@
       expr: sum(selector{job="foo"}) + sum(selector{job="foo"} offset 30m) > 5
   output: |
     3 |   expr: sum(selector{job="foo"}) + sum(selector{job="foo"} offset 30m) > 5
-                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This query can cause false positives when Prometheus restarts, add `for` option to avoid that.
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                               This query can cause false positives when Prometheus
+                                               restarts, add `for` option to avoid that.
   problem:
     reporter: promql/fragile
     summary: fragile query
@@ -146,7 +155,9 @@
       expr: sum(selector{job="foo"}) - sum(selector{job="foo"} offset 30m) > 5
   output: |
     3 |   expr: sum(selector{job="foo"}) - sum(selector{job="foo"} offset 30m) > 5
-                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This query can cause false positives when Prometheus restarts, add `for` option to avoid that.
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                               This query can cause false positives when Prometheus
+                                               restarts, add `for` option to avoid that.
   problem:
     reporter: promql/fragile
     summary: fragile query
@@ -177,7 +188,9 @@
       expr: sum(selector{job="foo"}) / sum(selector{job="foo"} offset 30m) > 5
   output: |
     3 |   expr: sum(selector{job="foo"}) / sum(selector{job="foo"} offset 30m) > 5
-                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This query can cause false positives when Prometheus restarts, add `for` option to avoid that.
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                               This query can cause false positives when Prometheus
+                                               restarts, add `for` option to avoid that.
   problem:
     reporter: promql/fragile
     summary: fragile query
@@ -208,7 +221,9 @@
       expr: sum(selector{job="foo"}) ^ sum(selector{job="foo"} offset 30m) > 5
   output: |
     3 |   expr: sum(selector{job="foo"}) ^ sum(selector{job="foo"} offset 30m) > 5
-                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This query can cause false positives when Prometheus restarts, add `for` option to avoid that.
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                               This query can cause false positives when Prometheus
+                                               restarts, add `for` option to avoid that.
   problem:
     reporter: promql/fragile
     summary: fragile query
@@ -244,7 +259,9 @@
       expr: sum(selector{job="foo"}) / sum(selector{job="bob"} offset 30m) > 5
   output: |
     3 |   expr: sum(selector{job="foo"}) / sum(selector{job="bob"} offset 30m) > 5
-                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This query can cause false positives when Prometheus restarts, add `for` option to avoid that.
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                               This query can cause false positives when Prometheus
+                                               restarts, add `for` option to avoid that.
   problem:
     reporter: promql/fragile
     summary: fragile query
@@ -304,7 +321,9 @@
       expr: bottomk(10, foo)
   output: |
     2 |   expr: bottomk(10, foo)
-                            ^^^ Using `bottomk` to select time series might return different set of time series on every query, which would cause flapping alerts.
+                            ^^^
+                            Using `bottomk` to select time series might return different set of time series
+                            on every query, which would cause flapping alerts.
   problem:
     reporter: promql/fragile
     summary: fragile query
@@ -333,7 +352,9 @@
       expr: topk(10, foo)
   output: |
     2 |   expr: topk(10, foo)
-                         ^^^ Using `topk` to select time series might return different set of time series on every query, which would cause flapping alerts.
+                         ^^^
+                         Using `topk` to select time series might return different set of time series on
+                         every query, which would cause flapping alerts.
   problem:
     reporter: promql/fragile
     summary: fragile query
@@ -362,7 +383,9 @@
       expr: bar or topk(10, foo) or bottomk(10, foo)
   output: |
     2 |   expr: bar or topk(10, foo) or bottomk(10, foo)
-                                ^^^ Using `topk` to select time series might return different set of time series on every query, which would cause flapping alerts.
+                                ^^^
+                                Using `topk` to select time series might return different set of time series
+                                on every query, which would cause flapping alerts.
   problem:
     reporter: promql/fragile
     summary: fragile query
@@ -387,7 +410,10 @@
       expr: bar or topk(10, foo) or bottomk(10, foo)
   output: |
     2 |   expr: bar or topk(10, foo) or bottomk(10, foo)
-                                                    ^^^ Using `bottomk` to select time series might return different set of time series on every query, which would cause flapping alerts.
+                                                    ^^^
+                                                    Using `bottomk` to select time series might return
+                                                    different set of time series on every query, which would
+                                                    cause flapping alerts.
   problem:
     reporter: promql/fragile
     summary: fragile query
@@ -416,7 +442,9 @@
       expr: bar or topk(10, foo)
   output: |
     2 |   expr: bar or topk(10, foo)
-                                ^^^ Using `topk` to select time series might return different set of time series on every query, which would cause flapping alerts.
+                                ^^^
+                                Using `topk` to select time series might return different set of time series
+                                on every query, which would cause flapping alerts.
   problem:
     reporter: promql/fragile
     summary: fragile query

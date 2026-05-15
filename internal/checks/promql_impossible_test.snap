@@ -20,11 +20,18 @@
     6 |           increase(kernel_device_io_soft_errors_total{device!~"loop.+"}[125m])*2 > increase(kernel_device_io_errors_total[120m])
     7 |         )
     8 |         and on(device, instance) absent(node_disk_info)
-                                         ^^^^^^ The right hand side will never be matched because it doesn't have the `device` label from `on(...)`. The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
-    You will only get any results back if the metric selector you pass doesn't match anything.
-    Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
-    This means that the only labels you can get back from absent call are the ones you pass to it.
-    If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+                                         ^^^^^^
+                                         The right hand side will never be matched because it doesn't have
+                                         the `device` label from `on(...)`. The
+                                         [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent)
+                                         function is used to check if provided query doesn't match any time
+                                         series. You will only get any results back if the metric selector
+                                         you pass doesn't match anything. Since there are no matching time
+                                         series there are also no labels. If some time series is missing you
+                                         cannot read its labels. This means that the only labels you can get
+                                         back from absent call are the ones you pass to it. If you're hoping
+                                         to get instance specific labels this way and alert when some target
+                                         is down then that won't work, use the `up` metric instead.
     9 |       ) unless on (instance,device) max(max_over_time(cloudchamber_snapshot_devices[1h])) by (instance,device)
   problem:
     reporter: promql/impossible
@@ -56,7 +63,9 @@
       expr: 0 > bool 0
   output: |
     3 |   expr: 0 > bool 0
-                ^ `0 > 0` always evaluates to `0 > 0` and uses the `bool` modifier which means it will always return 0
+                ^
+                `0 > 0` always evaluates to `0 > 0` and uses the `bool` modifier which means it will always
+                return 0
   problem:
     reporter: promql/impossible
     summary: dead code in query
@@ -83,7 +92,10 @@
         {job="foo"} unless on(__name__) count(sum({job="foo"})) by(__name__)
   output: |
     4 |     {job="foo"} unless on(__name__) count(sum({job="foo"})) by(__name__)
-                                                  ^^^^^^^^^^^^^^^^ The right hand side will never be matched because it doesn't have the `__name__` label from `on(...)`. Aggregation removes metric name.
+                                                  ^^^^^^^^^^^^^^^^
+                                                  The right hand side will never be matched because it
+                                                  doesn't have the `__name__` label from `on(...)`.
+                                                  Aggregation removes metric name.
   problem:
     reporter: promql/impossible
     summary: dead code in query
@@ -106,8 +118,11 @@
         {job="foo"} unless on(__name__) count(sum({job="foo"})) by(__name__)
   output: |
     4 |     {job="foo"} unless on(__name__) count(sum({job="foo"})) by(__name__)
-                                                                       ^^^^^^^^ You can't use `__name__` because this label is not possible here.
-                                                  ^^^^^^^^^^^^^^^^ Aggregation removes metric name.
+                                                                       ^^^^^^^^
+                                                                       You can't use `__name__` because this
+                                                                       label is not possible here.
+                                                  ^^^^^^^^^^^^^^^^
+                                                  Aggregation removes metric name.
   problem:
     reporter: promql/impossible
     summary: impossible label
@@ -150,8 +165,11 @@
   output: |4
      4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
      5 |       (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
-                                                          ^^^^^^^^^ You can't use `colo_name` because this label is not possible here.
-                                           ^^^^^^ Calling `vector()` will return a vector value with no labels.
+                                                          ^^^^^^^^^
+                                                          You can't use `colo_name` because this label is not
+                                                          possible here.
+                                           ^^^^^^
+                                           Calling `vector()` will return a vector value with no labels.
      6 |     > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
      7 |       avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
      8 |     # Multi-line comment
@@ -200,8 +218,12 @@
      5 |       (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
      6 |     > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
      7 |       avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
-                                                                   ^^^^^^^^^ You can't use `colo_name` because this label is not possible here.
-                                                    ^^^^^^ Calling `vector()` will return a vector value with no labels.
+                                                                   ^^^^^^^^^
+                                                                   You can't use `colo_name` because this
+                                                                   label is not possible here.
+                                                    ^^^^^^
+                                                    Calling `vector()` will return a vector value with no
+                                                    labels.
      8 |     # Multi-line comment
      9 |     # inside the query
     10 |     and on (colo_name)
@@ -247,8 +269,13 @@
      4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
      5 |       (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
      6 |     > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
-                                                                             ^^^^^^^^^ You can't use `colo_name` because this label is not possible here.
-                                                              ^^^^^^ Calling `vector()` will return a vector value with no labels.
+                                                                             ^^^^^^^^^
+                                                                             You can't use `colo_name`
+                                                                             because this label is not
+                                                                             possible here.
+                                                              ^^^^^^
+                                                              Calling `vector()` will return a vector value
+                                                              with no labels.
      7 |       avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
      8 |     # Multi-line comment
      9 |     # inside the query
@@ -296,8 +323,12 @@
      5 |       (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
      6 |     > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
      7 |       avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
-                                                                   ^^^^^^^^^ You can't use `colo_name` because this label is not possible here.
-                                                    ^^^^^^ Calling `vector()` will return a vector value with no labels.
+                                                                   ^^^^^^^^^
+                                                                   You can't use `colo_name` because this
+                                                                   label is not possible here.
+                                                    ^^^^^^
+                                                    Calling `vector()` will return a vector value with no
+                                                    labels.
      8 |     # Multi-line comment
      9 |     # inside the query
     10 |     and on (colo_name)
@@ -348,7 +379,10 @@
      9 |     # inside the query
     10 |     and on (colo_name)
     11 |       (colo_job:foo_total:rate2m or vector(0)) > 80
-                                             ^^^^^^ The right hand side will never be matched because it doesn't have the `colo_name` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
+                                             ^^^^^^
+                                             The right hand side will never be matched because it doesn't
+                                             have the `colo_name` label from `on(...)`. Calling `vector()`
+                                             will return a vector value with no labels.
     12 |     and on (colo_name)
     13 |       (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
   problem:
@@ -393,7 +427,11 @@
     11 |       (colo_job:foo_total:rate2m or vector(0)) > 80
     12 |     and on (colo_name)
     13 |       (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
-                                                       ^^^^^^ The right hand side will never be matched because it doesn't have the `colo_name` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
+                                                       ^^^^^^
+                                                       The right hand side will never be matched because it
+                                                       doesn't have the `colo_name` label from `on(...)`.
+                                                       Calling `vector()` will return a vector value with no
+                                                       labels.
   problem:
     reporter: promql/impossible
     summary: dead code in query
@@ -427,7 +465,10 @@
         summary: High rejectsion rate in {{ $labels.colo_name }}
   output: |4
      4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
-                                              ^^^^^^^^^ `vector(0) / vector(1) > 5 * vector(0) / vector(1)` always evaluates to `0 > 0` which is not possible, so it will never return anything.
+                                              ^^^^^^^^^
+                                              `vector(0) / vector(1) > 5 * vector(0) / vector(1)` always
+                                              evaluates to `0 > 0` which is not possible, so it will never
+                                              return anything.
      5 |       (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
      6 |     > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
      7 |       avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
@@ -470,8 +511,11 @@
         summary: High rejectsion rate in {{ $labels.colo_name }}
   output: |4
      4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
-                                                             ^^^^^^^^^ You can't use `colo_name` because this label is not possible here.
-                                              ^^^^^^ Calling `vector()` will return a vector value with no labels.
+                                                             ^^^^^^^^^
+                                                             You can't use `colo_name` because this label is
+                                                             not possible here.
+                                              ^^^^^^
+                                              Calling `vector()` will return a vector value with no labels.
      5 |       (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
      6 |     > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
      7 |       avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
@@ -518,14 +562,16 @@
         summary: High rejectsion rate in {{ $labels.colo_name }}
   output: |4
      4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
-                                              ^^^^^^ Calling `vector()` will return a vector value with no labels.
+                                              ^^^^^^
+                                              Calling `vector()` will return a vector value with no labels.
      5 |       (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
      6 |     > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
      7 |       avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
      8 |     # Multi-line comment
      9 |     # inside the query
     10 |     and on (colo_name)
-                     ^^^^^^^^^ You can't use `colo_name` because this label is not possible here.
+                     ^^^^^^^^^
+                     You can't use `colo_name` because this label is not possible here.
     11 |       (colo_job:foo_total:rate2m or vector(0)) > 80
     12 |     and on (colo_name)
     13 |       (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
@@ -567,8 +613,11 @@
   output: |4
      4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
      5 |       (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
-                                                          ^^^^^^^^^ You can't use `colo_name` because this label is not possible here.
-                                           ^^^^^^ Calling `vector()` will return a vector value with no labels.
+                                                          ^^^^^^^^^
+                                                          You can't use `colo_name` because this label is not
+                                                          possible here.
+                                           ^^^^^^
+                                           Calling `vector()` will return a vector value with no labels.
      6 |     > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
      7 |       avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
      8 |     # Multi-line comment
@@ -617,8 +666,12 @@
      5 |       (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
      6 |     > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
      7 |       avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
-                                                                   ^^^^^^^^^ You can't use `colo_name` because this label is not possible here.
-                                                    ^^^^^^ Calling `vector()` will return a vector value with no labels.
+                                                                   ^^^^^^^^^
+                                                                   You can't use `colo_name` because this
+                                                                   label is not possible here.
+                                                    ^^^^^^
+                                                    Calling `vector()` will return a vector value with no
+                                                    labels.
      8 |     # Multi-line comment
      9 |     # inside the query
     10 |     and on (colo_name)
@@ -664,8 +717,13 @@
      4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
      5 |       (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
      6 |     > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
-                                                                             ^^^^^^^^^ You can't use `colo_name` because this label is not possible here.
-                                                              ^^^^^^ Calling `vector()` will return a vector value with no labels.
+                                                                             ^^^^^^^^^
+                                                                             You can't use `colo_name`
+                                                                             because this label is not
+                                                                             possible here.
+                                                              ^^^^^^
+                                                              Calling `vector()` will return a vector value
+                                                              with no labels.
      7 |       avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
      8 |     # Multi-line comment
      9 |     # inside the query
@@ -713,8 +771,12 @@
      5 |       (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
      6 |     > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
      7 |       avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
-                                                                   ^^^^^^^^^ You can't use `colo_name` because this label is not possible here.
-                                                    ^^^^^^ Calling `vector()` will return a vector value with no labels.
+                                                                   ^^^^^^^^^
+                                                                   You can't use `colo_name` because this
+                                                                   label is not possible here.
+                                                    ^^^^^^
+                                                    Calling `vector()` will return a vector value with no
+                                                    labels.
      8 |     # Multi-line comment
      9 |     # inside the query
     10 |     and on (colo_name)
@@ -765,7 +827,10 @@
      9 |     # inside the query
     10 |     and on (colo_name)
     11 |       (colo_job:foo_total:rate2m or vector(0)) > 80
-                                             ^^^^^^ The right hand side will never be matched because it doesn't have the `colo_name` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
+                                             ^^^^^^
+                                             The right hand side will never be matched because it doesn't
+                                             have the `colo_name` label from `on(...)`. Calling `vector()`
+                                             will return a vector value with no labels.
     12 |     and on (colo_name)
     13 |       (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
   problem:
@@ -810,7 +875,11 @@
     11 |       (colo_job:foo_total:rate2m or vector(0)) > 80
     12 |     and on (colo_name)
     13 |       (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
-                                                       ^^^^^^ The right hand side will never be matched because it doesn't have the `colo_name` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
+                                                       ^^^^^^
+                                                       The right hand side will never be matched because it
+                                                       doesn't have the `colo_name` label from `on(...)`.
+                                                       Calling `vector()` will return a vector value with no
+                                                       labels.
   problem:
     reporter: promql/impossible
     summary: dead code in query
@@ -841,7 +910,10 @@
       expr: foo{job="bar"} unless sum(foo)
   output: |
     3 |   expr: foo{job="bar"} unless sum(foo)
-                                      ^^^ The right hand side will never be matched because it doesn't have the `job` label while the left hand side will. Query is using aggregation that removes all labels.
+                                      ^^^
+                                      The right hand side will never be matched because it doesn't have the
+                                      `job` label while the left hand side will. Query is using aggregation
+                                      that removes all labels.
   problem:
     reporter: promql/impossible
     summary: dead code in query
@@ -867,7 +939,10 @@
       expr: foo{job="bar"} unless vector(0)
   output: |
     3 |   expr: foo{job="bar"} unless vector(0)
-                                      ^^^^^^ The right hand side will never be matched because it doesn't have the `job` label while the left hand side will. Calling `vector()` will return a vector value with no labels.
+                                      ^^^^^^
+                                      The right hand side will never be matched because it doesn't have the
+                                      `job` label while the left hand side will. Calling `vector()` will
+                                      return a vector value with no labels.
   problem:
     reporter: promql/impossible
     summary: dead code in query
@@ -903,10 +978,14 @@
         )
   output: |
     4 |     group without(animal, brand) (
-                          ^^^^^^ Previously joined label `animal` is being removed from the results.
+                          ^^^^^^
+                          Previously joined label `animal` is being removed from the results.
     5 |       up{node_status="v", job="node_exporter"}
     6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
-                                                ^^^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                                                ^^^^^^
+                                                Query is using `group_left(tier, animal, brand, pop_name)`,
+                                                all labels included inside `group_left(...)` will be joined
+                                                to the results on the other side of the query.
     7 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
     8 |     )
   problem:
@@ -939,10 +1018,15 @@
         )
   output: |
     4 |     group without(animal, brand) (
-                                  ^^^^^ Previously joined label `brand` is being removed from the results.
+                                  ^^^^^
+                                  Previously joined label `brand` is being removed from the results.
     5 |       up{node_status="v", job="node_exporter"}
     6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
-                                                        ^^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                                                        ^^^^^
+                                                        Query is using `group_left(tier, animal, brand,
+                                                        pop_name)`, all labels included inside
+                                                        `group_left(...)` will be joined to the results on
+                                                        the other side of the query.
     7 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
     8 |     )
   problem:
@@ -998,11 +1082,16 @@
      8 |         colo_metadata{colo_status="v"}
      9 |       )
     10 |       * on(animal, instance)
-               ^ This binary operation prevents previously joined label `brand` from being added to the results.
+               ^
+               This binary operation prevents previously joined label `brand` from being added to the
+               results.
     11 |       (
     12 |         up{node_status="v", job="blackholebird"}
     13 |         * on (colo_name) group_left(animal, brand)
-                                                     ^^^^^ Query is using `group_left(animal, brand)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                                                     ^^^^^
+                                                     Query is using `group_left(animal, brand)`, all labels
+                                                     included inside `group_left(...)` will be joined to the
+                                                     results on the other side of the query.
     14 |         colo_metadata{colo_status="v"}
     15 |       )
     16 |     )
@@ -1049,10 +1138,14 @@
      4 |     up{node_status="v", job="node_exporter"}
      5 |     * on(instance) metal_services_enabled
      6 |     * on(instance) (
-             ^ This binary operation prevents previously joined label `sliver` from being added to the results.
+             ^
+             This binary operation prevents previously joined label `sliver` from being added to the results.
      7 |       metal_services_enabled
      8 |       * on(instance) group_left (sliver)
-                                          ^^^^^^ Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                                          ^^^^^^
+                                          Query is using `group_left(sliver)`, all labels included inside
+                                          `group_left(...)` will be joined to the results on the other side
+                                          of the query.
      9 |       sliver_metadata{node_status="v"}
     10 |     )
   problem:
@@ -1093,10 +1186,14 @@
      4 |     up{node_status="v", job="node_exporter"}
      5 |     * on(instance) group_left metal_services_enabled
      6 |     * on(instance, colo_name) (
-             ^ This binary operation prevents previously joined label `sliver` from being added to the results.
+             ^
+             This binary operation prevents previously joined label `sliver` from being added to the results.
      7 |       metal_services_enabled
      8 |       * on(instance) group_left (sliver)
-                                          ^^^^^^ Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                                          ^^^^^^
+                                          Query is using `group_left(sliver)`, all labels included inside
+                                          `group_left(...)` will be joined to the results on the other side
+                                          of the query.
      9 |       sliver_metadata{node_status="v"}
     10 |     )
   problem:
@@ -1137,10 +1234,14 @@
      4 |     up{node_status="v", job="node_exporter"}
      5 |     * on(instance) group_right metal_services_enabled
      6 |     * on(instance, colo_name) (
-             ^ This binary operation prevents previously joined label `sliver` from being added to the results.
+             ^
+             This binary operation prevents previously joined label `sliver` from being added to the results.
      7 |       metal_services_enabled
      8 |       * on(instance) group_left (sliver)
-                                          ^^^^^^ Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                                          ^^^^^^
+                                          Query is using `group_left(sliver)`, all labels included inside
+                                          `group_left(...)` will be joined to the results on the other side
+                                          of the query.
      9 |       sliver_metadata{node_status="v"}
     10 |     )
   problem:
@@ -1182,10 +1283,14 @@
         )
   output: |
     4 |     group by(brand) (
-                  ^^^^^^^^^ Previously joined label `tier` is being removed from the results.
+                  ^^^^^^^^^
+                  Previously joined label `tier` is being removed from the results.
     5 |       up{node_status="v", job="node_exporter"}
     6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
-                                          ^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                                          ^^^^
+                                          Query is using `group_left(tier, animal, brand, pop_name)`, all
+                                          labels included inside `group_left(...)` will be joined to the
+                                          results on the other side of the query.
     7 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
     8 |     )
   problem:
@@ -1218,10 +1323,14 @@
         )
   output: |
     4 |     group by(brand) (
-                  ^^^^^^^^^ Previously joined label `animal` is being removed from the results.
+                  ^^^^^^^^^
+                  Previously joined label `animal` is being removed from the results.
     5 |       up{node_status="v", job="node_exporter"}
     6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
-                                                ^^^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                                                ^^^^^^
+                                                Query is using `group_left(tier, animal, brand, pop_name)`,
+                                                all labels included inside `group_left(...)` will be joined
+                                                to the results on the other side of the query.
     7 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
     8 |     )
   problem:
@@ -1254,10 +1363,15 @@
         )
   output: |
     4 |     group by(brand) (
-                  ^^^^^^^^^ Previously joined label `pop_name` is being removed from the results.
+                  ^^^^^^^^^
+                  Previously joined label `pop_name` is being removed from the results.
     5 |       up{node_status="v", job="node_exporter"}
     6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
-                                                               ^^^^^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                                                               ^^^^^^^^
+                                                               Query is using `group_left(tier, animal,
+                                                               brand, pop_name)`, all labels included inside
+                                                               `group_left(...)` will be joined to the
+                                                               results on the other side of the query.
     7 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
     8 |     )
   problem:
@@ -1290,11 +1404,15 @@
         )
   output: |
     4 |     group by(brand) (
-                  ^^^^^^^^^ Previously joined label `sliver` is being removed from the results.
+                  ^^^^^^^^^
+                  Previously joined label `sliver` is being removed from the results.
     5 |       up{node_status="v", job="node_exporter"}
     6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
     7 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
-                                          ^^^^^^ Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                                          ^^^^^^
+                                          Query is using `group_left(sliver)`, all labels included inside
+                                          `group_left(...)` will be joined to the results on the other side
+                                          of the query.
     8 |     )
   problem:
     reporter: promql/impossible
@@ -1327,9 +1445,12 @@
         * on(instance) group_left(node_status) sliver_metadata
   output: |
     4 |     up{node_status="v", job="node_exporter"}
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Query will only return series where these labels are present.
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            Query will only return series where these labels are present.
     5 |     * on(instance) group_left(node_status) sliver_metadata
-                                      ^^^^^^^^^^^ Query is trying to join the `node_status` label that is already present on the other side of the query.
+                                      ^^^^^^^^^^^
+                                      Query is trying to join the `node_status` label that is already
+                                      present on the other side of the query.
   problem:
     reporter: promql/impossible
     summary: redundant label
@@ -1364,10 +1485,14 @@
         )
   output: |
     4 |     group (
-            ^^^^^^ Previously joined label `tier` is being removed from the results.
+            ^^^^^^
+            Previously joined label `tier` is being removed from the results.
     5 |       up{node_status="v", job="node_exporter"}
     6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
-                                          ^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                                          ^^^^
+                                          Query is using `group_left(tier, animal, brand, pop_name)`, all
+                                          labels included inside `group_left(...)` will be joined to the
+                                          results on the other side of the query.
     7 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
     8 |     )
   problem:
@@ -1400,10 +1525,14 @@
         )
   output: |
     4 |     group (
-            ^^^^^^ Previously joined label `animal` is being removed from the results.
+            ^^^^^^
+            Previously joined label `animal` is being removed from the results.
     5 |       up{node_status="v", job="node_exporter"}
     6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
-                                                ^^^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                                                ^^^^^^
+                                                Query is using `group_left(tier, animal, brand, pop_name)`,
+                                                all labels included inside `group_left(...)` will be joined
+                                                to the results on the other side of the query.
     7 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
     8 |     )
   problem:
@@ -1436,10 +1565,15 @@
         )
   output: |
     4 |     group (
-            ^^^^^^ Previously joined label `brand` is being removed from the results.
+            ^^^^^^
+            Previously joined label `brand` is being removed from the results.
     5 |       up{node_status="v", job="node_exporter"}
     6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
-                                                        ^^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                                                        ^^^^^
+                                                        Query is using `group_left(tier, animal, brand,
+                                                        pop_name)`, all labels included inside
+                                                        `group_left(...)` will be joined to the results on
+                                                        the other side of the query.
     7 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
     8 |     )
   problem:
@@ -1472,10 +1606,15 @@
         )
   output: |
     4 |     group (
-            ^^^^^^ Previously joined label `pop_name` is being removed from the results.
+            ^^^^^^
+            Previously joined label `pop_name` is being removed from the results.
     5 |       up{node_status="v", job="node_exporter"}
     6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
-                                                               ^^^^^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                                                               ^^^^^^^^
+                                                               Query is using `group_left(tier, animal,
+                                                               brand, pop_name)`, all labels included inside
+                                                               `group_left(...)` will be joined to the
+                                                               results on the other side of the query.
     7 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
     8 |     )
   problem:
@@ -1508,11 +1647,15 @@
         )
   output: |
     4 |     group (
-            ^^^^^^ Previously joined label `sliver` is being removed from the results.
+            ^^^^^^
+            Previously joined label `sliver` is being removed from the results.
     5 |       up{node_status="v", job="node_exporter"}
     6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
     7 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
-                                          ^^^^^^ Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                                          ^^^^^^
+                                          Query is using `group_left(sliver)`, all labels included inside
+                                          `group_left(...)` will be joined to the results on the other side
+                                          of the query.
     8 |     )
   problem:
     reporter: promql/impossible
@@ -1552,10 +1695,14 @@
      4 |     up{node_status="v", job="node_exporter"}
      5 |     * on(instance) metal_services_enabled
      6 |     * on(instance) (
-             ^ This binary operation prevents previously joined label `sliver` from being added to the results.
+             ^
+             This binary operation prevents previously joined label `sliver` from being added to the results.
      7 |       sliver_metadata{node_status="v"}
      8 |       * on(instance) group_right (sliver)
-                                           ^^^^^^ Query is using `group_right(sliver)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
+                                           ^^^^^^
+                                           Query is using `group_right(sliver)`, all labels included inside
+                                           `group_right(...)` will be joined to the results on the other side
+                                           of the query.
      9 |       metal_services_enabled
     10 |     )
   problem:
@@ -1592,7 +1739,10 @@
       expr: foo / on(instance) sum(bar)
   output: |
     3 |   expr: foo / on(instance) sum(bar)
-                                   ^^^ The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
+                                   ^^^
+                                   The right hand side will never be matched because it doesn't have the
+                                   `instance` label from `on(...)`. Query is using aggregation that removes
+                                   all labels.
   problem:
     reporter: promql/impossible
     summary: dead code in query
@@ -1618,7 +1768,10 @@
       expr: foo / on(instance) group_left(cluster) sum(bar)
   output: |
     3 |   expr: foo / on(instance) group_left(cluster) sum(bar)
-                                                       ^^^ The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
+                                                       ^^^
+                                                       The right hand side will never be matched because it
+                                                       doesn't have the `instance` label from `on(...)`.
+                                                       Query is using aggregation that removes all labels.
   problem:
     reporter: promql/impossible
     summary: dead code in query
@@ -1640,8 +1793,11 @@
       expr: foo / on(instance) group_left(cluster) sum(bar)
   output: |
     3 |   expr: foo / on(instance) group_left(cluster) sum(bar)
-                                                       ^^^ Query is using aggregation that removes all labels.
-                                              ^^^^^^^ You can't use `cluster` because this label is not possible here.
+                                                       ^^^
+                                                       Query is using aggregation that removes all labels.
+                                              ^^^^^^^
+                                              You can't use `cluster` because this label is not possible
+                                              here.
   problem:
     reporter: promql/impossible
     summary: impossible label
@@ -1671,7 +1827,9 @@
       expr: sum(bar) / on(instance) group_right(cluster) foo
   output: |
     3 |   expr: sum(bar) / on(instance) group_right(cluster) foo
-                ^^^ The left hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
+                ^^^
+                The left hand side will never be matched because it doesn't have the `instance` label from
+                `on(...)`. Query is using aggregation that removes all labels.
   problem:
     reporter: promql/impossible
     summary: dead code in query
@@ -1693,8 +1851,11 @@
       expr: sum(bar) / on(instance) group_right(cluster) foo
   output: |
     3 |   expr: sum(bar) / on(instance) group_right(cluster) foo
-                                                    ^^^^^^^ You can't use `cluster` because this label is not possible here.
-                ^^^ Query is using aggregation that removes all labels.
+                                                    ^^^^^^^
+                                                    You can't use `cluster` because this label is not
+                                                    possible here.
+                ^^^
+                Query is using aggregation that removes all labels.
   problem:
     reporter: promql/impossible
     summary: impossible label
@@ -1739,9 +1900,13 @@
      4 |     group by (colo_name, instance, tier, animal, brand, sliver, pop_name) (
      5 |       up{node_status="v", job="node_exporter"}
      6 |       and on (instance) (metal_services_enabled == 999)
-               ^^^ This binary operation prevents previously joined label `tier` from being added to the results.
+               ^^^
+               This binary operation prevents previously joined label `tier` from being added to the results.
      7 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
-                                           ^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                                           ^^^^
+                                           Query is using `group_left(tier, animal, brand, pop_name)`, all
+                                           labels included inside `group_left(...)` will be joined to the
+                                           results on the other side of the query.
      8 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
      9 |       unless on (instance) label_join(
     10 |         max by (boring_instance) (boring_reboot_in_maintenance) == 1,
@@ -1791,9 +1956,14 @@
      4 |     group by (colo_name, instance, tier, animal, brand, sliver, pop_name) (
      5 |       up{node_status="v", job="node_exporter"}
      6 |       and on (instance) (metal_services_enabled == 999)
-               ^^^ This binary operation prevents previously joined label `animal` from being added to the results.
+               ^^^
+               This binary operation prevents previously joined label `animal` from being added to the
+               results.
      7 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
-                                                 ^^^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                                                 ^^^^^^
+                                                 Query is using `group_left(tier, animal, brand, pop_name)`,
+                                                 all labels included inside `group_left(...)` will be joined
+                                                 to the results on the other side of the query.
      8 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
      9 |       unless on (instance) label_join(
     10 |         max by (boring_instance) (boring_reboot_in_maintenance) == 1,
@@ -1843,9 +2013,15 @@
      4 |     group by (colo_name, instance, tier, animal, brand, sliver, pop_name) (
      5 |       up{node_status="v", job="node_exporter"}
      6 |       and on (instance) (metal_services_enabled == 999)
-               ^^^ This binary operation prevents previously joined label `brand` from being added to the results.
+               ^^^
+               This binary operation prevents previously joined label `brand` from being added to the
+               results.
      7 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
-                                                         ^^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                                                         ^^^^^
+                                                         Query is using `group_left(tier, animal, brand,
+                                                         pop_name)`, all labels included inside
+                                                         `group_left(...)` will be joined to the results on
+                                                         the other side of the query.
      8 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
      9 |       unless on (instance) label_join(
     10 |         max by (boring_instance) (boring_reboot_in_maintenance) == 1,
@@ -1895,9 +2071,15 @@
      4 |     group by (colo_name, instance, tier, animal, brand, sliver, pop_name) (
      5 |       up{node_status="v", job="node_exporter"}
      6 |       and on (instance) (metal_services_enabled == 999)
-               ^^^ This binary operation prevents previously joined label `pop_name` from being added to the results.
+               ^^^
+               This binary operation prevents previously joined label `pop_name` from being added to the
+               results.
      7 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
-                                                                ^^^^^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                                                                ^^^^^^^^
+                                                                Query is using `group_left(tier, animal,
+                                                                brand, pop_name)`, all labels included inside
+                                                                `group_left(...)` will be joined to the
+                                                                results on the other side of the query.
      8 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
      9 |       unless on (instance) label_join(
     10 |         max by (boring_instance) (boring_reboot_in_maintenance) == 1,
@@ -1947,10 +2129,15 @@
      4 |     group by (colo_name, instance, tier, animal, brand, sliver, pop_name) (
      5 |       up{node_status="v", job="node_exporter"}
      6 |       and on (instance) (metal_services_enabled == 999)
-               ^^^ This binary operation prevents previously joined label `sliver` from being added to the results.
+               ^^^
+               This binary operation prevents previously joined label `sliver` from being added to the
+               results.
      7 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
      8 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
-                                           ^^^^^^ Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                                           ^^^^^^
+                                           Query is using `group_left(sliver)`, all labels included inside
+                                           `group_left(...)` will be joined to the results on the other side
+                                           of the query.
      9 |       unless on (instance) label_join(
     10 |         max by (boring_instance) (boring_reboot_in_maintenance) == 1,
     11 |             "instance",
@@ -1991,9 +2178,13 @@
         )
   output: |
     4 |     group by (env, cluster, status, instance, dc, port) (
-                      ^^^ You can't use `env` because this label is not possible here.
+                      ^^^
+                      You can't use `env` because this label is not possible here.
     5 |         up{env="prod", job="foo"} * on (instance) (services_enabled == 999)
-                                            ^^^^^^^^^^^^^ Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+                                            ^^^^^^^^^^^^^
+                                            Query is using one-to-one vector matching with `on(instance)`,
+                                            only labels included inside `on(...)` will be present on the
+                                            results.
     6 |     )
   problem:
     reporter: promql/impossible
@@ -2023,9 +2214,13 @@
         )
   output: |
     4 |     group by (env, cluster, status, instance, dc, port) (
-                           ^^^^^^^ You can't use `cluster` because this label is not possible here.
+                           ^^^^^^^
+                           You can't use `cluster` because this label is not possible here.
     5 |         up{env="prod", job="foo"} * on (instance) (services_enabled == 999)
-                                            ^^^^^^^^^^^^^ Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+                                            ^^^^^^^^^^^^^
+                                            Query is using one-to-one vector matching with `on(instance)`,
+                                            only labels included inside `on(...)` will be present on the
+                                            results.
     6 |     )
   problem:
     reporter: promql/impossible
@@ -2055,9 +2250,13 @@
         )
   output: |
     4 |     group by (env, cluster, status, instance, dc, port) (
-                                    ^^^^^^ You can't use `status` because this label is not possible here.
+                                    ^^^^^^
+                                    You can't use `status` because this label is not possible here.
     5 |         up{env="prod", job="foo"} * on (instance) (services_enabled == 999)
-                                            ^^^^^^^^^^^^^ Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+                                            ^^^^^^^^^^^^^
+                                            Query is using one-to-one vector matching with `on(instance)`,
+                                            only labels included inside `on(...)` will be present on the
+                                            results.
     6 |     )
   problem:
     reporter: promql/impossible
@@ -2087,9 +2286,14 @@
         )
   output: |
     4 |     group by (env, cluster, status, instance, dc, port) (
-                                                      ^^ You can't use `dc` because this label is not possible here.
+                                                      ^^
+                                                      You can't use `dc` because this label is not possible
+                                                      here.
     5 |         up{env="prod", job="foo"} * on (instance) (services_enabled == 999)
-                                            ^^^^^^^^^^^^^ Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+                                            ^^^^^^^^^^^^^
+                                            Query is using one-to-one vector matching with `on(instance)`,
+                                            only labels included inside `on(...)` will be present on the
+                                            results.
     6 |     )
   problem:
     reporter: promql/impossible
@@ -2119,9 +2323,14 @@
         )
   output: |
     4 |     group by (env, cluster, status, instance, dc, port) (
-                                                          ^^^^ You can't use `port` because this label is not possible here.
+                                                          ^^^^
+                                                          You can't use `port` because this label is not
+                                                          possible here.
     5 |         up{env="prod", job="foo"} * on (instance) (services_enabled == 999)
-                                            ^^^^^^^^^^^^^ Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+                                            ^^^^^^^^^^^^^
+                                            Query is using one-to-one vector matching with `on(instance)`,
+                                            only labels included inside `on(...)` will be present on the
+                                            results.
     6 |     )
   problem:
     reporter: promql/impossible
@@ -2156,9 +2365,13 @@
   output: |
     4 |     up{node_status="v", job="node_exporter"}
     5 |     and on (colo_name) colo_metadata{colo_status="v"}
-            ^^^ This binary operation prevents previously joined label `sliver` from being added to the results.
+            ^^^
+            This binary operation prevents previously joined label `sliver` from being added to the results.
     6 |     * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
-                                        ^^^^^^ Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                                        ^^^^^^
+                                        Query is using `group_left(sliver)`, all labels included inside
+                                        `group_left(...)` will be joined to the results on the other side of
+                                        the query.
   problem:
     reporter: promql/impossible
     summary: orphaned label
@@ -2193,9 +2406,13 @@
   output: |
     4 |     up{node_status="v", job="node_exporter"}
     5 |     and on (instance, animal, brand) (metal_services_enabled == 999)
-            ^^^ This binary operation prevents previously joined label `tier` from being added to the results.
+            ^^^
+            This binary operation prevents previously joined label `tier` from being added to the results.
     6 |     * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
-                                        ^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                                        ^^^^
+                                        Query is using `group_left(tier, animal, brand, pop_name)`, all
+                                        labels included inside `group_left(...)` will be joined to the
+                                        results on the other side of the query.
     7 |     * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
   problem:
     reporter: promql/impossible
@@ -2227,9 +2444,15 @@
   output: |
     4 |     up{node_status="v", job="node_exporter"}
     5 |     and on (instance, animal, brand) (metal_services_enabled == 999)
-            ^^^ This binary operation prevents previously joined label `pop_name` from being added to the results.
+            ^^^
+            This binary operation prevents previously joined label `pop_name` from being added to the
+            results.
     6 |     * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
-                                                             ^^^^^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                                                             ^^^^^^^^
+                                                             Query is using `group_left(tier, animal, brand,
+                                                             pop_name)`, all labels included inside
+                                                             `group_left(...)` will be joined to the results
+                                                             on the other side of the query.
     7 |     * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
   problem:
     reporter: promql/impossible
@@ -2261,10 +2484,14 @@
   output: |
     4 |     up{node_status="v", job="node_exporter"}
     5 |     and on (instance, animal, brand) (metal_services_enabled == 999)
-            ^^^ This binary operation prevents previously joined label `sliver` from being added to the results.
+            ^^^
+            This binary operation prevents previously joined label `sliver` from being added to the results.
     6 |     * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
     7 |     * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
-                                        ^^^^^^ Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                                        ^^^^^^
+                                        Query is using `group_left(sliver)`, all labels included inside
+                                        `group_left(...)` will be joined to the results on the other side of
+                                        the query.
   problem:
     reporter: promql/impossible
     summary: orphaned label
@@ -2294,8 +2521,10 @@
       expr: sum(bar) * on(cluster) sum(foo)
   output: |
     3 |   expr: sum(bar) * on(cluster) sum(foo)
-                              ^^^^^^^ You can't use `cluster` because this label is not possible here.
-                ^^^ Query is using aggregation that removes all labels.
+                              ^^^^^^^
+                              You can't use `cluster` because this label is not possible here.
+                ^^^
+                Query is using aggregation that removes all labels.
   problem:
     reporter: promql/impossible
     summary: impossible label
@@ -2329,9 +2558,12 @@
         )
   output: |
     4 |     sum by (cluster, err, gen, scope, is_dev, job, slice)
-                    ^^^^^^^ You can't use `cluster` because this label is not possible here.
+                    ^^^^^^^
+                    You can't use `cluster` because this label is not possible here.
     5 |       ( sum by (instance, job) (rate(cycles_total[2m])) * on (instance)
-                    ^^^ Query is using aggregation with `by(instance, job)`, only labels included inside `by(...)` will be present on the results.
+                    ^^^
+                    Query is using aggregation with `by(instance, job)`, only labels included inside
+                    `by(...)` will be present on the results.
     6 |       group_left (err, gen, scope, is_dev, slice) (instance_job:node_metadata)
     7 |     )
   problem:
@@ -2367,8 +2599,11 @@
   output: |
     4 |     sum by (job) (
     5 |       up{env="prod", job="foo"} * on () group_left(job) services_enabled{job=""}
-                                                           ^^^ Query is trying to join the `job` label that is already present on the other side of the query.
-              ^^^^^^^^^^^^^^^^^^^^^^^^^ Query will only return series where these labels are present.
+                                                           ^^^
+                                                           Query is trying to join the `job` label that is
+                                                           already present on the other side of the query.
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+              Query will only return series where these labels are present.
     6 |     )
   problem:
     reporter: promql/impossible
@@ -2399,8 +2634,13 @@
   output: |
     4 |     sum by (job) (
     5 |       up{env="prod", job="foo"} * on () group_left(job) services_enabled{job=""}
-                                                                ^^^^^^^^^^^^^^^^^^^^^^^^ Query uses `{job=""}` selector which will filter out any time series with the `job` label set.
-                                                           ^^^ You can't use `job` because this label is not possible here.
+                                                                ^^^^^^^^^^^^^^^^^^^^^^^^
+                                                                Query uses `{job=""}` selector which will
+                                                                filter out any time series with the `job`
+                                                                label set.
+                                                           ^^^
+                                                           You can't use `job` because this label is not
+                                                           possible here.
     6 |     )
   problem:
     reporter: promql/impossible
@@ -2435,8 +2675,11 @@
   output: |
     4 |     sum by (job) (
     5 |       up{env="prod", job="foo"} * on () group_left(job) services_enabled{job!=""}
-                                                           ^^^ Query is trying to join the `job` label that is already present on the other side of the query.
-              ^^^^^^^^^^^^^^^^^^^^^^^^^ Query will only return series where these labels are present.
+                                                           ^^^
+                                                           Query is trying to join the `job` label that is
+                                                           already present on the other side of the query.
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+              Query will only return series where these labels are present.
     6 |     )
   problem:
     reporter: promql/impossible
@@ -2480,8 +2723,12 @@
   output: |
     4 |     (prometheus_ready * on(instance) group_left(version) prometheus_build_info)
     5 |     * ignoring(version) prometheus_config_last_reload_successful
-                       ^^^^^^^ Query is using one-to-one vector matching with `ignoring(version)`, all labels included inside `ignoring(...)` will be removed on the results.
-            ^ This binary operation prevents previously joined label `version` from being added to the results.
+                       ^^^^^^^
+                       Query is using one-to-one vector matching with `ignoring(version)`, all labels
+                       included inside `ignoring(...)` will be removed on the results.
+            ^
+            This binary operation prevents previously joined label `version` from being added to the
+            results.
   problem:
     reporter: promql/impossible
     summary: orphaned label
@@ -2536,7 +2783,9 @@
     5 |       max(job:writes_total:rate5m{region=~"wnam|weur", job="myjob", cluster=~"(a|b)"} or vector(0)) by(region)
     6 |       +
     7 |       max(job:skipps_total:rate5m{region=~"wnam|weur", job="myjob", cluster=~"(a|b)"} or vector(0)) by(region)
-                                                                                                 ^^^^^^ The right hand side will never be matched because it doesn't have the `region` label while the left hand side will. Calling `vector()` will return a vector value with no labels.
+                                                                                                 ^^^^^^
+        The right hand side will never be matched because it doesn't have the `region` label while the left
+        hand side will. Calling `vector()` will return a vector value with no labels.
     8 |     ) / sum(rate(records_total{region=~"wnam|weur"}[5m])) by (region) < 0.90
   problem:
     reporter: promql/impossible
@@ -2569,8 +2818,10 @@
     5 |       max(job:writes_total:rate5m{region=~"wnam|weur", job="myjob", cluster=~"(a|b)"} or vector(0)) by(region)
     6 |       +
     7 |       max(job:skipps_total:rate5m{region=~"wnam|weur", job="myjob", cluster=~"(a|b)"} or vector(0)) by(region)
-                                                                                                               ^^^^^^ You can't use `region` because this label is not possible here.
-                                                                                                 ^^^^^^ Calling `vector()` will return a vector value with no labels.
+                                                                                                               ^^^^^^
+        You can't use `region` because this label is not possible here.
+                                                                                                 ^^^^^^
+        Calling `vector()` will return a vector value with no labels.
     8 |     ) / sum(rate(records_total{region=~"wnam|weur"}[5m])) by (region) < 0.90
   problem:
     reporter: promql/impossible
@@ -2605,8 +2856,10 @@
   output: |
     4 |     (
     5 |       max(job:writes_total:rate5m{region=~"wnam|weur", job="myjob", cluster=~"(a|b)"} or vector(0)) by(region)
-                                                                                                               ^^^^^^ You can't use `region` because this label is not possible here.
-                                                                                                 ^^^^^^ Calling `vector()` will return a vector value with no labels.
+                                                                                                               ^^^^^^
+        You can't use `region` because this label is not possible here.
+                                                                                                 ^^^^^^
+        Calling `vector()` will return a vector value with no labels.
     6 |       +
     7 |       max(job:skipps_total:rate5m{region=~"wnam|weur", job="myjob", cluster=~"(a|b)"} or vector(0)) by(region)
     8 |     ) / sum(rate(records_total{region=~"wnam|weur"}[5m])) by (region) < 0.90
@@ -2645,8 +2898,10 @@
     5 |       max(job:writes_total:rate5m{region=~"wnam|weur", job="myjob", cluster=~"(a|b)"} or vector(0)) by(region)
     6 |       +
     7 |       max(job:skipps_total:rate5m{region=~"wnam|weur", job="myjob", cluster=~"(a|b)"} or vector(0)) by(region)
-                                                                                                               ^^^^^^ You can't use `region` because this label is not possible here.
-                                                                                                 ^^^^^^ Calling `vector()` will return a vector value with no labels.
+                                                                                                               ^^^^^^
+        You can't use `region` because this label is not possible here.
+                                                                                                 ^^^^^^
+        Calling `vector()` will return a vector value with no labels.
     8 |     ) / sum(rate(records_total{region=~"wnam|weur"}[5m])) by (region) < 0.90
   problem:
     reporter: promql/impossible
@@ -2682,9 +2937,13 @@
   output: |
     4 |     up{node_status="v", job="node_exporter"}
     5 |     and on (instance) (metal_services_enabled == 999)
-            ^^^ This binary operation prevents previously joined label `tier` from being added to the results.
+            ^^^
+            This binary operation prevents previously joined label `tier` from being added to the results.
     6 |     * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
-                                        ^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                                        ^^^^
+                                        Query is using `group_left(tier, animal, brand, pop_name)`, all
+                                        labels included inside `group_left(...)` will be joined to the
+                                        results on the other side of the query.
     7 |     * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
   problem:
     reporter: promql/impossible
@@ -2716,9 +2975,13 @@
   output: |
     4 |     up{node_status="v", job="node_exporter"}
     5 |     and on (instance) (metal_services_enabled == 999)
-            ^^^ This binary operation prevents previously joined label `animal` from being added to the results.
+            ^^^
+            This binary operation prevents previously joined label `animal` from being added to the results.
     6 |     * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
-                                              ^^^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                                              ^^^^^^
+                                              Query is using `group_left(tier, animal, brand, pop_name)`,
+                                              all labels included inside `group_left(...)` will be joined to
+                                              the results on the other side of the query.
     7 |     * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
   problem:
     reporter: promql/impossible
@@ -2750,9 +3013,14 @@
   output: |
     4 |     up{node_status="v", job="node_exporter"}
     5 |     and on (instance) (metal_services_enabled == 999)
-            ^^^ This binary operation prevents previously joined label `brand` from being added to the results.
+            ^^^
+            This binary operation prevents previously joined label `brand` from being added to the results.
     6 |     * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
-                                                      ^^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                                                      ^^^^^
+                                                      Query is using `group_left(tier, animal, brand,
+                                                      pop_name)`, all labels included inside
+                                                      `group_left(...)` will be joined to the results on the
+                                                      other side of the query.
     7 |     * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
   problem:
     reporter: promql/impossible
@@ -2784,9 +3052,15 @@
   output: |
     4 |     up{node_status="v", job="node_exporter"}
     5 |     and on (instance) (metal_services_enabled == 999)
-            ^^^ This binary operation prevents previously joined label `pop_name` from being added to the results.
+            ^^^
+            This binary operation prevents previously joined label `pop_name` from being added to the
+            results.
     6 |     * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
-                                                             ^^^^^^^^ Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                                                             ^^^^^^^^
+                                                             Query is using `group_left(tier, animal, brand,
+                                                             pop_name)`, all labels included inside
+                                                             `group_left(...)` will be joined to the results
+                                                             on the other side of the query.
     7 |     * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
   problem:
     reporter: promql/impossible
@@ -2818,10 +3092,14 @@
   output: |
     4 |     up{node_status="v", job="node_exporter"}
     5 |     and on (instance) (metal_services_enabled == 999)
-            ^^^ This binary operation prevents previously joined label `sliver` from being added to the results.
+            ^^^
+            This binary operation prevents previously joined label `sliver` from being added to the results.
     6 |     * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
     7 |     * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
-                                        ^^^^^^ Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+                                        ^^^^^^
+                                        Query is using `group_left(sliver)`, all labels included inside
+                                        `group_left(...)` will be joined to the results on the other side of
+                                        the query.
   problem:
     reporter: promql/impossible
     summary: orphaned label
@@ -2853,7 +3131,14 @@
         sliver_metadata{node_status="v"} * on (instance) group_right (sliver)
         (metal_services_enabled == 999) * on (instance) group_right()
         up{node_status="v", job="node_exporter"}
-  output: "4 |     colo_metadata{colo_status=\"v\"} * on (colo_name) group_right(tier, animal, brand, pop_name)\n5 |     sliver_metadata{node_status=\"v\"} * on (instance) group_right (sliver)\n6 |     (metal_services_enabled == 999) * on (instance) group_right()\n                                        ^ This binary operation prevents previously joined label `sliver` from being added to the results.\n                                          \n7 |     up{node_status=\"v\", job=\"node_exporter\"}\n"
+  output: |
+    4 |     colo_metadata{colo_status="v"} * on (colo_name) group_right(tier, animal, brand, pop_name)
+    5 |     sliver_metadata{node_status="v"} * on (instance) group_right (sliver)
+    6 |     (metal_services_enabled == 999) * on (instance) group_right()
+                                            ^
+                                            This binary operation prevents previously joined label `sliver`
+                                            from being added to the results.
+    7 |     up{node_status="v", job="node_exporter"}
   problem:
     reporter: promql/impossible
     summary: orphaned label
@@ -2881,7 +3166,14 @@
         sliver_metadata{node_status="v"} * on (instance) group_right (sliver)
         (metal_services_enabled == 999) * on (instance) group_right()
         up{node_status="v", job="node_exporter"}
-  output: "4 |     colo_metadata{colo_status=\"v\"} * on (colo_name) group_right(tier, animal, brand, pop_name)\n5 |     sliver_metadata{node_status=\"v\"} * on (instance) group_right (sliver)\n                                         ^ This binary operation prevents previously joined label `tier` from being added to the results.\n                                           \n6 |     (metal_services_enabled == 999) * on (instance) group_right()\n7 |     up{node_status=\"v\", job=\"node_exporter\"}\n"
+  output: |
+    4 |     colo_metadata{colo_status="v"} * on (colo_name) group_right(tier, animal, brand, pop_name)
+    5 |     sliver_metadata{node_status="v"} * on (instance) group_right (sliver)
+                                             ^
+                                             This binary operation prevents previously joined label `tier`
+                                             from being added to the results.
+    6 |     (metal_services_enabled == 999) * on (instance) group_right()
+    7 |     up{node_status="v", job="node_exporter"}
   problem:
     reporter: promql/impossible
     summary: orphaned label
@@ -2909,7 +3201,14 @@
         sliver_metadata{node_status="v"} * on (instance) group_right (sliver)
         (metal_services_enabled == 999) * on (instance) group_right()
         up{node_status="v", job="node_exporter"}
-  output: "4 |     colo_metadata{colo_status=\"v\"} * on (colo_name) group_right(tier, animal, brand, pop_name)\n5 |     sliver_metadata{node_status=\"v\"} * on (instance) group_right (sliver)\n                                         ^ This binary operation prevents previously joined label `animal` from being added to the results.\n                                           \n6 |     (metal_services_enabled == 999) * on (instance) group_right()\n7 |     up{node_status=\"v\", job=\"node_exporter\"}\n"
+  output: |
+    4 |     colo_metadata{colo_status="v"} * on (colo_name) group_right(tier, animal, brand, pop_name)
+    5 |     sliver_metadata{node_status="v"} * on (instance) group_right (sliver)
+                                             ^
+                                             This binary operation prevents previously joined label `animal`
+                                             from being added to the results.
+    6 |     (metal_services_enabled == 999) * on (instance) group_right()
+    7 |     up{node_status="v", job="node_exporter"}
   problem:
     reporter: promql/impossible
     summary: orphaned label
@@ -2937,7 +3236,14 @@
         sliver_metadata{node_status="v"} * on (instance) group_right (sliver)
         (metal_services_enabled == 999) * on (instance) group_right()
         up{node_status="v", job="node_exporter"}
-  output: "4 |     colo_metadata{colo_status=\"v\"} * on (colo_name) group_right(tier, animal, brand, pop_name)\n5 |     sliver_metadata{node_status=\"v\"} * on (instance) group_right (sliver)\n                                         ^ This binary operation prevents previously joined label `brand` from being added to the results.\n                                           \n6 |     (metal_services_enabled == 999) * on (instance) group_right()\n7 |     up{node_status=\"v\", job=\"node_exporter\"}\n"
+  output: |
+    4 |     colo_metadata{colo_status="v"} * on (colo_name) group_right(tier, animal, brand, pop_name)
+    5 |     sliver_metadata{node_status="v"} * on (instance) group_right (sliver)
+                                             ^
+                                             This binary operation prevents previously joined label `brand`
+                                             from being added to the results.
+    6 |     (metal_services_enabled == 999) * on (instance) group_right()
+    7 |     up{node_status="v", job="node_exporter"}
   problem:
     reporter: promql/impossible
     summary: orphaned label
@@ -2965,7 +3271,14 @@
         sliver_metadata{node_status="v"} * on (instance) group_right (sliver)
         (metal_services_enabled == 999) * on (instance) group_right()
         up{node_status="v", job="node_exporter"}
-  output: "4 |     colo_metadata{colo_status=\"v\"} * on (colo_name) group_right(tier, animal, brand, pop_name)\n5 |     sliver_metadata{node_status=\"v\"} * on (instance) group_right (sliver)\n                                         ^ This binary operation prevents previously joined label `pop_name` from being added to the results.\n                                           \n6 |     (metal_services_enabled == 999) * on (instance) group_right()\n7 |     up{node_status=\"v\", job=\"node_exporter\"}\n"
+  output: |
+    4 |     colo_metadata{colo_status="v"} * on (colo_name) group_right(tier, animal, brand, pop_name)
+    5 |     sliver_metadata{node_status="v"} * on (instance) group_right (sliver)
+                                             ^
+                                             This binary operation prevents previously joined label
+                                             `pop_name` from being added to the results.
+    6 |     (metal_services_enabled == 999) * on (instance) group_right()
+    7 |     up{node_status="v", job="node_exporter"}
   problem:
     reporter: promql/impossible
     summary: orphaned label
@@ -2997,7 +3310,14 @@
         sliver_metadata{node_status="v"} * on (instance) group_right (sliver, animal)
         (metal_services_enabled == 999) * on (instance)
         up{node_status="v", job="node_exporter"}
-  output: "4 |     colo_metadata{colo_status=\"v\"} * on (colo_name) group_right(tier, animal, brand, pop_name)\n5 |     sliver_metadata{node_status=\"v\"} * on (instance) group_right (sliver, animal)\n                                         ^ This binary operation prevents previously joined label `tier` from being added to the results.\n                                           \n6 |     (metal_services_enabled == 999) * on (instance)\n7 |     up{node_status=\"v\", job=\"node_exporter\"}\n"
+  output: |
+    4 |     colo_metadata{colo_status="v"} * on (colo_name) group_right(tier, animal, brand, pop_name)
+    5 |     sliver_metadata{node_status="v"} * on (instance) group_right (sliver, animal)
+                                             ^
+                                             This binary operation prevents previously joined label `tier`
+                                             from being added to the results.
+    6 |     (metal_services_enabled == 999) * on (instance)
+    7 |     up{node_status="v", job="node_exporter"}
   problem:
     reporter: promql/impossible
     summary: orphaned label
@@ -3025,7 +3345,14 @@
         sliver_metadata{node_status="v"} * on (instance) group_right (sliver, animal)
         (metal_services_enabled == 999) * on (instance)
         up{node_status="v", job="node_exporter"}
-  output: "4 |     colo_metadata{colo_status=\"v\"} * on (colo_name) group_right(tier, animal, brand, pop_name)\n5 |     sliver_metadata{node_status=\"v\"} * on (instance) group_right (sliver, animal)\n                                         ^ This binary operation prevents previously joined label `brand` from being added to the results.\n                                           \n6 |     (metal_services_enabled == 999) * on (instance)\n7 |     up{node_status=\"v\", job=\"node_exporter\"}\n"
+  output: |
+    4 |     colo_metadata{colo_status="v"} * on (colo_name) group_right(tier, animal, brand, pop_name)
+    5 |     sliver_metadata{node_status="v"} * on (instance) group_right (sliver, animal)
+                                             ^
+                                             This binary operation prevents previously joined label `brand`
+                                             from being added to the results.
+    6 |     (metal_services_enabled == 999) * on (instance)
+    7 |     up{node_status="v", job="node_exporter"}
   problem:
     reporter: promql/impossible
     summary: orphaned label
@@ -3053,7 +3380,14 @@
         sliver_metadata{node_status="v"} * on (instance) group_right (sliver, animal)
         (metal_services_enabled == 999) * on (instance)
         up{node_status="v", job="node_exporter"}
-  output: "4 |     colo_metadata{colo_status=\"v\"} * on (colo_name) group_right(tier, animal, brand, pop_name)\n5 |     sliver_metadata{node_status=\"v\"} * on (instance) group_right (sliver, animal)\n                                         ^ This binary operation prevents previously joined label `pop_name` from being added to the results.\n                                           \n6 |     (metal_services_enabled == 999) * on (instance)\n7 |     up{node_status=\"v\", job=\"node_exporter\"}\n"
+  output: |
+    4 |     colo_metadata{colo_status="v"} * on (colo_name) group_right(tier, animal, brand, pop_name)
+    5 |     sliver_metadata{node_status="v"} * on (instance) group_right (sliver, animal)
+                                             ^
+                                             This binary operation prevents previously joined label
+                                             `pop_name` from being added to the results.
+    6 |     (metal_services_enabled == 999) * on (instance)
+    7 |     up{node_status="v", job="node_exporter"}
   problem:
     reporter: promql/impossible
     summary: orphaned label
@@ -3085,9 +3419,13 @@
     4 |     colo_metadata{colo_status="v"} * on (colo_name) group_right(tier, animal, brand, pop_name)
     5 |     sliver_metadata{node_status="v"} * on (instance) group_right (sliver, animal)
     6 |     (metal_services_enabled == 999) * on (instance)
-                                            ^ This binary operation prevents previously joined label `sliver` from being added to the results.
+                                            ^
+                                            This binary operation prevents previously joined label `sliver`
+                                            from being added to the results.
     7 |     up{node_status="v", job="node_exporter"}
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            Query is using one-to-one vector matching with `on(instance)`, only labels included inside
+            `on(...)` will be present on the results.
   problem:
     reporter: promql/impossible
     summary: orphaned label
@@ -3119,9 +3457,13 @@
     4 |     colo_metadata{colo_status="v"} * on (colo_name) group_right(tier, animal, brand, pop_name)
     5 |     sliver_metadata{node_status="v"} * on (instance) group_right (sliver, animal)
     6 |     (metal_services_enabled == 999) * on (instance)
-                                            ^ This binary operation prevents previously joined label `animal` from being added to the results.
+                                            ^
+                                            This binary operation prevents previously joined label `animal`
+                                            from being added to the results.
     7 |     up{node_status="v", job="node_exporter"}
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            Query is using one-to-one vector matching with `on(instance)`, only labels included inside
+            `on(...)` will be present on the results.
   problem:
     reporter: promql/impossible
     summary: orphaned label
@@ -3152,7 +3494,13 @@
         colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
         sliver_metadata * on (instance) group_right (sliver)
         metal_services_enabled
-  output: "4 |     colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)\n5 |     sliver_metadata * on (instance) group_right (sliver)\n                        ^ This binary operation prevents previously joined label `tier` from being added to the results.\n                          \n6 |     metal_services_enabled\n"
+  output: |
+    4 |     colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
+    5 |     sliver_metadata * on (instance) group_right (sliver)
+                            ^
+                            This binary operation prevents previously joined label `tier` from being added
+                            to the results.
+    6 |     metal_services_enabled
   problem:
     reporter: promql/impossible
     summary: orphaned label
@@ -3179,7 +3527,13 @@
         colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
         sliver_metadata * on (instance) group_right (sliver)
         metal_services_enabled
-  output: "4 |     colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)\n5 |     sliver_metadata * on (instance) group_right (sliver)\n                        ^ This binary operation prevents previously joined label `animal` from being added to the results.\n                          \n6 |     metal_services_enabled\n"
+  output: |
+    4 |     colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
+    5 |     sliver_metadata * on (instance) group_right (sliver)
+                            ^
+                            This binary operation prevents previously joined label `animal` from being added
+                            to the results.
+    6 |     metal_services_enabled
   problem:
     reporter: promql/impossible
     summary: orphaned label
@@ -3206,7 +3560,13 @@
         colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
         sliver_metadata * on (instance) group_right (sliver)
         metal_services_enabled
-  output: "4 |     colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)\n5 |     sliver_metadata * on (instance) group_right (sliver)\n                        ^ This binary operation prevents previously joined label `brand` from being added to the results.\n                          \n6 |     metal_services_enabled\n"
+  output: |
+    4 |     colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
+    5 |     sliver_metadata * on (instance) group_right (sliver)
+                            ^
+                            This binary operation prevents previously joined label `brand` from being added
+                            to the results.
+    6 |     metal_services_enabled
   problem:
     reporter: promql/impossible
     summary: orphaned label
@@ -3233,7 +3593,13 @@
         colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
         sliver_metadata * on (instance) group_right (sliver)
         metal_services_enabled
-  output: "4 |     colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)\n5 |     sliver_metadata * on (instance) group_right (sliver)\n                        ^ This binary operation prevents previously joined label `pop_name` from being added to the results.\n                          \n6 |     metal_services_enabled\n"
+  output: |
+    4 |     colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
+    5 |     sliver_metadata * on (instance) group_right (sliver)
+                            ^
+                            This binary operation prevents previously joined label `pop_name` from being
+                            added to the results.
+    6 |     metal_services_enabled
   problem:
     reporter: promql/impossible
     summary: orphaned label
@@ -3273,7 +3639,9 @@
       expr: sum(foo or vector(0)) > 0
   output: |
     3 |   expr: sum(foo or vector(0)) > 0
-                           ^^^^^^^^^ `vector(0) > 0` always evaluates to `0 > 0` which is not possible, so it will never return anything.
+                           ^^^^^^^^^
+                           `vector(0) > 0` always evaluates to `0 > 0` which is not possible, so it will
+                           never return anything.
   problem:
     reporter: promql/impossible
     summary: dead code in query
@@ -3305,9 +3673,14 @@
   output: |
     4 |     colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
     5 |     group by (animal) (
-                  ^^^^^^^^^^^ Previously joined label `sliver` is being removed from the results.
+                  ^^^^^^^^^^^
+                  Previously joined label `sliver` is being removed from the results.
     6 |         sliver_metadata * on (instance) group_right (sliver)
-                                                             ^^^^^^ Query is using `group_right(sliver)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
+                                                             ^^^^^^
+                                                             Query is using `group_right(sliver)`, all
+                                                             labels included inside `group_right(...)` will
+                                                             be joined to the results on the other side of
+                                                             the query.
     7 |         metal_services_enabled
     8 |     )
   problem:
@@ -3340,9 +3713,12 @@
         )
   output: |
     4 |     colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
-                                ^^^^^^^^^ You can't use `colo_name` because this label is not possible here.
+                                ^^^^^^^^^
+                                You can't use `colo_name` because this label is not possible here.
     5 |     group by (animal) (
-                  ^^^ Query is using aggregation with `by(animal)`, only labels included inside `by(...)` will be present on the results.
+                  ^^^
+                  Query is using aggregation with `by(animal)`, only labels included inside `by(...)` will
+                  be present on the results.
     6 |         sliver_metadata * on (instance) group_right (sliver)
     7 |         metal_services_enabled
     8 |     )
@@ -3381,9 +3757,14 @@
   output: |
     4 |     colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
     5 |     group by (colo_name, animal) (
-                  ^^^^^^^^^^^^^^^^^^^^^^ Previously joined label `sliver` is being removed from the results.
+                  ^^^^^^^^^^^^^^^^^^^^^^
+                  Previously joined label `sliver` is being removed from the results.
     6 |         sliver_metadata * on (instance) group_right (sliver)
-                                                             ^^^^^^ Query is using `group_right(sliver)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
+                                                             ^^^^^^
+                                                             Query is using `group_right(sliver)`, all
+                                                             labels included inside `group_right(...)` will
+                                                             be joined to the results on the other side of
+                                                             the query.
     7 |         metal_services_enabled
     8 |     )
   problem:
@@ -3418,8 +3799,12 @@
   output: |
     4 |     (prometheus_ready * on(instance) group_left(version) prometheus_build_info)
     5 |     * on(instance) prometheus_config_last_reload_successful
-            ^ This binary operation prevents previously joined label `version` from being added to the results.
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+            ^
+            This binary operation prevents previously joined label `version` from being added to the
+            results.
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            Query is using one-to-one vector matching with `on(instance)`, only labels included inside
+            `on(...)` will be present on the results.
   problem:
     reporter: promql/impossible
     summary: orphaned label
@@ -3449,7 +3834,9 @@
       expr: ((( group(vector(0)) ))) > 0
   output: |
     3 |   expr: ((( group(vector(0)) ))) > 0
-                          ^^^^^^^^^ `vector(0) > 0` always evaluates to `0 > 0` which is not possible, so it will never return anything.
+                          ^^^^^^^^^
+                          `vector(0) > 0` always evaluates to `0 > 0` which is not possible, so it will
+                          never return anything.
   problem:
     reporter: promql/impossible
     summary: dead code in query

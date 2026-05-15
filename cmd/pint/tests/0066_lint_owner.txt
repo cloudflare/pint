@@ -9,7 +9,9 @@ level=INFO msg="Checking Prometheus rules" entries=5 workers=10 online=true
 Bug: missing owner (rule/owner)
   ---> rules/1.yml:4-5 -> `No Owner` [+2 duplicates]
 5 |     expr: up > 0
-              ^^^ `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule.
+              ^^^
+              `rule/owner` comments are required in all files, please add a `# pint file/owner $owner`
+              somewhere in this file and/or `# pint rule/owner $owner` on top of each rule.
 
 level=INFO msg="Some problems are duplicated between rules and all the duplicates were hidden, pass `--show-duplicates` to see them" total=3 duplicates=2 shown=1
 level=INFO msg="Problems found" Bug=3

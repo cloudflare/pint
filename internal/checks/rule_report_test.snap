@@ -6,7 +6,8 @@
       expr: sum(foo)
   output: |
     1 | - record: foo
-                  ^^^ problem reported
+                  ^^^
+                  problem reported
   problem:
     reporter: rule/report
     summary: problem reported by config rule
@@ -33,7 +34,8 @@
         alert: foo
   output: |
     1 | - alert: foo
-                 ^^^ problem reported
+                 ^^^
+                 problem reported
   problem:
     reporter: rule/report
     summary: problem reported by config rule

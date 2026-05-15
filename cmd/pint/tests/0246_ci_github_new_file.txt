@@ -65,7 +65,7 @@ body: |
 
   ```yaml
   5 |     expr: sum(foo) by(job)
-                    ^^^ 
+                    ^^^
   ```
 
   This query doesn't have any condition and so this alert will always fire if it matches anything.
@@ -130,7 +130,9 @@ body: |+
   Warning: always firing alert (alerts/comparison)
     ---> rules.yml:5 -> `rule1`
   5 |     expr: sum(foo) by(job)
-                    ^^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
+                    ^^^
+                    This query doesn't have any condition and so this alert will always fire if it matches
+                    anything.
 
   ```
 

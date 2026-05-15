@@ -6,7 +6,9 @@
       expr: found > 0
   output: |
     1 | - record: foo
-                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.
+                  ^^^
+                  Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX
+                  error: `server_error: internal error`.
   problem:
     reporter: promql/series
     summary: unable to run checks
@@ -36,7 +38,9 @@
       expr: found > 0
   output: |
     1 | - record: foo
-                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.
+                  ^^^
+                  Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX
+                  error: `server_error: internal error`.
   problem:
     reporter: promql/series
     summary: unable to run checks
@@ -61,7 +65,9 @@
       expr: sum(notfound)
   output: |
     2 |   expr: sum(notfound)
-                    ^^^^^^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `notfound` metric in the last 1w.
+                    ^^^^^^^^
+                    `prom` Prometheus server at https://simple.example.com didn't have any series for
+                    `notfound` metric in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -86,7 +92,9 @@
       expr: sum(notfound)
   output: |
     2 |   expr: sum(notfound)
-                    ^^^^^^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `notfound` metric in the last 3d.
+                    ^^^^^^^^
+                    `prom` Prometheus server at https://simple.example.com didn't have any series for
+                    `notfound` metric in the last 3d.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -111,7 +119,10 @@
       expr: sum(notfound)
   output: |
     2 |   expr: sum(notfound)
-                    ^^^^^^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `notfound` metric in the last 1w. Metric name `notfound` matches `promql/series` check ignore regexp `^not.+$`.
+                    ^^^^^^^^
+                    `prom` Prometheus server at https://simple.example.com didn't have any series for
+                    `notfound` metric in the last 1w. Metric name `notfound` matches `promql/series` check
+                    ignore regexp `^not.+$`.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -136,7 +147,10 @@
       expr: sum(foo:bar{job="xxx"})
   output: |
     2 |   expr: sum(foo:bar{job="xxx"})
-                    ^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `foo:bar` metric in the last 1w but found recording rule that generates it, skipping further checks.
+                    ^^^^^^^^^^^^^^^^^^
+                    `prom` Prometheus server at https://simple.example.com didn't have any series for
+                    `foo:bar` metric in the last 1w but found recording rule that generates it, skipping
+                    further checks.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -165,7 +179,10 @@
       expr: sum(foo:bar{job="xxx"})
   output: |
     2 |   expr: sum(foo:bar{job="xxx"})
-                    ^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `foo:bar` metric in the last 1w but found recording rule that generates it, skipping further checks.
+                    ^^^^^^^^^^^^^^^^^^
+                    `prom` Prometheus server at https://simple.example.com didn't have any series for
+                    `foo:bar` metric in the last 1w but found recording rule that generates it, skipping
+                    further checks.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -194,7 +211,10 @@
       expr: sum(foo:bar{job="xxx"})
   output: |
     2 |   expr: sum(foo:bar{job="xxx"})
-                    ^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `foo:bar` metric in the last 1w but found recording rule that generates it, skipping further checks.
+                    ^^^^^^^^^^^^^^^^^^
+                    `prom` Prometheus server at https://simple.example.com didn't have any series for
+                    `foo:bar` metric in the last 1w but found recording rule that generates it, skipping
+                    further checks.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -223,7 +243,9 @@
       expr: count(ALERTS{alertname="myalert"})
   output: |
     2 |   expr: count(ALERTS{alertname="myalert"})
-                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^ `ALERTS{alertname="myalert"}` metric is generated by alerts but didn't found any rule named `myalert`.
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                      `ALERTS{alertname="myalert"}` metric is generated by alerts but didn't found any rule
+                      named `myalert`.
   problem:
     reporter: promql/series
     summary: unknown alert referenced
@@ -253,7 +275,9 @@
       expr: sum(found{job="abc"})
   output: |
     2 |   expr: sum(found{job="abc"})
-                    ^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com has `found` metric but there are no series with `job` label in the last 1w.
+                    ^^^^^^^^^^^^^^^^
+                    `prom` Prometheus server at https://simple.example.com has `found` metric but there are
+                    no series with `job` label in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -278,7 +302,9 @@
       expr: sum(found{job="foo", notfound="xxx"})
   output: |
     2 |   expr: sum(found{job="foo", notfound="xxx"})
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com has `found` metric but there are no series with `notfound` label in the last 1w.
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    `prom` Prometheus server at https://simple.example.com has `found` metric but there are
+                    no series with `notfound` label in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -303,7 +329,9 @@
       expr: sum(found{notfound="xxx"})
   output: |
     1 | - record: foo
-                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.
+                  ^^^
+                  Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX
+                  error: `server_error: internal error`.
   problem:
     reporter: promql/series
     summary: unable to run checks
@@ -328,7 +356,9 @@
       expr: sum(found{job="abc", cluster="dev"})
   output: |
     2 |   expr: sum(found{job="abc", cluster="dev"})
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Metric `found` is only sometimes present on `prom` Prometheus server at https://simple.example.com with average life span of 5m in the last 1w.
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    Metric `found` is only sometimes present on `prom` Prometheus server at
+                    https://simple.example.com with average life span of 5m in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -353,7 +383,9 @@
       expr: sum(found{job="abc", cluster="dev"})
   output: |
     2 |   expr: sum(found{job="abc", cluster="dev"})
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Metric `found` is only sometimes present on `prom` Prometheus server at https://simple.example.com with average life span of 1d5m in the last 1w.
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    Metric `found` is only sometimes present on `prom` Prometheus server at
+                    https://simple.example.com with average life span of 1d5m in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -378,7 +410,9 @@
       expr: sum(found{job="abc", cluster="dev"})
   output: |
     2 |   expr: sum(found{job="abc", cluster="dev"})
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Metric `found` is only sometimes present on `prom` Prometheus server at https://simple.example.com with average life span of 1d5m in the last 1w.
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    Metric `found` is only sometimes present on `prom` Prometheus server at
+                    https://simple.example.com with average life span of 1d5m in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -405,7 +439,9 @@
       expr: sum(found{job="foo", instance="bar"})
   output: |
     4 |   expr: sum(found{job="foo", instance="bar"})
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com doesn't currently have `found`, it was last present 4d ago.
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    `prom` Prometheus server at https://simple.example.com doesn't currently have `found`,
+                    it was last present 4d ago.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -432,7 +468,8 @@
       expr: sum(found{job="foo", instance="bar"})
   output: |
     4 |   expr: sum(found{job="foo", instance="bar"})
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed to parse pint comment as duration: not a valid duration string: "foo"
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                failed to parse pint comment as duration: not a valid duration string: "foo"
   problem:
     reporter: promql/series
     summary: invalid comment
@@ -457,7 +494,9 @@
       expr: sum(found{job="foo", instance="bar"})
   output: |
     4 |   expr: sum(found{job="foo", instance="bar"})
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com doesn't currently have `found`, it was last present 4d ago.
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    `prom` Prometheus server at https://simple.example.com doesn't currently have `found`,
+                    it was last present 4d ago.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -489,7 +528,9 @@
       expr: sum(found{job="foo", instance="bar"})
   output: |
     4 |   expr: sum(found{job="foo", instance="bar"})
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com doesn't currently have `found`, it was last present 4d ago.
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    `prom` Prometheus server at https://simple.example.com doesn't currently have `found`,
+                    it was last present 4d ago.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -512,7 +553,9 @@
       expr: sum(found{job="foo", instance="bar"})
   output: |
     4 |   expr: sum(found{job="foo", instance="bar"})
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ pint rule/set comment `promql/series(bar) min-age 5d` doesn't match any label matcher in this query
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                pint rule/set comment `promql/series(bar) min-age 5d` doesn't match any label matcher in
+                this query
   problem:
     reporter: promql/series
     summary: invalid comment
@@ -554,7 +597,9 @@
       expr: sum(found{job="foo", instance="bar"})
   output: |
     2 |   expr: sum(found{job="foo", instance="bar"})
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com doesn't currently have `found`, it was last present 4d ago.
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    `prom` Prometheus server at https://simple.example.com doesn't currently have `found`,
+                    it was last present 4d ago.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -579,7 +624,10 @@
       expr: sum(found{job="foo", instance="bar"})
   output: |
     2 |   expr: sum(found{job="foo", instance="bar"})
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com doesn't currently have `found`, it was last present 4d ago. Metric name `found` matches `promql/series` check ignore regexp `^found$`.
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    `prom` Prometheus server at https://simple.example.com doesn't currently have `found`,
+                    it was last present 4d ago. Metric name `found` matches `promql/series` check ignore
+                    regexp `^found$`.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -604,7 +652,10 @@
       expr: sum(sometimes{churn="notfound"})
   output: |
     2 |   expr: sum(sometimes{churn="notfound"})
-                              ^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com has `sometimes` metric with `churn` label but there are no series matching `{churn="notfound"}` in the last 1w.
+                              ^^^^^^^^^^^^^^^^
+                              `prom` Prometheus server at https://simple.example.com has `sometimes` metric
+                              with `churn` label but there are no series matching `{churn="notfound"}` in
+                              the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -636,7 +687,9 @@
       expr: sum(foo{error="notfound"})
   output: |
     4 |   expr: sum(foo{error="notfound"})
-                        ^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com has `foo` metric with `error` label but there are no series matching `{error="notfound"}` in the last 1w.
+                        ^^^^^^^^^^^^^^^^
+                        `prom` Prometheus server at https://simple.example.com has `foo` metric with `error`
+                        label but there are no series matching `{error="notfound"}` in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -659,7 +712,9 @@
       expr: sum(foo{error="notfound"})
   output: |
     4 |   expr: sum(foo{error="notfound"})
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^ pint rule/set comment `promql/series(foo{job="bob"}) ignore/label-value error` doesn't match any label matcher in this query
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^
+                pint rule/set comment `promql/series(foo{job="bob"}) ignore/label-value error` doesn't match
+                any label matcher in this query
   problem:
     reporter: promql/series
     summary: invalid comment
@@ -697,7 +752,9 @@
       expr: sum(foo{error="notfound"})
   output: |
     3 |   expr: sum(foo{error="notfound"})
-                        ^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com has `foo` metric with `error` label but there are no series matching `{error="notfound"}` in the last 1w.
+                        ^^^^^^^^^^^^^^^^
+                        `prom` Prometheus server at https://simple.example.com has `foo` metric with `error`
+                        label but there are no series matching `{error="notfound"}` in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -727,7 +784,9 @@
       expr: sum(found{error="xxx"})
   output: |
     1 | - record: foo
-                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.
+                  ^^^
+                  Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX
+                  error: `server_error: internal error`.
   problem:
     reporter: promql/series
     summary: unable to run checks
@@ -752,7 +811,11 @@
       expr: sum(found{notfound="notfound", instance=~".+", not!="negative", instance!~"bad"})
   output: |
     2 |   expr: sum(found{notfound="notfound", instance=~".+", not!="negative", instance!~"bad"})
-                          ^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com has `found` metric with `notfound` label but there are no series matching `{notfound="notfound"}` in the last 1w. Metric name `found` matches `promql/series` check ignore regexp `^found$`.
+                          ^^^^^^^^^^^^^^^^^^^
+                          `prom` Prometheus server at https://simple.example.com has `found` metric with
+                          `notfound` label but there are no series matching `{notfound="notfound"}` in the
+                          last 1w. Metric name `found` matches `promql/series` check ignore regexp
+                          `^found$`.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -777,7 +840,10 @@
       expr: sum(found{notfound="notfound", instance=~".+", not!="negative", instance!~"bad"})
   output: |
     2 |   expr: sum(found{notfound="notfound", instance=~".+", not!="negative", instance!~"bad"})
-                          ^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com has `found` metric with `notfound` label but there are no series matching `{notfound="notfound"}` in the last 1w.
+                          ^^^^^^^^^^^^^^^^^^^
+                          `prom` Prometheus server at https://simple.example.com has `found` metric with
+                          `notfound` label but there are no series matching `{notfound="notfound"}` in the
+                          last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -802,7 +868,10 @@
       expr: sum({__name__="found", removed="xxx"})
   output: |
     2 |   expr: sum({__name__="found", removed="xxx"})
-                                       ^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com has `found` metric but doesn't currently have series matching `{removed="xxx"}`, such series was last present 5d16h ago.
+                                       ^^^^^^^^^^^^^
+                                       `prom` Prometheus server at https://simple.example.com has `found`
+                                       metric but doesn't currently have series matching `{removed="xxx"}`,
+                                       such series was last present 5d16h ago.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -829,7 +898,8 @@
       expr: sum({__name__="found", removed="xxx"})
   output: |
     4 |   expr: sum({__name__="found", removed="xxx"})
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed to parse pint comment as duration: unknown unit "e" in duration "1e"
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                failed to parse pint comment as duration: unknown unit "e" in duration "1e"
   problem:
     reporter: promql/series
     summary: invalid comment
@@ -854,7 +924,10 @@
       expr: sum({__name__="found", removed="xxx"})
   output: |
     4 |   expr: sum({__name__="found", removed="xxx"})
-                                       ^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com has `found` metric but doesn't currently have series matching `{removed="xxx"}`, such series was last present 5d16h ago.
+                                       ^^^^^^^^^^^^^
+                                       `prom` Prometheus server at https://simple.example.com has `found`
+                                       metric but doesn't currently have series matching `{removed="xxx"}`,
+                                       such series was last present 5d16h ago.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -884,7 +957,9 @@
       expr: sum(found{sometimes="xxx"})
   output: |
     2 |   expr: sum(found{sometimes="xxx"})
-                          ^^^^^^^^^^^^^^^ Metric `found` with label `{sometimes="xxx"}` is only sometimes present on `prom` Prometheus server at https://simple.example.com with average life span of 18h45m.
+                          ^^^^^^^^^^^^^^^
+                          Metric `found` with label `{sometimes="xxx"}` is only sometimes present on `prom`
+                          Prometheus server at https://simple.example.com with average life span of 18h45m.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -909,7 +984,9 @@
       expr: sum(sometimes{foo!="bar"})
   output: |
     2 |   expr: sum(sometimes{foo!="bar"})
-                    ^^^^^^^^^^^^^^^^^^^^^ Metric `sometimes` is only sometimes present on `prom` Prometheus server at https://simple.example.com with average life span of 35m in the last 1w.
+                    ^^^^^^^^^^^^^^^^^^^^^
+                    Metric `sometimes` is only sometimes present on `prom` Prometheus server at
+                    https://simple.example.com with average life span of 35m in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -954,7 +1031,12 @@
       expr: rate({__name__=~"(foo|bar)_panics_total", job="myjob"}[2m]) > 0
   output: |
     2 |   expr: rate({__name__=~"(foo|bar)_panics_total", job="myjob"}[2m]) > 0
-                                                          ^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com has `{__name__=~"(foo|bar)_panics_total"}` metric with `job` label but there are no series matching `{job="myjob"}` in the last 1w.
+                                                          ^^^^^^^^^^^
+                                                          `prom` Prometheus server at
+                                                          https://simple.example.com has
+                                                          `{__name__=~"(foo|bar)_panics_total"}` metric with
+                                                          `job` label but there are no series matching
+                                                          `{job="myjob"}` in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -979,7 +1061,9 @@
       expr: rate({__name__=~"(foo|bar)_panics_total", job="myjob"}[2m]) > 0
   output: |
     2 |   expr: rate({__name__=~"(foo|bar)_panics_total", job="myjob"}[2m]) > 0
-                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `{__name__=~"(foo|bar)_panics_total"}` metric in the last 1w.
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     `prom` Prometheus server at https://simple.example.com didn't have any series for
+                     `{__name__=~"(foo|bar)_panics_total"}` metric in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -1009,7 +1093,10 @@
       expr: sum(foo:count) / sum(foo:sum) > 120
   output: |
     2 |   expr: sum(foo:count) / sum(foo:sum) > 120
-                    ^^^^^^^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `foo:count` metric in the last 1w but found recording rule that generates it, skipping further checks.
+                    ^^^^^^^^^
+                    `prom` Prometheus server at https://simple.example.com didn't have any series for
+                    `foo:count` metric in the last 1w but found recording rule that generates it, skipping
+                    further checks.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -1034,7 +1121,10 @@
       expr: sum(foo:count) / sum(foo:sum) > 120
   output: |
     2 |   expr: sum(foo:count) / sum(foo:sum) > 120
-                                     ^^^^^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `foo:sum` metric in the last 1w but found recording rule that generates it, skipping further checks.
+                                     ^^^^^^^
+                                     `prom` Prometheus server at https://simple.example.com didn't have any
+                                     series for `foo:sum` metric in the last 1w but found recording rule
+                                     that generates it, skipping further checks.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -1063,7 +1153,9 @@
       expr: sum(foo)
   output: |
     1 | - record: foo
-                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `bad_data: bad input data`.
+                  ^^^
+                  Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX
+                  error: `bad_data: bad input data`.
   problem:
     reporter: promql/series
     summary: unable to run checks
@@ -1088,7 +1180,9 @@
       expr: sum(foo)
   output: |
     1 | - record: foo
-                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.127.127.127:9999 error: `connection refused`.
+                  ^^^
+                  Couldn't run some online checks due to `prom` Prometheus server at
+                  http://127.127.127.127:9999 error: `connection refused`.
   problem:
     reporter: promql/series
     summary: unable to run checks
@@ -1113,7 +1207,9 @@
       expr: sum(found_7 * on (job) sum(sum(notfound))) / found_7
   output: |
     2 |   expr: sum(found_7 * on (job) sum(sum(notfound))) / found_7
-                                               ^^^^^^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `notfound` metric in the last 1w.
+                                               ^^^^^^^^
+                                               `prom` Prometheus server at https://simple.example.com didn't
+                                               have any series for `notfound` metric in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -1141,7 +1237,8 @@
       expr: count(bar)
   output: |
     5 |   expr: count(bar)
-                ^^^^^^^^^^ pint disable comment `promql/series(foo)` doesn't match any selector in this query
+                ^^^^^^^^^^
+                pint disable comment `promql/series(foo)` doesn't match any selector in this query
   problem:
     reporter: promql/series
     summary: invalid comment
@@ -1199,7 +1296,9 @@
      8 |     (rate(metric1[5m]) or vector(0)) +
      9 |     (rate(metric3{log_name="samplerd"}[5m]) or vector(0))
     10 |     > 0
-             ^^^ pint disable comment `promql/series(metric1)` has no effect because the selector is not being checked due to a fallback `vector(0)`
+             ^^^
+             pint disable comment `promql/series(metric1)` has no effect because the selector is not being
+             checked due to a fallback `vector(0)`
   problem:
     reporter: promql/series
     summary: invalid comment
@@ -1233,7 +1332,9 @@
      8 |     (rate(metric1[5m]) or vector(0)) +
      9 |     (rate(metric3{log_name="samplerd"}[5m]) or vector(0))
     10 |     > 0
-             ^^^ pint disable comment `promql/series(metric2)` has no effect because the selector is not being checked due to a fallback `vector(0)`
+             ^^^
+             pint disable comment `promql/series(metric2)` has no effect because the selector is not being
+             checked due to a fallback `vector(0)`
   problem:
     reporter: promql/series
     summary: invalid comment
@@ -1267,7 +1368,9 @@
      8 |     (rate(metric1[5m]) or vector(0)) +
      9 |     (rate(metric3{log_name="samplerd"}[5m]) or vector(0))
     10 |     > 0
-             ^^^ pint disable comment `promql/series(metric3)` has no effect because the selector is not being checked due to a fallback `vector(0)`
+             ^^^
+             pint disable comment `promql/series(metric3)` has no effect because the selector is not being
+             checked due to a fallback `vector(0)`
   problem:
     reporter: promql/series
     summary: invalid comment
@@ -1299,7 +1402,10 @@
       expr: sum(foo)
   output: |
     1 | - record: foo
-                  ^^^ Couldn't run some online checks on `prom` Prometheus server at http://127.0.0.1:XXXXX because some queries are too expensive: `execution: expanding series: context deadline exceeded`.
+                  ^^^
+                  Couldn't run some online checks on `prom` Prometheus server at http://127.0.0.1:XXXXX
+                  because some queries are too expensive: `execution: expanding series: context deadline
+                  exceeded`.
   problem:
     reporter: promql/series
     summary: unable to run checks
@@ -1345,7 +1451,9 @@
       expr: sum(foo)
   output: |
     3 |   expr: sum(foo)
-                    ^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `foo` metric in the last 1w.
+                    ^^^
+                    `prom` Prometheus server at https://simple.example.com didn't have any series for `foo`
+                    metric in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -1371,7 +1479,9 @@
       expr: sum(foo)
   output: |
     3 |   expr: sum(foo)
-                    ^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `foo` metric in the last 1w.
+                    ^^^
+                    `prom` Prometheus server at https://simple.example.com didn't have any series for `foo`
+                    metric in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -1417,7 +1527,9 @@
       expr: sum(foo)
   output: |
     3 |   expr: sum(foo)
-                    ^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `foo` metric in the last 1w.
+                    ^^^
+                    `prom` Prometheus server at https://simple.example.com didn't have any series for `foo`
+                    metric in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -1487,7 +1599,9 @@
      7 |       vector(1)
      8 |     ) and (
      9 |       ((bob > 10) or sum(bar))
-                 ^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `bob` metric in the last 1w.
+                 ^^^
+                 `prom` Prometheus server at https://simple.example.com didn't have any series for `bob`
+                 metric in the last 1w.
     10 |       or
     11 |       notfound > 0
     12 |     )
@@ -1526,7 +1640,9 @@
      7 |       vector(1)
      8 |     ) and (
      9 |       ((bob > 10) or sum(bar))
-                                  ^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `bar` metric in the last 1w.
+                                  ^^^
+                                  `prom` Prometheus server at https://simple.example.com didn't have any
+                                  series for `bar` metric in the last 1w.
     10 |       or
     11 |       notfound > 0
     12 |     )
@@ -1567,7 +1683,9 @@
      9 |       ((bob > 10) or sum(bar))
     10 |       or
     11 |       notfound > 0
-               ^^^^^^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `notfound` metric in the last 1w.
+               ^^^^^^^^
+               `prom` Prometheus server at https://simple.example.com didn't have any series for `notfound`
+               metric in the last 1w.
     12 |     )
   problem:
     reporter: promql/series
@@ -1608,7 +1726,10 @@
       expr: sum(foo)
   output: |
     1 | - record: foo
-                  ^^^ Couldn't run some online checks on `prom` Prometheus server at http://127.0.0.1:XXXXX because some queries are too expensive: `execution: query processing would load too many samples into memory in query execution`.
+                  ^^^
+                  Couldn't run some online checks on `prom` Prometheus server at http://127.0.0.1:XXXXX
+                  because some queries are too expensive: `execution: query processing would load too many
+                  samples into memory in query execution`.
   problem:
     reporter: promql/series
     summary: unable to run checks
@@ -1633,7 +1754,9 @@
       expr: found{job="notfound"}
   output: |
     2 |   expr: found{job="notfound"}
-                      ^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com has `found` metric with `job` label but there are no series matching `{job="notfound"}` in the last 1w.
+                      ^^^^^^^^^^^^^^
+                      `prom` Prometheus server at https://simple.example.com has `found` metric with `job`
+                      label but there are no series matching `{job="notfound"}` in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -1660,7 +1783,9 @@
       expr: count(notfound{job=~"foo"}) == 0
   output: |
     4 |   expr: count(notfound{job=~"foo"}) == 0
-                      ^^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `notfound` metric in the last 1w.
+                      ^^^^^^^^^^^^^^^^^^^^
+                      `prom` Prometheus server at https://simple.example.com didn't have any series for
+                      `notfound` metric in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -1683,7 +1808,9 @@
       expr: count(notfound{job=~"foo"}) == 0
   output: |
     4 |   expr: count(notfound{job=~"foo"}) == 0
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ pint disable comment `promql/series(notfound{job=foo})` doesn't match any selector in this query
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                pint disable comment `promql/series(notfound{job=foo})` doesn't match any selector in this
+                query
   problem:
     reporter: promql/series
     summary: invalid comment
@@ -1712,7 +1839,9 @@
       expr: count(notfound{job=~"foo"}) == 0
   output: |
     4 |   expr: count(notfound{job=~"foo"}) == 0
-                      ^^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `notfound` metric in the last 1w.
+                      ^^^^^^^^^^^^^^^^^^^^
+                      `prom` Prometheus server at https://simple.example.com didn't have any series for
+                      `notfound` metric in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -1735,7 +1864,8 @@
       expr: count(notfound{job=~"foo"}) == 0
   output: |
     4 |   expr: count(notfound{job=~"foo"}) == 0
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ pint disable comment `promql/series({job="foo"})` doesn't match any selector in this query
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                pint disable comment `promql/series({job="foo"})` doesn't match any selector in this query
   problem:
     reporter: promql/series
     summary: invalid comment
@@ -1764,7 +1894,9 @@
       expr: count(notfound) == 0
   output: |
     4 |   expr: count(notfound) == 0
-                      ^^^^^^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `notfound` metric in the last 1w.
+                      ^^^^^^^^
+                      `prom` Prometheus server at https://simple.example.com didn't have any series for
+                      `notfound` metric in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -1787,7 +1919,9 @@
       expr: count(notfound) == 0
   output: |
     4 |   expr: count(notfound) == 0
-                ^^^^^^^^^^^^^^^^^^^^ pint disable comment `promql/series(notfound{job="foo"})` doesn't match any selector in this query
+                ^^^^^^^^^^^^^^^^^^^^
+                pint disable comment `promql/series(notfound{job="foo"})` doesn't match any selector in this
+                query
   problem:
     reporter: promql/series
     summary: invalid comment
@@ -1814,7 +1948,9 @@
       expr: count(notfound) == 0
   output: |
     2 |   expr: count(notfound) == 0
-                      ^^^^^^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `notfound` metric in the last 1w.
+                      ^^^^^^^^
+                      `prom` Prometheus server at https://simple.example.com didn't have any series for
+                      `notfound` metric in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -1839,7 +1975,9 @@
       expr: notfound{job="notfound"}
   output: |
     2 |   expr: notfound{job="notfound"}
-                ^^^^^^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `notfound` metric in the last 1w.
+                ^^^^^^^^^^^^^^^^^^^^^^^^
+                `prom` Prometheus server at https://simple.example.com didn't have any series for `notfound`
+                metric in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -1911,7 +2049,9 @@
       expr: count(notfound{job="foo"}) == 0
   output: |
     4 |   expr: count(notfound{job="foo"}) == 0
-                      ^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `notfound` metric in the last 1w.
+                      ^^^^^^^^^^^^^^^^^^^
+                      `prom` Prometheus server at https://simple.example.com didn't have any series for
+                      `notfound` metric in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -1934,7 +2074,9 @@
       expr: count(notfound{job="foo"}) == 0
   output: |
     4 |   expr: count(notfound{job="foo"}) == 0
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ pint snooze comment `promql/series(notfound{job=foo})` doesn't match any selector in this query
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                pint snooze comment `promql/series(notfound{job=foo})` doesn't match any selector in this
+                query
   problem:
     reporter: promql/series
     summary: invalid comment
@@ -1963,7 +2105,9 @@
       expr: count(notfound{job="foo"}) == 0
   output: |
     4 |   expr: count(notfound{job="foo"}) == 0
-                      ^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `notfound` metric in the last 1w.
+                      ^^^^^^^^^^^^^^^^^^^
+                      `prom` Prometheus server at https://simple.example.com didn't have any series for
+                      `notfound` metric in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -1990,7 +2134,9 @@
       expr: count(notfound{job="foo"}) == 0
   output: |
     4 |   expr: count(notfound{job="foo"}) == 0
-                      ^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `notfound` metric in the last 1w.
+                      ^^^^^^^^^^^^^^^^^^^
+                      `prom` Prometheus server at https://simple.example.com didn't have any series for
+                      `notfound` metric in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -2013,7 +2159,9 @@
       expr: count(notfound{job="foo"}) == 0
   output: |
     4 |   expr: count(notfound{job="foo"}) == 0
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ pint snooze comment `promql/series(notfound{job="bob"})` doesn't match any selector in this query
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                pint snooze comment `promql/series(notfound{job="bob"})` doesn't match any selector in this
+                query
   problem:
     reporter: promql/series
     summary: invalid comment
@@ -2051,7 +2199,9 @@
       expr: '{__name__="notfound", job="bar"}'
   output: |
     3 |   expr: '{__name__="notfound", job="bar"}'
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `notfound` metric in the last 1w.
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                 `prom` Prometheus server at https://simple.example.com didn't have any series for
+                 `notfound` metric in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -2091,7 +2241,9 @@
       expr: notfound
   output: |
     2 |   expr: notfound
-                ^^^^^^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `notfound` metric in the last 1w.
+                ^^^^^^^^
+                `prom` Prometheus server at https://simple.example.com didn't have any series for `notfound`
+                metric in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -2116,7 +2268,9 @@
       expr: notfound
   output: |
     2 |   expr: notfound
-                ^^^^^^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `notfound` metric in the last 1w.
+                ^^^^^^^^
+                `prom` Prometheus server at https://simple.example.com didn't have any series for `notfound`
+                metric in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -2150,7 +2304,9 @@
       expr: notfound
   output: |
     2 |   expr: notfound
-                ^^^^^^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `notfound` metric in the last 1w.
+                ^^^^^^^^
+                `prom` Prometheus server at https://simple.example.com didn't have any series for `notfound`
+                metric in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -2190,7 +2346,9 @@
       expr: notfound
   output: |
     2 |   expr: notfound
-                ^^^^^^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `notfound` metric in the last 1w.
+                ^^^^^^^^
+                `prom` Prometheus server at https://simple.example.com didn't have any series for `notfound`
+                metric in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -2224,7 +2382,9 @@
       expr: notfound
   output: |
     2 |   expr: notfound
-                ^^^^^^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `notfound` metric in the last 1w.
+                ^^^^^^^^
+                `prom` Prometheus server at https://simple.example.com didn't have any series for `notfound`
+                metric in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -2266,7 +2426,9 @@
       expr: sum(notfound)
   output: |
     2 |   expr: sum(notfound)
-                    ^^^^^^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `notfound` metric in the last 1w.
+                    ^^^^^^^^
+                    `prom` Prometheus server at https://simple.example.com didn't have any series for
+                    `notfound` metric in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -2291,7 +2453,9 @@
       expr: count(notfound) / sum(notfound)
   output: |
     2 |   expr: count(notfound) / sum(notfound)
-                      ^^^^^^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `notfound` metric in the last 1w.
+                      ^^^^^^^^
+                      `prom` Prometheus server at https://simple.example.com didn't have any series for
+                      `notfound` metric in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -2316,7 +2480,9 @@
       expr: sum(foo)
   output: |
     1 | - record: foo
-                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `client_error: 404 Not Found`.
+                  ^^^
+                  Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX
+                  error: `client_error: 404 Not Found`.
   problem:
     reporter: promql/series
     summary: unable to run checks
@@ -2341,7 +2507,9 @@
       expr: sum(foo)
   output: |
     1 | - record: foo
-                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `client_error: 404 Not Found`.
+                  ^^^
+                  Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX
+                  error: `client_error: 404 Not Found`.
   problem:
     reporter: promql/series
     summary: unable to run checks
@@ -2369,7 +2537,9 @@
       expr: (rate(mymetric{action="failure"}[2m])) > 0
   output: |
     5 |   expr: (rate(mymetric{action="failure"}[2m])) > 0
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ pint rule/set comment `promql/series(mymetric) ignore/label-value type` doesn't match any label matcher in this query
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                pint rule/set comment `promql/series(mymetric) ignore/label-value type` doesn't match any
+                label matcher in this query
   problem:
     reporter: promql/series
     summary: invalid comment
@@ -2399,7 +2569,9 @@
       expr: (rate(mymetric{action="failure"}[2m]) or vector(0)) > 0
   output: |
     5 |   expr: (rate(mymetric{action="failure"}[2m]) or vector(0)) > 0
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ pint rule/set comment `promql/series(mymetric) ignore/label-value type` doesn't match any label matcher in this query
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                pint rule/set comment `promql/series(mymetric) ignore/label-value type` doesn't match any
+                label matcher in this query
   problem:
     reporter: promql/series
     summary: invalid comment

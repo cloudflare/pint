@@ -46,7 +46,8 @@
       expr: up == 0
   output: |
     1 | - record: foo
-                  ^^^ Duplicated rule, identical rule found at fake.yml:6.
+                  ^^^
+                  Duplicated rule, identical rule found at fake.yml:6.
   problem:
     reporter: rule/duplicate
     summary: duplicated recording rule
@@ -71,7 +72,8 @@
       expr: sum(up) by(job)
   output: |
     1 | - record: job:up:sum
-                  ^^^^^^^^^^ Duplicated rule, identical rule found at fake.yml:6.
+                  ^^^^^^^^^^
+                  Duplicated rule, identical rule found at fake.yml:6.
   problem:
     reporter: rule/duplicate
     summary: duplicated recording rule
