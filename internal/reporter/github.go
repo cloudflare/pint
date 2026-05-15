@@ -40,25 +40,9 @@ type ghCommentMeta struct {
 type ghPR struct{}
 
 // commentPosition returns the side and line number for a GitHub PR review comment.
-// GitHub only accepts comments on lines present in the diff, so if the target
-// line is not in the diff we move it to the nearest changed line.
-// AnchorBefore targets the old (deleted) side if oldLine is known.
-// AnchorAfter (or fallback) targets the new (added/unchanged) side.
 func (gr GithubReporter) commentPosition(p PendingComment) (side string, line int) {
-	if p.anchor == checks.AnchorBefore {
-		if p.changedLines.HasBefore(p.line) {
-			return "LEFT", p.line
-		}
-		if nearest := p.changedLines.NearestBefore(p.line); nearest > 0 {
-			return "LEFT", nearest
-		}
-		// No deleted lines in the diff, fall through to RIGHT side.
-	}
-	if p.changedLines.HasAfter(p.line) {
-		return "RIGHT", p.line
-	}
-	if nearest := p.changedLines.NearestAfter(p.line); nearest > 0 {
-		return "RIGHT", nearest
+	if p.isBefore {
+		return "LEFT", p.line
 	}
 	return "RIGHT", p.line
 }
@@ -181,8 +165,6 @@ func (gr GithubReporter) List(ctx context.Context, _ any) ([]ExistingComment, er
 }
 
 func (gr GithubReporter) Create(ctx context.Context, _ any, p PendingComment) error {
-	side, line := gr.commentPosition(p)
-
 	// The generated comment must follow these rules:
 	// https://docs.github.com/en/rest/pulls/comments#create-a-review-comment-for-a-pull-request
 	//
@@ -194,6 +176,7 @@ func (gr GithubReporter) Create(ctx context.Context, _ any, p PendingComment) er
 	//   - side:      which side of a split diff the comment targets:
 	//       "LEFT"  -- deletions (red lines in the diff).
 	//       "RIGHT" -- additions (green) or unchanged context lines (white).
+	side, line := gr.commentPosition(p)
 	comment := &github.PullRequestComment{
 		CommitID: new(gr.headCommit),
 		Path:     new(p.path),

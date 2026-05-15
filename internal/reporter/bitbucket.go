@@ -151,8 +151,13 @@ func moveReportedLine(report Report) (reported, original int) {
 	}
 
 	if reported < 0 {
-		if bestLine := report.Changes.Lines.NearestAfter(report.Problem.Lines.First); bestLine > 0 {
-			return bestLine, original
+		nearestLine, isBefore := report.Changes.Lines.Nearest(
+			report.Problem.Lines.First,
+			report.Problem.Lines.First,
+			report.Problem.Lines.Last,
+		)
+		if nearestLine > 0 && !isBefore {
+			return nearestLine, original
 		}
 	}
 

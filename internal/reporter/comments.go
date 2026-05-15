@@ -14,12 +14,21 @@ import (
 )
 
 type PendingComment struct {
-	path         string
-	oldPath      string
-	text         string
-	changedLines git.LineNumbers
-	line         int
-	anchor       checks.Anchor
+	path    string
+	oldPath string
+	text    string
+	// line is the resolved line number to comment on.
+	line int
+	// oldLine is the corresponding old-side (before the change) line number, 0 if the line was added.
+	oldLine int
+	anchor  checks.Anchor
+	// isBefore is true when the comment targets the old (deleted) side of the diff.
+	isBefore bool
+	// isModified is true when line is a modified (added/changed) line rather than a context line.
+	isModified bool
+	// isGeneral is true when no suitable diff line was found, meaning the comment
+	// should be posted as a general (file-level) comment without a line position.
+	isGeneral bool
 }
 
 type ExistingComment struct {
@@ -176,16 +185,56 @@ func makeComments(summary Summary, showDuplicates bool) (comments []PendingComme
 			}
 		}
 
-		comments = append(comments, PendingComment{
-			anchor:       reports[0].Problem.Anchor,
-			path:         reports[0].Path.SymlinkTarget,
-			oldPath:      oldPath,
-			line:         line,
-			changedLines: changedLines,
-			text:         buf.String(),
-		})
+		pc := PendingComment{
+			path:       reports[0].Path.SymlinkTarget,
+			oldPath:    oldPath,
+			text:       buf.String(),
+			line:       line,
+			oldLine:    0,
+			anchor:     reports[0].Problem.Anchor,
+			isBefore:   false,
+			isModified: false,
+			isGeneral:  false,
+		}
+		selectCommentLine(
+			&pc,
+			changedLines,
+			reports[0].Problem.Lines.First,
+			reports[0].Problem.Lines.Last,
+		)
+		comments = append(comments, pc)
 	}
 	return comments
+}
+
+func selectCommentLine(pc *PendingComment, changedLines git.LineNumbers, rangeFirst, rangeLast int) {
+	if pc.anchor == checks.AnchorBefore {
+		if changedLines.HasBefore(pc.line) {
+			pc.isBefore = true
+			return
+		}
+	}
+	if changedLines.HasAfter(pc.line) {
+		pc.oldLine = changedLines.BeforeForAfter(pc.line)
+		pc.isModified = true
+		return
+	}
+
+	nearestLine, isBefore := changedLines.Nearest(pc.line, rangeFirst, rangeLast)
+	isContextLine := changedLines.HasAnyAfter(pc.line)
+	switch {
+	case nearestLine > 0 && !isBefore:
+		pc.line = nearestLine
+		pc.oldLine = changedLines.BeforeForAfter(nearestLine)
+		pc.isModified = true
+	case nearestLine > 0 && isBefore && !isContextLine:
+		pc.line = nearestLine
+		pc.isBefore = true
+	case isContextLine:
+		pc.oldLine = changedLines.BeforeForAfter(pc.line)
+	default:
+		pc.isGeneral = true
+	}
 }
 
 func dedupReports(src []Report, showDuplicates bool) (dst [][]Report) {

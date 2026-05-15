@@ -1277,167 +1277,214 @@ func TestHasBefore(t *testing.T) {
 	}
 }
 
-func TestNearestAfter(t *testing.T) {
+func TestHasAnyAfter(t *testing.T) {
 	type testCaseT struct {
 		title    string
 		lns      git.LineNumbers
-		target   int
-		expected int
+		line     int
+		expected bool
 	}
 
 	testCases := []testCaseT{
 		{
-			title: "exact match",
+			title: "match on modified line",
 			lns: git.LineNumbers{
-				{Before: 0, After: 5, Modified: true},
-				{Before: 0, After: 10, Modified: true},
+				{Before: 1, After: 5, Modified: true},
 			},
-			target:   10,
-			expected: 10,
+			line:     5,
+			expected: true,
 		},
 		{
-			title: "closer to lower",
+			title: "match on unmodified context line",
 			lns: git.LineNumbers{
-				{Before: 0, After: 5, Modified: true},
-				{Before: 0, After: 20, Modified: true},
+				{Before: 3, After: 5, Modified: false},
 			},
-			target:   8,
-			expected: 5,
+			line:     5,
+			expected: true,
 		},
 		{
-			title: "closer to higher",
+			title: "no match",
 			lns: git.LineNumbers{
-				{Before: 0, After: 5, Modified: true},
-				{Before: 0, After: 20, Modified: true},
+				{Before: 1, After: 2, Modified: true},
 			},
-			target:   18,
-			expected: 20,
-		},
-		{
-			title: "target below all",
-			lns: git.LineNumbers{
-				{Before: 0, After: 10, Modified: true},
-				{Before: 0, After: 20, Modified: true},
-			},
-			target:   2,
-			expected: 10,
-		},
-		{
-			title: "target above all",
-			lns: git.LineNumbers{
-				{Before: 0, After: 10, Modified: true},
-				{Before: 0, After: 20, Modified: true},
-			},
-			target:   99,
-			expected: 20,
-		},
-		{
-			title: "skips deletions",
-			lns: git.LineNumbers{
-				{Before: 5, After: 0, Modified: false},
-				{Before: 0, After: 20, Modified: true},
-			},
-			target:   3,
-			expected: 20,
+			line:     99,
+			expected: false,
 		},
 		{
 			title:    "empty slice",
 			lns:      git.LineNumbers{},
-			target:   5,
-			expected: 0,
-		},
-		{
-			title: "all deletions",
-			lns: git.LineNumbers{
-				{Before: 3, After: 0, Modified: false},
-				{Before: 5, After: 0, Modified: false},
-			},
-			target:   4,
-			expected: 0,
+			line:     1,
+			expected: false,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.title, func(t *testing.T) {
-			require.Equal(t, tc.expected, tc.lns.NearestAfter(tc.target))
+			require.Equal(t, tc.expected, tc.lns.HasAnyAfter(tc.line))
 		})
 	}
 }
 
-func TestNearestBefore(t *testing.T) {
+func TestNearest(t *testing.T) {
 	type testCaseT struct {
-		title    string
-		lns      git.LineNumbers
-		target   int
-		expected int
+		title          string
+		lns            git.LineNumbers
+		target         int
+		rangeFirst     int
+		rangeLast      int
+		expectedLine   int
+		expectedBefore bool
 	}
 
 	testCases := []testCaseT{
 		{
-			title: "exact match",
+			title: "exact modified After match",
+			lns: git.LineNumbers{
+				{Before: 0, After: 5, Modified: true},
+				{Before: 0, After: 10, Modified: true},
+			},
+			target:         10,
+			rangeFirst:     10,
+			rangeLast:      10,
+			expectedLine:   10,
+			expectedBefore: false,
+		},
+		{
+			title: "closer to lower modified After",
+			lns: git.LineNumbers{
+				{Before: 0, After: 5, Modified: true},
+				{Before: 0, After: 20, Modified: true},
+			},
+			target:         8,
+			rangeFirst:     1,
+			rangeLast:      8,
+			expectedLine:   5,
+			expectedBefore: false,
+		},
+		{
+			title: "closer to higher modified After",
+			lns: git.LineNumbers{
+				{Before: 0, After: 5, Modified: true},
+				{Before: 0, After: 20, Modified: true},
+			},
+			target:         18,
+			rangeFirst:     18,
+			rangeLast:      18,
+			expectedLine:   20,
+			expectedBefore: false,
+		},
+		{
+			title: "target below all modified After",
+			lns: git.LineNumbers{
+				{Before: 0, After: 10, Modified: true},
+				{Before: 0, After: 20, Modified: true},
+			},
+			target:         2,
+			rangeFirst:     2,
+			rangeLast:      2,
+			expectedLine:   10,
+			expectedBefore: false,
+		},
+		{
+			title: "target above all modified After",
+			lns: git.LineNumbers{
+				{Before: 0, After: 10, Modified: true},
+				{Before: 0, After: 20, Modified: true},
+			},
+			target:         99,
+			rangeFirst:     99,
+			rangeLast:      99,
+			expectedLine:   20,
+			expectedBefore: false,
+		},
+		{
+			title: "skips deletions when modified After exists",
 			lns: git.LineNumbers{
 				{Before: 5, After: 0, Modified: false},
-				{Before: 10, After: 0, Modified: false},
+				{Before: 0, After: 20, Modified: true},
 			},
-			target:   10,
-			expected: 10,
+			target:         3,
+			rangeFirst:     3,
+			rangeLast:      3,
+			expectedLine:   20,
+			expectedBefore: false,
 		},
 		{
-			title: "closer to lower",
+			title:          "empty slice returns zero",
+			lns:            git.LineNumbers{},
+			target:         5,
+			rangeFirst:     5,
+			rangeLast:      5,
+			expectedLine:   0,
+			expectedBefore: false,
+		},
+		{
+			title: "falls back to Before when no modified After exists",
 			lns: git.LineNumbers{
+				{Before: 3, After: 0, Modified: false},
 				{Before: 5, After: 0, Modified: false},
-				{Before: 20, After: 0, Modified: false},
 			},
-			target:   8,
-			expected: 5,
+			target:         4,
+			rangeFirst:     4,
+			rangeLast:      4,
+			expectedLine:   3,
+			expectedBefore: true,
 		},
 		{
-			title: "closer to higher",
-			lns: git.LineNumbers{
-				{Before: 5, After: 0, Modified: false},
-				{Before: 20, After: 0, Modified: false},
-			},
-			target:   18,
-			expected: 20,
-		},
-		{
-			title: "target below all",
-			lns: git.LineNumbers{
-				{Before: 10, After: 0, Modified: false},
-				{Before: 20, After: 0, Modified: false},
-			},
-			target:   2,
-			expected: 10,
-		},
-		{
-			title: "skips additions",
-			lns: git.LineNumbers{
-				{Before: 0, After: 5, Modified: false},
-				{Before: 20, After: 0, Modified: false},
-			},
-			target:   3,
-			expected: 20,
-		},
-		{
-			title:    "empty slice",
-			lns:      git.LineNumbers{},
-			target:   5,
-			expected: 0,
-		},
-		{
-			title: "all additions",
+			title: "no usable entries returns zero",
 			lns: git.LineNumbers{
 				{Before: 0, After: 3, Modified: false},
 				{Before: 0, After: 5, Modified: false},
 			},
-			target:   4,
-			expected: 0,
+			target:         4,
+			rangeFirst:     4,
+			rangeLast:      4,
+			expectedLine:   0,
+			expectedBefore: false,
+		},
+		{
+			title: "in-range modified After preferred over closer out-of-range",
+			lns: git.LineNumbers{
+				{Before: 0, After: 2, Modified: true},
+				{Before: 0, After: 15, Modified: true},
+			},
+			target:         10,
+			rangeFirst:     12,
+			rangeLast:      20,
+			expectedLine:   15,
+			expectedBefore: false,
+		},
+		{
+			title: "in-range Before preferred over closer out-of-range Before",
+			lns: git.LineNumbers{
+				{Before: 2, After: 0, Modified: false},
+				{Before: 15, After: 0, Modified: false},
+			},
+			target:         10,
+			rangeFirst:     12,
+			rangeLast:      20,
+			expectedLine:   15,
+			expectedBefore: true,
+		},
+		{
+			title: "modified After preferred over closer Before",
+			lns: git.LineNumbers{
+				{Before: 9, After: 0, Modified: false},
+				{Before: 0, After: 20, Modified: true},
+			},
+			target:         10,
+			rangeFirst:     10,
+			rangeLast:      10,
+			expectedLine:   20,
+			expectedBefore: false,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.title, func(t *testing.T) {
-			require.Equal(t, tc.expected, tc.lns.NearestBefore(tc.target))
+			line, isBefore := tc.lns.Nearest(tc.target, tc.rangeFirst, tc.rangeLast)
+			require.Equal(t, tc.expectedLine, line)
+			require.Equal(t, tc.expectedBefore, isBefore)
 		})
 	}
 }
