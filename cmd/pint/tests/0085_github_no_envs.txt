@@ -186,8 +186,7 @@ body: |+
   Information: redundant field with default value (alerts/for)
     ---> rules.yml:6 -> `rule1`
   6 |     for: 0s
-               ^^
-               `0s` is the default value of `for`, this line is unnecessary.
+               ^^ `0s` is the default value of `for`, this line is unnecessary.
 
   ```
 

@@ -9,14 +9,12 @@ cmp stderr stderr.txt
 Warning: required annotation not set (alerts/annotation)
   ---> rules/1.yml:1-2 -> `Test Alert 1` [+527 duplicates]
 2 |   expr: up == 0
-            ^^^
-            `runbook_url` annotation is required.
+            ^^^ `runbook_url` annotation is required.
 
 Bug: required label not set (rule/label)
   ---> rules/1.yml:1-2 -> `Test Alert 1` [+527 duplicates]
 2 |   expr: up == 0
-            ^^^
-            `severity` label is required.
+            ^^^ `severity` label is required.
 
 level=ERROR msg="Execution completed with error(s)" err="found 528 problem(s) with severity Bug or higher"
 -- copy.sh --

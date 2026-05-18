@@ -6,8 +6,7 @@
       expr: sum(foo) without(
   output: |
     2 |   expr: sum(foo) without(
-                ^^^
-                `severity` annotation is required.
+                ^^^ `severity` annotation is required.
   problem:
     reporter: alerts/annotation
     summary: required annotation not set
@@ -37,8 +36,7 @@
         level: warning
   output: |
     7 |     level: warning
-            ^^^
-            `severity` annotation is required.
+            ^^^ `severity` annotation is required.
   problem:
     reporter: alerts/annotation
     summary: required annotation not set
@@ -70,8 +68,7 @@
         components: api db
   output: |
     4 |     components: api db
-                        ^^^^^^
-                        `components` annotation value must match `^api|memcached$`.
+                        ^^^^^^ `components` annotation value must match `^api|memcached$`.
   problem:
     reporter: alerts/annotation
     summary: invalid annotation value
@@ -98,8 +95,7 @@
         components: api db
   output: |
     4 |     components: api db
-                        ^^^^^^
-                        `components` annotation value is not one of valid values.
+                        ^^^^^^ `components` annotation value is not one of valid values.
   problem:
     reporter: alerts/annotation
     summary: invalid annotation value
@@ -142,8 +138,7 @@
         foo: bar
   output: |
     4 |     foo: bar
-            ^^^
-            `severity` annotation is required.
+            ^^^ `severity` annotation is required.
   problem:
     reporter: alerts/annotation
     summary: required annotation not set
@@ -173,8 +168,7 @@
       expr: sum(foo)
   output: |
     2 |   expr: sum(foo)
-                ^^^
-                `severity` annotation is required.
+                ^^^ `severity` annotation is required.
   problem:
     reporter: alerts/annotation
     summary: required annotation not set
@@ -207,8 +201,7 @@
         for: 4m
   output: |
     5 |     for: 4m
-                 ^^
-                 `for` annotation value must match `^{{ $for }}$`.
+                 ^^ `for` annotation value must match `^{{ $for }}$`.
   problem:
     reporter: alerts/annotation
     summary: invalid annotation value
@@ -255,8 +248,7 @@
         annotation_1: bar
   output: |
     4 |     annotation_1: bar
-                          ^^^
-                          `annotation_.*` annotation value must match `^critical$`.
+                          ^^^ `annotation_.*` annotation value must match `^critical$`.
   problem:
     reporter: alerts/annotation
     summary: invalid annotation value
@@ -283,8 +275,7 @@
         annotation_1: bar
   output: |
     4 |     annotation_1: bar
-                          ^^^
-                          `annotation_.*` annotation value must match `^critical$`.
+                          ^^^ `annotation_.*` annotation value must match `^critical$`.
   problem:
     reporter: alerts/annotation
     summary: invalid annotation value
@@ -311,8 +302,7 @@
         severity: bar
   output: |
     4 |     severity: bar
-                      ^^^
-                      `severity` annotation value must match `^critical$`.
+                      ^^^ `severity` annotation value must match `^critical$`.
   problem:
     reporter: alerts/annotation
     summary: invalid annotation value
@@ -339,8 +329,7 @@
         severity: bar
   output: |
     4 |     severity: bar
-                      ^^^
-                      `severity` annotation value must match `^critical$`.
+                      ^^^ `severity` annotation value must match `^critical$`.
   problem:
     reporter: alerts/annotation
     summary: invalid annotation value

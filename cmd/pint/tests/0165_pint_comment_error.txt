@@ -14,8 +14,7 @@ Warning: invalid comment (pint/comment)
 Information: This file was excluded from pint checks. (ignore/file)
   ---> rules/2.yml:4
 4 |   # pint ignore/file
-        ^^^^^^^^^^^^^^^^
-        This file was excluded from pint checks.
+        ^^^^^^^^^^^^^^^^ This file was excluded from pint checks.
 
 level=INFO msg="Problems found" Warning=1 Information=1
 -- rules/1.yml --

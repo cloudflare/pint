@@ -400,6 +400,22 @@ func TestAggregationCheck(t *testing.T) {
 			prometheus: noProm,
 			problems:   true,
 		},
+		{
+			description: "must keep job label / sum() without()",
+			content:     "- record: foo\n  expr: sum(foo) without()\n",
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", true, "", checks.Warning)
+			},
+			prometheus: noProm,
+		},
+		{
+			description: "must strip job label / sum() by()",
+			content:     "- record: foo\n  expr: sum(foo) by()\n",
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", false, "", checks.Warning)
+			},
+			prometheus: noProm,
+		},
 	}
 	runTests(t, testCases)
 }

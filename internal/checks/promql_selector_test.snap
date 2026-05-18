@@ -17,8 +17,7 @@
       expr: errors > 0
   output: |
     3 |   expr: errors > 0
-                ^^^^^^
-                This vector selector must specify `job` label. Please add a `{job="..."} matcher.
+                ^^^^^^ This vector selector must specify `job` label. Please add a `{job="..."} matcher.
   problem:
     reporter: promql/selector
     summary: required matcher missing

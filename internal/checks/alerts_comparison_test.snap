@@ -256,8 +256,7 @@
       expr: vector(0)
   output: |
     2 |   expr: vector(0)
-                ^^^^^^^^^
-                This query will always return a result and so this alert will always fire.
+                ^^^^^^^^^ This query will always return a result and so this alert will always fire.
   problem:
     reporter: alerts/comparison
     summary: always firing alert

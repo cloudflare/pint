@@ -1032,11 +1032,10 @@
   output: |
     2 |   expr: rate({__name__=~"(foo|bar)_panics_total", job="myjob"}[2m]) > 0
                                                           ^^^^^^^^^^^
-                                                          `prom` Prometheus server at
-                                                          https://simple.example.com has
-                                                          `{__name__=~"(foo|bar)_panics_total"}` metric with
-                                                          `job` label but there are no series matching
-                                                          `{job="myjob"}` in the last 1w.
+           `prom` Prometheus server at https://simple.example.com has
+           `{__name__=~"(foo|bar)_panics_total"}` metric with `job`
+           label but there are no series matching `{job="myjob"}` in the
+           last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series

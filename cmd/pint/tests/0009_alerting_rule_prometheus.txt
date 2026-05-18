@@ -9,8 +9,7 @@ level=INFO msg="Checking Prometheus rules" entries=2 workers=10 online=true
 Bug: required annotation not set (alerts/annotation)
   ---> rules/0001.yml:6-13 -> `InstanceDown` [+1 duplicates]
 13 |       description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes."
-           ^^^
-           `link` annotation is required.
+           ^^^ `link` annotation is required.
 
 Warning: required label is being removed via aggregation (promql/aggregate)
   ---> rules/0001.yml:17 -> `APIHighRequestLatency`

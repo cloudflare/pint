@@ -279,9 +279,9 @@
   output: |
     2 |   expr: mad_over_time(bar[5m+1m] smoothed) + on(job) fill(0) baz
                                                              ^^^^
-                                                             `fill` requires Prometheus 3.10.0 or later but
-                                                             `prom` Prometheus server at
-                                                             https://simple.example.com is running 2.0.0.
+            `fill` requires Prometheus 3.10.0 or later but `prom`
+            Prometheus server at https://simple.example.com is
+            running 2.0.0.
   problem:
     reporter: promql/features
     summary: required feature flag not enabled

@@ -42,23 +42,35 @@ func wrapText(text string, width int) []string {
 // writeWrappedMessage writes msg to buf, wrapping it at word boundaries.
 // indent is the number of leading spaces to write before each line.
 // msgWidth is the maximum width of each line.
-func writeWrappedMessage(buf *strings.Builder, msg string, color output.Color, indent, msgWidth int) {
+// When alignRight > 0 the first line is right-aligned so its last character
+// sits at column alignRight-1 (0-indexed); subsequent lines left-align to
+// the same starting column as the first line.
+func writeWrappedMessage(buf *strings.Builder, msg string, color output.Color, indent, msgWidth, alignRight int) int {
 	if len(msg) == 0 {
-		return
+		return indent
 	}
 
+	var parts []string
 	if len(msg) <= msgWidth {
-		buf.WriteString(strings.Repeat(" ", indent))
-		buf.WriteString(output.MaybeColor(color, color == output.None, msg))
-		buf.WriteRune('\n')
-		return
+		parts = []string{msg}
+	} else {
+		parts = wrapText(msg, msgWidth)
 	}
 
-	for _, part := range wrapText(msg, msgWidth) {
-		buf.WriteString(strings.Repeat(" ", indent))
+	for i, part := range parts {
+		pad := indent
+		if alignRight > 0 && i == 0 {
+			pad = max(indent, alignRight-len(part))
+		}
+		// After the first line, lock indent to where the first line started.
+		if i == 0 {
+			indent = pad
+		}
+		buf.WriteString(strings.Repeat(" ", pad))
 		buf.WriteString(output.MaybeColor(color, color == output.None, part))
 		buf.WriteRune('\n')
 	}
+	return indent
 }
 
 type Kind uint8
@@ -121,6 +133,8 @@ func InjectDiagnostics(content string, d []Diagnostic, color output.Color) strin
 	lines := lineCoverage(diags)
 	lastLine := slices.Max(lines)
 
+	// Sort diagnostics by FirstColumn descending so that rightmost carets
+	// are printed first — this ensures inner carets don't overwrite outer ones.
 	slices.SortStableFunc(diags, func(a, b Diagnostic) int {
 		return cmp.Compare(b.FirstColumn, a.FirstColumn)
 	})
@@ -138,6 +152,7 @@ func InjectDiagnostics(content string, d []Diagnostic, color output.Color) strin
 	var buf strings.Builder
 	nextLine := make([]strings.Builder, len(diags))
 	needsNextLine := make([]bool, len(diags))
+	msgIndent := make([]int, len(diags))
 
 	// When two diagnostics have the exact same range, only the first one prints
 	// underline characters. Subsequent ones skip the caret line but still print
@@ -220,6 +235,8 @@ func InjectDiagnostics(content string, d []Diagnostic, color output.Color) strin
 			if ok {
 				caretLine := nextLine[i].String()
 
+				// indent is the absolute column (0-indexed from the start of the
+				// output line) of the first '^'; it includes the gutter width.
 				indent := strings.IndexFunc(caretLine, func(r rune) bool { return r != ' ' })
 				if indent < 0 {
 					// For disabled-point diagnostics the caret line is all spaces,
@@ -233,21 +250,60 @@ func InjectDiagnostics(content string, d []Diagnostic, color output.Color) strin
 					}
 				}
 
-				if !disablePoints[i] {
+				gutter := digits + 3
+				lastCaret := strings.LastIndex(caretLine, "^")
+				if lastCaret < 0 {
+					lastCaret = indent
+				}
+
+				// Inline the message on the caret line when it fits in one
+				// piece and there are at least 20 columns after the last ^.
+				msg := diags[i].Message
+				spaceAfterCaret := maxLineWidth + gutter - lastCaret - 1
+				if !disablePoints[i] && len(msg) > 0 && len(msg)+1 <= spaceAfterCaret && spaceAfterCaret >= 20 {
 					buf.WriteString(output.MaybeColor(color, color == output.None, caretLine))
+					buf.WriteRune(' ')
+					buf.WriteString(output.MaybeColor(color, color == output.None, msg))
 					buf.WriteRune('\n')
-				}
+					msgIndent[i] = lastCaret + 2
+				} else {
+					if !disablePoints[i] {
+						buf.WriteString(output.MaybeColor(color, color == output.None, caretLine))
+						buf.WriteRune('\n')
+					}
 
-				// If the first caret is past column 80, left-align the message
-				// so it doesn't get pushed off-screen. Use the gutter width as
-				// padding so the message lines up with the source content.
-				caretCol := digits + 3 + indent
-				if caretCol > 80 {
-					indent = digits + 3
-				}
+					// Place the message on whichever side of the caret has more
+					// horizontal space.
+					// Right side: message starts at firstCaret, extends to maxLineWidth.
+					// Left side:  message block ends at lastCaret, width up to maxLineWidth,
+					//             indent is pushed left so the block right-edge aligns with ^.
+					firstCaret := indent
+					rightSpace := maxLineWidth + gutter - firstCaret
+					leftSpace := lastCaret + 1 - gutter
 
-				msgWidth := max(20, maxLineWidth+digits+3-indent)
-				writeWrappedMessage(&buf, diags[i].Message, color, indent, msgWidth)
+					var msgWidth, alignRight int
+					if rightSpace >= leftSpace {
+						msgWidth = max(20, rightSpace)
+					} else {
+						indent = max(gutter, lastCaret+1-max(20, leftSpace))
+						msgWidth = max(20, lastCaret+1-indent)
+						alignRight = lastCaret + 1
+					}
+
+					// For diagnostics that share a caret range with a previous
+					// one, align to the same column as that diagnostic's message.
+					if disablePoints[i] {
+						for j := range i {
+							if diags[j].FirstColumn == diags[i].FirstColumn && diags[j].LastColumn == diags[i].LastColumn {
+								indent = msgIndent[j]
+								alignRight = 0
+								msgWidth = max(20, maxLineWidth+gutter-indent)
+								break
+							}
+						}
+					}
+					msgIndent[i] = writeWrappedMessage(&buf, msg, color, indent, msgWidth, alignRight)
+				}
 				nextLine[i].Reset()
 			}
 		}

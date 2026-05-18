@@ -7,8 +7,7 @@
       for: 0h
   output: |
     3 |   for: 0h
-               ^^
-               `0h` is the default value of `for`, this line is unnecessary.
+               ^^ `0h` is the default value of `for`, this line is unnecessary.
   problem:
     reporter: alerts/for
     summary: redundant field with default value
@@ -34,8 +33,7 @@
       keep_firing_for: 0h
   output: |
     3 |   keep_firing_for: 0h
-                           ^^
-                           `0h` is the default value of `keep_firing_for`, this line is unnecessary.
+                           ^^ `0h` is the default value of `keep_firing_for`, this line is unnecessary.
   problem:
     reporter: alerts/for
     summary: redundant field with default value
@@ -71,8 +69,7 @@
       for: abc
   output: |
     3 |   for: abc
-               ^^^
-               not a valid duration string: "abc"
+               ^^^ not a valid duration string: "abc"
   problem:
     reporter: alerts/for
     summary: invalid duration
@@ -98,8 +95,7 @@
       keep_firing_for: abc
   output: |
     3 |   keep_firing_for: abc
-                           ^^^
-                           not a valid duration string: "abc"
+                           ^^^ not a valid duration string: "abc"
   problem:
     reporter: alerts/for
     summary: invalid duration
@@ -125,8 +121,7 @@
       for: -5m
   output: |
     3 |   for: -5m
-               ^^^
-               not a valid duration string: "-5m"
+               ^^^ not a valid duration string: "-5m"
   problem:
     reporter: alerts/for
     summary: invalid duration
@@ -152,8 +147,7 @@
       keep_firing_for: -5m
   output: |
     3 |   keep_firing_for: -5m
-                           ^^^
-                           not a valid duration string: "-5m"
+                           ^^^ not a valid duration string: "-5m"
   problem:
     reporter: alerts/for
     summary: invalid duration

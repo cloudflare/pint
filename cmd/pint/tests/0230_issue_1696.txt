@@ -9,8 +9,7 @@ level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
 Bug: required label not set (rule/label)
   ---> rules/1.yml:3-4 -> `alert:http_success_rate:ratio_2m`
 3 |   labels:
-      ^^^^^^
-      `service` label is required.
+      ^^^^^^ `service` label is required.
 
 level=INFO msg="Problems found" Bug=1
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"

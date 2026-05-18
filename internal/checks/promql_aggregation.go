@@ -123,13 +123,18 @@ func (c AggregationCheck) Check(_ context.Context, entry *discovery.Entry, _ []*
 		if !c.keep && src.CanHaveLabel(c.label) {
 			posrange := src.Position
 			if aggr, ok := source.MostOuterOperation[*promParser.AggregateExpr](src); ok {
-				posrange = aggr.PosRange
-				if len(aggr.Grouping) != 0 {
-					if aggr.Without {
-						posrange = source.FindFuncNamePosition(expr.Value.Value, aggr.PosRange, "without")
+				if aggr.Without {
+					if len(aggr.Grouping) == 0 {
+						// without() with empty grouping removes nothing.
+						posrange = source.FindFuncPosition(expr.Value.Value, aggr.PosRange, "without", nil)
 					} else {
-						posrange = source.FindFuncNamePosition(expr.Value.Value, aggr.PosRange, "by")
+						// without(...) remove passed labels.
+						posrange = source.FindFuncNamePosition(expr.Value.Value, aggr.PosRange, "without")
 					}
+				} else {
+					// by() with empty grouping drops all labels, so CanHaveLabel
+					// returns false and this branch is never reached for that case.
+					posrange = source.FindFuncNamePosition(expr.Value.Value, aggr.PosRange, "by")
 				}
 			}
 			if l, ok := src.Labels[c.label]; ok {

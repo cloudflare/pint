@@ -10,8 +10,7 @@ level=WARN msg="You have --min-severity set to a higher severity value than --fa
 Fatal: required matcher missing (promql/selector)
   ---> rules/0001.yml:11 -> `fatal`
 11 |     expr: fatal == 0
-               ^^^^^
-               This vector selector must specify `xxx` label. Please add a `{xxx="..."} matcher.
+               ^^^^^ This vector selector must specify `xxx` label. Please add a `{xxx="..."} matcher.
 
 level=INFO msg="Problems found" Fatal=1 Bug=1 Warning=1 Information=1
 level=INFO msg="3 problem(s) not visible because of --min-severity=fatal flag"

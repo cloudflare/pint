@@ -42,8 +42,7 @@ Warning: redundant regexp (promql/regexp)
 Information: redundant field with default value (alerts/for)
   ---> rules.yml:3 -> `rule1b` [+1 duplicates]
 3 |   for: 0s
-           ^^
-           `0s` is the default value of `for`, this line is unnecessary.
+           ^^ `0s` is the default value of `for`, this line is unnecessary.
 
 -- src/v1.yml --
 - alert: rule1a

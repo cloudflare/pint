@@ -119,10 +119,8 @@
   output: |
     4 |     {job="foo"} unless on(__name__) count(sum({job="foo"})) by(__name__)
                                                                        ^^^^^^^^
-                                                                       You can't use `__name__` because this
-                                                                       label is not possible here.
-                                                  ^^^^^^^^^^^^^^^^
-                                                  Aggregation removes metric name.
+              You can't use `__name__` because this label is not possible here.
+                                                  ^^^^^^^^^^^^^^^^ Aggregation removes metric name.
   problem:
     reporter: promql/impossible
     summary: impossible label
@@ -166,8 +164,8 @@
      4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
      5 |       (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
                                                           ^^^^^^^^^
-                                                          You can't use `colo_name` because this label is not
-                                                          possible here.
+                You can't use `colo_name` because this label is not
+                possible here.
                                            ^^^^^^
                                            Calling `vector()` will return a vector value with no labels.
      6 |     > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
@@ -219,8 +217,7 @@
      6 |     > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
      7 |       avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
                                                                    ^^^^^^^^^
-                                                                   You can't use `colo_name` because this
-                                                                   label is not possible here.
+          You can't use `colo_name` because this label is not possible here.
                                                     ^^^^^^
                                                     Calling `vector()` will return a vector value with no
                                                     labels.
@@ -270,12 +267,10 @@
      5 |       (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
      6 |     > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
                                                                              ^^^^^^^^^
-                                                                             You can't use `colo_name`
-                                                                             because this label is not
-                                                                             possible here.
+                    You can't use `colo_name` because this label is not possible here.
                                                               ^^^^^^
-                                                              Calling `vector()` will return a vector value
-                                                              with no labels.
+               Calling `vector()` will return a vector value with no
+               labels.
      7 |       avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
      8 |     # Multi-line comment
      9 |     # inside the query
@@ -324,8 +319,7 @@
      6 |     > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
      7 |       avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
                                                                    ^^^^^^^^^
-                                                                   You can't use `colo_name` because this
-                                                                   label is not possible here.
+          You can't use `colo_name` because this label is not possible here.
                                                     ^^^^^^
                                                     Calling `vector()` will return a vector value with no
                                                     labels.
@@ -512,8 +506,8 @@
   output: |4
      4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
                                                              ^^^^^^^^^
-                                                             You can't use `colo_name` because this label is
-                                                             not possible here.
+          You can't use `colo_name` because this label is not possible
+          here.
                                               ^^^^^^
                                               Calling `vector()` will return a vector value with no labels.
      5 |       (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
@@ -570,8 +564,7 @@
      8 |     # Multi-line comment
      9 |     # inside the query
     10 |     and on (colo_name)
-                     ^^^^^^^^^
-                     You can't use `colo_name` because this label is not possible here.
+                     ^^^^^^^^^ You can't use `colo_name` because this label is not possible here.
     11 |       (colo_job:foo_total:rate2m or vector(0)) > 80
     12 |     and on (colo_name)
     13 |       (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
@@ -614,8 +607,8 @@
      4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
      5 |       (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
                                                           ^^^^^^^^^
-                                                          You can't use `colo_name` because this label is not
-                                                          possible here.
+                You can't use `colo_name` because this label is not
+                possible here.
                                            ^^^^^^
                                            Calling `vector()` will return a vector value with no labels.
      6 |     > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
@@ -667,8 +660,7 @@
      6 |     > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
      7 |       avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
                                                                    ^^^^^^^^^
-                                                                   You can't use `colo_name` because this
-                                                                   label is not possible here.
+          You can't use `colo_name` because this label is not possible here.
                                                     ^^^^^^
                                                     Calling `vector()` will return a vector value with no
                                                     labels.
@@ -718,12 +710,10 @@
      5 |       (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
      6 |     > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
                                                                              ^^^^^^^^^
-                                                                             You can't use `colo_name`
-                                                                             because this label is not
-                                                                             possible here.
+                    You can't use `colo_name` because this label is not possible here.
                                                               ^^^^^^
-                                                              Calling `vector()` will return a vector value
-                                                              with no labels.
+               Calling `vector()` will return a vector value with no
+               labels.
      7 |       avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
      8 |     # Multi-line comment
      9 |     # inside the query
@@ -772,8 +762,7 @@
      6 |     > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
      7 |       avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
                                                                    ^^^^^^^^^
-                                                                   You can't use `colo_name` because this
-                                                                   label is not possible here.
+          You can't use `colo_name` because this label is not possible here.
                                                     ^^^^^^
                                                     Calling `vector()` will return a vector value with no
                                                     labels.
@@ -978,8 +967,7 @@
         )
   output: |
     4 |     group without(animal, brand) (
-                          ^^^^^^
-                          Previously joined label `animal` is being removed from the results.
+                          ^^^^^^ Previously joined label `animal` is being removed from the results.
     5 |       up{node_status="v", job="node_exporter"}
     6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
                                                 ^^^^^^
@@ -1018,15 +1006,14 @@
         )
   output: |
     4 |     group without(animal, brand) (
-                                  ^^^^^
-                                  Previously joined label `brand` is being removed from the results.
+                                  ^^^^^ Previously joined label `brand` is being removed from the results.
     5 |       up{node_status="v", job="node_exporter"}
     6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
                                                         ^^^^^
-                                                        Query is using `group_left(tier, animal, brand,
-                                                        pop_name)`, all labels included inside
-                                                        `group_left(...)` will be joined to the results on
-                                                        the other side of the query.
+              Query is using `group_left(tier, animal, brand,
+              pop_name)`, all labels included inside
+              `group_left(...)` will be joined to the results on
+              the other side of the query.
     7 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
     8 |     )
   problem:
@@ -1283,8 +1270,7 @@
         )
   output: |
     4 |     group by(brand) (
-                  ^^^^^^^^^
-                  Previously joined label `tier` is being removed from the results.
+                  ^^^^^^^^^ Previously joined label `tier` is being removed from the results.
     5 |       up{node_status="v", job="node_exporter"}
     6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
                                           ^^^^
@@ -1323,8 +1309,7 @@
         )
   output: |
     4 |     group by(brand) (
-                  ^^^^^^^^^
-                  Previously joined label `animal` is being removed from the results.
+                  ^^^^^^^^^ Previously joined label `animal` is being removed from the results.
     5 |       up{node_status="v", job="node_exporter"}
     6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
                                                 ^^^^^^
@@ -1363,15 +1348,13 @@
         )
   output: |
     4 |     group by(brand) (
-                  ^^^^^^^^^
-                  Previously joined label `pop_name` is being removed from the results.
+                  ^^^^^^^^^ Previously joined label `pop_name` is being removed from the results.
     5 |       up{node_status="v", job="node_exporter"}
     6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
                                                                ^^^^^^^^
-                                                               Query is using `group_left(tier, animal,
-                                                               brand, pop_name)`, all labels included inside
-                                                               `group_left(...)` will be joined to the
-                                                               results on the other side of the query.
+        Query is using `group_left(tier, animal, brand, pop_name)`, all
+        labels included inside `group_left(...)` will be joined to the
+        results on the other side of the query.
     7 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
     8 |     )
   problem:
@@ -1404,8 +1387,7 @@
         )
   output: |
     4 |     group by(brand) (
-                  ^^^^^^^^^
-                  Previously joined label `sliver` is being removed from the results.
+                  ^^^^^^^^^ Previously joined label `sliver` is being removed from the results.
     5 |       up{node_status="v", job="node_exporter"}
     6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
     7 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
@@ -1485,8 +1467,7 @@
         )
   output: |
     4 |     group (
-            ^^^^^^
-            Previously joined label `tier` is being removed from the results.
+            ^^^^^^ Previously joined label `tier` is being removed from the results.
     5 |       up{node_status="v", job="node_exporter"}
     6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
                                           ^^^^
@@ -1525,8 +1506,7 @@
         )
   output: |
     4 |     group (
-            ^^^^^^
-            Previously joined label `animal` is being removed from the results.
+            ^^^^^^ Previously joined label `animal` is being removed from the results.
     5 |       up{node_status="v", job="node_exporter"}
     6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
                                                 ^^^^^^
@@ -1565,15 +1545,14 @@
         )
   output: |
     4 |     group (
-            ^^^^^^
-            Previously joined label `brand` is being removed from the results.
+            ^^^^^^ Previously joined label `brand` is being removed from the results.
     5 |       up{node_status="v", job="node_exporter"}
     6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
                                                         ^^^^^
-                                                        Query is using `group_left(tier, animal, brand,
-                                                        pop_name)`, all labels included inside
-                                                        `group_left(...)` will be joined to the results on
-                                                        the other side of the query.
+              Query is using `group_left(tier, animal, brand,
+              pop_name)`, all labels included inside
+              `group_left(...)` will be joined to the results on
+              the other side of the query.
     7 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
     8 |     )
   problem:
@@ -1606,15 +1585,13 @@
         )
   output: |
     4 |     group (
-            ^^^^^^
-            Previously joined label `pop_name` is being removed from the results.
+            ^^^^^^ Previously joined label `pop_name` is being removed from the results.
     5 |       up{node_status="v", job="node_exporter"}
     6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
                                                                ^^^^^^^^
-                                                               Query is using `group_left(tier, animal,
-                                                               brand, pop_name)`, all labels included inside
-                                                               `group_left(...)` will be joined to the
-                                                               results on the other side of the query.
+        Query is using `group_left(tier, animal, brand, pop_name)`, all
+        labels included inside `group_left(...)` will be joined to the
+        results on the other side of the query.
     7 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
     8 |     )
   problem:
@@ -1647,8 +1624,7 @@
         )
   output: |
     4 |     group (
-            ^^^^^^
-            Previously joined label `sliver` is being removed from the results.
+            ^^^^^^ Previously joined label `sliver` is being removed from the results.
     5 |       up{node_status="v", job="node_exporter"}
     6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
     7 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
@@ -1854,8 +1830,7 @@
                                                     ^^^^^^^
                                                     You can't use `cluster` because this label is not
                                                     possible here.
-                ^^^
-                Query is using aggregation that removes all labels.
+                ^^^ Query is using aggregation that removes all labels.
   problem:
     reporter: promql/impossible
     summary: impossible label
@@ -2018,10 +1993,10 @@
                results.
      7 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
                                                          ^^^^^
-                                                         Query is using `group_left(tier, animal, brand,
-                                                         pop_name)`, all labels included inside
-                                                         `group_left(...)` will be joined to the results on
-                                                         the other side of the query.
+               Query is using `group_left(tier, animal, brand,
+               pop_name)`, all labels included inside
+               `group_left(...)` will be joined to the results on
+               the other side of the query.
      8 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
      9 |       unless on (instance) label_join(
     10 |         max by (boring_instance) (boring_reboot_in_maintenance) == 1,
@@ -2076,10 +2051,9 @@
                results.
      7 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
                                                                 ^^^^^^^^
-                                                                Query is using `group_left(tier, animal,
-                                                                brand, pop_name)`, all labels included inside
-                                                                `group_left(...)` will be joined to the
-                                                                results on the other side of the query.
+         Query is using `group_left(tier, animal, brand, pop_name)`, all
+         labels included inside `group_left(...)` will be joined to the
+         results on the other side of the query.
      8 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
      9 |       unless on (instance) label_join(
     10 |         max by (boring_instance) (boring_reboot_in_maintenance) == 1,
@@ -2178,8 +2152,7 @@
         )
   output: |
     4 |     group by (env, cluster, status, instance, dc, port) (
-                      ^^^
-                      You can't use `env` because this label is not possible here.
+                      ^^^ You can't use `env` because this label is not possible here.
     5 |         up{env="prod", job="foo"} * on (instance) (services_enabled == 999)
                                             ^^^^^^^^^^^^^
                                             Query is using one-to-one vector matching with `on(instance)`,
@@ -2214,8 +2187,7 @@
         )
   output: |
     4 |     group by (env, cluster, status, instance, dc, port) (
-                           ^^^^^^^
-                           You can't use `cluster` because this label is not possible here.
+                           ^^^^^^^ You can't use `cluster` because this label is not possible here.
     5 |         up{env="prod", job="foo"} * on (instance) (services_enabled == 999)
                                             ^^^^^^^^^^^^^
                                             Query is using one-to-one vector matching with `on(instance)`,
@@ -2250,8 +2222,7 @@
         )
   output: |
     4 |     group by (env, cluster, status, instance, dc, port) (
-                                    ^^^^^^
-                                    You can't use `status` because this label is not possible here.
+                                    ^^^^^^ You can't use `status` because this label is not possible here.
     5 |         up{env="prod", job="foo"} * on (instance) (services_enabled == 999)
                                             ^^^^^^^^^^^^^
                                             Query is using one-to-one vector matching with `on(instance)`,
@@ -2324,8 +2295,8 @@
   output: |
     4 |     group by (env, cluster, status, instance, dc, port) (
                                                           ^^^^
-                                                          You can't use `port` because this label is not
-                                                          possible here.
+                You can't use `port` because this label is not
+                possible here.
     5 |         up{env="prod", job="foo"} * on (instance) (services_enabled == 999)
                                             ^^^^^^^^^^^^^
                                             Query is using one-to-one vector matching with `on(instance)`,
@@ -2449,10 +2420,9 @@
             results.
     6 |     * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
                                                              ^^^^^^^^
-                                                             Query is using `group_left(tier, animal, brand,
-                                                             pop_name)`, all labels included inside
-                                                             `group_left(...)` will be joined to the results
-                                                             on the other side of the query.
+          Query is using `group_left(tier, animal, brand, pop_name)`,
+          all labels included inside `group_left(...)` will be joined
+          to the results on the other side of the query.
     7 |     * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
   problem:
     reporter: promql/impossible
@@ -2521,10 +2491,8 @@
       expr: sum(bar) * on(cluster) sum(foo)
   output: |
     3 |   expr: sum(bar) * on(cluster) sum(foo)
-                              ^^^^^^^
-                              You can't use `cluster` because this label is not possible here.
-                ^^^
-                Query is using aggregation that removes all labels.
+                              ^^^^^^^ You can't use `cluster` because this label is not possible here.
+                ^^^ Query is using aggregation that removes all labels.
   problem:
     reporter: promql/impossible
     summary: impossible label
@@ -2558,8 +2526,7 @@
         )
   output: |
     4 |     sum by (cluster, err, gen, scope, is_dev, job, slice)
-                    ^^^^^^^
-                    You can't use `cluster` because this label is not possible here.
+                    ^^^^^^^ You can't use `cluster` because this label is not possible here.
     5 |       ( sum by (instance, job) (rate(cycles_total[2m])) * on (instance)
                     ^^^
                     Query is using aggregation with `by(instance, job)`, only labels included inside
@@ -2600,10 +2567,9 @@
     4 |     sum by (job) (
     5 |       up{env="prod", job="foo"} * on () group_left(job) services_enabled{job=""}
                                                            ^^^
-                                                           Query is trying to join the `job` label that is
-                                                           already present on the other side of the query.
-              ^^^^^^^^^^^^^^^^^^^^^^^^^
-              Query will only return series where these labels are present.
+               Query is trying to join the `job` label that is
+               already present on the other side of the query.
+              ^^^^^^^^^^^^^^^^^^^^^^^^^ Query will only return series where these labels are present.
     6 |     )
   problem:
     reporter: promql/impossible
@@ -2635,12 +2601,11 @@
     4 |     sum by (job) (
     5 |       up{env="prod", job="foo"} * on () group_left(job) services_enabled{job=""}
                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^
-                                                                Query uses `{job=""}` selector which will
-                                                                filter out any time series with the `job`
-                                                                label set.
+           Query uses `{job=""}` selector which will filter out any time series with the
+           `job` label set.
                                                            ^^^
-                                                           You can't use `job` because this label is not
-                                                           possible here.
+        You can't use `job` because this label is not possible
+        here.
     6 |     )
   problem:
     reporter: promql/impossible
@@ -2676,10 +2641,9 @@
     4 |     sum by (job) (
     5 |       up{env="prod", job="foo"} * on () group_left(job) services_enabled{job!=""}
                                                            ^^^
-                                                           Query is trying to join the `job` label that is
-                                                           already present on the other side of the query.
-              ^^^^^^^^^^^^^^^^^^^^^^^^^
-              Query will only return series where these labels are present.
+               Query is trying to join the `job` label that is
+               already present on the other side of the query.
+              ^^^^^^^^^^^^^^^^^^^^^^^^^ Query will only return series where these labels are present.
     6 |     )
   problem:
     reporter: promql/impossible
@@ -2784,8 +2748,8 @@
     6 |       +
     7 |       max(job:skipps_total:rate5m{region=~"wnam|weur", job="myjob", cluster=~"(a|b)"} or vector(0)) by(region)
                                                                                                  ^^^^^^
-        The right hand side will never be matched because it doesn't have the `region` label while the left
-        hand side will. Calling `vector()` will return a vector value with no labels.
+         The right hand side will never be matched because it doesn't have the `region` label while the
+         left hand side will. Calling `vector()` will return a vector value with no labels.
     8 |     ) / sum(rate(records_total{region=~"wnam|weur"}[5m])) by (region) < 0.90
   problem:
     reporter: promql/impossible
@@ -2819,9 +2783,9 @@
     6 |       +
     7 |       max(job:skipps_total:rate5m{region=~"wnam|weur", job="myjob", cluster=~"(a|b)"} or vector(0)) by(region)
                                                                                                                ^^^^^^
-        You can't use `region` because this label is not possible here.
+                                                      You can't use `region` because this label is not possible here.
                                                                                                  ^^^^^^
-        Calling `vector()` will return a vector value with no labels.
+                                          Calling `vector()` will return a vector value with no labels.
     8 |     ) / sum(rate(records_total{region=~"wnam|weur"}[5m])) by (region) < 0.90
   problem:
     reporter: promql/impossible
@@ -2857,9 +2821,9 @@
     4 |     (
     5 |       max(job:writes_total:rate5m{region=~"wnam|weur", job="myjob", cluster=~"(a|b)"} or vector(0)) by(region)
                                                                                                                ^^^^^^
-        You can't use `region` because this label is not possible here.
+                                                      You can't use `region` because this label is not possible here.
                                                                                                  ^^^^^^
-        Calling `vector()` will return a vector value with no labels.
+                                          Calling `vector()` will return a vector value with no labels.
     6 |       +
     7 |       max(job:skipps_total:rate5m{region=~"wnam|weur", job="myjob", cluster=~"(a|b)"} or vector(0)) by(region)
     8 |     ) / sum(rate(records_total{region=~"wnam|weur"}[5m])) by (region) < 0.90
@@ -2899,9 +2863,9 @@
     6 |       +
     7 |       max(job:skipps_total:rate5m{region=~"wnam|weur", job="myjob", cluster=~"(a|b)"} or vector(0)) by(region)
                                                                                                                ^^^^^^
-        You can't use `region` because this label is not possible here.
+                                                      You can't use `region` because this label is not possible here.
                                                                                                  ^^^^^^
-        Calling `vector()` will return a vector value with no labels.
+                                          Calling `vector()` will return a vector value with no labels.
     8 |     ) / sum(rate(records_total{region=~"wnam|weur"}[5m])) by (region) < 0.90
   problem:
     reporter: promql/impossible
@@ -3057,10 +3021,9 @@
             results.
     6 |     * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
                                                              ^^^^^^^^
-                                                             Query is using `group_left(tier, animal, brand,
-                                                             pop_name)`, all labels included inside
-                                                             `group_left(...)` will be joined to the results
-                                                             on the other side of the query.
+          Query is using `group_left(tier, animal, brand, pop_name)`,
+          all labels included inside `group_left(...)` will be joined
+          to the results on the other side of the query.
     7 |     * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
   problem:
     reporter: promql/impossible
@@ -3673,14 +3636,12 @@
   output: |
     4 |     colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
     5 |     group by (animal) (
-                  ^^^^^^^^^^^
-                  Previously joined label `sliver` is being removed from the results.
+                  ^^^^^^^^^^^ Previously joined label `sliver` is being removed from the results.
     6 |         sliver_metadata * on (instance) group_right (sliver)
                                                              ^^^^^^
-                                                             Query is using `group_right(sliver)`, all
-                                                             labels included inside `group_right(...)` will
-                                                             be joined to the results on the other side of
-                                                             the query.
+          Query is using `group_right(sliver)`, all labels included
+          inside `group_right(...)` will be joined to the results on
+          the other side of the query.
     7 |         metal_services_enabled
     8 |     )
   problem:
@@ -3713,8 +3674,7 @@
         )
   output: |
     4 |     colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
-                                ^^^^^^^^^
-                                You can't use `colo_name` because this label is not possible here.
+                                ^^^^^^^^^ You can't use `colo_name` because this label is not possible here.
     5 |     group by (animal) (
                   ^^^
                   Query is using aggregation with `by(animal)`, only labels included inside `by(...)` will
@@ -3757,14 +3717,12 @@
   output: |
     4 |     colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
     5 |     group by (colo_name, animal) (
-                  ^^^^^^^^^^^^^^^^^^^^^^
-                  Previously joined label `sliver` is being removed from the results.
+                  ^^^^^^^^^^^^^^^^^^^^^^ Previously joined label `sliver` is being removed from the results.
     6 |         sliver_metadata * on (instance) group_right (sliver)
                                                              ^^^^^^
-                                                             Query is using `group_right(sliver)`, all
-                                                             labels included inside `group_right(...)` will
-                                                             be joined to the results on the other side of
-                                                             the query.
+          Query is using `group_right(sliver)`, all labels included
+          inside `group_right(...)` will be joined to the results on
+          the other side of the query.
     7 |         metal_services_enabled
     8 |     )
   problem:

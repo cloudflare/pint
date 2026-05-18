@@ -442,8 +442,8 @@
   output: |
     2 |   expr: sum without (le) (... * histogram_count(rate(fl2_request_phase_duration_seconds[5m])))
                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                                        Use `instance_job:fl2_hmd_request_phase_latency_count:rate5m` here
-                                        instead to speed up the query.
+           Use `instance_job:fl2_hmd_request_phase_latency_count:rate5m` here instead to speed up the
+           query.
   problem:
     reporter: query/cost
     summary: query could use a recording rule
@@ -632,8 +632,7 @@
       expr: sum(rate(foo_total[5m])) without(instance) > 10
   output: |
     2 |   expr: sum(rate(foo_total[5m])) without(instance) > 10
-                    ^^^^^^^^^^^^^^^^^^^
-                    Use `foo:rate5m` here instead to speed up the query.
+                    ^^^^^^^^^^^^^^^^^^^ Use `foo:rate5m` here instead to speed up the query.
   problem:
     reporter: query/cost
     summary: query could use a recording rule

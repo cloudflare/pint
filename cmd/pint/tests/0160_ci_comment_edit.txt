@@ -52,8 +52,7 @@ level=INFO msg="Problems found" Bug=2 Warning=1
 Warning: invalid comment (promql/series)
   ---> rules.yml:8 -> `DownAlert`
 8 |     expr: up == 0
-              ^^^^^^^
-              pint disable comment `promql/series(xxx)` doesn't match any selector in this query
+              ^^^^^^^ pint disable comment `promql/series(xxx)` doesn't match any selector in this query
 
 Bug: query on nonexistent series (promql/series)
   ---> rules.yml:8 -> `DownAlert` [+1 duplicates]

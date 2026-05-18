@@ -36,12 +36,10 @@
         summary: "{{ $value | first }} errors"
   output: |
     3 |   expr: rate(errors[2m])
-                ^^^^^^^^^^^^^^^^
-                `rate()` will produce results that are hard to read for humans.
+                ^^^^^^^^^^^^^^^^ `rate()` will produce results that are hard to read for humans.
       | [...]
     5 |     summary: "{{ $value | first }} errors"
-                         ^^^^^^^
-                         Use one of humanize template functions to make the result more readable.
+                         ^^^^^^^ Use one of humanize template functions to make the result more readable.
   problem:
     reporter: alerts/template
     summary: use humanize filters for the results
@@ -73,8 +71,7 @@
         summary: '{{ .Labels.job }} is above zero on {{ $labels.__name__ }}'
   output: |
     3 |   expr: sum(foo) > 0
-                ^^^
-                Query is using aggregation that removes all labels.
+                ^^^ Query is using aggregation that removes all labels.
       | [...]
     5 |     summary: '{{ .Labels.job }} is above zero on {{ $labels.__name__ }}'
                                 ^^^^
@@ -106,13 +103,12 @@
         summary: '{{ .Labels.job }} is above zero on {{ $labels.__name__ }}'
   output: |
     3 |   expr: sum(foo) > 0
-                ^^^^^^^^
-                Aggregation removes metric name.
+                ^^^^^^^^ Aggregation removes metric name.
       | [...]
     5 |     summary: '{{ .Labels.job }} is above zero on {{ $labels.__name__ }}'
                                                                    ^^^^^^^^^
-                                                                   Template is using `__name__` label but
-                                                                   the query results won't have this label.
+         Template is using `__name__` label but the query results won't have
+         this label.
   problem:
     reporter: alerts/template
     summary: template uses non-existent label
@@ -144,13 +140,12 @@
         summary: '{{ .Labels.job }} is above zero on {{ $labels.__name__ }}'
   output: |
     3 |   expr: foo + on(__name__, job) foo > 0
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                Binary operation between two vectors removes metric names.
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^ Binary operation between two vectors removes metric names.
       | [...]
     5 |     summary: '{{ .Labels.job }} is above zero on {{ $labels.__name__ }}'
                                                                    ^^^^^^^^^
-                                                                   Template is using `__name__` label but
-                                                                   the query results won't have this label.
+         Template is using `__name__` label but the query results won't have
+         this label.
   problem:
     reporter: alerts/template
     summary: template uses non-existent label
@@ -198,8 +193,8 @@
       | [...]
     5 |     summary: '{{ .Labels.job }} in cluster {{$labels.cluster}}/{{ $labels.env }} is missing'
                                                             ^^^^^^^^
-                                                            Template is using `cluster` label but the query
-                                                            results won't have this label.
+             Template is using `cluster` label but the query results
+             won't have this label.
   problem:
     reporter: alerts/template
     summary: template uses non-existent label
@@ -243,7 +238,7 @@
       | [...]
     5 |     summary: '{{ .Labels.job }} in cluster {{$labels.cluster}}/{{ $labels.env }} is missing'
                                                                                  ^^^^
-        Template is using `env` label but the query results won't have this label.
+           Template is using `env` label but the query results won't have this label.
   problem:
     reporter: alerts/template
     summary: template uses non-existent label
@@ -284,8 +279,7 @@
         summary: 'Deadmans switch on {{ $labels.instance }} / {{ $labels.job }} is firing'
   output: |
     2 |   expr: 1 > bool 0
-                ^
-                This query returns a number value with no labels.
+                ^ This query returns a number value with no labels.
       | [...]
     4 |     summary: 'Deadmans switch on {{ $labels.instance }} / {{ $labels.job }} is firing'
                                                    ^^^^^^^^^
@@ -317,14 +311,12 @@
         summary: 'Deadmans switch on {{ $labels.instance }} / {{ $labels.job }} is firing'
   output: |
     2 |   expr: 1 > bool 0
-                ^
-                This query returns a number value with no labels.
+                ^ This query returns a number value with no labels.
       | [...]
     4 |     summary: 'Deadmans switch on {{ $labels.instance }} / {{ $labels.job }} is firing'
                                                                             ^^^^
-                                                                            Template is using `job` label
-                                                                            but the query results won't have
-                                                                            this label.
+             Template is using `job` label but the query results won't have this
+             label.
   problem:
     reporter: alerts/template
     summary: template uses non-existent label
@@ -355,8 +347,7 @@
         summary: 'Deadmans switch on {{ $labels.instance }} is firing'
   output: |
     2 |   expr: vector(1)
-                ^^^^^^
-                Calling `vector()` will return a vector value with no labels.
+                ^^^^^^ Calling `vector()` will return a vector value with no labels.
       | [...]
     4 |     summary: 'Deadmans switch on {{ $labels.instance }} is firing'
                                                    ^^^^^^^^^
@@ -534,8 +525,8 @@
       | [...]
     5 |     summary: '{{ $labels.instance }} on {{ .Labels.job }} is missing'
                                                           ^^^^
-                                                          Template is using `job` label but the query
-                                                          results won't have this label.
+           Template is using `job` label but the query results
+           won't have this label.
   problem:
     reporter: alerts/template
     summary: template uses non-existent label
@@ -730,8 +721,8 @@
       | [...]
     7 |     summary: '{{ $labels.instance }} on {{ .Labels.foo }} is missing'
                                                           ^^^^
-                                                          Template is using `foo` label but the query
-                                                          results won't have this label.
+           Template is using `foo` label but the query results
+           won't have this label.
   problem:
     reporter: alerts/template
     summary: template uses non-existent label
@@ -777,8 +768,7 @@
                 when some target is down then that won't work, use the `up` metric instead.
       | [...]
     8 |     help: '{{ $labels.xxx }}'
-                             ^^^^
-                             Template is using `xxx` label but the query results won't have this label.
+                             ^^^^ Template is using `xxx` label but the query results won't have this label.
   problem:
     reporter: alerts/template
     summary: template uses non-existent label
@@ -814,8 +804,7 @@
         summary: '{{ $labels.job }}'
   output: |
     2 |   expr: sum(foo) > 0
-                ^^^
-                Query is using aggregation that removes all labels.
+                ^^^ Query is using aggregation that removes all labels.
       | [...]
     4 |     summary: '{{ $labels.job }}'
                                 ^^^^
@@ -850,8 +839,7 @@
         summary: '{{ .Labels.job }}'
   output: |
     2 |   expr: sum(foo) > 0
-                ^^^
-                Query is using aggregation that removes all labels.
+                ^^^ Query is using aggregation that removes all labels.
       | [...]
     4 |     summary: '{{ .Labels.job }}'
                                 ^^^^
@@ -925,8 +913,7 @@
         summary: '{{ .Labels.job }}'
   output: |
     2 |   expr: sum(foo) by(job) or sum(bar)
-                                    ^^^
-                                    Query is using aggregation that removes all labels.
+                                    ^^^ Query is using aggregation that removes all labels.
       | [...]
     4 |     summary: '{{ .Labels.job }}'
                                 ^^^^
@@ -1092,8 +1079,8 @@
       | [...]
     5 |     summary: '{{ $labels.instance }} on {{ .Labels.job }} is missing'
                                                           ^^^^
-                                                          Template is using `job` label but the query
-                                                          results won't have this label.
+           Template is using `job` label but the query results
+           won't have this label.
   problem:
     reporter: alerts/template
     summary: template uses non-existent label
@@ -1192,8 +1179,8 @@
       | [...]
     5 |     summary: '{{ .Labels.job }} in cluster {{$labels.cluster}}/{{ $labels.env }} is missing'
                                                             ^^^^^^^^
-                                                            Template is using `cluster` label but the query
-                                                            results won't have this label.
+             Template is using `cluster` label but the query results
+             won't have this label.
   problem:
     reporter: alerts/template
     summary: template uses non-existent label
@@ -1240,7 +1227,7 @@
       | [...]
     5 |     summary: '{{ .Labels.job }} in cluster {{$labels.cluster}}/{{ $labels.env }} is missing'
                                                                                  ^^^^
-        Template is using `env` label but the query results won't have this label.
+           Template is using `env` label but the query results won't have this label.
   problem:
     reporter: alerts/template
     summary: template uses non-existent label
@@ -1326,8 +1313,7 @@
           summary: '{{ .Labels.team }}'
   output: |
     7 |     expr: sum(foo) > 0
-                  ^^^
-                  Query is using aggregation that removes all labels.
+                  ^^^ Query is using aggregation that removes all labels.
       | [...]
     9 |       summary: '{{ .Labels.team }}'
                                   ^^^^^
@@ -1378,8 +1364,7 @@
           summary: '{{ .Labels.team }}'
   output: |
     7 |     expr: sum(foo) > 0
-                  ^^^
-                  Query is using aggregation that removes all labels.
+                  ^^^ Query is using aggregation that removes all labels.
       | [...]
     9 |       summary: '{{ .Labels.team }}'
                                   ^^^^^
@@ -1551,8 +1536,7 @@
         summary: Seeing {{ printf "%f" 2 }}{{ $value }} instances with errors
   output: |
     3 |   expr: rate(errors_total[5m]) > 0
-                ^^^^^^^^^^^^^^^^^^^^^^
-                `rate()` will produce results that are hard to read for humans.
+                ^^^^^^^^^^^^^^^^^^^^^^ `rate()` will produce results that are hard to read for humans.
       | [...]
     5 |     summary: Seeing {{ printf "%f" 2 }}{{ $value }} instances with errors
                                                   ^^^^^^^
@@ -1747,8 +1731,7 @@
         summary: 'Deadmans switch on {{ $labels.instance }} is firing'
   output: |
     2 |   expr: vector(1)
-                ^^^^^^
-                Calling `vector()` will return a vector value with no labels.
+                ^^^^^^ Calling `vector()` will return a vector value with no labels.
       | [...]
     4 |     summary: 'Deadmans switch on {{ $labels.instance }} is firing'
                                                    ^^^^^^^^^
@@ -1788,7 +1771,7 @@
   output: |
     4 |     max without (instance) (metric1{exported_job="abc"}) == 0 or (metric2 OR on() vector(0)) == 0
                                                                                           ^^^^^^
-        Calling `vector()` will return a vector value with no labels.
+                                   Calling `vector()` will return a vector value with no labels.
       | [...]
     7 |     summary: 'Foo is down in {{ $labels.colo_name }}'
                                                ^^^^^^^^^^
@@ -1950,8 +1933,7 @@
         summary: "Seeing {{ .Value }} errors"
   output: |
     3 |   expr: irate(errors[2m]) > 0
-                ^^^^^^^^^^^^^^^^^
-                `irate()` will produce results that are hard to read for humans.
+                ^^^^^^^^^^^^^^^^^ `irate()` will produce results that are hard to read for humans.
       | [...]
     5 |     summary: "Seeing {{ .Value }} errors"
                                 ^^^^^^^
@@ -1987,8 +1969,7 @@
         summary: "Seeing {{ .Value }} errors"
   output: |
     3 |   expr: deriv(errors[2m]) > 0
-                ^^^^^^^^^^^^^^^^^
-                `deriv()` will produce results that are hard to read for humans.
+                ^^^^^^^^^^^^^^^^^ `deriv()` will produce results that are hard to read for humans.
       | [...]
     5 |     summary: "Seeing {{ .Value }} errors"
                                 ^^^^^^^
@@ -2024,8 +2005,7 @@
         summary: "Seeing {{ $value }} errors"
   output: |
     3 |   expr: rate(errors[2m]) > 0
-                ^^^^^^^^^^^^^^^^
-                `rate()` will produce results that are hard to read for humans.
+                ^^^^^^^^^^^^^^^^ `rate()` will produce results that are hard to read for humans.
       | [...]
     5 |     summary: "Seeing {{ $value }} errors"
                                 ^^^^^^^
@@ -2061,14 +2041,12 @@
         summary: "{{ $foo := $value }}{{ $bar := $foo }} Seeing {{ $bar }} errors"
   output: |
     3 |   expr: rate(errors[2m]) > 0
-                ^^^^^^^^^^^^^^^^
-                `rate()` will produce results that are hard to read for humans.
+                ^^^^^^^^^^^^^^^^ `rate()` will produce results that are hard to read for humans.
       | [...]
     5 |     summary: "{{ $foo := $value }}{{ $bar := $foo }} Seeing {{ $bar }} errors"
                                                                        ^^^^^
-                                                                       Use one of humanize template
-                                                                       functions to make the result more
-                                                                       readable.
+              Use one of humanize template functions to make the result more
+              readable.
   problem:
     reporter: alerts/template
     summary: use humanize filters for the results
@@ -2125,8 +2103,7 @@
         summary: "Seeing {{ $value"
   output: |
     5 |     summary: "Seeing {{ $value"
-                      ^^^^^^^^^^^^^^^^
-                      Template failed to parse with this error: `unclosed action`.
+                      ^^^^^^^^^^^^^^^^ Template failed to parse with this error: `unclosed action`.
   problem:
     reporter: alerts/template
     summary: template syntax error
@@ -2173,10 +2150,9 @@
   output: |
     6 |       {{ with printf "suz({job='%s'})" .Labels.job | query }}
                                                              ^^^^^^
-                                                             Template failed to parse with this error: `159:
-                                                             executing "summary" at <query>: error calling
-                                                             query: 1:1: parse error: unknown function with
-                                                             name "suz"`.
+          Template failed to parse with this error: `159: executing
+          "summary" at <query>: error calling query: 1:1: parse
+          error: unknown function with name "suz"`.
     7 |       {{ . | first | label "instance" }}
     8 |       {{ end }}
   problem:
@@ -2245,10 +2221,9 @@
   output: |
     6 |       {{ with printf "sum({job='%s'}) by(" .Labels.job | query }}
                                                                  ^^^^^^
-                                                                 Template failed to parse with this error:
-                                                                 `163: executing "summary" at <query>: error
-                                                                 calling query: 1:18: parse error: unclosed
-                                                                 left parenthesis`.
+              Template failed to parse with this error: `163: executing
+              "summary" at <query>: error calling query: 1:18: parse error:
+              unclosed left parenthesis`.
     7 |       {{ . | first | label "instance" }}
     8 |       {{ end }}
   problem:

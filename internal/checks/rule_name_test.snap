@@ -6,8 +6,7 @@
       expr: sum(foo) without(
   output: |
     1 | - alert: foo
-                 ^^^
-                 alerting rule name must match `^total:.+$`.
+                 ^^^ alerting rule name must match `^total:.+$`.
   problem:
     reporter: rule/name
     summary: name not allowed
@@ -32,8 +31,7 @@
       expr: sum(foo) without()
   output: |
     1 | - alert: CockroachDB_High_CPU_Usage
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
-                 alerting rule name must match `^[a-z_]+$`.
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^ alerting rule name must match `^[a-z_]+$`.
   problem:
     reporter: rule/name
     summary: name not allowed
@@ -63,8 +61,7 @@
       expr: sum(foo) without(
   output: |
     1 | - record: foo
-                  ^^^
-                  recording rule name must match `^total:.+$`.
+                  ^^^ recording rule name must match `^total:.+$`.
   problem:
     reporter: rule/name
     summary: name not allowed
@@ -89,8 +86,7 @@
       expr: sum(foo)
   output: |
     1 | - record: foo
-                  ^^^
-                  recording rule name must match `^total:.+$`.
+                  ^^^ recording rule name must match `^total:.+$`.
   problem:
     reporter: rule/name
     summary: name not allowed

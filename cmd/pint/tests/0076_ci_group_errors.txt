@@ -144,32 +144,27 @@ rule {
 Bug: required annotation not set (alerts/annotation)
   ---> rules.yml:4-5 -> `syntax error` [+6 duplicates]
 5 |     expr: sum(foo) bar
-              ^^^
-              `link` annotation is required.
+              ^^^ `link` annotation is required.
 
 Bug: required annotation not set (alerts/annotation)
   ---> rules.yml:4-5 -> `syntax error` [+4 duplicates]
 5 |     expr: sum(foo) bar
-              ^^^
-              `summary` annotation is required.
+              ^^^ `summary` annotation is required.
 
 Bug: required label not set (rule/label)
   ---> rules.yml:4-5 -> `syntax error` [+4 duplicates]
 5 |     expr: sum(foo) bar
-              ^^^
-              `component` label is required.
+              ^^^ `component` label is required.
 
 Bug: required label not set (rule/label)
   ---> rules.yml:4-5 -> `syntax error` [+4 duplicates]
 5 |     expr: sum(foo) bar
-              ^^^
-              `notify` label is required.
+              ^^^ `notify` label is required.
 
 Bug: required label not set (rule/label)
   ---> rules.yml:4-5 -> `syntax error` [+4 duplicates]
 5 |     expr: sum(foo) bar
-              ^^^
-              `priority` label is required.
+              ^^^ `priority` label is required.
 
 Bug: missing owner (rule/owner)
   ---> rules.yml:4-5 -> `syntax error` [+8 duplicates]
@@ -181,8 +176,7 @@ Bug: missing owner (rule/owner)
 Fatal: PromQL syntax error (promql/syntax)
   ---> rules.yml:5 -> `syntax error`
 5 |     expr: sum(foo) bar
-                       ^^^
-                       unexpected identifier "bar"
+                       ^^^ unexpected identifier "bar"
 
 Warning: always firing alert (alerts/comparison)
   ---> rules.yml:8 -> `missing required fields` [+3 duplicates]
@@ -194,8 +188,7 @@ Warning: always firing alert (alerts/comparison)
 Information: redundant field with default value (alerts/for)
   ---> rules.yml:21 -> `for_and_rate`
 21 |     for: 0m
-              ^^
-              `0m` is the default value of `for`, this line is unnecessary.
+              ^^ `0m` is the default value of `for`, this line is unnecessary.
 
 Bug: template uses non-existent label (alerts/template)
   ---> rules.yml:25-30 -> `template`
@@ -226,9 +219,8 @@ Warning: redundant regexp (promql/regexp)
 Bug: required label is being removed via aggregation (promql/aggregate)
   ---> rules.yml:36 -> `regexp`
 36 |     expr: sum(no_such_metric{job=~"fake"})
-               ^^^
-               Query is using aggregation that removes all labels.
-               `job` label is required and should be preserved when aggregating all rules.
+               ^^^ Query is using aggregation that removes all labels.
+                   `job` label is required and should be preserved when aggregating all rules.
 
 level=ERROR msg="Execution completed with error(s)" err="submitting reports: fatal error(s) reported"
 -- bitbucket.expected --
