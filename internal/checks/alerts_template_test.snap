@@ -9,17 +9,18 @@
         summary: "{{ $value | first }} errors"
   output: |
     5 |     summary: "{{ $value | first }} errors"
-                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                      Template failed to parse with this error: `124: executing "summary" at <first>: wrong
-                      type for value; expected template.queryResult; got float64`.
+                                  ^^^^^^
+                                  Template failed to parse with this error: `124: executing "summary" at
+                                  <first>: wrong type for value; expected template.queryResult; got
+                                  float64`.
   problem:
     reporter: alerts/template
     summary: template syntax error
     details: Supported template syntax is documented [here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#templating).
     diagnostics:
         - message: 'Template failed to parse with this error: `124: executing "summary" at <first>: wrong type for value; expected template.queryResult; got float64`.'
-          firstcolumn: 1
-          lastcolumn: 27
+          firstcolumn: 13
+          lastcolumn: 18
           kind: 0
     lines:
         first: 5
@@ -1276,6 +1277,41 @@
 
 ---
 
+[TestTemplateCheck/error_on_third_line_of_multi-line_template - 1]
+- description: error on third line of multi-line template
+  content: |4
+
+    - alert: Foo
+      expr: up == 0
+      annotations:
+        summary: |
+          line one
+          line two
+          {{ nil }}
+  output: |
+    6 |       line one
+    7 |       line two
+    8 |       {{ nil }}
+                 ^^^^
+                 Template failed to parse with this error: `3: executing "summary" at <nil>: nil is not a
+                 command`.
+  problem:
+    reporter: alerts/template
+    summary: template syntax error
+    details: Supported template syntax is documented [here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#templating).
+    diagnostics:
+        - message: 'Template failed to parse with this error: `3: executing "summary" at <nil>: nil is not a command`.'
+          firstcolumn: 22
+          lastcolumn: 25
+          kind: 0
+    lines:
+        first: 5
+        last: 8
+    severity: 3
+    anchor: 0
+
+---
+
 [TestTemplateCheck/everything_is_stripped_/_relaxed_/_group_label_missing - 1]
 - description: everything is stripped / relaxed / group label missing
   content: |
@@ -2136,19 +2172,21 @@
           {{ end }}
   output: |
     6 |       {{ with printf "suz({job='%s'})" .Labels.job | query }}
+                                                             ^^^^^^
+                                                             Template failed to parse with this error: `159:
+                                                             executing "summary" at <query>: error calling
+                                                             query: 1:1: parse error: unknown function with
+                                                             name "suz"`.
     7 |       {{ . | first | label "instance" }}
     8 |       {{ end }}
-              ^^^^^^^^^
-              Template failed to parse with this error: `159: executing "summary" at <query>: error calling
-              query: 1:1: parse error: unknown function with name "suz"`.
   problem:
     reporter: alerts/template
     summary: template syntax error
     details: Supported template syntax is documented [here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#templating).
     diagnostics:
         - message: 'Template failed to parse with this error: `159: executing "summary" at <query>: error calling query: 1:1: parse error: unknown function with name "suz"`.'
-          firstcolumn: 1
-          lastcolumn: 101
+          firstcolumn: 48
+          lastcolumn: 53
           kind: 0
     lines:
         first: 5
@@ -2171,19 +2209,19 @@
           {{ end }}
   output: |
     6 |       {{ range query "up xxx" }}
+                       ^^^^^^^^^^^^^^^
+                       Template failed to parse with this error: `121: executing "summary" at <query "up
+                       xxx">: error calling query: 1:4: parse error: unexpected identifier "xxx"`.
     7 |       {{ .Labels.instance }} {{ .Value }}
     8 |       {{ end }}
-              ^^^^^^^^^
-              Template failed to parse with this error: `121: executing "summary" at <query "up xxx">: error
-              calling query: 1:4: parse error: unexpected identifier "xxx"`.
   problem:
     reporter: alerts/template
     summary: template syntax error
     details: Supported template syntax is documented [here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#templating).
     diagnostics:
         - message: 'Template failed to parse with this error: `121: executing "summary" at <query "up xxx">: error calling query: 1:4: parse error: unexpected identifier "xxx"`.'
-          firstcolumn: 1
-          lastcolumn: 73
+          firstcolumn: 10
+          lastcolumn: 24
           kind: 0
     lines:
         first: 5
@@ -2206,19 +2244,21 @@
           {{ end }}
   output: |
     6 |       {{ with printf "sum({job='%s'}) by(" .Labels.job | query }}
+                                                                 ^^^^^^
+                                                                 Template failed to parse with this error:
+                                                                 `163: executing "summary" at <query>: error
+                                                                 calling query: 1:18: parse error: unclosed
+                                                                 left parenthesis`.
     7 |       {{ . | first | label "instance" }}
     8 |       {{ end }}
-              ^^^^^^^^^
-              Template failed to parse with this error: `163: executing "summary" at <query>: error calling
-              query: 1:18: parse error: unclosed left parenthesis`.
   problem:
     reporter: alerts/template
     summary: template syntax error
     details: Supported template syntax is documented [here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#templating).
     diagnostics:
         - message: 'Template failed to parse with this error: `163: executing "summary" at <query>: error calling query: 1:18: parse error: unclosed left parenthesis`.'
-          firstcolumn: 1
-          lastcolumn: 105
+          firstcolumn: 52
+          lastcolumn: 57
           kind: 0
     lines:
         first: 5

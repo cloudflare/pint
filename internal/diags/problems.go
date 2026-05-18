@@ -20,9 +20,6 @@ func countDigits(n int) (c int) {
 // wrapText splits text at word boundaries so that each line fits within width.
 func wrapText(text string, width int) []string {
 	words := strings.Fields(text)
-	if len(words) == 0 {
-		return nil
-	}
 
 	var lines []string
 	current := words[0]

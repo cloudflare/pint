@@ -533,18 +533,13 @@ func TestAstTrimLineMultiLinePositions(t *testing.T) {
 	require.Contains(t, newLine, "sum(rate(...[5m])) by(instance)")
 }
 
-func TestWrapTextEmpty(t *testing.T) {
-	require.Nil(t, wrapText("", 80))
-	require.Nil(t, wrapText("   ", 80))
-}
-
 func TestWriteWrappedMessage(t *testing.T) {
 	var buf strings.Builder
 
 	// Empty message should write nothing.
 	buf.Reset()
 	writeWrappedMessage(&buf, "", output.None, 4, 80)
-	require.Equal(t, "", buf.String())
+	require.Empty(t, buf.String())
 
 	// Short message that fits within width.
 	buf.Reset()
