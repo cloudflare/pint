@@ -8,6 +8,11 @@
   option for ignoring specific metrics when checking for cross-group dependencies
   - [#1795](https://github.com/cloudflare/pint/issues/1795).
 
+### Changed
+
+- Reported problems will now trim parts of the query for which the problem is reported
+  to make it easier to read.
+
 ### Fixed
 
 - GitHub and GitLab reporter was trying to create comments on incorrect lines.
