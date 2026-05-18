@@ -850,7 +850,7 @@
 
 - [rule/dependency](checks/rule/dependency.md) check will now warn if an alerting rule
   that's being removed in a pull request is being used inside `ALERTS{alertname="..."}`
-  or  `ALERTS_FOR_STATE{alertname="..."}` queries.
+  or `ALERTS_FOR_STATE{alertname="..."}` queries.
 - pint will now perform extra validation of YAML files to ensure that all values
   are mappings and strings.
   This will error on rules where, for example, label value is unquoted number:
@@ -993,7 +993,7 @@
   This allows pint to flag rules that are most likely deployed to the wrong servers,
   using missing scrape jobs.
 - Reporting problems to BitBucket will now use comments instead of annotations.
-  This is only if there is an  open pull request for tested branch, if there is no
+  This is only if there is an open pull request for tested branch, if there is no
   open pull request problems will be reported using code insight annotations.
 
 ## v0.48.2
