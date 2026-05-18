@@ -6,7 +6,9 @@
       expr: http_requests_total > 1
   output: |
     1 | - record: foo
-                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.
+                  ^^^
+                  Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX
+                  error: `server_error: internal error`.
   problem:
     reporter: promql/counter
     summary: unable to run checks
@@ -62,7 +64,9 @@
       expr: http_requests_total == 1 and http_requests_total > 2 or http_requests_total < 3
   output: |
     3 |   expr: http_requests_total == 1 and http_requests_total > 2 or http_requests_total < 3
-                ^^^^^^^^^^^^^^^^^^^ `http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangerous to use its value directly.
+                ^^^^^^^^^^^^^^^^^^^
+                `http_requests_total` is a counter according to metrics metadata from `prom` Prometheus
+                server at https://simple.example.com, it can be dangerous to use its value directly.
   problem:
     reporter: promql/counter
     summary: direct counter read
@@ -91,7 +95,9 @@
       expr: http_requests_total > 1
   output: |
     2 |   expr: http_requests_total > 1
-                ^^^^^^^^^^^^^^^^^^^ `http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangerous to use its value directly.
+                ^^^^^^^^^^^^^^^^^^^
+                `http_requests_total` is a counter according to metrics metadata from `prom` Prometheus
+                server at https://simple.example.com, it can be dangerous to use its value directly.
   problem:
     reporter: promql/counter
     summary: direct counter read
@@ -131,7 +137,9 @@
       expr:  http_requests_total{cluster="prod"} > 1 unless absent(http_requests_total{cluster="dev"})
   output: |
     3 |   expr:  http_requests_total{cluster="prod"} > 1 unless absent(http_requests_total{cluster="dev"})
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangerous to use its value directly.
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                 `http_requests_total` is a counter according to metrics metadata from `prom` Prometheus
+                 server at https://simple.example.com, it can be dangerous to use its value directly.
   problem:
     reporter: promql/counter
     summary: direct counter read
@@ -160,7 +168,10 @@
       expr: delta(http_requests_total[2m]) > 1
   output: |
     2 |   expr: delta(http_requests_total[2m]) > 1
-                      ^^^^^^^^^^^^^^^^^^^ `http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangerous to use its value directly.
+                      ^^^^^^^^^^^^^^^^^^^
+                      `http_requests_total` is a counter according to metrics metadata from `prom`
+                      Prometheus server at https://simple.example.com, it can be dangerous to use its value
+                      directly.
   problem:
     reporter: promql/counter
     summary: direct counter read
@@ -204,7 +215,9 @@
       expr: http_requests_total > 1
   output: |
     1 | - record: foo
-                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `bad_data: bad input data`.
+                  ^^^
+                  Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX
+                  error: `bad_data: bad input data`.
   problem:
     reporter: promql/counter
     summary: unable to run checks
@@ -249,7 +262,9 @@
       expr: sum(http_requests_total) > 1
   output: |
     2 |   expr: sum(http_requests_total) > 1
-                    ^^^^^^^^^^^^^^^^^^^ `http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangerous to use its value directly.
+                    ^^^^^^^^^^^^^^^^^^^
+                    `http_requests_total` is a counter according to metrics metadata from `prom` Prometheus
+                    server at https://simple.example.com, it can be dangerous to use its value directly.
   problem:
     reporter: promql/counter
     summary: direct counter read
@@ -278,7 +293,9 @@
       expr: sum(http_requests_total) > 1
   output: |
     2 |   expr: sum(http_requests_total) > 1
-                    ^^^^^^^^^^^^^^^^^^^ `http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangerous to use its value directly.
+                    ^^^^^^^^^^^^^^^^^^^
+                    `http_requests_total` is a counter according to metrics metadata from `prom` Prometheus
+                    server at https://simple.example.com, it can be dangerous to use its value directly.
   problem:
     reporter: promql/counter
     summary: direct counter read

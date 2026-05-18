@@ -11,7 +11,9 @@ level=INFO msg="Checking Prometheus rules" entries=3 workers=10 online=true
 Warning: always firing alert (alerts/comparison)
   ---> rules/rules.yml:2 -> `first` [+2 duplicates]
 2 |   expr: &e up
-               ^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
+               ^^
+               This query doesn't have any condition and so this alert will always fire if it matches
+               anything.
 
 level=INFO msg="Some problems are duplicated between rules and all the duplicates were hidden, pass `--show-duplicates` to see them" total=3 duplicates=2 shown=1
 level=INFO msg="Problems found" Warning=3

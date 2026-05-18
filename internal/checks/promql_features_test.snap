@@ -11,7 +11,9 @@
       expr: mad_over_time(bar[5m])
   output: |
     1 | - record: foo
-                  ^^^ Couldn't run some online checks due to "prom" error: `failed to parse Prometheus version "not-a-version": expected major.minor.patch format`.
+                  ^^^
+                  Couldn't run some online checks due to "prom" error: `failed to parse Prometheus version
+                  "not-a-version": expected major.minor.patch format`.
   problem:
     reporter: promql/features
     summary: unable to run checks
@@ -36,7 +38,10 @@
       expr: mad_over_time(bar[5m])
   output: |
     2 |   expr: mad_over_time(bar[5m])
-                ^^^^^^^^^^^^^ `mad_over_time` was added in Prometheus 2.49.0 and requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.
+                ^^^^^^^^^^^^^
+                `mad_over_time` was added in Prometheus 2.49.0 and requires
+                `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at
+                https://simple.example.com.
   problem:
     reporter: promql/features
     summary: required feature flag not enabled
@@ -63,8 +68,13 @@
       expr: mad_over_time(bar[5m]) + mad_over_time(baz[5m])
   output: |
     2 |   expr: mad_over_time(bar[5m]) + mad_over_time(baz[5m])
-                                         ^^^^^^^^^^^^^ `mad_over_time` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.
-                ^^^^^^^^^^^^^ `mad_over_time` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.
+                                         ^^^^^^^^^^^^^
+                                         `mad_over_time` requires
+                                         `--enable-feature=promql-experimental-functions` to be set on
+                                         `prom` Prometheus server at https://simple.example.com.
+                ^^^^^^^^^^^^^
+                `mad_over_time` requires `--enable-feature=promql-experimental-functions` to be set on
+                `prom` Prometheus server at https://simple.example.com.
   problem:
     reporter: promql/features
     summary: required feature flag not enabled
@@ -95,7 +105,9 @@
       expr: rate(bar[5m+1m])
   output: |
     2 |   expr: rate(bar[5m+1m])
-                         ^^^^^ `duration_expr` requires Prometheus 3.4.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.
+                         ^^^^^
+                         `duration_expr` requires Prometheus 3.4.0 or later but `prom` Prometheus server at
+                         https://simple.example.com is running 2.0.0.
   problem:
     reporter: promql/features
     summary: required feature flag not enabled
@@ -127,7 +139,9 @@
       expr: mad_over_time(bar[5m])
   output: |
     2 |   expr: mad_over_time(bar[5m])
-                ^^^^^^^^^^^^^ `mad_over_time` requires Prometheus 2.49.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.
+                ^^^^^^^^^^^^^
+                `mad_over_time` requires Prometheus 2.49.0 or later but `prom` Prometheus server at
+                https://simple.example.com is running 2.0.0.
   problem:
     reporter: promql/features
     summary: required feature flag not enabled
@@ -164,7 +178,9 @@
       expr: mad_over_time(bar[5m])
   output: |
     2 |   expr: mad_over_time(bar[5m])
-                ^^^^^^^^^^^^^ `mad_over_time` requires Prometheus 2.49.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.
+                ^^^^^^^^^^^^^
+                `mad_over_time` requires Prometheus 2.49.0 or later but `prom` Prometheus server at
+                https://simple.example.com is running 2.0.0.
   problem:
     reporter: promql/features
     summary: required feature flag not enabled
@@ -191,7 +207,9 @@
       expr: bar + fill(0) baz
   output: |
     2 |   expr: bar + fill(0) baz
-                      ^^^^ `fill` requires Prometheus 3.10.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.
+                      ^^^^
+                      `fill` requires Prometheus 3.10.0 or later but `prom` Prometheus server at
+                      https://simple.example.com is running 2.0.0.
   problem:
     reporter: promql/features
     summary: required feature flag not enabled
@@ -218,7 +236,9 @@
       expr: mad_over_time(bar[5m])
   output: |
     1 | - record: foo
-                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.
+                  ^^^
+                  Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX
+                  error: `server_error: internal error`.
   problem:
     reporter: promql/features
     summary: unable to run checks
@@ -258,7 +278,10 @@
       expr: mad_over_time(bar[5m+1m] smoothed) + on(job) fill(0) baz
   output: |
     2 |   expr: mad_over_time(bar[5m+1m] smoothed) + on(job) fill(0) baz
-                                                             ^^^^ `fill` requires Prometheus 3.10.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.
+                                                             ^^^^
+            `fill` requires Prometheus 3.10.0 or later but `prom`
+            Prometheus server at https://simple.example.com is
+            running 2.0.0.
   problem:
     reporter: promql/features
     summary: required feature flag not enabled
@@ -281,7 +304,9 @@
       expr: mad_over_time(bar[5m+1m] smoothed) + on(job) fill(0) baz
   output: |
     2 |   expr: mad_over_time(bar[5m+1m] smoothed) + on(job) fill(0) baz
-                                  ^^^^^ `duration_expr` requires Prometheus 3.4.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.
+                                  ^^^^^
+                                  `duration_expr` requires Prometheus 3.4.0 or later but `prom` Prometheus
+                                  server at https://simple.example.com is running 2.0.0.
   problem:
     reporter: promql/features
     summary: required feature flag not enabled
@@ -304,7 +329,9 @@
       expr: mad_over_time(bar[5m+1m] smoothed) + on(job) fill(0) baz
   output: |
     2 |   expr: mad_over_time(bar[5m+1m] smoothed) + on(job) fill(0) baz
-                ^^^^^^^^^^^^^ `mad_over_time` requires Prometheus 2.49.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.
+                ^^^^^^^^^^^^^
+                `mad_over_time` requires Prometheus 2.49.0 or later but `prom` Prometheus server at
+                https://simple.example.com is running 2.0.0.
   problem:
     reporter: promql/features
     summary: required feature flag not enabled
@@ -327,7 +354,9 @@
       expr: mad_over_time(bar[5m+1m] smoothed) + on(job) fill(0) baz
   output: |
     2 |   expr: mad_over_time(bar[5m+1m] smoothed) + on(job) fill(0) baz
-                              ^^^ `smoothed` requires Prometheus 3.7.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.
+                              ^^^
+                              `smoothed` requires Prometheus 3.7.0 or later but `prom` Prometheus server at
+                              https://simple.example.com is running 2.0.0.
   problem:
     reporter: promql/features
     summary: required feature flag not enabled
@@ -359,7 +388,9 @@
       expr: mad_over_time(bar[5m])
   output: |
     2 |   expr: mad_over_time(bar[5m])
-                ^^^^^^^^^^^^^ `mad_over_time` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.
+                ^^^^^^^^^^^^^
+                `mad_over_time` requires `--enable-feature=promql-experimental-functions` to be set on
+                `prom` Prometheus server at https://simple.example.com.
   problem:
     reporter: promql/features
     summary: required feature flag not enabled
@@ -386,7 +417,9 @@
       expr: rate(bar[5m] smoothed)
   output: |
     2 |   expr: rate(bar[5m] smoothed)
-                     ^^^ `smoothed` requires Prometheus 3.7.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.
+                     ^^^
+                     `smoothed` requires Prometheus 3.7.0 or later but `prom` Prometheus server at
+                     https://simple.example.com is running 2.0.0.
   problem:
     reporter: promql/features
     summary: required feature flag not enabled

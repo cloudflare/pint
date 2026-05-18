@@ -87,14 +87,14 @@ body: |
 
   ```yaml
   4 |     summary: 'foo is down on {{ $labels.instance }}'
-                                             ^^^^^^^^^ 
+                                             ^^^^^^^^^
   ```
 
   Template is using `instance` label but the query results won't have this label.
 
   ```yaml
   2 |   expr: sum(foo)
-              ^^^ 
+              ^^^
   ```
 
   Query is using aggregation that removes all labels.
@@ -136,7 +136,7 @@ body: |
 
   ```yaml
   2 |   expr: sum(foo)
-                  ^^^ 
+                  ^^^
   ```
 
   This query doesn't have any condition and so this alert will always fire if it matches anything.
@@ -216,12 +216,16 @@ body: |+
               ^^^ Query is using aggregation that removes all labels.
     | [...]
   4 |     summary: 'foo is down on {{ $labels.instance }}'
-                                             ^^^^^^^^^ Template is using `instance` label but the query results won't have this label.
+                                             ^^^^^^^^^
+                                             Template is using `instance` label but the query results
+                                             won't have this label.
 
   Warning: always firing alert (alerts/comparison)
     ---> rules.yml:2 -> `rule1` [+1 duplicates]
   2 |   expr: sum(foo)
-                  ^^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
+                  ^^^
+                  This query doesn't have any condition and so this alert will always fire if it matches
+                  anything.
 
   ```
 

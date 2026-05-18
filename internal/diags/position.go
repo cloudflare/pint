@@ -2,6 +2,7 @@ package diags
 
 import (
 	"strconv"
+	"strings"
 
 	"go.yaml.in/yaml/v3"
 )
@@ -143,14 +144,8 @@ END:
 	return offsets
 }
 
-func countLeadingSpace(line string) (i int) {
-	for _, r := range line {
-		if r != ' ' {
-			return i
-		}
-		i++
-	}
-	return i
+func countLeadingSpace(line string) int {
+	return len(line) - len(strings.TrimLeft(line, " "))
 }
 
 func readRange(firstColumn, lastColumn int, prs PositionRanges) PositionRanges {

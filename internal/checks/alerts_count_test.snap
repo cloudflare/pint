@@ -6,7 +6,9 @@
       expr: up{job="foo"} == 0
   output: |
     1 | - alert: Foo Is Down
-                 ^^^^^^^^^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `bad_data: bad input data`.
+                 ^^^^^^^^^^^
+                 Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX
+                 error: `bad_data: bad input data`.
   problem:
     reporter: alerts/count
     summary: unable to run checks
@@ -31,7 +33,9 @@
       expr: up{job="foo"} == 0
   output: |
     1 | - alert: Foo Is Down
-                 ^^^^^^^^^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 error: `connection refused`.
+                 ^^^^^^^^^^^
+                 Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111
+                 error: `connection refused`.
   problem:
     reporter: alerts/count
     summary: unable to run checks
@@ -56,7 +60,9 @@
       expr: up{job="foo"} == 0
   output: |
     2 |   expr: up{job="foo"} == 0
-                ^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com would trigger 0 alert(s) in the last 1d.
+                ^^^^^^^^^^^^^^^^^^
+                `prom` Prometheus server at https://simple.example.com would trigger 0 alert(s) in the last
+                1d.
   problem:
     reporter: alerts/count
     summary: alert count estimate
@@ -82,7 +88,9 @@
       expr: up{job="foo"} == 0
   output: |
     3 |   expr: up{job="foo"} == 0
-                ^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com would trigger 2 alert(s) in the last 1d.
+                ^^^^^^^^^^^^^^^^^^
+                `prom` Prometheus server at https://simple.example.com would trigger 2 alert(s) in the last
+                1d.
   problem:
     reporter: alerts/count
     summary: alert count estimate
@@ -109,7 +117,9 @@
       expr: up{job="foo"} == 0
   output: |
     4 |   expr: up{job="foo"} == 0
-                ^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com would trigger 1 alert(s) in the last 1d.
+                ^^^^^^^^^^^^^^^^^^
+                `prom` Prometheus server at https://simple.example.com would trigger 1 alert(s) in the last
+                1d.
   problem:
     reporter: alerts/count
     summary: alert count estimate
@@ -145,7 +155,9 @@
       expr: up{job="foo"} == 0
   output: |
     3 |   expr: up{job="foo"} == 0
-                ^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com would trigger 2 alert(s) in the last 1d.
+                ^^^^^^^^^^^^^^^^^^
+                `prom` Prometheus server at https://simple.example.com would trigger 2 alert(s) in the last
+                1d.
   problem:
     reporter: alerts/count
     summary: alert count estimate
@@ -171,7 +183,9 @@
       expr: up{job="foo"} == 0
   output: |
     3 |   expr: up{job="foo"} == 0
-                ^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com would trigger 2 alert(s) in the last 1d.
+                ^^^^^^^^^^^^^^^^^^
+                `prom` Prometheus server at https://simple.example.com would trigger 2 alert(s) in the last
+                1d.
   problem:
     reporter: alerts/count
     summary: alert count estimate
@@ -199,7 +213,9 @@
       expr: up{job="foo"} == 0
   output: |
     3 |   expr: up{job="foo"} == 0
-                ^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com would trigger 2 alert(s) in the last 1d.
+                ^^^^^^^^^^^^^^^^^^
+                `prom` Prometheus server at https://simple.example.com would trigger 2 alert(s) in the last
+                1d.
   problem:
     reporter: alerts/count
     summary: alert count estimate
@@ -229,7 +245,9 @@
       expr: up{job="foo"} == 0
   output: |
     2 |   expr: up{job="foo"} == 0
-                ^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com would trigger 7 alert(s) in the last 1d.
+                ^^^^^^^^^^^^^^^^^^
+                `prom` Prometheus server at https://simple.example.com would trigger 7 alert(s) in the last
+                1d.
   problem:
     reporter: alerts/count
     summary: alert count estimate
@@ -255,7 +273,9 @@
       expr: up{job="foo"} == 0
   output: |
     3 |   expr: up{job="foo"} == 0
-                ^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com would trigger 1 alert(s) in the last 1d.
+                ^^^^^^^^^^^^^^^^^^
+                `prom` Prometheus server at https://simple.example.com would trigger 1 alert(s) in the last
+                1d.
   problem:
     reporter: alerts/count
     summary: alert count estimate
@@ -281,7 +301,9 @@
       expr: up{job="foo"} == 0
   output: |
     3 |   expr: up{job="foo"} == 0
-                ^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com would trigger 0 alert(s) in the last 1d.
+                ^^^^^^^^^^^^^^^^^^
+                `prom` Prometheus server at https://simple.example.com would trigger 0 alert(s) in the last
+                1d.
   problem:
     reporter: alerts/count
     summary: alert count estimate
@@ -306,7 +328,9 @@
       expr: up{job="foo"} == 0
   output: |
     2 |   expr: up{job="foo"} == 0
-                ^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com would trigger 3 alert(s) in the last 1d.
+                ^^^^^^^^^^^^^^^^^^
+                `prom` Prometheus server at https://simple.example.com would trigger 3 alert(s) in the last
+                1d.
   problem:
     reporter: alerts/count
     summary: alert count estimate
@@ -332,7 +356,9 @@
       expr: '{__name__="up", job="foo"} == 0'
   output: |
     3 |   expr: '{__name__="up", job="foo"} == 0'
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com would trigger 3 alert(s) in the last 1d.
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                 `prom` Prometheus server at https://simple.example.com would trigger 3 alert(s) in the last
+                 1d.
   problem:
     reporter: alerts/count
     summary: alert count estimate
@@ -358,7 +384,9 @@
       expr: '{__name__=~"(up|foo)", job="foo"} == 0'
   output: |
     3 |   expr: '{__name__=~"(up|foo)", job="foo"} == 0'
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com would trigger 3 alert(s) in the last 1d.
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                 `prom` Prometheus server at https://simple.example.com would trigger 3 alert(s) in the last
+                 1d.
   problem:
     reporter: alerts/count
     summary: alert count estimate

@@ -169,7 +169,9 @@ Bug: required label not set (rule/label)
 Bug: missing owner (rule/owner)
   ---> rules.yml:4-5 -> `syntax error` [+8 duplicates]
 5 |     expr: sum(foo) bar
-              ^^^ `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule.
+              ^^^
+              `rule/owner` comments are required in all files, please add a `# pint file/owner $owner`
+              somewhere in this file and/or `# pint rule/owner $owner` on top of each rule.
 
 Fatal: PromQL syntax error (promql/syntax)
   ---> rules.yml:5 -> `syntax error`
@@ -179,7 +181,9 @@ Fatal: PromQL syntax error (promql/syntax)
 Warning: always firing alert (alerts/comparison)
   ---> rules.yml:8 -> `missing required fields` [+3 duplicates]
 8 |     expr: no_such_metric{job="fake"}
-              ^^^^^^^^^^^^^^^^^^^^^^^^^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+              This query doesn't have any condition and so this alert will always fire if it matches
+              anything.
 
 Information: redundant field with default value (alerts/for)
   ---> rules.yml:21 -> `for_and_rate`
@@ -189,20 +193,28 @@ Information: redundant field with default value (alerts/for)
 Bug: template uses non-existent label (alerts/template)
   ---> rules.yml:25-30 -> `template`
 26 |     expr: sum(no_such_metric) by(foo) > 0
-                                   ^^ Query is using aggregation with `by(foo)`, only labels included inside `by(...)` will be present on the results.
+                                   ^^
+                                   Query is using aggregation with `by(foo)`, only labels included inside
+                                   `by(...)` will be present on the results.
    | [...]
 30 |       instance: 'sum on {{ $labels.instance }} is {{ $value }}'
-                                       ^^^^^^^^^ Template is using `instance` label but the query results won't have this label.
+                                       ^^^^^^^^^
+                                       Template is using `instance` label but the query results won't
+                                       have this label.
 
 Bug: value used in labels (alerts/template)
   ---> rules.yml:28 -> `template`
 28 |       value: '{{ $value }}'
-                   ^^^^^^^^^^^^ Using `$value` in labels will generate a new alert on every value change, move it to annotations.
+                   ^^^^^^^^^^^^
+                   Using `$value` in labels will generate a new alert on every value change, move it to
+                   annotations.
 
 Warning: redundant regexp (promql/regexp)
   ---> rules.yml:36 -> `regexp`
 36 |     expr: sum(no_such_metric{job=~"fake"})
-                                  ^^^^^^^^^^^ Unnecessary regexp match on static string `job=~"fake"`, use `job="fake"` instead.
+                                  ^^^^^^^^^^^
+                                  Unnecessary regexp match on static string `job=~"fake"`, use
+                                  `job="fake"` instead.
 
 Bug: required label is being removed via aggregation (promql/aggregate)
   ---> rules.yml:36 -> `regexp`

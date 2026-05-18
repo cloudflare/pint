@@ -82,7 +82,7 @@ body: |
 
   ```yaml
   7 |     expr: rate(errors_total[2m])
-                     ^^^^^^^^^^^^^^^^ 
+                     ^^^^^^^^^^^^^^^^
   ```
 
   This query doesn't have any condition and so this alert will always fire if it matches anything.
@@ -158,7 +158,9 @@ body: |+
   Warning: always firing alert (alerts/comparison)
     ---> rules.yml:7 -> `rule2` [+1 duplicates]
   7 |     expr: rate(errors_total[2m])
-                     ^^^^^^^^^^^^^^^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
+                     ^^^^^^^^^^^^^^^^
+                     This query doesn't have any condition and so this alert will always fire if it
+                     matches anything.
 
   ```
 

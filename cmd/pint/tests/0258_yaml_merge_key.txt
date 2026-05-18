@@ -11,12 +11,16 @@ level=INFO msg="Checking Prometheus rules" entries=2 workers=10 online=true
 Warning: always firing alert (alerts/comparison)
   ---> rules/rules.yml:6 -> `first`
 6 |   expr: &e up
-               ^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
+               ^^
+               This query doesn't have any condition and so this alert will always fire if it matches
+               anything.
 
 Warning: always firing alert (alerts/comparison)
   ---> rules/rules.yml:9 -> `second`
 9 |   expr: *e
-             ^ This query doesn't have any condition and so this alert will always fire if it matches anything.
+             ^
+             This query doesn't have any condition and so this alert will always fire if it matches
+             anything.
 
 level=INFO msg="Problems found" Warning=2
 -- rules/rules.yml --

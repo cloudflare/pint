@@ -1,0 +1,271 @@
+
+[TestInjectDiagnostics/single_diagnostic_on_one_line - 1]
+expr: foo(bar) by()
+
+1 | expr: foo(bar) by()
+          ^^^^^^^^^^^^^ this is bad
+
+---
+
+[TestInjectDiagnostics/caret_in_the_middle_of_a_line - 1]
+expr: foo(bar) on()
+
+1 | expr: foo(bar) on()
+                   ^^ oops
+
+---
+
+[TestInjectDiagnostics/two_diagnostics_on_different_columns - 1]
+
+expr: sum(foo{job="bar"})
+      / on(a,b)
+      sum(foo)
+
+
+2 | expr: sum(foo{job="bar"})
+3 |       / on(a,b)
+               ^^^ efg
+            ^^^^^^^ abc
+4 |       sum(foo)
+
+---
+
+[TestInjectDiagnostics/YAML_literal_block_scalar - 1]
+
+expr: |
+  sum(bar{job="foo"})
+  / on(c,d)
+  sum(bar)
+
+
+3 |   sum(bar{job="foo"})
+4 |   / on(c,d)
+        ^^ 123
+5 |   sum(bar)
+      ^^^ 456
+
+---
+
+[TestInjectDiagnostics/two_diagnostics_on_same_columns - 1]
+
+expr:
+  sum(bar{job="foo"})
+  / on(c,d)
+  sum(bar)
+
+
+3 |   sum(bar{job="foo"})
+4 |   / on(c,d)
+        ^^^^^^^ abc
+                efg
+5 |   sum(bar)
+
+---
+
+[TestInjectDiagnostics/YAML_folded_block_scalar_with_surrounding_lines - 1]
+
+### BEGIN ###
+expr: >-
+  sum(bar{job="foo"})
+  / on(c,d)
+  sum(bar)
+### END ###
+
+
+4 |   sum(bar{job="foo"})
+5 |   / on(c,d)
+        ^^^^^^^ abc
+                efg
+6 |   sum(bar)
+
+---
+
+[TestInjectDiagnostics/single_column_caret - 1]
+expr: cnt(bar) by()
+
+1 | expr: cnt(bar) by()
+                      ^ this is bad
+
+---
+
+[TestInjectDiagnostics/multi-line_expression_with_caret_on_last_line - 1]
+
+expr: |
+  foo{
+  job="bar"
+  }
+
+
+3 |   foo{
+4 |   job="bar"
+5 |   }
+      ^ this is bad
+
+---
+
+[TestInjectDiagnostics/issue_and_context_diagnostics_on_same_column - 1]
+expr: foo(bar) by()
+
+1 | expr: foo(bar) by()
+          ^^^^^^^^^^^^^ this is bad
+                        this is context
+
+---
+
+[TestInjectDiagnostics/rightmost_caret_is_printed_first - 1]
+expr: foo(bar) by()
+
+1 | expr: foo(bar) by()
+                   ^^^^ this is context
+          ^^^^^^^^^^^^^ this is bad
+
+---
+
+[TestInjectDiagnostics/multiple_position_ranges_on_same_line_compute_min_and_max_columns - 1]
+sum by (instance) (rate(http_requests_total{job="api",status=~"5.."}[5m])) / sum by (instance) (rate(up{job="api"}[5m])) > 0.01
+
+1 | ... / sum by (instance) (rate(up{job="api"}[5m])) > 0.01
+                                 ^^^^ check this
+
+---
+
+[TestInjectDiagnostics/short_expression_range_on_long_line_skips_AST_trimming - 1]
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: sum(foo) by(bar)
+
+1 | aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: sum(foo) by(bar)
+                                                                                                      ^
+                                                                                                    bad
+
+---
+
+[TestInjectDiagnostics/AST_trimming_with_multi-line_positions_skips_other_lines - 1]
+sum by (instance) (rate(http_requests_total{job="api",status=~"5.."}[5m])) / sum by (instance) (rate(up{job="api"}[5m])) > 0.01
+
+1 | ... / sum by (instance) (rate(...)) > 0.01
+                              ^^^^ dead code
+
+---
+
+[TestInjectDiagnostics/empty_message_diagnostic_produces_no_message_line - 1]
+expr: foo(bar) by()
+
+1 | expr: foo(bar) by()
+          ^^^^^^^^^^^^^
+
+---
+
+[TestInjectDiagnostics/non-consecutive_lines_produce_gap_marker - 1]
+line1: foo
+line2: bar
+line3: baz
+
+
+1 | line1: foo
+             ^ err1
+  | [...]
+3 | line3: baz
+               err3
+
+---
+
+[TestInjectDiagnostics/non-overlapping_subexpression_is_replaced_with_ellipsis - 1]
+
+expr: sum by (instance) (rate(http_requests_total{job="api",status=~"5.."}[5m])) / sum by (instance) (rate(up{job="api"}[5m])) > 0.01
+
+2 | expr: ... / sum by (instance) (rate(up{job="api"}[5m])) > 0.01
+                                          ^^^^ dead code
+
+---
+
+[TestInjectDiagnostics/large_vector_selector_inside_sum_is_replaced - 1]
+
+expr: sum(oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo) by(x)
+
+2 | expr: sum(...) by(x)
+                   ^^^^^ by(x) issue
+
+---
+
+[TestInjectDiagnostics/invalid_PromQL_skips_trimming_and_keeps_full_line - 1]
+
+expr: sum(rate(http_requests_total{job="api",status=~"5.."}[5m]) / sum(rate(up{job="api"}[5m])) > 0.01
+
+2 | expr: sum(rate(http_requests_total{job="api",status=~"5.."}[5m]) / sum(rate(up{job="api"}[5m])) > 0.01
+          ^^^ syntax error
+
+---
+
+[TestInjectDiagnostics/invalid_PromQL_with_far_right_caret_places_message_on_left - 1]
+
+expr: sum(rate(http_requests_total{job="api",status=~"5.."}[5m])) / sum(rate(up{job="api"}[5m]))) > 0.01
+
+2 | expr: sum(rate(http_requests_total{job="api",status=~"5.."}[5m])) / sum(rate(up{job="api"}[5m]))) > 0.01
+                                                                                                           ^
+                                                                                                syntax error
+
+---
+
+[TestInjectDiagnostics/replacement_after_diagnostic_does_not_shift_caret - 1]
+
+expr: sum(foo) + sum(rate(very_long_metric_name_aaaa{job="api",status=~"5..",instance=~".*"}[5m])) > 0
+
+2 | expr: sum(foo) + ... > 0
+          ^^^^^^^^ bad sum
+
+---
+
+[TestInjectDiagnostics/far_right_caret_places_short_message_on_left - 1]
+
+expr: sum(foo) without(colo_id, instance, node_type, region, node_status, job, colo_name)
+
+2 | expr: sum(foo) without(colo_id, instance, node_type, region, node_status, job, colo_name)
+                                                                                         ^^^^
+                                                                                    bad label
+
+---
+
+[TestInjectDiagnostics/far_right_caret_wraps_long_message_on_left - 1]
+
+expr: sum(foo) without(colo_id, instance, node_type, region, node_status, job, colo_name)
+
+2 | expr: sum(foo) without(colo_id, instance, node_type, region, node_status, job, colo_name)
+                                                                                         ^^^^
+           Using `without(colo_id, instance, node_type, region, node_status, job, colo_name)`
+           removes all these labels from the results.
+
+---
+
+[TestInjectDiagnostics/multi-line_expression_skips_AST_trimming - 1]
+
+expr: |
+  sum(rate(very_long_metric_name_that_pushes_past_the_width_limit_aaaa{job="api",status=~"5.."}[5m])) by(instance)
+  + sum(rate(another_very_long_metric_name_that_pushes_past_the_width_limit{job="api"}[5m]))
+
+3 |   sum(rate(very_long_metric_name_that_pushes_past_the_width_limit_aaaa{job="api",status=~"5.."}[5m])) by(instance)
+        ^^^^^^ bad rate
+4 |   + sum(rate(another_very_long_metric_name_that_pushes_past_the_width_limit{job="api"}[5m]))
+
+---
+
+[TestInjectDiagnostics/diagnostic_covers_entire_expression_so_no_nodes_are_replaced - 1]
+
+expr: sum(rate(very_long_metric_name_that_pushes_past_the_width_limit_aaaa{job="api",status=~"5.."}[5m])) by(instance)
+
+2 | expr: sum(rate(very_long_metric_name_that_pushes_past_the_width_limit_aaaa{job="api",status=~"5.."}[5m])) by(instance)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                                                                                              bad query
+
+---
+
+[TestInjectDiagnostics/right_side_message_wraps_at_line_width_limit - 1]
+
+expr: sum(foo) without(colo_id, instance, node_type, region, node_status, job, colo_name)
+
+2 | expr: sum(foo) without(colo_id, instance, node_type, region, node_status, job, colo_name)
+                           ^^^^
+                           Query is using aggregation with `without(colo_id, instance, node_type,
+                           region, node_status, job, colo_name)`, all labels included inside
+                           `without(...)` will be removed from the results. `job` label is required and
+                           should be preserved when aggregating all rules.
+
+---

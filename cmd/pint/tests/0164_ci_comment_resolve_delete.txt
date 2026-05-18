@@ -171,7 +171,7 @@ text: |
 
   ```yaml
   5 |     expr: count(up == 1) bie(job)
-                               ^^^ 
+                               ^^^
   ```
 
   unexpected identifier "bie"

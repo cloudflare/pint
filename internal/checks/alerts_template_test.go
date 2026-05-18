@@ -569,6 +569,21 @@ func TestTemplateCheck(t *testing.T) {
 			problems:   true,
 		},
 		{
+			description: "error on third line of multi-line template",
+			content: `
+- alert: Foo
+  expr: up == 0
+  annotations:
+    summary: |
+      line one
+      line two
+      {{ nil }}
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   true,
+		},
+		{
 			description: "template query with valid expr",
 			content: `
 - alert: Foo

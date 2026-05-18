@@ -33,7 +33,9 @@
         link: http://127.0.0.1:XXXXX/dashboard
   output: |
     4 |     link: http://127.0.0.1:XXXXX/dashboard
-                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GET request for http://127.0.0.1:XXXXX/dashboard returned invalid status code: `400 Bad Request`.
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  GET request for http://127.0.0.1:XXXXX/dashboard returned invalid status code: `400 Bad
+                  Request`.
   problem:
     reporter: rule/link
     summary: link check failed
@@ -70,7 +72,8 @@
         link: http://
   output: |
     4 |     link: http://
-                  ^^^^^^^ GET request for http: returned an error: Get "http:": http: no Host in request URL.
+                  ^^^^^^^
+                  GET request for http: returned an error: Get "http:": http: no Host in request URL.
   problem:
     reporter: rule/link
     summary: link check failed
@@ -103,7 +106,9 @@
         link2: http://127.0.0.1:XXXXX/graph
   output: |
     4 |     link1: http://127.0.0.1:XXXXX/dashboard
-                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GET request for http://127.0.0.1:XXXXX/dashboard returned invalid status code: `400 Bad Request`.
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   GET request for http://127.0.0.1:XXXXX/dashboard returned invalid status code: `400 Bad
+                   Request`.
   problem:
     reporter: rule/link
     summary: link check failed
@@ -127,7 +132,9 @@
         link2: http://127.0.0.1:XXXXX/graph
   output: |
     5 |     link2: http://127.0.0.1:XXXXX/graph
-                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GET request for http://127.0.0.1:XXXXX/graph returned invalid status code: `400 Bad Request`.
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   GET request for http://127.0.0.1:XXXXX/graph returned invalid status code: `400 Bad
+                   Request`.
   problem:
     reporter: rule/link
     summary: link check failed

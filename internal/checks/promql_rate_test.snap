@@ -6,7 +6,9 @@
       expr: rate(foo[5m])
   output: |
     1 | - record: foo
-                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.
+                  ^^^
+                  Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX
+                  error: `server_error: internal error`.
   problem:
     reporter: promql/rate
     summary: unable to run checks
@@ -36,7 +38,9 @@
       expr: rate(foo[5m])
   output: |
     1 | - record: foo
-                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 error: `connection refused`.
+                  ^^^
+                  Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111
+                  error: `connection refused`.
   problem:
     reporter: promql/rate
     summary: unable to run checks
@@ -61,7 +65,9 @@
       expr: deriv(foo[1m])
   output: |
     2 |   expr: deriv(foo[1m])
-                ^^^^^^^^^^^^^^ Duration for `deriv()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
+                ^^^^^^^^^^^^^^
+                Duration for `deriv()` must be at least 2 x scrape_interval, `prom` Prometheus server at
+                https://simple.example.com is using `1m` scrape_interval.
   problem:
     reporter: promql/rate
     summary: duration too small
@@ -109,7 +115,10 @@
       expr: rate(foo[5m])
   output: |
     1 | - record: foo
-                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `failed to decode config data in http://127.0.0.1:XXXXX response: yaml: line 2: could not find expected ':'`.
+                  ^^^
+                  Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX
+                  error: `failed to decode config data in http://127.0.0.1:XXXXX response: yaml: line 2:
+                  could not find expected ':'`.
   problem:
     reporter: promql/rate
     summary: unable to run checks
@@ -134,7 +143,9 @@
       expr: rate(foo[5m])
   output: |
     1 | - record: foo
-                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `bad_data: bad input data`.
+                  ^^^
+                  Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX
+                  error: `bad_data: bad input data`.
   problem:
     reporter: promql/rate
     summary: unable to run checks
@@ -159,7 +170,9 @@
       expr: irate(foo[1m])
   output: |
     2 |   expr: irate(foo[1m])
-                ^^^^^^^^^^^^^^ Duration for `irate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
+                ^^^^^^^^^^^^^^
+                Duration for `irate()` must be at least 2 x scrape_interval, `prom` Prometheus server at
+                https://simple.example.com is using `1m` scrape_interval.
   problem:
     reporter: promql/rate
     summary: duration too small
@@ -232,7 +245,9 @@
       expr: rate(foo{job="xxx"}[1m])
   output: |
     2 |   expr: rate(foo{job="xxx"}[1m])
-                ^^^^^^^^^^^^^^^^^^^^^^^^ Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
+                ^^^^^^^^^^^^^^^^^^^^^^^^
+                Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at
+                https://simple.example.com is using `1m` scrape_interval.
   problem:
     reporter: promql/rate
     summary: duration too small
@@ -261,7 +276,9 @@
       expr: rate(foo{job="xxx"}[1m])
   output: |
     1 | - record: foo
-                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.
+                  ^^^
+                  Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX
+                  error: `server_error: internal error`.
   problem:
     reporter: promql/rate
     summary: unable to run checks
@@ -286,7 +303,9 @@
       expr: rate(foo{job="xxx"}[1m])
   output: |
     2 |   expr: rate(foo{job="xxx"}[1m])
-                ^^^^^^^^^^^^^^^^^^^^^^^^ Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
+                ^^^^^^^^^^^^^^^^^^^^^^^^
+                Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at
+                https://simple.example.com is using `1m` scrape_interval.
   problem:
     reporter: promql/rate
     summary: duration too small
@@ -319,7 +338,10 @@
       expr: sum(rate(foo[3m])) / sum(rate(bar[1m]))
   output: |
     2 |   expr: sum(rate(foo[3m])) / sum(rate(bar[1m]))
-                                         ^^^^^^^^^^^^^ Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
+                                         ^^^^^^^^^^^^^
+                                         Duration for `rate()` must be at least 2 x scrape_interval, `prom`
+                                         Prometheus server at https://simple.example.com is using `1m`
+                                         scrape_interval.
   problem:
     reporter: promql/rate
     summary: duration too small
@@ -352,7 +374,10 @@
       expr: rate(foo_c[2m]) / rate(bar_g[2m])
   output: |
     2 |   expr: rate(foo_c[2m]) / rate(bar_g[2m])
-                                  ^^^^^^^^^^^^^^^ `rate()` should only be used with counters but `bar_g` is a gauge according to metrics metadata from `prom` Prometheus server at https://simple.example.com.
+                                  ^^^^^^^^^^^^^^^
+                                  `rate()` should only be used with counters but `bar_g` is a gauge
+                                  according to metrics metadata from `prom` Prometheus server at
+                                  https://simple.example.com.
   problem:
     reporter: promql/rate
     summary: counter based function called on a non-counter
@@ -385,7 +410,9 @@
       expr: rate(foo[2m]) / rate(foo[2m]) / sum(rate(foo[2m]))
   output: |
     2 |   expr: rate(foo[2m]) / rate(foo[2m]) / sum(rate(foo[2m]))
-                ^^^^^^^^^^^^^ `rate()` should only be used with counters but `foo` is a gauge according to metrics metadata from `prom` Prometheus server at https://simple.example.com.
+                ^^^^^^^^^^^^^
+                `rate()` should only be used with counters but `foo` is a gauge according to metrics
+                metadata from `prom` Prometheus server at https://simple.example.com.
   problem:
     reporter: promql/rate
     summary: counter based function called on a non-counter
@@ -418,7 +445,9 @@
       expr: rate(foo{job="xxx"}[1m])
   output: |
     2 |   expr: rate(foo{job="xxx"}[1m])
-                ^^^^^^^^^^^^^^^^^^^^^^^^ Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
+                ^^^^^^^^^^^^^^^^^^^^^^^^
+                Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at
+                https://simple.example.com is using `1m` scrape_interval.
   problem:
     reporter: promql/rate
     summary: duration too small
@@ -447,7 +476,9 @@
       expr: rate(foo{job="xxx"}[1m])
   output: |
     2 |   expr: rate(foo{job="xxx"}[1m])
-                ^^^^^^^^^^^^^^^^^^^^^^^^ `rate()` should only be used with counters but `foo` is a gauge according to metrics metadata from `prom` Prometheus server at https://simple.example.com.
+                ^^^^^^^^^^^^^^^^^^^^^^^^
+                `rate()` should only be used with counters but `foo` is a gauge according to metrics
+                metadata from `prom` Prometheus server at https://simple.example.com.
   problem:
     reporter: promql/rate
     summary: counter based function called on a non-counter
@@ -495,7 +526,9 @@
       expr: rate(foo[1m])
   output: |
     2 |   expr: rate(foo[1m])
-                ^^^^^^^^^^^^^ Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
+                ^^^^^^^^^^^^^
+                Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at
+                https://simple.example.com is using `1m` scrape_interval.
   problem:
     reporter: promql/rate
     summary: duration too small
@@ -543,7 +576,9 @@
       expr: rate(my:sum[5m])
   output: |
     2 |   expr: rate(my:sum[5m])
-                    ^^^ `rate(sum(counter))` chain detected, `rate(my:sum[5m])` is called here on results of `sum(foo)`.
+                    ^^^
+                    `rate(sum(counter))` chain detected, `rate(my:sum[5m])` is called here on results of
+                    `sum(foo)`.
   problem:
     reporter: promql/rate
     summary: chained rate call
@@ -578,7 +613,9 @@
       expr: rate(my:sum[5m])
   output: |
     1 | - alert: my alert
-                 ^^^^^^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.
+                 ^^^^^^^^
+                 Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX
+                 error: `server_error: internal error`.
   problem:
     reporter: promql/rate
     summary: unable to run checks
@@ -623,7 +660,10 @@
   output: |4
      4 |     sum(
      5 |       rate(global:response_time_sum{namespace!~"test[.].+"}[15m])
-             ^^^^^^^^^^^^^^^^^^^^^^^ `rate(sum(counter))` chain detected, `rate(global:response_time_sum{namespace!~"test[.].+"}[15m])` is called here on results of `sum(response_time_sum:rate2m)`.
+             ^^^^^^^^^^^^^^^^^^^^^^^
+             `rate(sum(counter))` chain detected,
+             `rate(global:response_time_sum{namespace!~"test[.].+"}[15m])` is called here on results of
+             `sum(response_time_sum:rate2m)`.
      6 |     ) by (environment, namespace)
      7 |     /
      8 |     sum(

@@ -330,7 +330,7 @@ func TestGitLabReporter(t *testing.T) {
 				})
 				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{})
 				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
-					Body:     discBodyWithDiag("a", "foo error1", "foo details", "```yaml\n2 | - record: target is down\n3 |   expr: up == 0\n      ^^ \n```", "Diagnostic message"),
+					Body:     discBodyWithDiag("a", "foo error1", "foo details", "```yaml\n2 | - record: target is down\n3 |   expr: up == 0\n      ^^\n```", "Diagnostic message"),
 					Position: discPosition(mockPath, 2),
 				}).ReturnJSON(gitlab.Response{})
 			}),
@@ -886,7 +886,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 				})
 				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{})
 				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
-					Body: discBodyWithDiag("a", "foo error1", "foo details", "```yaml\n2 | - record: target is down\n3 |   expr: up == 0\n      ^^ \n```", "Diagnostic message"),
+					Body: discBodyWithDiag("a", "foo error1", "foo details", "```yaml\n2 | - record: target is down\n3 |   expr: up == 0\n      ^^\n```", "Diagnostic message"),
 					Position: new(gitlab.PositionOptions{
 						BaseSHA:      new("base"),
 						StartSHA:     new("start"),
@@ -962,7 +962,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 				})
 				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{})
 				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
-					Body: discBodyWithDiag("a", "foo error1", "foo details", "```yaml\n2 | - record: target is down\n3 |   expr: up == 0\n      ^^ \n```", "Diagnostic message"),
+					Body: discBodyWithDiag("a", "foo error1", "foo details", "```yaml\n2 | - record: target is down\n3 |   expr: up == 0\n      ^^\n```", "Diagnostic message"),
 					Position: new(gitlab.PositionOptions{
 						BaseSHA:      new("base"),
 						StartSHA:     new("start"),

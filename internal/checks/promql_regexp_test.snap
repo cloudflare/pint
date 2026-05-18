@@ -16,7 +16,8 @@
       expr: foo{job=~"bar"} / foo{job=~"bar"}
   output: |
     2 |   expr: foo{job=~"bar"} / foo{job=~"bar"}
-                    ^^^^^^^^^^ Unnecessary regexp match on static string `job=~"bar"`, use `job="bar"` instead.
+                    ^^^^^^^^^^
+                    Unnecessary regexp match on static string `job=~"bar"`, use `job="bar"` instead.
   problem:
     reporter: promql/regexp
     summary: redundant regexp
@@ -41,7 +42,8 @@
       expr: foo{job=~"bar"} / foo{job=~"bar", level="total"}
   output: |
     2 |   expr: foo{job=~"bar"} / foo{job=~"bar", level="total"}
-                    ^^^^^^^^^^ Unnecessary regexp match on static string `job=~"bar"`, use `job="bar"` instead.
+                    ^^^^^^^^^^
+                    Unnecessary regexp match on static string `job=~"bar"`, use `job="bar"` instead.
   problem:
     reporter: promql/regexp
     summary: redundant regexp
@@ -62,7 +64,9 @@
       expr: foo{job=~"bar"} / foo{job=~"bar", level="total"}
   output: |
     2 |   expr: foo{job=~"bar"} / foo{job=~"bar", level="total"}
-                                      ^^^^^^^^^^ Unnecessary regexp match on static string `job=~"bar"`, use `job="bar"` instead.
+                                      ^^^^^^^^^^
+                                      Unnecessary regexp match on static string `job=~"bar"`, use
+                                      `job="bar"` instead.
   problem:
     reporter: promql/regexp
     summary: redundant regexp
@@ -97,7 +101,8 @@
       expr: foo{job=~"(?:)"}
   output: |
     2 |   expr: foo{job=~"(?:)"}
-                    ^^^^^^^^^^^ Unnecessary regexp match on static string `job=~"(?:)"`, use `job=""` instead.
+                    ^^^^^^^^^^^
+                    Unnecessary regexp match on static string `job=~"(?:)"`, use `job=""` instead.
   problem:
     reporter: promql/regexp
     summary: redundant regexp
@@ -157,7 +162,8 @@
       expr: foo{job=~"bar", cluster=~"us-east-.*"}
   output: |
     2 |   expr: foo{job=~"bar", cluster=~"us-east-.*"}
-                    ^^^^^^^^^^ Unnecessary regexp match on static string `job=~"bar"`, use `job="bar"` instead.
+                    ^^^^^^^^^^
+                    Unnecessary regexp match on static string `job=~"bar"`, use `job="bar"` instead.
   problem:
     reporter: promql/regexp
     summary: redundant regexp
@@ -178,7 +184,10 @@
       expr: foo{job=~"bar", cluster=~"us-east-.*"}
   output: |
     2 |   expr: foo{job=~"bar", cluster=~"us-east-.*"}
-                                ^^^^^^^^^^^^^^^^^^^^^ `{cluster=~"us-east-.*"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels
+                                ^^^^^^^^^^^^^^^^^^^^^
+                                `{cluster=~"us-east-.*"}` looks like a smelly selector that tries to extract
+                                substrings from the value, please consider breaking down the value of this
+                                label into multiple smaller labels
   problem:
     reporter: promql/regexp
     summary: smelly regexp selector
@@ -223,7 +232,10 @@
       expr: foo{job=~"service_.*_prod", code=~"5.."}
   output: |
     2 |   expr: foo{job=~"service_.*_prod", code=~"5.."}
-                    ^^^^^^^^^^^^^^^^^^^^^^ `{job=~"service_.*_prod"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels
+                    ^^^^^^^^^^^^^^^^^^^^^^
+                    `{job=~"service_.*_prod"}` looks like a smelly selector that tries to extract substrings
+                    from the value, please consider breaking down the value of this label into multiple
+                    smaller labels
   problem:
     reporter: promql/regexp
     summary: smelly regexp selector
@@ -248,7 +260,10 @@
       expr: foo{job=~"service_.*_prod"}
   output: |
     2 |   expr: foo{job=~"service_.*_prod"}
-                    ^^^^^^^^^^^^^^^^^^^^^^ `{job=~"service_.*_prod"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels
+                    ^^^^^^^^^^^^^^^^^^^^^^
+                    `{job=~"service_.*_prod"}` looks like a smelly selector that tries to extract substrings
+                    from the value, please consider breaking down the value of this label into multiple
+                    smaller labels
   problem:
     reporter: promql/regexp
     summary: smelly regexp selector
@@ -278,7 +293,10 @@
       expr: foo{job=~"service_.*_prod"}
   output: |
     2 |   expr: foo{job=~"service_.*_prod"}
-                    ^^^^^^^^^^^^^^^^^^^^^^ `{job=~"service_.*_prod"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels
+                    ^^^^^^^^^^^^^^^^^^^^^^
+                    `{job=~"service_.*_prod"}` looks like a smelly selector that tries to extract substrings
+                    from the value, please consider breaking down the value of this label into multiple
+                    smaller labels
   problem:
     reporter: promql/regexp
     summary: smelly regexp selector
@@ -303,7 +321,10 @@
       expr: foo{job=~"service.+"}
   output: |
     2 |   expr: foo{job=~"service.+"}
-                    ^^^^^^^^^^^^^^^^ `{job=~"service.+"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels
+                    ^^^^^^^^^^^^^^^^
+                    `{job=~"service.+"}` looks like a smelly selector that tries to extract substrings from
+                    the value, please consider breaking down the value of this label into multiple smaller
+                    labels
   problem:
     reporter: promql/regexp
     summary: smelly regexp selector
@@ -329,8 +350,11 @@
       expr: |
         sum by (instance, type) (rate(requests_total{env=~"production.*", status="failed"}[5m])) / (1 + sum by (instance, type) (rate(request_total{env=~"production.*"}[5m]))) > 0.1
   output: |
-    4 |     sum by (instance, type) (rate(requests_total{env=~"production.*", status="failed"}[5m])) / (1 + sum by (instance, type) (rate(request_total{env=~"production.*"}[5m]))) > 0.1
-                                                         ^^^^^^^^^^^^^^^^^^^ `{env=~"production.*"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels
+    4 |     sum by (instance, type) (rate(requests_total{env=~"production.*", status="failed"}[5m])) / ... > 0.1
+                                                         ^^^^^^^^^^^^^^^^^^^
+          `{env=~"production.*"}` looks like a smelly selector that tries to
+          extract substrings from the value, please consider breaking down the
+          value of this label into multiple smaller labels
   problem:
     reporter: promql/regexp
     summary: smelly regexp selector
@@ -352,8 +376,11 @@
       expr: |
         sum by (instance, type) (rate(requests_total{env=~"production.*", status="failed"}[5m])) / (1 + sum by (instance, type) (rate(request_total{env=~"production.*"}[5m]))) > 0.1
   output: |
-    4 |     sum by (instance, type) (rate(requests_total{env=~"production.*", status="failed"}[5m])) / (1 + sum by (instance, type) (rate(request_total{env=~"production.*"}[5m]))) > 0.1
-                                                                                                                                                        ^^^^^^^^^^^^^^^^^^^ `{env=~"production.*"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels
+    4 |     ... / (1 + sum by (instance, type) (rate(request_total{env=~"production.*"}[5m]))) > 0.1
+                                                                   ^^^^^^^^^^^^^^^^^^^
+            `{env=~"production.*"}` looks like a smelly selector that tries to extract
+            substrings from the value, please consider breaking down the value of this
+            label into multiple smaller labels
   problem:
     reporter: promql/regexp
     summary: smelly regexp selector
@@ -383,7 +410,9 @@
       expr: foo{job!~".+"}
   output: |
     2 |   expr: foo{job!~".+"}
-                    ^^^^^^^^^ Use `foo{job=""}` if you want to match on all time series for `foo` without the `job` label.
+                    ^^^^^^^^^
+                    Use `foo{job=""}` if you want to match on all time series for `foo` without the `job`
+                    label.
   problem:
     reporter: promql/regexp
     summary: unnecessary negative wildcard regexp
@@ -408,7 +437,8 @@
       expr: foo{job!~"bar"}
   output: |
     2 |   expr: foo{job!~"bar"}
-                    ^^^^^^^^^^ Unnecessary regexp match on static string `job!~"bar"`, use `job!="bar"` instead.
+                    ^^^^^^^^^^
+                    Unnecessary regexp match on static string `job!~"bar"`, use `job!="bar"` instead.
   problem:
     reporter: promql/regexp
     summary: redundant regexp
@@ -433,7 +463,9 @@
       expr: foo{job!~".*"}
   output: |
     2 |   expr: foo{job!~".*"}
-                    ^^^^^^^^^ Use `foo{job=""}` if you want to match on all time series for `foo` without the `job` label.
+                    ^^^^^^^^^
+                    Use `foo{job=""}` if you want to match on all time series for `foo` without the `job`
+                    label.
   problem:
     reporter: promql/regexp
     summary: unnecessary negative wildcard regexp
@@ -458,7 +490,8 @@
       expr: foo{job=~"bar"}
   output: |
     2 |   expr: foo{job=~"bar"}
-                    ^^^^^^^^^^ Unnecessary regexp match on static string `job=~"bar"`, use `job="bar"` instead.
+                    ^^^^^^^^^^
+                    Unnecessary regexp match on static string `job=~"bar"`, use `job="bar"` instead.
   problem:
     reporter: promql/regexp
     summary: redundant regexp
@@ -483,7 +516,9 @@
       expr: foo{job=~"^.+$"}
   output: |
     2 |   expr: foo{job=~"^.+$"}
-                    ^^^^^^^^^^^ Prometheus regexp matchers are automatically fully anchored so match for `job=~"^.+$"` will result in `job=~"^^.+$$"`, remove regexp anchors `^` and/or `$`.
+                    ^^^^^^^^^^^
+                    Prometheus regexp matchers are automatically fully anchored so match for `job=~"^.+$"`
+                    will result in `job=~"^^.+$$"`, remove regexp anchors `^` and/or `$`.
   problem:
     reporter: promql/regexp
     summary: redundant regexp anchors
@@ -508,7 +543,10 @@
       expr: foo{job=~"(foo|^.+)$"}
   output: |
     2 |   expr: foo{job=~"(foo|^.+)$"}
-                    ^^^^^^^^^^^^^^^^^ Prometheus regexp matchers are automatically fully anchored so match for `job=~"(foo|^.+)$"` will result in `job=~"^(foo|^.+)$$"`, remove regexp anchors `^` and/or `$`.
+                    ^^^^^^^^^^^^^^^^^
+                    Prometheus regexp matchers are automatically fully anchored so match for
+                    `job=~"(foo|^.+)$"` will result in `job=~"^(foo|^.+)$$"`, remove regexp anchors `^`
+                    and/or `$`.
   problem:
     reporter: promql/regexp
     summary: redundant regexp anchors
@@ -533,7 +571,8 @@
       expr: foo{job=~"foo\"bar"}
   output: |
     2 |   expr: foo{job=~"foo\"bar"}
-                ^^^^^^^^^^^^^^^^^^^^ Unnecessary regexp match on static string `job=~"foo\"bar"`, use `job="foo\"bar"` instead.
+                ^^^^^^^^^^^^^^^^^^^^
+                Unnecessary regexp match on static string `job=~"foo\"bar"`, use `job="foo\"bar"` instead.
   problem:
     reporter: promql/regexp
     summary: redundant regexp
@@ -604,7 +643,8 @@
       expr: foo{job=~".*", cluster=~".*", instance="bob"}
   output: |
     2 |   expr: foo{job=~".*", cluster=~".*", instance="bob"}
-                               ^^^^^^^^^^^^^ Use `foo{instance="bob"}` if you want to match on all `cluster` values.
+                               ^^^^^^^^^^^^^
+                               Use `foo{instance="bob"}` if you want to match on all `cluster` values.
   problem:
     reporter: promql/regexp
     summary: unnecessary wildcard regexp
@@ -700,7 +740,9 @@
         {job=~".*", __name__=~"foo|bar", cluster=~".*", instance="bob"}
   output: |
     3 |     {job=~".*", __name__=~"foo|bar", cluster=~".*", instance="bob"}
-                                             ^^^^^^^^^^^^^ Use `{__name__=~"foo|bar", instance="bob"}` if you want to match on all `cluster` values.
+                                             ^^^^^^^^^^^^^
+                                             Use `{__name__=~"foo|bar", instance="bob"}` if you want to
+                                             match on all `cluster` values.
   problem:
     reporter: promql/regexp
     summary: unnecessary wildcard regexp
@@ -771,7 +813,9 @@
       expr: foo{job=~".*", cluster=~"prod"}
   output: |
     2 |   expr: foo{job=~".*", cluster=~"prod"}
-                               ^^^^^^^^^^^^^^^ Unnecessary regexp match on static string `cluster=~"prod"`, use `cluster="prod"` instead.
+                               ^^^^^^^^^^^^^^^
+                               Unnecessary regexp match on static string `cluster=~"prod"`, use
+                               `cluster="prod"` instead.
   problem:
     reporter: promql/regexp
     summary: redundant regexp

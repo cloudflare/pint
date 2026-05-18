@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"regexp"
 	"slices"
+	"strconv"
 	"strings"
 	"sync"
 	textTemplate "text/template"
@@ -127,6 +129,13 @@ func (c TemplateCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*d
 
 	for _, label := range entry.Labels().Items {
 		if err := checkTemplateSyntax(ctx, label.Key.Value, label.Value.Value, data); err != nil {
+			firstCol := 1
+			lastCol := len(label.Value.Value)
+			var terr templateError
+			if errors.As(err, &terr) {
+				firstCol = terr.firstCol
+				lastCol = terr.lastCol
+			}
 			problems = append(problems, Problem{
 				Anchor: AnchorAfter,
 				Lines: diags.LineRange{
@@ -141,8 +150,8 @@ func (c TemplateCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*d
 					{
 						Message:     fmt.Sprintf("Template failed to parse with this error: `%s`.", err),
 						Pos:         label.Value.Pos,
-						FirstColumn: 1,
-						LastColumn:  len(label.Value.Value),
+						FirstColumn: firstCol,
+						LastColumn:  lastCol,
 						Kind:        diags.Issue,
 					},
 				},
@@ -177,6 +186,13 @@ func (c TemplateCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*d
 	if entry.Rule.AlertingRule.Annotations != nil {
 		for _, annotation := range entry.Rule.AlertingRule.Annotations.Items {
 			if err := checkTemplateSyntax(ctx, annotation.Key.Value, annotation.Value.Value, data); err != nil {
+				firstCol := 1
+				lastCol := len(annotation.Value.Value)
+				var terr templateError
+				if errors.As(err, &terr) {
+					firstCol = terr.firstCol
+					lastCol = terr.lastCol
+				}
 				problems = append(problems, Problem{
 					Anchor: AnchorAfter,
 					Lines: diags.LineRange{
@@ -191,8 +207,8 @@ func (c TemplateCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*d
 						{
 							Message:     fmt.Sprintf("Template failed to parse with this error: `%s`.", err),
 							Pos:         annotation.Value.Pos,
-							FirstColumn: 1,
-							LastColumn:  len(annotation.Value.Value),
+							FirstColumn: firstCol,
+							LastColumn:  lastCol,
 							Kind:        diags.Issue,
 						},
 					},
@@ -312,6 +328,70 @@ func maybeExpandError(err error) error {
 	return err
 }
 
+// templateError wraps a template parse or execution error with the exact
+// column range in the source text where the error occurred.
+type templateError struct {
+	msg      string
+	firstCol int
+	lastCol  int
+}
+
+func (e templateError) Error() string {
+	return e.msg
+}
+
+var (
+	templateErrorPrefixRe = regexp.MustCompile(`^template: ([^:]+):(\d+):(\d+):`)
+	templateErrorTokenRe  = regexp.MustCompile(`at <([^>]+)>`)
+)
+
+// newTemplateError builds a templateError from a raw template error,
+// normalizing the message and extracting column positions when possible.
+func newTemplateError(rawErr error, name, text string) templateError {
+	te := templateError{
+		msg:      normalizeTemplateError(name, rawErr).Error(),
+		firstCol: 1,
+		lastCol:  len(text),
+	}
+
+	msg := rawErr.Error()
+	m := templateErrorPrefixRe.FindStringSubmatch(msg)
+	if m == nil || m[1] != name {
+		return te
+	}
+
+	lineNum, _ := strconv.Atoi(m[2])
+	offset, _ := strconv.Atoi(m[3])
+
+	// templateDefsString is prepended to text and has no newlines,
+	// so only line 1 offsets need adjustment.
+	if lineNum == 1 {
+		offset -= templateDefsLen
+	}
+
+	// Find the byte position of the target line in user text.
+	pos := 0
+	for range lineNum - 2 {
+		pos += strings.IndexByte(text[pos:], '\n') + 1
+	}
+	pos += offset
+
+	te.firstCol = pos + 1
+	te.lastCol = pos + 1
+
+	if tokenM := templateErrorTokenRe.FindStringSubmatch(msg); tokenM != nil {
+		if idx := strings.Index(text[pos:], tokenM[1]); idx >= 0 {
+			te.firstCol = pos + idx + 1
+			te.lastCol = pos + idx + len(tokenM[1]) + 1
+		}
+	}
+
+	return te
+}
+
+// checkTemplateSyntax parses and expands a template value. If parsing or
+// execution fails it returns a templateError with the normalized message
+// and, when possible, the exact column range where the error occurred.
 func checkTemplateSyntax(ctx context.Context, name, text string, data any) error {
 	tmpl := promTemplate.NewTemplateExpander(
 		ctx,
@@ -325,12 +405,11 @@ func checkTemplateSyntax(ctx context.Context, name, text string, data any) error
 	)
 
 	if err := tmpl.ParseTest(); err != nil {
-		return normalizeTemplateError(name, maybeExpandError(err))
+		return newTemplateError(maybeExpandError(err), name, text)
 	}
 
-	_, err := tmpl.Expand()
-	if err != nil {
-		return normalizeTemplateError(name, maybeExpandError(err))
+	if _, err := tmpl.Expand(); err != nil {
+		return newTemplateError(maybeExpandError(err), name, text)
 	}
 
 	return nil

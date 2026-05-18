@@ -6,7 +6,10 @@
       expr: (foo / ignoring(notfound) foo_with_notfound) / (memory_bytes / ignoring(job) memory_limit)
   output: |
     2 |   expr: (foo / ignoring(notfound) foo_with_notfound) / (memory_bytes / ignoring(job) memory_limit)
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This query will never return anything on `prom` Prometheus server at https://simple.example.com because results from the right and the left hand side have different labels: `[instance, job]` != `[dev, instance, job]`.
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                This query will never return anything on `prom` Prometheus server at
+                https://simple.example.com because results from the right and the left hand side have
+                different labels: `[instance, job]` != `[dev, instance, job]`.
   problem:
     reporter: promql/vector_matching
     summary: impossible binary operation
@@ -39,7 +42,9 @@
       expr: xxx/yyy
   output: |
     1 | - record: foo
-                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 error: `connection refused`.
+                  ^^^
+                  Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111
+                  error: `connection refused`.
   problem:
     reporter: promql/vector_matching
     summary: unable to run checks
@@ -64,7 +69,9 @@
       expr: xxx/yyy
   output: |
     1 | - record: foo
-                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 error: `connection refused`.
+                  ^^^
+                  Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111
+                  error: `connection refused`.
   problem:
     reporter: promql/vector_matching
     summary: unable to run checks
@@ -89,7 +96,9 @@
       expr: xxx/yyy
   output: |
     1 | - record: foo
-                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.
+                  ^^^
+                  Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX
+                  error: `server_error: internal error`.
   problem:
     reporter: promql/vector_matching
     summary: unable to run checks
@@ -114,7 +123,9 @@
       expr: xxx/yyy
   output: |
     1 | - record: foo
-                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.
+                  ^^^
+                  Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX
+                  error: `server_error: internal error`.
   problem:
     reporter: promql/vector_matching
     summary: unable to run checks
@@ -159,7 +170,10 @@
       expr: foo / ignoring(xxx) app_registry
   output: |
     2 |   expr: foo / ignoring(xxx) app_registry
-                ^^^^^^^^^^^^ Using `ignoring()` won't produce any results on `prom` Prometheus server at https://simple.example.com because results from both sides of the query have different labels: `[instance, job]` != `[app_name]`.
+                ^^^^^^^^^^^^
+                Using `ignoring()` won't produce any results on `prom` Prometheus server at
+                https://simple.example.com because results from both sides of the query have different
+                labels: `[instance, job]` != `[app_name]`.
   problem:
     reporter: promql/vector_matching
     summary: impossible binary operation
@@ -202,7 +216,11 @@
     4 |     max by (cluster, env) (
     5 |       increase(error_total{}[10m])
     6 |     ) > 0
-            ^^^^^ Using `on(cluster)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned by this query](https://simple.example.com/query?g0.expr=max+by+%28cluster%2C+env%29+%28increase%28error_total%5B10m%5D%29%29&&g0.tab=table) doesn't have the `cluster` label.
+            ^^^^^
+            Using `on(cluster)` won't produce any results on `prom` Prometheus server at
+            https://simple.example.com because [series returned by this
+            query](https://simple.example.com/query?g0.expr=max+by+%28cluster%2C+env%29+%28increase%28error_total%5B10m%5D%29%29&&g0.tab=table)
+            doesn't have the `cluster` label.
     7 |     and on (cluster)
     8 |     cluster_metadata{cluster="foo", environment="prod"} > 0
   problem:
@@ -231,8 +249,12 @@
     - alert: foo
       expr: (memory_bytes / ignoring(job) (memory_limit > 0)) * on(app_name) group_left(a,b,c) app_registry
   output: |
-    2 |   expr: (memory_bytes / ignoring(job) (memory_limit > 0)) * on(app_name) group_left(a,b,c) app_registry
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Using `on(app_name)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned by this query](https://simple.example.com/query?g0.expr=%28memory_bytes+%2F+ignoring+%28job%29+memory_limit%29&&g0.tab=table) doesn't have the `app_name` label.
+    2 |   expr: (memory_bytes / ignoring(job) (memory_limit > 0)) * on(app_name) group_left(a,b,c) ...
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                Using `on(app_name)` won't produce any results on `prom` Prometheus server at
+                https://simple.example.com because [series returned by this
+                query](https://simple.example.com/query?g0.expr=%28memory_bytes+%2F+ignoring+%28job%29+memory_limit%29&&g0.tab=table)
+                doesn't have the `app_name` label.
   problem:
     reporter: promql/vector_matching
     summary: impossible binary operation
@@ -260,7 +282,10 @@
       expr: foo_with_notfound / bar
   output: |
     2 |   expr: foo_with_notfound / bar
-                ^^^ This query will never return anything on `prom` Prometheus server at https://simple.example.com because results from the right and the left hand side have different labels: `[instance, job, notfound]` != `[instance, job]`.
+                ^^^
+                This query will never return anything on `prom` Prometheus server at
+                https://simple.example.com because results from the right and the left hand side have
+                different labels: `[instance, job, notfound]` != `[instance, job]`.
   problem:
     reporter: promql/vector_matching
     summary: impossible binary operation
@@ -323,7 +348,12 @@
       expr: foo / on(notfound) bar
   output: |
     2 |   expr: foo / on(notfound) bar
-                      ^^^^^^^^^^^^ Using `on(notfound)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned from both sides of the query](notfound) don't have the `https://simple.example.com/query?g0.expr=foo+%2F+on+%28notfound%29+bar&&g0.tab=table` label.
+                      ^^^^^^^^^^^^
+                      Using `on(notfound)` won't produce any results on `prom` Prometheus server at
+                      https://simple.example.com because [series returned from both sides of the
+                      query](notfound) don't have the
+                      `https://simple.example.com/query?g0.expr=foo+%2F+on+%28notfound%29+bar&&g0.tab=table`
+                      label.
   problem:
     reporter: promql/vector_matching
     summary: impossible binary operation
@@ -351,7 +381,11 @@
       expr: foo / on(notfound) bar_with_notfound
   output: |
     2 |   expr: foo / on(notfound) bar_with_notfound
-                ^^^ Using `on(notfound)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned by this query](https://simple.example.com/query?g0.expr=foo&&g0.tab=table) doesn't have the `notfound` label.
+                ^^^
+                Using `on(notfound)` won't produce any results on `prom` Prometheus server at
+                https://simple.example.com because [series returned by this
+                query](https://simple.example.com/query?g0.expr=foo&&g0.tab=table) doesn't have the
+                `notfound` label.
   problem:
     reporter: promql/vector_matching
     summary: impossible binary operation
@@ -379,7 +413,12 @@
       expr: foo_with_notfound / on(notfound) bar
   output: |
     2 |   expr: foo_with_notfound / on(notfound) bar
-                                                 ^^^ Using `on(notfound)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned by this query](https://simple.example.com/query?g0.expr=bar&&g0.tab=table) don't have the `notfound` label.
+                                                 ^^^
+                                                 Using `on(notfound)` won't produce any results on `prom`
+                                                 Prometheus server at https://simple.example.com because
+                                                 [series returned by this
+                                                 query](https://simple.example.com/query?g0.expr=bar&&g0.tab=table)
+                                                 don't have the `notfound` label.
   problem:
     reporter: promql/vector_matching
     summary: impossible binary operation
@@ -442,7 +481,10 @@
       expr: min_over_time((foo_with_notfound > 0)[30m:1m]) / bar
   output: |
     2 |   expr: min_over_time((foo_with_notfound > 0)[30m:1m]) / bar
-                ^^^ This query will never return anything on `prom` Prometheus server at https://simple.example.com because results from the right and the left hand side have different labels: `[instance, job, notfound]` != `[instance, job]`.
+                ^^^
+                This query will never return anything on `prom` Prometheus server at
+                https://simple.example.com because results from the right and the left hand side have
+                different labels: `[instance, job, notfound]` != `[instance, job]`.
   problem:
     reporter: promql/vector_matching
     summary: impossible binary operation
@@ -480,7 +522,9 @@
       expr: up{job="a"} / up{job="b"}
   output: |
     2 |   expr: up{job="a"} / up{job="b"}
-                ^^^^^^^^^^^ The left hand side uses `{job="a"}` while the right hand side uses `{job="b"}`, this will never match.
+                ^^^^^^^^^^^
+                The left hand side uses `{job="a"}` while the right hand side uses `{job="b"}`, this will
+                never match.
   problem:
     reporter: promql/vector_matching
     summary: impossible binary operation

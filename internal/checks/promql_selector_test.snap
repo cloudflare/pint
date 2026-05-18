@@ -44,7 +44,8 @@
         {__name__="errors"} > 0
   output: |
     4 |     {__name__="errors"} > 0
-            ^^^^^^^^^^^^^^^^^^^ This vector selector must specify `job` label. Please add a `{job="..."} matcher.
+            ^^^^^^^^^^^^^^^^^^^
+            This vector selector must specify `job` label. Please add a `{job="..."} matcher.
   problem:
     reporter: promql/selector
     summary: required matcher missing
@@ -71,7 +72,8 @@
         {__name__=~"errors"} > 0
   output: |
     4 |     {__name__=~"errors"} > 0
-            ^^^^^^^^^^^^^^^^^^^^ This vector selector must specify `job` label. Please add a `{job="..."} matcher.
+            ^^^^^^^^^^^^^^^^^^^^
+            This vector selector must specify `job` label. Please add a `{job="..."} matcher.
   problem:
     reporter: promql/selector
     summary: required matcher missing
@@ -97,7 +99,8 @@
       expr: errors{cluster="dev", instance="foo"} > 0
   output: |
     3 |   expr: errors{cluster="dev", instance="foo"} > 0
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This vector selector must specify `job` label. Please add a `{job="..."} matcher.
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                This vector selector must specify `job` label. Please add a `{job="..."} matcher.
   problem:
     reporter: promql/selector
     summary: required matcher missing
@@ -133,7 +136,9 @@
       expr: absent(errors{xjob="foo"})
   output: |
     3 |   expr: absent(errors{xjob="foo"})
-                       ^^^^^^^^^^^^^^^^^^ Vector selectors inside the `absent()` function must specify `job` label. Please add a `{job="..."} matcher.
+                       ^^^^^^^^^^^^^^^^^^
+                       Vector selectors inside the `absent()` function must specify `job` label. Please add
+                       a `{job="..."} matcher.
   problem:
     reporter: promql/selector
     summary: required matcher missing

@@ -11,7 +11,10 @@
       expr: rate(foo[20d])
   output: |
     2 |   expr: rate(foo[20d])
-                ^^^^^^^^^^^^^^ `foo[20d]` selector is trying to query Prometheus for 20d worth of metrics, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.
+                ^^^^^^^^^^^^^^
+                `foo[20d]` selector is trying to query Prometheus for 20d worth of metrics, but `prom`
+                Prometheus server at https://simple.example.com is configured to only keep 15d of metrics
+                history.
   problem:
     reporter: promql/range_query
     summary: query beyond configured retention
@@ -36,7 +39,9 @@
       expr: rate(foo[30d])
   output: |
     2 |   expr: rate(foo[30d])
-                ^^^^^^^^^^^^^^ Cannot parse --storage.tsdb.retention.time="abc" flag value: not a valid duration string: "abc"
+                ^^^^^^^^^^^^^^
+                Cannot parse --storage.tsdb.retention.time="abc" flag value: not a valid duration string:
+                "abc"
   problem:
     reporter: promql/range_query
     summary: unable to run checks
@@ -57,7 +62,10 @@
       expr: rate(foo[30d])
   output: |
     2 |   expr: rate(foo[30d])
-                ^^^^^^^^^^^^^^ `foo[30d]` selector is trying to query Prometheus for 30d worth of metrics, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.
+                ^^^^^^^^^^^^^^
+                `foo[30d]` selector is trying to query Prometheus for 30d worth of metrics, but `prom`
+                Prometheus server at https://simple.example.com is configured to only keep 15d of metrics
+                history.
   problem:
     reporter: promql/range_query
     summary: query beyond configured retention
@@ -82,7 +90,9 @@
       expr: rate(foo[30d])
   output: |
     1 | - record: foo
-                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.
+                  ^^^
+                  Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX
+                  error: `server_error: internal error`.
   problem:
     reporter: promql/range_query
     summary: unable to run checks
@@ -112,7 +122,10 @@
       expr: rate(foo[11d1h])
   output: |
     2 |   expr: rate(foo[11d1h])
-                ^^^^^^^^^^^^^^^^ `foo[11d1h]` selector is trying to query Prometheus for 11d1h worth of metrics, but `prom` Prometheus server at https://simple.example.com is configured to only keep 11d of metrics history.
+                ^^^^^^^^^^^^^^^^
+                `foo[11d1h]` selector is trying to query Prometheus for 11d1h worth of metrics, but `prom`
+                Prometheus server at https://simple.example.com is configured to only keep 11d of metrics
+                history.
   problem:
     reporter: promql/range_query
     summary: query beyond configured retention
@@ -147,7 +160,10 @@
       expr: rate(foo[20d])
   output: |
     2 |   expr: rate(foo[20d])
-                ^^^^^^^^^^^^^^ `foo[20d]` selector is trying to query Prometheus for 20d worth of metrics, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.
+                ^^^^^^^^^^^^^^
+                `foo[20d]` selector is trying to query Prometheus for 20d worth of metrics, but `prom`
+                Prometheus server at https://simple.example.com is configured to only keep 15d of metrics
+                history.
   problem:
     reporter: promql/range_query
     summary: query beyond configured retention
@@ -182,7 +198,9 @@
       expr: rate(foo[5h])
   output: |
     2 |   expr: rate(foo[5h])
-                ^^^^^^^^^^^^^ `foo[5h]` selector is trying to query Prometheus for 5h worth of metrics, but 4h is the maximum allowed range query.
+                ^^^^^^^^^^^^^
+                `foo[5h]` selector is trying to query Prometheus for 5h worth of metrics, but 4h is the
+                maximum allowed range query.
   problem:
     reporter: promql/range_query
     summary: query beyond configured retention

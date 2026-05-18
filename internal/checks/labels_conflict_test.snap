@@ -8,7 +8,9 @@
         foo: bar
   output: |
     4 |     foo: bar
-            ^^^ `prom` Prometheus server at https://simple.example.com external_labels already has foo="bob" label set, please choose a different name for this label to avoid any conflicts.
+            ^^^
+            `prom` Prometheus server at https://simple.example.com external_labels already has foo="bob"
+            label set, please choose a different name for this label to avoid any conflicts.
   problem:
     reporter: labels/conflict
     summary: conflicting labels
@@ -35,7 +37,10 @@
         foo: bar
   output: |
     4 |     foo: bar
-            ^^^ This label is redundant. `prom` Prometheus server at https://simple.example.com external_labels already has foo="bar" label set and it will be automatically added to all alerts, there's no need to set it manually.
+            ^^^
+            This label is redundant. `prom` Prometheus server at https://simple.example.com external_labels
+            already has foo="bar" label set and it will be automatically added to all alerts, there's no
+            need to set it manually.
   problem:
     reporter: labels/conflict
     summary: conflicting labels
@@ -62,7 +67,9 @@
         foo: bar
   output: |
     4 |     foo: bar
-            ^^^ `prom` Prometheus server at https://simple.example.com external_labels already has foo="bob" label set, please choose a different name for this label to avoid any conflicts.
+            ^^^
+            `prom` Prometheus server at https://simple.example.com external_labels already has foo="bob"
+            label set, please choose a different name for this label to avoid any conflicts.
   problem:
     reporter: labels/conflict
     summary: conflicting labels
@@ -89,7 +96,9 @@
         foo: bar
   output: |
     1 | - record: foo
-                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 error: `connection refused`.
+                  ^^^
+                  Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111
+                  error: `connection refused`.
   problem:
     reporter: labels/conflict
     summary: unable to run checks
