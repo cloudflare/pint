@@ -5,8 +5,8 @@
 ### Added
 
 - [rule/dependency](checks/rule/dependency.md) check now supports `ignoreGroupMismatch`
-  option for ignoring specific metrics when checking for cross-group dependencies
-  - [#1795](https://github.com/cloudflare/pint/issues/1795).
+  option for ignoring specific metrics when checking for cross-group
+  dependencies - [#1795](https://github.com/cloudflare/pint/issues/1795).
 
 ### Changed
 
