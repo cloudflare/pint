@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/go-github/v85/github"
+	"github.com/google/go-github/v87/github"
 	"golang.org/x/oauth2"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -76,8 +76,20 @@ func NewGithubReporter(
 	)
 	tc := oauth2.NewClient(ctx, ts)
 
+	opts := []github.ClientOptionsFunc{
+		github.WithHTTPClient(tc),
+	}
+	if baseURL != "" && uploadURL != "" {
+		opts = append(opts, github.WithEnterpriseURLs(baseURL, uploadURL))
+	}
+
+	client, err := github.NewClient(opts...)
+	if err != nil {
+		return GithubReporter{}, fmt.Errorf("creating new GitHub client: %w", err)
+	}
+
 	gr := GithubReporter{
-		client:         github.NewClient(tc),
+		client:         client,
 		version:        version,
 		baseURL:        baseURL,
 		uploadURL:      uploadURL,
@@ -88,13 +100,6 @@ func NewGithubReporter(
 		maxComments:    maxComments,
 		headCommit:     headCommit,
 		showDuplicates: showDuplicates,
-	}
-
-	if gr.uploadURL != "" && gr.baseURL != "" {
-		gr.client, err = gr.client.WithEnterpriseURLs(gr.baseURL, gr.uploadURL)
-		if err != nil {
-			return gr, fmt.Errorf("creating new GitHub client: %w", err)
-		}
 	}
 
 	return gr, nil
