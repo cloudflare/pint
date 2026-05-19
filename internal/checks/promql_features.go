@@ -114,6 +114,7 @@ func (c FeaturesCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*d
 			d = append(d, diags.Diagnostic{
 				Message:     msg,
 				Pos:         expr.Value.Pos,
+				Expr:        expr.Query().Expr,
 				FirstColumn: int(frag.Start) + 1,
 				LastColumn:  int(frag.End),
 				Kind:        diags.Issue,

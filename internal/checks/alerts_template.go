@@ -150,6 +150,7 @@ func (c TemplateCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*d
 					{
 						Message:     fmt.Sprintf("Template failed to parse with this error: `%s`.", err),
 						Pos:         label.Value.Pos,
+						Expr:        nil,
 						FirstColumn: firstCol,
 						LastColumn:  lastCol,
 						Kind:        diags.Issue,
@@ -172,6 +173,7 @@ func (c TemplateCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*d
 					{
 						Message:     msg,
 						Pos:         label.Value.Pos,
+						Expr:        nil,
 						FirstColumn: 1,
 						LastColumn:  len(label.Value.Value),
 						Kind:        diags.Issue,
@@ -207,6 +209,7 @@ func (c TemplateCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*d
 						{
 							Message:     fmt.Sprintf("Template failed to parse with this error: `%s`.", err),
 							Pos:         annotation.Value.Pos,
+							Expr:        nil,
 							FirstColumn: firstCol,
 							LastColumn:  lastCol,
 							Kind:        diags.Issue,
@@ -247,6 +250,7 @@ func (c TemplateCheck) checkHumanizeIsNeeded(expr parser.PromQLExpr, ann *parser
 				{
 					Message:     fmt.Sprintf("`%s()` will produce results that are hard to read for humans.", call.Func.Name),
 					Pos:         expr.Value.Pos,
+					Expr:        expr.Query().Expr,
 					FirstColumn: int(call.PosRange.Start) + 1,
 					LastColumn:  int(call.PosRange.End),
 					Kind:        diags.Context,
@@ -259,6 +263,7 @@ func (c TemplateCheck) checkHumanizeIsNeeded(expr parser.PromQLExpr, ann *parser
 						dgs = append(dgs, diags.Diagnostic{
 							Message:     "Use one of humanize template functions to make the result more readable.",
 							Pos:         ann.Value.Pos,
+							Expr:        nil,
 							FirstColumn: v.column,
 							LastColumn:  v.column + len(v.value[0]),
 							Kind:        diags.Issue,
@@ -370,7 +375,7 @@ func newTemplateError(rawErr error, name, text string) templateError {
 	}
 
 	// Find the byte position of the target line in user text.
-	pos := 0
+	var pos int
 	for range lineNum - 2 {
 		pos += strings.IndexByte(text[pos:], '\n') + 1
 	}
@@ -604,6 +609,7 @@ func (c TemplateCheck) checkQueryLabels(group *parser.Group, rule parser.Rule, l
 								{
 									Message:     fmt.Sprintf("Template is using `%s` label but the query results won't have this label.", v.value[1]),
 									Pos:         label.Value.Pos,
+									Expr:        nil,
 									FirstColumn: v.column,
 									LastColumn:  v.column + len(v.value[1]),
 									Kind:        diags.Issue,
@@ -611,6 +617,7 @@ func (c TemplateCheck) checkQueryLabels(group *parser.Group, rule parser.Rule, l
 								{
 									Message:     reason,
 									Pos:         rule.AlertingRule.Expr.Value.Pos,
+									Expr:        rule.Expr().Query().Expr,
 									FirstColumn: int(fragment.Start) + 1,
 									LastColumn:  int(fragment.End),
 									Kind:        diags.Context,

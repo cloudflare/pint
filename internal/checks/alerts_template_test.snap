@@ -1875,22 +1875,22 @@
       annotations:
         dashboard: 'Prefix is {{ $labels.prefix }}'
   output: |4
-     4 |     avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"})
+     4 |     avg without(router, colo_id, instance) (...)
      5 |     < 0.5 > 0
-     6 |     or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*multicolo.*"})
+     6 |     or avg without(router, colo_id, instance) (...)
      7 |     < 0.4 > 0
-     8 |     or sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*offpeak.*"})
+     8 |     or sum without(router, colo_id, instance) (...)
      9 |     < 8 > 0
-    10 |     or sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"})
+    10 |     or sum without(router, colo_id, instance) (...)
     11 |     < on() count(colo_router_tier:disabled_pops:max{tier="1",router=~"edge.*"}) * 0.4 > 0
                ^^^^
                Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)`
                will be present on the results.
-    12 |     or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*regional.*"})
+    12 |     or avg without(router, colo_id, instance) (...)
     13 |     < 0.1 > 0
-    14 |     or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*brat.*",cidr_use_case!~".*tier1.*",plan=~".*(free|pro).*"})
+    14 |     or avg without(router, colo_id, instance) (...)
     15 |     <  0.1 > 0
-    16 |     or sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*utopia.*"})
+    16 |     or sum without(router, colo_id, instance) (...)
     17 |     < 5 > 0
        | [...]
     19 |     dashboard: 'Prefix is {{ $labels.prefix }}'

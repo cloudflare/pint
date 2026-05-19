@@ -134,6 +134,7 @@ func (c SelectorCheck) checkSource(keyRe, callRe *regexp.Regexp, s source.Source
 			Diagnostics: []diags.Diagnostic{
 				{
 					Pos:         pos,
+					Expr:        nil,
 					FirstColumn: int(vs.PosRange.Start) + 1,
 					LastColumn:  int(vs.PosRange.End),
 					Message: fmt.Sprintf(

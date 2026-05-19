@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/gkampitakis/go-snaps/snaps"
+	promParser "github.com/prometheus/prometheus/promql/parser"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/output"
@@ -252,7 +253,7 @@ expr: sum(foo) without(colo_id, instance, node_type, region, node_status, job, c
 			},
 		},
 		{
-			name: "multi-line expression skips AST trimming",
+			name: "multi-line expression trims individual long lines",
 			input: `
 expr: |
   sum(rate(very_long_metric_name_that_pushes_past_the_width_limit_aaaa{job="api",status=~"5.."}[5m])) by(instance)
@@ -275,6 +276,22 @@ expr: sum(rate(very_long_metric_name_that_pushes_past_the_width_limit_aaaa{job="
 expr: sum(foo) without(colo_id, instance, node_type, region, node_status, job, colo_name)`,
 			diags: []Diagnostic{
 				{FirstColumn: 18, LastColumn: 21, Message: "Query is using aggregation with `without(colo_id, instance, node_type, region, node_status, job, colo_name)`, all labels included inside `without(...)` will be removed from the results. `job` label is required and should be preserved when aggregating all rules."},
+			},
+		},
+		{
+			name: "multi-line expression trims long inner line",
+			input: `
+expr: >-
+  sum by (exporter, colo_name) (rate(otelcol_exporter_send_failed_log_records{node_status="v", exporter=~"(failover|otlp)/.*"}[5m]))
+  /
+  (
+    sum by (exporter, colo_name) (rate(otelcol_exporter_send_failed_log_records{exporter=~"(failover|otlp)/.*"}[5m])) + sum by (exporter, colo_name) (rate(otelcol_exporter_sent_log_records{exporter=~"(failover|otlp)/.*"}[5m]))
+  )
+  > 0.1
+  and
+  sum by (exporter, colo_name) (rate(otelcol_exporter_send_failed_log_records{node_status="v", exporter=~"(failover|otlp)/.*"}[5m])) > 10`,
+			diags: []Diagnostic{
+				{FirstColumn: 323, LastColumn: 352, Message: "smelly regexp selector"},
 			},
 		},
 	}
@@ -302,11 +319,17 @@ expr: sum(foo) without(colo_id, instance, node_type, region, node_status, job, c
 				pos := NewPositionRange(strings.Split(tc.input, "\n"), val, key.Column+2)
 				require.NotEmpty(t, pos)
 
+				var expr promParser.Node
+				if node, err := promParser.NewParser(promParser.Options{}).ParseExpr(val.Value); err == nil {
+					expr = node
+				}
+
 				for _, diag := range tc.diags {
 					diags = append(diags, Diagnostic{
 						Message:     diag.Message,
 						Kind:        diag.Kind,
 						Pos:         pos,
+						Expr:        expr,
 						FirstColumn: diag.FirstColumn,
 						LastColumn:  diag.LastColumn,
 					})

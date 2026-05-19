@@ -51,6 +51,7 @@ func (c SyntaxCheck) Check(_ context.Context, entry *discovery.Entry, _ []*disco
 		diag := diags.Diagnostic{
 			Message:     err.Error(),
 			Pos:         expr.Value.Pos,
+			Expr:        nil,
 			FirstColumn: 1,
 			LastColumn:  len(expr.Value.Value),
 			Kind:        diags.Issue,
@@ -62,6 +63,7 @@ func (c SyntaxCheck) Check(_ context.Context, entry *discovery.Entry, _ []*disco
 				diag = diags.Diagnostic{
 					Message:     perr.Err.Error(),
 					Pos:         expr.Value.Pos,
+					Expr:        nil,
 					FirstColumn: int(perr.PositionRange.Start) + 1,
 					LastColumn:  int(perr.PositionRange.End),
 					Kind:        diags.Issue,

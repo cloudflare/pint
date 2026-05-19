@@ -81,6 +81,7 @@ func (p Parser) parseGroups(doc *yaml.Node, offsetLine, offsetColumn int, conten
 							{
 								Message:     "duplicated group name",
 								Pos:         g.Name.Pos,
+								Expr:        nil,
 								FirstColumn: 1,
 								LastColumn:  g.Name.Pos.Len(),
 								Kind:        diags.Issue,

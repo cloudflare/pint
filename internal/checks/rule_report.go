@@ -54,6 +54,7 @@ func (c ReportCheck) Check(_ context.Context, entry *discovery.Entry, _ []*disco
 			{
 				Message:     c.comment,
 				Pos:         name.Pos,
+				Expr:        nil,
 				FirstColumn: 1,
 				LastColumn:  len(name.Value),
 				Kind:        diags.Issue,

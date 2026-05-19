@@ -152,6 +152,7 @@ func (c AnnotationCheck) checkValue(rule parser.Rule, value string, ann *parser.
 				{
 					Message:     fmt.Sprintf("`%s` annotation value must match `%s`.", c.keyRe.original, c.valueRe.anchored),
 					Pos:         ann.Pos,
+					Expr:        nil,
 					FirstColumn: 1,
 					LastColumn:  len(ann.Value),
 					Kind:        diags.Issue,
@@ -190,6 +191,7 @@ func (c AnnotationCheck) checkValue(rule parser.Rule, value string, ann *parser.
 					{
 						Message:     fmt.Sprintf("`%s` annotation value is not one of valid values.", c.keyRe.original),
 						Pos:         ann.Pos,
+						Expr:        nil,
 						FirstColumn: 1,
 						LastColumn:  len(ann.Value),
 						Kind:        diags.Issue,

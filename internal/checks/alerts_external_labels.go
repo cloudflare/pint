@@ -82,6 +82,7 @@ func (c AlertsExternalLabelsCheck) Check(ctx context.Context, entry *discovery.E
 					{
 						Message:     fmt.Sprintf("Template is using `%s` external label but %s doesn't have this label configured in global:external_labels.", name, promText(c.prom.Name(), cfg.URI)),
 						Pos:         label.Value.Pos,
+						Expr:        nil,
 						FirstColumn: 1,
 						LastColumn:  len(label.Value.Value),
 						Kind:        diags.Issue,
@@ -108,6 +109,7 @@ func (c AlertsExternalLabelsCheck) Check(ctx context.Context, entry *discovery.E
 						{
 							Message:     fmt.Sprintf("Template is using `%s` external label but %s doesn't have this label configured in global:external_labels.", name, promText(c.prom.Name(), cfg.URI)),
 							Pos:         annotation.Value.Pos,
+							Expr:        nil,
 							FirstColumn: 1,
 							LastColumn:  len(annotation.Value.Value),
 							Kind:        diags.Issue,

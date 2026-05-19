@@ -86,6 +86,7 @@ func (c RuleDuplicateCheck) compareRules(_ context.Context, rule *parser.Recordi
 				{
 					Message:     fmt.Sprintf("Duplicated rule, identical rule found at %s:%d.", entry.Path.SymlinkTarget, entry.Rule.RecordingRule.Record.Pos.Lines().First),
 					Pos:         rule.Record.Pos,
+					Expr:        nil,
 					FirstColumn: 1,
 					LastColumn:  len(rule.Record.Value),
 					Kind:        diags.Issue,

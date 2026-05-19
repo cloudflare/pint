@@ -111,6 +111,7 @@ func makeComments(summary Summary, showDuplicates bool) (comments []PendingComme
 							{
 								Message:     "",
 								Pos:         diag.Pos,
+								Expr:        diag.Expr,
 								FirstColumn: diag.FirstColumn,
 								LastColumn:  diag.LastColumn,
 								Kind:        diag.Kind,

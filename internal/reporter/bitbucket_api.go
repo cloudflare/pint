@@ -640,6 +640,7 @@ func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges
 							{
 								Message:     "",
 								Pos:         diag.Pos,
+								Expr:        diag.Expr,
 								FirstColumn: diag.FirstColumn,
 								LastColumn:  diag.LastColumn,
 								Kind:        diag.Kind,

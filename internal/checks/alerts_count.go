@@ -130,6 +130,7 @@ func (c AlertsCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*dis
 			{
 				Message:     fmt.Sprintf("%s would trigger %d alert(s) in the last %s.", promText(c.prom.Name(), qr.URI), alerts, output.HumanizeDuration(delta)),
 				Pos:         entry.Rule.AlertingRule.Expr.Value.Pos,
+				Expr:        entry.Rule.AlertingRule.Expr.Query().Expr,
 				FirstColumn: 1,
 				LastColumn:  len(entry.Rule.AlertingRule.Expr.Value.Value),
 				Kind:        diags.Issue,

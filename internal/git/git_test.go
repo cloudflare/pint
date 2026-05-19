@@ -33,7 +33,7 @@ func TestDescribe(t *testing.T) {
 			// First command succeeds, second (rev-parse --abbrev-ref HEAD) fails.
 			name: "current branch command fails",
 			mock: func() git.CommandRunner {
-				calls := 0
+				var calls int
 				return func(_ ...string) ([]byte, error) {
 					calls++
 					if calls == 1 {
@@ -48,7 +48,7 @@ func TestDescribe(t *testing.T) {
 			// Both commands succeed.
 			name: "both commands succeed",
 			mock: func() git.CommandRunner {
-				calls := 0
+				var calls int
 				return func(_ ...string) ([]byte, error) {
 					calls++
 					if calls == 1 {

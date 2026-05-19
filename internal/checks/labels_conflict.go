@@ -87,6 +87,7 @@ func (c LabelsConflictCheck) Check(ctx context.Context, entry *discovery.Entry, 
 						{
 							Message:     c.formatText(k, label.Value.Value, v, entry.Rule.Type(), cfg),
 							Pos:         label.Key.Pos,
+							Expr:        nil,
 							FirstColumn: 1,
 							LastColumn:  len(label.Key.Value),
 							Kind:        diags.Issue,
