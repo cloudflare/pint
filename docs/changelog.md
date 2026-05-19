@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.84.0
+
+### Added
+
+- GitHub and GitLab reporters will now automatically delete outdated general
+  comments from previous `pint ci` runs.
+
 ## v0.83.0
 
 ### Added

@@ -1,17 +1,16 @@
 http method github GET /api/v3/repos/cloudflare/pint/pulls/1/reviews 200 []
 http method github POST /api/v3/repos/cloudflare/pint/pulls/1/reviews 200 {}
 http method github GET /api/v3/repos/cloudflare/pint/pulls/1/comments 200 []
-http method github GET /api/v3/repos/cloudflare/pint/issues/1/comments 200 []
+http method github GET /api/v3/repos/cloudflare/pint/issues/1/comments 200 [{"id":999,"body":"stale general comment from previous pint run"}]
 http method github POST /api/v3/repos/cloudflare/pint/pulls/1/comments 200 {}
-http start github 127.0.0.1:6118
+http method github DELETE /api/v3/repos/cloudflare/pint/issues/comments/999 200 {}
+http start github 127.0.0.1:6271
 
 mkdir testrepo
 cd testrepo
 exec git init --initial-branch=main .
 
-mkdir my/dir/rules
-cp ../src/rules.yml my/dir/rules/rules.yml
-exec ln -s my/dir/rules v1dir
+cp ../src/v1.yml rules.yml
 cp ../src/.pint.hcl .
 env GIT_AUTHOR_NAME=pint
 env GIT_AUTHOR_EMAIL=pint@example.com
@@ -21,34 +20,40 @@ exec git add .
 exec git commit -am 'import rules and config'
 
 exec git checkout -b v2
-exec git mv v1dir v2dir
+cp ../src/v2.yml rules.yml
 exec git commit -am 'v2'
 
 env GITHUB_AUTH_TOKEN=12345
 env GITHUB_PULL_REQUEST_NUMBER=1
-exec pint -l debug --no-color ci
+exec pint -l debug --offline --no-color ci
 ! stdout .
+stderr 'level=INFO msg="Deleting stale general comment" reporter=GitHub id=999'
 stderr 'level=INFO msg="Pull request review created" status="200 OK"'
-stderr 'msg="Skipping directory entry change"'
 cmp github.got ../github.expected
 
--- src/rules.yml --
-groups:
-- name: foo
-  rules:
-  - alert: rule1
-    expr: rate(errors_total[5m]) > 0
-  - alert: rule2
-    expr: rate(errors_total[5m]) > 0
+-- src/v1.yml --
+- record: foo
+  expr: sum(up)
+  labels:
+    cluster: dev
+
+-- src/v2.yml --
+- record: foo
+  expr: sum(up)
+  labels:
+    cluster: prod
 
 -- src/.pint.hcl --
 ci {
   baseBranch = "main"
 }
+parser {
+  relaxed = [".*"]
+}
 repository {
   github {
-    baseuri   = "http://127.0.0.1:6118"
-    uploaduri = "http://127.0.0.1:6118"
+    baseuri   = "http://127.0.0.1:6271"
+    uploaduri = "http://127.0.0.1:6271"
     owner     = "cloudflare"
     repo      = "pint"
   }
@@ -63,6 +68,12 @@ GET /api/v3/repos/cloudflare/pint/pulls/1/comments
 
 GET /api/v3/repos/cloudflare/pint/issues/1/comments
   Accept: application/vnd.github.squirrel-girl-preview
+  Accept-Encoding: gzip
+  Authorization: Bearer 12345
+  X-Github-Api-Version: 2022-11-28
+
+DELETE /api/v3/repos/cloudflare/pint/issues/comments/999
+  Accept: application/vnd.github.v3+json
   Accept-Encoding: gzip
   Authorization: Bearer 12345
   X-Github-Api-Version: 2022-11-28
@@ -90,10 +101,10 @@ body: |+
   | Stat | Value |
   | --- | --- |
   | Version | unknown |
-  | Number of rules parsed | 2 |
-  | Number of rules checked | 2 |
+  | Number of rules parsed | 1 |
+  | Number of rules checked | 1 |
   | Number of problems found | 0 |
-  | Number of offline checks | 0 |
+  | Number of offline checks | 9 |
   | Number of online checks | 0 |
   | Checks duration | 0 |
 

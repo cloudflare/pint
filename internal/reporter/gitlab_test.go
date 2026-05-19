@@ -381,6 +381,9 @@ func TestGitLabReporter(t *testing.T) {
 					s.ExpectPut(apiDiscussions(i, false) + "/400").WithBodyJSON(
 						gitlab.ResolveMergeRequestDiscussionOptions{Resolved: new(true)},
 					).ReturnJSON(gitlab.Response{})
+					s.ExpectPut(apiDiscussions(i, false) + "/500").WithBodyJSON(
+						gitlab.ResolveMergeRequestDiscussionOptions{Resolved: new(true)},
+					).ReturnJSON(gitlab.Response{})
 				}
 
 				s.ExpectPost(apiDiscussions(5, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
@@ -462,6 +465,42 @@ func TestGitLabReporter(t *testing.T) {
 				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
 					Body: new("This pint run would create 3 comment(s), which is more than the limit configured for pint (1).\n2 comment(s) were skipped and won't be visible on this PR."),
 				}).ReturnJSON(gitlab.Response{})
+			}),
+			errorHandler: func(err error) error {
+				return err
+			},
+		},
+		{
+			description: "stale general comment deleted",
+			timeout:     time.Minute,
+			maxComments: 1,
+			summary:     reporter.NewSummary([]reporter.Report{fooReport}),
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(apiUser).ReturnJSON(gitlab.User{ID: 123})
+				s.ExpectGet(apiOpenMergeRequests).ReturnJSON([]gitlab.BasicMergeRequest{
+					{IID: 1},
+				})
+				s.ExpectGet(apiVersions(1)).ReturnJSON([]gitlab.MergeRequestDiffVersion{
+					{ID: 2, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
+					{ID: 1, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
+				})
+				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{
+					{
+						ID:    "100",
+						Notes: []*gitlab.Note{systemNote(discNote(101, 123, "system comment", nil))},
+					},
+					{
+						ID:    "200",
+						Notes: []*gitlab.Note{discNote(201, 123, "This pint run would create 3 comment(s), which is more than the limit configured for pint (1).\n2 comment(s) were skipped and won't be visible on this PR.", nil)},
+					},
+				})
+				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
+					Body:     discBody("foo", "foo error", "foo details"),
+					Position: discPosition("foo.txt", 2),
+				}).ReturnJSON(gitlab.Response{})
+				s.ExpectPut(apiDiscussions(1, false) + "/200").WithBodyJSON(
+					gitlab.ResolveMergeRequestDiscussionOptions{Resolved: new(true)},
+				).ReturnJSON(gitlab.Response{})
 			}),
 			errorHandler: func(err error) error {
 				return err

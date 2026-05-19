@@ -75,6 +75,10 @@ func (tc testCommenter) IsEqual(_ any, e ExistingComment, p PendingComment) bool
 	return tc.isEqual(e, p)
 }
 
+func (tc testCommenter) MaxComments() int {
+	return 0
+}
+
 func TestCommenter(t *testing.T) {
 	p := parser.NewParser(parser.DefaultOptions)
 	mockFile := p.Parse(strings.NewReader(`
@@ -902,6 +906,51 @@ foo details
 					return nil
 				},
 				delete: func(_ context.Context, _ any, _ ExistingComment) error {
+					return nil
+				},
+				isEqual: func(e ExistingComment, p PendingComment) bool {
+					return e.path == p.path && e.line == p.line && e.text == p.text
+				},
+				canCreate: func(_ int) bool {
+					return true
+				},
+			},
+			checkErr: func(t *testing.T, err error) {
+				require.NoError(t, err)
+			},
+		},
+		{
+			description: "stale general comment fails to be deleted",
+			reports:     []Report{fooReport},
+			commenter: testCommenter{
+				destinations: func(_ context.Context) ([]any, error) {
+					return []any{1}, nil
+				},
+				summary: func(_ context.Context, _ any, _ Summary, _ []PendingComment, errs []error) error {
+					if len(errs) != 0 {
+						return fmt.Errorf("Expected empty errs, got %v", errs)
+					}
+					return nil
+				},
+				list: func(_ context.Context, _ any) ([]ExistingComment, error) {
+					return []ExistingComment{
+						fooComment,
+						{
+							path:      "",
+							text:      "stale general comment",
+							line:      0,
+							meta:      nil,
+							isGeneral: true,
+						},
+					}, nil
+				},
+				create: func(_ context.Context, _ any, _ PendingComment) error {
+					return nil
+				},
+				delete: func(_ context.Context, _ any, e ExistingComment) error {
+					if e.isGeneral {
+						return errDelete
+					}
 					return nil
 				},
 				isEqual: func(e ExistingComment, p PendingComment) bool {
