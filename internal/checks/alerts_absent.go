@@ -110,6 +110,7 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, entry *discovery.Entry, _ 
 					{
 						Message:     "Query passed inside `absent()` will always return some results, so absent will never return anything.",
 						Pos:         entry.Rule.AlertingRule.Expr.Value.Pos,
+						Expr:        entry.Rule.AlertingRule.Expr.Query().Expr,
 						FirstColumn: int(call.PosRange.Start) + 1,
 						LastColumn:  int(call.PosRange.End),
 						Kind:        diags.Issue,
@@ -126,6 +127,7 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, entry *discovery.Entry, _ 
 			{
 				Message:     "Using `absent()` might cause false positive alerts when Prometheus restarts.",
 				Pos:         entry.Rule.AlertingRule.Expr.Value.Pos,
+				Expr:        entry.Rule.AlertingRule.Expr.Query().Expr,
 				FirstColumn: int(call.PosRange.Start) + 1,
 				LastColumn:  int(call.PosRange.End),
 				Kind:        diags.Issue,
@@ -137,6 +139,7 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, entry *discovery.Entry, _ 
 				Message: fmt.Sprintf("Use a value that's at least twice Prometheus scrape interval (`%s`).",
 					output.HumanizeDuration(cfg.Config.Global.ScrapeInterval)),
 				Pos:         entry.Rule.AlertingRule.For.Pos,
+				Expr:        nil,
 				FirstColumn: 1,
 				LastColumn:  entry.Rule.AlertingRule.For.Pos.Len(),
 				Kind:        diags.Issue,

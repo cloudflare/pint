@@ -13,22 +13,28 @@ type intRange struct {
 	end   int // 0-indexed, exclusive
 }
 
-// parseASTRanges parses a PromQL expression and returns all AST node position ranges.
-func parseASTRanges(expr string) []intRange {
-	node, err := promParser.NewParser(promParser.Options{}).ParseExpr(expr)
-	if err != nil {
-		return nil
-	}
-
-	// Rough estimate: ~1 node per 4 bytes of expression.
-	ranges := make([]intRange, 0, len(expr)/4)
+// nodeRangesFromAST walks a parsed PromQL AST and maps each node's position
+// range to line/column using pos. Only nodes that fit on a single line are
+// included.
+func nodeRangesFromAST(node promParser.Node, pos PositionRanges) []PositionRange {
+	posLen := pos.Len()
+	var ranges []PositionRange
 	var walk func(n promParser.Node)
 	walk = func(n promParser.Node) {
 		pr := n.PositionRange()
-		ranges = append(ranges, intRange{
-			start: int(pr.Start),
-			end:   int(pr.End),
-		})
+		start := int(pr.Start)
+		end := int(pr.End)
+		if start >= 0 && end > start && end <= posLen {
+			startLine, startCol, ok1 := posAtOffset(pos, start)
+			endLine, endCol, ok2 := posAtOffset(pos, end-1)
+			if ok1 && ok2 && startLine == endLine {
+				ranges = append(ranges, PositionRange{
+					Line:        startLine,
+					FirstColumn: startCol,
+					LastColumn:  endCol,
+				})
+			}
+		}
 		for _, child := range promParser.Children(n) {
 			walk(child)
 		}
@@ -37,28 +43,21 @@ func parseASTRanges(expr string) []intRange {
 	return ranges
 }
 
-// isSingleLineExpr reports whether all positions of diag are on lineNum.
-func isSingleLineExpr(diag Diagnostic, lineNum int) bool {
-	for _, pos := range diag.Pos {
-		if pos.Line != lineNum {
-			return false
+// posAtOffset returns the line and column for a 0-indexed byte offset
+// within the flat expression text mapped by pos.
+func posAtOffset(pos PositionRanges, offset int) (line, col int, ok bool) {
+	var n int
+	for _, pr := range pos {
+		span := pr.LastColumn - pr.FirstColumn + 1
+		if offset < n+span {
+			line = pr.Line
+			col = pr.FirstColumn + (offset - n)
+			ok = true
+			break
 		}
+		n += span
 	}
-	return len(diag.Pos) > 0
-}
-
-// extractExprFromLine pulls the PromQL expression text from line using diag.Pos.
-// It returns the expression substring and its 0-indexed start column in the line.
-// The caller must ensure isSingleLineExpr(diag, lineNum) is true.
-func extractExprFromLine(diag Diagnostic, line string) (expr string, start int) {
-	firstCol := diag.Pos[0].FirstColumn
-	lastCol := diag.Pos[0].LastColumn
-	for _, pos := range diag.Pos[1:] {
-		firstCol = min(firstCol, pos.FirstColumn)
-		lastCol = max(lastCol, pos.LastColumn)
-	}
-	start = firstCol - 1
-	return line[start:lastCol], start
+	return line, col, ok
 }
 
 // offsetForCol computes the total column shift for a diagnostic position after
@@ -67,7 +66,7 @@ func extractExprFromLine(diag Diagnostic, line string) (expr string, start int) 
 // replaced with "...". exprStart is the 0-indexed column where the expression
 // begins in the original line. col is the diagnostic column to adjust.
 func offsetForCol(reps []intRange, exprStart, col int) int {
-	offset := 0
+	var offset int
 	for _, r := range reps {
 		if exprStart+r.end < col {
 			offset += 3 - (r.end - r.start)
@@ -122,10 +121,10 @@ func findReplacements(astNodes, diagRanges []intRange) []intRange {
 	})
 
 	// Remove nested replacements in-place (keep outermost).
-	n := 0
+	var n int
 	for _, r := range reps {
 		nested := false
-		for i := 0; i < n; i++ {
+		for i := range n {
 			if r.start >= reps[i].start && r.end <= reps[i].end {
 				nested = true
 				break
@@ -142,7 +141,7 @@ func findReplacements(astNodes, diagRanges []intRange) []intRange {
 // applyReplacements substitutes each [start, end) range in expr with "...".
 func applyReplacements(expr string, reps []intRange) string {
 	var buf strings.Builder
-	last := 0
+	var last int
 	for _, r := range reps {
 		buf.WriteString(expr[last:r.start])
 		buf.WriteString("...")
@@ -152,34 +151,53 @@ func applyReplacements(expr string, reps []intRange) string {
 	return buf.String()
 }
 
-// astTrimLine parses PromQL expressions on the given line and replaces AST nodes
-// that don't overlap with any diagnostic. It updates diagPositions in place to
-// account for length changes. It returns the modified line and true if any
-// replacement was made.
+// exprNodesOnLine walks diag.Expr and returns AST node ranges on lineNum
+// as intRange relative to exprStart.
+func exprNodesOnLine(diag Diagnostic, lineNum, exprStart int) []intRange {
+	allNodes := nodeRangesFromAST(diag.Expr, diag.Pos)
+	var out []intRange
+	for _, nr := range allNodes {
+		if nr.Line != lineNum {
+			continue
+		}
+		out = append(out, intRange{
+			start: nr.FirstColumn - 1 - exprStart,
+			end:   nr.LastColumn - exprStart,
+		})
+	}
+	return out
+}
+
+// astTrimLine replaces AST nodes that don't overlap with any diagnostic on the
+// given line using the pre-parsed AST stored in diag.Expr. Diagnostics without
+// Expr are skipped. It updates diagPositions in place to account for length
+// changes and returns the modified line and true if any replacement was made.
 func astTrimLine(line string, diags []Diagnostic, diagPositions []PositionRanges, lineNum int) (string, bool) {
 	for _, diag := range diags {
-		if !isSingleLineExpr(diag, lineNum) {
+		var lineNodes []intRange
+		var exprStart int
+
+		if diag.Expr == nil {
 			continue
 		}
+		exprStart = len(line) - len(strings.TrimLeft(line, " \t"))
+		lineNodes = exprNodesOnLine(diag, lineNum, exprStart)
 
-		expr, exprStart := extractExprFromLine(diag, line)
-		if len(expr) < 10 {
-			continue
+		diagRanges := collectDiagRanges(diagPositions, lineNum, exprStart, len(line)-exprStart)
+		nodes := lineNodes
+		if len(diagRanges) == 0 {
+			if len(nodes) > 0 {
+				nodes = nodes[1:]
+			}
 		}
 
-		astNodes := parseASTRanges(expr)
-		if astNodes == nil {
-			continue
-		}
-
-		diagRanges := collectDiagRanges(diagPositions, lineNum, exprStart, len(expr))
-		reps := findReplacements(astNodes, diagRanges)
+		reps := findReplacements(nodes, diagRanges)
 		if len(reps) == 0 {
 			continue
 		}
 
-		trimmedExpr := applyReplacements(expr, reps)
-		newLine := line[:exprStart] + trimmedExpr + line[exprStart+len(expr):]
+		trimmedExpr := applyReplacements(line[exprStart:], reps)
+		newLine := line[:exprStart] + trimmedExpr
 
 		for i := range diagPositions {
 			for j := range diagPositions[i] {

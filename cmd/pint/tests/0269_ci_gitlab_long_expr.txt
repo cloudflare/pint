@@ -47,6 +47,26 @@ groups:
         summary: '{{ $labels.instance }} on {{ .Labels.foo }} is down'
         help: '{{ $labels.ixtance }}'
 
+    - alert: OpenTelemetry_Collector_Failed_Logs
+      # pint disable promql/series
+      expr: >-
+        sum by (exporter, colo_name) (rate(otelcol_exporter_send_failed_log_records{node_status="v", exporter=~"(failover|otlp)/.*"}[5m]))
+        /
+        (
+          sum by (exporter, colo_name) (rate(otelcol_exporter_send_failed_log_records{exporter=~"(failover|otlp)/.*"}[5m])) + sum by (exporter, colo_name) (rate(otelcol_exporter_sent_log_records{exporter=~"(failover|otlp)/.*"}[5m]))
+        )
+        > 0.1
+        and
+        sum by (exporter, colo_name) (rate(otelcol_exporter_send_failed_log_records{node_status="v", exporter=~"(failover|otlp)/.*"}[5m])) > 10
+      for: 15m
+      labels:
+        priority: "3"
+        component: opentelemetry-collector
+      annotations:
+        summary: "OpenTelemetry Collector is failing to send {{ $value | humanize }} of logs to exporter {{ $labels.exporter }} in {{ $labels.colo_name }}"
+        dashboard: https://grafana.example.com/d/1?var-colo_name={{ $labels.colo_name }}
+        link: https://alerts.example.com/OpenTelemetry_Collector_Failed_Logs
+
 -- src/.pint.hcl --
 ci {
   baseBranch = "main"
@@ -160,5 +180,60 @@ position:
   old_path: rules.yml
   position_type: text
   new_line: 8
+--- END ---
+
+POST /api/v4/projects/1234/merge_requests/1/discussions
+  Accept: application/json
+  Accept-Encoding: gzip
+  Content-Type: application/json
+  Private-Token: secret
+--- BODY ---
+body: |
+  :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **promql/regexp** check.
+
+  <details>
+  <summary>smelly regexp selector</summary>
+
+  ```yaml
+  13 |         sum by (exporter, colo_name) (...)
+  14 |         /
+  15 |         (
+  16 |           ... + sum by (exporter, colo_name) (rate(otelcol_exporter_sent_log_records{exporter=~"(failover|otlp)/.*"}[5m]))
+                                                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  17 |         )
+  18 |         > 0.1
+  19 |         and
+  20 |         ... > 10
+  ```
+
+  `{exporter=~"(failover|otlp)/.*"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels
+
+  See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+
+  </details>
+
+  ------
+
+  The same issue was reported 2 more time(s), duplicates where suppressed.
+
+  <details>
+  <summary>Show affected rules</summary>
+
+  - `OpenTelemetry_Collector_Failed_Logs` at `rules.yml:13`
+  - `OpenTelemetry_Collector_Failed_Logs` at `rules.yml:13`
+
+  </details>
+
+  ------
+
+  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/regexp.html).
+position:
+  base_sha: base
+  head_sha: head
+  start_sha: start
+  new_path: rules.yml
+  old_path: rules.yml
+  position_type: text
+  new_line: 20
 --- END ---
 

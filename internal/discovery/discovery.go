@@ -268,6 +268,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 								LastColumn:  comment.Offset + len(owner.Name),
 							},
 						},
+						Expr:        nil,
 						FirstColumn: comment.Offset + 1,
 						LastColumn:  comment.Offset + len(owner.Name),
 						Kind:        diags.Issue,

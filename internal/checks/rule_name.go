@@ -61,6 +61,7 @@ func (c RuleNameCheck) Check(_ context.Context, entry *discovery.Entry, _ []*dis
 				{
 					Message:     fmt.Sprintf("alerting rule name must match `%s`.", c.re.anchored),
 					Pos:         entry.Rule.AlertingRule.Alert.Pos,
+					Expr:        nil,
 					FirstColumn: 1,
 					LastColumn:  len(entry.Rule.AlertingRule.Alert.Value),
 					Kind:        diags.Issue,
@@ -80,6 +81,7 @@ func (c RuleNameCheck) Check(_ context.Context, entry *discovery.Entry, _ []*dis
 				{
 					Message:     fmt.Sprintf("recording rule name must match `%s`.", c.re.anchored),
 					Pos:         entry.Rule.RecordingRule.Record.Pos,
+					Expr:        nil,
 					FirstColumn: 1,
 					LastColumn:  len(entry.Rule.RecordingRule.Record.Value),
 					Kind:        diags.Issue,

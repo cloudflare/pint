@@ -113,6 +113,7 @@ func (c LabelCheck) checkRecordingRule(entry *discovery.Entry) (problems []Probl
 					{
 						Message:     fmt.Sprintf("`%s` label is required.", c.keyRe.original),
 						Pos:         entryLabels.Key.Pos,
+						Expr:        nil,
 						FirstColumn: 1,
 						LastColumn:  len(entryLabels.Key.Value),
 						Kind:        diags.Issue,
@@ -217,6 +218,7 @@ func (c LabelCheck) checkValue(rule parser.Rule, value string, lab *parser.YamlN
 				{
 					Message:     fmt.Sprintf("`%s` label value must match `%s`.", c.keyRe.original, c.valueRe.anchored),
 					Pos:         lab.Pos,
+					Expr:        nil,
 					FirstColumn: 1,
 					LastColumn:  len(lab.Value),
 					Kind:        diags.Issue,
@@ -255,6 +257,7 @@ func (c LabelCheck) checkValue(rule parser.Rule, value string, lab *parser.YamlN
 					{
 						Message:     fmt.Sprintf("`%s` label value is not one of valid values.", c.keyRe.original),
 						Pos:         lab.Pos,
+						Expr:        nil,
 						FirstColumn: 1,
 						LastColumn:  len(lab.Value),
 						Kind:        diags.Issue,

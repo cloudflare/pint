@@ -91,6 +91,7 @@ func (c FragileCheck) checkTopK(expr *parser.PromQLExpr, src source.Source) (pro
 			{
 				Message:     fmt.Sprintf("Using `%s` to select time series might return different set of time series on every query, which would cause flapping alerts.", src.Operation()),
 				Pos:         expr.Value.Pos,
+				Expr:        expr.Query().Expr,
 				FirstColumn: int(src.Position.Start) + 1,
 				LastColumn:  int(src.Position.End),
 				Kind:        diags.Issue,
@@ -147,6 +148,7 @@ func (c FragileCheck) checkPartialData(expr *parser.PromQLExpr, src source.Sourc
 				{
 					Message:     "This query can cause false positives when Prometheus restarts, add `for` option to avoid that.",
 					Pos:         expr.Value.Pos,
+					Expr:        expr.Query().Expr,
 					FirstColumn: int(j.Src.Position.Start) + 1,
 					LastColumn:  int(j.Src.Position.End),
 					Kind:        diags.Issue,

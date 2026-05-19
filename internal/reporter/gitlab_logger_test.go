@@ -50,7 +50,7 @@ func TestGetGitLabPaginated(t *testing.T) {
 	})
 
 	t.Run("multiple pages", func(t *testing.T) {
-		callCount := 0
+		var callCount int
 		items, err := getGitLabPaginated(func(pageNum int64) ([]string, *gitlab.Response, error) {
 			callCount++
 			if pageNum == 1 {

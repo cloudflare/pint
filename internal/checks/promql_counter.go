@@ -137,6 +137,7 @@ LOOP:
 						promText(c.prom.Name(), metadata.URI),
 					),
 					Pos:         expr.Value.Pos,
+					Expr:        expr.Query().Expr,
 					FirstColumn: int(selector.PosRange.Start) + 1,
 					LastColumn:  int(selector.PosRange.End),
 					Kind:        diags.Issue,

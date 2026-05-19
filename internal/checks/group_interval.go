@@ -65,6 +65,7 @@ func (c GroupIntervalCheck) Check(_ context.Context, entry *discovery.Entry, _ [
 			{
 				Message:     "Using group interval > 5m will cause gaps in recording rule results and flapping alerts.",
 				Pos:         entry.Group.Interval.Pos,
+				Expr:        nil,
 				FirstColumn: 1,
 				LastColumn:  entry.Group.Interval.Pos.Len(),
 				Kind:        diags.Issue,

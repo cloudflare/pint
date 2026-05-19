@@ -69,6 +69,7 @@ func (c AlertsForChecksFor) checkField(name string, value *parser.YamlDuration) 
 				{
 					Message:     value.ParseError.Error(),
 					Pos:         value.Pos,
+					Expr:        nil,
 					FirstColumn: 1,
 					LastColumn:  value.Pos.Len(),
 					Kind:        diags.Issue,
@@ -90,6 +91,7 @@ func (c AlertsForChecksFor) checkField(name string, value *parser.YamlDuration) 
 				{
 					Message:     fmt.Sprintf("`%s` is the default value of `%s`, this line is unnecessary.", value.Raw, name),
 					Pos:         value.Pos,
+					Expr:        nil,
 					FirstColumn: 1,
 					LastColumn:  value.Pos.Len(),
 					Kind:        diags.Issue,

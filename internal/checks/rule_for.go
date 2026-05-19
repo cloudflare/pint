@@ -78,6 +78,7 @@ func (c RuleForCheck) Check(_ context.Context, entry *discovery.Entry, _ []*disc
 		diag = diags.Diagnostic{
 			Message:     "",
 			Pos:         entry.Rule.AlertingRule.For.Pos,
+			Expr:        nil,
 			FirstColumn: 1,
 			LastColumn:  entry.Rule.AlertingRule.For.Pos.Len(),
 			Kind:        diags.Issue,
@@ -88,6 +89,7 @@ func (c RuleForCheck) Check(_ context.Context, entry *discovery.Entry, _ []*disc
 		diag = diags.Diagnostic{
 			Message:     "",
 			Pos:         entry.Rule.AlertingRule.KeepFiringFor.Pos,
+			Expr:        nil,
 			FirstColumn: 1,
 			LastColumn:  entry.Rule.AlertingRule.KeepFiringFor.Pos.Len(),
 			Kind:        diags.Issue,
@@ -97,6 +99,7 @@ func (c RuleForCheck) Check(_ context.Context, entry *discovery.Entry, _ []*disc
 		diag = diags.Diagnostic{
 			Message:     "",
 			Pos:         entry.Rule.AlertingRule.Alert.Pos,
+			Expr:        nil,
 			FirstColumn: 1,
 			LastColumn:  len(entry.Rule.AlertingRule.Alert.Value),
 			Kind:        diags.Issue,
@@ -115,6 +118,7 @@ func (c RuleForCheck) Check(_ context.Context, entry *discovery.Entry, _ []*disc
 				{
 					Message:     fmt.Sprintf("This alert rule must have a `%s` field with a minimum duration of %s.", c.key, output.HumanizeDuration(c.minFor)),
 					Pos:         diag.Pos,
+					Expr:        nil,
 					FirstColumn: diag.FirstColumn,
 					LastColumn:  diag.LastColumn,
 					Kind:        diag.Kind,
@@ -135,6 +139,7 @@ func (c RuleForCheck) Check(_ context.Context, entry *discovery.Entry, _ []*disc
 				{
 					Message:     fmt.Sprintf("This alert rule must have a `%s` field with a maximum duration of %s.", c.key, output.HumanizeDuration(c.maxFor)),
 					Pos:         diag.Pos,
+					Expr:        nil,
 					FirstColumn: diag.FirstColumn,
 					LastColumn:  diag.LastColumn,
 					Kind:        diag.Kind,

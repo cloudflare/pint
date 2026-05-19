@@ -176,6 +176,7 @@ func problemFromError(err error, rule parser.Rule, reporter, prom string, s Seve
 			{
 				Message:     text,
 				Pos:         name.Pos,
+				Expr:        nil,
 				FirstColumn: 1,
 				LastColumn:  len(name.Value),
 				Kind:        diags.Issue,
@@ -193,6 +194,7 @@ func WholeRuleDiag(rule parser.Rule, msg string) diags.Diagnostic {
 	return diags.Diagnostic{
 		Message:     msg,
 		Pos:         node.Pos,
+		Expr:        nil,
 		FirstColumn: 1,
 		LastColumn:  min(3, len(node.Value)),
 		Kind:        diags.Issue,

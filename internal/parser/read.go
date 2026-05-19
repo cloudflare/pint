@@ -101,6 +101,7 @@ func (r *ContentReader) parseComments() {
 						LastColumn:  len(r.buf) - 1,
 					},
 				},
+				Expr:        nil,
 				FirstColumn: comment.Offset + 1,
 				LastColumn:  len(r.buf) - 1,
 				Kind:        diags.Issue,

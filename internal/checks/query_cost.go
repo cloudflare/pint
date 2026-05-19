@@ -124,6 +124,7 @@ func (c CostCheck) Check(ctx context.Context, entry *discovery.Entry, entries []
 				{
 					Message:     fmt.Sprintf("%s returned %d result(s)%s, maximum allowed series is %d.", promText(c.prom.Name(), qr.URI), series, estimate, c.maxSeries),
 					Pos:         expr.Value.Pos,
+					Expr:        expr.Query().Expr,
 					FirstColumn: 1,
 					LastColumn:  len(expr.Value.Value),
 					Kind:        diags.Issue,
@@ -145,6 +146,7 @@ func (c CostCheck) Check(ctx context.Context, entry *discovery.Entry, entries []
 				{
 					Message:     fmt.Sprintf("%s queried %d samples in total when executing this query, which is more than the configured limit of %d.", promText(c.prom.Name(), qr.URI), qr.Stats.Samples.TotalQueryableSamples, c.maxTotalSamples),
 					Pos:         expr.Value.Pos,
+					Expr:        expr.Query().Expr,
 					FirstColumn: 1,
 					LastColumn:  len(expr.Value.Value),
 					Kind:        diags.Issue,
@@ -166,6 +168,7 @@ func (c CostCheck) Check(ctx context.Context, entry *discovery.Entry, entries []
 				{
 					Message:     fmt.Sprintf("%s queried %d peak samples when executing this query, which is more than the configured limit of %d.", promText(c.prom.Name(), qr.URI), qr.Stats.Samples.PeakSamples, c.maxPeakSamples),
 					Pos:         expr.Value.Pos,
+					Expr:        expr.Query().Expr,
 					FirstColumn: 1,
 					LastColumn:  len(expr.Value.Value),
 					Kind:        diags.Issue,
@@ -188,6 +191,7 @@ func (c CostCheck) Check(ctx context.Context, entry *discovery.Entry, entries []
 				{
 					Message:     fmt.Sprintf("%s took %s when executing this query, which is more than the configured limit of %s.", promText(c.prom.Name(), qr.URI), output.HumanizeDuration(evalDur), output.HumanizeDuration(c.maxEvaluationDuration)),
 					Pos:         expr.Value.Pos,
+					Expr:        expr.Query().Expr,
 					FirstColumn: 1,
 					LastColumn:  len(expr.Value.Value),
 					Kind:        diags.Issue,
@@ -209,6 +213,7 @@ func (c CostCheck) Check(ctx context.Context, entry *discovery.Entry, entries []
 				{
 					Message:     fmt.Sprintf("%s returned %d result(s)%s.", promText(c.prom.Name(), qr.URI), series, estimate),
 					Pos:         expr.Value.Pos,
+					Expr:        expr.Query().Expr,
 					FirstColumn: 1,
 					LastColumn:  len(expr.Value.Value),
 					Kind:        diags.Issue,
@@ -338,6 +343,7 @@ func (c CostCheck) suggestRecordingRules(
 							{
 								Message:     fmt.Sprintf("Use `%s` here instead to speed up the query.", other.Rule.RecordingRule.Record.Value),
 								Pos:         expr.Value.Pos,
+								Expr:        expr.Query().Expr,
 								FirstColumn: int(op.PositionRange().Start) + 1,
 								LastColumn:  int(op.PositionRange().End),
 								Kind:        diags.Issue,

@@ -105,6 +105,7 @@ func (c AggregationCheck) Check(_ context.Context, entry *discovery.Entry, _ []*
 						Message: fmt.Sprintf("`%s` label is required and should be preserved when aggregating %s rules.",
 							c.label, nameDesc),
 						Pos:         expr.Value.Pos,
+						Expr:        expr.Query().Expr,
 						FirstColumn: int(fragment.Start) + 1,
 						LastColumn:  int(fragment.End),
 						Kind:        diags.Issue,
@@ -112,6 +113,7 @@ func (c AggregationCheck) Check(_ context.Context, entry *discovery.Entry, _ []*
 					{
 						Message:     reason,
 						Pos:         expr.Value.Pos,
+						Expr:        expr.Query().Expr,
 						FirstColumn: int(fragment.Start) + 1,
 						LastColumn:  int(fragment.End),
 						Kind:        diags.Context,
@@ -151,6 +153,7 @@ func (c AggregationCheck) Check(_ context.Context, entry *discovery.Entry, _ []*
 						Message: fmt.Sprintf("`%s` label should be removed when aggregating %s rules.",
 							c.label, nameDesc),
 						Pos:         expr.Value.Pos,
+						Expr:        expr.Query().Expr,
 						FirstColumn: int(posrange.Start) + 1,
 						LastColumn:  int(posrange.End),
 						Kind:        diags.Issue,

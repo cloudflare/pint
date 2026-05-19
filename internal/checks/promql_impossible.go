@@ -66,6 +66,7 @@ func (c ImpossibleCheck) checkSource(expr *parser.PromQLExpr, s source.Source) (
 			Diagnostics: []diags.Diagnostic{
 				{
 					Pos:         expr.Value.Pos,
+					Expr:        expr.Query().Expr,
 					FirstColumn: int(s.DeadInfo.Fragment.Start) + 1,
 					LastColumn:  int(s.DeadInfo.Fragment.End),
 					Message:     s.DeadInfo.Reason,
@@ -85,6 +86,7 @@ func (c ImpossibleCheck) checkSource(expr *parser.PromQLExpr, s source.Source) (
 			Diagnostics: []diags.Diagnostic{
 				{
 					Pos:         expr.Value.Pos,
+					Expr:        expr.Query().Expr,
 					FirstColumn: int(dl.UsageFragment.Start) + 1,
 					LastColumn:  int(dl.UsageFragment.End),
 					Message:     dl.Reason,
@@ -92,6 +94,7 @@ func (c ImpossibleCheck) checkSource(expr *parser.PromQLExpr, s source.Source) (
 				},
 				{
 					Pos:         expr.Value.Pos,
+					Expr:        expr.Query().Expr,
 					FirstColumn: int(dl.LabelFragment.Start) + 1,
 					LastColumn:  int(dl.LabelFragment.End),
 					Message:     dl.LabelReason,

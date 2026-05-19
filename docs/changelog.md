@@ -7,6 +7,11 @@
 - GitHub and GitLab reporters will now automatically delete outdated general
   comments from previous `pint ci` runs.
 
+### Changed
+
+- Reported problems will now trim more parts of the query for which the problem is
+  reported, to make it easier to read.
+
 ## v0.83.0
 
 ### Added

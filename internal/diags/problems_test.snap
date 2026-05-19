@@ -124,8 +124,9 @@ expr: foo(bar) by()
 [TestInjectDiagnostics/multiple_position_ranges_on_same_line_compute_min_and_max_columns - 1]
 sum by (instance) (rate(http_requests_total{job="api",status=~"5.."}[5m])) / sum by (instance) (rate(up{job="api"}[5m])) > 0.01
 
-1 | ... / sum by (instance) (rate(up{job="api"}[5m])) > 0.01
-                                 ^^^^ check this
+1 | sum by (instance) (rate(http_requests_total{job="api",status=~"5.."}[5m])) / sum by (instance) (rate(up{job="api"}[5m])) > 0.01
+                                                                                                        ^^^^
+                                                                                                  check this
 
 ---
 
@@ -141,8 +142,9 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 [TestInjectDiagnostics/AST_trimming_with_multi-line_positions_skips_other_lines - 1]
 sum by (instance) (rate(http_requests_total{job="api",status=~"5.."}[5m])) / sum by (instance) (rate(up{job="api"}[5m])) > 0.01
 
-1 | ... / sum by (instance) (rate(...)) > 0.01
-                              ^^^^ dead code
+1 | sum by (instance) (rate(http_requests_total{job="api",status=~"5.."}[5m])) / sum by (instance) (rate(up{job="api"}[5m])) > 0.01
+                                                                                                     ^^^^
+                                                                                                dead code
 
 ---
 
@@ -267,5 +269,42 @@ expr: sum(foo) without(colo_id, instance, node_type, region, node_status, job, c
                            region, node_status, job, colo_name)`, all labels included inside
                            `without(...)` will be removed from the results. `job` label is required and
                            should be preserved when aggregating all rules.
+
+---
+
+[TestInjectDiagnostics/multi-line_expression_trims_long_inner_line - 1]
+
+expr: >-
+  sum by (exporter, colo_name) (rate(otelcol_exporter_send_failed_log_records{node_status="v", exporter=~"(failover|otlp)/.*"}[5m]))
+  /
+  (
+    sum by (exporter, colo_name) (rate(otelcol_exporter_send_failed_log_records{exporter=~"(failover|otlp)/.*"}[5m])) + sum by (exporter, colo_name) (rate(otelcol_exporter_sent_log_records{exporter=~"(failover|otlp)/.*"}[5m]))
+  )
+  > 0.1
+  and
+  sum by (exporter, colo_name) (rate(otelcol_exporter_send_failed_log_records{node_status="v", exporter=~"(failover|otlp)/.*"}[5m])) > 10
+
+ 3 |   sum by (exporter, colo_name) (...)
+ 4 |   /
+ 5 |   (
+ 6 |     ... + sum by (exporter, colo_name) (rate(otelcol_exporter_sent_log_records{exporter=~"(failover|otlp)/.*"}[5m]))
+                                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                                                                            smelly regexp selector
+ 7 |   )
+ 8 |   > 0.1
+ 9 |   and
+10 |   ... > 10
+
+---
+
+[TestInjectDiagnostics/multi-line_expression_trims_individual_long_lines - 1]
+
+expr: |
+  sum(rate(very_long_metric_name_that_pushes_past_the_width_limit_aaaa{job="api",status=~"5.."}[5m])) by(instance)
+  + sum(rate(another_very_long_metric_name_that_pushes_past_the_width_limit{job="api"}[5m]))
+
+3 |   sum(rate(...)) by(instance)
+        ^^^^^^ bad rate
+4 |   + sum(rate(another_very_long_metric_name_that_pushes_past_the_width_limit{job="api"}[5m]))
 
 ---

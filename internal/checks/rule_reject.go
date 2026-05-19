@@ -91,6 +91,7 @@ func (c Reject) reject(rule parser.Rule, label *parser.YamlKeyValue) (problems [
 				{
 					Message:     fmt.Sprintf("key is not allowed to match `%s`.", c.keyRe.anchored),
 					Pos:         label.Key.Pos,
+					Expr:        nil,
 					FirstColumn: 1,
 					LastColumn:  len(label.Key.Value),
 					Kind:        diags.Issue,
@@ -113,6 +114,7 @@ func (c Reject) reject(rule parser.Rule, label *parser.YamlKeyValue) (problems [
 				{
 					Message:     fmt.Sprintf("value is not allowed to match `%s`.", c.valueRe.anchored),
 					Pos:         label.Value.Pos,
+					Expr:        nil,
 					FirstColumn: 1,
 					LastColumn:  len(label.Value.Value),
 					Kind:        diags.Issue,

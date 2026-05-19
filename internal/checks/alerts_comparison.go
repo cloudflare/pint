@@ -98,6 +98,7 @@ func (c ComparisonCheck) Check(_ context.Context, entry *discovery.Entry, _ []*d
 					{
 						Message:     msg,
 						Pos:         entry.Rule.AlertingRule.Expr.Value.Pos,
+						Expr:        expr.Query().Expr,
 						FirstColumn: int(src.Position.Start) + 1,
 						LastColumn:  int(src.Position.End),
 						Kind:        diags.Issue,

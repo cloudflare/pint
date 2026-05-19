@@ -16,8 +16,8 @@
           component: disk
   output: |
     4 |       max without (source_instance) (
-    5 |         increase(kernel_device_io_errors_total{device!~"loop.+"}[120m]) > 3 unless on(instance, device) (
-    6 |           increase(kernel_device_io_soft_errors_total{device!~"loop.+"}[125m])*2 > increase(kernel_device_io_errors_total[120m])
+    5 |         ... > 3 unless on(instance, device) (
+    6 |           ... > ...
     7 |         )
     8 |         and on(device, instance) absent(node_disk_info)
                                          ^^^^^^
@@ -32,7 +32,7 @@
                                          back from absent call are the ones you pass to it. If you're hoping
                                          to get instance specific labels this way and alert when some target
                                          is down then that won't work, use the `up` metric instead.
-    9 |       ) unless on (instance,device) max(max_over_time(cloudchamber_snapshot_devices[1h])) by (instance,device)
+    9 |       ) unless on (instance,device) max(...) by (instance,device)
   problem:
     reporter: promql/impossible
     summary: dead code in query
@@ -2744,12 +2744,13 @@
         summary: Throughput in region {{ $labels.region }}
   output: |
     4 |     (
-    5 |       max(job:writes_total:rate5m{region=~"wnam|weur", job="myjob", cluster=~"(a|b)"} or vector(0)) by(region)
+    5 |       max(...) by(region)
     6 |       +
-    7 |       max(job:skipps_total:rate5m{region=~"wnam|weur", job="myjob", cluster=~"(a|b)"} or vector(0)) by(region)
-                                                                                                 ^^^^^^
-         The right hand side will never be matched because it doesn't have the `region` label while the
-         left hand side will. Calling `vector()` will return a vector value with no labels.
+    7 |       max(... or vector(0)) by(region)
+                         ^^^^^^
+                         The right hand side will never be matched because it doesn't have the `region`
+                         label while the left hand side will. Calling `vector()` will return a vector value
+                         with no labels.
     8 |     ) / sum(rate(records_total{region=~"wnam|weur"}[5m])) by (region) < 0.90
   problem:
     reporter: promql/impossible
@@ -2779,13 +2780,12 @@
         summary: Throughput in region {{ $labels.region }}
   output: |
     4 |     (
-    5 |       max(job:writes_total:rate5m{region=~"wnam|weur", job="myjob", cluster=~"(a|b)"} or vector(0)) by(region)
+    5 |       max(...) by(region)
     6 |       +
-    7 |       max(job:skipps_total:rate5m{region=~"wnam|weur", job="myjob", cluster=~"(a|b)"} or vector(0)) by(region)
-                                                                                                               ^^^^^^
-                                                      You can't use `region` because this label is not possible here.
-                                                                                                 ^^^^^^
-                                          Calling `vector()` will return a vector value with no labels.
+    7 |       max(... or vector(0)) by(region)
+                                       ^^^^^^
+                                       You can't use `region` because this label is not possible here.
+                         ^^^^^^ Calling `vector()` will return a vector value with no labels.
     8 |     ) / sum(rate(records_total{region=~"wnam|weur"}[5m])) by (region) < 0.90
   problem:
     reporter: promql/impossible
@@ -2819,13 +2819,12 @@
         summary: Throughput in region {{ $labels.region }}
   output: |
     4 |     (
-    5 |       max(job:writes_total:rate5m{region=~"wnam|weur", job="myjob", cluster=~"(a|b)"} or vector(0)) by(region)
-                                                                                                               ^^^^^^
-                                                      You can't use `region` because this label is not possible here.
-                                                                                                 ^^^^^^
-                                          Calling `vector()` will return a vector value with no labels.
+    5 |       max(... or vector(0)) by(region)
+                                       ^^^^^^
+                                       You can't use `region` because this label is not possible here.
+                         ^^^^^^ Calling `vector()` will return a vector value with no labels.
     6 |       +
-    7 |       max(job:skipps_total:rate5m{region=~"wnam|weur", job="myjob", cluster=~"(a|b)"} or vector(0)) by(region)
+    7 |       max(...) by(region)
     8 |     ) / sum(rate(records_total{region=~"wnam|weur"}[5m])) by (region) < 0.90
   problem:
     reporter: promql/impossible
@@ -2859,13 +2858,12 @@
         summary: Throughput in region {{ $labels.region }}
   output: |
     4 |     (
-    5 |       max(job:writes_total:rate5m{region=~"wnam|weur", job="myjob", cluster=~"(a|b)"} or vector(0)) by(region)
+    5 |       max(...) by(region)
     6 |       +
-    7 |       max(job:skipps_total:rate5m{region=~"wnam|weur", job="myjob", cluster=~"(a|b)"} or vector(0)) by(region)
-                                                                                                               ^^^^^^
-                                                      You can't use `region` because this label is not possible here.
-                                                                                                 ^^^^^^
-                                          Calling `vector()` will return a vector value with no labels.
+    7 |       max(... or vector(0)) by(region)
+                                       ^^^^^^
+                                       You can't use `region` because this label is not possible here.
+                         ^^^^^^ Calling `vector()` will return a vector value with no labels.
     8 |     ) / sum(rate(records_total{region=~"wnam|weur"}[5m])) by (region) < 0.90
   problem:
     reporter: promql/impossible
