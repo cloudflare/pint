@@ -1,6 +1,7 @@
 http method github GET /api/v3/repos/cloudflare/pint/pulls/123/reviews 200 []
 http method github POST /api/v3/repos/cloudflare/pint/pulls/123/reviews 200 {}
 http method github GET /api/v3/repos/cloudflare/pint/pulls/123/comments 200 []
+http method github GET /api/v3/repos/cloudflare/pint/issues/123/comments 200 []
 http method github POST /api/v3/repos/cloudflare/pint/pulls/123/comments 200 {}
 http start github 127.0.0.1:6085
 
@@ -63,6 +64,12 @@ repository {
 -- github.expected --
 GET /api/v3/repos/cloudflare/pint/pulls/123/comments
   Accept: application/vnd.github.squirrel-girl-preview, application/vnd.github.comfort-fade-preview+json
+  Accept-Encoding: gzip
+  Authorization: Bearer 12345
+  X-Github-Api-Version: 2022-11-28
+
+GET /api/v3/repos/cloudflare/pint/issues/123/comments
+  Accept: application/vnd.github.squirrel-girl-preview
   Accept-Encoding: gzip
   Authorization: Bearer 12345
   X-Github-Api-Version: 2022-11-28

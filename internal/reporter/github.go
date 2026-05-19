@@ -37,6 +37,10 @@ type ghCommentMeta struct {
 	id int64
 }
 
+type ghIssueCommentMeta struct {
+	id int64
+}
+
 type ghPR struct{}
 
 // commentPosition returns the side and line number for a GitHub PR review comment.
@@ -159,10 +163,27 @@ func (gr GithubReporter) List(ctx context.Context, _ any) ([]ExistingComment, er
 			continue
 		}
 		comments = append(comments, ExistingComment{
-			path: ec.GetPath(),
-			text: ec.GetBody(),
-			line: ec.GetLine(),
-			meta: ghCommentMeta{id: ec.GetID()},
+			id:        strconv.FormatInt(ec.GetID(), 10),
+			path:      ec.GetPath(),
+			text:      ec.GetBody(),
+			line:      ec.GetLine(),
+			meta:      ghCommentMeta{id: ec.GetID()},
+			isGeneral: false,
+		})
+	}
+
+	issueComments, _, err := gr.client.Issues.ListComments(reqCtx, gr.owner, gr.repo, gr.prNum, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list issue comments: %w", err)
+	}
+	for _, ic := range issueComments {
+		comments = append(comments, ExistingComment{
+			id:        strconv.FormatInt(ic.GetID(), 10),
+			path:      "",
+			text:      ic.GetBody(),
+			line:      0,
+			meta:      ghIssueCommentMeta{id: ic.GetID()},
+			isGeneral: true,
 		})
 	}
 
@@ -206,12 +227,22 @@ func (gr GithubReporter) Create(ctx context.Context, _ any, p PendingComment) er
 	return err
 }
 
-func (gr GithubReporter) Delete(_ context.Context, _ any, _ ExistingComment) error {
+func (gr GithubReporter) Delete(ctx context.Context, _ any, comment ExistingComment) error {
+	if meta, ok := comment.meta.(ghIssueCommentMeta); ok {
+		reqCtx, cancel := gr.reqContext(ctx)
+		defer cancel()
+		_, err := gr.client.Issues.DeleteComment(reqCtx, gr.owner, gr.repo, meta.id)
+		return err
+	}
 	return nil
 }
 
-func (gr GithubReporter) CanDelete(ExistingComment) bool {
-	return false
+func (gr GithubReporter) CanDelete(c ExistingComment) bool {
+	return c.isGeneral
+}
+
+func (gr GithubReporter) MaxComments() int {
+	return gr.maxComments
 }
 
 func (gr GithubReporter) CanCreate(done int) bool {

@@ -176,6 +176,21 @@ func (gl GitLabReporter) List(_ context.Context, dst any) ([]ExistingComment, er
 				goto NEXT
 			}
 			if note.Position == nil {
+				// General comment, no path, line or commit information available.
+				comments = append(comments, ExistingComment{
+					id:   strconv.FormatInt(note.ID, 10),
+					path: "",
+					text: note.Body,
+					line: 0,
+					meta: gitlabComment{
+						discussionID: disc.ID,
+						noteID:       note.ID,
+						baseSHA:      "",
+						headSHA:      "",
+						startSHA:     "",
+					},
+					isGeneral: true,
+				})
 				goto NEXT
 			}
 			if note.Resolved {
@@ -249,6 +264,10 @@ func (gl GitLabReporter) IsEqual(_ any, existing ExistingComment, pending Pendin
 
 func (gl GitLabReporter) CanDelete(ExistingComment) bool {
 	return true
+}
+
+func (gl GitLabReporter) MaxComments() int {
+	return gl.maxComments
 }
 
 func (gl GitLabReporter) CanCreate(done int) bool {
@@ -359,6 +378,7 @@ func (gl GitLabReporter) noteToExisting(discID string, note *gitlab.Note) (c Exi
 	} else {
 		c.line = int(note.Position.OldLine) // FIXME int64 -> int
 	}
+	c.id = strconv.FormatInt(note.ID, 10)
 	c.text = note.Body
 	c.meta = gitlabComment{
 		discussionID: discID,

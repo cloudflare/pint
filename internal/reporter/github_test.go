@@ -138,6 +138,56 @@ func TestGitHubReporter(t *testing.T) {
 			}),
 		},
 		{
+			description: "list issue comments error",
+			owner:       "foo",
+			repo:        "bar",
+			token:       "something",
+			prNum:       123,
+			maxComments: 50,
+			timeout:     time.Second,
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
+					w.Header().Set("Content-Type", "application/json")
+					_, _ = w.Write([]byte(`[]`))
+					return
+				}
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/issues/123/comments" {
+					w.WriteHeader(http.StatusBadRequest)
+					_, _ = w.Write([]byte("Error"))
+					return
+				}
+				_, _ = w.Write([]byte(""))
+			}),
+			error: func(uri string) string {
+				return fmt.Sprintf(
+					"failed to list issue comments: GET %s/api/v3/repos/foo/bar/issues/123/comments: 400  []",
+					uri,
+				)
+			},
+			summary: reporter.NewSummary([]reporter.Report{
+				{
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+					Changes: &discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
+					Problem: checks.Problem{
+						Lines: diags.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: "mock",
+						Summary:  "syntax error",
+						Severity: checks.Fatal,
+					},
+				},
+			}),
+		},
+		{
 			description: "no problems",
 			owner:       "foo",
 			repo:        "bar",
@@ -176,6 +226,142 @@ func TestGitHubReporter(t *testing.T) {
 						Summary:  "syntax error",
 						Details:  "syntax details",
 						Severity: checks.Fatal,
+					},
+				},
+			}),
+		},
+		{
+			description: "stale general comment deleted",
+			owner:       "foo",
+			repo:        "bar",
+			token:       "something",
+			prNum:       123,
+			maxComments: 1,
+			timeout:     time.Second,
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/reviews" {
+					_, _ = w.Write([]byte(`[{"id":1,"body":"### This pull request was validated by [pint](https://github.com/cloudflare/pint).\nxxxx"}]`))
+					return
+				}
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
+					_, _ = w.Write([]byte(`[]`))
+					return
+				}
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/issues/123/comments" {
+					_, _ = w.Write([]byte(`[{"id":999,"body":"This pint run would create 3 comment(s), which is more than the limit configured for pint (1).\n2 comment(s) were skipped and won't be visible on this PR."}]`))
+					return
+				}
+				if r.Method == http.MethodDelete && r.URL.Path == "/api/v3/repos/foo/bar/issues/comments/999" {
+					_, _ = w.Write([]byte(`{}`))
+					return
+				}
+				if r.Method == http.MethodPost && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
+					_, _ = w.Write([]byte(`{}`))
+					return
+				}
+				if r.Method == http.MethodPost && r.URL.Path == "/api/v3/repos/foo/bar/issues/123/comments" {
+					t.Errorf("Unexpected general comment creation")
+					return
+				}
+				_, _ = w.Write([]byte(""))
+			}),
+			summary: reporter.NewSummary([]reporter.Report{
+				{
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
+					Changes: &discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
+					Problem: checks.Problem{
+						Lines: diags.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: "mock",
+						Summary:  "syntax error",
+						Details:  "syntax details",
+						Severity: checks.Fatal,
+					},
+				},
+			}),
+		},
+		{
+			description: "general comment already present",
+			owner:       "foo",
+			repo:        "bar",
+			token:       "something",
+			prNum:       123,
+			maxComments: 1,
+			timeout:     time.Second,
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/reviews" {
+					_, _ = w.Write([]byte(`[{"id":1,"body":"### This pull request was validated by [pint](https://github.com/cloudflare/pint).\nxxxx"}]`))
+					return
+				}
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
+					_, _ = w.Write([]byte(`[]`))
+					return
+				}
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/issues/123/comments" {
+					_, _ = w.Write([]byte(`[{"id":999,"body":"This pint run would create 2 comment(s), which is more than the limit configured for pint (1).\n1 comment(s) were skipped and won't be visible on this PR."}]`))
+					return
+				}
+				if r.Method == http.MethodDelete && r.URL.Path == "/api/v3/repos/foo/bar/issues/comments/999" {
+					t.Errorf("Unexpected delete of general comment that should be kept")
+					return
+				}
+				if r.Method == http.MethodPost && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
+					_, _ = w.Write([]byte(`{}`))
+					return
+				}
+				_, _ = w.Write([]byte(""))
+			}),
+			summary: reporter.NewSummary([]reporter.Report{
+				{
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+					Changes: &discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
+					Problem: checks.Problem{
+						Lines: diags.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: "mock1",
+						Summary:  "syntax error1",
+						Details:  "syntax details1",
+						Severity: checks.Bug,
+					},
+				},
+				{
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+					Changes: &discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
+					Problem: checks.Problem{
+						Lines: diags.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: "mock2",
+						Summary:  "syntax error2",
+						Details:  "syntax details2",
+						Severity: checks.Bug,
 					},
 				},
 			}),

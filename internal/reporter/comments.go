@@ -32,10 +32,12 @@ type PendingComment struct {
 }
 
 type ExistingComment struct {
-	meta any
-	path string
-	text string
-	line int
+	meta      any
+	id        string
+	path      string
+	text      string
+	line      int
+	isGeneral bool
 }
 
 type Commenter interface {
@@ -48,6 +50,7 @@ type Commenter interface {
 	CanCreate(int) bool
 	CanDelete(ExistingComment) bool
 	IsEqual(any, ExistingComment, PendingComment) bool
+	MaxComments() int
 }
 
 func NewCommentReporter(c Commenter, showDuplicates bool) CommentReporter {
@@ -406,13 +409,16 @@ func updateDestination(ctx context.Context, s Summary, c Commenter, dst any, sho
 	}
 
 	for _, existing := range existingComments {
+		if existing.isGeneral {
+			goto NEXT
+		}
 		for _, pending := range pendingComments {
 			if c.IsEqual(dst, existing, pending) {
-				goto NEXTDelete
+				goto NEXT
 			}
 		}
 		if !c.CanDelete(existing) {
-			goto NEXTDelete
+			goto NEXT
 		}
 		slog.LogAttrs(
 			ctx, slog.LevelInfo, "Trying to delete a stale existing comment",
@@ -429,8 +435,10 @@ func updateDestination(ctx context.Context, s Summary, c Commenter, dst any, sho
 			)
 			errs = append(errs, err)
 		}
-	NEXTDelete:
+	NEXT:
 	}
+
+	deleteStaleGeneralComments(ctx, c, dst, s, existingComments, pendingComments, errs)
 
 	slog.LogAttrs(
 		ctx, slog.LevelInfo, "Creating report summary",
@@ -447,6 +455,55 @@ func updateDestination(ctx context.Context, s Summary, c Commenter, dst any, sho
 	}
 
 	return nil
+}
+
+func deleteStaleGeneralComments(
+	ctx context.Context,
+	c Commenter,
+	dst any,
+	s Summary,
+	existingComments []ExistingComment,
+	pendingComments []PendingComment,
+	errs []error,
+) {
+	needed := pendingGeneralComments(c, s, pendingComments, errs)
+
+	for _, existing := range existingComments {
+		if !existing.isGeneral {
+			continue
+		}
+		if _, ok := needed[existing.text]; ok {
+			continue
+		}
+		slog.LogAttrs(
+			ctx, slog.LevelInfo, "Deleting stale general comment",
+			slog.String("reporter", c.Describe()),
+			slog.String("id", existing.id),
+		)
+		if err := c.Delete(ctx, dst, existing); err != nil {
+			slog.LogAttrs(
+				ctx, slog.LevelError, "Failed to delete stale general comment",
+				slog.String("reporter", c.Describe()),
+				slog.Any("err", err),
+			)
+		}
+	}
+}
+
+// pendingGeneralComments returns the set of general comment bodies that
+// Summary() will create, so they are not deleted as stale.
+func pendingGeneralComments(c Commenter, s Summary, pendingComments []PendingComment, errs []error) map[string]struct{} {
+	needed := make(map[string]struct{})
+	if m := c.MaxComments(); m > 0 && len(pendingComments) > m {
+		needed[tooManyCommentsMsg(len(pendingComments), m)] = struct{}{}
+	}
+	if len(errs) > 0 {
+		needed[errsToComment(errs)] = struct{}{}
+	}
+	if details := makePrometheusDetailsComment(s); details != "" {
+		needed[details] = struct{}{}
+	}
+	return needed
 }
 
 func makePrometheusDetailsComment(s Summary) string {
