@@ -85,6 +85,12 @@ entry:
     rulecomments:
         - value:
             match: promql/series
+            position:
+                pos:
+                    - line: 4
+                      firstcolumn: 3
+                      lastcolumn: 30
+                offset: 15
           type: 10
           offset: 0
 checks:

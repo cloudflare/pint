@@ -90,46 +90,112 @@ entry:
     rulecomments:
         - value:
             match: alerts/count(+disable)
+            position:
+                pos:
+                    - line: 2
+                      firstcolumn: 1
+                      lastcolumn: 37
+                offset: 15
           type: 10
           offset: 0
         - value:
             match: alerts/external_labels(+disable)
+            position:
+                pos:
+                    - line: 3
+                      firstcolumn: 1
+                      lastcolumn: 47
+                offset: 15
           type: 10
           offset: 0
         - value:
             match: labels/conflict(+disable)
+            position:
+                pos:
+                    - line: 4
+                      firstcolumn: 1
+                      lastcolumn: 40
+                offset: 15
           type: 10
           offset: 0
         - value:
             match: promql/counter(+disable)
+            position:
+                pos:
+                    - line: 5
+                      firstcolumn: 1
+                      lastcolumn: 39
+                offset: 15
           type: 10
           offset: 0
         - value:
             match: promql/range_query(+disable)
+            position:
+                pos:
+                    - line: 6
+                      firstcolumn: 1
+                      lastcolumn: 43
+                offset: 15
           type: 10
           offset: 0
         - value:
             match: promql/regexp(+disable)
+            position:
+                pos:
+                    - line: 7
+                      firstcolumn: 1
+                      lastcolumn: 38
+                offset: 15
           type: 10
           offset: 0
         - value:
             match: promql/series(+disable)
+            position:
+                pos:
+                    - line: 8
+                      firstcolumn: 1
+                      lastcolumn: 38
+                offset: 15
           type: 10
           offset: 0
         - value:
             match: promql/rate(+disable)
+            position:
+                pos:
+                    - line: 9
+                      firstcolumn: 1
+                      lastcolumn: 36
+                offset: 15
           type: 10
           offset: 0
         - value:
             match: promql/vector_matching(+disable)
+            position:
+                pos:
+                    - line: 10
+                      firstcolumn: 1
+                      lastcolumn: 47
+                offset: 15
           type: 10
           offset: 0
         - value:
             match: rule/duplicate(+disable)
+            position:
+                pos:
+                    - line: 11
+                      firstcolumn: 1
+                      lastcolumn: 39
+                offset: 15
           type: 10
           offset: 0
         - value:
             match: alerts/absent(+disable)
+            position:
+                pos:
+                    - line: 12
+                      firstcolumn: 1
+                      lastcolumn: 38
+                offset: 15
           type: 10
           offset: 0
 checks:

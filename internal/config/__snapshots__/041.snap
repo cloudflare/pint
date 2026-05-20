@@ -78,10 +78,22 @@ entry:
     rulecomments:
         - value:
             match: promql/series
+            position:
+                pos:
+                    - line: 3
+                      firstcolumn: 1
+                      lastcolumn: 28
+                offset: 15
           type: 10
           offset: 0
         - value:
             match: promql/range_query
+            position:
+                pos:
+                    - line: 5
+                      firstcolumn: 1
+                      lastcolumn: 33
+                offset: 15
           type: 10
           offset: 0
 checks:

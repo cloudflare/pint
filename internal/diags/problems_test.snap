@@ -125,8 +125,8 @@ expr: foo(bar) by()
 sum by (instance) (rate(http_requests_total{job="api",status=~"5.."}[5m])) / sum by (instance) (rate(up{job="api"}[5m])) > 0.01
 
 1 | sum by (instance) (rate(http_requests_total{job="api",status=~"5.."}[5m])) / sum by (instance) (rate(up{job="api"}[5m])) > 0.01
-                                                                                                        ^^^^
-                                                                                                  check this
+                                                                                                         ^^
+                                                                                                 check this
 
 ---
 
@@ -143,8 +143,8 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 sum by (instance) (rate(http_requests_total{job="api",status=~"5.."}[5m])) / sum by (instance) (rate(up{job="api"}[5m])) > 0.01
 
 1 | sum by (instance) (rate(http_requests_total{job="api",status=~"5.."}[5m])) / sum by (instance) (rate(up{job="api"}[5m])) > 0.01
-                                                                                                     ^^^^
-                                                                                                dead code
+                                                                                                         ^^
+                                                                                                  dead code
 
 ---
 
@@ -175,7 +175,7 @@ line3: baz
 expr: sum by (instance) (rate(http_requests_total{job="api",status=~"5.."}[5m])) / sum by (instance) (rate(up{job="api"}[5m])) > 0.01
 
 2 | expr: ... / sum by (instance) (rate(up{job="api"}[5m])) > 0.01
-                                          ^^^^ dead code
+                                        ^^ dead code
 
 ---
 
@@ -193,7 +193,8 @@ expr: sum(oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
 expr: sum(rate(http_requests_total{job="api",status=~"5.."}[5m]) / sum(rate(up{job="api"}[5m])) > 0.01
 
 2 | expr: sum(rate(http_requests_total{job="api",status=~"5.."}[5m]) / sum(rate(up{job="api"}[5m])) > 0.01
-          ^^^ syntax error
+                                                                                                    ^^^^^^
+                                                                                              syntax error
 
 ---
 
@@ -221,8 +222,8 @@ expr: sum(foo) + sum(rate(very_long_metric_name_aaaa{job="api",status=~"5..",ins
 expr: sum(foo) without(colo_id, instance, node_type, region, node_status, job, colo_name)
 
 2 | expr: sum(foo) without(colo_id, instance, node_type, region, node_status, job, colo_name)
-                                                                                         ^^^^
-                                                                                    bad label
+                                                                                   ^^^^^^^^^
+                                                                                   bad label
 
 ---
 
@@ -231,9 +232,9 @@ expr: sum(foo) without(colo_id, instance, node_type, region, node_status, job, c
 expr: sum(foo) without(colo_id, instance, node_type, region, node_status, job, colo_name)
 
 2 | expr: sum(foo) without(colo_id, instance, node_type, region, node_status, job, colo_name)
-                                                                                         ^^^^
-           Using `without(colo_id, instance, node_type, region, node_status, job, colo_name)`
-           removes all these labels from the results.
+                                                                                   ^^^^^^^^^
+          Using `without(colo_id, instance, node_type, region, node_status, job, colo_name)`
+          removes all these labels from the results.
 
 ---
 
@@ -264,11 +265,11 @@ expr: sum(rate(very_long_metric_name_that_pushes_past_the_width_limit_aaaa{job="
 expr: sum(foo) without(colo_id, instance, node_type, region, node_status, job, colo_name)
 
 2 | expr: sum(foo) without(colo_id, instance, node_type, region, node_status, job, colo_name)
-                           ^^^^
-                           Query is using aggregation with `without(colo_id, instance, node_type,
-                           region, node_status, job, colo_name)`, all labels included inside
-                           `without(...)` will be removed from the results. `job` label is required and
-                           should be preserved when aggregating all rules.
+                   ^^^^^^^
+                   Query is using aggregation with `without(colo_id, instance, node_type, region,
+                   node_status, job, colo_name)`, all labels included inside `without(...)` will be
+                   removed from the results. `job` label is required and should be preserved when
+                   aggregating all rules.
 
 ---
 
@@ -303,8 +304,8 @@ expr: |
   sum(rate(very_long_metric_name_that_pushes_past_the_width_limit_aaaa{job="api",status=~"5.."}[5m])) by(instance)
   + sum(rate(another_very_long_metric_name_that_pushes_past_the_width_limit{job="api"}[5m]))
 
-3 |   sum(rate(...)) by(instance)
-        ^^^^^^ bad rate
+3 |   sum(...) by(instance)
+      ^^^ bad rate
 4 |   + sum(rate(another_very_long_metric_name_that_pushes_past_the_width_limit{job="api"}[5m]))
 
 ---

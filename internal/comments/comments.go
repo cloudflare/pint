@@ -45,12 +45,12 @@ var (
 	RuleSetComment        = "rule/set"
 )
 
-type CommentValue interface {
+type Value interface {
 	String() string
 }
 
 type Comment struct {
-	Value  CommentValue
+	Value  Value
 	Type   Type
 	Offset int
 }
@@ -86,11 +86,11 @@ func parseType(s string) Type {
 	}
 }
 
-type CommentError struct {
+type Error struct {
 	Diagnostic diags.Diagnostic
 }
 
-func (ce CommentError) Error() string {
+func (ce Error) Error() string {
 	return ce.Diagnostic.Message
 }
 
@@ -103,16 +103,21 @@ func (oe OwnerError) Error() string {
 }
 
 type Invalid struct {
-	Err CommentError
+	Err Error
 }
 
 func (i Invalid) String() string {
 	return i.Err.Error()
 }
 
+type Position struct {
+	Pos    diags.PositionRanges
+	Offset int
+}
+
 type Owner struct {
 	Name string
-	Line int
+	Position
 }
 
 func (o Owner) String() string {
@@ -121,6 +126,7 @@ func (o Owner) String() string {
 
 type Disable struct {
 	Match string
+	Position
 }
 
 func (d Disable) String() string {
@@ -130,6 +136,7 @@ func (d Disable) String() string {
 type Snooze struct {
 	Until time.Time
 	Match string
+	Position
 }
 
 func (s Snooze) String() string {
@@ -138,19 +145,21 @@ func (s Snooze) String() string {
 
 type RuleSet struct {
 	Value string
+	Position
 }
 
 func (r RuleSet) String() string {
 	return r.Value
 }
 
-func parseSnooze(s string) (snz Snooze, err error) {
+func parseSnooze(s string, pos diags.PositionRanges, offset int) (snz Snooze, err error) {
 	parts := strings.SplitN(s, " ", 2)
 	if len(parts) != 2 {
 		return Snooze{}, fmt.Errorf("invalid snooze comment, expected '$TIME $MATCH' got %q", s)
 	}
 
 	snz.Match = parts[1]
+	snz.Position = Position{Pos: pos, Offset: offset + len(parts[0]) + 1}
 	snz.Until, err = time.Parse(time.RFC3339, parts[0])
 	if err != nil {
 		snz.Until, err = time.Parse("2006-01-02", parts[0])
@@ -161,7 +170,7 @@ func parseSnooze(s string) (snz Snooze, err error) {
 	return snz, nil
 }
 
-func parseValue(commentType Type, s string, line int) (CommentValue, error) {
+func parseValue(commentType Type, s string, pos diags.PositionRanges, offset int) (Value, error) {
 	// nolint:exhaustive
 	switch commentType {
 	case IgnoreFileType, IgnoreLineType, IgnoreBeginType, IgnoreEndType, IgnoreNextLineType:
@@ -173,37 +182,52 @@ func parseValue(commentType Type, s string, line int) (CommentValue, error) {
 		if s == "" {
 			return nil, fmt.Errorf("missing %s value", FileOwnerComment)
 		}
-		return Owner{Name: s, Line: line}, nil
+		return Owner{
+			Name:     s,
+			Position: Position{Pos: pos, Offset: offset},
+		}, nil
 	case RuleOwnerType:
 		if s == "" {
 			return nil, fmt.Errorf("missing %s value", RuleOwnerComment)
 		}
-		return Owner{Name: s, Line: 0}, nil // comment attached to the rule, line numbers are unreliable
+		return Owner{
+			Name:     s,
+			Position: Position{Pos: pos, Offset: offset},
+		}, nil
 	case FileDisableType:
 		if s == "" {
 			return nil, fmt.Errorf("missing %s value", FileDisableComment)
 		}
-		return Disable{Match: s}, nil
+		return Disable{
+			Match:    s,
+			Position: Position{Pos: pos, Offset: offset},
+		}, nil
 	case DisableType:
 		if s == "" {
 			return nil, fmt.Errorf("missing %s value", DisableComment)
 		}
-		return Disable{Match: s}, nil
+		return Disable{
+			Match:    s,
+			Position: Position{Pos: pos, Offset: offset},
+		}, nil
 	case FileSnoozeType:
 		if s == "" {
 			return nil, fmt.Errorf("missing %s value", FileSnoozeComment)
 		}
-		return parseSnooze(s)
+		return parseSnooze(s, pos, offset)
 	case SnoozeType:
 		if s == "" {
 			return nil, fmt.Errorf("missing %s value", SnoozeComment)
 		}
-		return parseSnooze(s)
+		return parseSnooze(s, pos, offset)
 	case RuleSetType:
 		if s == "" {
 			return nil, fmt.Errorf("missing %s value", RuleSetComment)
 		}
-		return RuleSet{Value: s}, nil
+		return RuleSet{
+			Value:    s,
+			Position: Position{Pos: pos, Offset: offset},
+		}, nil
 	case UnknownType, InvalidComment:
 		// these are never passed here
 		return nil, nil
@@ -223,12 +247,15 @@ const (
 	readsValue
 )
 
-func parseComment(s string, line int) (parsed []Comment) {
-	var err error
-	var buf strings.Builder
-	var c Comment
+func parseComment(s string, line, columnOffset int) (parsed []Comment) {
+	var (
+		err         error
+		buf         strings.Builder
+		c           Comment
+		valueOffset int
+		state       = needsHash
+	)
 
-	state := needsHash
 	for i, r := range s + "\n" {
 	READRUNE:
 		switch state {
@@ -294,6 +321,7 @@ func parseComment(s string, line int) (parsed []Comment) {
 			if unicode.IsSpace(r) {
 				goto NEXT
 			}
+			valueOffset = i
 			state = readsValue
 			goto READRUNE
 		case readsValue:
@@ -306,20 +334,21 @@ func parseComment(s string, line int) (parsed []Comment) {
 	}
 
 	if c.Type != UnknownType {
-		c.Value, err = parseValue(c.Type, strings.TrimSpace(buf.String()), line)
+		pos := diags.PositionRanges{
+			{
+				Line:        line,
+				FirstColumn: columnOffset + c.Offset + 1,
+				LastColumn:  columnOffset + len(s),
+			},
+		}
+		c.Value, err = parseValue(c.Type, strings.TrimSpace(buf.String()), pos, valueOffset)
 		if err != nil {
 			c.Type = InvalidComment
 			c.Value = Invalid{
-				Err: CommentError{
+				Err: Error{
 					Diagnostic: diags.Diagnostic{
-						Message: "This comment is not a valid pint control comment: " + err.Error(),
-						Pos: diags.PositionRanges{
-							{
-								Line:        line,
-								FirstColumn: c.Offset + 1,
-								LastColumn:  len(s),
-							},
-						},
+						Message:     "This comment is not a valid pint control comment: " + err.Error(),
+						Pos:         pos,
 						Expr:        nil,
 						FirstColumn: 1,
 						LastColumn:  len(s),
@@ -334,10 +363,10 @@ func parseComment(s string, line int) (parsed []Comment) {
 	return parsed
 }
 
-func Parse(lineno int, text string) (comments []Comment) {
+func Parse(lineno int, text string, columnOffset int) (comments []Comment) {
 	var index int
 	for line := range strings.SplitSeq(text, "\n") {
-		comments = append(comments, parseComment(line, lineno+index)...)
+		comments = append(comments, parseComment(line, lineno+index, columnOffset)...)
 		index++
 	}
 	return comments

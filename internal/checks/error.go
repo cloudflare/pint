@@ -77,7 +77,7 @@ func parseRuleError(rule parser.Rule, err error) Problem {
 		}
 	}
 
-	if commentErr, ok := errors.AsType[comments.CommentError](err); ok {
+	if commentErr, ok := errors.AsType[comments.Error](err); ok {
 		slog.LogAttrs(context.Background(), slog.LevelDebug, "invalid comment report", slog.Any("err", commentErr))
 		return Problem{
 			Anchor: AnchorAfter,

@@ -54,7 +54,7 @@ func TestParse(t *testing.T) {
 				{
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{
-						Err: comments.CommentError{
+						Err: comments.Error{
 							Diagnostic: diags.Diagnostic{
 								Message: `This comment is not a valid pint control comment: unexpected comment suffix: "this file"`,
 								Pos: diags.PositionRanges{
@@ -85,7 +85,7 @@ func TestParse(t *testing.T) {
 				{
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{
-						Err: comments.CommentError{
+						Err: comments.Error{
 							Diagnostic: diags.Diagnostic{
 								Message: `This comment is not a valid pint control comment: unexpected comment suffix: "this line"`,
 								Pos: diags.PositionRanges{
@@ -115,7 +115,7 @@ func TestParse(t *testing.T) {
 				{
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{
-						Err: comments.CommentError{
+						Err: comments.Error{
 							Diagnostic: diags.Diagnostic{
 								Message: `This comment is not a valid pint control comment: unexpected comment suffix: "here"`,
 								Pos: diags.PositionRanges{
@@ -146,7 +146,7 @@ func TestParse(t *testing.T) {
 				{
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{
-						Err: comments.CommentError{
+						Err: comments.Error{
 							Diagnostic: diags.Diagnostic{
 								Message: `This comment is not a valid pint control comment: unexpected comment suffix: "here"`,
 								Pos: diags.PositionRanges{
@@ -177,7 +177,7 @@ func TestParse(t *testing.T) {
 				{
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{
-						Err: comments.CommentError{
+						Err: comments.Error{
 							Diagnostic: diags.Diagnostic{
 								Message: `This comment is not a valid pint control comment: unexpected comment suffix: "here"`,
 								Pos: diags.PositionRanges{
@@ -208,7 +208,7 @@ func TestParse(t *testing.T) {
 				{
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{
-						Err: comments.CommentError{
+						Err: comments.Error{
 							Diagnostic: diags.Diagnostic{
 								Message: `This comment is not a valid pint control comment: missing file/owner value`,
 								Pos: diags.PositionRanges{
@@ -234,7 +234,16 @@ func TestParse(t *testing.T) {
 					Type: comments.FileOwnerType,
 					Value: comments.Owner{
 						Name: "bob and alice",
-						Line: 1,
+						Position: comments.Position{
+							Offset: 18,
+							Pos: diags.PositionRanges{
+								{
+									Line:        1,
+									FirstColumn: 1,
+									LastColumn:  31,
+								},
+							},
+						},
 					},
 				},
 			},
@@ -245,7 +254,7 @@ func TestParse(t *testing.T) {
 				{
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{
-						Err: comments.CommentError{
+						Err: comments.Error{
 							Diagnostic: diags.Diagnostic{
 								Message: `This comment is not a valid pint control comment: missing rule/owner value`,
 								Pos: diags.PositionRanges{
@@ -271,6 +280,16 @@ func TestParse(t *testing.T) {
 					Type: comments.RuleOwnerType,
 					Value: comments.Owner{
 						Name: "bob and alice",
+						Position: comments.Position{
+							Offset: 18,
+							Pos: diags.PositionRanges{
+								{
+									Line:        1,
+									FirstColumn: 1,
+									LastColumn:  31,
+								},
+							},
+						},
 					},
 				},
 			},
@@ -281,7 +300,7 @@ func TestParse(t *testing.T) {
 				{
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{
-						Err: comments.CommentError{
+						Err: comments.Error{
 							Diagnostic: diags.Diagnostic{
 								Message: `This comment is not a valid pint control comment: missing file/disable value`,
 								Pos: diags.PositionRanges{
@@ -304,8 +323,20 @@ func TestParse(t *testing.T) {
 			input: `# pint file/disable promql/series(http_errors_total{label="this has spaces"})`,
 			output: []comments.Comment{
 				{
-					Type:  comments.FileDisableType,
-					Value: comments.Disable{Match: `promql/series(http_errors_total{label="this has spaces"})`},
+					Type: comments.FileDisableType,
+					Value: comments.Disable{
+						Match: `promql/series(http_errors_total{label="this has spaces"})`,
+						Position: comments.Position{
+							Offset: 20,
+							Pos: diags.PositionRanges{
+								{
+									Line:        1,
+									FirstColumn: 1,
+									LastColumn:  77,
+								},
+							},
+						},
+					},
 				},
 			},
 		},
@@ -315,7 +346,7 @@ func TestParse(t *testing.T) {
 				{
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{
-						Err: comments.CommentError{
+						Err: comments.Error{
 							Diagnostic: diags.Diagnostic{
 								Message: `This comment is not a valid pint control comment: missing disable value`,
 								Pos: diags.PositionRanges{
@@ -338,8 +369,20 @@ func TestParse(t *testing.T) {
 			input: `# pint disable promql/series(http_errors_total{label="this has spaces"})`,
 			output: []comments.Comment{
 				{
-					Type:  comments.DisableType,
-					Value: comments.Disable{Match: `promql/series(http_errors_total{label="this has spaces"})`},
+					Type: comments.DisableType,
+					Value: comments.Disable{
+						Match: `promql/series(http_errors_total{label="this has spaces"})`,
+						Position: comments.Position{
+							Offset: 15,
+							Pos: diags.PositionRanges{
+								{
+									Line:        1,
+									FirstColumn: 1,
+									LastColumn:  72,
+								},
+							},
+						},
+					},
 				},
 			},
 		},
@@ -347,8 +390,20 @@ func TestParse(t *testing.T) {
 			input: `# pint disable promql/series(http_errors_total{label="this has spaces and a # symbol"})`,
 			output: []comments.Comment{
 				{
-					Type:  comments.DisableType,
-					Value: comments.Disable{Match: `promql/series(http_errors_total{label="this has spaces and a # symbol"})`},
+					Type: comments.DisableType,
+					Value: comments.Disable{
+						Match: `promql/series(http_errors_total{label="this has spaces and a # symbol"})`,
+						Position: comments.Position{
+							Offset: 15,
+							Pos: diags.PositionRanges{
+								{
+									Line:        1,
+									FirstColumn: 1,
+									LastColumn:  87,
+								},
+							},
+						},
+					},
 				},
 			},
 		},
@@ -358,7 +413,7 @@ func TestParse(t *testing.T) {
 				{
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{
-						Err: comments.CommentError{
+						Err: comments.Error{
 							Diagnostic: diags.Diagnostic{
 								Message: `This comment is not a valid pint control comment: missing file/snooze value`,
 								Pos: diags.PositionRanges{
@@ -383,7 +438,7 @@ func TestParse(t *testing.T) {
 				{
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{
-						Err: comments.CommentError{
+						Err: comments.Error{
 							Diagnostic: diags.Diagnostic{
 								Message: `This comment is not a valid pint control comment: invalid snooze comment, expected '$TIME $MATCH' got "2023-12-31"`,
 								Pos: diags.PositionRanges{
@@ -408,7 +463,7 @@ func TestParse(t *testing.T) {
 				{
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{
-						Err: comments.CommentError{
+						Err: comments.Error{
 							Diagnostic: diags.Diagnostic{
 								Message: `This comment is not a valid pint control comment: invalid snooze comment, expected '$TIME $MATCH' got "abc"`,
 								Pos: diags.PositionRanges{
@@ -432,7 +487,7 @@ func TestParse(t *testing.T) {
 			output: []comments.Comment{
 				{
 					Type: comments.InvalidComment,
-					Value: comments.Invalid{Err: comments.CommentError{
+					Value: comments.Invalid{Err: comments.Error{
 						Diagnostic: diags.Diagnostic{
 							Message: fmt.Sprintf("This comment is not a valid pint control comment: invalid snooze timestamp: %s", errUntil("2023-1231")),
 							Pos: diags.PositionRanges{
@@ -458,6 +513,16 @@ func TestParse(t *testing.T) {
 					Value: comments.Snooze{
 						Until: parseUntil("2023-12-31T00:00:00Z"),
 						Match: `promql/series(http_errors_total{label="this has spaces"})`,
+						Position: comments.Position{
+							Offset: 30,
+							Pos: diags.PositionRanges{
+								{
+									Line:        1,
+									FirstColumn: 1,
+									LastColumn:  87,
+								},
+							},
+						},
 					},
 				},
 			},
@@ -468,7 +533,7 @@ func TestParse(t *testing.T) {
 				{
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{
-						Err: comments.CommentError{
+						Err: comments.Error{
 							Diagnostic: diags.Diagnostic{
 								Message: `This comment is not a valid pint control comment: missing snooze value`,
 								Pos: diags.PositionRanges{
@@ -493,7 +558,7 @@ func TestParse(t *testing.T) {
 				{
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{
-						Err: comments.CommentError{
+						Err: comments.Error{
 							Diagnostic: diags.Diagnostic{
 								Message: `This comment is not a valid pint control comment: invalid snooze comment, expected '$TIME $MATCH' got "2023-12-31"`,
 								Pos: diags.PositionRanges{
@@ -518,7 +583,7 @@ func TestParse(t *testing.T) {
 				{
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{
-						Err: comments.CommentError{
+						Err: comments.Error{
 							Diagnostic: diags.Diagnostic{
 								Message: `This comment is not a valid pint control comment: invalid snooze comment, expected '$TIME $MATCH' got "abc"`,
 								Pos: diags.PositionRanges{
@@ -542,7 +607,7 @@ func TestParse(t *testing.T) {
 			output: []comments.Comment{
 				{
 					Type: comments.InvalidComment,
-					Value: comments.Invalid{Err: comments.CommentError{
+					Value: comments.Invalid{Err: comments.Error{
 						Diagnostic: diags.Diagnostic{
 							Message: fmt.Sprintf("This comment is not a valid pint control comment: invalid snooze timestamp: %s", errUntil("2023-1231")),
 							Pos: diags.PositionRanges{
@@ -568,6 +633,16 @@ func TestParse(t *testing.T) {
 					Value: comments.Snooze{
 						Until: parseUntil("2023-12-31T00:00:00Z"),
 						Match: `promql/series(http_errors_total{label="this has spaces"})`,
+						Position: comments.Position{
+							Offset: 25,
+							Pos: diags.PositionRanges{
+								{
+									Line:        1,
+									FirstColumn: 1,
+									LastColumn:  82,
+								},
+							},
+						},
 					},
 				},
 			},
@@ -580,6 +655,16 @@ func TestParse(t *testing.T) {
 					Value: comments.Snooze{
 						Until: parseUntil("2023-12-31T00:00:00Z"),
 						Match: `promql/series(http_errors_total{label="this has    spaces"})`,
+						Position: comments.Position{
+							Offset: 25,
+							Pos: diags.PositionRanges{
+								{
+									Line:        1,
+									FirstColumn: 1,
+									LastColumn:  85,
+								},
+							},
+						},
 					},
 				},
 			},
@@ -590,7 +675,7 @@ func TestParse(t *testing.T) {
 				{
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{
-						Err: comments.CommentError{
+						Err: comments.Error{
 							Diagnostic: diags.Diagnostic{
 								Message: `This comment is not a valid pint control comment: missing rule/set value`,
 								Pos: diags.PositionRanges{
@@ -613,8 +698,20 @@ func TestParse(t *testing.T) {
 			input: "# pint rule/set bob and alice",
 			output: []comments.Comment{
 				{
-					Type:  comments.RuleSetType,
-					Value: comments.RuleSet{Value: "bob and alice"},
+					Type: comments.RuleSetType,
+					Value: comments.RuleSet{
+						Value: "bob and alice",
+						Position: comments.Position{
+							Offset: 16,
+							Pos: diags.PositionRanges{
+								{
+									Line:        1,
+									FirstColumn: 1,
+									LastColumn:  29,
+								},
+							},
+						},
+					},
 				},
 			},
 		},
@@ -622,8 +719,20 @@ func TestParse(t *testing.T) {
 			input: "code # pint disable xxx  \ncode # alice\n",
 			output: []comments.Comment{
 				{
-					Type:   comments.DisableType,
-					Value:  comments.Disable{Match: "xxx"},
+					Type: comments.DisableType,
+					Value: comments.Disable{
+						Match: "xxx",
+						Position: comments.Position{
+							Offset: 20,
+							Pos: diags.PositionRanges{
+								{
+									Line:        1,
+									FirstColumn: 6,
+									LastColumn:  25,
+								},
+							},
+						},
+					},
 					Offset: len("code "),
 				},
 			},
@@ -632,15 +741,36 @@ func TestParse(t *testing.T) {
 			input: "code # pint disable xxx yyy \n # pint\tfile/owner bob",
 			output: []comments.Comment{
 				{
-					Type:   comments.DisableType,
-					Value:  comments.Disable{Match: "xxx yyy"},
+					Type: comments.DisableType,
+					Value: comments.Disable{
+						Match: "xxx yyy",
+						Position: comments.Position{
+							Offset: 20,
+							Pos: diags.PositionRanges{
+								{
+									Line:        1,
+									FirstColumn: 6,
+									LastColumn:  28,
+								},
+							},
+						},
+					},
 					Offset: len("code "),
 				},
 				{
 					Type: comments.FileOwnerType,
 					Value: comments.Owner{
 						Name: "bob",
-						Line: 2,
+						Position: comments.Position{
+							Offset: 19,
+							Pos: diags.PositionRanges{
+								{
+									Line:        2,
+									FirstColumn: 2,
+									LastColumn:  22,
+								},
+							},
+						},
 					},
 					Offset: 1,
 				},
@@ -650,8 +780,20 @@ func TestParse(t *testing.T) {
 			input: "# pint rule/set promql/series(found) min-age foo",
 			output: []comments.Comment{
 				{
-					Type:  comments.RuleSetType,
-					Value: comments.RuleSet{Value: "promql/series(found) min-age foo"},
+					Type: comments.RuleSetType,
+					Value: comments.RuleSet{
+						Value: "promql/series(found) min-age foo",
+						Position: comments.Position{
+							Offset: 16,
+							Pos: diags.PositionRanges{
+								{
+									Line:        1,
+									FirstColumn: 1,
+									LastColumn:  48,
+								},
+							},
+						},
+					},
 				},
 			},
 		},
@@ -688,7 +830,7 @@ func TestParse(t *testing.T) {
 				{
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{
-						Err: comments.CommentError{
+						Err: comments.Error{
 							Diagnostic: diags.Diagnostic{
 								Message: `This comment is not a valid pint control comment: unexpected comment suffix: "# pint ignore/file"`,
 								Pos: diags.PositionRanges{
@@ -731,7 +873,16 @@ func TestParse(t *testing.T) {
 					Type: comments.FileOwnerType,
 					Value: comments.Owner{
 						Name: "bob",
-						Line: 1,
+						Position: comments.Position{
+							Offset: 18,
+							Pos: diags.PositionRanges{
+								{
+									Line:        1,
+									FirstColumn: 1,
+									LastColumn:  22,
+								},
+							},
+						},
 					},
 				},
 			},
@@ -740,15 +891,36 @@ func TestParse(t *testing.T) {
 			input: "code # pint disable xxx\r\n # pint\tfile/owner bob\r\n",
 			output: []comments.Comment{
 				{
-					Type:   comments.DisableType,
-					Value:  comments.Disable{Match: "xxx"},
+					Type: comments.DisableType,
+					Value: comments.Disable{
+						Match: "xxx",
+						Position: comments.Position{
+							Offset: 20,
+							Pos: diags.PositionRanges{
+								{
+									Line:        1,
+									FirstColumn: 6,
+									LastColumn:  24,
+								},
+							},
+						},
+					},
 					Offset: len("code "),
 				},
 				{
 					Type: comments.FileOwnerType,
 					Value: comments.Owner{
 						Name: "bob",
-						Line: 2,
+						Position: comments.Position{
+							Offset: 19,
+							Pos: diags.PositionRanges{
+								{
+									Line:        2,
+									FirstColumn: 2,
+									LastColumn:  23,
+								},
+							},
+						},
 					},
 					Offset: 1,
 				},
@@ -758,8 +930,20 @@ func TestParse(t *testing.T) {
 			input: "# pint rule/set promql/series(found)\r\n",
 			output: []comments.Comment{
 				{
-					Type:  comments.RuleSetType,
-					Value: comments.RuleSet{Value: "promql/series(found)"},
+					Type: comments.RuleSetType,
+					Value: comments.RuleSet{
+						Value: "promql/series(found)",
+						Position: comments.Position{
+							Offset: 16,
+							Pos: diags.PositionRanges{
+								{
+									Line:        1,
+									FirstColumn: 1,
+									LastColumn:  37,
+								},
+							},
+						},
+					},
 				},
 			},
 		},
@@ -773,7 +957,7 @@ func TestParse(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.input, func(t *testing.T) {
-			output := comments.Parse(1, tc.input)
+			output := comments.Parse(1, tc.input, 0)
 			require.Equal(t, tc.output, output)
 		})
 	}
@@ -781,7 +965,7 @@ func TestParse(t *testing.T) {
 
 func TestCommentValueString(t *testing.T) {
 	type testCaseT struct {
-		comment  comments.CommentValue
+		comment  comments.Value
 		expected string
 	}
 
@@ -793,7 +977,7 @@ func TestCommentValueString(t *testing.T) {
 
 	testCases := []testCaseT{
 		{
-			comment: comments.Invalid{Err: comments.CommentError{
+			comment: comments.Invalid{Err: comments.Error{
 				Diagnostic: diags.Diagnostic{
 					Message: "foo bar",
 					Pos: diags.PositionRanges{
@@ -811,7 +995,7 @@ func TestCommentValueString(t *testing.T) {
 			expected: "foo bar",
 		},
 		{
-			comment: comments.Invalid{Err: comments.CommentError{
+			comment: comments.Invalid{Err: comments.Error{
 				Diagnostic: diags.Diagnostic{
 					Message: "foo bar",
 					Pos: diags.PositionRanges{

@@ -531,32 +531,88 @@ func TestParse(t *testing.T) {
 								Lines: diags.LineRange{First: 3, Last: 10},
 								Comments: []comments.Comment{
 									{
-										Type:  comments.DisableType,
-										Value: comments.Disable{Match: "head comment"},
+										Type: comments.DisableType,
+										Value: comments.Disable{
+											Match: "head comment",
+											Position: comments.Position{
+												Offset: 15,
+												Pos: diags.PositionRanges{
+													{Line: 2, FirstColumn: 1, LastColumn: 27},
+												},
+											},
+										},
 									},
 									{
-										Type:  comments.DisableType,
-										Value: comments.Disable{Match: "record comment"},
+										Type: comments.DisableType,
+										Value: comments.Disable{
+											Match: "record comment",
+											Position: comments.Position{
+												Offset: 15,
+												Pos: diags.PositionRanges{
+													{Line: 3, FirstColumn: 1, LastColumn: 29},
+												},
+											},
+										},
 									},
 									{
-										Type:  comments.DisableType,
-										Value: comments.Disable{Match: "expr comment"},
+										Type: comments.DisableType,
+										Value: comments.Disable{
+											Match: "expr comment",
+											Position: comments.Position{
+												Offset: 15,
+												Pos: diags.PositionRanges{
+													{Line: 4, FirstColumn: 1, LastColumn: 27},
+												},
+											},
+										},
 									},
 									{
-										Type:  comments.DisableType,
-										Value: comments.Disable{Match: "pre-labels comment"},
+										Type: comments.DisableType,
+										Value: comments.Disable{
+											Match: "pre-labels comment",
+											Position: comments.Position{
+												Offset: 16,
+												Pos: diags.PositionRanges{
+													{Line: 5, FirstColumn: 3, LastColumn: 36},
+												},
+											},
+										},
 									},
 									{
-										Type:  comments.DisableType,
-										Value: comments.Disable{Match: "foot comment"},
+										Type: comments.DisableType,
+										Value: comments.Disable{
+											Match: "foot comment",
+											Position: comments.Position{
+												Offset: 15,
+												Pos: diags.PositionRanges{
+													{Line: 7, FirstColumn: 5, LastColumn: 31},
+												},
+											},
+										},
 									},
 									{
-										Type:  comments.DisableType,
-										Value: comments.Disable{Match: "pre-foo comment"},
+										Type: comments.DisableType,
+										Value: comments.Disable{
+											Match: "pre-foo comment",
+											Position: comments.Position{
+												Offset: 15,
+												Pos: diags.PositionRanges{
+													{Line: 7, FirstColumn: 5, LastColumn: 34},
+												},
+											},
+										},
 									},
 									{
-										Type:  comments.DisableType,
-										Value: comments.Disable{Match: "post-foo comment"},
+										Type: comments.DisableType,
+										Value: comments.Disable{
+											Match: "post-foo comment",
+											Position: comments.Position{
+												Offset: 15,
+												Pos: diags.PositionRanges{
+													{Line: 9, FirstColumn: 5, LastColumn: 35},
+												},
+											},
+										},
 									},
 								},
 								RecordingRule: &parser.RecordingRule{
@@ -1381,24 +1437,64 @@ data:
 								Lines: diags.LineRange{First: 6, Last: 7},
 								Comments: []comments.Comment{
 									{
-										Type:  comments.DisableType,
-										Value: comments.Disable{Match: "before recordAnchor"},
+										Type: comments.DisableType,
+										Value: comments.Disable{
+											Match: "before recordAnchor",
+											Position: comments.Position{
+												Offset: 15,
+												Pos: diags.PositionRanges{
+													{Line: 5, FirstColumn: 3, LastColumn: 36},
+												},
+											},
+										},
 									},
 									{
-										Type:  comments.DisableType,
-										Value: comments.Disable{Match: "recordAnchor"},
+										Type: comments.DisableType,
+										Value: comments.Disable{
+											Match: "recordAnchor",
+											Position: comments.Position{
+												Offset: 15,
+												Pos: diags.PositionRanges{
+													{Line: 6, FirstColumn: 1, LastColumn: 27},
+												},
+											},
+										},
 									},
 									{
-										Type:  comments.DisableType,
-										Value: comments.Disable{Match: "name1"},
+										Type: comments.DisableType,
+										Value: comments.Disable{
+											Match: "name1",
+											Position: comments.Position{
+												Offset: 15,
+												Pos: diags.PositionRanges{
+													{Line: 6, FirstColumn: 1, LastColumn: 20},
+												},
+											},
+										},
 									},
 									{
-										Type:  comments.DisableType,
-										Value: comments.Disable{Match: "after expr1"},
+										Type: comments.DisableType,
+										Value: comments.Disable{
+											Match: "after expr1",
+											Position: comments.Position{
+												Offset: 15,
+												Pos: diags.PositionRanges{
+													{Line: 8, FirstColumn: 5, LastColumn: 30},
+												},
+											},
+										},
 									},
 									{
-										Type:  comments.DisableType,
-										Value: comments.Disable{Match: "expr1"},
+										Type: comments.DisableType,
+										Value: comments.Disable{
+											Match: "expr1",
+											Position: comments.Position{
+												Offset: 15,
+												Pos: diags.PositionRanges{
+													{Line: 7, FirstColumn: 1, LastColumn: 20},
+												},
+											},
+										},
 									},
 								},
 								RecordingRule: &parser.RecordingRule{
@@ -1421,16 +1517,40 @@ data:
 							{
 								Comments: []comments.Comment{
 									{
-										Type:  comments.DisableType,
-										Value: comments.Disable{Match: "before recordAnchor"},
+										Type: comments.DisableType,
+										Value: comments.Disable{
+											Match: "before recordAnchor",
+											Position: comments.Position{
+												Offset: 15,
+												Pos: diags.PositionRanges{
+													{Line: 5, FirstColumn: 3, LastColumn: 36},
+												},
+											},
+										},
 									},
 									{
-										Type:  comments.DisableType,
-										Value: comments.Disable{Match: "recordAnchor"},
+										Type: comments.DisableType,
+										Value: comments.Disable{
+											Match: "recordAnchor",
+											Position: comments.Position{
+												Offset: 15,
+												Pos: diags.PositionRanges{
+													{Line: 6, FirstColumn: 1, LastColumn: 27},
+												},
+											},
+										},
 									},
 									{
-										Type:  comments.DisableType,
-										Value: comments.Disable{Match: "name1"},
+										Type: comments.DisableType,
+										Value: comments.Disable{
+											Match: "name1",
+											Position: comments.Position{
+												Offset: 15,
+												Pos: diags.PositionRanges{
+													{Line: 6, FirstColumn: 1, LastColumn: 20},
+												},
+											},
+										},
 									},
 								},
 								Lines: diags.LineRange{First: 6, Last: 10},
@@ -1454,24 +1574,64 @@ data:
 							{
 								Comments: []comments.Comment{
 									{
-										Type:  comments.DisableType,
-										Value: comments.Disable{Match: "before recordAnchor"},
+										Type: comments.DisableType,
+										Value: comments.Disable{
+											Match: "before recordAnchor",
+											Position: comments.Position{
+												Offset: 15,
+												Pos: diags.PositionRanges{
+													{Line: 5, FirstColumn: 3, LastColumn: 36},
+												},
+											},
+										},
 									},
 									{
-										Type:  comments.DisableType,
-										Value: comments.Disable{Match: "recordAnchor"},
+										Type: comments.DisableType,
+										Value: comments.Disable{
+											Match: "recordAnchor",
+											Position: comments.Position{
+												Offset: 15,
+												Pos: diags.PositionRanges{
+													{Line: 6, FirstColumn: 1, LastColumn: 27},
+												},
+											},
+										},
 									},
 									{
-										Type:  comments.DisableType,
-										Value: comments.Disable{Match: "name1"},
+										Type: comments.DisableType,
+										Value: comments.Disable{
+											Match: "name1",
+											Position: comments.Position{
+												Offset: 15,
+												Pos: diags.PositionRanges{
+													{Line: 6, FirstColumn: 1, LastColumn: 20},
+												},
+											},
+										},
 									},
 									{
-										Type:  comments.DisableType,
-										Value: comments.Disable{Match: "after expr1"},
+										Type: comments.DisableType,
+										Value: comments.Disable{
+											Match: "after expr1",
+											Position: comments.Position{
+												Offset: 15,
+												Pos: diags.PositionRanges{
+													{Line: 8, FirstColumn: 5, LastColumn: 30},
+												},
+											},
+										},
 									},
 									{
-										Type:  comments.DisableType,
-										Value: comments.Disable{Match: "expr1"},
+										Type: comments.DisableType,
+										Value: comments.Disable{
+											Match: "expr1",
+											Position: comments.Position{
+												Offset: 15,
+												Pos: diags.PositionRanges{
+													{Line: 7, FirstColumn: 1, LastColumn: 20},
+												},
+											},
+										},
 									},
 								},
 								Lines: diags.LineRange{First: 6, Last: 7},
@@ -1582,8 +1742,16 @@ data:
 							{
 								Comments: []comments.Comment{
 									{
-										Type:  comments.DisableType,
-										Value: comments.Disable{Match: "foot comment"},
+										Type: comments.DisableType,
+										Value: comments.Disable{
+											Match: "foot comment",
+											Position: comments.Position{
+												Offset: 15,
+												Pos: diags.PositionRanges{
+													{Line: 12, FirstColumn: 5, LastColumn: 31},
+												},
+											},
+										},
 									},
 								},
 								Lines: diags.LineRange{First: 9, Last: 11},
@@ -1767,14 +1935,32 @@ data:
 						Type: comments.FileOwnerType,
 						Value: comments.Owner{
 							Name: "bob",
-							Line: 2,
+							Position: comments.Position{
+								Offset: 18,
+								Pos: diags.PositionRanges{
+									{
+										Line:        2,
+										FirstColumn: 1,
+										LastColumn:  21,
+									},
+								},
+							},
 						},
 					},
 					{
 						Type: comments.FileOwnerType,
 						Value: comments.Owner{
 							Name: "alice",
-							Line: 10,
+							Position: comments.Position{
+								Offset: 18,
+								Pos: diags.PositionRanges{
+									{
+										Line:        10,
+										FirstColumn: 1,
+										LastColumn:  23,
+									},
+								},
+							},
 						},
 					},
 				},
@@ -6675,8 +6861,16 @@ data:
 								Lines: diags.LineRange{First: 1, Last: 2},
 								Comments: []comments.Comment{
 									{
-										Type:  comments.DisableType,
-										Value: comments.Disable{Match: "line comment"},
+										Type: comments.DisableType,
+										Value: comments.Disable{
+											Match: "line comment",
+											Position: comments.Position{
+												Offset: 15,
+												Pos: diags.PositionRanges{
+													{Line: 1, FirstColumn: 1, LastColumn: 27},
+												},
+											},
+										},
 									},
 								},
 								RecordingRule: &parser.RecordingRule{
@@ -6714,8 +6908,16 @@ data:
 								Lines: diags.LineRange{First: 1, Last: 1},
 								Comments: []comments.Comment{
 									{
-										Type:  comments.DisableType,
-										Value: comments.Disable{Match: "flow comment"},
+										Type: comments.DisableType,
+										Value: comments.Disable{
+											Match: "flow comment",
+											Position: comments.Position{
+												Offset: 15,
+												Pos: diags.PositionRanges{
+													{Line: 1, FirstColumn: 1, LastColumn: 27},
+												},
+											},
+										},
 									},
 								},
 								RecordingRule: &parser.RecordingRule{
@@ -6763,8 +6965,16 @@ data:
 								Lines: diags.LineRange{First: 4, Last: 4},
 								Comments: []comments.Comment{
 									{
-										Type:  comments.DisableType,
-										Value: comments.Disable{Match: "foot comment"},
+										Type: comments.DisableType,
+										Value: comments.Disable{
+											Match: "foot comment",
+											Position: comments.Position{
+												Offset: 15,
+												Pos: diags.PositionRanges{
+													{Line: 5, FirstColumn: 3, LastColumn: 29},
+												},
+											},
+										},
 									},
 								},
 								RecordingRule: &parser.RecordingRule{

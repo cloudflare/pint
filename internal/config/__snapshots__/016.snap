@@ -99,50 +99,122 @@ entry:
     rulecomments:
         - value:
             match: promql/counter
+            position:
+                pos:
+                    - line: 2
+                      firstcolumn: 1
+                      lastcolumn: 29
+                offset: 15
           type: 10
           offset: 0
         - value:
             match: promql/series
+            position:
+                pos:
+                    - line: 3
+                      firstcolumn: 1
+                      lastcolumn: 28
+                offset: 15
           type: 10
           offset: 0
         - value:
             match: promql/rate
+            position:
+                pos:
+                    - line: 4
+                      firstcolumn: 1
+                      lastcolumn: 26
+                offset: 15
           type: 10
           offset: 0
         - value:
             match: promql/vector_matching(prom1)
+            position:
+                pos:
+                    - line: 5
+                      firstcolumn: 1
+                      lastcolumn: 44
+                offset: 15
           type: 10
           offset: 0
         - value:
             match: promql/vector_matching(prom2)
+            position:
+                pos:
+                    - line: 6
+                      firstcolumn: 1
+                      lastcolumn: 44
+                offset: 15
           type: 10
           offset: 0
         - value:
             match: promql/range_query
+            position:
+                pos:
+                    - line: 7
+                      firstcolumn: 1
+                      lastcolumn: 33
+                offset: 15
           type: 10
           offset: 0
         - value:
             match: rule/duplicate
+            position:
+                pos:
+                    - line: 8
+                      firstcolumn: 1
+                      lastcolumn: 29
+                offset: 15
           type: 10
           offset: 0
         - value:
             match: labels/conflict
+            position:
+                pos:
+                    - line: 9
+                      firstcolumn: 1
+                      lastcolumn: 30
+                offset: 15
           type: 10
           offset: 0
         - value:
             match: alerts/external_labels
+            position:
+                pos:
+                    - line: 10
+                      firstcolumn: 1
+                      lastcolumn: 37
+                offset: 15
           type: 10
           offset: 0
         - value:
             match: promql/impossible
+            position:
+                pos:
+                    - line: 11
+                      firstcolumn: 1
+                      lastcolumn: 32
+                offset: 15
           type: 10
           offset: 0
         - value:
             match: promql/fragile
+            position:
+                pos:
+                    - line: 13
+                      firstcolumn: 3
+                      lastcolumn: 31
+                offset: 15
           type: 10
           offset: 0
         - value:
             match: promql/regexp
+            position:
+                pos:
+                    - line: 14
+                      firstcolumn: 3
+                      lastcolumn: 30
+                offset: 15
           type: 10
           offset: 0
 checks:

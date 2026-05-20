@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"slices"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -30,18 +31,43 @@ func nodeValue(node *yaml.Node) string {
 	return node.Value
 }
 
-func mergeComments(node *yaml.Node) (comments []string) {
+type commentText struct {
+	text   string
+	line   int
+	column int
+}
+
+func commentColumn(contentLines []string, line int) int {
+	s := contentLines[line-1]
+	return len(s) - len(strings.TrimLeft(s, " \t"))
+}
+
+func mergeComments(node *yaml.Node, contentLines []string) (comments []commentText) {
 	if node.HeadComment != "" {
-		comments = append(comments, node.HeadComment)
+		headLine := node.Line - strings.Count(node.HeadComment, "\n") - 1
+		comments = append(comments, commentText{
+			text:   node.HeadComment,
+			line:   headLine,
+			column: commentColumn(contentLines, headLine),
+		})
 	}
 	if node.LineComment != "" {
-		comments = append(comments, node.LineComment)
+		comments = append(comments, commentText{
+			text:   node.LineComment,
+			line:   node.Line,
+			column: 0,
+		})
 	}
 	if node.FootComment != "" {
-		comments = append(comments, node.FootComment)
+		footLine := node.Line + 1
+		comments = append(comments, commentText{
+			text:   node.FootComment,
+			line:   footLine,
+			column: commentColumn(contentLines, footLine),
+		})
 	}
 	for _, child := range node.Content {
-		comments = append(comments, mergeComments(child)...)
+		comments = append(comments, mergeComments(child, contentLines)...)
 	}
 	return comments
 }

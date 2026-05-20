@@ -467,9 +467,9 @@
       # pint rule/set promql/series(found) min-age foo
       expr: sum(found{job="foo", instance="bar"})
   output: |
-    4 |   expr: sum(found{job="foo", instance="bar"})
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                failed to parse pint comment as duration: not a valid duration string: "foo"
+    3 |   # pint rule/set promql/series(found) min-age foo
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                          failed to parse pint comment as duration: not a valid duration string: "foo"
   problem:
     reporter: promql/series
     summary: invalid comment
@@ -478,12 +478,12 @@
         [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#min-age) to see supported syntax.
     diagnostics:
         - message: 'failed to parse pint comment as duration: not a valid duration string: "foo"'
-          firstcolumn: 1
-          lastcolumn: 37
+          firstcolumn: 17
+          lastcolumn: 48
           kind: 0
     lines:
-        first: 2
-        last: 4
+        first: 3
+        last: 3
     severity: 1
     anchor: 0
 - description: '#4 metric was present but disappeared / min-age / invalid value'
@@ -552,10 +552,10 @@
       # pint rule/set promql/series(bar) min-age 5d
       expr: sum(found{job="foo", instance="bar"})
   output: |
-    4 |   expr: sum(found{job="foo", instance="bar"})
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                pint rule/set comment `promql/series(bar) min-age 5d` doesn't match any label matcher in
-                this query
+    3 |   # pint rule/set promql/series(bar) min-age 5d
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                          pint rule/set comment `promql/series(bar) min-age 5d` doesn't match any label
+                          matcher in this query
   problem:
     reporter: promql/series
     summary: invalid comment
@@ -564,12 +564,12 @@
         [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#ignorelabel-value) for docs about comment syntax.
     diagnostics:
         - message: pint rule/set comment `promql/series(bar) min-age 5d` doesn't match any label matcher in this query
-          firstcolumn: 1
-          lastcolumn: 37
+          firstcolumn: 17
+          lastcolumn: 45
           kind: 0
     lines:
-        first: 4
-        last: 4
+        first: 3
+        last: 3
     severity: 1
     anchor: 0
 
@@ -711,10 +711,10 @@
       # pint rule/set promql/series(foo{job="bob"}) ignore/label-value error
       expr: sum(foo{error="notfound"})
   output: |
-    4 |   expr: sum(foo{error="notfound"})
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^
-                pint rule/set comment `promql/series(foo{job="bob"}) ignore/label-value error` doesn't match
-                any label matcher in this query
+    3 |   # pint rule/set promql/series(foo{job="bob"}) ignore/label-value error
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                          pint rule/set comment `promql/series(foo{job="bob"}) ignore/label-value error`
+                          doesn't match any label matcher in this query
   problem:
     reporter: promql/series
     summary: invalid comment
@@ -723,12 +723,12 @@
         [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#ignorelabel-value) for docs about comment syntax.
     diagnostics:
         - message: pint rule/set comment `promql/series(foo{job="bob"}) ignore/label-value error` doesn't match any label matcher in this query
-          firstcolumn: 1
-          lastcolumn: 26
+          firstcolumn: 17
+          lastcolumn: 70
           kind: 0
     lines:
-        first: 4
-        last: 4
+        first: 3
+        last: 3
     severity: 1
     anchor: 0
 
@@ -897,9 +897,9 @@
     - record: foo
       expr: sum({__name__="found", removed="xxx"})
   output: |
-    4 |   expr: sum({__name__="found", removed="xxx"})
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                failed to parse pint comment as duration: unknown unit "e" in duration "1e"
+    2 | # pint rule/set promql/series(found) min-age 1e
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        failed to parse pint comment as duration: unknown unit "e" in duration "1e"
   problem:
     reporter: promql/series
     summary: invalid comment
@@ -908,12 +908,12 @@
         [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#min-age) to see supported syntax.
     diagnostics:
         - message: 'failed to parse pint comment as duration: unknown unit "e" in duration "1e"'
-          firstcolumn: 1
-          lastcolumn: 38
+          firstcolumn: 17
+          lastcolumn: 47
           kind: 0
     lines:
-        first: 3
-        last: 4
+        first: 2
+        last: 2
     severity: 1
     anchor: 0
 - description: '#6 metric was always present but label disappeared / invalid min-age'
@@ -1235,9 +1235,9 @@
     - record: my_series
       expr: count(bar)
   output: |
-    5 |   expr: count(bar)
-                ^^^^^^^^^^
-                pint disable comment `promql/series(foo)` doesn't match any selector in this query
+    3 | # pint disable promql/series(foo)
+                       ^^^^^^^^^^^^^^^^^^
+                       pint disable comment `promql/series(foo)` doesn't match any selector in this query
   problem:
     reporter: promql/series
     summary: invalid comment
@@ -1246,12 +1246,12 @@
         [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax.
     diagnostics:
         - message: pint disable comment `promql/series(foo)` doesn't match any selector in this query
-          firstcolumn: 1
-          lastcolumn: 10
+          firstcolumn: 16
+          lastcolumn: 33
           kind: 0
     lines:
-        first: 5
-        last: 5
+        first: 3
+        last: 3
     severity: 1
     anchor: 0
 
@@ -1290,14 +1290,11 @@
         (rate(metric1[5m]) or vector(0)) +
         (rate(metric3{log_name="samplerd"}[5m]) or vector(0))
         > 0
-  output: |4
-     7 |     (rate(metric2[5m]) or vector(0)) +
-     8 |     (rate(metric1[5m]) or vector(0)) +
-     9 |     (rate(metric3{log_name="samplerd"}[5m]) or vector(0))
-    10 |     > 0
-             ^^^
-             pint disable comment `promql/series(metric1)` has no effect because the selector is not being
-             checked due to a fallback `vector(0)`
+  output: |
+    3 |   # pint disable promql/series(metric1)
+                         ^^^^^^^^^^^^^^^^^^^^^^
+                         pint disable comment `promql/series(metric1)` has no effect because the selector is
+                         not being checked due to a fallback `vector(0)`
   problem:
     reporter: promql/series
     summary: invalid comment
@@ -1306,12 +1303,12 @@
         [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax.
     diagnostics:
         - message: pint disable comment `promql/series(metric1)` has no effect because the selector is not being checked due to a fallback `vector(0)`
-          firstcolumn: 1
-          lastcolumn: 128
+          firstcolumn: 16
+          lastcolumn: 37
           kind: 0
     lines:
-        first: 7
-        last: 10
+        first: 3
+        last: 3
     severity: 1
     anchor: 0
 - description: disable comment with vector() fallback
@@ -1326,14 +1323,11 @@
         (rate(metric1[5m]) or vector(0)) +
         (rate(metric3{log_name="samplerd"}[5m]) or vector(0))
         > 0
-  output: |4
-     7 |     (rate(metric2[5m]) or vector(0)) +
-     8 |     (rate(metric1[5m]) or vector(0)) +
-     9 |     (rate(metric3{log_name="samplerd"}[5m]) or vector(0))
-    10 |     > 0
-             ^^^
-             pint disable comment `promql/series(metric2)` has no effect because the selector is not being
-             checked due to a fallback `vector(0)`
+  output: |
+    4 |   # pint disable promql/series(metric2)
+                         ^^^^^^^^^^^^^^^^^^^^^^
+                         pint disable comment `promql/series(metric2)` has no effect because the selector is
+                         not being checked due to a fallback `vector(0)`
   problem:
     reporter: promql/series
     summary: invalid comment
@@ -1342,12 +1336,12 @@
         [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax.
     diagnostics:
         - message: pint disable comment `promql/series(metric2)` has no effect because the selector is not being checked due to a fallback `vector(0)`
-          firstcolumn: 1
-          lastcolumn: 128
+          firstcolumn: 16
+          lastcolumn: 37
           kind: 0
     lines:
-        first: 7
-        last: 10
+        first: 4
+        last: 4
     severity: 1
     anchor: 0
 - description: disable comment with vector() fallback
@@ -1362,14 +1356,11 @@
         (rate(metric1[5m]) or vector(0)) +
         (rate(metric3{log_name="samplerd"}[5m]) or vector(0))
         > 0
-  output: |4
-     7 |     (rate(metric2[5m]) or vector(0)) +
-     8 |     (rate(metric1[5m]) or vector(0)) +
-     9 |     (rate(metric3{log_name="samplerd"}[5m]) or vector(0))
-    10 |     > 0
-             ^^^
-             pint disable comment `promql/series(metric3)` has no effect because the selector is not being
-             checked due to a fallback `vector(0)`
+  output: |
+    5 |   # pint disable promql/series(metric3)
+                         ^^^^^^^^^^^^^^^^^^^^^^
+                         pint disable comment `promql/series(metric3)` has no effect because the selector is
+                         not being checked due to a fallback `vector(0)`
   problem:
     reporter: promql/series
     summary: invalid comment
@@ -1378,12 +1369,12 @@
         [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax.
     diagnostics:
         - message: pint disable comment `promql/series(metric3)` has no effect because the selector is not being checked due to a fallback `vector(0)`
-          firstcolumn: 1
-          lastcolumn: 128
+          firstcolumn: 16
+          lastcolumn: 37
           kind: 0
     lines:
-        first: 7
-        last: 10
+        first: 5
+        last: 5
     severity: 1
     anchor: 0
 
@@ -1806,10 +1797,10 @@
     - record: foo
       expr: count(notfound{job=~"foo"}) == 0
   output: |
-    4 |   expr: count(notfound{job=~"foo"}) == 0
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                pint disable comment `promql/series(notfound{job=foo})` doesn't match any selector in this
-                query
+    2 | # pint disable promql/series(notfound{job=foo})
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       pint disable comment `promql/series(notfound{job=foo})` doesn't match any selector in
+                       this query
   problem:
     reporter: promql/series
     summary: invalid comment
@@ -1818,12 +1809,12 @@
         [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax.
     diagnostics:
         - message: pint disable comment `promql/series(notfound{job=foo})` doesn't match any selector in this query
-          firstcolumn: 1
-          lastcolumn: 32
+          firstcolumn: 16
+          lastcolumn: 47
           kind: 0
     lines:
-        first: 4
-        last: 4
+        first: 2
+        last: 2
     severity: 1
     anchor: 0
 
@@ -1862,9 +1853,10 @@
     - record: foo
       expr: count(notfound{job=~"foo"}) == 0
   output: |
-    4 |   expr: count(notfound{job=~"foo"}) == 0
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                pint disable comment `promql/series({job="foo"})` doesn't match any selector in this query
+    2 | # pint disable promql/series({job="foo"})
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       pint disable comment `promql/series({job="foo"})` doesn't match any selector in this
+                       query
   problem:
     reporter: promql/series
     summary: invalid comment
@@ -1873,12 +1865,12 @@
         [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax.
     diagnostics:
         - message: pint disable comment `promql/series({job="foo"})` doesn't match any selector in this query
-          firstcolumn: 1
-          lastcolumn: 32
+          firstcolumn: 16
+          lastcolumn: 41
           kind: 0
     lines:
-        first: 4
-        last: 4
+        first: 2
+        last: 2
     severity: 1
     anchor: 0
 
@@ -1917,10 +1909,10 @@
     - record: foo
       expr: count(notfound) == 0
   output: |
-    4 |   expr: count(notfound) == 0
-                ^^^^^^^^^^^^^^^^^^^^
-                pint disable comment `promql/series(notfound{job="foo"})` doesn't match any selector in this
-                query
+    2 | # pint disable promql/series(notfound{job="foo"})
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       pint disable comment `promql/series(notfound{job="foo"})` doesn't match any selector
+                       in this query
   problem:
     reporter: promql/series
     summary: invalid comment
@@ -1929,12 +1921,12 @@
         [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax.
     diagnostics:
         - message: pint disable comment `promql/series(notfound{job="foo"})` doesn't match any selector in this query
-          firstcolumn: 1
-          lastcolumn: 20
+          firstcolumn: 16
+          lastcolumn: 49
           kind: 0
     lines:
-        first: 4
-        last: 4
+        first: 2
+        last: 2
     severity: 1
     anchor: 0
 
@@ -2072,10 +2064,10 @@
     - record: foo
       expr: count(notfound{job="foo"}) == 0
   output: |
-    4 |   expr: count(notfound{job="foo"}) == 0
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                pint snooze comment `promql/series(notfound{job=foo})` doesn't match any selector in this
-                query
+    2 | # pint snooze 2099-12-31 promql/series(notfound{job=foo})
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                 pint snooze comment `promql/series(notfound{job=foo})` doesn't match any
+                                 selector in this query
   problem:
     reporter: promql/series
     summary: invalid comment
@@ -2084,12 +2076,12 @@
         [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax.
     diagnostics:
         - message: pint snooze comment `promql/series(notfound{job=foo})` doesn't match any selector in this query
-          firstcolumn: 1
-          lastcolumn: 31
+          firstcolumn: 26
+          lastcolumn: 57
           kind: 0
     lines:
-        first: 4
-        last: 4
+        first: 2
+        last: 2
     severity: 1
     anchor: 0
 
@@ -2157,10 +2149,10 @@
     - record: foo
       expr: count(notfound{job="foo"}) == 0
   output: |
-    4 |   expr: count(notfound{job="foo"}) == 0
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                pint snooze comment `promql/series(notfound{job="bob"})` doesn't match any selector in this
-                query
+    2 | # pint snooze 2099-12-31 promql/series(notfound{job="bob"})
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                 pint snooze comment `promql/series(notfound{job="bob"})` doesn't match any
+                                 selector in this query
   problem:
     reporter: promql/series
     summary: invalid comment
@@ -2169,12 +2161,12 @@
         [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax.
     diagnostics:
         - message: pint snooze comment `promql/series(notfound{job="bob"})` doesn't match any selector in this query
-          firstcolumn: 1
-          lastcolumn: 31
+          firstcolumn: 26
+          lastcolumn: 59
           kind: 0
     lines:
-        first: 4
-        last: 4
+        first: 2
+        last: 2
     severity: 1
     anchor: 0
 
@@ -2535,10 +2527,10 @@
       # pint rule/set promql/series(mymetric) ignore/label-value type
       expr: (rate(mymetric{action="failure"}[2m])) > 0
   output: |
-    5 |   expr: (rate(mymetric{action="failure"}[2m])) > 0
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                pint rule/set comment `promql/series(mymetric) ignore/label-value type` doesn't match any
-                label matcher in this query
+    4 |   # pint rule/set promql/series(mymetric) ignore/label-value type
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                          pint rule/set comment `promql/series(mymetric) ignore/label-value type` doesn't
+                          match any label matcher in this query
   problem:
     reporter: promql/series
     summary: invalid comment
@@ -2547,12 +2539,12 @@
         [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#ignorelabel-value) for docs about comment syntax.
     diagnostics:
         - message: pint rule/set comment `promql/series(mymetric) ignore/label-value type` doesn't match any label matcher in this query
-          firstcolumn: 1
-          lastcolumn: 42
+          firstcolumn: 17
+          lastcolumn: 63
           kind: 0
     lines:
-        first: 5
-        last: 5
+        first: 4
+        last: 4
     severity: 1
     anchor: 0
 
@@ -2567,10 +2559,10 @@
       # pint rule/set promql/series(mymetric) ignore/label-value type
       expr: (rate(mymetric{action="failure"}[2m]) or vector(0)) > 0
   output: |
-    5 |   expr: (rate(mymetric{action="failure"}[2m]) or vector(0)) > 0
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                pint rule/set comment `promql/series(mymetric) ignore/label-value type` doesn't match any
-                label matcher in this query
+    4 |   # pint rule/set promql/series(mymetric) ignore/label-value type
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                          pint rule/set comment `promql/series(mymetric) ignore/label-value type` doesn't
+                          match any label matcher in this query
   problem:
     reporter: promql/series
     summary: invalid comment
@@ -2579,12 +2571,12 @@
         [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#ignorelabel-value) for docs about comment syntax.
     diagnostics:
         - message: pint rule/set comment `promql/series(mymetric) ignore/label-value type` doesn't match any label matcher in this query
-          firstcolumn: 1
-          lastcolumn: 55
+          firstcolumn: 17
+          lastcolumn: 63
           kind: 0
     lines:
-        first: 5
-        last: 5
+        first: 4
+        last: 4
     severity: 1
     anchor: 0
 

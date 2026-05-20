@@ -78,21 +78,45 @@ entry:
         - value:
             until: 2000-11-28T00:00:00Z
             match: promql/series(prom1)
+            position:
+                pos:
+                    - line: 2
+                      firstcolumn: 1
+                      lastcolumn: 45
+                offset: 25
           type: 12
           offset: 0
         - value:
             until: 2000-11-28T10:24:18Z
             match: promql/range_query
+            position:
+                pos:
+                    - line: 3
+                      firstcolumn: 1
+                      lastcolumn: 53
+                offset: 35
           type: 12
           offset: 0
         - value:
             until: 2000-11-28T00:00:00Z
             match: rule/duplicate
+            position:
+                pos:
+                    - line: 4
+                      firstcolumn: 1
+                      lastcolumn: 39
+                offset: 25
           type: 12
           offset: 0
         - value:
             until: 2000-11-28T00:00:00Z
             match: promql/vector_matching
+            position:
+                pos:
+                    - line: 5
+                      firstcolumn: 1
+                      lastcolumn: 62
+                offset: 40
           type: 12
           offset: 0
 checks:

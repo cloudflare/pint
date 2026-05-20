@@ -77,7 +77,7 @@ func (r *ContentReader) readNextLine() (err error) {
 }
 
 func (r *ContentReader) parseComments() {
-	lineComments := comments.Parse(r.lineno, string(r.buf))
+	lineComments := comments.Parse(r.lineno, string(r.buf), 0)
 
 	if r.skipAll {
 		r.emptyCurrentLine(lineComments)

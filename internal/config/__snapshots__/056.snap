@@ -81,6 +81,12 @@ entry:
         - value:
             until: 2099-11-28T00:00:00Z
             match: promql/aggregate
+            position:
+                pos:
+                    - line: 3
+                      firstcolumn: 3
+                      lastcolumn: 43
+                offset: 25
           type: 12
           offset: 0
 checks:
