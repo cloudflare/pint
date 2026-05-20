@@ -16,7 +16,7 @@
           component: disk
   output: |
     4 |       max without (source_instance) (
-    5 |         ... > 3 unless on(instance, device) (
+      |       [...]
     6 |           ... > ...
     7 |         )
     8 |         and on(device, instance) absent(node_disk_info)
@@ -170,11 +170,7 @@
                                            Calling `vector()` will return a vector value with no labels.
      6 |     > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
      7 |       avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
-     8 |     # Multi-line comment
-     9 |     # inside the query
-    10 |     and on (colo_name)
-    11 |       (colo_job:foo_total:rate2m or vector(0)) > 80
-    12 |     and on (colo_name)
+       |     [...]
     13 |       (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
   problem:
     reporter: promql/impossible
@@ -223,9 +219,7 @@
                                                     labels.
      8 |     # Multi-line comment
      9 |     # inside the query
-    10 |     and on (colo_name)
-    11 |       (colo_job:foo_total:rate2m or vector(0)) > 80
-    12 |     and on (colo_name)
+       |     [...]
     13 |       (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
   problem:
     reporter: promql/impossible
@@ -273,10 +267,7 @@
                labels.
      7 |       avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
      8 |     # Multi-line comment
-     9 |     # inside the query
-    10 |     and on (colo_name)
-    11 |       (colo_job:foo_total:rate2m or vector(0)) > 80
-    12 |     and on (colo_name)
+       |     [...]
     13 |       (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
   problem:
     reporter: promql/impossible
@@ -325,9 +316,7 @@
                                                     labels.
      8 |     # Multi-line comment
      9 |     # inside the query
-    10 |     and on (colo_name)
-    11 |       (colo_job:foo_total:rate2m or vector(0)) > 80
-    12 |     and on (colo_name)
+       |     [...]
     13 |       (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
   problem:
     reporter: promql/impossible
@@ -366,10 +355,7 @@
         summary: High rejectsion rate in {{ $labels.colo_name }}
   output: |4
      4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
-     5 |       (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
-     6 |     > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
-     7 |       avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
-     8 |     # Multi-line comment
+       |     [...]
      9 |     # inside the query
     10 |     and on (colo_name)
     11 |       (colo_job:foo_total:rate2m or vector(0)) > 80
@@ -412,12 +398,7 @@
         summary: High rejectsion rate in {{ $labels.colo_name }}
   output: |4
      4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
-     5 |       (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
-     6 |     > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
-     7 |       avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
-     8 |     # Multi-line comment
-     9 |     # inside the query
-    10 |     and on (colo_name)
+       |     [...]
     11 |       (colo_job:foo_total:rate2m or vector(0)) > 80
     12 |     and on (colo_name)
     13 |       (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
@@ -465,12 +446,7 @@
                                               return anything.
      5 |       (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
      6 |     > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
-     7 |       avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
-     8 |     # Multi-line comment
-     9 |     # inside the query
-    10 |     and on (colo_name)
-    11 |       (colo_job:foo_total:rate2m or vector(0)) > 80
-    12 |     and on (colo_name)
+       |     [...]
     13 |       (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
   problem:
     reporter: promql/impossible
@@ -512,12 +488,7 @@
                                               Calling `vector()` will return a vector value with no labels.
      5 |       (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
      6 |     > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
-     7 |       avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
-     8 |     # Multi-line comment
-     9 |     # inside the query
-    10 |     and on (colo_name)
-    11 |       (colo_job:foo_total:rate2m or vector(0)) > 80
-    12 |     and on (colo_name)
+       |     [...]
     13 |       (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
   problem:
     reporter: promql/impossible
@@ -560,7 +531,7 @@
                                               Calling `vector()` will return a vector value with no labels.
      5 |       (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
      6 |     > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
-     7 |       avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
+       |     [...]
      8 |     # Multi-line comment
      9 |     # inside the query
     10 |     and on (colo_name)
@@ -613,11 +584,7 @@
                                            Calling `vector()` will return a vector value with no labels.
      6 |     > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
      7 |       avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
-     8 |     # Multi-line comment
-     9 |     # inside the query
-    10 |     and on (colo_name)
-    11 |       (colo_job:foo_total:rate2m or vector(0)) > 80
-    12 |     and on (colo_name)
+       |     [...]
     13 |       (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
   problem:
     reporter: promql/impossible
@@ -666,9 +633,7 @@
                                                     labels.
      8 |     # Multi-line comment
      9 |     # inside the query
-    10 |     and on (colo_name)
-    11 |       (colo_job:foo_total:rate2m or vector(0)) > 80
-    12 |     and on (colo_name)
+       |     [...]
     13 |       (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
   problem:
     reporter: promql/impossible
@@ -716,10 +681,7 @@
                labels.
      7 |       avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
      8 |     # Multi-line comment
-     9 |     # inside the query
-    10 |     and on (colo_name)
-    11 |       (colo_job:foo_total:rate2m or vector(0)) > 80
-    12 |     and on (colo_name)
+       |     [...]
     13 |       (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
   problem:
     reporter: promql/impossible
@@ -768,9 +730,7 @@
                                                     labels.
      8 |     # Multi-line comment
      9 |     # inside the query
-    10 |     and on (colo_name)
-    11 |       (colo_job:foo_total:rate2m or vector(0)) > 80
-    12 |     and on (colo_name)
+       |     [...]
     13 |       (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
   problem:
     reporter: promql/impossible
@@ -809,10 +769,7 @@
         summary: High rejectsion rate in {{ $labels.colo_name }}
   output: |4
      4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
-     5 |       (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
-     6 |     > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
-     7 |       avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
-     8 |     # Multi-line comment
+       |     [...]
      9 |     # inside the query
     10 |     and on (colo_name)
     11 |       (colo_job:foo_total:rate2m or vector(0)) > 80
@@ -855,12 +812,7 @@
         summary: High rejectsion rate in {{ $labels.colo_name }}
   output: |4
      4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
-     5 |       (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
-     6 |     > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
-     7 |       avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
-     8 |     # Multi-line comment
-     9 |     # inside the query
-    10 |     and on (colo_name)
+       |     [...]
     11 |       (colo_job:foo_total:rate2m or vector(0)) > 80
     12 |     and on (colo_name)
     13 |       (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
@@ -1063,9 +1015,7 @@
         )
   output: |4
      4 |     group without(animal) (
-     5 |       (
-     6 |         up{node_status="v", job="node_exporter"}
-     7 |         * on (colo_name) group_left(animal)
+       |     [...]
      8 |         colo_metadata{colo_status="v"}
      9 |       )
     10 |       * on(animal, instance)
@@ -1884,12 +1834,7 @@
                                            results on the other side of the query.
      8 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
      9 |       unless on (instance) label_join(
-    10 |         max by (boring_instance) (boring_reboot_in_maintenance) == 1,
-    11 |             "instance",
-    12 |             "$1",
-    13 |             "boring_instance"
-    14 |           )
-    15 |       unless on (colo_name) (colostat_disabled_pops == 1)
+       |     [...]
     16 |     )
   problem:
     reporter: promql/impossible
@@ -1941,12 +1886,7 @@
                                                  to the results on the other side of the query.
      8 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
      9 |       unless on (instance) label_join(
-    10 |         max by (boring_instance) (boring_reboot_in_maintenance) == 1,
-    11 |             "instance",
-    12 |             "$1",
-    13 |             "boring_instance"
-    14 |           )
-    15 |       unless on (colo_name) (colostat_disabled_pops == 1)
+       |     [...]
     16 |     )
   problem:
     reporter: promql/impossible
@@ -1999,12 +1939,7 @@
                the other side of the query.
      8 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
      9 |       unless on (instance) label_join(
-    10 |         max by (boring_instance) (boring_reboot_in_maintenance) == 1,
-    11 |             "instance",
-    12 |             "$1",
-    13 |             "boring_instance"
-    14 |           )
-    15 |       unless on (colo_name) (colostat_disabled_pops == 1)
+       |     [...]
     16 |     )
   problem:
     reporter: promql/impossible
@@ -2056,12 +1991,7 @@
          results on the other side of the query.
      8 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
      9 |       unless on (instance) label_join(
-    10 |         max by (boring_instance) (boring_reboot_in_maintenance) == 1,
-    11 |             "instance",
-    12 |             "$1",
-    13 |             "boring_instance"
-    14 |           )
-    15 |       unless on (colo_name) (colostat_disabled_pops == 1)
+       |     [...]
     16 |     )
   problem:
     reporter: promql/impossible
@@ -2114,11 +2044,7 @@
                                            of the query.
      9 |       unless on (instance) label_join(
     10 |         max by (boring_instance) (boring_reboot_in_maintenance) == 1,
-    11 |             "instance",
-    12 |             "$1",
-    13 |             "boring_instance"
-    14 |           )
-    15 |       unless on (colo_name) (colostat_disabled_pops == 1)
+       |     [...]
     16 |     )
   problem:
     reporter: promql/impossible

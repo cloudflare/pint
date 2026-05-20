@@ -129,12 +129,47 @@ func lineCoverage(diags []Diagnostic) (lines []int) {
 	return lines
 }
 
+const diagContextLines = 2
+
+// visibleLines reduces allLines to only those near annotated lines (+/- diagContextLines),
+// always keeping the first and last lines.
+func visibleLines(
+	allLines []int,
+	diagPositions []PositionRanges,
+) []int {
+	anchorLines := make(map[int]bool)
+	for _, dp := range diagPositions {
+		if lr := dp.Lines(); lr.Last > 0 {
+			anchorLines[lr.Last] = true
+		}
+	}
+
+	firstLine := allLines[0]
+	lastLine := allLines[len(allLines)-1]
+	keep := make(map[int]bool)
+	keep[firstLine] = true
+	keep[lastLine] = true
+	for anchor := range anchorLines {
+		for delta := -diagContextLines; delta <= diagContextLines; delta++ {
+			keep[anchor+delta] = true
+		}
+	}
+
+	var visible []int
+	for _, l := range allLines {
+		if keep[l] {
+			visible = append(visible, l)
+		}
+	}
+
+	return visible
+}
+
 func InjectDiagnostics(content string, d []Diagnostic, color output.Color) string {
 	diags := make([]Diagnostic, len(d))
 	copy(diags, d)
 
 	lines := lineCoverage(diags)
-	lastLine := slices.Max(lines)
 
 	// Sort diagnostics by FirstColumn descending so that rightmost carets
 	// are printed first — this ensures inner carets don't overwrite outer ones.
@@ -151,6 +186,9 @@ func InjectDiagnostics(content string, d []Diagnostic, color output.Color) strin
 			diag.Pos,
 		)
 	}
+
+	lines = visibleLines(lines, diagPositions)
+	lastLine := slices.Max(lines)
 
 	var buf strings.Builder
 	nextLine := make([]strings.Builder, len(diags))
@@ -173,8 +211,11 @@ func InjectDiagnostics(content string, d []Diagnostic, color output.Color) strin
 	digits := countDigits(lastLine)
 	nrFmt := fmt.Sprintf("%%%dd", digits)
 
+	contentLines := strings.Split(content, "\n")
+
 	var lastWriteLine int
-	for lineIndex, line := range strings.Split(content, "\n") {
+	minIndent := -1
+	for lineIndex, line := range contentLines {
 
 		if lineIndex+1 > lastLine {
 			break
@@ -195,11 +236,37 @@ func InjectDiagnostics(content string, d []Diagnostic, color output.Color) strin
 
 		prefix := fmt.Sprintf(nrFmt+" | ", lineIndex+1)
 
+		// Print a gap marker when lines were skipped between the previous
+		// and current visible line. If only one line was skipped and it's
+		// short, print it verbatim — a [...] marker would be larger than
+		// the content it replaces.
 		if lastWriteLine > 0 && lineIndex+1-lastWriteLine > 1 {
-			buf.WriteString(output.MaybeColor(output.White, color == output.None, strings.Repeat(" ", digits)))
-			buf.WriteString(" | [...]\n")
+			skipped := lineIndex + 1 - lastWriteLine - 1
+			skippedLine := contentLines[lastWriteLine]
+			if skipped == 1 && len(strings.TrimSpace(skippedLine)) < 10 {
+				buf.WriteString(output.MaybeColor(
+					output.White, color == output.None,
+					fmt.Sprintf(nrFmt+" | ", lastWriteLine+1),
+				))
+				buf.WriteString(skippedLine)
+				buf.WriteRune('\n')
+			} else {
+				buf.WriteString(output.MaybeColor(output.White, color == output.None, strings.Repeat(" ", digits)))
+				buf.WriteString(" | ")
+				if minIndent > 0 {
+					buf.WriteString(strings.Repeat(" ", minIndent))
+				}
+				buf.WriteString("[...]\n")
+			}
 		}
 		lastWriteLine = lineIndex + 1
+
+		if trimmed := strings.TrimLeft(line, " "); len(trimmed) > 0 {
+			indent := len(line) - len(trimmed)
+			if minIndent < 0 || indent < minIndent {
+				minIndent = indent
+			}
+		}
 
 		buf.WriteString(output.MaybeColor(output.White, color == output.None, prefix))
 		for i, ok := range needsNextLine {

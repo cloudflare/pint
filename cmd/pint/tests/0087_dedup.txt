@@ -9,7 +9,7 @@ Bug: template uses non-existent label (alerts/template)
   ---> rules/01.yml:4-13 -> `foo` [+1 duplicates]
  5 |     expr: sum(up{job="bar"}) / sum(foo) / sum(bar)
                ^^^ Query is using aggregation that removes all labels.
-   | [...]
+   |     [...]
 13 |         dashboard: "https://grafana.example.com/dashboard?var-cluster={{ $labels.cluster }}&var-instance={{ $labels.cluster }}"
                                                                                      ^^^^^^^^
                Template is using `cluster` label but the query results won't have this label.
@@ -18,7 +18,7 @@ Bug: template uses non-existent label (alerts/template)
   ---> rules/01.yml:4-13 -> `foo`
  5 |     expr: sum(up{job="bar"}) / sum(foo) / sum(bar)
                ^^^ Query is using aggregation that removes all labels.
-   | [...]
+   |     [...]
 12 |         summary: "Server {{ $labels.instance }} in cluster {{ $labels.cluster }} has gone down"
                                         ^^^^^^^^^
                                         Template is using `instance` label but the query results won't

@@ -37,7 +37,7 @@
   output: |
     3 |   expr: rate(errors[2m])
                 ^^^^^^^^^^^^^^^^ `rate()` will produce results that are hard to read for humans.
-      | [...]
+      |   [...]
     5 |     summary: "{{ $value | first }} errors"
                          ^^^^^^^ Use one of humanize template functions to make the result more readable.
   problem:
@@ -72,7 +72,7 @@
   output: |
     3 |   expr: sum(foo) > 0
                 ^^^ Query is using aggregation that removes all labels.
-      | [...]
+      |   [...]
     5 |     summary: '{{ .Labels.job }} is above zero on {{ $labels.__name__ }}'
                                 ^^^^
                                 Template is using `job` label but the query results won't have this label.
@@ -104,7 +104,7 @@
   output: |
     3 |   expr: sum(foo) > 0
                 ^^^^^^^^ Aggregation removes metric name.
-      | [...]
+      |   [...]
     5 |     summary: '{{ .Labels.job }} is above zero on {{ $labels.__name__ }}'
                                                                    ^^^^^^^^^
          Template is using `__name__` label but the query results won't have
@@ -141,7 +141,7 @@
   output: |
     3 |   expr: foo + on(__name__, job) foo > 0
                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^ Binary operation between two vectors removes metric names.
-      | [...]
+      |   [...]
     5 |     summary: '{{ .Labels.job }} is above zero on {{ $labels.__name__ }}'
                                                                    ^^^^^^^^^
          Template is using `__name__` label but the query results won't have
@@ -190,7 +190,7 @@
                 read its labels. This means that the only labels you can get back from absent call are the
                 ones you pass to it. If you're hoping to get instance specific labels this way and alert
                 when some target is down then that won't work, use the `up` metric instead.
-      | [...]
+      |   [...]
     5 |     summary: '{{ .Labels.job }} in cluster {{$labels.cluster}}/{{ $labels.env }} is missing'
                                                             ^^^^^^^^
              Template is using `cluster` label but the query results
@@ -235,7 +235,7 @@
                 read its labels. This means that the only labels you can get back from absent call are the
                 ones you pass to it. If you're hoping to get instance specific labels this way and alert
                 when some target is down then that won't work, use the `up` metric instead.
-      | [...]
+      |   [...]
     5 |     summary: '{{ .Labels.job }} in cluster {{$labels.cluster}}/{{ $labels.env }} is missing'
                                                                                  ^^^^
            Template is using `env` label but the query results won't have this label.
@@ -280,7 +280,7 @@
   output: |
     2 |   expr: 1 > bool 0
                 ^ This query returns a number value with no labels.
-      | [...]
+      |   [...]
     4 |     summary: 'Deadmans switch on {{ $labels.instance }} / {{ $labels.job }} is firing'
                                                    ^^^^^^^^^
                                                    Template is using `instance` label but the query results
@@ -312,7 +312,7 @@
   output: |
     2 |   expr: 1 > bool 0
                 ^ This query returns a number value with no labels.
-      | [...]
+      |   [...]
     4 |     summary: 'Deadmans switch on {{ $labels.instance }} / {{ $labels.job }} is firing'
                                                                             ^^^^
              Template is using `job` label but the query results won't have this
@@ -348,7 +348,7 @@
   output: |
     2 |   expr: vector(1)
                 ^^^^^^ Calling `vector()` will return a vector value with no labels.
-      | [...]
+      |   [...]
     4 |     summary: 'Deadmans switch on {{ $labels.instance }} is firing'
                                                    ^^^^^^^^^
                                                    Template is using `instance` label but the query results
@@ -386,7 +386,7 @@
                              ^^
                              Query is using aggregation with `by(notjob)`, only labels included inside
                              `by(...)` will be present on the results.
-      | [...]
+      |   [...]
     4 |     summary: '{{ .Labels.job }}'
                                 ^^^^
                                 Template is using `job` label but the query results won't have this label.
@@ -429,7 +429,7 @@
                 read its labels. This means that the only labels you can get back from absent call are the
                 ones you pass to it. If you're hoping to get instance specific labels this way and alert
                 when some target is down then that won't work, use the `up` metric instead.
-      | [...]
+      |   [...]
     5 |     summary: '{{ .Labels.job }} / {{$labels.job}} is missing'
                                 ^^^^
                                 Template is using `job` label but the query results won't have this label.
@@ -477,7 +477,7 @@
                 read its labels. This means that the only labels you can get back from absent call are the
                 ones you pass to it. If you're hoping to get instance specific labels this way and alert
                 when some target is down then that won't work, use the `up` metric instead.
-      | [...]
+      |   [...]
     5 |     summary: '{{ $labels.instance }} on {{ .Labels.job }} is missing'
                                 ^^^^^^^^^
                                 Template is using `instance` label but the query results won't have this
@@ -522,7 +522,7 @@
                 read its labels. This means that the only labels you can get back from absent call are the
                 ones you pass to it. If you're hoping to get instance specific labels this way and alert
                 when some target is down then that won't work, use the `up` metric instead.
-      | [...]
+      |   [...]
     5 |     summary: '{{ $labels.instance }} on {{ .Labels.job }} is missing'
                                                           ^^^^
            Template is using `job` label but the query results
@@ -571,7 +571,7 @@
                 read its labels. This means that the only labels you can get back from absent call are the
                 ones you pass to it. If you're hoping to get instance specific labels this way and alert
                 when some target is down then that won't work, use the `up` metric instead.
-      | [...]
+      |   [...]
     5 |     summary: '{{ .Labels.job }} is missing'
                                 ^^^^
                                 Template is using `job` label but the query results won't have this label.
@@ -622,7 +622,7 @@
                 read its labels. This means that the only labels you can get back from absent call are the
                 ones you pass to it. If you're hoping to get instance specific labels this way and alert
                 when some target is down then that won't work, use the `up` metric instead.
-      | [...]
+    4 |   labels:
     5 |     instance: '{{ $labels.instance }}'
                                  ^^^^^^^^^
                                  Template is using `instance` label but the query results won't have this
@@ -670,7 +670,7 @@
                 read its labels. This means that the only labels you can get back from absent call are the
                 ones you pass to it. If you're hoping to get instance specific labels this way and alert
                 when some target is down then that won't work, use the `up` metric instead.
-      | [...]
+      |   [...]
     7 |     summary: '{{ $labels.instance }} on {{ .Labels.foo }} is missing'
                                 ^^^^^^^^^
                                 Template is using `instance` label but the query results won't have this
@@ -718,7 +718,7 @@
                 read its labels. This means that the only labels you can get back from absent call are the
                 ones you pass to it. If you're hoping to get instance specific labels this way and alert
                 when some target is down then that won't work, use the `up` metric instead.
-      | [...]
+      |   [...]
     7 |     summary: '{{ $labels.instance }} on {{ .Labels.foo }} is missing'
                                                           ^^^^
            Template is using `foo` label but the query results
@@ -766,7 +766,7 @@
                 read its labels. This means that the only labels you can get back from absent call are the
                 ones you pass to it. If you're hoping to get instance specific labels this way and alert
                 when some target is down then that won't work, use the `up` metric instead.
-      | [...]
+      |   [...]
     8 |     help: '{{ $labels.xxx }}'
                              ^^^^ Template is using `xxx` label but the query results won't have this label.
   problem:
@@ -805,7 +805,7 @@
   output: |
     2 |   expr: sum(foo) > 0
                 ^^^ Query is using aggregation that removes all labels.
-      | [...]
+      |   [...]
     4 |     summary: '{{ $labels.job }}'
                                 ^^^^
                                 Template is using `job` label but the query results won't have this label.
@@ -840,7 +840,7 @@
   output: |
     2 |   expr: sum(foo) > 0
                 ^^^ Query is using aggregation that removes all labels.
-      | [...]
+      |   [...]
     4 |     summary: '{{ .Labels.job }}'
                                 ^^^^
                                 Template is using `job` label but the query results won't have this label.
@@ -879,7 +879,7 @@
                            ^^^
                            Query is using aggregation with `by(instance, version)`, only labels included
                            inside `by(...)` will be present on the results.
-      | [...]
+      |   [...]
     6 |     help: '{{ $labels.ixtance }}'
                              ^^^^^^^^
                              Template is using `ixtance` label but the query results won't have this label.
@@ -914,7 +914,7 @@
   output: |
     2 |   expr: sum(foo) by(job) or sum(bar)
                                     ^^^ Query is using aggregation that removes all labels.
-      | [...]
+      |   [...]
     4 |     summary: '{{ .Labels.job }}'
                                 ^^^^
                                 Template is using `job` label but the query results won't have this label.
@@ -951,7 +951,7 @@
                                  ^^^
                                  Query is using aggregation with `without(job)`, all labels included inside
                                  `without(...)` will be removed from the results.
-      | [...]
+      |   [...]
     4 |     summary: '{{ $labels.job }}'
                                 ^^^^
                                 Template is using `job` label but the query results won't have this label.
@@ -988,7 +988,7 @@
                                  ^^^
                                  Query is using aggregation with `without(job)`, all labels included inside
                                  `without(...)` will be removed from the results.
-      | [...]
+      |   [...]
     4 |     summary: '{{ .Labels.job }}'
                                 ^^^^
                                 Template is using `job` label but the query results won't have this label.
@@ -1031,7 +1031,7 @@
                 read its labels. This means that the only labels you can get back from absent call are the
                 ones you pass to it. If you're hoping to get instance specific labels this way and alert
                 when some target is down then that won't work, use the `up` metric instead.
-      | [...]
+      |   [...]
     5 |     summary: '{{ $labels.instance }} on {{ .Labels.job }} is missing'
                                 ^^^^^^^^^
                                 Template is using `instance` label but the query results won't have this
@@ -1076,7 +1076,7 @@
                 read its labels. This means that the only labels you can get back from absent call are the
                 ones you pass to it. If you're hoping to get instance specific labels this way and alert
                 when some target is down then that won't work, use the `up` metric instead.
-      | [...]
+      |   [...]
     5 |     summary: '{{ $labels.instance }} on {{ .Labels.job }} is missing'
                                                           ^^^^
            Template is using `job` label but the query results
@@ -1130,7 +1130,7 @@
                                ^^^
                                Query is using one-to-one vector matching with `ignoring(job)`, all labels
                                included inside `ignoring(...)` will be removed on the results.
-      | [...]
+      |   [...]
     5 |     summary: '{{ .Labels.job }} in cluster {{$labels.cluster}}/{{ $labels.env }} is missing'
                                 ^^^^
                                 Template is using `job` label but the query results won't have this label.
@@ -1176,7 +1176,7 @@
                                          back from absent call are the ones you pass to it. If you're hoping
                                          to get instance specific labels this way and alert when some target
                                          is down then that won't work, use the `up` metric instead.
-      | [...]
+      |   [...]
     5 |     summary: '{{ .Labels.job }} in cluster {{$labels.cluster}}/{{ $labels.env }} is missing'
                                                             ^^^^^^^^
              Template is using `cluster` label but the query results
@@ -1224,7 +1224,7 @@
                                          back from absent call are the ones you pass to it. If you're hoping
                                          to get instance specific labels this way and alert when some target
                                          is down then that won't work, use the `up` metric instead.
-      | [...]
+      |   [...]
     5 |     summary: '{{ .Labels.job }} in cluster {{$labels.cluster}}/{{ $labels.env }} is missing'
                                                                                  ^^^^
            Template is using `env` label but the query results won't have this label.
@@ -1314,7 +1314,7 @@
   output: |
     7 |     expr: sum(foo) > 0
                   ^^^ Query is using aggregation that removes all labels.
-      | [...]
+      |     [...]
     9 |       summary: '{{ .Labels.team }}'
                                   ^^^^^
                                   Template is using `team` label but the query results won't have this
@@ -1365,7 +1365,7 @@
   output: |
     7 |     expr: sum(foo) > 0
                   ^^^ Query is using aggregation that removes all labels.
-      | [...]
+      |     [...]
     9 |       summary: '{{ .Labels.team }}'
                                   ^^^^^
                                   Template is using `team` label but the query results won't have this
@@ -1415,7 +1415,7 @@
                       ^^^^^^^^^^^^^^^^^^^^^^^
                       Query is using one-to-one vector matching with `on(instance, app_name)`, only labels
                       included inside `on(...)` will be present on the results.
-      | [...]
+      |   [...]
     6 |     job: "{{ $labels.job_name }}"
                             ^^^^^^^^^
                             Template is using `job_name` label but the query results won't have this label.
@@ -1450,7 +1450,7 @@
                       ^^^^^^^^^^^^^^^^^^^^^^^
                       Query is using one-to-one vector matching with `on(instance, app_name)`, only labels
                       included inside `on(...)` will be present on the results.
-      | [...]
+      |   [...]
     4 |     summary: "{{ $labels.app_type }} is using {{ $value }} fds."
                                 ^^^^^^^^^
                                 Template is using `app_type` label but the query results won't have this
@@ -1537,7 +1537,7 @@
   output: |
     3 |   expr: rate(errors_total[5m]) > 0
                 ^^^^^^^^^^^^^^^^^^^^^^ `rate()` will produce results that are hard to read for humans.
-      | [...]
+      |   [...]
     5 |     summary: Seeing {{ printf "%f" 2 }}{{ $value }} instances with errors
                                                   ^^^^^^^
                                                   Use one of humanize template functions to make the result
@@ -1692,7 +1692,7 @@
                                  ^^^
                                  Query is using aggregation with `without(job)`, all labels included inside
                                  `without(...)` will be removed from the results.
-      | [...]
+    3 |   labels:
     4 |     summary: '{{ $labels.job }}'
                                 ^^^^
                                 Template is using `job` label but the query results won't have this label.
@@ -1732,7 +1732,7 @@
   output: |
     2 |   expr: vector(1)
                 ^^^^^^ Calling `vector()` will return a vector value with no labels.
-      | [...]
+    3 |   labels:
     4 |     summary: 'Deadmans switch on {{ $labels.instance }} is firing'
                                                    ^^^^^^^^^
                                                    Template is using `instance` label but the query results
@@ -1772,7 +1772,7 @@
     4 |     max without (instance) (metric1{exported_job="abc"}) == 0 or (metric2 OR on() vector(0)) == 0
                                                                                           ^^^^^^
                                    Calling `vector()` will return a vector value with no labels.
-      | [...]
+      |     [...]
     7 |     summary: 'Foo is down in {{ $labels.colo_name }}'
                                                ^^^^^^^^^^
                                                Template is using `colo_name` label but the query results
@@ -1819,9 +1819,7 @@
                      be present on the results.
      5 |         stddev by (colo_name, region) (
      6 |           instance_mode:node_cpu:used_p90:rate2m{node_type="metal",node_status="v"}
-     7 |         ) > 0.1
-     8 |       ) >= 5
-       | [...]
+       |       [...]
     11 |       summary: "Errors in {{ $labels.colo_name }}"
                                              ^^^^^^^^^^
                                              Template is using `colo_name` label but the query results won't
@@ -1876,10 +1874,7 @@
         dashboard: 'Prefix is {{ $labels.prefix }}'
   output: |4
      4 |     avg without(router, colo_id, instance) (...)
-     5 |     < 0.5 > 0
-     6 |     or avg without(router, colo_id, instance) (...)
-     7 |     < 0.4 > 0
-     8 |     or sum without(router, colo_id, instance) (...)
+       |     [...]
      9 |     < 8 > 0
     10 |     or sum without(router, colo_id, instance) (...)
     11 |     < on() count(colo_router_tier:disabled_pops:max{tier="1",router=~"edge.*"}) * 0.4 > 0
@@ -1888,11 +1883,9 @@
                will be present on the results.
     12 |     or avg without(router, colo_id, instance) (...)
     13 |     < 0.1 > 0
-    14 |     or avg without(router, colo_id, instance) (...)
-    15 |     <  0.1 > 0
-    16 |     or sum without(router, colo_id, instance) (...)
+       |     [...]
     17 |     < 5 > 0
-       | [...]
+       |     [...]
     19 |     dashboard: 'Prefix is {{ $labels.prefix }}'
                                              ^^^^^^^
                                              Template is using `prefix` label but the query results won't
@@ -1934,7 +1927,7 @@
   output: |
     3 |   expr: irate(errors[2m]) > 0
                 ^^^^^^^^^^^^^^^^^ `irate()` will produce results that are hard to read for humans.
-      | [...]
+      |   [...]
     5 |     summary: "Seeing {{ .Value }} errors"
                                 ^^^^^^^
                                 Use one of humanize template functions to make the result more readable.
@@ -1970,7 +1963,7 @@
   output: |
     3 |   expr: deriv(errors[2m]) > 0
                 ^^^^^^^^^^^^^^^^^ `deriv()` will produce results that are hard to read for humans.
-      | [...]
+      |   [...]
     5 |     summary: "Seeing {{ .Value }} errors"
                                 ^^^^^^^
                                 Use one of humanize template functions to make the result more readable.
@@ -2006,7 +1999,7 @@
   output: |
     3 |   expr: rate(errors[2m]) > 0
                 ^^^^^^^^^^^^^^^^ `rate()` will produce results that are hard to read for humans.
-      | [...]
+      |   [...]
     5 |     summary: "Seeing {{ $value }} errors"
                                 ^^^^^^^
                                 Use one of humanize template functions to make the result more readable.
@@ -2042,7 +2035,7 @@
   output: |
     3 |   expr: rate(errors[2m]) > 0
                 ^^^^^^^^^^^^^^^^ `rate()` will produce results that are hard to read for humans.
-      | [...]
+      |   [...]
     5 |     summary: "{{ $foo := $value }}{{ $bar := $foo }} Seeing {{ $bar }} errors"
                                                                        ^^^^^
               Use one of humanize template functions to make the result more

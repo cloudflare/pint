@@ -221,7 +221,7 @@ body: |+
     ---> rules.yml:1-4 -> `rule1` [+1 duplicates]
   2 |   expr: sum(foo)
               ^^^ Query is using aggregation that removes all labels.
-    | [...]
+    |   [...]
   4 |     summary: 'foo is down on {{ $labels.instance }}'
                                              ^^^^^^^^^
                                              Template is using `instance` label but the query results

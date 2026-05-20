@@ -666,9 +666,7 @@
              `sum(response_time_sum:rate2m)`.
      6 |     ) by (environment, namespace)
      7 |     /
-     8 |     sum(
-     9 |       rate(global:response_time_count{namespace!~"test[.].+"}[15m])
-    10 |     ) by (environment, namespace)
+       |     [...]
     11 |     > 3000
   problem:
     reporter: promql/rate
