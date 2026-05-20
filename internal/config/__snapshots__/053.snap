@@ -94,6 +94,12 @@ entry:
         - value:
             until: 2099-11-28T00:00:00Z
             match: alerts/absent
+            position:
+                pos:
+                    - line: 2
+                      firstcolumn: 1
+                      lastcolumn: 38
+                offset: 25
           type: 12
           offset: 0
 checks:

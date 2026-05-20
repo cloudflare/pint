@@ -80,6 +80,12 @@ entry:
     rulecomments:
         - value:
             match: promql/aggregate
+            position:
+                pos:
+                    - line: 3
+                      firstcolumn: 3
+                      lastcolumn: 33
+                offset: 15
           type: 10
           offset: 0
 checks:

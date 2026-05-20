@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/comments"
+	"github.com/cloudflare/pint/internal/diags"
 )
 
 func TestReadContent(t *testing.T) {
@@ -150,8 +151,20 @@ func TestReadContent(t *testing.T) {
 			output: []byte("# pint file/owner bob\n# pint rule/set xxx\n# pint bamboozle xxx\n"),
 			comments: []comments.Comment{
 				{
-					Type:  comments.FileOwnerType,
-					Value: comments.Owner{Name: "bob", Line: 1},
+					Type: comments.FileOwnerType,
+					Value: comments.Owner{
+						Name: "bob",
+						Position: comments.Position{
+							Offset: 18,
+							Pos: diags.PositionRanges{
+								{
+									Line:        1,
+									FirstColumn: 1,
+									LastColumn:  21,
+								},
+							},
+						},
+					},
 				},
 			},
 		},
@@ -326,8 +339,20 @@ func TestReadContent(t *testing.T) {
 			output: []byte("# pint file/owner bob\r\n"),
 			comments: []comments.Comment{
 				{
-					Type:  comments.FileOwnerType,
-					Value: comments.Owner{Name: "bob", Line: 1},
+					Type: comments.FileOwnerType,
+					Value: comments.Owner{
+						Name: "bob",
+						Position: comments.Position{
+							Offset: 18,
+							Pos: diags.PositionRanges{
+								{
+									Line:        1,
+									FirstColumn: 1,
+									LastColumn:  22,
+								},
+							},
+						},
+					},
 				},
 			},
 		},

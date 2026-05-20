@@ -84,34 +84,82 @@ entry:
     rulecomments:
         - value:
             match: promql/series(prom1)
+            position:
+                pos:
+                    - line: 2
+                      firstcolumn: 1
+                      lastcolumn: 35
+                offset: 15
           type: 10
           offset: 0
         - value:
             match: query/cost(prom2)
+            position:
+                pos:
+                    - line: 3
+                      firstcolumn: 1
+                      lastcolumn: 32
+                offset: 15
           type: 10
           offset: 0
         - value:
             match: promql/rate(prom2)
+            position:
+                pos:
+                    - line: 5
+                      firstcolumn: 3
+                      lastcolumn: 35
+                offset: 15
           type: 10
           offset: 0
         - value:
             match: promql/vector_matching(prom1)
+            position:
+                pos:
+                    - line: 6
+                      firstcolumn: 3
+                      lastcolumn: 46
+                offset: 15
           type: 10
           offset: 0
         - value:
             match: rule/duplicate(prom1)
+            position:
+                pos:
+                    - line: 7
+                      firstcolumn: 3
+                      lastcolumn: 38
+                offset: 15
           type: 10
           offset: 0
         - value:
             match: labels/conflict(prom2)
+            position:
+                pos:
+                    - line: 8
+                      firstcolumn: 3
+                      lastcolumn: 39
+                offset: 15
           type: 10
           offset: 0
         - value:
             match: alerts/external_labels(prom2)
+            position:
+                pos:
+                    - line: 9
+                      firstcolumn: 3
+                      lastcolumn: 46
+                offset: 15
           type: 10
           offset: 0
         - value:
             match: promql/counter(prom1)
+            position:
+                pos:
+                    - line: 10
+                      firstcolumn: 3
+                      lastcolumn: 38
+                offset: 15
           type: 10
           offset: 0
 checks:

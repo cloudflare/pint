@@ -248,8 +248,8 @@ func (p Parser) parseRule(node *yaml.Node, offsetLine, offsetColumn int, content
 		if i == len(node.Content)-1 && node.FootComment != "" && part.HeadComment == "" {
 			part.FootComment = node.FootComment
 		}
-		for _, s := range mergeComments(part) {
-			for _, c := range comments.Parse(part.Line, s) {
+		for _, ct := range mergeComments(part, contentLines) {
+			for _, c := range comments.Parse(ct.line, ct.text, ct.column) {
 				if comments.IsRuleComment(c.Type) {
 					ruleComments = append(ruleComments, c)
 				}

@@ -715,7 +715,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 		}
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
-			Lines:    expr.Value.Pos.Lines(),
+			Lines:    comment.pos.Lines(),
 			Reporter: c.Reporter(),
 			Details:  SeriesCheckUnusedDisableComment,
 			Severity: Warning,
@@ -723,10 +723,10 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 			Diagnostics: []diags.Diagnostic{
 				{
 					Message:     msg,
-					Pos:         expr.Value.Pos,
-					Expr:        expr.Query().Expr,
-					FirstColumn: 1,
-					LastColumn:  len(expr.Value.Value),
+					Pos:         comment.pos,
+					Expr:        nil,
+					FirstColumn: comment.offset + 1,
+					LastColumn:  comment.lastColumn,
 					Kind:        diags.Issue,
 				},
 			},
@@ -735,7 +735,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 	for _, ruleSet := range orphanedRuleSetComments(entry.Rule, selectors) {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
-			Lines:    expr.Value.Pos.Lines(),
+			Lines:    ruleSet.Pos.Lines(),
 			Reporter: c.Reporter(),
 			Details:  SeriesCheckUnusedRuleSetComment,
 			Severity: Warning,
@@ -743,10 +743,10 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 			Diagnostics: []diags.Diagnostic{
 				{
 					Message:     fmt.Sprintf("pint %s comment `%s` doesn't match any label matcher in this query", comments.RuleSetComment, ruleSet.Value),
-					Pos:         expr.Value.Pos,
-					Expr:        expr.Query().Expr,
-					FirstColumn: 1,
-					LastColumn:  len(expr.Value.Value),
+					Pos:         ruleSet.Pos,
+					Expr:        nil,
+					FirstColumn: ruleSet.Offset + 1,
+					LastColumn:  ruleSet.Offset + len(ruleSet.Value),
 					Kind:        diags.Issue,
 				},
 			},
@@ -902,7 +902,7 @@ func (c SeriesCheck) getMinAge(rule parser.Rule, selector *promParser.VectorSele
 		if err != nil {
 			problems = append(problems, Problem{
 				Anchor:   AnchorAfter,
-				Lines:    rule.Lines,
+				Lines:    ruleSet.Pos.Lines(),
 				Reporter: c.Reporter(),
 				Summary:  "invalid comment",
 				Details:  SeriesCheckMinAgeDetails,
@@ -910,10 +910,10 @@ func (c SeriesCheck) getMinAge(rule parser.Rule, selector *promParser.VectorSele
 				Diagnostics: []diags.Diagnostic{
 					{
 						Message:     fmt.Sprintf("failed to parse pint comment as duration: %s", err),
-						Pos:         rule.Expr().Value.Pos,
-						Expr:        rule.Expr().Query().Expr,
-						FirstColumn: 1,
-						LastColumn:  len(rule.Expr().Value.Value),
+						Pos:         ruleSet.Pos,
+						Expr:        nil,
+						FirstColumn: ruleSet.Offset + 1,
+						LastColumn:  ruleSet.Offset + len(ruleSet.Value),
 						Kind:        diags.Issue,
 					},
 				},
@@ -1187,9 +1187,12 @@ func wasCommentUsed(commentMatch string, promNames, promTags []string, selectors
 }
 
 type orphanedComment struct {
-	kind     string
-	match    string
-	fallback string
+	kind       string
+	match      string
+	fallback   string
+	pos        diags.PositionRanges
+	offset     int
+	lastColumn int
 }
 
 func orphanedComments(ctx context.Context, rule parser.Rule, selectors []selectorInfo) (orhpaned []orphanedComment) {
@@ -1204,9 +1207,12 @@ func orphanedComments(ctx context.Context, rule parser.Rule, selectors []selecto
 		used, fallback := wasCommentUsed(disable.Match, promNames, promTags, selectors)
 		if !used || fallback != "" {
 			orhpaned = append(orhpaned, orphanedComment{
-				kind:     comments.DisableComment,
-				match:    disable.Match,
-				fallback: fallback,
+				kind:       comments.DisableComment,
+				match:      disable.Match,
+				fallback:   fallback,
+				pos:        disable.Pos,
+				offset:     disable.Offset,
+				lastColumn: disable.Offset + len(disable.Match),
 			})
 		}
 	}
@@ -1214,9 +1220,12 @@ func orphanedComments(ctx context.Context, rule parser.Rule, selectors []selecto
 		used, fallback := wasCommentUsed(snooze.Match, promNames, promTags, selectors)
 		if !used || fallback != "" {
 			orhpaned = append(orhpaned, orphanedComment{
-				kind:     comments.SnoozeComment,
-				match:    snooze.Match,
-				fallback: fallback,
+				kind:       comments.SnoozeComment,
+				match:      snooze.Match,
+				fallback:   fallback,
+				pos:        snooze.Pos,
+				offset:     snooze.Offset,
+				lastColumn: snooze.Offset + len(snooze.Match),
 			})
 		}
 	}

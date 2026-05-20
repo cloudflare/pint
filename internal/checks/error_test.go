@@ -69,7 +69,7 @@ This usually means that it's missing some required fields.`,
 		{
 			description: "comment error",
 			entry: &discovery.Entry{
-				PathError: comments.CommentError{
+				PathError: comments.Error{
 					Diagnostic: diags.Diagnostic{
 						Message: "invalid comment",
 						Pos:     diags.PositionRanges{{Line: 5}},

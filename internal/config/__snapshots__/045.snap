@@ -91,56 +91,122 @@ entry:
         - value:
             until: 2099-11-28T00:00:00Z
             match: alerts/count(+disable)
+            position:
+                pos:
+                    - line: 2
+                      firstcolumn: 1
+                      lastcolumn: 47
+                offset: 25
           type: 12
           offset: 0
         - value:
             until: 2099-11-28T00:00:00Z
             match: alerts/external_labels(+disable)
+            position:
+                pos:
+                    - line: 3
+                      firstcolumn: 1
+                      lastcolumn: 57
+                offset: 25
           type: 12
           offset: 0
         - value:
             until: 2099-11-28T00:00:00Z
             match: labels/conflict(+disable)
+            position:
+                pos:
+                    - line: 4
+                      firstcolumn: 1
+                      lastcolumn: 50
+                offset: 25
           type: 12
           offset: 0
         - value:
             until: 2099-11-28T00:00:00Z
             match: promql/range_query(+disable)
+            position:
+                pos:
+                    - line: 5
+                      firstcolumn: 1
+                      lastcolumn: 53
+                offset: 25
           type: 12
           offset: 0
         - value:
             until: 2099-11-28T00:00:00Z
             match: promql/regexp(+disable)
+            position:
+                pos:
+                    - line: 6
+                      firstcolumn: 1
+                      lastcolumn: 48
+                offset: 25
           type: 12
           offset: 0
         - value:
             until: 2099-11-28T00:00:00Z
             match: promql/counter(+disable)
+            position:
+                pos:
+                    - line: 7
+                      firstcolumn: 1
+                      lastcolumn: 49
+                offset: 25
           type: 12
           offset: 0
         - value:
             until: 2099-11-28T00:00:00Z
             match: promql/series(+disable)
+            position:
+                pos:
+                    - line: 8
+                      firstcolumn: 1
+                      lastcolumn: 48
+                offset: 25
           type: 12
           offset: 0
         - value:
             until: 2099-11-28T00:00:00Z
             match: promql/rate(+disable)
+            position:
+                pos:
+                    - line: 9
+                      firstcolumn: 1
+                      lastcolumn: 46
+                offset: 25
           type: 12
           offset: 0
         - value:
             until: 2099-11-28T00:00:00Z
             match: promql/vector_matching(+disable)
+            position:
+                pos:
+                    - line: 10
+                      firstcolumn: 1
+                      lastcolumn: 57
+                offset: 25
           type: 12
           offset: 0
         - value:
             until: 2099-11-28T00:00:00Z
             match: rule/duplicate(+disable)
+            position:
+                pos:
+                    - line: 11
+                      firstcolumn: 1
+                      lastcolumn: 49
+                offset: 25
           type: 12
           offset: 0
         - value:
             until: 2099-11-28T00:00:00Z
             match: alerts/absent(+disable)
+            position:
+                pos:
+                    - line: 12
+                      firstcolumn: 1
+                      lastcolumn: 48
+                offset: 25
           type: 12
           offset: 0
 checks:

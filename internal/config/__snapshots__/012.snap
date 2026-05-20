@@ -75,10 +75,22 @@ entry:
     rulecomments:
         - value:
             match: promql/aggregate(instance:false)
+            position:
+                pos:
+                    - line: 3
+                      firstcolumn: 3
+                      lastcolumn: 49
+                offset: 15
           type: 10
           offset: 0
         - value:
             match: promql/impossible
+            position:
+                pos:
+                    - line: 4
+                      firstcolumn: 3
+                      lastcolumn: 34
+                offset: 15
           type: 10
           offset: 0
 checks:
