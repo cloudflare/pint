@@ -270,7 +270,7 @@ body: |+
                              ^^^
                              Query is using aggregation with `by(instance, version)`, only labels included
                              inside `by(...)` will be present on the results.
-    | [...]
+    |       [...]
   8 |         help: '{{ $labels.ixtance }}'
                                ^^^^^^^^
                                Template is using `ixtance` label but the query results won't have this

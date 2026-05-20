@@ -1584,8 +1584,7 @@
         )
   output: |4
      4 |     (
-     5 |       sum(sometimes{foo!="bar"})
-     6 |       or
+       |     [...]
      7 |       vector(1)
      8 |     ) and (
      9 |       ((bob > 10) or sum(bar))
@@ -1625,8 +1624,7 @@
         )
   output: |4
      4 |     (
-     5 |       sum(sometimes{foo!="bar"})
-     6 |       or
+       |     [...]
      7 |       vector(1)
      8 |     ) and (
      9 |       ((bob > 10) or sum(bar))
@@ -1666,10 +1664,7 @@
         )
   output: |4
      4 |     (
-     5 |       sum(sometimes{foo!="bar"})
-     6 |       or
-     7 |       vector(1)
-     8 |     ) and (
+       |     [...]
      9 |       ((bob > 10) or sum(bar))
     10 |       or
     11 |       notfound > 0

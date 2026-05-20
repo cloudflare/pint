@@ -279,6 +279,29 @@ expr: sum(foo) without(colo_id, instance, node_type, region, node_status, job, c
 			},
 		},
 		{
+			name:  "indented multi-line gap uses aligned ellipsis marker",
+			input: "  line1\n  line2\n  line3\n  line4\n  line5\n  line6\n  line7\n  line8\n  line9\n  line10",
+			diags: []Diagnostic{
+				{
+					Message:     "problem here",
+					FirstColumn: 3,
+					LastColumn:  7,
+					Pos: PositionRanges{
+						{Line: 1, FirstColumn: 1, LastColumn: 7},
+						{Line: 2, FirstColumn: 1, LastColumn: 7},
+						{Line: 3, FirstColumn: 1, LastColumn: 7},
+						{Line: 4, FirstColumn: 1, LastColumn: 7},
+						{Line: 5, FirstColumn: 1, LastColumn: 7},
+						{Line: 6, FirstColumn: 1, LastColumn: 7},
+						{Line: 7, FirstColumn: 1, LastColumn: 7},
+						{Line: 8, FirstColumn: 1, LastColumn: 7},
+						{Line: 9, FirstColumn: 1, LastColumn: 7},
+						{Line: 10, FirstColumn: 1, LastColumn: 7},
+					},
+				},
+			},
+		},
+		{
 			name: "multi-line expression trims long inner line",
 			input: `
 expr: >-
