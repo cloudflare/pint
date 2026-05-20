@@ -60,7 +60,7 @@ func (c LabelsConflictCheck) Check(ctx context.Context, entry *discovery.Entry, 
 		return problems
 	}
 
-	cfg, err := c.prom.Config(ctx, 0)
+	cfg, err := c.prom.Config(ctx, 0).Wait()
 	if err != nil {
 		if errors.Is(err, promapi.ErrUnsupported) {
 			c.prom.DisableCheck(promapi.APIPathConfig, c.Reporter())

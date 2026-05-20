@@ -126,7 +126,7 @@ func TestBuildInfo(t *testing.T) {
 			fg.StartWorkers(reg)
 			defer fg.Close(reg)
 
-			bi, err := fg.BuildInfo(t.Context())
+			bi, err := fg.BuildInfo(t.Context()).Wait()
 			tc.assertErr(t, err)
 			if bi != nil {
 				require.Equal(t, tc.version, bi.Version)

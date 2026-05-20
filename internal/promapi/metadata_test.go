@@ -179,7 +179,7 @@ func TestMetadata(t *testing.T) {
 			fg.StartWorkers(reg)
 			defer fg.Close(reg)
 
-			metadata, err := fg.Metadata(t.Context(), tc.name)
+			metadata, err := fg.Metadata(t.Context(), tc.name).Wait()
 			tc.assertErr(t, err)
 			if metadata != nil {
 				require.Equal(t, tc.metadata, metadata.Metadata)

@@ -89,7 +89,7 @@ func (c RangeQueryCheck) Check(ctx context.Context, entry *discovery.Entry, _ []
 		return problems
 	}
 
-	flags, err := c.prom.Flags(ctx)
+	flags, err := c.prom.Flags(ctx).Wait()
 	if err != nil {
 		if errors.Is(err, promapi.ErrUnsupported) {
 			c.prom.DisableCheck(promapi.APIPathFlags, c.Reporter())

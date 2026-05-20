@@ -341,7 +341,7 @@ func TestQuery(t *testing.T) {
 			fg.StartWorkers(reg)
 			defer fg.Close(reg)
 
-			qr, err := fg.Query(t.Context(), tc.name)
+			qr, err := fg.Query(t.Context(), tc.name).Wait()
 			tc.assertErr(t, err)
 			if qr != nil {
 				require.Equal(t, tc.series, qr.Series)

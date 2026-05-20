@@ -62,48 +62,30 @@ func (c CounterCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*di
 		return problems
 	}
 
+	names := c.collectMetricNames(expr)
+	if len(names) == 0 {
+		return problems
+	}
+
+	pending := make(map[string]*promapi.Request[*promapi.MetadataResult], len(names))
+	for _, name := range names {
+		pending[name] = c.prom.Metadata(ctx, name)
+	}
+
 	done := map[string]struct{}{}
 
 LOOP:
 	for _, vs := range parser.WalkDownExpr[*promParser.VectorSelector](expr.Query()) {
-		if vs.Parent == nil {
-			// This might be a counter but there's no parent so we have something like `expr: foo`.
-			// We're only testing for the existence of foo in alerts OR copying it via recording rules.
+		if !c.needsMetadataCheck(vs) {
 			continue LOOP
-		}
-
-		for _, call := range parser.WalkUpExpr[*promParser.Call](vs.Parent) {
-			if fn := call.Expr.(*promParser.Call); c.isSafeFunc(fn.Func.Name) {
-				// This might be a counter but it's wrapped in one of the functions that make it
-				// safe to use.
-				continue LOOP
-			}
-		}
-
-		for _, aggr := range parser.WalkUpExpr[*promParser.AggregateExpr](vs.Parent) {
-			if ag := aggr.Expr.(*promParser.AggregateExpr); ag.Op == promParser.COUNT || ag.Op == promParser.GROUP {
-				// This might be a counter but it's wrapped in count() or group() call so it's safe to use.
-				continue LOOP
-			}
-		}
-
-		for _, binSide := range parser.WalkUpParent[*promParser.BinaryExpr](vs) {
-			if binExp := binSide.Parent.Expr.(*promParser.BinaryExpr); binExp.Op == promParser.LUNLESS {
-				// We're inside a binary expression with `foo unless bar`.
-				// Check which side we're at, if it's the RHS then it's safe to use counters directly.
-				if binExp.RHS.String() == binSide.Expr.String() {
-					continue LOOP
-				}
-			}
 		}
 
 		selector := vs.Expr.(*promParser.VectorSelector)
 		if _, ok := done[selector.Name]; ok {
-			// This selector was already checked, skip it.
 			continue LOOP
 		}
 
-		metadata, err := c.prom.Metadata(ctx, selector.Name)
+		metadata, err := pending[selector.Name].Wait()
 		if err != nil {
 			if errors.Is(err, promapi.ErrUnsupported) {
 				c.prom.DisableCheck(promapi.APIPathMetadata, c.Reporter())
@@ -113,12 +95,10 @@ LOOP:
 			continue LOOP
 		}
 		if len(metadata.Metadata) == 0 {
-			// No metadata so we don't know what type it uses.
 			continue LOOP
 		}
 		for _, m := range metadata.Metadata {
 			if m.Type != v1.MetricTypeCounter {
-				// There's metadata with non-counter type, so it's not always a counter.
 				continue LOOP
 			}
 		}
@@ -149,6 +129,51 @@ LOOP:
 	}
 
 	return problems
+}
+
+func (c CounterCheck) needsMetadataCheck(vs *parser.PromQLNode) bool {
+	if vs.Parent == nil {
+		return false
+	}
+
+	for _, call := range parser.WalkUpExpr[*promParser.Call](vs.Parent) {
+		if fn := call.Expr.(*promParser.Call); c.isSafeFunc(fn.Func.Name) {
+			return false
+		}
+	}
+
+	for _, aggr := range parser.WalkUpExpr[*promParser.AggregateExpr](vs.Parent) {
+		if ag := aggr.Expr.(*promParser.AggregateExpr); ag.Op == promParser.COUNT || ag.Op == promParser.GROUP {
+			return false
+		}
+	}
+
+	for _, binSide := range parser.WalkUpParent[*promParser.BinaryExpr](vs) {
+		if binExp := binSide.Parent.Expr.(*promParser.BinaryExpr); binExp.Op == promParser.LUNLESS {
+			if binExp.RHS.String() == binSide.Expr.String() {
+				return false
+			}
+		}
+	}
+
+	return true
+}
+
+func (c CounterCheck) collectMetricNames(expr *parser.PromQLExpr) []string {
+	seen := map[string]struct{}{}
+	var names []string
+	for _, vs := range parser.WalkDownExpr[*promParser.VectorSelector](expr.Query()) {
+		if !c.needsMetadataCheck(vs) {
+			continue
+		}
+		selector := vs.Expr.(*promParser.VectorSelector)
+		if _, ok := seen[selector.Name]; ok {
+			continue
+		}
+		seen[selector.Name] = struct{}{}
+		names = append(names, selector.Name)
+	}
+	return names
 }
 
 func (c CounterCheck) isSafeFunc(name string) bool {

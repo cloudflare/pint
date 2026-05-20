@@ -65,7 +65,7 @@ func (c FeaturesCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*d
 		return problems
 	}
 
-	flags, err := c.prom.Flags(ctx)
+	flags, err := c.prom.Flags(ctx).Wait()
 	if err != nil {
 		if errors.Is(err, promapi.ErrUnsupported) {
 			c.prom.DisableCheck(promapi.APIPathFlags, c.Reporter())
@@ -76,7 +76,7 @@ func (c FeaturesCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*d
 	}
 
 	var serverVersion source.PrometheusVersion
-	bi, err := c.prom.BuildInfo(ctx)
+	bi, err := c.prom.BuildInfo(ctx).Wait()
 	if err != nil {
 		if errors.Is(err, promapi.ErrUnsupported) {
 			c.prom.DisableCheck(promapi.APIPathBuildInfo, c.Reporter())
