@@ -133,8 +133,8 @@ expr: |
 						{Line: 1, FirstColumn: 1, LastColumn: 74},
 						{Line: 1, FirstColumn: 78, LastColumn: 120},
 					},
-					FirstColumn: 98,
-					LastColumn:  101,
+					FirstColumn: 99,
+					LastColumn:  100,
 				},
 			},
 		},
@@ -157,17 +157,17 @@ expr: |
 				{
 					Message:     "dead code",
 					Pos:         PositionRanges{{Line: 1, FirstColumn: 1, LastColumn: 120}},
-					FirstColumn: 98,
-					LastColumn:  101,
+					FirstColumn: 102,
+					LastColumn:  103,
 				},
 				{
 					Message: "extra",
 					Pos: PositionRanges{
-						{Line: 1, FirstColumn: 98, LastColumn: 101},
+						{Line: 1, FirstColumn: 102, LastColumn: 103},
 						{Line: 2, FirstColumn: 1, LastColumn: 5},
 					},
-					FirstColumn: 98,
-					LastColumn:  101,
+					FirstColumn: 102,
+					LastColumn:  103,
 				},
 			},
 		},
@@ -201,7 +201,7 @@ expr: |
 			input: `
 expr: sum by (instance) (rate(http_requests_total{job="api",status=~"5.."}[5m])) / sum by (instance) (rate(up{job="api"}[5m])) > 0.01`,
 			diags: []Diagnostic{
-				{FirstColumn: 104, LastColumn: 107, Message: "dead code"},
+				{FirstColumn: 102, LastColumn: 103, Message: "dead code"},
 			},
 		},
 		{
@@ -217,7 +217,7 @@ expr: sum(oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
 			input: `
 expr: sum(rate(http_requests_total{job="api",status=~"5.."}[5m]) / sum(rate(up{job="api"}[5m])) > 0.01`,
 			diags: []Diagnostic{
-				{FirstColumn: 1, LastColumn: 3, Message: "syntax error"},
+				{FirstColumn: 91, LastColumn: 96, Message: "syntax error"},
 			},
 		},
 		{
@@ -241,7 +241,7 @@ expr: sum(foo) + sum(rate(very_long_metric_name_aaaa{job="api",status=~"5..",ins
 			input: `
 expr: sum(foo) without(colo_id, instance, node_type, region, node_status, job, colo_name)`,
 			diags: []Diagnostic{
-				{FirstColumn: 80, LastColumn: 89, Message: "bad label"},
+				{FirstColumn: 74, LastColumn: 82, Message: "bad label"},
 			},
 		},
 		{
@@ -249,7 +249,7 @@ expr: sum(foo) without(colo_id, instance, node_type, region, node_status, job, c
 			input: `
 expr: sum(foo) without(colo_id, instance, node_type, region, node_status, job, colo_name)`,
 			diags: []Diagnostic{
-				{FirstColumn: 80, LastColumn: 89, Message: "Using `without(colo_id, instance, node_type, region, node_status, job, colo_name)` removes all these labels from the results."},
+				{FirstColumn: 74, LastColumn: 82, Message: "Using `without(colo_id, instance, node_type, region, node_status, job, colo_name)` removes all these labels from the results."},
 			},
 		},
 		{
@@ -259,7 +259,7 @@ expr: |
   sum(rate(very_long_metric_name_that_pushes_past_the_width_limit_aaaa{job="api",status=~"5.."}[5m])) by(instance)
   + sum(rate(another_very_long_metric_name_that_pushes_past_the_width_limit{job="api"}[5m]))`,
 			diags: []Diagnostic{
-				{FirstColumn: 3, LastColumn: 8, Message: "bad rate"},
+				{FirstColumn: 1, LastColumn: 3, Message: "bad rate"},
 			},
 		},
 		{
@@ -275,7 +275,7 @@ expr: sum(rate(very_long_metric_name_that_pushes_past_the_width_limit_aaaa{job="
 			input: `
 expr: sum(foo) without(colo_id, instance, node_type, region, node_status, job, colo_name)`,
 			diags: []Diagnostic{
-				{FirstColumn: 18, LastColumn: 21, Message: "Query is using aggregation with `without(colo_id, instance, node_type, region, node_status, job, colo_name)`, all labels included inside `without(...)` will be removed from the results. `job` label is required and should be preserved when aggregating all rules."},
+				{FirstColumn: 10, LastColumn: 16, Message: "Query is using aggregation with `without(colo_id, instance, node_type, region, node_status, job, colo_name)`, all labels included inside `without(...)` will be removed from the results. `job` label is required and should be preserved when aggregating all rules."},
 			},
 		},
 		{
