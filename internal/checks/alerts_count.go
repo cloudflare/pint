@@ -73,14 +73,14 @@ func (c AlertsCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*dis
 
 	params := promapi.NewRelativeRange(c.lookBack, c.step)
 
-	qr, err := c.prom.RangeQuery(ctx, entry.Rule.AlertingRule.Expr.Value.Value, params)
+	qr, err := c.prom.RangeQuery(ctx, entry.Rule.AlertingRule.Expr.Value.Value, params).Wait()
 	if err != nil {
 		problems = append(problems, problemFromError(err, entry.Rule, c.Reporter(), c.prom.Name(), Bug))
 		return problems
 	}
 
 	if len(qr.Series.Ranges) > 0 {
-		promUptime, err := c.prom.RangeQuery(ctx, wrapExpr(c.prom.UptimeMetric(), "count"), params)
+		promUptime, err := c.prom.RangeQuery(ctx, wrapExpr(c.prom.UptimeMetric(), "count"), params).Wait()
 		if err != nil {
 			slog.LogAttrs(ctx, slog.LevelWarn, "Cannot detect Prometheus uptime gaps", slog.Any("err", err), slog.String("name", c.prom.Name()))
 		} else {

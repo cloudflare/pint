@@ -101,7 +101,7 @@ func (c CostCheck) Check(ctx context.Context, entry *discovery.Entry, entries []
 
 	var estimate string
 	if series > 0 {
-		result, err := c.prom.Query(ctx, BytesPerSampleQuery)
+		result, err := c.prom.Query(ctx, BytesPerSampleQuery).Wait()
 		if err == nil {
 			for _, s := range result.Series {
 				estimate = fmt.Sprintf(" with %s estimated memory usage", output.HumanizeBytes(int(s.Value*float64(series))))
@@ -230,7 +230,7 @@ func (c CostCheck) statToDuration(f float64) time.Duration {
 }
 
 func (c CostCheck) getQueryCost(ctx context.Context, expr string) (*promapi.QueryResult, int, error) {
-	qr, err := c.prom.Query(ctx, wrapExpr(expr, "count"))
+	qr, err := c.prom.Query(ctx, wrapExpr(expr, "count")).Wait()
 	if err != nil {
 		return nil, 0, err
 	}

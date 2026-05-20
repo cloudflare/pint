@@ -460,6 +460,7 @@ group by (cluster, namespace, workload, workload_type, pod) (
 	`foo % bar`,
 	`foo ^ bar`,
 	`sum(foo * on(job) group_left(cluster) bar) by(job) * on(job) group_left(cluster) baz`,
+	`sum by (colo) (metric_a) / scalar(sum(metric_b))`, // {colo} / <number> to avoid on()
 }
 
 func TestLabelsSource(t *testing.T) {

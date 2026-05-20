@@ -13734,6 +13734,44 @@ output:
 
 ---
 
+[TestLabelsSource/261 - 1]
+expr: sum by (colo) (metric_a) / scalar(sum(metric_b))
+output:
+    - labels:
+        "":
+            reason: Query is using aggregation with `by(colo)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 4
+                end: 7
+        __name__:
+            reason: Aggregation removes metric name.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 24
+        colo:
+            reason: Query is using aggregation with `by(colo)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 8
+                end: 12
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] metric_a'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum by (colo) (metric_a)'
+          op: sum
+      usedLabels:
+        - colo
+      position:
+        start: 15
+        end: 23
+      type: aggregation
+      fixedLabels: true
+
+---
+
 [TestLabelsSourceWithFeatures/all_four_features_combined - 1]
 expr: mad_over_time(foo[5m+1m] smoothed) + on(job) fill(0) bar
 output:

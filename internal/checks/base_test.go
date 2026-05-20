@@ -359,6 +359,14 @@ func (rpc requestPathCond) isMatch(r *http.Request) bool {
 	return r.URL.Path == rpc.path
 }
 
+type requestPathSuffixCond struct {
+	suffix string
+}
+
+func (rps requestPathSuffixCond) isMatch(r *http.Request) bool {
+	return strings.HasSuffix(r.URL.Path, rps.suffix)
+}
+
 type formCond struct {
 	key   string
 	value string

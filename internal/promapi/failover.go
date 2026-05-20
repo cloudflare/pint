@@ -220,101 +220,161 @@ func (fg *FailoverGroup) CleanCache() {
 	}
 }
 
-func (fg *FailoverGroup) Config(ctx context.Context, cacheTTL time.Duration) (cfg *ConfigResult, err error) {
-	var uri string
-	for _, prom := range fg.servers {
-		uri = prom.safeURI
-		cfg, err = prom.Config(ctx, cacheTTL)
-		if err == nil {
-			return cfg, nil
-		}
-		if !IsUnavailableError(err) && !errors.Is(err, ErrUnsupported) {
-			return nil, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
-		}
-	}
-	return nil, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
+type Request[T any] struct {
+	val T
+	err error
+	wg  sync.WaitGroup
 }
 
-func (fg *FailoverGroup) Query(ctx context.Context, expr string) (qr *QueryResult, err error) {
-	var uri string
-	for try, prom := range fg.servers {
-		if try > 0 {
-			slog.LogAttrs(
-				ctx, slog.LevelDebug,
-				"Using failover URI",
-				slog.String("name", fg.name),
-				slog.Int("retry", try),
-				slog.String("uri", prom.safeURI),
-			)
-		}
-		uri = prom.safeURI
-		qr, err = prom.Query(ctx, expr)
-		if err == nil {
-			return qr, nil
-		}
-		if !IsUnavailableError(err) {
-			return qr, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
-		}
-	}
-	return nil, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
+func newRequest[T any](fn func() (T, error)) *Request[T] {
+	var p Request[T]
+	p.wg.Go(func() {
+		p.val, p.err = fn()
+	})
+	return &p
 }
 
-func (fg *FailoverGroup) RangeQuery(ctx context.Context, expr string, params RangeQueryTimes) (rqr *RangeQueryResult, err error) {
-	var uri string
-	for _, prom := range fg.servers {
-		uri = prom.safeURI
-		rqr, err = prom.RangeQuery(ctx, expr, params)
-		if err == nil {
-			return rqr, nil
-		}
-		if !IsUnavailableError(err) {
-			return rqr, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
-		}
-	}
-	return nil, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
+func (p *Request[T]) Wait() (T, error) {
+	p.wg.Wait()
+	return p.val, p.err
 }
 
-func (fg *FailoverGroup) Metadata(ctx context.Context, metric string) (metadata *MetadataResult, err error) {
-	var uri string
-	for _, prom := range fg.servers {
-		uri = prom.safeURI
-		metadata, err = prom.Metadata(ctx, metric)
-		if err == nil {
-			return metadata, nil
+func (fg *FailoverGroup) Config(
+	ctx context.Context,
+	cacheTTL time.Duration,
+) *Request[*ConfigResult] {
+	return newRequest(func() (*ConfigResult, error) {
+		var cfg *ConfigResult
+		var uri string
+		var err error
+		for _, prom := range fg.servers {
+			uri = prom.safeURI
+			cfg, err = prom.Config(ctx, cacheTTL)
+			if err == nil {
+				return cfg, nil
+			}
+			if !IsUnavailableError(err) && !errors.Is(err, ErrUnsupported) {
+				return nil, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
+			}
 		}
-		if !IsUnavailableError(err) && !errors.Is(err, ErrUnsupported) {
-			return metadata, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
-		}
-	}
-	return nil, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
+		return nil, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
+	})
 }
 
-func (fg *FailoverGroup) Flags(ctx context.Context) (flags *FlagsResult, err error) {
-	var uri string
-	for _, prom := range fg.servers {
-		uri = prom.safeURI
-		flags, err = prom.Flags(ctx)
-		if err == nil {
-			return flags, nil
+func (fg *FailoverGroup) Query(
+	ctx context.Context,
+	expr string,
+) *Request[*QueryResult] {
+	return newRequest(func() (*QueryResult, error) {
+		var qr *QueryResult
+		var uri string
+		var err error
+		for try, prom := range fg.servers {
+			if try > 0 {
+				slog.LogAttrs(
+					ctx, slog.LevelDebug,
+					"Using failover URI",
+					slog.String("name", fg.name),
+					slog.Int("retry", try),
+					slog.String("uri", prom.safeURI),
+				)
+			}
+			uri = prom.safeURI
+			qr, err = prom.Query(ctx, expr)
+			if err == nil {
+				return qr, nil
+			}
+			if !IsUnavailableError(err) {
+				return qr, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
+			}
 		}
-		if !IsUnavailableError(err) && !errors.Is(err, ErrUnsupported) {
-			return nil, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
-		}
-	}
-	return nil, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
+		return nil, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
+	})
 }
 
-func (fg *FailoverGroup) BuildInfo(ctx context.Context) (bi *BuildInfoResult, err error) {
-	var uri string
-	for _, prom := range fg.servers {
-		uri = prom.safeURI
-		bi, err = prom.BuildInfo(ctx)
-		if err == nil {
-			return bi, nil
+func (fg *FailoverGroup) RangeQuery(
+	ctx context.Context,
+	expr string,
+	params RangeQueryTimes,
+) *Request[*RangeQueryResult] {
+	return newRequest(func() (*RangeQueryResult, error) {
+		var rqr *RangeQueryResult
+		var uri string
+		var err error
+		for _, prom := range fg.servers {
+			uri = prom.safeURI
+			rqr, err = prom.RangeQuery(ctx, expr, params)
+			if err == nil {
+				return rqr, nil
+			}
+			if !IsUnavailableError(err) {
+				return rqr, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
+			}
 		}
-		if !IsUnavailableError(err) && !errors.Is(err, ErrUnsupported) {
-			return nil, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
+		return nil, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
+	})
+}
+
+func (fg *FailoverGroup) Metadata(
+	ctx context.Context,
+	metric string,
+) *Request[*MetadataResult] {
+	return newRequest(func() (*MetadataResult, error) {
+		var metadata *MetadataResult
+		var uri string
+		var err error
+		for _, prom := range fg.servers {
+			uri = prom.safeURI
+			metadata, err = prom.Metadata(ctx, metric)
+			if err == nil {
+				return metadata, nil
+			}
+			if !IsUnavailableError(err) && !errors.Is(err, ErrUnsupported) {
+				return metadata, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
+			}
 		}
-	}
-	return nil, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
+		return nil, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
+	})
+}
+
+func (fg *FailoverGroup) Flags(
+	ctx context.Context,
+) *Request[*FlagsResult] {
+	return newRequest(func() (*FlagsResult, error) {
+		var flags *FlagsResult
+		var uri string
+		var err error
+		for _, prom := range fg.servers {
+			uri = prom.safeURI
+			flags, err = prom.Flags(ctx)
+			if err == nil {
+				return flags, nil
+			}
+			if !IsUnavailableError(err) && !errors.Is(err, ErrUnsupported) {
+				return nil, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
+			}
+		}
+		return nil, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
+	})
+}
+
+func (fg *FailoverGroup) BuildInfo(
+	ctx context.Context,
+) *Request[*BuildInfoResult] {
+	return newRequest(func() (*BuildInfoResult, error) {
+		var bi *BuildInfoResult
+		var uri string
+		var err error
+		for _, prom := range fg.servers {
+			uri = prom.safeURI
+			bi, err = prom.BuildInfo(ctx)
+			if err == nil {
+				return bi, nil
+			}
+			if !IsUnavailableError(err) && !errors.Is(err, ErrUnsupported) {
+				return nil, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
+			}
+		}
+		return nil, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
+	})
 }

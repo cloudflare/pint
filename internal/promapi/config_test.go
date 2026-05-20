@@ -193,7 +193,7 @@ func TestConfig(t *testing.T) {
 				reg := prometheus.NewRegistry()
 				fg.StartWorkers(reg)
 				t.Cleanup(func() { fg.Close(reg) })
-				cfg, err = fg.Config(t.Context(), 0)
+				cfg, err = fg.Config(t.Context(), 0).Wait()
 			} else {
 				prom.StartWorkers()
 				t.Cleanup(prom.Close)
@@ -257,7 +257,7 @@ func TestConfigHeaders(t *testing.T) {
 			fg.StartWorkers(reg)
 			defer fg.Close(reg)
 
-			_, err := fg.Config(t.Context(), 0)
+			_, err := fg.Config(t.Context(), 0).Wait()
 			require.NoError(t, err)
 		})
 	}

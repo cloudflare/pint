@@ -3392,7 +3392,7 @@ func TestSeriesCheck(t *testing.T) {
 					},
 				},
 				{
-					conds: []requestCondition{requireQueryPath},
+					conds: []requestCondition{requestPathSuffixCond{suffix: promapi.APIPathQuery}},
 					resp:  respondWithEmptyVector(),
 				},
 				{
@@ -3408,7 +3408,7 @@ func TestSeriesCheck(t *testing.T) {
 			prometheus:  newSimpleProm,
 			ctx: func(ctx context.Context, _ string) context.Context {
 				s := checks.PromqlSeriesSettings{
-					FallbackTimeout: "5s",
+					FallbackTimeout: "100ms",
 				}
 				if err := s.Validate(); err != nil {
 					t.Error(err)
@@ -3417,20 +3417,58 @@ func TestSeriesCheck(t *testing.T) {
 				return context.WithValue(ctx, checks.SettingsKey(checks.SeriesCheckName), &s)
 			},
 			otherProms: func(uri string) []*promapi.FailoverGroup {
-				proms := make([]*promapi.FailoverGroup, 0, 30)
-				for i := range 30 {
-					proms = append(proms, simpleProm(fmt.Sprintf("prom%d", i), uri+"/other", time.Second, false))
+				proms := make([]*promapi.FailoverGroup, 0, 15)
+				for i := range 15 {
+					proms = append(proms, simpleProm(
+						fmt.Sprintf("prom%d", i),
+						fmt.Sprintf("%s/other/%d", uri, i),
+						time.Second,
+						false,
+					))
 				}
 				return proms
 			},
 			problems: true,
 			mocks: []*prometheusMock{
 				{
-					conds: []requestCondition{requestPathCond{path: "/other" + promapi.APIPathQuery}},
-					resp: sleepResponse{
-						sleep: time.Millisecond * 230,
-						resp:  respondWithSingleInstantVector(),
-					},
+					conds: []requestCondition{requestPathCond{path: "/other/0" + promapi.APIPathQuery}},
+					resp:  respondWithSingleInstantVector(),
+				},
+				{
+					conds: []requestCondition{requestPathCond{path: "/other/1" + promapi.APIPathQuery}},
+					resp:  respondWithSingleInstantVector(),
+				},
+				{
+					conds: []requestCondition{requestPathCond{path: "/other/2" + promapi.APIPathQuery}},
+					resp:  respondWithSingleInstantVector(),
+				},
+				{
+					conds: []requestCondition{requestPathCond{path: "/other/3" + promapi.APIPathQuery}},
+					resp:  respondWithSingleInstantVector(),
+				},
+				{
+					conds: []requestCondition{requestPathCond{path: "/other/4" + promapi.APIPathQuery}},
+					resp:  respondWithSingleInstantVector(),
+				},
+				{
+					conds: []requestCondition{requestPathCond{path: "/other/5" + promapi.APIPathQuery}},
+					resp:  respondWithSingleInstantVector(),
+				},
+				{
+					conds: []requestCondition{requestPathCond{path: "/other/6" + promapi.APIPathQuery}},
+					resp:  respondWithSingleInstantVector(),
+				},
+				{
+					conds: []requestCondition{requestPathCond{path: "/other/7" + promapi.APIPathQuery}},
+					resp:  respondWithSingleInstantVector(),
+				},
+				{
+					conds: []requestCondition{requestPathCond{path: "/other/8" + promapi.APIPathQuery}},
+					resp:  respondWithSingleInstantVector(),
+				},
+				{
+					conds: []requestCondition{requestPathCond{path: "/other/9" + promapi.APIPathQuery}},
+					resp:  respondWithSingleInstantVector(),
 				},
 				{
 					conds: []requestCondition{requireQueryPath},
@@ -3439,6 +3477,13 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{requireRangeQueryPath},
 					resp:  respondWithEmptyMatrix(),
+				},
+				{
+					conds: []requestCondition{requestPathSuffixCond{suffix: promapi.APIPathQuery}},
+					resp: sleepResponse{
+						sleep: time.Millisecond * 200,
+						resp:  respondWithSingleInstantVector(),
+					},
 				},
 			},
 		},

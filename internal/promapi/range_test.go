@@ -555,7 +555,7 @@ func TestRange(t *testing.T) {
 
 			for i := 1; i < 5; i++ {
 				t.Run(tc.query, func(t *testing.T) {
-					qr, err := fg.RangeQuery(t.Context(), tc.query, newAbsoluteRange(tc.start, tc.end, tc.step))
+					qr, err := fg.RangeQuery(t.Context(), tc.query, newAbsoluteRange(tc.start, tc.end, tc.step)).Wait()
 					tc.assertErr(t, err)
 					if qr != nil {
 						require.Equal(t, printRange(tc.out.Ranges), printRange(qr.Series.Ranges), tc)

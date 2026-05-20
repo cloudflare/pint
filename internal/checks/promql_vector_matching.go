@@ -76,7 +76,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 		n.Op != promParser.LUNLESS {
 
 		q := wrapExpr(n.String(), "count")
-		qr, err := c.prom.Query(ctx, q)
+		qr, err := c.prom.Query(ctx, q).Wait()
 		if err != nil {
 			problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug))
 			return problems
@@ -341,7 +341,7 @@ func (c VectorMatchingCheck) seriesLabels(ctx context.Context, query string, ign
 		}
 	}
 	expr.WriteString(")")
-	qr, err := c.prom.Query(ctx, expr.String())
+	qr, err := c.prom.Query(ctx, expr.String()).Wait()
 	if err != nil {
 		return nil, "", err
 	}

@@ -728,6 +728,13 @@ func TestRateCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireMetadataPath,
+						formCond{"metric", "global:response_time_count"},
+					},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{}},
+				},
+				{
+					conds: []requestCondition{
+						requireMetadataPath,
 						formCond{"metric", "response_time_sum:rate2m"},
 					},
 					resp: httpResponse{code: http.StatusNotFound, body: "Not Found"},

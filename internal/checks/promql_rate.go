@@ -81,7 +81,7 @@ func (c RateCheck) Check(ctx context.Context, entry *discovery.Entry, entries []
 		return problems
 	}
 
-	cfg, err := c.prom.Config(ctx, 0)
+	cfg, err := c.prom.Config(ctx, 0).Wait()
 	if err != nil {
 		if errors.Is(err, promapi.ErrUnsupported) {
 			c.prom.DisableCheck(promapi.APIPathConfig, c.Reporter())
@@ -91,11 +91,81 @@ func (c RateCheck) Check(ctx context.Context, entry *discovery.Entry, entries []
 		return problems
 	}
 
-	problems = append(problems, c.checkNode(ctx, entry.Rule, expr, expr.Query(), entries, cfg, &completedList{values: nil})...)
+	metadataNames := c.collectRateMetricNames(expr.Query(), entries)
+	pending := make(map[string]*promapi.Request[*promapi.MetadataResult], len(metadataNames))
+	for _, name := range metadataNames {
+		pending[name] = c.prom.Metadata(ctx, name)
+	}
+
+	problems = append(problems, c.checkNode(ctx, entry.Rule, expr, expr.Query(), entries, cfg, pending, &completedList{values: nil})...)
 	return problems
 }
 
-func (c RateCheck) checkNode(ctx context.Context, rule parser.Rule, expr *parser.PromQLExpr, node *parser.PromQLNode, entries []*discovery.Entry, cfg *promapi.ConfigResult, done *completedList) (problems []Problem) {
+func (c RateCheck) collectRateMetricNames(node *parser.PromQLNode, entries []*discovery.Entry) []string {
+	seen := map[string]struct{}{}
+	var names []string
+
+	add := func(name string) {
+		if _, ok := seen[name]; ok {
+			return
+		}
+		seen[name] = struct{}{}
+		names = append(names, name)
+	}
+
+	c.walkMetricNames(node, entries, add)
+	return names
+}
+
+func (c RateCheck) walkMetricNames(node *parser.PromQLNode, entries []*discovery.Entry, add func(string)) {
+	if n, ok := node.Expr.(*promParser.Call); ok && (n.Func.Name == "rate" || n.Func.Name == "irate" || n.Func.Name == "deriv") {
+		for _, arg := range n.Args {
+			m, ok := arg.(*promParser.MatrixSelector)
+			if !ok {
+				continue
+			}
+			if n.Func.Name == "deriv" {
+				continue
+			}
+			if s, ok := m.VectorSelector.(*promParser.VectorSelector); ok {
+				add(s.Name)
+				for _, e := range entries {
+					if e.PathError != nil {
+						continue
+					}
+					if e.Rule.Error.Err != nil {
+						continue
+					}
+					if e.Rule.RecordingRule != nil && e.Rule.RecordingRule.Expr.SyntaxError() == nil && e.Rule.RecordingRule.Record.Value == s.Name {
+						for _, src := range e.Rule.RecordingRule.Expr.Source() {
+							if src.Type != source.AggregateSource {
+								continue
+							}
+							if vs, ok := source.MostOuterOperation[*promParser.VectorSelector](src); ok {
+								add(vs.Name)
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	for _, child := range node.Children {
+		c.walkMetricNames(child, entries, add)
+	}
+}
+
+func (c RateCheck) checkNode(
+	ctx context.Context,
+	rule parser.Rule,
+	expr *parser.PromQLExpr,
+	node *parser.PromQLNode,
+	entries []*discovery.Entry,
+	cfg *promapi.ConfigResult,
+	pending map[string]*promapi.Request[*promapi.MetadataResult],
+	done *completedList,
+) (problems []Problem) {
 	if n, ok := node.Expr.(*promParser.Call); ok && (n.Func.Name == "rate" || n.Func.Name == "irate" || n.Func.Name == "deriv") {
 		for _, arg := range n.Args {
 			m, ok := arg.(*promParser.MatrixSelector)
@@ -131,7 +201,7 @@ func (c RateCheck) checkNode(ctx context.Context, rule parser.Rule, expr *parser
 					continue
 				}
 				done.values = append(done.values, s.Name)
-				metadata, err := c.prom.Metadata(ctx, s.Name)
+				metadata, err := pending[s.Name].Wait()
 				if err != nil {
 					if errors.Is(err, promapi.ErrUnsupported) {
 						continue
@@ -176,7 +246,7 @@ func (c RateCheck) checkNode(ctx context.Context, rule parser.Rule, expr *parser
 								continue
 							}
 							if vs, ok := source.MostOuterOperation[*promParser.VectorSelector](src); ok {
-								metadata, err := c.prom.Metadata(ctx, vs.Name)
+								metadata, err := pending[vs.Name].Wait()
 								if err != nil {
 									if errors.Is(err, promapi.ErrUnsupported) {
 										continue
@@ -231,7 +301,7 @@ func (c RateCheck) checkNode(ctx context.Context, rule parser.Rule, expr *parser
 	}
 
 	for _, child := range node.Children {
-		problems = append(problems, c.checkNode(ctx, rule, expr, child, entries, cfg, done)...)
+		problems = append(problems, c.checkNode(ctx, rule, expr, child, entries, cfg, pending, done)...)
 	}
 
 	return problems

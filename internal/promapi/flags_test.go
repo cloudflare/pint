@@ -135,7 +135,7 @@ func TestFlags(t *testing.T) {
 			fg.StartWorkers(reg)
 			defer fg.Close(reg)
 
-			flags, err := fg.Flags(t.Context())
+			flags, err := fg.Flags(t.Context()).Wait()
 			tc.assertErr(t, err)
 			if flags != nil {
 				require.Equal(t, tc.flags, flags.Flags)

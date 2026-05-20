@@ -262,7 +262,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 			continue
 		}
 
-		promUptime, err := c.prom.RangeQuery(ctx, wrapExpr(c.prom.UptimeMetric(), "count"), params)
+		promUptime, err := c.prom.RangeQuery(ctx, wrapExpr(c.prom.UptimeMetric(), "count"), params).Wait()
 		if err != nil {
 			slog.LogAttrs(ctx, slog.LevelWarn, "Cannot detect Prometheus uptime gaps", slog.Any("err", err), slog.String("name", c.prom.Name()))
 		}
@@ -309,7 +309,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 
 		// 2. If foo was NEVER there -> BUG
 		slog.LogAttrs(ctx, slog.LevelDebug, "Checking if base metric has historical series", slog.String("check", c.Reporter()), slog.String("selector", bareSelectorString))
-		trs, err := c.prom.RangeQuery(ctx, wrapExpr(bareSelectorString, "count"), params)
+		trs, err := c.prom.RangeQuery(ctx, wrapExpr(bareSelectorString, "count"), params).Wait()
 		if err != nil {
 			problems = append(problems, problemFromError(err, entry.Rule, c.Reporter(), c.prom.Name(), Bug))
 			continue
@@ -393,7 +393,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 			ls := l.String()
 
 			slog.LogAttrs(ctx, slog.LevelDebug, "Checking if base metric has historical series with required label", slog.String("check", c.Reporter()), slog.String("selector", ls), slog.String("label", name))
-			trsLabelCount, err := c.prom.RangeQuery(ctx, wrapExpr(ls, "absent"), params)
+			trsLabelCount, err := c.prom.RangeQuery(ctx, wrapExpr(ls, "absent"), params).Wait()
 			if err != nil {
 				problems = append(problems, problemFromError(err, entry.Rule, c.Reporter(), c.prom.Name(), Bug))
 				continue
@@ -517,7 +517,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 			labelSelectorString := labelSelector.String()
 			slog.LogAttrs(ctx, slog.LevelDebug, "Checking if there are historical series matching filter", slog.String("check", c.Reporter()), slog.String("selector", labelSelectorString), slog.String("matcher", lms))
 
-			trsLabel, err := c.prom.RangeQuery(ctx, wrapExpr(labelSelectorString, "count"), params)
+			trsLabel, err := c.prom.RangeQuery(ctx, wrapExpr(labelSelectorString, "count"), params).Wait()
 			if err != nil {
 				problems = append(problems, problemFromError(err, entry.Rule, c.Reporter(), c.prom.Name(), Bug))
 				continue
@@ -771,36 +771,52 @@ func (c SeriesCheck) checkOtherServer(ctx context.Context, query string, setting
 		return SeriesCheckCommonProblemDetails, true
 	}
 
-	var suffix string
-	var buf strings.Builder
-	buf.WriteRune('`')
-	buf.WriteString(query)
-	buf.WriteString("` was found on other prometheus servers:\n\n")
+	queryCtx, cancel := context.WithTimeout(ctx, settings.fallbackTimeout)
+	defer cancel()
 
-	start := time.Now()
-	var tested, matches, skipped int
+	type pendingQuery struct {
+		prom    *promapi.FailoverGroup
+		pending *promapi.Request[*promapi.QueryResult]
+	}
+
+	pending := make([]pendingQuery, 0, len(servers))
 	for _, prom := range servers {
-		if time.Since(start) >= settings.fallbackTimeout {
-			slog.LogAttrs(
-				ctx, slog.LevelDebug, "Time limit reached for checking if metric exists on any other Prometheus server",
-				slog.String("check", c.Reporter()),
-				slog.String("selector", query),
-			)
-			suffix = fmt.Sprintf("\npint tried to check %d server(s) but stopped after checking %d server(s) due to reaching time limit (%s).\n",
-				len(servers), tested, output.HumanizeDuration(settings.fallbackTimeout))
-			break
-		}
-
 		slog.LogAttrs(
 			ctx, slog.LevelDebug, "Checking if metric exists on any other Prometheus server",
 			slog.String("check", c.Reporter()),
 			slog.String("name", prom.Name()),
 			slog.String("selector", query),
 		)
+		pending = append(pending, pendingQuery{
+			prom:    prom,
+			pending: prom.Query(queryCtx, wrapExpr(query, "count")),
+		})
+	}
 
+	var suffix string
+	var buf strings.Builder
+	buf.WriteRune('`')
+	buf.WriteString(query)
+	buf.WriteString("` was found on other prometheus servers:\n\n")
+
+	var tested, matches, skipped int
+	for _, pq := range pending {
+		qr, err := pq.pending.Wait()
 		tested++
-		qr, err := prom.Query(ctx, wrapExpr(query, "count"))
 		if err != nil {
+			if queryCtx.Err() != nil {
+				slog.LogAttrs(
+					ctx, slog.LevelDebug,
+					"Time limit reached for checking if metric exists on any other Prometheus server",
+					slog.String("check", c.Reporter()),
+					slog.String("selector", query),
+				)
+				suffix = fmt.Sprintf(
+					"\npint tried to check %d server(s) but stopped after checking %d server(s) due to reaching time limit (%s).\n",
+					len(servers), tested, output.HumanizeDuration(settings.fallbackTimeout),
+				)
+				break
+			}
 			continue
 		}
 
@@ -809,12 +825,10 @@ func (c SeriesCheck) checkOtherServer(ctx context.Context, query string, setting
 			series += int(s.Value)
 		}
 
-		uri := prom.URI()
-
 		if series > 0 {
 			for _, selector := range settings.IgnoreMatchingElsewhere {
 				m, _ := parser.PromQLParser.ParseMetricSelector(selector)
-				if c.hasSeriesWithSelector(ctx, prom, query, m) {
+				if c.hasSeriesWithSelector(ctx, pq.prom, query, m) {
 					return "", false
 				}
 			}
@@ -824,8 +838,9 @@ func (c SeriesCheck) checkOtherServer(ctx context.Context, query string, setting
 				skipped++
 				continue
 			}
+			uri := pq.prom.URI()
 			buf.WriteString("- [")
-			buf.WriteString(prom.Name())
+			buf.WriteString(pq.prom.Name())
 			buf.WriteString("](")
 			buf.WriteString(uri)
 			buf.WriteString("/graph?g0.expr=")
@@ -850,7 +865,7 @@ func (c SeriesCheck) checkOtherServer(ctx context.Context, query string, setting
 }
 
 func (c SeriesCheck) hasSeriesWithSelector(ctx context.Context, prom *promapi.FailoverGroup, query string, matchers []*labels.Matcher) bool {
-	qr, err := prom.Query(ctx, query)
+	qr, err := prom.Query(ctx, query).Wait()
 	if err != nil {
 		return false
 	}
@@ -872,7 +887,7 @@ func (c SeriesCheck) hasSeriesWithSelector(ctx context.Context, prom *promapi.Fa
 }
 
 func (c SeriesCheck) instantSeriesCount(ctx context.Context, query string) (int, error) {
-	qr, err := c.prom.Query(ctx, query)
+	qr, err := c.prom.Query(ctx, query).Wait()
 	if err != nil {
 		return 0, err
 	}

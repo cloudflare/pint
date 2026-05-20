@@ -90,7 +90,7 @@ var watchCmd = &cli.Command{
 				slog.LogAttrs(ctx, slog.LevelDebug, "Starting rule_fules watch", slog.String("name", args[0]))
 
 				return actionWatch(c, meta, func(ctx context.Context) ([]string, error) {
-					cfg, err := prom.Config(ctx, time.Millisecond)
+					cfg, err := prom.Config(ctx, time.Millisecond).Wait()
 					if err != nil {
 						return nil, fmt.Errorf("failed to query %q Prometheus configuration: %w", prom.Name(), err)
 					}
