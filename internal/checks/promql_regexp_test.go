@@ -245,7 +245,7 @@ func TestRegexpCheck(t *testing.T) {
 			prometheus:  noProm,
 		},
 		{
-			description: "smelly selector / multiple",
+			description: "prefix-only selector is not smelly",
 			content: `
 - record: foo
   expr: |
@@ -253,7 +253,6 @@ func TestRegexpCheck(t *testing.T) {
 `,
 			checker:    newRegexpCheck,
 			prometheus: noProm,
-			problems:   true,
 		},
 		{
 			description: "valid literal with prefix wildcard",
@@ -262,11 +261,10 @@ func TestRegexpCheck(t *testing.T) {
 			prometheus:  noProm,
 		},
 		{
-			description: "smelly selector / literal then plus",
+			description: "prefix with .+ is not smelly",
 			content:     "- record: foo\n  expr: foo{job=~\"service.+\"}\n",
 			checker:     newRegexpCheck,
 			prometheus:  noProm,
-			problems:    true,
 		},
 		{
 			// One selector has a redundant static regexp and another has a valid regexp.
@@ -306,6 +304,57 @@ func TestRegexpCheck(t *testing.T) {
 			checker:     newRegexpCheck,
 			prometheus:  noProm,
 			problems:    true,
+		},
+		{
+			description: "prefix wildcard is not smelly",
+			content:     "- record: foo\n  expr: foo{instance=~\"edge.*\"}\n",
+			checker:     newRegexpCheck,
+			prometheus:  noProm,
+		},
+		{
+			description: "suffix wildcard is not smelly",
+			content:     "- record: foo\n  expr: foo{job=~\".*staging\"}\n",
+			checker:     newRegexpCheck,
+			prometheus:  noProm,
+		},
+		{
+			description: "contains pattern is smelly",
+			content:     "- record: foo\n  expr: foo{cluster=~\".*dev.*\"}\n",
+			checker:     newRegexpCheck,
+			prometheus:  noProm,
+			problems:    true,
+		},
+		{
+			description: "negative contains pattern is smelly",
+			content:     "- record: foo\n  expr: foo{cluster!~\".*staging.*\"}\n",
+			checker:     newRegexpCheck,
+			prometheus:  noProm,
+			problems:    true,
+		},
+		{
+			description: "literal-wildcard-literal is smelly",
+			content:     "- record: foo\n  expr: foo{name=~\"etcd-backup-.*.timer\"}\n",
+			checker:     newRegexpCheck,
+			prometheus:  noProm,
+			problems:    true,
+		},
+		{
+			description: "character class before literal blocks smelly wildcard lookup",
+			content:     "- record: foo\n  expr: foo{job=~\"[a-z]foo.*\"}\n",
+			checker:     newRegexpCheck,
+			prometheus:  noProm,
+		},
+		{
+			description: "character class after literal blocks smelly wildcard lookup",
+			content:     "- record: foo\n  expr: foo{job=~\".*foo[0-9]\"}\n",
+			checker:     newRegexpCheck,
+			prometheus:  noProm,
+		},
+		{
+			description: "character class after wildcard blocks smelly literal lookup",
+			content:     "- record: foo\n  expr: foo{job=~\"foo.*[0-9]\"}\n",
+			checker:     newRegexpCheck,
+			prometheus:  noProm,
 		},
 	}
 	runTests(t, testCases)

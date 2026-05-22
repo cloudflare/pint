@@ -52,7 +52,7 @@ groups:
     - alert: OpenTelemetry_Collector_Failed_Logs
       # pint disable promql/series
       expr: >-
-        sum by (exporter, colo_name) (rate(otelcol_exporter_send_failed_log_records{node_status="v", exporter=~"(failover|otlp)/.*"}[5m]))
+        sum by (exporter, colo_name) (rate(otelcol_exporter_send_failed_log_records{node_status="v", exporter=~"(failover|otlp)/.*", job=~"foo_.+_bar"}[5m]))
         /
         (
           sum by (exporter, colo_name) (rate(otelcol_exporter_send_failed_log_records{exporter=~"(failover|otlp)/.*"}[5m])) + sum by (exporter, colo_name) (rate(otelcol_exporter_sent_log_records{exporter=~"(failover|otlp)/.*"}[5m]))
@@ -185,32 +185,17 @@ body: |
   <summary>smelly regexp selector</summary>
 
   ```yaml
-  13 |         sum by (exporter, colo_name) (...)
+  13 |         sum by (exporter, colo_name) (rate(otelcol_exporter_send_failed_log_records{node_status="v", exporter=~"(failover|otlp)/.*", job=~"foo_.+_bar"}[5m]))
+                                                                                                                                            ^^^^^^^^^^^^^^^^^
   14 |         /
   15 |         (
-  16 |           ... + sum by (exporter, colo_name) (rate(otelcol_exporter_sent_log_records{exporter=~"(failover|otlp)/.*"}[5m]))
-                                                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  17 |         )
-  18 |         > 0.1
-  19 |         and
+     |         [...]
   20 |         ... > 10
   ```
 
-  `{exporter=~"(failover|otlp)/.*"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels
+  `{job=~"foo_.+_bar"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels
 
   See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
-
-  </details>
-
-  ------
-
-  The same issue was reported 2 more time(s), duplicates where suppressed.
-
-  <details>
-  <summary>Show affected rules</summary>
-
-  - `OpenTelemetry_Collector_Failed_Logs` at `rules.yml:13`
-  - `OpenTelemetry_Collector_Failed_Logs` at `rules.yml:13`
 
   </details>
 
@@ -243,7 +228,7 @@ body: |+
   | Severity | Number of problems |
   | --- | --- |
   | Bug | 1 |
-  | Warning | 4 |
+  | Warning | 2 |
   <details><summary>Stats</summary>
   <p>
 
@@ -252,7 +237,7 @@ body: |+
   | Version | unknown |
   | Number of rules parsed | 2 |
   | Number of rules checked | 2 |
-  | Number of problems found | 5 |
+  | Number of problems found | 3 |
   | Number of offline checks | 18 |
   | Number of online checks | 0 |
   | Checks duration | 0 |
@@ -288,17 +273,14 @@ body: |+
                                                       possible here.
 
   Warning: smelly regexp selector (promql/regexp)
-    ---> rules.yml:13-20 -> `OpenTelemetry_Collector_Failed_Logs` [+2 duplicates]
-  13 |         sum by (exporter, colo_name) (...)
+    ---> rules.yml:13-20 -> `OpenTelemetry_Collector_Failed_Logs`
+  13 |         sum by (exporter, colo_name) (rate(otelcol_exporter_send_failed_log_records{node_status="v", exporter=~"(failover|otlp)/.*", job=~"foo_.+_bar"}[5m]))
+                                                                                                                                            ^^^^^^^^^^^^^^^^^
+          `{job=~"foo_.+_bar"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this
+          label into multiple smaller labels
   14 |         /
   15 |         (
-  16 |           ... + sum by (exporter, colo_name) (rate(otelcol_exporter_sent_log_records{exporter=~"(failover|otlp)/.*"}[5m]))
-                                                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-          `{exporter=~"(failover|otlp)/.*"}` looks like a smelly selector that tries to extract substrings from the value,
-          please consider breaking down the value of this label into multiple smaller labels
-  17 |         )
-  18 |         > 0.1
-  19 |         and
+     |         [...]
   20 |         ... > 10
 
   ```

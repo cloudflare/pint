@@ -3,6 +3,7 @@ package checks
 import (
 	"context"
 	"fmt"
+	"iter"
 	"regexp"
 	"regexp/syntax"
 	"slices"
@@ -112,15 +113,11 @@ func (c RegexpCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*dis
 				re = "^(?s:" + re + ")$"
 			}
 
-			var hasFlags, isUseful, isWildcard, isLiteral, isBad, isSmelly, hasNonDigits bool
+			var hasFlags, isUseful, isWildcard, isLiteral, isBad bool
 			var beginText, endText int
-			var lastOp syntax.Op
 			var literalValue strings.Builder
 			r, _ := syntax.Parse(re, syntax.Perl)
 			for _, s := range r.Sub {
-				if isOpSmelly(s.Op, lastOp) && hasNonDigits {
-					isSmelly = true
-				}
 				// nolint: exhaustive
 				switch s.Op {
 				case syntax.OpBeginText:
@@ -135,9 +132,6 @@ func (c RegexpCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*dis
 					}
 					for _, r := range s.Rune {
 						literalValue.WriteRune(r)
-						if !unicode.IsDigit(r) {
-							hasNonDigits = true
-						}
 					}
 					isLiteral = true
 				case syntax.OpEmptyMatch:
@@ -152,8 +146,8 @@ func (c RegexpCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*dis
 				default:
 					isUseful = true
 				}
-				lastOp = s.Op
 			}
+			isSmelly := isRegexpSmelly(r.Sub)
 			if hasFlags && !isWildcard {
 				isUseful = true
 			}
@@ -279,12 +273,60 @@ func makeLabel(name string, matchers ...*labels.Matcher) string {
 	return b.String()
 }
 
-func isOpSmelly(a, b syntax.Op) bool {
-	if a == syntax.OpLiteral && (b == syntax.OpStar || b == syntax.OpPlus) {
-		return true
+func isWildcardOp(op syntax.Op) bool {
+	return op == syntax.OpStar || op == syntax.OpPlus
+}
+
+func hasNonDigitLiteral(sub *syntax.Regexp) bool {
+	if sub.Op != syntax.OpLiteral {
+		return false
 	}
-	if b == syntax.OpLiteral && (a == syntax.OpStar || a == syntax.OpPlus) {
-		return true
+	for _, r := range sub.Rune {
+		if !unicode.IsDigit(r) {
+			return true
+		}
+	}
+	return false
+}
+
+func isRegexpSmelly(subs []*syntax.Regexp) bool {
+	for i, s := range subs {
+		if isWildcardOp(s.Op) {
+			if hasSmellyLiteral(slices.Backward(subs[:i]), syntax.OpBeginText) &&
+				hasSmellyLiteral(slices.All(subs[i+1:]), syntax.OpEndText) {
+				return true
+			}
+		}
+		if hasNonDigitLiteral(s) {
+			if hasSmellyWildcard(slices.Backward(subs[:i]), syntax.OpBeginText) &&
+				hasSmellyWildcard(slices.All(subs[i+1:]), syntax.OpEndText) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func hasSmellyLiteral(subs iter.Seq2[int, *syntax.Regexp], anchorOp syntax.Op) bool {
+	for _, s := range subs {
+		if hasNonDigitLiteral(s) {
+			return true
+		}
+		if s.Op != anchorOp && s.Op != syntax.OpEmptyMatch && s.Op != syntax.OpAnyChar && s.Op != syntax.OpAnyCharNotNL {
+			return false
+		}
+	}
+	return false
+}
+
+func hasSmellyWildcard(subs iter.Seq2[int, *syntax.Regexp], anchorOp syntax.Op) bool {
+	for _, s := range subs {
+		if isWildcardOp(s.Op) {
+			return true
+		}
+		if s.Op != anchorOp && s.Op != syntax.OpEmptyMatch {
+			return false
+		}
 	}
 	return false
 }

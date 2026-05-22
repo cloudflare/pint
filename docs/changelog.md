@@ -11,6 +11,8 @@
 
 - Reported problems will now trim more parts of the query for which the problem is
   reported, to make it easier to read.
+- Reduced the number of low-value reports about smelly regexp selectors from the
+  [promql/regexp](checks/promql/regexp.md) check.
 
 ## v0.83.0
 
