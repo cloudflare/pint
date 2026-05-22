@@ -1,6 +1,49 @@
 
+[TestRegexpCheck/character_class_after_literal_blocks_smelly_wildcard_lookup - 1]
+[]
+
+---
+
+[TestRegexpCheck/character_class_after_wildcard_blocks_smelly_literal_lookup - 1]
+[]
+
+---
+
+[TestRegexpCheck/character_class_before_literal_blocks_smelly_wildcard_lookup - 1]
+[]
+
+---
+
 [TestRegexpCheck/code=~5.* - 1]
 []
+
+---
+
+[TestRegexpCheck/contains_pattern_is_smelly - 1]
+- description: contains pattern is smelly
+  content: |
+    - record: foo
+      expr: foo{cluster=~".*dev.*"}
+  output: |
+    2 |   expr: foo{cluster=~".*dev.*"}
+                    ^^^^^^^^^^^^^^^^^^
+                    `{cluster=~".*dev.*"}` looks like a smelly selector that tries to extract substrings
+                    from the value, please consider breaking down the value of this label into multiple
+                    smaller labels
+  problem:
+    reporter: promql/regexp
+    summary: smelly regexp selector
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    diagnostics:
+        - message: '`{cluster=~".*dev.*"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels'
+          firstcolumn: 5
+          lastcolumn: 22
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
 
 ---
 
@@ -155,6 +198,34 @@
 
 ---
 
+[TestRegexpCheck/literal-wildcard-literal_is_smelly - 1]
+- description: literal-wildcard-literal is smelly
+  content: |
+    - record: foo
+      expr: foo{name=~"etcd-backup-.*.timer"}
+  output: |
+    2 |   expr: foo{name=~"etcd-backup-.*.timer"}
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    `{name=~"etcd-backup-.*.timer"}` looks like a smelly selector that tries to extract
+                    substrings from the value, please consider breaking down the value of this label into
+                    multiple smaller labels
+  problem:
+    reporter: promql/regexp
+    summary: smelly regexp selector
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    diagnostics:
+        - message: '`{name=~"etcd-backup-.*.timer"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels'
+          firstcolumn: 5
+          lastcolumn: 32
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
 [TestRegexpCheck/mixed_redundant_and_valid_regexp - 1]
 - description: mixed redundant and valid regexp
   content: |
@@ -178,24 +249,33 @@
         last: 2
     severity: 1
     anchor: 0
-- description: mixed redundant and valid regexp
+
+---
+
+[TestRegexpCheck/needed_wildcard_regexp - 1]
+[]
+
+---
+
+[TestRegexpCheck/negative_contains_pattern_is_smelly - 1]
+- description: negative contains pattern is smelly
   content: |
     - record: foo
-      expr: foo{job=~"bar", cluster=~"us-east-.*"}
+      expr: foo{cluster!~".*staging.*"}
   output: |
-    2 |   expr: foo{job=~"bar", cluster=~"us-east-.*"}
-                                ^^^^^^^^^^^^^^^^^^^^^
-                                `{cluster=~"us-east-.*"}` looks like a smelly selector that tries to extract
-                                substrings from the value, please consider breaking down the value of this
-                                label into multiple smaller labels
+    2 |   expr: foo{cluster!~".*staging.*"}
+                    ^^^^^^^^^^^^^^^^^^^^^^
+                    `{cluster!~".*staging.*"}` looks like a smelly selector that tries to extract substrings
+                    from the value, please consider breaking down the value of this label into multiple
+                    smaller labels
   problem:
     reporter: promql/regexp
     summary: smelly regexp selector
     details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
     diagnostics:
-        - message: '`{cluster=~"us-east-.*"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels'
-          firstcolumn: 17
-          lastcolumn: 37
+        - message: '`{cluster!~".*staging.*"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels'
+          firstcolumn: 5
+          lastcolumn: 26
           kind: 0
     lines:
         first: 2
@@ -205,17 +285,27 @@
 
 ---
 
-[TestRegexpCheck/needed_wildcard_regexp - 1]
-[]
-
----
-
 [TestRegexpCheck/non-smelly_selector - 1]
 []
 
 ---
 
 [TestRegexpCheck/positive_wildcard_regexp - 1]
+[]
+
+---
+
+[TestRegexpCheck/prefix-only_selector_is_not_smelly - 1]
+[]
+
+---
+
+[TestRegexpCheck/prefix_wildcard_is_not_smelly - 1]
+[]
+
+---
+
+[TestRegexpCheck/prefix_with_.+_is_not_smelly - 1]
 []
 
 ---
@@ -314,91 +404,12 @@
 
 ---
 
-[TestRegexpCheck/smelly_selector_/_literal_then_plus - 1]
-- description: smelly selector / literal then plus
-  content: |
-    - record: foo
-      expr: foo{job=~"service.+"}
-  output: |
-    2 |   expr: foo{job=~"service.+"}
-                    ^^^^^^^^^^^^^^^^
-                    `{job=~"service.+"}` looks like a smelly selector that tries to extract substrings from
-                    the value, please consider breaking down the value of this label into multiple smaller
-                    labels
-  problem:
-    reporter: promql/regexp
-    summary: smelly regexp selector
-    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
-    diagnostics:
-        - message: '`{job=~"service.+"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels'
-          firstcolumn: 5
-          lastcolumn: 20
-          kind: 0
-    lines:
-        first: 2
-        last: 2
-    severity: 1
-    anchor: 0
-
----
-
-[TestRegexpCheck/smelly_selector_/_multiple - 1]
-- description: smelly selector / multiple
-  content: |4
-
-    - record: foo
-      expr: |
-        sum by (instance, type) (rate(requests_total{env=~"production.*", status="failed"}[5m])) / (1 + sum by (instance, type) (rate(request_total{env=~"production.*"}[5m]))) > 0.1
-  output: |
-    4 |     sum by (instance, type) (rate(requests_total{env=~"production.*", status="failed"}[5m])) / ... > 0.1
-                                                         ^^^^^^^^^^^^^^^^^^^
-          `{env=~"production.*"}` looks like a smelly selector that tries to
-          extract substrings from the value, please consider breaking down the
-          value of this label into multiple smaller labels
-  problem:
-    reporter: promql/regexp
-    summary: smelly regexp selector
-    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
-    diagnostics:
-        - message: '`{env=~"production.*"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels'
-          firstcolumn: 46
-          lastcolumn: 64
-          kind: 0
-    lines:
-        first: 4
-        last: 4
-    severity: 1
-    anchor: 0
-- description: smelly selector / multiple
-  content: |4
-
-    - record: foo
-      expr: |
-        sum by (instance, type) (rate(requests_total{env=~"production.*", status="failed"}[5m])) / (1 + sum by (instance, type) (rate(request_total{env=~"production.*"}[5m]))) > 0.1
-  output: |
-    4 |     ... / (1 + sum by (instance, type) (rate(request_total{env=~"production.*"}[5m]))) > 0.1
-                                                                   ^^^^^^^^^^^^^^^^^^^
-            `{env=~"production.*"}` looks like a smelly selector that tries to extract
-            substrings from the value, please consider breaking down the value of this
-            label into multiple smaller labels
-  problem:
-    reporter: promql/regexp
-    summary: smelly regexp selector
-    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
-    diagnostics:
-        - message: '`{env=~"production.*"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels'
-          firstcolumn: 141
-          lastcolumn: 159
-          kind: 0
-    lines:
-        first: 4
-        last: 4
-    severity: 1
-    anchor: 0
-
----
-
 [TestRegexpCheck/static_match - 1]
+[]
+
+---
+
+[TestRegexpCheck/suffix_wildcard_is_not_smelly - 1]
 []
 
 ---

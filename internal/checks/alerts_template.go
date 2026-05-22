@@ -131,8 +131,7 @@ func (c TemplateCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*d
 		if err := checkTemplateSyntax(ctx, label.Key.Value, label.Value.Value, data); err != nil {
 			firstCol := 1
 			lastCol := len(label.Value.Value)
-			var terr templateError
-			if errors.As(err, &terr) {
+			if terr, ok := errors.AsType[templateError](err); ok {
 				firstCol = terr.firstCol
 				lastCol = terr.lastCol
 			}
@@ -190,8 +189,7 @@ func (c TemplateCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*d
 			if err := checkTemplateSyntax(ctx, annotation.Key.Value, annotation.Value.Value, data); err != nil {
 				firstCol := 1
 				lastCol := len(annotation.Value.Value)
-				var terr templateError
-				if errors.As(err, &terr) {
+				if terr, ok := errors.AsType[templateError](err); ok {
 					firstCol = terr.firstCol
 					lastCol = terr.lastCol
 				}
