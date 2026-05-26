@@ -176,7 +176,7 @@ Just like with `# pint disable ...` you can also use tags with snooze comments.
 ```
 
 If you want to snooze some checks for the entire file then you can use
-`# pint file/snooze ...` comment anywhere in given file.
+`# pint file/snooze ...` comment anywhere in a given file.
 
 Example:
 

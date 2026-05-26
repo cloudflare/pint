@@ -33,9 +33,9 @@ annotation "$pattern" {
   the `values` list. If you want to break the value into sub-strings and
   validate each of them independently you can do this by setting `token`
   to a regexp that captures a single sub-string.
-- `value` - optional value regexp to enforce, if not set only pint will only
+- `value` - optional value regexp to enforce, if not set pint will only
   check if the annotation exists.
-- `values` - optional list of allowed values - this is alternative to using.
+- `values` - optional list of allowed values - this is an alternative to using
   `value` regexp. Set this to the list of all possible valid annotation values.
 - `required` - if `true` pint will require every rule to have this annotation set,
   if `false` it will only check values where annotation is set.
@@ -65,7 +65,7 @@ rule {
 
   annotation "dashboard" {
     severity = "bug"
-    comment  = "You must add a link do a Grafana dashboard showing impact of this alert"
+    comment  = "You must add a link to a Grafana dashboard showing impact of this alert"
     value    = "https://grafana\.example\.com/.+"
   }
 }
@@ -129,7 +129,7 @@ checks {
 }
 ```
 
-You can also disable it for all rules inside given file by adding
+You can also disable it for all rules inside a given file by adding
 a comment anywhere in that file. Example:
 
 ```yaml
@@ -198,7 +198,7 @@ Example comment disabling that rule:
 
 ## How to snooze it
 
-You can disable this check until given time by adding a comment to it. Example:
+You can disable this check until a given time by adding a comment to it. Example:
 
 ```yaml
 # pint snooze $TIMESTAMP alerts/annotation
@@ -206,5 +206,5 @@ You can disable this check until given time by adding a comment to it. Example:
 
 Where `$TIMESTAMP` is either [RFC3339](https://www.rfc-editor.org/rfc/rfc3339)
 formatted or `YYYY-MM-DD`.
-Adding this comment will disable `alerts/annotation` *until* `$TIMESTAMP`, after that
-check will be re-enabled.
+Adding this comment will disable `alerts/annotation` *until* `$TIMESTAMP`, after which
+the check will be re-enabled.

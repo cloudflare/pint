@@ -86,7 +86,7 @@ checks {
 }
 ```
 
-You can also disable it for all rules inside given file by adding
+You can also disable it for all rules inside a given file by adding
 a comment anywhere in that file. Example:
 
 ```yaml
@@ -116,7 +116,7 @@ Example:
 
 ## How to snooze it
 
-You can disable this check until given time by adding a comment to it. Example:
+You can disable this check until a given time by adding a comment to it. Example:
 
 ```yaml
 # pint snooze $TIMESTAMP promql/vector_matching
@@ -124,5 +124,5 @@ You can disable this check until given time by adding a comment to it. Example:
 
 Where `$TIMESTAMP` is either [RFC3339](https://www.rfc-editor.org/rfc/rfc3339)
 formatted or `YYYY-MM-DD`.
-Adding this comment will disable `promql/vector_matching` *until* `$TIMESTAMP`, after that
-check will be re-enabled.
+Adding this comment will disable `promql/vector_matching` *until* `$TIMESTAMP`, after which
+the check will be re-enabled.

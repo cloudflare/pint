@@ -33,8 +33,8 @@ alerts {
   to `scrape_interval`, try to reduce it if that would load too many samples.
   Defaults to `1m`.
 - `resolve` - duration after which stale alerts are resolved. Defaults to `5m`.
-- `minCount` - minimal number of alerts for this check to report it. Default to `0`.
-  Set this to a no-zero value if you want this check to report only if the estimated
+- `minCount` - minimal number of alerts for this check to report it. Defaults to `0`.
+  Set this to a non-zero value if you want this check to report only if the estimated
   number of alerts is high enough.
 - `comment` - set a custom comment that will be added to reported problems.
 - `severity` - set custom severity for reported issues, defaults to `info`.
@@ -78,7 +78,7 @@ rule {
     step       = "1m"
     resolve    = "5m"
     minCount   = 50
-    comment    = "You cannot add an rule that would immediately fire 50+ alerts, fix the problem first"
+    comment    = "You cannot add a rule that would immediately fire 50+ alerts, fix the problem first"
     severity   = "bug"
   }
 }
@@ -94,7 +94,7 @@ checks {
 }
 ```
 
-You can also disable it for all rules inside given file by adding
+You can also disable it for all rules inside a given file by adding
 a comment anywhere in that file. Example:
 
 ```yaml
@@ -124,7 +124,7 @@ Example:
 
 ## How to snooze it
 
-You can disable this check until given time by adding a comment to it. Example:
+You can disable this check until a given time by adding a comment to it. Example:
 
 ```yaml
 # pint snooze $TIMESTAMP alerts/count
@@ -132,5 +132,5 @@ You can disable this check until given time by adding a comment to it. Example:
 
 Where `$TIMESTAMP` is either [RFC3339](https://www.rfc-editor.org/rfc/rfc3339)
 formatted or `YYYY-MM-DD`.
-Adding this comment will disable `alerts/count` *until* `$TIMESTAMP`, after that
-check will be re-enabled.
+Adding this comment will disable `alerts/count` *until* `$TIMESTAMP`, after which
+the check will be re-enabled.

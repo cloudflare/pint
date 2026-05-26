@@ -6,7 +6,7 @@ grand_parent: Documentation
 
 # ignore/file
 
-You will see this check reports for files that are excludes from pint using a
+You will see this check reports for files that are excluded from pint using a
 `ignore/file` comment.
 See this [page](../../ignoring.md) for details on how such comments work.
 
