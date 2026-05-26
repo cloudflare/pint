@@ -4,6 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
+
+	"github.com/prometheus/common/model"
 
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
@@ -27,6 +30,7 @@ var (
 		FragileCheckName,
 		GroupIntervalCheckName,
 		ImpossibleCheckName,
+		OffsetCheckName,
 		RangeQueryCheckName,
 		RateCheckName,
 		RegexpCheckName,
@@ -51,6 +55,7 @@ var (
 		LabelsConflictCheckName,
 		CounterCheckName,
 		FeaturesCheckName,
+		OffsetCheckName,
 		RangeQueryCheckName,
 		RateCheckName,
 		SeriesCheckName,
@@ -187,6 +192,41 @@ func problemFromError(err error, rule parser.Rule, reporter, prom string, s Seve
 
 func promText(name, uri string) string {
 	return fmt.Sprintf("`%s` Prometheus server at %s", name, uri)
+}
+
+func retentionFromFlags(flags map[string]string, reporter string, expr *parser.PromQLExpr) (time.Duration, *Problem) {
+	var retention time.Duration
+	if v, ok := flags["storage.tsdb.retention.time"]; ok {
+		r, err := model.ParseDuration(v)
+		if err != nil {
+			p := Problem{
+				Anchor:   AnchorAfter,
+				Lines:    expr.Value.Pos.Lines(),
+				Reporter: reporter,
+				Summary:  "unable to run checks",
+				Details:  "",
+				Severity: Warning,
+				Diagnostics: []diags.Diagnostic{
+					{
+						Message:     fmt.Sprintf("Cannot parse --storage.tsdb.retention.time=%q flag value: %s", v, err),
+						Pos:         expr.Value.Pos,
+						Expr:        expr.Query().Expr,
+						FirstColumn: 1,
+						LastColumn:  len(expr.Value.Value),
+						Kind:        diags.Issue,
+					},
+				},
+			}
+			return 0, &p
+		}
+		retention = time.Duration(r)
+	}
+	if retention <= 0 {
+		// Default Prometheus retention
+		// https://prometheus.io/docs/prometheus/latest/storage/#operational-aspects
+		retention = time.Hour * 24 * 15
+	}
+	return retention, nil
 }
 
 func WholeRuleDiag(rule parser.Rule, msg string) diags.Diagnostic {

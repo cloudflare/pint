@@ -19,10 +19,10 @@ level=WARN msg="Using dummy Prometheus uptime metric results with no gaps" name=
 Warning: query beyond configured retention (promql/range_query)
   ---> rules/1.yml:2 -> `http errors`
 2 |   expr: rate(http_errors_total[2d]) > 0
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-            `http_errors_total[2d]` selector is trying to query Prometheus for 2d worth of metrics, but
-            `prom1` Prometheus server at http://127.0.0.1:7080 is configured to only keep 1d of metrics
-            history.
+                 ^^^^^^^^^^^^^^^^^^^^^
+                 `http_errors_total[2d]` selector is trying to query Prometheus for 2d worth of metrics,
+                 but `prom1` Prometheus server at http://127.0.0.1:7080 is configured to only keep 1d of
+                 metrics history.
 
 Warning: query on nonexistent series (promql/series)
   ---> rules/1.yml:2 -> `http errors`

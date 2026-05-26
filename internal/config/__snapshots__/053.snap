@@ -25,6 +25,7 @@ config: |-
           "promql/fragile",
           "group/interval",
           "promql/impossible",
+          "promql/offset",
           "promql/range_query",
           "promql/rate",
           "promql/regexp",
@@ -110,9 +111,11 @@ checks:
     - rule/dependency
     - promql/impossible
     - group/interval
+    - promql/offset(prom1)
     - labels/conflict(prom1)
     - alerts/external_labels(prom1)
     - promql/features(prom1)
+    - promql/offset(prom2)
     - labels/conflict(prom2)
     - alerts/external_labels(prom2)
     - promql/features(prom2)

@@ -99,36 +99,9 @@ func (c RangeQueryCheck) Check(ctx context.Context, entry *discovery.Entry, _ []
 		return problems
 	}
 
-	var retention time.Duration
-	if v, ok := flags.Flags["storage.tsdb.retention.time"]; ok {
-		r, err := model.ParseDuration(v)
-		if err != nil {
-			problems = append(problems, Problem{
-				Anchor:   AnchorAfter,
-				Lines:    expr.Value.Pos.Lines(),
-				Reporter: c.Reporter(),
-				Summary:  "unable to run checks",
-				Details:  "",
-				Severity: Warning,
-				Diagnostics: []diags.Diagnostic{
-					{
-						Message:     fmt.Sprintf("Cannot parse --storage.tsdb.retention.time=%q flag value: %s", v, err),
-						Pos:         expr.Value.Pos,
-						Expr:        expr.Query().Expr,
-						FirstColumn: 1,
-						LastColumn:  len(expr.Value.Value),
-						Kind:        diags.Issue,
-					},
-				},
-			})
-		} else {
-			retention = time.Duration(r)
-		}
-	}
-	if retention <= 0 {
-		// Default Prometheus retention
-		// https://prometheus.io/docs/prometheus/latest/storage/#operational-aspects
-		retention = time.Hour * 24 * 15
+	retention, p := retentionFromFlags(flags.Flags, c.Reporter(), expr)
+	if p != nil {
+		problems = append(problems, *p)
 	}
 
 	problems = append(
@@ -162,8 +135,8 @@ func (c RangeQueryCheck) checkNode(ctx context.Context, expr *parser.PromQLExpr,
 							node.Expr, model.Duration(n.Range), reason),
 						Pos:         expr.Value.Pos,
 						Expr:        expr.Query().Expr,
-						FirstColumn: 1,
-						LastColumn:  len(expr.Value.Value),
+						FirstColumn: int(n.PositionRange().Start) + 1,
+						LastColumn:  int(n.PositionRange().End),
 						Kind:        diags.Issue,
 					},
 				},

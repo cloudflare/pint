@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.85.0
+
+### Added
+
+- Added [promql/offset](checks/promql/offset.md) check that warns when a PromQL
+  query uses an `offset` larger than configured Prometheus retention.
+
 ## v0.84.0
 
 ### Added

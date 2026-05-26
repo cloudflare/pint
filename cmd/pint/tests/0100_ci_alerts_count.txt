@@ -113,7 +113,7 @@ data:
   - value: 20
     title: Number of offline checks
     type: NUMBER
-  - value: 18
+  - value: 20
     title: Number of online checks
     type: NUMBER
   - value: 0
