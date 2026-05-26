@@ -177,15 +177,14 @@ func (prom *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, e
 	prom.locker.lock(key)
 	defer prom.locker.unlock(key)
 
-	resultChan := make(chan queryResult)
-	prom.queries <- queryRequest{
-		query:  instantQuery{prom: prom, ctx: ctx, expr: expr, timestamp: time.Now()},
-		result: resultChan,
-	}
-
-	result := <-resultChan
-	if result.err != nil {
-		return nil, QueryError{err: result.err, msg: decodeError(result.err)}
+	result, err := prom.runQuery(ctx, instantQuery{
+		prom:      prom,
+		ctx:       ctx,
+		expr:      expr,
+		timestamp: time.Now(),
+	})
+	if err != nil {
+		return nil, QueryError{err: err, msg: decodeError(err)}
 	}
 
 	qr := QueryResult{

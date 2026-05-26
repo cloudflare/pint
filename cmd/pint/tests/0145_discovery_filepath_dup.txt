@@ -27,9 +27,6 @@ level=DEBUG msg="Rendered Prometheus server" name=prom2 uri=https://prom2.exampl
 level=INFO msg="Configured new Prometheus server" name=prom1 uris=2 uptime=up tags=["name/prom1"] include=[] exclude=[]
 level=DEBUG msg="Starting query workers" name=prom1 uri=https://prom1.example.com workers=16
 level=DEBUG msg="Starting query workers" name=prom1 uri=https://prom1-backup.example.com workers=16
-level=DEBUG msg="Stopping query workers" name=prom2 uri=https://unique.example.com
-level=DEBUG msg="Stopping query workers" name=prom1 uri=https://prom1.example.com
-level=DEBUG msg="Stopping query workers" name=prom1 uri=https://prom1-backup.example.com
 level=ERROR msg="Execution completed with error(s)" err="Duplicated name for Prometheus server definition: prom2"
 -- rules/0001.yml --
 groups:

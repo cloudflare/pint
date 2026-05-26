@@ -410,7 +410,6 @@ func (pq PrometheusQuery) Discover(ctx context.Context) ([]*promapi.FailoverGrou
 
 	prom := promapi.NewPrometheus("discovery", pq.URI, "", pq.Headers, timeout, 1, 100, tls)
 	prom.StartWorkers()
-	defer prom.Close()
 
 	slog.LogAttrs(
 		ctx, slog.LevelInfo,

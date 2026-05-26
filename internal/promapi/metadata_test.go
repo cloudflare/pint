@@ -1,6 +1,7 @@
 package promapi_test
 
 import (
+	"context"
 	"net/http"
 	"regexp"
 	"testing"
@@ -16,6 +17,7 @@ import (
 
 func TestMetadata(t *testing.T) {
 	type testCaseT struct {
+		ctx       func(t *testing.T) context.Context
 		mock      httpmock.Mocker
 		name      string
 		assertErr func(t *testing.T, err error)
@@ -70,7 +72,7 @@ func TestMetadata(t *testing.T) {
 			}),
 		},
 		{
-			name:    "slow",
+			name:    "connection timeout",
 			timeout: time.Millisecond * 10,
 			assertErr: func(t *testing.T, err error) {
 				require.EqualError(t, err, "connection timeout")
@@ -85,7 +87,7 @@ func TestMetadata(t *testing.T) {
 			}),
 		},
 		{
-			name:    "empty",
+			name:    "empty response",
 			timeout: time.Second,
 			assertErr: func(t *testing.T, err error) {
 				require.EqualError(t, err, "unknown: empty response object")
@@ -98,7 +100,7 @@ func TestMetadata(t *testing.T) {
 			}),
 		},
 		{
-			name:    "error",
+			name:    "500 error",
 			timeout: time.Second,
 			assertErr: func(t *testing.T, err error) {
 				require.EqualError(t, err, "server_error: 500 Internal Server Error")
@@ -111,7 +113,7 @@ func TestMetadata(t *testing.T) {
 			}),
 		},
 		{
-			name:     "once",
+			name:     "cached response",
 			timeout:  time.Second,
 			metadata: []v1.Metadata{{Type: "gauge", Help: "Text", Unit: ""}},
 			assertErr: func(t *testing.T, err error) {
@@ -120,12 +122,12 @@ func TestMetadata(t *testing.T) {
 			mock: httpmock.New(func(s *httpmock.Server) {
 				s.ExpectGet(regexp.MustCompile("^"+promapi.APIPathMetadata)).
 					ReturnHeader("Content-Type", "application/json").
-					Return(`{"status":"success","data":{"once":[{"type":"gauge","help":"Text","unit":""}]}}`).
+					Return(`{"status":"success","data":{"cached response":[{"type":"gauge","help":"Text","unit":""}]}}`).
 					UnlimitedTimes()
 			}),
 		},
 		{
-			name:    "apiError",
+			name:    "API error with message",
 			timeout: time.Second,
 			assertErr: func(t *testing.T, err error) {
 				require.EqualError(t, err, "bad_data: custom error message")
@@ -138,7 +140,7 @@ func TestMetadata(t *testing.T) {
 			}),
 		},
 		{
-			name:    "badJson",
+			name:    "invalid JSON",
 			timeout: time.Second,
 			assertErr: func(t *testing.T, err error) {
 				require.EqualError(
@@ -154,7 +156,7 @@ func TestMetadata(t *testing.T) {
 			}),
 		},
 		{
-			name:    "emptyError",
+			name:    "API error without message",
 			timeout: time.Second,
 			assertErr: func(t *testing.T, err error) {
 				require.EqualError(t, err, "bad_data: empty response object")
@@ -165,6 +167,19 @@ func TestMetadata(t *testing.T) {
 					Return(`{"status":"error","errorType":"bad_data"}`).
 					UnlimitedTimes()
 			}),
+		},
+		{
+			name:    "context cancelled",
+			timeout: time.Second,
+			ctx: func(t *testing.T) context.Context {
+				ctx, cancel := context.WithCancel(t.Context())
+				cancel()
+				return ctx
+			},
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(t, err, "context canceled")
+			},
+			mock: httpmock.New(func(_ *httpmock.Server) {}),
 		},
 	}
 
@@ -179,7 +194,12 @@ func TestMetadata(t *testing.T) {
 			fg.StartWorkers(reg)
 			defer fg.Close(reg)
 
-			metadata, err := fg.Metadata(t.Context(), tc.name).Wait()
+			ctx := t.Context()
+			if tc.ctx != nil {
+				ctx = tc.ctx(t)
+			}
+
+			metadata, err := fg.Metadata(ctx, tc.name).Wait()
 			tc.assertErr(t, err)
 			if metadata != nil {
 				require.Equal(t, tc.metadata, metadata.Metadata)

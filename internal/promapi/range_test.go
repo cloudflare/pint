@@ -1,6 +1,7 @@
 package promapi_test
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -55,6 +56,7 @@ func (ar absoluteRange) String() string {
 
 func TestRange(t *testing.T) {
 	type testCaseT struct {
+		ctx       func(t *testing.T) context.Context
 		start     time.Time
 		end       time.Time
 		mock      httpmock.Mocker
@@ -388,7 +390,7 @@ func TestRange(t *testing.T) {
 			}),
 		},
 		{
-			query:   "3h/timeout",
+			query:   "3h with partial timeout",
 			start:   timeParse("2022-06-14T00:00:00Z"),
 			end:     timeParse("2022-06-14T03:00:00Z"),
 			step:    time.Minute * 5,
@@ -422,7 +424,7 @@ func TestRange(t *testing.T) {
 			}),
 		},
 		{
-			query:   "apiError",
+			query:   "API error with message",
 			start:   timeParse("2022-06-14T00:00:00Z"),
 			end:     timeParse("2022-06-14T00:01:00Z"),
 			step:    time.Minute,
@@ -438,7 +440,7 @@ func TestRange(t *testing.T) {
 			}),
 		},
 		{
-			query:   "badJson",
+			query:   "invalid JSON",
 			start:   timeParse("2022-06-14T00:00:00Z"),
 			end:     timeParse("2022-06-14T00:01:00Z"),
 			step:    time.Minute,
@@ -457,7 +459,7 @@ func TestRange(t *testing.T) {
 			}),
 		},
 		{
-			query:   "emptyError",
+			query:   "API error without message",
 			start:   timeParse("2022-06-14T00:00:00Z"),
 			end:     timeParse("2022-06-14T00:01:00Z"),
 			step:    time.Minute,
@@ -473,7 +475,7 @@ func TestRange(t *testing.T) {
 			}),
 		},
 		{
-			query:   "vector",
+			query:   "unexpected vector result type",
 			start:   timeParse("2022-06-14T00:00:00Z"),
 			end:     timeParse("2022-06-14T00:05:00Z"),
 			step:    time.Second,
@@ -489,7 +491,7 @@ func TestRange(t *testing.T) {
 			}),
 		},
 		{
-			query:   "stats",
+			query:   "response with stats",
 			start:   timeParse("2022-06-14T00:00:00Z"),
 			end:     timeParse("2022-06-14T07:00:00Z"),
 			step:    time.Minute,
@@ -540,6 +542,22 @@ func TestRange(t *testing.T) {
 					UnlimitedTimes()
 			}),
 		},
+		{
+			query:   "context cancelled",
+			start:   timeParse("2022-06-14T00:00:00Z"),
+			end:     timeParse("2022-06-14T00:01:00Z"),
+			step:    time.Minute,
+			timeout: time.Second,
+			ctx: func(t *testing.T) context.Context {
+				ctx, cancel := context.WithCancel(t.Context())
+				cancel()
+				return ctx
+			},
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(t, err, "context canceled")
+			},
+			mock: httpmock.New(func(_ *httpmock.Server) {}),
+		},
 	}
 
 	for _, tc := range testCases {
@@ -553,9 +571,14 @@ func TestRange(t *testing.T) {
 			fg.StartWorkers(reg)
 			defer fg.Close(reg)
 
+			ctx := t.Context()
+			if tc.ctx != nil {
+				ctx = tc.ctx(t)
+			}
+
 			for i := 1; i < 5; i++ {
 				t.Run(tc.query, func(t *testing.T) {
-					qr, err := fg.RangeQuery(t.Context(), tc.query, newAbsoluteRange(tc.start, tc.end, tc.step)).Wait()
+					qr, err := fg.RangeQuery(ctx, tc.query, newAbsoluteRange(tc.start, tc.end, tc.step)).Wait()
 					tc.assertErr(t, err)
 					if qr != nil {
 						require.Equal(t, printRange(tc.out.Ranges), printRange(qr.Series.Ranges), tc)

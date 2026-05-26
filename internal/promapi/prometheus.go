@@ -47,11 +47,6 @@ type querier interface {
 	Run() queryResult
 }
 
-type queryRequest struct {
-	query  querier
-	result chan queryResult
-}
-
 type queryResult struct {
 	value any
 	err   error
@@ -128,20 +123,19 @@ func (ua *unsupporedAPIs) disable(s string) {
 }
 
 type Prometheus struct {
-	rateLimiter ratelimit.Limiter
-	headers     map[string]string
-	cache       *queryCache
-	locker      *partitionLocker
-	apis        *unsupporedAPIs
-	queries     chan queryRequest
-	client      http.Client
-	name        string
-	unsafeURI   string // raw prometheus URI, for queries
-	safeURI     string // prometheus URI but with auth info stripped, for logging
-	publicURI   string // either set explicitly by user in the config or same as safeURI, this ends up as URI in query responses
-	wg          sync.WaitGroup
-	timeout     time.Duration
-	concurrency int
+	rateLimiter      ratelimit.Limiter
+	headers          map[string]string
+	cache            *queryCache
+	locker           *partitionLocker
+	apis             *unsupporedAPIs
+	concurrencyLimit chan struct{}
+	client           http.Client
+	name             string
+	unsafeURI        string // raw prometheus URI, for queries
+	safeURI          string // prometheus URI but with auth info stripped, for logging
+	publicURI        string // either set explicitly by user in the config or same as safeURI, this ends up as URI in query responses
+	timeout          time.Duration
+	concurrency      int
 }
 
 func NewPrometheus(name, uri, publicURI string, headers map[string]string, timeout time.Duration, concurrency, rl int, tlsConf *tls.Config) *Prometheus {
@@ -178,10 +172,19 @@ func (prom *Prometheus) SafeURI() string {
 	return prom.safeURI
 }
 
-func (prom *Prometheus) Close() {
-	slog.LogAttrs(context.Background(), slog.LevelDebug, "Stopping query workers", slog.String("name", prom.name), slog.String("uri", prom.safeURI))
-	close(prom.queries)
-	prom.wg.Wait()
+func (prom *Prometheus) runQuery(ctx context.Context, query querier) (queryResult, error) {
+	select {
+	case <-ctx.Done():
+		return queryResult{}, ctx.Err()
+	case prom.concurrencyLimit <- struct{}{}:
+	}
+	defer func() { <-prom.concurrencyLimit }()
+
+	result := processJob(prom, query)
+	if result.err != nil {
+		return result, result.err
+	}
+	return result, nil
 }
 
 func (prom *Prometheus) StartWorkers() {
@@ -192,13 +195,7 @@ func (prom *Prometheus) StartWorkers() {
 		slog.String("uri", prom.safeURI),
 		slog.Int("workers", prom.concurrency),
 	)
-	prom.queries = make(chan queryRequest, prom.concurrency*10)
-
-	for w := 1; w <= prom.concurrency; w++ {
-		prom.wg.Go(func() {
-			queryWorker(prom, prom.queries)
-		})
-	}
+	prom.concurrencyLimit = make(chan struct{}, prom.concurrency)
 }
 
 func (prom *Prometheus) doRequest(ctx context.Context, method, path string, args url.Values) (*http.Response, error) {
@@ -234,44 +231,38 @@ func (prom *Prometheus) requestContext(ctx context.Context) (context.Context, co
 	return context.WithTimeout(ctx, prom.timeout+time.Second)
 }
 
-func queryWorker(prom *Prometheus, queries chan queryRequest) {
-	for job := range queries {
-		job.result <- processJob(prom, job)
-	}
-}
-
-func processJob(prom *Prometheus, job queryRequest) queryResult {
-	cacheKey := job.query.CacheKey()
+func processJob(prom *Prometheus, query querier) queryResult {
+	cacheKey := query.CacheKey()
 	if prom.cache != nil {
-		if cached, ok := prom.cache.get(cacheKey, job.query.Endpoint()); ok {
+		if cached, ok := prom.cache.get(cacheKey, query.Endpoint()); ok {
 			return cached.(queryResult)
 		}
 	}
 
-	if !prom.apis.isSupported(job.query.Endpoint()) {
+	if !prom.apis.isSupported(query.Endpoint()) {
 		return queryResult{err: ErrUnsupported} // nolint: exhaustruct
 	}
 
-	prometheusQueriesTotal.WithLabelValues(prom.name, job.query.Endpoint()).Inc()
-	prometheusQueriesRunning.WithLabelValues(prom.name, job.query.Endpoint()).Inc()
+	prometheusQueriesTotal.WithLabelValues(prom.name, query.Endpoint()).Inc()
+	prometheusQueriesRunning.WithLabelValues(prom.name, query.Endpoint()).Inc()
 
 	prom.rateLimiter.Take()
-	result := job.query.Run()
-	prometheusQueriesRunning.WithLabelValues(prom.name, job.query.Endpoint()).Dec()
+	result := query.Run()
+	prometheusQueriesRunning.WithLabelValues(prom.name, query.Endpoint()).Dec()
 
 	if result.err != nil {
 		if errors.Is(result.err, context.Canceled) {
 			return result
 		}
-		prometheusQueryErrorsTotal.WithLabelValues(prom.name, job.query.Endpoint(), errReason(result.err)).Inc()
+		prometheusQueryErrorsTotal.WithLabelValues(prom.name, query.Endpoint(), errReason(result.err)).Inc()
 		if isUnsupportedError(result.err) {
-			prom.apis.disable(job.query.Endpoint())
+			prom.apis.disable(query.Endpoint())
 			slog.LogAttrs(
 				context.Background(), slog.LevelWarn,
 				"Looks like this server doesn't support some Prometheus API endpoints, all checks using this API will be disabled",
 				slog.String("name", prom.name),
 				slog.String("uri", prom.safeURI),
-				slog.String("api", job.query.Endpoint()),
+				slog.String("api", query.Endpoint()),
 			)
 			return queryResult{err: ErrUnsupported} // nolint: exhaustruct
 		}
@@ -280,13 +271,13 @@ func processJob(prom *Prometheus, job queryRequest) queryResult {
 			"Query returned an error",
 			slog.Any("err", result.err),
 			slog.String("uri", prom.safeURI),
-			slog.String("query", job.query.String()),
+			slog.String("query", query.String()),
 		)
 		return result
 	}
 
 	if prom.cache != nil {
-		prom.cache.set(cacheKey, result, job.query.CacheTTL())
+		prom.cache.set(cacheKey, result, query.CacheTTL())
 	}
 
 	return result

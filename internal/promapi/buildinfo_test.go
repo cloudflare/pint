@@ -1,6 +1,7 @@
 package promapi_test
 
 import (
+	"context"
 	"net/http"
 	"testing"
 	"time"
@@ -14,6 +15,7 @@ import (
 
 func TestBuildInfo(t *testing.T) {
 	type testCaseT struct {
+		ctx       func(t *testing.T) context.Context
 		mock      httpmock.Mocker
 		assertErr func(t *testing.T, err error)
 		name      string
@@ -22,9 +24,8 @@ func TestBuildInfo(t *testing.T) {
 	}
 
 	testCases := []testCaseT{
-		// Verifies that a valid buildinfo response is parsed correctly.
 		{
-			name:    "success",
+			name:    "valid response",
 			timeout: time.Second,
 			version: "2.49.0",
 			assertErr: func(t *testing.T, err error) {
@@ -37,9 +38,8 @@ func TestBuildInfo(t *testing.T) {
 					UnlimitedTimes()
 			}),
 		},
-		// Verifies that a request timeout produces a connection timeout error.
 		{
-			name:    "slow",
+			name:    "connection timeout",
 			timeout: time.Millisecond * 10,
 			assertErr: func(t *testing.T, err error) {
 				require.EqualError(t, err, "connection timeout")
@@ -53,9 +53,8 @@ func TestBuildInfo(t *testing.T) {
 					UnlimitedTimes()
 			}),
 		},
-		// Verifies that a non-2xx HTTP status produces a server error.
 		{
-			name:    "error",
+			name:    "500 error",
 			timeout: time.Second,
 			assertErr: func(t *testing.T, err error) {
 				require.EqualError(t, err, "server_error: 500 Internal Server Error")
@@ -67,9 +66,8 @@ func TestBuildInfo(t *testing.T) {
 					UnlimitedTimes()
 			}),
 		},
-		// Verifies that invalid JSON produces a bad_response error.
 		{
-			name:    "badJson",
+			name:    "invalid JSON",
 			timeout: time.Second,
 			assertErr: func(t *testing.T, err error) {
 				require.EqualError(
@@ -84,9 +82,8 @@ func TestBuildInfo(t *testing.T) {
 					UnlimitedTimes()
 			}),
 		},
-		// Verifies that an API-level error with a custom message is forwarded.
 		{
-			name:    "apiError",
+			name:    "API error with message",
 			timeout: time.Second,
 			assertErr: func(t *testing.T, err error) {
 				require.EqualError(t, err, "bad_data: custom error message")
@@ -98,9 +95,8 @@ func TestBuildInfo(t *testing.T) {
 					UnlimitedTimes()
 			}),
 		},
-		// Verifies that an API-level error without a message uses the fallback.
 		{
-			name:    "emptyError",
+			name:    "API error without message",
 			timeout: time.Second,
 			assertErr: func(t *testing.T, err error) {
 				require.EqualError(t, err, "bad_data: empty response object")
@@ -111,6 +107,19 @@ func TestBuildInfo(t *testing.T) {
 					Return(`{"status":"error","errorType":"bad_data"}`).
 					UnlimitedTimes()
 			}),
+		},
+		{
+			name:    "context cancelled",
+			timeout: time.Second,
+			ctx: func(t *testing.T) context.Context {
+				ctx, cancel := context.WithCancel(t.Context())
+				cancel()
+				return ctx
+			},
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(t, err, "context canceled")
+			},
+			mock: httpmock.New(func(_ *httpmock.Server) {}),
 		},
 	}
 
@@ -126,7 +135,12 @@ func TestBuildInfo(t *testing.T) {
 			fg.StartWorkers(reg)
 			defer fg.Close(reg)
 
-			bi, err := fg.BuildInfo(t.Context()).Wait()
+			ctx := t.Context()
+			if tc.ctx != nil {
+				ctx = tc.ctx(t)
+			}
+
+			bi, err := fg.BuildInfo(ctx).Wait()
 			tc.assertErr(t, err)
 			if bi != nil {
 				require.Equal(t, tc.version, bi.Version)

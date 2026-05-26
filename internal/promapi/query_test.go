@@ -1,6 +1,7 @@
 package promapi_test
 
 import (
+	"context"
 	"errors"
 	"io"
 	"net/http"
@@ -21,6 +22,7 @@ import (
 
 func TestQuery(t *testing.T) {
 	type testCaseT struct {
+		ctx       func(t *testing.T) context.Context
 		mock      httpmock.Mocker
 		name      string
 		assertErr func(t *testing.T, err error)
@@ -31,7 +33,7 @@ func TestQuery(t *testing.T) {
 
 	testCases := []testCaseT{
 		{
-			name:    "empty",
+			name:    "empty result",
 			timeout: time.Second,
 			series:  []promapi.Sample{},
 			assertErr: func(t *testing.T, err error) {
@@ -91,7 +93,7 @@ func TestQuery(t *testing.T) {
 			}),
 		},
 		{
-			name:    "error",
+			name:    "API error",
 			timeout: time.Second,
 			assertErr: func(t *testing.T, err error) {
 				require.EqualError(t, err, "bad_data: unhandled query")
@@ -105,7 +107,7 @@ func TestQuery(t *testing.T) {
 			}),
 		},
 		{
-			name:    "matrix",
+			name:    "unexpected matrix result type",
 			timeout: time.Second,
 			assertErr: func(t *testing.T, err error) {
 				require.EqualError(t, err, "bad_response: invalid result type, expected vector, got matrix")
@@ -118,7 +120,7 @@ func TestQuery(t *testing.T) {
 			}),
 		},
 		{
-			name:    "timeout",
+			name:    "connection timeout",
 			timeout: time.Millisecond * 20,
 			assertErr: func(t *testing.T, err error) {
 				require.EqualError(t, err, "connection timeout")
@@ -133,7 +135,7 @@ func TestQuery(t *testing.T) {
 			}),
 		},
 		{
-			name:    "once",
+			name:    "cached response",
 			timeout: time.Second,
 			series: []promapi.Sample{
 				{
@@ -152,7 +154,7 @@ func TestQuery(t *testing.T) {
 			}),
 		},
 		{
-			name:    "overload",
+			name:    "query overload",
 			timeout: time.Second,
 			assertErr: func(t *testing.T, err error) {
 				require.EqualError(
@@ -169,7 +171,7 @@ func TestQuery(t *testing.T) {
 			}),
 		},
 		{
-			name:    "stats",
+			name:    "response with stats",
 			timeout: time.Second * 5,
 			series: []promapi.Sample{
 				{
@@ -202,7 +204,7 @@ func TestQuery(t *testing.T) {
 			}),
 		},
 		{
-			name:    "apiError",
+			name:    "API error with message",
 			timeout: time.Second,
 			assertErr: func(t *testing.T, err error) {
 				require.EqualError(t, err, "bad_data: custom error message")
@@ -215,7 +217,7 @@ func TestQuery(t *testing.T) {
 			}),
 		},
 		{
-			name:    "badJson",
+			name:    "invalid JSON",
 			timeout: time.Second,
 			assertErr: func(t *testing.T, err error) {
 				require.EqualError(
@@ -231,7 +233,7 @@ func TestQuery(t *testing.T) {
 			}),
 		},
 		{
-			name:    "emptyError",
+			name:    "API error without message",
 			timeout: time.Second,
 			assertErr: func(t *testing.T, err error) {
 				require.EqualError(t, err, "bad_data: empty response object")
@@ -244,7 +246,7 @@ func TestQuery(t *testing.T) {
 			}),
 		},
 		{
-			name:    "badMetricKind",
+			name:    "invalid metric type in response",
 			timeout: time.Second,
 			assertErr: func(t *testing.T, err error) {
 				var se *json.SemanticError
@@ -261,7 +263,7 @@ func TestQuery(t *testing.T) {
 			}),
 		},
 		{
-			name:    "badValueKind",
+			name:    "invalid value type in response",
 			timeout: time.Second,
 			assertErr: func(t *testing.T, err error) {
 				var se *json.SemanticError
@@ -278,7 +280,7 @@ func TestQuery(t *testing.T) {
 			}),
 		},
 		{
-			name:    "badValueClosingToken",
+			name:    "missing value closing token",
 			timeout: time.Second,
 			assertErr: func(t *testing.T, err error) {
 				var se *json.SemanticError
@@ -295,7 +297,7 @@ func TestQuery(t *testing.T) {
 			}),
 		},
 		{
-			name:    "badTimestampNotANumber",
+			name:    "non-numeric timestamp",
 			timeout: time.Second,
 			assertErr: func(t *testing.T, err error) {
 				var se *json.SemanticError
@@ -312,7 +314,7 @@ func TestQuery(t *testing.T) {
 			}),
 		},
 		{
-			name:    "badValueExtraElements",
+			name:    "extra elements in value array",
 			timeout: time.Second,
 			assertErr: func(t *testing.T, err error) {
 				var se *json.SemanticError
@@ -328,6 +330,19 @@ func TestQuery(t *testing.T) {
 					UnlimitedTimes()
 			}),
 		},
+		{
+			name:    "context cancelled",
+			timeout: time.Second,
+			ctx: func(t *testing.T) context.Context {
+				ctx, cancel := context.WithCancel(t.Context())
+				cancel()
+				return ctx
+			},
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(t, err, "context canceled")
+			},
+			mock: httpmock.New(func(_ *httpmock.Server) {}),
+		},
 	}
 
 	for _, tc := range testCases {
@@ -341,7 +356,12 @@ func TestQuery(t *testing.T) {
 			fg.StartWorkers(reg)
 			defer fg.Close(reg)
 
-			qr, err := fg.Query(t.Context(), tc.name).Wait()
+			ctx := t.Context()
+			if tc.ctx != nil {
+				ctx = tc.ctx(t)
+			}
+
+			qr, err := fg.Query(ctx, tc.name).Wait()
 			tc.assertErr(t, err)
 			if qr != nil {
 				require.Equal(t, tc.series, qr.Series)
@@ -374,19 +394,16 @@ func TestSampleLabelsUnmarshalJSONFromReadTokenErrors(t *testing.T) {
 
 	testCases := []testCaseT{
 		{
-			// Reader fails immediately so the first ReadToken returns an error.
 			name:  "error on first read",
 			input: &errReader{r: strings.NewReader(""), err: io.ErrUnexpectedEOF},
 			err:   "jsontext: read error: unexpected EOF",
 		},
 		{
-			// Opening '{' is read but ReadToken fails on the first key.
 			name:  "error reading key inside object",
 			input: &errReader{r: strings.NewReader(`{"k`), err: io.ErrUnexpectedEOF},
 			err:   "jsontext: read error: unexpected EOF",
 		},
 		{
-			// All keys read but ReadToken fails on closing '}'.
 			name:  "error reading closing brace",
 			input: &errReader{r: strings.NewReader(`{"a":"b"`), err: io.ErrUnexpectedEOF},
 			err:   "jsontext: read error: unexpected EOF",
@@ -412,25 +429,21 @@ func TestSampleTimestampValueUnmarshalJSONFromReadTokenErrors(t *testing.T) {
 
 	testCases := []testCaseT{
 		{
-			// Reader fails immediately so the first ReadToken returns an error.
 			name:  "error on first read",
 			input: &errReader{r: strings.NewReader(""), err: io.ErrUnexpectedEOF},
 			err:   "jsontext: read error: unexpected EOF",
 		},
 		{
-			// Opening '[' is read but ReadToken fails on the timestamp.
 			name:  "error reading timestamp token",
 			input: &errReader{r: strings.NewReader(`[1`), err: io.ErrUnexpectedEOF},
 			err:   "jsontext: read error: unexpected EOF",
 		},
 		{
-			// Timestamp read but ReadToken fails on the value string.
 			name:  "error reading value token",
 			input: &errReader{r: strings.NewReader(`[1614859502.068,"1`), err: io.ErrUnexpectedEOF},
 			err:   "jsontext: read error: unexpected EOF",
 		},
 		{
-			// Value read but ReadToken fails on closing ']'.
 			name:  "error reading closing bracket",
 			input: &errReader{r: strings.NewReader(`[1614859502.068,"1"`), err: io.ErrUnexpectedEOF},
 			err:   "jsontext: read error: unexpected EOF",

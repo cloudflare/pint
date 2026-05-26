@@ -146,32 +146,27 @@ func (prom *Prometheus) RangeQuery(ctx context.Context, expr string, params Rang
 
 	results := make(chan queryResult, len(timeSlices))
 	for _, s := range timeSlices {
-		query := queryRequest{ // nolint: exhaustruct
-			query: rangeQuery{
-				prom: prom,
-				ctx:  ctx,
-				expr: expr,
-				r: v1.Range{
-					Start: s.Start,
-					End:   s.End,
-					Step:  step,
-				},
-				ttl: s.End.Sub(start) + time.Minute*10,
+		q := rangeQuery{
+			prom: prom,
+			ctx:  ctx,
+			expr: expr,
+			r: v1.Range{
+				Start: s.Start,
+				End:   s.End,
+				Step:  step,
 			},
+			ttl: s.End.Sub(start) + time.Minute*10,
 		}
 
-		wg.Add(1)
-		go func() {
-			var result queryResult
-			query.result = make(chan queryResult)
-			prom.queries <- query
-			result = <-query.result
-			results <- result
-
-			if result.err != nil {
+		wg.Go(func() {
+			result, err := prom.runQuery(ctx, q)
+			if err != nil {
+				results <- queryResult{err: err} // nolint: exhaustruct
 				cancel()
+				return
 			}
-		}()
+			results <- result
+		})
 	}
 
 	go func() {
@@ -193,7 +188,6 @@ func (prom *Prometheus) RangeQuery(ctx context.Context, expr string, params Rang
 			if !errors.Is(result.err, context.Canceled) {
 				lastErr = result.err
 			}
-			wg.Done()
 			continue
 		}
 		merged.Series.Ranges = append(merged.Series.Ranges, result.value.(MetricTimeRanges)...)
@@ -205,7 +199,6 @@ func (prom *Prometheus) RangeQuery(ctx context.Context, expr string, params Rang
 		merged.Stats.Timings.InnerEvalTime += result.stats.Timings.InnerEvalTime
 		merged.Stats.Timings.QueryPreparationTime += result.stats.Timings.QueryPreparationTime
 		merged.Stats.Timings.ResultSortTime += result.stats.Timings.ResultSortTime
-		wg.Done()
 	}
 	if len(merged.Series.Ranges) > 1 {
 		merged.Series.Ranges, _ = MergeRanges(merged.Series.Ranges, step)
@@ -213,6 +206,10 @@ func (prom *Prometheus) RangeQuery(ctx context.Context, expr string, params Rang
 
 	if lastErr != nil {
 		return nil, QueryError{err: lastErr, msg: decodeError(lastErr)}
+	}
+
+	if ctx.Err() != nil {
+		return nil, QueryError{err: ctx.Err(), msg: decodeError(ctx.Err())}
 	}
 
 	slices.SortStableFunc(merged.Series.Ranges, CompareMetricTimeRanges)

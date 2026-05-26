@@ -82,15 +82,13 @@ func (prom *Prometheus) BuildInfo(ctx context.Context) (*BuildInfoResult, error)
 	prom.locker.lock(APIPathBuildInfo)
 	defer prom.locker.unlock(APIPathBuildInfo)
 
-	resultChan := make(chan queryResult)
-	prom.queries <- queryRequest{
-		query:  buildInfoQuery{prom: prom, ctx: ctx, timestamp: time.Now()},
-		result: resultChan,
-	}
-
-	result := <-resultChan
-	if result.err != nil {
-		return nil, QueryError{err: result.err, msg: decodeError(result.err)}
+	result, err := prom.runQuery(ctx, buildInfoQuery{
+		prom:      prom,
+		ctx:       ctx,
+		timestamp: time.Now(),
+	})
+	if err != nil {
+		return nil, QueryError{err: err, msg: decodeError(err)}
 	}
 
 	bi := result.value.(v1.BuildinfoResult)
