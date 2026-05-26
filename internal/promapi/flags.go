@@ -82,15 +82,13 @@ func (prom *Prometheus) Flags(ctx context.Context) (*FlagsResult, error) {
 	prom.locker.lock(APIPathFlags)
 	defer prom.locker.unlock(APIPathFlags)
 
-	resultChan := make(chan queryResult)
-	prom.queries <- queryRequest{
-		query:  flagsQuery{prom: prom, ctx: ctx, timestamp: time.Now()},
-		result: resultChan,
-	}
-
-	result := <-resultChan
-	if result.err != nil {
-		return nil, QueryError{err: result.err, msg: decodeError(result.err)}
+	result, err := prom.runQuery(ctx, flagsQuery{
+		prom:      prom,
+		ctx:       ctx,
+		timestamp: time.Now(),
+	})
+	if err != nil {
+		return nil, QueryError{err: err, msg: decodeError(err)}
 	}
 
 	r := FlagsResult{

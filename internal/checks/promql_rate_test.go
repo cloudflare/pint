@@ -719,8 +719,28 @@ func TestRateCheck(t *testing.T) {
 					resp:  configResponse{yaml: "global:\n  scrape_interval: 53s\n"},
 				},
 				{
-					conds: []requestCondition{requireMetadataPath},
-					resp:  httpResponse{code: http.StatusNotFound, body: "Not Found"},
+					conds: []requestCondition{
+						requireMetadataPath,
+						formCond{"metric", "global:response_time_sum"},
+					},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{}},
+				},
+				{
+					conds: []requestCondition{
+						requireMetadataPath,
+						formCond{"metric", "global:response_time_count"},
+					},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{}},
+				},
+				{
+					conds: []requestCondition{
+						requireMetadataPath,
+						formCond{"metric", "response_time_sum:rate2m"},
+					},
+					resp: sleepResponse{
+						sleep: 100 * time.Millisecond,
+						resp:  httpResponse{code: http.StatusNotFound, body: "Not Found"},
+					},
 				},
 			},
 		},

@@ -1,6 +1,7 @@
 package promapi_test
 
 import (
+	"context"
 	"net/http"
 	"testing"
 	"time"
@@ -15,6 +16,7 @@ import (
 
 func TestFlags(t *testing.T) {
 	type testCaseT struct {
+		ctx       func(t *testing.T) context.Context
 		flags     v1.FlagsResult
 		mock      httpmock.Mocker
 		assertErr func(t *testing.T, err error)
@@ -24,7 +26,7 @@ func TestFlags(t *testing.T) {
 
 	testCases := []testCaseT{
 		{
-			name:    "default",
+			name:    "empty flags",
 			timeout: time.Second,
 			flags:   v1.FlagsResult{},
 			assertErr: func(t *testing.T, err error) {
@@ -38,7 +40,7 @@ func TestFlags(t *testing.T) {
 			}),
 		},
 		{
-			name:    "foo",
+			name:    "single flag",
 			timeout: time.Second,
 			flags:   v1.FlagsResult{"foo": "bar"},
 			assertErr: func(t *testing.T, err error) {
@@ -52,7 +54,7 @@ func TestFlags(t *testing.T) {
 			}),
 		},
 		{
-			name:    "slow",
+			name:    "connection timeout",
 			timeout: time.Millisecond * 10,
 			assertErr: func(t *testing.T, err error) {
 				require.EqualError(t, err, "connection timeout")
@@ -67,7 +69,7 @@ func TestFlags(t *testing.T) {
 			}),
 		},
 		{
-			name:    "error",
+			name:    "500 error",
 			timeout: time.Second,
 			assertErr: func(t *testing.T, err error) {
 				require.EqualError(t, err, "server_error: 500 Internal Server Error")
@@ -80,7 +82,7 @@ func TestFlags(t *testing.T) {
 			}),
 		},
 		{
-			name:    "badJson",
+			name:    "invalid JSON",
 			timeout: time.Second,
 			assertErr: func(t *testing.T, err error) {
 				require.EqualError(
@@ -96,7 +98,7 @@ func TestFlags(t *testing.T) {
 			}),
 		},
 		{
-			name:    "apiError",
+			name:    "API error with message",
 			timeout: time.Second,
 			assertErr: func(t *testing.T, err error) {
 				require.EqualError(t, err, "bad_data: custom error message")
@@ -109,7 +111,7 @@ func TestFlags(t *testing.T) {
 			}),
 		},
 		{
-			name:    "emptyError",
+			name:    "API error without message",
 			timeout: time.Second,
 			assertErr: func(t *testing.T, err error) {
 				require.EqualError(t, err, "bad_data: empty response object")
@@ -120,6 +122,19 @@ func TestFlags(t *testing.T) {
 					Return(`{"status":"error","errorType":"bad_data"}`).
 					UnlimitedTimes()
 			}),
+		},
+		{
+			name:    "context cancelled",
+			timeout: time.Second,
+			ctx: func(t *testing.T) context.Context {
+				ctx, cancel := context.WithCancel(t.Context())
+				cancel()
+				return ctx
+			},
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(t, err, "context canceled")
+			},
+			mock: httpmock.New(func(_ *httpmock.Server) {}),
 		},
 	}
 
@@ -135,7 +150,12 @@ func TestFlags(t *testing.T) {
 			fg.StartWorkers(reg)
 			defer fg.Close(reg)
 
-			flags, err := fg.Flags(t.Context()).Wait()
+			ctx := t.Context()
+			if tc.ctx != nil {
+				ctx = tc.ctx(t)
+			}
+
+			flags, err := fg.Flags(ctx).Wait()
 			tc.assertErr(t, err)
 			if flags != nil {
 				require.Equal(t, tc.flags, flags.Flags)

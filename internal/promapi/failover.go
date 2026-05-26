@@ -204,9 +204,6 @@ func (fg *FailoverGroup) Close(reg *prometheus.Registry) {
 	if !fg.started {
 		return
 	}
-	for _, prom := range fg.servers {
-		prom.Close()
-	}
 	reg.Unregister(fg.cacheCollector)
 	fg.quitChan <- true
 }

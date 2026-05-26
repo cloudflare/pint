@@ -1,6 +1,7 @@
 package promapi_test
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -17,6 +18,7 @@ import (
 
 func TestConfig(t *testing.T) {
 	type testCaseT struct {
+		ctx         func(t *testing.T) context.Context
 		mock        httpmock.Mocker
 		errCheck    func(t *testing.T, err error)
 		name        string
@@ -36,7 +38,7 @@ func TestConfig(t *testing.T) {
 
 	testCases := []testCaseT{
 		{
-			name:    "default",
+			name:    "default config",
 			timeout: time.Second,
 			cfg:     defaults,
 			mock: httpmock.New(func(s *httpmock.Server) {
@@ -76,7 +78,7 @@ func TestConfig(t *testing.T) {
 			}),
 		},
 		{
-			name:    "slow",
+			name:    "connection timeout",
 			timeout: time.Millisecond * 10,
 			errCheck: func(t *testing.T, err error) {
 				t.Helper()
@@ -92,7 +94,7 @@ func TestConfig(t *testing.T) {
 			}),
 		},
 		{
-			name:    "error",
+			name:    "500 error",
 			timeout: time.Second,
 			errCheck: func(t *testing.T, err error) {
 				t.Helper()
@@ -106,7 +108,7 @@ func TestConfig(t *testing.T) {
 			}),
 		},
 		{
-			name:    "badYaml",
+			name:    "invalid YAML",
 			timeout: time.Second,
 			errCheck: func(t *testing.T, err error) {
 				t.Helper()
@@ -120,7 +122,7 @@ func TestConfig(t *testing.T) {
 			}),
 		},
 		{
-			name:    "badJson",
+			name:    "invalid JSON",
 			timeout: time.Second,
 			errCheck: func(t *testing.T, err error) {
 				t.Helper()
@@ -134,7 +136,7 @@ func TestConfig(t *testing.T) {
 			}),
 		},
 		{
-			name:    "apiError",
+			name:    "API error with message",
 			timeout: time.Second,
 			errCheck: func(t *testing.T, err error) {
 				t.Helper()
@@ -148,7 +150,7 @@ func TestConfig(t *testing.T) {
 			}),
 		},
 		{
-			name:    "emptyError",
+			name:    "API error without message",
 			timeout: time.Second,
 			errCheck: func(t *testing.T, err error) {
 				t.Helper()
@@ -161,10 +163,23 @@ func TestConfig(t *testing.T) {
 					UnlimitedTimes()
 			}),
 		},
-		// Verifies that FailoverGroup.Config returns a FailoverGroupError
-		// immediately when the server returns a non-unavailable error (bad_data).
 		{
-			name:        "failover/non-unavailable error",
+			name:        "context cancelled",
+			timeout:     time.Second,
+			useFailover: true,
+			ctx: func(t *testing.T) context.Context {
+				ctx, cancel := context.WithCancel(t.Context())
+				cancel()
+				return ctx
+			},
+			errCheck: func(t *testing.T, err error) {
+				t.Helper()
+				require.EqualError(t, err, "context canceled")
+			},
+			mock: httpmock.New(func(_ *httpmock.Server) {}),
+		},
+		{
+			name:        "failover returns non-retryable error",
 			timeout:     time.Second,
 			useFailover: true,
 			errCheck: func(t *testing.T, err error) {
@@ -192,11 +207,16 @@ func TestConfig(t *testing.T) {
 				fg := promapi.NewFailoverGroup("test", srv.URL(), []*promapi.Prometheus{prom}, true, "up", nil, nil, nil)
 				reg := prometheus.NewRegistry()
 				fg.StartWorkers(reg)
-				t.Cleanup(func() { fg.Close(reg) })
-				cfg, err = fg.Config(t.Context(), 0).Wait()
+				defer fg.Close(reg)
+
+				ctx := t.Context()
+				if tc.ctx != nil {
+					ctx = tc.ctx(t)
+				}
+
+				cfg, err = fg.Config(ctx, 0).Wait()
 			} else {
 				prom.StartWorkers()
-				t.Cleanup(prom.Close)
 				cfg, err = prom.Config(t.Context(), time.Minute)
 			}
 

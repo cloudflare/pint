@@ -90,15 +90,14 @@ func (prom *Prometheus) Metadata(ctx context.Context, metric string) (*MetadataR
 	prom.locker.lock(key)
 	defer prom.locker.unlock(key)
 
-	resultChan := make(chan queryResult)
-	prom.queries <- queryRequest{
-		query:  metadataQuery{prom: prom, ctx: ctx, metric: metric, timestamp: time.Now()},
-		result: resultChan,
-	}
-
-	result := <-resultChan
-	if result.err != nil {
-		return nil, QueryError{err: result.err, msg: decodeError(result.err)}
+	result, err := prom.runQuery(ctx, metadataQuery{
+		prom:      prom,
+		ctx:       ctx,
+		metric:    metric,
+		timestamp: time.Now(),
+	})
+	if err != nil {
+		return nil, QueryError{err: err, msg: decodeError(err)}
 	}
 
 	metadata := MetadataResult{

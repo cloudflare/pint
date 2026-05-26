@@ -149,12 +149,28 @@ func tryDecodingAPIError(resp *http.Response) error {
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		switch resp.StatusCode / 100 {
 		case 4:
-			return APIError{Status: "error", ErrorType: v1.ErrClient, Err: errors.New(resp.Status)}
+			return APIError{
+				Status:    "error",
+				ErrorType: v1.ErrClient,
+				Err:       errors.New(resp.Status),
+			}
 		case 5:
-			return APIError{Status: "error", ErrorType: v1.ErrServer, Err: errors.New(resp.Status)}
+			return APIError{
+				Status:    "error",
+				ErrorType: v1.ErrServer,
+				Err:       errors.New(resp.Status),
+			}
 		}
-		return APIError{Status: "error", ErrorType: v1.ErrBadResponse, Err: errors.New(resp.Status)}
+		return APIError{
+			Status:    "error",
+			ErrorType: v1.ErrBadResponse,
+			Err:       errors.New(resp.Status),
+		}
 	}
 
-	return APIError{Status: data.Status, ErrorType: decodeErrorType(data.ErrorType), Err: errors.New(data.Error)}
+	return APIError{
+		Status:    data.Status,
+		ErrorType: decodeErrorType(data.ErrorType),
+		Err:       errors.New(data.Error),
+	}
 }

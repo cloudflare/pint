@@ -25,7 +25,6 @@ Warning: required label is being removed via aggregation (promql/aggregate)
                 `job` label is required and should be preserved when aggregating all rules.
 
 level=INFO msg="Problems found" Warning=1
-level=DEBUG msg="Stopping query workers" name=prom uri=http://127.0.0.1
 -- rules/0001.yml --
 - alert: default-for
   expr: foo > 1

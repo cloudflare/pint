@@ -103,15 +103,14 @@ func (prom *Prometheus) Config(ctx context.Context, cacheTTL time.Duration) (*Co
 		cacheTTL = time.Minute
 	}
 
-	resultChan := make(chan queryResult)
-	prom.queries <- queryRequest{
-		query:  configQuery{prom: prom, ctx: ctx, timestamp: time.Now(), cacheTTL: cacheTTL},
-		result: resultChan,
-	}
-
-	result := <-resultChan
-	if result.err != nil {
-		return nil, QueryError{err: result.err, msg: decodeError(result.err)}
+	result, err := prom.runQuery(ctx, configQuery{
+		prom:      prom,
+		ctx:       ctx,
+		timestamp: time.Now(),
+		cacheTTL:  cacheTTL,
+	})
+	if err != nil {
+		return nil, QueryError{err: err, msg: decodeError(err)}
 	}
 
 	r := ConfigResult{
