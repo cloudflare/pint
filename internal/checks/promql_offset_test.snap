@@ -1,0 +1,303 @@
+
+[TestOffsetCheck/binary_expr_with_one_offset_exceeding_retention - 1]
+- description: binary expr with one offset exceeding retention
+  content: |
+    - record: foo
+      expr: foo + foo offset 20d
+  output: |
+    2 |   expr: foo + foo offset 20d
+                          ^^^^^^^^^^
+                          `foo offset 20d` selector is using 20d offset, but `prom` Prometheus server at
+                          https://simple.example.com is configured to only keep 15d of metrics history.
+  problem:
+    reporter: promql/offset
+    summary: query offset beyond configured retention
+    details: ""
+    diagnostics:
+        - message: '`foo offset 20d` selector is using 20d offset, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.'
+          firstcolumn: 11
+          lastcolumn: 20
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestOffsetCheck/flag_not_set,_10d_offset - 1]
+[]
+
+---
+
+[TestOffsetCheck/flag_not_set,_20d_offset - 1]
+- description: flag not set, 20d offset
+  content: |
+    - record: foo
+      expr: foo offset 20d
+  output: |
+    2 |   expr: foo offset 20d
+                    ^^^^^^^^^^
+                    `foo offset 20d` selector is using 20d offset, but `prom` Prometheus server at
+                    https://simple.example.com is configured to only keep 15d of metrics history.
+  problem:
+    reporter: promql/offset
+    summary: query offset beyond configured retention
+    details: ""
+    diagnostics:
+        - message: '`foo offset 20d` selector is using 20d offset, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.'
+          firstcolumn: 5
+          lastcolumn: 14
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestOffsetCheck/flag_parse_error - 1]
+- description: flag parse error
+  content: |
+    - record: foo
+      expr: foo offset 30d
+  output: |
+    2 |   expr: foo offset 30d
+                ^^^^^^^^^^^^^^
+                Cannot parse --storage.tsdb.retention.time="abc" flag value: not a valid duration string:
+                "abc"
+  problem:
+    reporter: promql/offset
+    summary: unable to run checks
+    details: ""
+    diagnostics:
+        - message: 'Cannot parse --storage.tsdb.retention.time="abc" flag value: not a valid duration string: "abc"'
+          firstcolumn: 1
+          lastcolumn: 14
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+- description: flag parse error
+  content: |
+    - record: foo
+      expr: foo offset 30d
+  output: |
+    2 |   expr: foo offset 30d
+                    ^^^^^^^^^^
+                    `foo offset 30d` selector is using 30d offset, but `prom` Prometheus server at
+                    https://simple.example.com is configured to only keep 0s of metrics history.
+  problem:
+    reporter: promql/offset
+    summary: query offset beyond configured retention
+    details: ""
+    diagnostics:
+        - message: '`foo offset 30d` selector is using 30d offset, but `prom` Prometheus server at https://simple.example.com is configured to only keep 0s of metrics history.'
+          firstcolumn: 5
+          lastcolumn: 14
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestOffsetCheck/flag_query_error - 1]
+- description: flag query error
+  content: |
+    - record: foo
+      expr: foo offset 30d
+  output: |
+    1 | - record: foo
+                  ^^^
+                  Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX
+                  error: `server_error: internal error`.
+  problem:
+    reporter: promql/offset
+    summary: unable to run checks
+    details: ""
+    diagnostics:
+        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.'
+          firstcolumn: 1
+          lastcolumn: 3
+          kind: 0
+    lines:
+        first: 1
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestOffsetCheck/flag_unsupported - 1]
+[]
+
+---
+
+[TestOffsetCheck/flag_with_0s,_10d_offset - 1]
+[]
+
+---
+
+[TestOffsetCheck/flag_with_0s,_20d_offset - 1]
+- description: flag with 0s, 20d offset
+  content: |
+    - record: foo
+      expr: foo offset 20d
+  output: |
+    2 |   expr: foo offset 20d
+                    ^^^^^^^^^^
+                    `foo offset 20d` selector is using 20d offset, but `prom` Prometheus server at
+                    https://simple.example.com is configured to only keep 15d of metrics history.
+  problem:
+    reporter: promql/offset
+    summary: query offset beyond configured retention
+    details: ""
+    diagnostics:
+        - message: '`foo offset 20d` selector is using 20d offset, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.'
+          firstcolumn: 5
+          lastcolumn: 14
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestOffsetCheck/ignores_rules_with_syntax_errors - 1]
+[]
+
+---
+
+[TestOffsetCheck/matrix_selector_with_offset_exceeding_retention - 1]
+- description: matrix selector with offset exceeding retention
+  content: |
+    - record: foo
+      expr: rate(foo[5m] offset 20d)
+  output: |
+    2 |   expr: rate(foo[5m] offset 20d)
+                             ^^^^^^^^^^
+                             `foo offset 20d` selector is using 20d offset, but `prom` Prometheus server at
+                             https://simple.example.com is configured to only keep 15d of metrics history.
+  problem:
+    reporter: promql/offset
+    summary: query offset beyond configured retention
+    details: ""
+    diagnostics:
+        - message: '`foo offset 20d` selector is using 20d offset, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.'
+          firstcolumn: 14
+          lastcolumn: 23
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestOffsetCheck/metric_name_containing_offset - 1]
+- description: metric name containing offset
+  content: |
+    - record: foo
+      expr: foo_offset_offset offset 20d
+  output: |
+    2 |   expr: foo_offset_offset offset 20d
+                                  ^^^^^^^^^^
+                                  `foo_offset_offset offset 20d` selector is using 20d offset, but `prom`
+                                  Prometheus server at https://simple.example.com is configured to only keep
+                                  15d of metrics history.
+  problem:
+    reporter: promql/offset
+    summary: query offset beyond configured retention
+    details: ""
+    diagnostics:
+        - message: '`foo_offset_offset offset 20d` selector is using 20d offset, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.'
+          firstcolumn: 19
+          lastcolumn: 28
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestOffsetCheck/no_offset_used - 1]
+[]
+
+---
+
+[TestOffsetCheck/retention_11d,_offset_10d - 1]
+[]
+
+---
+
+[TestOffsetCheck/retention_11d,_offset_11d1h - 1]
+- description: retention 11d, offset 11d1h
+  content: |
+    - record: foo
+      expr: foo offset 11d1h
+  output: |
+    2 |   expr: foo offset 11d1h
+                    ^^^^^^^^^^^^
+                    `foo offset 11d1h` selector is using 11d1h offset, but `prom` Prometheus server at
+                    https://simple.example.com is configured to only keep 11d of metrics history.
+  problem:
+    reporter: promql/offset
+    summary: query offset beyond configured retention
+    details: ""
+    diagnostics:
+        - message: '`foo offset 11d1h` selector is using 11d1h offset, but `prom` Prometheus server at https://simple.example.com is configured to only keep 11d of metrics history.'
+          firstcolumn: 5
+          lastcolumn: 16
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestOffsetCheck/subquery_offset_exceeding_retention - 1]
+- description: subquery offset exceeding retention
+  content: |
+    - record: foo
+      expr: max_over_time(foo[1h:5m] offset 20d)
+  output: |
+    2 |   expr: max_over_time(foo[1h:5m] offset 20d)
+                                         ^^^^^^^^^^
+                                         `foo[1h:5m] offset 20d` selector is using 20d offset, but `prom`
+                                         Prometheus server at https://simple.example.com is configured to
+                                         only keep 15d of metrics history.
+  problem:
+    reporter: promql/offset
+    summary: query offset beyond configured retention
+    details: ""
+    diagnostics:
+        - message: '`foo[1h:5m] offset 20d` selector is using 20d offset, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.'
+          firstcolumn: 26
+          lastcolumn: 35
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestOffsetCheck/subquery_offset_within_retention - 1]
+[]
+
+---

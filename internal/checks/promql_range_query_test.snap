@@ -11,18 +11,18 @@
       expr: rate(foo[20d])
   output: |
     2 |   expr: rate(foo[20d])
-                ^^^^^^^^^^^^^^
-                `foo[20d]` selector is trying to query Prometheus for 20d worth of metrics, but `prom`
-                Prometheus server at https://simple.example.com is configured to only keep 15d of metrics
-                history.
+                     ^^^^^^^^
+                     `foo[20d]` selector is trying to query Prometheus for 20d worth of metrics, but `prom`
+                     Prometheus server at https://simple.example.com is configured to only keep 15d of
+                     metrics history.
   problem:
     reporter: promql/range_query
     summary: query beyond configured retention
     details: ""
     diagnostics:
         - message: '`foo[20d]` selector is trying to query Prometheus for 20d worth of metrics, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.'
-          firstcolumn: 1
-          lastcolumn: 14
+          firstcolumn: 6
+          lastcolumn: 13
           kind: 0
     lines:
         first: 2
@@ -62,18 +62,18 @@
       expr: rate(foo[30d])
   output: |
     2 |   expr: rate(foo[30d])
-                ^^^^^^^^^^^^^^
-                `foo[30d]` selector is trying to query Prometheus for 30d worth of metrics, but `prom`
-                Prometheus server at https://simple.example.com is configured to only keep 15d of metrics
-                history.
+                     ^^^^^^^^
+                     `foo[30d]` selector is trying to query Prometheus for 30d worth of metrics, but `prom`
+                     Prometheus server at https://simple.example.com is configured to only keep 0s of
+                     metrics history.
   problem:
     reporter: promql/range_query
     summary: query beyond configured retention
     details: ""
     diagnostics:
-        - message: '`foo[30d]` selector is trying to query Prometheus for 30d worth of metrics, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.'
-          firstcolumn: 1
-          lastcolumn: 14
+        - message: '`foo[30d]` selector is trying to query Prometheus for 30d worth of metrics, but `prom` Prometheus server at https://simple.example.com is configured to only keep 0s of metrics history.'
+          firstcolumn: 6
+          lastcolumn: 13
           kind: 0
     lines:
         first: 2
@@ -122,18 +122,18 @@
       expr: rate(foo[11d1h])
   output: |
     2 |   expr: rate(foo[11d1h])
-                ^^^^^^^^^^^^^^^^
-                `foo[11d1h]` selector is trying to query Prometheus for 11d1h worth of metrics, but `prom`
-                Prometheus server at https://simple.example.com is configured to only keep 11d of metrics
-                history.
+                     ^^^^^^^^^^
+                     `foo[11d1h]` selector is trying to query Prometheus for 11d1h worth of metrics, but
+                     `prom` Prometheus server at https://simple.example.com is configured to only keep 11d
+                     of metrics history.
   problem:
     reporter: promql/range_query
     summary: query beyond configured retention
     details: ""
     diagnostics:
         - message: '`foo[11d1h]` selector is trying to query Prometheus for 11d1h worth of metrics, but `prom` Prometheus server at https://simple.example.com is configured to only keep 11d of metrics history.'
-          firstcolumn: 1
-          lastcolumn: 16
+          firstcolumn: 6
+          lastcolumn: 15
           kind: 0
     lines:
         first: 2
@@ -160,18 +160,18 @@
       expr: rate(foo[20d])
   output: |
     2 |   expr: rate(foo[20d])
-                ^^^^^^^^^^^^^^
-                `foo[20d]` selector is trying to query Prometheus for 20d worth of metrics, but `prom`
-                Prometheus server at https://simple.example.com is configured to only keep 15d of metrics
-                history.
+                     ^^^^^^^^
+                     `foo[20d]` selector is trying to query Prometheus for 20d worth of metrics, but `prom`
+                     Prometheus server at https://simple.example.com is configured to only keep 15d of
+                     metrics history.
   problem:
     reporter: promql/range_query
     summary: query beyond configured retention
     details: ""
     diagnostics:
         - message: '`foo[20d]` selector is trying to query Prometheus for 20d worth of metrics, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.'
-          firstcolumn: 1
-          lastcolumn: 14
+          firstcolumn: 6
+          lastcolumn: 13
           kind: 0
     lines:
         first: 2
@@ -198,17 +198,17 @@
       expr: rate(foo[5h])
   output: |
     2 |   expr: rate(foo[5h])
-                ^^^^^^^^^^^^^
-                `foo[5h]` selector is trying to query Prometheus for 5h worth of metrics, but 4h is the
-                maximum allowed range query.
+                     ^^^^^^^
+                     `foo[5h]` selector is trying to query Prometheus for 5h worth of metrics, but 4h is the
+                     maximum allowed range query.
   problem:
     reporter: promql/range_query
     summary: query beyond configured retention
     details: 'Rule comment: some text'
     diagnostics:
         - message: '`foo[5h]` selector is trying to query Prometheus for 5h worth of metrics, but 4h is the maximum allowed range query.'
-          firstcolumn: 1
-          lastcolumn: 13
+          firstcolumn: 6
+          lastcolumn: 12
           kind: 0
     lines:
         first: 2

@@ -25,6 +25,7 @@ config: |-
           "promql/fragile",
           "group/interval",
           "promql/impossible",
+          "promql/offset",
           "promql/range_query",
           "promql/rate",
           "promql/regexp",
@@ -129,6 +130,7 @@ checks:
     - group/interval
     - promql/series(prom1)
     - promql/vector_matching(prom1)
+    - promql/offset(prom1)
     - promql/range_query(prom1)
     - rule/duplicate(prom1)
     - labels/conflict(prom1)
@@ -138,6 +140,7 @@ checks:
     - promql/features(prom1)
     - promql/series(prom2)
     - promql/vector_matching(prom2)
+    - promql/offset(prom2)
     - promql/range_query(prom2)
     - rule/duplicate(prom2)
     - labels/conflict(prom2)

@@ -54,6 +54,7 @@ checks:
     - promql/rate(prom1)
     - promql/series(prom1)
     - promql/vector_matching(prom1)
+    - promql/offset(prom1)
     - promql/range_query(prom1)
     - rule/duplicate(prom1)
     - labels/conflict(prom1)
