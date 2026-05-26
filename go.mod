@@ -4,7 +4,7 @@ go 1.26.0
 
 require (
 	github.com/cespare/xxhash/v2 v2.3.0
-	github.com/gkampitakis/go-snaps v0.5.21
+	github.com/gkampitakis/go-snaps v0.5.22
 	github.com/go-json-experiment/json v0.0.0-20260505212615-e40f80bf6836
 	github.com/google/go-cmp v0.7.0
 	github.com/google/go-github/v87 v87.0.0
@@ -38,10 +38,10 @@ require (
 	github.com/edsrzf/mmap-go v1.2.0 // indirect
 	github.com/facette/natsort v0.0.0-20181210072756-2cd4dd1e2dcb // indirect
 	github.com/fxamacker/cbor/v2 v2.9.0 // indirect
-	github.com/gkampitakis/ciinfo v0.3.2 // indirect
+	github.com/gkampitakis/ciinfo v0.3.4 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
-	github.com/goccy/go-yaml v1.18.0 // indirect
+	github.com/goccy/go-yaml v1.19.2 // indirect
 	github.com/google/go-querystring v1.2.0 // indirect
 	github.com/grafana/regexp v0.0.0-20250905093917-f7b3be9d1853 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
@@ -51,7 +51,7 @@ require (
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
-	github.com/maruel/natural v1.1.1 // indirect
+	github.com/maruel/natural v1.3.0 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.3-0.20250322232337-35a7c28c31ee // indirect
@@ -60,7 +60,7 @@ require (
 	github.com/prometheus/procfs v0.16.1 // indirect
 	github.com/sergi/go-diff v1.4.0 // indirect
 	github.com/swaggest/assertjson v1.7.0 // indirect
-	github.com/tidwall/gjson v1.18.0 // indirect
+	github.com/tidwall/gjson v1.19.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/tidwall/sjson v1.2.5 // indirect
