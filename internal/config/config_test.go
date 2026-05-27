@@ -1778,6 +1778,47 @@ rule {
 				Rule: newRule(t, "- record: foo\n  expr: absent(foo)\n"),
 			},
 		},
+		{
+			title: "custom range_query disabled by rule",
+			config: `rule {
+  disable = ["promql/range_query"]
+  range_query {
+    max      = "1h"
+    severity = "bug"
+  }
+}`,
+			entry: &discovery.Entry{
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			},
+		},
+		{
+			title: "report disabled by rule",
+			config: `
+rule {
+  match {
+    kind = "recording"
+  }
+  disable = ["rule/report"]
+  report {
+    comment  = "You cannot add any recording rules to this Prometheus server."
+    severity = "bug"
+  }
+}
+`,
+			entry: &discovery.Entry{
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			},
+		},
 	}
 
 	dir := t.TempDir()

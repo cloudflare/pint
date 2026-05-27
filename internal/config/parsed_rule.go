@@ -365,7 +365,7 @@ func parseRule(rule Rule, prometheusServers []*promapi.FailoverGroup, defaultSta
 		rules = append(rules, newParsedRule(
 			rule,
 			defaultStates,
-			checks.CostCheckName,
+			checks.RangeQueryCheckName,
 			checks.NewRangeQueryCheck(nil, limit, rule.RangeQuery.Comment, severity),
 			nil,
 		))
@@ -375,7 +375,7 @@ func parseRule(rule Rule, prometheusServers []*promapi.FailoverGroup, defaultSta
 		rules = append(rules, newParsedRule(
 			rule,
 			defaultStates,
-			checks.CostCheckName,
+			checks.ReportCheckName,
 			checks.NewReportCheck(rule.Report.Comment, rule.Report.getSeverity()),
 			nil,
 		))
