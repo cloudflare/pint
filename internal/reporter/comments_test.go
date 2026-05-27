@@ -920,15 +920,18 @@ foo details
 			},
 		},
 		{
-			description: "stale general comment fails to be deleted",
+			description: "stale general comment delete error is reported to summary",
 			reports:     []Report{fooReport},
 			commenter: testCommenter{
 				destinations: func(_ context.Context) ([]any, error) {
 					return []any{1}, nil
 				},
 				summary: func(_ context.Context, _ any, _ Summary, _ []PendingComment, errs []error) error {
-					if len(errs) != 0 {
-						return fmt.Errorf("Expected empty errs, got %v", errs)
+					if len(errs) != 1 {
+						return fmt.Errorf("Expected errDelete in errs, got %v", errs)
+					}
+					if !errors.Is(errs[0], errDelete) {
+						return fmt.Errorf("Expected errDelete in errs, got %w", errs[0])
 					}
 					return nil
 				},

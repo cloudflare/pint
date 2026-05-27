@@ -439,7 +439,7 @@ func updateDestination(ctx context.Context, s Summary, c Commenter, dst any, sho
 	NEXT:
 	}
 
-	deleteStaleGeneralComments(ctx, c, dst, s, existingComments, pendingComments, errs)
+	errs = deleteStaleGeneralComments(ctx, c, dst, s, existingComments, pendingComments, errs)
 
 	slog.LogAttrs(
 		ctx, slog.LevelInfo, "Creating report summary",
@@ -466,7 +466,7 @@ func deleteStaleGeneralComments(
 	existingComments []ExistingComment,
 	pendingComments []PendingComment,
 	errs []error,
-) {
+) []error {
 	needed := pendingGeneralComments(c, s, pendingComments, errs)
 
 	for _, existing := range existingComments {
@@ -487,8 +487,11 @@ func deleteStaleGeneralComments(
 				slog.String("reporter", c.Describe()),
 				slog.Any("err", err),
 			)
+			errs = append(errs, err)
 		}
 	}
+
+	return errs
 }
 
 // pendingGeneralComments returns the set of general comment bodies that
