@@ -113,6 +113,28 @@ func TestQueryCachePurgeExpired(t *testing.T) {
 	require.Equal(t, 50, cache.evictions)
 }
 
+func TestQueryCacheGetExpiredEntryIsMiss(t *testing.T) {
+	mockErr := errors.New("Fake Error")
+	now := time.Unix(100, 0)
+	cache := newQueryCache(time.Minute, func() time.Time {
+		return now
+	})
+
+	cache.set(1, mockErr, time.Second)
+
+	v, ok := cache.get(1, "/foo")
+	require.True(t, ok)
+	require.Equal(t, mockErr, v)
+
+	now = now.Add(2 * time.Second)
+
+	v, ok = cache.get(1, "/foo")
+	require.False(t, ok)
+	require.Zero(t, v)
+	require.Equal(t, 1, cache.stats["/foo"].hits)
+	require.Equal(t, 1, cache.stats["/foo"].misses)
+}
+
 func TestQueryCacheEvictMaxStale(t *testing.T) {
 	mockErr := errors.New("Fake Error")
 	cache := newQueryCache(time.Second, time.Now)

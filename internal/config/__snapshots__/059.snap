@@ -1,0 +1,77 @@
+
+[TestGetChecksForRule/custom_range_query_disabled_by_rule - 1]
+title: custom range_query disabled by rule
+config: |-
+    {
+      "ci": {
+        "baseBranch": "master",
+        "maxCommits": 20
+      },
+      "parser": {},
+      "repository": {},
+      "checks": {
+        "enabled": [
+          "alerts/absent",
+          "alerts/annotation",
+          "alerts/comparison",
+          "alerts/count",
+          "alerts/external_labels",
+          "alerts/for",
+          "alerts/template",
+          "labels/conflict",
+          "promql/aggregate",
+          "promql/counter",
+          "promql/features",
+          "promql/fragile",
+          "group/interval",
+          "promql/impossible",
+          "promql/offset",
+          "promql/range_query",
+          "promql/rate",
+          "promql/regexp",
+          "promql/selector",
+          "promql/series",
+          "promql/syntax",
+          "promql/vector_matching",
+          "query/cost",
+          "rule/dependency",
+          "rule/duplicate",
+          "rule/for",
+          "rule/label",
+          "rule/link",
+          "rule/name",
+          "rule/reject",
+          "rule/report"
+        ]
+      },
+      "owners": {},
+      "rules": [
+        {
+          "disable": [
+            "promql/range_query"
+          ],
+          "range_query": {
+            "max": "1h",
+            "severity": "bug"
+          }
+        }
+      ]
+    }
+entry:
+    path:
+        name: rules.yml
+        symlinktarget: rules.yml
+    filecomments: []
+    rulecomments: []
+checks:
+    - promql/syntax
+    - alerts/for
+    - alerts/comparison
+    - alerts/template
+    - promql/fragile
+    - promql/regexp
+    - rule/dependency
+    - promql/impossible
+    - group/interval
+
+---

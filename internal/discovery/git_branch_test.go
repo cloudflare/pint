@@ -1888,6 +1888,176 @@ groups:
 				},
 			},
 		},
+		{
+			title: "rule added - relaxed path",
+			setup: func(t *testing.T) {
+				commitFile(t, "base.yml", "groups:\n- name: base\n  rules: []\n", "v1")
+
+				_, err := git.RunGit("checkout", "-b", "v2")
+				require.NoError(t, err, "git checkout v2")
+
+				require.NoError(t, os.MkdirAll("relaxed", 0o755))
+				commitFile(t, "relaxed/rules.yml", `
+- record: up:count
+  expr: count(up == 1)
+`, "v2")
+			},
+			finder: discovery.NewGitBranchFinder(
+				git.RunGit,
+				git.NewPathFilter(
+					includeAll,
+					nil,
+					[]*regexp.Regexp{
+						regexp.MustCompile("^relaxed/.*"),
+					},
+				),
+				"main",
+				4,
+				parser.DefaultOptions,
+				nil,
+			),
+			entries: []*discovery.Entry{
+				{
+					State: discovery.Added,
+					Path: discovery.Path{
+						Name:          "relaxed/rules.yml",
+						SymlinkTarget: "relaxed/rules.yml",
+					},
+					Changes: &discovery.Changes{
+						Lines: []git.LineNumber{
+							{Before: 0, After: 1, Modified: true},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
+						},
+					},
+					Rule: mustParse(1, "- record: up:count\n  expr: count(up == 1)\n"),
+				},
+			},
+		},
+		{
+			title: "rule file moved from strict to relaxed path",
+			setup: func(t *testing.T) {
+				commitFile(t, "strict.yml", "groups:\n- name: base\n  rules:\n  - record: up:count\n    expr: count(up)\n", "v1")
+
+				_, err := git.RunGit("checkout", "-b", "v2")
+				require.NoError(t, err, "git checkout v2")
+
+				require.NoError(t, os.MkdirAll("relaxed", 0o755))
+				_, err = git.RunGit("mv", "strict.yml", "relaxed/rules.yml")
+				require.NoError(t, err, "git mv")
+
+				commitFile(t, "relaxed/rules.yml", "- record: up:count\n  expr: count(up == 1)\n", "v2")
+			},
+			finder: discovery.NewGitBranchFinder(
+				git.RunGit,
+				git.NewPathFilter(
+					includeAll,
+					nil,
+					[]*regexp.Regexp{
+						regexp.MustCompile("^relaxed/.*"),
+					},
+				),
+				"main",
+				4,
+				parser.DefaultOptions,
+				nil,
+			),
+			entries: []*discovery.Entry{
+				{
+					State: discovery.Added,
+					Path: discovery.Path{
+						Name:          "relaxed/rules.yml",
+						SymlinkTarget: "relaxed/rules.yml",
+					},
+					Changes: &discovery.Changes{
+						Lines: []git.LineNumber{
+							{Before: 0, After: 1, Modified: true},
+							{Before: 0, After: 2, Modified: true},
+						},
+					},
+					Rule: mustParse(0, "- record: up:count\n  expr: count(up == 1)\n"),
+				},
+				{
+					State: discovery.Removed,
+					Path: discovery.Path{
+						Name:          "strict.yml",
+						SymlinkTarget: "strict.yml",
+					},
+					Changes: &discovery.Changes{
+						Lines: []git.LineNumber{
+							{Before: 1, After: 0, Modified: false},
+							{Before: 2, After: 0, Modified: false},
+							{Before: 3, After: 0, Modified: false},
+							{Before: 4, After: 0, Modified: false},
+							{Before: 5, After: 0, Modified: false},
+						},
+					},
+					Rule: mustParse(3, "  - record: up:count\n    expr: count(up)\n"),
+				},
+			},
+		},
+		{
+			title: "rule file moved from relaxed to strict path",
+			setup: func(t *testing.T) {
+				require.NoError(t, os.MkdirAll("relaxed", 0o755))
+				commitFile(t, "relaxed/rules.yml", "- record: up:count\n  expr: count(up)\n", "v1")
+
+				_, err := git.RunGit("checkout", "-b", "v2")
+				require.NoError(t, err, "git checkout v2")
+
+				_, err = git.RunGit("mv", "relaxed/rules.yml", "strict.yml")
+				require.NoError(t, err, "git mv")
+
+				commitFile(t, "strict.yml", "groups:\n- name: base\n  rules:\n  - record: up:count\n    expr: count(up == 1)\n", "v2")
+			},
+			finder: discovery.NewGitBranchFinder(
+				git.RunGit,
+				git.NewPathFilter(
+					includeAll,
+					nil,
+					[]*regexp.Regexp{
+						regexp.MustCompile("^relaxed/.*"),
+					},
+				),
+				"main",
+				4,
+				parser.DefaultOptions,
+				nil,
+			),
+			entries: []*discovery.Entry{
+				{
+					State: discovery.Removed,
+					Path: discovery.Path{
+						Name:          "relaxed/rules.yml",
+						SymlinkTarget: "relaxed/rules.yml",
+					},
+					Changes: &discovery.Changes{
+						Lines: []git.LineNumber{
+							{Before: 1, After: 0, Modified: false},
+							{Before: 2, After: 0, Modified: false},
+						},
+					},
+					Rule: mustParse(0, "- record: up:count\n  expr: count(up)\n"),
+				},
+				{
+					State: discovery.Added,
+					Path: discovery.Path{
+						Name:          "strict.yml",
+						SymlinkTarget: "strict.yml",
+					},
+					Changes: &discovery.Changes{
+						Lines: []git.LineNumber{
+							{Before: 0, After: 1, Modified: true},
+							{Before: 0, After: 2, Modified: true},
+							{Before: 0, After: 3, Modified: true},
+							{Before: 0, After: 4, Modified: true},
+							{Before: 0, After: 5, Modified: true},
+						},
+					},
+					Rule: mustParse(3, "  - record: up:count\n    expr: count(up == 1)\n"),
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {

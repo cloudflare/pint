@@ -60,7 +60,12 @@ func (f GitBranchFinder) Find(allEntries []*Entry) (entries []*Entry, err error)
 	}
 
 	for _, change := range changes {
-		p := parser.NewParser(f.opts.WithStrict(!f.filter.IsRelaxed(change.Path.Before.Name)))
+		beforeParser := parser.NewParser(
+			f.opts.WithStrict(!f.filter.IsRelaxed(change.Path.Before.Name)),
+		)
+		afterParser := parser.NewParser(
+			f.opts.WithStrict(!f.filter.IsRelaxed(change.Path.After.Name)),
+		)
 		var oldPath string
 		if change.Path.Before.Name != change.Path.After.Name {
 			oldPath = change.Path.Before.Name
@@ -76,7 +81,7 @@ func (f GitBranchFinder) Find(allEntries []*Entry) (entries []*Entry, err error)
 			change.Path.Before.EffectivePath(),
 			change.Path.Before.Name,
 			bytes.NewReader(change.Body.Before),
-			p,
+			beforeParser,
 			nil,
 			fileChanges,
 		)
@@ -84,7 +89,7 @@ func (f GitBranchFinder) Find(allEntries []*Entry) (entries []*Entry, err error)
 			change.Path.After.EffectivePath(),
 			change.Path.After.Name,
 			bytes.NewReader(change.Body.After),
-			p,
+			afterParser,
 			f.allowedOwners,
 			fileChanges,
 		)
