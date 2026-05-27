@@ -88,6 +88,12 @@ func (m Match) validate(allowEmpty bool) error {
 		}
 	}
 
+	if m.KeepFiringFor != "" {
+		if _, err := parseDurationMatch(m.KeepFiringFor); err != nil {
+			return err
+		}
+	}
+
 	for _, s := range m.State {
 		switch s {
 		case StateAny, StateAdded, StateModified, StateRenamed, StateRemoved, StateUnmodified:
@@ -97,7 +103,16 @@ func (m Match) validate(allowEmpty bool) error {
 		}
 	}
 
-	if !allowEmpty && m.Path == "" && m.Name == "" && m.Kind == "" && m.Label == nil && m.Annotation == nil && m.Command == nil && m.For == "" && m.State == nil {
+	if !allowEmpty &&
+		m.Path == "" &&
+		m.Name == "" &&
+		m.Kind == "" &&
+		m.Label == nil &&
+		m.Annotation == nil &&
+		m.Command == nil &&
+		m.For == "" &&
+		m.KeepFiringFor == "" &&
+		m.State == nil {
 		return errors.New("ignore block must have at least one condition")
 	}
 

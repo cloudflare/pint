@@ -64,6 +64,22 @@ func TestConfigLoadMergeDefaultsWhenMissing(t *testing.T) {
 	require.NotNil(t, cfg.Repository)
 }
 
+func TestConfigLoadIgnoreKeepFiringForOnly(t *testing.T) {
+	dir := t.TempDir()
+	path := path.Join(dir, "config.hcl")
+
+	err := os.WriteFile(path, []byte(`rule {
+  ignore {
+    keep_firing_for = "> 5m"
+  }
+}`), 0o644)
+	require.NoError(t, err)
+
+	_, ok, err := config.Load(path, true)
+	require.True(t, ok)
+	require.NoError(t, err)
+}
+
 func TestDisableOnlineChecksWithPrometheus(t *testing.T) {
 	dir := t.TempDir()
 	path := path.Join(dir, "config.hcl")
@@ -2210,6 +2226,22 @@ func TestConfigErrors(t *testing.T) {
   call "absent" {}
 }`,
 			err: "you must specific at least one `selector` block",
+		},
+		{
+			config: `rule {
+  match {
+    keep_firing_for = "!1s"
+  }
+}`,
+			err: `not a valid duration string: "!1s"`,
+		},
+		{
+			config: `rule {
+  ignore {
+    keep_firing_for = "!1s"
+  }
+}`,
+			err: `not a valid duration string: "!1s"`,
 		},
 	}
 
