@@ -37,9 +37,10 @@ func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 		lastRunDuration.Set(time.Since(start).Seconds())
 	}()
 
-	jobs := make(chan scanJob, workers*5)
-	results := make(chan reporter.Report, workers*5)
+	concurrencyLimit := make(chan struct{}, workers)
 	wg := sync.WaitGroup{}
+	var mu sync.Mutex
+	var reports []reporter.Report
 
 	ctx = context.WithValue(ctx, promapi.AllPrometheusServers, gen.Servers())
 	for _, s := range cfg.Check {
@@ -48,73 +49,69 @@ func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 		ctx = context.WithValue(ctx, key, settings)
 	}
 
-	for w := 1; w <= workers; w++ {
-		wg.Go(func() {
-			scanWorker(ctx, jobs, results)
-		})
-	}
-
-	go func() {
-		defer close(results)
-		wg.Wait()
-	}()
-
 	var onlineChecksCount, offlineChecksCount, checkedEntriesCount atomic.Int64
-	go func() {
-		for _, entry := range entries {
-			switch {
-			case entry.PathError != nil && entry.State == discovery.Removed:
-				continue
-			case entry.Rule.Error.Err != nil && entry.State == discovery.Removed:
-				continue
-			default:
-				if entry.Rule.RecordingRule != nil {
-					rulesParsedTotal.WithLabelValues(config.RecordingRuleType).Inc()
-					slog.LogAttrs(
-						ctx, slog.LevelDebug, "Found recording rule",
-						slog.String("path", entry.Path.Name),
-						slog.String("record", entry.Rule.RecordingRule.Record.Value),
-						slog.String("lines", entry.Rule.Lines.String()),
-						slog.String("state", entry.State.String()),
-					)
-				}
-				if entry.Rule.AlertingRule != nil {
-					rulesParsedTotal.WithLabelValues(config.AlertingRuleType).Inc()
-					slog.LogAttrs(
-						ctx, slog.LevelDebug, "Found alerting rule",
-						slog.String("path", entry.Path.Name),
-						slog.String("alert", entry.Rule.AlertingRule.Alert.Value),
-						slog.String("lines", entry.Rule.Lines.String()),
-						slog.String("state", entry.State.String()),
-					)
-				}
-				if entry.Rule.Error.Err != nil {
-					slog.LogAttrs(
-						ctx, slog.LevelDebug, "Found invalid rule",
-						slog.String("path", entry.Path.Name),
-						slog.String("lines", entry.Rule.Lines.String()),
-						slog.String("state", entry.State.String()),
-					)
-					rulesParsedTotal.WithLabelValues(config.InvalidRuleType).Inc()
-				}
+	for _, entry := range entries {
+		switch {
+		case entry.PathError != nil && entry.State == discovery.Removed:
+			continue
+		case entry.Rule.Error.Err != nil && entry.State == discovery.Removed:
+			continue
+		default:
+			if entry.Rule.RecordingRule != nil {
+				rulesParsedTotal.WithLabelValues(config.RecordingRuleType).Inc()
+				slog.LogAttrs(
+					ctx, slog.LevelDebug, "Found recording rule",
+					slog.String("path", entry.Path.Name),
+					slog.String("record", entry.Rule.RecordingRule.Record.Value),
+					slog.String("lines", entry.Rule.Lines.String()),
+					slog.String("state", entry.State.String()),
+				)
+			}
+			if entry.Rule.AlertingRule != nil {
+				rulesParsedTotal.WithLabelValues(config.AlertingRuleType).Inc()
+				slog.LogAttrs(
+					ctx, slog.LevelDebug, "Found alerting rule",
+					slog.String("path", entry.Path.Name),
+					slog.String("alert", entry.Rule.AlertingRule.Alert.Value),
+					slog.String("lines", entry.Rule.Lines.String()),
+					slog.String("state", entry.State.String()),
+				)
+			}
+			if entry.Rule.Error.Err != nil {
+				slog.LogAttrs(
+					ctx, slog.LevelDebug, "Found invalid rule",
+					slog.String("path", entry.Path.Name),
+					slog.String("lines", entry.Rule.Lines.String()),
+					slog.String("state", entry.State.String()),
+				)
+				rulesParsedTotal.WithLabelValues(config.InvalidRuleType).Inc()
+			}
 
-				checkedEntriesCount.Add(1)
-				checkList := cfg.GetChecksForEntry(ctx, gen, entry)
-				for _, check := range checkList {
-					checkIterationChecks.Inc()
-					if check.Meta().Online {
-						onlineChecksCount.Add(1)
-					} else {
-						offlineChecksCount.Add(1)
-					}
-					jobs <- scanJob{entry: entry, allEntries: entries, check: check}
+			checkedEntriesCount.Add(1)
+			checkList := cfg.GetChecksForEntry(ctx, gen, entry)
+			for _, check := range checkList {
+				checkIterationChecks.Inc()
+				if check.Meta().Online {
+					onlineChecksCount.Add(1)
+				} else {
+					offlineChecksCount.Add(1)
 				}
+				concurrencyLimit <- struct{}{}
+				wg.Go(func() {
+					defer func() { <-concurrencyLimit }()
+					results := runCheck(ctx, check, entry, entries)
+					if len(results) > 0 {
+						mu.Lock()
+						reports = append(reports, results...)
+						mu.Unlock()
+					}
+				})
 			}
 		}
-		defer close(jobs)
-	}()
+	}
+	wg.Wait()
 
-	for result := range results {
+	for _, result := range reports {
 		summary.Report(result)
 	}
 	summary.Duration = time.Since(start)
@@ -145,44 +142,40 @@ func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 	return summary, nil
 }
 
-type scanJob struct {
-	check      checks.RuleChecker
-	entry      *discovery.Entry
-	allEntries []*discovery.Entry
-}
-
-func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporter.Report) {
-	for job := range jobs {
-		select {
-		case <-ctx.Done():
-			return
-		default:
-			if job.entry.State == discovery.Unknown {
-				slog.LogAttrs(
-					ctx, slog.LevelWarn,
-					"Bug: unknown rule state",
-					slog.String("path", job.entry.Path.String()),
-					slog.Int("line", job.entry.Rule.Lines.First),
-					slog.String("name", job.entry.Rule.Name()),
-				)
-			}
-
-			start := time.Now()
-			problems := job.check.Check(ctx, job.entry, job.allEntries)
-			checkDuration.WithLabelValues(job.check.Reporter()).Observe(time.Since(start).Seconds())
-			for _, problem := range problems {
-				results <- reporter.Report{
-					Path:        job.entry.Path,
-					Changes:     job.entry.Changes,
-					Rule:        job.entry.Rule,
-					Problem:     problem,
-					Owner:       job.entry.Owner,
-					IsDuplicate: false, // unused
-					Duplicates:  nil,
-				}
-			}
-		}
-
-		checkIterationChecksDone.Inc()
+func runCheck(ctx context.Context, check checks.RuleChecker, entry *discovery.Entry, entries []*discovery.Entry) []reporter.Report {
+	select {
+	case <-ctx.Done():
+		return nil
+	default:
 	}
+
+	if entry.State == discovery.Unknown {
+		slog.LogAttrs(
+			ctx, slog.LevelWarn,
+			"Bug: unknown rule state",
+			slog.String("path", entry.Path.String()),
+			slog.Int("line", entry.Rule.Lines.First),
+			slog.String("name", entry.Rule.Name()),
+		)
+	}
+
+	start := time.Now()
+	problems := check.Check(ctx, entry, entries)
+	checkDuration.WithLabelValues(check.Reporter()).Observe(time.Since(start).Seconds())
+
+	var reports []reporter.Report
+	for _, problem := range problems {
+		reports = append(reports, reporter.Report{
+			Path:        entry.Path,
+			Changes:     entry.Changes,
+			Rule:        entry.Rule,
+			Problem:     problem,
+			Owner:       entry.Owner,
+			IsDuplicate: false,
+			Duplicates:  nil,
+		})
+	}
+
+	checkIterationChecksDone.Inc()
+	return reports
 }
