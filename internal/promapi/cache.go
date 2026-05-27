@@ -65,6 +65,10 @@ func (c *queryCache) get(key uint64, endpoint string) (v any, ok bool) {
 		c.endpointStats(endpoint).miss()
 		return v, ok
 	}
+	if !ce.expiresAt.IsZero() && !ce.expiresAt.After(c.now()) {
+		c.endpointStats(endpoint).miss()
+		return v, false
+	}
 
 	ce.lastGet = c.now()
 	c.endpointStats(endpoint).hit()
