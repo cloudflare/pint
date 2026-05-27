@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -34,157 +33,119 @@ func (tc testCheck) Check(_ context.Context, _ *discovery.Entry, _ []*discovery.
 	return tc.problems
 }
 
-func TestScanWorker(t *testing.T) {
+func TestRunCheck(t *testing.T) {
 	type testCaseT struct {
 		name            string
-		jobs            []scanJob
-		expectedReports int
-		cancelCtx       bool
+		setup           func(context.Context) context.Context
+		check           checks.RuleChecker
+		entry           *discovery.Entry
+		entries         []*discovery.Entry
+		expectedReports []reporter.Report
 	}
 
 	testCases := []testCaseT{
 		{
-			name:      "context cancelled before job processed",
-			cancelCtx: true,
-			jobs: []scanJob{
-				{
-					check: testCheck{name: "test"},
-					entry: &discovery.Entry{
-						State: discovery.Noop,
-						Rule:  parser.Rule{},
-					},
-				},
+			name: "context cancelled before check runs",
+			setup: func(ctx context.Context) context.Context {
+				ctx, cancel := context.WithCancel(ctx)
+				cancel()
+				return ctx
 			},
-			expectedReports: 0,
+			check: testCheck{name: "test"},
+			entry: &discovery.Entry{
+				State: discovery.Noop,
+				Rule:  parser.Rule{},
+			},
+			expectedReports: nil,
 		},
 		{
-			name:      "unknown state triggers warning log",
-			cancelCtx: false,
-			jobs: []scanJob{
-				{
-					check: testCheck{name: "test"},
-					entry: &discovery.Entry{
-						State: discovery.Unknown,
-						Path:  discovery.Path{Name: "test.yaml"},
-						Rule:  parser.Rule{},
-					},
-				},
+			name:  "unknown state produces no reports",
+			check: testCheck{name: "test"},
+			entry: &discovery.Entry{
+				State: discovery.Unknown,
+				Path:  discovery.Path{Name: "test.yaml"},
+				Rule:  parser.Rule{},
 			},
-			expectedReports: 0,
+			expectedReports: nil,
 		},
 		{
-			name:      "job with problems produces reports",
-			cancelCtx: false,
-			jobs: []scanJob{
-				{
-					check: testCheck{
-						name: "test",
-						problems: []checks.Problem{
-							{Severity: checks.Bug, Summary: "test problem"},
-						},
-					},
-					entry: &discovery.Entry{
-						State: discovery.Noop,
-						Path:  discovery.Path{Name: "test.yaml"},
-						Rule:  parser.Rule{},
-					},
+			name: "check with single problem produces one report",
+			check: testCheck{
+				name: "test",
+				problems: []checks.Problem{
+					{Severity: checks.Bug, Summary: "test problem"},
 				},
 			},
-			expectedReports: 1,
+			entry: &discovery.Entry{
+				State: discovery.Noop,
+				Path:  discovery.Path{Name: "test.yaml"},
+				Rule:  parser.Rule{},
+			},
+			expectedReports: []reporter.Report{
+				{
+					Path:        discovery.Path{Name: "test.yaml"},
+					Rule:        parser.Rule{},
+					Problem:     checks.Problem{Severity: checks.Bug, Summary: "test problem"},
+					IsDuplicate: false,
+					Duplicates:  nil,
+				},
+			},
 		},
 		{
-			name:      "multiple jobs produce multiple reports",
-			cancelCtx: false,
-			jobs: []scanJob{
-				{
-					check: testCheck{
-						name:     "test",
-						problems: []checks.Problem{{Severity: checks.Bug, Summary: "p1"}},
-					},
-					entry: &discovery.Entry{
-						State: discovery.Noop,
-						Path:  discovery.Path{Name: "test.yaml"},
-						Rule:  parser.Rule{},
-					},
-				},
-				{
-					check: testCheck{
-						name:     "test",
-						problems: []checks.Problem{{Severity: checks.Bug, Summary: "p2"}},
-					},
-					entry: &discovery.Entry{
-						State: discovery.Noop,
-						Path:  discovery.Path{Name: "test.yaml"},
-						Rule:  parser.Rule{},
-					},
-				},
-				{
-					check: testCheck{
-						name:     "test",
-						problems: []checks.Problem{{Severity: checks.Bug, Summary: "p3"}},
-					},
-					entry: &discovery.Entry{
-						State: discovery.Noop,
-						Path:  discovery.Path{Name: "test.yaml"},
-						Rule:  parser.Rule{},
-					},
+			name: "check with multiple problems produces multiple reports",
+			check: testCheck{
+				name: "test",
+				problems: []checks.Problem{
+					{Severity: checks.Bug, Summary: "p1"},
+					{Severity: checks.Warning, Summary: "p2"},
 				},
 			},
-			expectedReports: 3,
+			entry: &discovery.Entry{
+				State: discovery.Noop,
+				Path:  discovery.Path{Name: "test.yaml"},
+				Rule:  parser.Rule{},
+			},
+			expectedReports: []reporter.Report{
+				{
+					Path:        discovery.Path{Name: "test.yaml"},
+					Rule:        parser.Rule{},
+					Problem:     checks.Problem{Severity: checks.Bug, Summary: "p1"},
+					IsDuplicate: false,
+					Duplicates:  nil,
+				},
+				{
+					Path:        discovery.Path{Name: "test.yaml"},
+					Rule:        parser.Rule{},
+					Problem:     checks.Problem{Severity: checks.Warning, Summary: "p2"},
+					IsDuplicate: false,
+					Duplicates:  nil,
+				},
+			},
 		},
 		{
-			name:      "job with no problems produces no reports",
-			cancelCtx: false,
-			jobs: []scanJob{
-				{
-					check: testCheck{name: "test", problems: nil},
-					entry: &discovery.Entry{
-						State: discovery.Noop,
-						Path:  discovery.Path{Name: "test.yaml"},
-						Rule:  parser.Rule{},
-					},
-				},
+			name: "check with no problems produces no reports",
+			check: testCheck{
+				name:     "test",
+				problems: nil,
 			},
-			expectedReports: 0,
+			entry: &discovery.Entry{
+				State: discovery.Noop,
+				Path:  discovery.Path{Name: "test.yaml"},
+				Rule:  parser.Rule{},
+			},
+			expectedReports: nil,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			ctx, cancel := context.WithCancel(context.Background())
-			defer cancel()
-
-			jobs := make(chan scanJob, len(tc.jobs)+1)
-			results := make(chan reporter.Report, 10)
-
-			done := make(chan struct{})
-			go func() {
-				scanWorker(ctx, jobs, results)
-				close(results)
-				close(done)
-			}()
-
-			if tc.cancelCtx {
-				cancel()
+			ctx := context.Background()
+			if tc.setup != nil {
+				ctx = tc.setup(ctx)
 			}
 
-			for _, job := range tc.jobs {
-				jobs <- job
-			}
-			close(jobs)
-
-			var reports []reporter.Report
-			for r := range results {
-				reports = append(reports, r)
-			}
-
-			select {
-			case <-done:
-			case <-time.After(time.Second):
-				t.Fatal("worker did not finish in time")
-			}
-
-			require.Len(t, reports, tc.expectedReports)
+			reports := runCheck(ctx, tc.check, tc.entry, tc.entries)
+			require.Equal(t, tc.expectedReports, reports)
 		})
 	}
 }

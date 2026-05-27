@@ -2,8 +2,8 @@ github.com/KimMachineGun/automemlimit v0.7.5 h1:RkbaC0MwhjL1ZuBKunGDjE/ggwAX43Dw
 github.com/KimMachineGun/automemlimit v0.7.5/go.mod h1:QZxpHaGOQoYvFhv/r4u3U0JTC2ZcOwbSr11UZF46UBM=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/dkorunic/betteralign v0.9.2 h1:SWtylzuLqPtZUzK4TGRGu4+dRBxO5ApKbJ2J03pk02I=
-github.com/dkorunic/betteralign v0.9.2/go.mod h1:tt0jh7qNdP5K2DhnY5+izilpksGpIPw3i2GhQdH36Fc=
+github.com/dkorunic/betteralign v0.11.0 h1:3Vh5+bRGaUlIwmnfx/4WFjRgOC+NbTb5MbxcHluVhDs=
+github.com/dkorunic/betteralign v0.11.0/go.mod h1:tt0jh7qNdP5K2DhnY5+izilpksGpIPw3i2GhQdH36Fc=
 github.com/google/go-cmp v0.6.0 h1:ofyhxvXcZhMsU5ulbFiLKl/XBFqE1GSq7atu8tAmTRI=
 github.com/google/go-cmp v0.6.0/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
 github.com/google/renameio/v2 v2.0.2 h1:qKZs+tfn+arruZZhQ7TKC/ergJunuJicWS6gLDt/dGw=

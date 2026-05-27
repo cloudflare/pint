@@ -22,7 +22,7 @@ env GITHUB_API_URL=://bad
 cmp stderr ../stderr.txt
 
 -- stderr.txt --
-level=ERROR msg="Execution completed with error(s)" err="creating new GitHub client: parse \"://bad\": missing protocol scheme"
+level=ERROR msg="Execution completed with error(s)" err="creating new GitHub client: invalid base url: invalid url: parse \"://bad\": missing protocol scheme"
 -- src/.pint.hcl --
 ci {
   baseBranch = "main"
