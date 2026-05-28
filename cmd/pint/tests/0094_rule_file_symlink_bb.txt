@@ -12,8 +12,10 @@ http response prometheus5m /api/v1/query_range 200 {"status":"success","data":{"
 http response prometheus5m /api/v1/query 200 {"status":"success","data":{"resultType":"vector","result":[]}}
 http start prometheus5m 127.0.0.1:2094
 
-http response bitbucket /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint 200 OK
-http response bitbucket /rest/api/1.0/projects/prometheus/repos/rules/commits/.*/pull-requests 200 {}
+http response bitbucket /plugins/servlet/applinks/whoami 200 pint
+http response bitbucket /rest/api/1.0/projects/prometheus/repos/rules/commits/.*/pull-requests 200 {"size":1,"isLastPage":true,"values":[{"id":1,"open":true,"fromRef":{"id":"refs/heads/v2","latestCommit":"fake-commit-id"},"toRef":{"id":"refs/heads/main","latestCommit":"fake-commit-id"}}]}
+http response bitbucket /rest/api/latest/projects/prometheus/repos/rules/pull-requests/1/activities 200 {"size":0,"isLastPage":true,"values":[]}
+http response bitbucket /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments 200 {}
 http start bitbucket 127.0.0.1:6094
 
 mkdir testrepo
@@ -49,7 +51,6 @@ stderr 'path=double.yml rule=rule2'
 ! stderr 'path=ignored.yml'
 
 stderr 'level=INFO msg="Problems found" Bug=4'
-stderr 'result":"FAIL"'
 
 ! stderr '---> rules.yml:5 Bug: Duration for `rate'
 ! stderr '---> rules.yml:7 Bug: Duration for `rate'
@@ -57,16 +58,6 @@ stderr '---> symlink.yml ~> rules.yml:5'
 stderr '---> symlink.yml ~> rules.yml:7'
 stderr '---> double.yml ~> rules.yml:5'
 stderr '---> double.yml ~> rules.yml:7'
-
-stderr '{"path":"rules.yml","message":"Problem detected on symlinked file symlink.yml: .*","line":5}'
-stderr '{"path":"rules.yml","message":"Problem detected on symlinked file double.yml: .*","line":5}'
-stderr '{"path":"rules.yml","message":"Problem detected on symlinked file symlink.yml: .*","line":7}'
-stderr '{"path":"rules.yml","message":"Problem detected on symlinked file double.yml: .*","line":7}'
-! stderr '{"path":"symlink.yml"'
-! stderr '{"path":"double.yml"'
-
-stderr 'Problem detected on symlinked file symlink.yml:'
-stderr 'Problem detected on symlinked file double.yml:'
 
 cmp bitbucket.got ../bitbucket.expected
 
@@ -114,84 +105,104 @@ prometheus "5m" {
 }
 
 -- bitbucket.expected --
-DELETE /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
-  Accept-Encoding: gzip
-  Authorization: Bearer "12345"
-  Content-Type: application/json
-
-PUT /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
-  Accept-Encoding: gzip
-  Authorization: Bearer "12345"
-  Content-Type: application/json
---- BODY ---
-reporter: Prometheus rule linter
-title: pint unknown
-result: FAIL
-details: |-
-  pint is a Prometheus rule linter/validator.
-  It will inspect all Prometheus recording and alerting rules for problems that could prevent these from working correctly.
-  Checks can be either offline (static checks using only rule definition) or online (validate rule against live Prometheus server).
-link: https://cloudflare.github.io/pint/
-data:
-  - value: 6
-    title: Number of rules parsed
-    type: NUMBER
-  - value: 6
-    title: Number of rules checked
-    type: NUMBER
-  - value: 4
-    title: Number of problems found
-    type: NUMBER
-  - value: 60
-    title: Number of offline checks
-    type: NUMBER
-  - value: 54
-    title: Number of online checks
-    type: NUMBER
-  - value: 0
-    title: Checks duration
-    type: DURATION
---- END ---
-
 GET /rest/api/1.0/projects/prometheus/repos/rules/commits/.*/pull-requests
   Accept-Encoding: gzip
   Authorization: Bearer "12345"
   Content-Type: application/json
 
-DELETE /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
+GET /plugins/servlet/applinks/whoami
   Accept-Encoding: gzip
   Authorization: Bearer "12345"
   Content-Type: application/json
 
-POST /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
+GET /rest/api/latest/projects/prometheus/repos/rules/pull-requests/1/activities
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+
+POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Accept-Encoding: gzip
   Authorization: Bearer "12345"
   Content-Type: application/json
 --- BODY ---
-annotations:
-  - path: rules.yml
-    message: "Problem detected on symlinked file double.yml: promql/rate: duration too small"
-    severity: MEDIUM
-    type: BUG
-    link: https://cloudflare.github.io/pint/checks/promql/rate.html
-    line: 5
-  - path: rules.yml
-    message: "Problem detected on symlinked file double.yml: promql/rate: duration too small"
-    severity: MEDIUM
-    type: BUG
-    link: https://cloudflare.github.io/pint/checks/promql/rate.html
-    line: 7
-  - path: rules.yml
-    message: "Problem detected on symlinked file symlink.yml: promql/rate: duration too small"
-    severity: MEDIUM
-    type: BUG
-    link: https://cloudflare.github.io/pint/checks/promql/rate.html
-    line: 5
-  - path: rules.yml
-    message: "Problem detected on symlinked file symlink.yml: promql/rate: duration too small"
-    severity: MEDIUM
-    type: BUG
-    link: https://cloudflare.github.io/pint/checks/promql/rate.html
-    line: 7
+text: |
+  :stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **promql/rate** check.
+
+  <details>
+  <summary>duration too small</summary>
+
+  ```yaml
+  5 |     expr: rate(errors_total[2m]) > 0
+                ^^^^^^^^^^^^^^^^^^^^^^
+  ```
+
+  Duration for `rate()` must be at least 2 x scrape_interval, `5m` Prometheus server at http://127.0.0.1:2094 is using `5m` scrape_interval.
+
+  Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) and [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) function comes with a few requirements:
+
+  - The metric you calculate (i)rate from must be a counter or native histograms.
+  - The time window of the (i)rate function must have at least 2 samples.
+
+  The type of your metric is defined by the application that exports that metric.
+  The number of samples depends on how often your application is being scraped by Prometheus.
+  Each scrape produces a sample, so if your application is scrape every minute then the minimal time window you can use is two minutes.
+
+  </details>
+
+  :leftwards_arrow_with_hook: This problem was detected on a symlinked file `double.yml`.
+
+  ------
+
+  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/rate.html).
+severity: NORMAL
+anchor:
+  path: rules.yml
+  lineType: ADDED
+  fileType: TO
+  diffType: EFFECTIVE
+  line: 5
+--- END ---
+
+POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+--- BODY ---
+text: |
+  :stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **promql/rate** check.
+
+  <details>
+  <summary>duration too small</summary>
+
+  ```yaml
+  7 |     expr: rate(errors_total[2m]) > 0
+                ^^^^^^^^^^^^^^^^^^^^^^
+  ```
+
+  Duration for `rate()` must be at least 2 x scrape_interval, `5m` Prometheus server at http://127.0.0.1:2094 is using `5m` scrape_interval.
+
+  Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) and [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) function comes with a few requirements:
+
+  - The metric you calculate (i)rate from must be a counter or native histograms.
+  - The time window of the (i)rate function must have at least 2 samples.
+
+  The type of your metric is defined by the application that exports that metric.
+  The number of samples depends on how often your application is being scraped by Prometheus.
+  Each scrape produces a sample, so if your application is scrape every minute then the minimal time window you can use is two minutes.
+
+  </details>
+
+  :leftwards_arrow_with_hook: This problem was detected on a symlinked file `double.yml`.
+
+  ------
+
+  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/rate.html).
+severity: NORMAL
+anchor:
+  path: rules.yml
+  lineType: ADDED
+  fileType: TO
+  diffType: EFFECTIVE
+  line: 7
 --- END ---
 

@@ -1,5 +1,7 @@
-http response bitbucket /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint 200 OK
-http response bitbucket /rest/api/1.0/projects/prometheus/repos/rules/commits/.*/pull-requests 200 {}
+http response bitbucket /plugins/servlet/applinks/whoami 200 pint
+http response bitbucket /rest/api/1.0/projects/prometheus/repos/rules/commits/.*/pull-requests 200 {"size":1,"isLastPage":true,"values":[{"id":1,"open":true,"fromRef":{"id":"refs/heads/v2","latestCommit":"fake-commit-id"},"toRef":{"id":"refs/heads/main","latestCommit":"fake-commit-id"}}]}
+http response bitbucket /rest/api/latest/projects/prometheus/repos/rules/pull-requests/1/activities 200 {"size":0,"isLastPage":true,"values":[]}
+http response bitbucket /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments 200 {}
 http start bitbucket 127.0.0.1:6093
 
 mkdir testrepo
@@ -56,66 +58,50 @@ repository {
 }
 
 -- bitbucket.expected --
-DELETE /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
-  Accept-Encoding: gzip
-  Authorization: Bearer "12345"
-  Content-Type: application/json
-
-PUT /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
-  Accept-Encoding: gzip
-  Authorization: Bearer "12345"
-  Content-Type: application/json
---- BODY ---
-reporter: Prometheus rule linter
-title: pint unknown
-result: PASS
-details: |-
-  pint is a Prometheus rule linter/validator.
-  It will inspect all Prometheus recording and alerting rules for problems that could prevent these from working correctly.
-  Checks can be either offline (static checks using only rule definition) or online (validate rule against live Prometheus server).
-link: https://cloudflare.github.io/pint/
-data:
-  - value: 1
-    title: Number of rules parsed
-    type: NUMBER
-  - value: 1
-    title: Number of rules checked
-    type: NUMBER
-  - value: 1
-    title: Number of problems found
-    type: NUMBER
-  - value: 1
-    title: Number of offline checks
-    type: NUMBER
-  - value: 0
-    title: Number of online checks
-    type: NUMBER
-  - value: 0
-    title: Checks duration
-    type: DURATION
---- END ---
-
 GET /rest/api/1.0/projects/prometheus/repos/rules/commits/.*/pull-requests
   Accept-Encoding: gzip
   Authorization: Bearer "12345"
   Content-Type: application/json
 
-DELETE /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
+GET /plugins/servlet/applinks/whoami
   Accept-Encoding: gzip
   Authorization: Bearer "12345"
   Content-Type: application/json
 
-POST /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
+GET /rest/api/latest/projects/prometheus/repos/rules/pull-requests/1/activities
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+
+POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Accept-Encoding: gzip
   Authorization: Bearer "12345"
   Content-Type: application/json
 --- BODY ---
-annotations:
-  - path: rules.yml
-    message: "Problem reported on unmodified line 1, annotation moved here: ignore/file: This file was excluded from pint checks."
-    severity: LOW
-    type: CODE_SMELL
-    link: https://cloudflare.github.io/pint/checks/ignore/file.html
-    line: 3
+text: |
+  :information_source: **Information** reported by [pint](https://cloudflare.github.io/pint/) **ignore/file** check.
+
+  <details>
+  <summary>This file was excluded from pint checks.</summary>
+
+  ```yaml
+  1 | # pint ignore/file
+      ^^^^^^^^^^^^^^^^^^
+  ```
+
+  This file was excluded from pint checks.
+
+  </details>
+
+  ------
+
+  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/ignore/file.html).
+severity: NORMAL
+anchor:
+  path: rules.yml
+  lineType: ADDED
+  fileType: TO
+  diffType: EFFECTIVE
+  line: 3
 --- END ---
 

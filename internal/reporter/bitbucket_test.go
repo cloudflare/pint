@@ -1,18 +1,17 @@
 package reporter_test
 
 import (
-	"errors"
+	"encoding/json"
 	"fmt"
 	"log/slog"
-	"net"
 	"net/http"
-	"os"
-	"path/filepath"
+	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/neilotoole/slogt"
+	"github.com/stretchr/testify/require"
 	"go.nhat.io/httpmock"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -23,15 +22,68 @@ import (
 	"github.com/cloudflare/pint/internal/reporter"
 )
 
-func TestBitBucketReporter(t *testing.T) {
-	type errorCheck func(err error) error
+func bbCommentText(severity, reporter, summary string) string {
+	icon := ":stop_sign:"
+	switch severity {
+	case "Warning":
+		icon = ":warning:"
+	case "Information":
+		icon = ":information_source:"
+	}
+	return icon + " **" + severity + "** reported by [pint](https://cloudflare.github.io/pint/) **" + reporter + "** check.\n\n------\n\n" + summary + "\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/" + reporter + ".html).\n"
+}
 
+const (
+	bbPRPath       = "/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests"
+	bbWhoami       = "/plugins/servlet/applinks/whoami"
+	bbActivities   = "/rest/api/latest/projects/proj/repos/repo/pull-requests/1/activities"
+	bbComments     = "/rest/api/1.0/projects/proj/repos/repo/pull-requests/1/comments"
+	bbFakeBranch   = "fake-branch"
+	bbFakeCommitID = "fake-commit-id"
+)
+
+func bbComment(id int) string {
+	return fmt.Sprintf("%s/%d", bbComments, id)
+}
+
+func bbExpectPR(s *httpmock.Server) {
+	s.ExpectGet(bbPRPath + "?start=0").ReturnJSON(reporter.BitBucketPullRequests{
+		Values: []reporter.BitBucketPullRequest{
+			{
+				ID:   1,
+				Open: true,
+				FromRef: reporter.BitBucketRef{
+					ID:     "refs/heads/fake-branch",
+					Commit: "fake-commit-id",
+				},
+				ToRef: reporter.BitBucketRef{
+					ID:     "refs/heads/main",
+					Commit: "main-commit-id",
+				},
+			},
+		},
+		IsLastPage: true,
+	})
+}
+
+func bbExpectWhoami(s *httpmock.Server) {
+	s.ExpectGet(bbWhoami).Return("user")
+}
+
+func bbExpectEmptyActivities(s *httpmock.Server) {
+	s.ExpectGet(bbActivities + "?start=0").ReturnJSON(
+		reporter.BitBucketPullRequestActivities{IsLastPage: true},
+	)
+}
+
+func TestBitBucketReporter(t *testing.T) {
 	type testCaseT struct {
 		mock           httpmock.Mocker
-		gitCmd         git.CommandRunner
-		errorHandler   errorCheck
+		errorHandler   func(err error) error
+		setupSummary   func(*reporter.Summary)
 		description    string
 		reports        []reporter.Report
+		maxComments    int
 		showDuplicates bool
 	}
 
@@ -43,2000 +95,1584 @@ func TestBitBucketReporter(t *testing.T) {
   expr: sum(errors) by (job)
 `))
 
-	fakeGit := func(args ...string) ([]byte, error) {
-		if args[0] == "rev-parse" && args[1] == "--verify" && args[2] == "HEAD" {
-			return []byte("fake-commit-id"), nil
-		}
-		if args[0] == "rev-parse" && args[1] == "--abbrev-ref" && args[2] == "HEAD" {
-			return []byte("fake-branch"), nil
-		}
-		return nil, nil
-	}
-
-	diagFile := filepath.Join(t.TempDir(), "diag.txt")
-	if err := os.WriteFile(diagFile, []byte("- record: target is down\n  expr: up == 0\n"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-
-	testCases := []testCaseT{
+	for _, tc := range []testCaseT{
 		{
-			description: "returns an error on git head failure",
-			gitCmd: func(args ...string) ([]byte, error) {
-				if args[0] == "rev-parse" && args[1] == "--verify" && args[2] == "HEAD" {
-					return nil, errors.New("git head error")
-				}
-				return nil, nil
-			},
-			mock: httpmock.New(func(_ *httpmock.Server) {}),
-			errorHandler: func(err error) error {
-				if err != nil && err.Error() == "failed to get git info: git head error" {
-					return nil
-				}
-				return fmt.Errorf("Expected git head error, got %w", err)
-			},
-		},
-		{
-			description: "returns an error on git branch failure",
-			gitCmd: func(args ...string) ([]byte, error) {
-				if args[0] == "rev-parse" && args[1] == "--verify" && args[2] == "HEAD" {
-					return []byte("fake-commit-id"), nil
-				}
-				if args[0] == "rev-parse" && args[1] == "--abbrev-ref" && args[2] == "HEAD" {
-					return nil, errors.New("git branch error")
-				}
-				return nil, nil
-			},
-			mock: httpmock.New(func(_ *httpmock.Server) {}),
-			errorHandler: func(err error) error {
-				if err != nil && err.Error() == "failed to get git info: git branch error" {
-					return nil
-				}
-				return fmt.Errorf("Expected git branch error, got %w", err)
-			},
-		},
-		{
-			description: "returns an error on non-200 HTTP response",
-			gitCmd:      fakeGit,
+			description: "no open pull request, no error",
+			maxComments: 50,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(bbPRPath + "?start=0").ReturnJSON(
+					reporter.BitBucketPullRequests{IsLastPage: true},
+				)
+			}),
 			reports: []reporter.Report{
 				{
 					Path: discovery.Path{
-						SymlinkTarget: "foo.txt",
-						Name:          "foo.txt",
+						Name:          "rule.yaml",
+						SymlinkTarget: "rule.yaml",
 					},
 					Changes: &discovery.Changes{
-						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
-					},
-					Rule:    mockFile.Groups[0].Rules[0],
-					Problem: checks.Problem{},
-				},
-			},
-			mock: httpmock.New(func(s *httpmock.Server) {
-				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					ReturnCode(http.StatusBadRequest).
-					Return("Bad Request").
-					Once()
-			}),
-			errorHandler: func(err error) error {
-				if err != nil && err.Error() == "failed to create BitBucket report: PUT request failed" {
-					return nil
-				}
-				return fmt.Errorf("Expected 'failed to create BitBucket report: PUT request failed', got %w", err)
-			},
-		},
-		{
-			description: "returns an error on HTTP response headers timeout",
-			gitCmd:      fakeGit,
-			reports: []reporter.Report{
-				{
-					Path: discovery.Path{
-						SymlinkTarget: "foo.txt",
-						Name:          "foo.txt",
-					},
-					Changes: &discovery.Changes{
-						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
-					},
-					Rule:    mockFile.Groups[0].Rules[0],
-					Problem: checks.Problem{},
-				},
-			},
-			mock: httpmock.New(func(s *httpmock.Server) {
-				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Run(func(_ *http.Request) ([]byte, error) {
-						time.Sleep(time.Second * 2)
-						return []byte("Bad Request"), nil
-					}).
-					ReturnCode(http.StatusBadRequest).
-					Once()
-			}),
-			errorHandler: func(err error) error {
-				if neterr, ok := errors.AsType[net.Error](errors.Unwrap(err)); ok && neterr.Timeout() {
-					return nil
-				}
-				return fmt.Errorf("Expected a timeout error, got %w", err)
-			},
-		},
-		{
-			description: "returns an error on HTTP response body timeout",
-			gitCmd:      fakeGit,
-			reports: []reporter.Report{
-				{
-					Path: discovery.Path{
-						SymlinkTarget: "foo.txt",
-						Name:          "foo.txt",
-					},
-					Changes: &discovery.Changes{
-						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 2, Modified: true}},
-					},
-					Rule:    mockFile.Groups[0].Rules[0],
-					Problem: checks.Problem{},
-				},
-			},
-			mock: httpmock.New(func(s *httpmock.Server) {
-				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Run(func(_ *http.Request) ([]byte, error) {
-						time.Sleep(time.Second * 2)
-						return []byte("Bad Request"), nil
-					}).
-					ReturnCode(http.StatusBadRequest).
-					Once()
-			}),
-			errorHandler: func(err error) error {
-				if neterr, ok := errors.AsType[net.Error](errors.Unwrap(err)); ok && neterr.Timeout() {
-					return nil
-				}
-				return fmt.Errorf("Expected a timeout error, got %w", err)
-			},
-		},
-		{
-			description: "sends a correct report that fails",
-			gitCmd:      fakeGit,
-			mock: httpmock.New(func(s *httpmock.Server) {
-				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					ReturnCode(http.StatusInternalServerError).
-					Return("Internal error").
-					Once()
-			}),
-			errorHandler: func(err error) error {
-				if err.Error() != "failed to create BitBucket report: PUT request failed" {
-					return fmt.Errorf("Unpexpected error: %w", err)
-				}
-				return nil
-			},
-		},
-		{
-			description: "sends a correct report but fails to delete annotations",
-			gitCmd:      fakeGit,
-			mock: httpmock.New(func(s *httpmock.Server) {
-				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
-					ReturnJSON(reporter.BitBucketPullRequests{
-						IsLastPage: true,
-						Values:     []reporter.BitBucketPullRequest{},
-					}).
-					Once()
-				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint/annotations").
-					ReturnCode(http.StatusInternalServerError).
-					Return("Internal error").
-					Once()
-			}),
-			errorHandler: func(err error) error {
-				if err.Error() != "failed to delete existing BitBucket code insight annotations: DELETE request failed" {
-					return fmt.Errorf("Unpexpected error: %w", err)
-				}
-				return nil
-			},
-		},
-		{
-			description: "sends a correct report but fails to create annotations",
-			gitCmd:      fakeGit,
-			reports: []reporter.Report{
-				{
-					Path: discovery.Path{
-						SymlinkTarget: "foo.txt",
-						Name:          "foo.txt",
-					},
-					Changes: &discovery.Changes{
-						OldPath: "",
-						Lines: []git.LineNumber{
-							{Before: 0, After: 2, Modified: true},
-							{Before: 0, After: 4, Modified: true},
-						},
-					},
-					Rule: mockFile.Groups[0].Rules[1],
-					Problem: checks.Problem{
-						Lines: diags.LineRange{
-							First: 1,
-							Last:  1,
-						},
-						Reporter: "mock",
-						Summary:  "this should be ignored, line is not part of the diff",
-						Severity: checks.Bug,
-					},
-				},
-				{
-					Path: discovery.Path{
-						SymlinkTarget: "bar.txt",
-						Name:          "bar.txt",
-					},
-					Changes: &discovery.Changes{
-						OldPath: "",
-						Lines:   git.LineNumbers{},
-					},
-					Rule: mockFile.Groups[0].Rules[1],
-					Problem: checks.Problem{
-						Lines: diags.LineRange{
-							First: 1,
-							Last:  1,
-						},
-						Reporter: "mock",
-						Summary:  "this should be ignored, file is not part of the diff",
-						Severity: checks.Bug,
-					},
-				},
-				{
-					Path: discovery.Path{
-						SymlinkTarget: "foo.txt",
-						Name:          "foo.txt",
-					},
-					Changes: &discovery.Changes{
-						OldPath: "",
-						Lines: []git.LineNumber{
-							{Before: 0, After: 2, Modified: true},
-							{Before: 0, After: 4, Modified: true},
-						},
-					},
-					Rule: mockFile.Groups[0].Rules[1],
-					Problem: checks.Problem{
-						Lines: diags.LineRange{
-							First: 2,
-							Last:  2,
-						},
-						Reporter: "mock",
-						Summary:  "bad name",
-						Severity: checks.Fatal,
-					},
-				},
-				{
-					Path: discovery.Path{
-						SymlinkTarget: "foo.txt",
-						Name:          "foo.txt",
-					},
-					Changes: &discovery.Changes{
-						OldPath: "",
-						Lines: []git.LineNumber{
-							{Before: 0, After: 2, Modified: true},
-							{Before: 0, After: 4, Modified: true},
-						},
+						Lines: git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
-						Lines: diags.LineRange{
-							First: 2,
-							Last:  2,
-						},
+						Lines:    diags.LineRange{First: 2, Last: 2},
 						Reporter: "mock",
-						Summary:  "mock text",
+						Summary:  "mock error",
 						Severity: checks.Bug,
-					},
-				},
-				{
-					Path: discovery.Path{
-						SymlinkTarget: "foo.txt",
-						Name:          "foo.txt",
-					},
-					Changes: &discovery.Changes{
-						OldPath: "",
-						Lines: []git.LineNumber{
-							{Before: 0, After: 2, Modified: true},
-							{Before: 0, After: 4, Modified: true},
-						},
-					},
-					Rule: mockFile.Groups[0].Rules[1],
-					Problem: checks.Problem{
-						Lines: diags.LineRange{
-							First: 4,
-							Last:  4,
-						},
-						Reporter: "mock",
-						Summary:  "mock text 2",
-						Severity: checks.Warning,
+						Anchor:   checks.AnchorAfter,
 					},
 				},
 			},
-			mock: httpmock.New(func(s *httpmock.Server) {
-				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
-					ReturnJSON(reporter.BitBucketPullRequests{
-						IsLastPage: true,
-						Values:     []reporter.BitBucketPullRequest{},
-					}).
-					Once()
-				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint/annotations").
-					Once()
-				s.ExpectPost("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint/annotations").
-					ReturnCode(http.StatusInternalServerError).
-					Return("Internal error").
-					Once()
-			}),
-			errorHandler: func(err error) error {
-				if err.Error() != "failed to create BitBucket code insight annotations: POST request failed" {
-					return fmt.Errorf("Unpexpected error: %w", err)
-				}
-				return nil
-			},
 		},
 		{
-			description: "pull requests get fails",
-			gitCmd:      fakeGit,
+			description: "pull request found, comment created",
+			maxComments: 50,
 			mock: httpmock.New(func(s *httpmock.Server) {
-				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
-					ReturnCode(http.StatusInternalServerError).
-					Return("Internal error").
-					Once()
-			}),
-			errorHandler: func(err error) error {
-				if err.Error() != "failed to get open pull requests from BitBucket: GET request failed" {
-					return fmt.Errorf("Unpexpected error: %w", err)
-				}
-				return nil
-			},
-		},
-		{
-			description: "pull request changes get fails",
-			gitCmd:      fakeGit,
-			mock: httpmock.New(func(s *httpmock.Server) {
-				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
-					ReturnJSON(reporter.BitBucketPullRequests{
-						IsLastPage: true,
-						Values: []reporter.BitBucketPullRequest{
-							{
-								ID:   102,
-								Open: true,
-								FromRef: reporter.BitBucketRef{
-									ID:     "refs/heads/fake-branch",
-									Commit: "fake-commit-id",
-								},
-								ToRef: reporter.BitBucketRef{
-									ID:     "refs/heads/main",
-									Commit: "main-commit-id",
-								},
-							},
+				bbExpectPR(s)
+				bbExpectWhoami(s)
+				bbExpectEmptyActivities(s)
+				s.ExpectPost(bbComments).
+					WithBodyJSON(reporter.BitBucketPendingComment{
+						Text:     bbCommentText("Bug", "mock", "mock error"),
+						Severity: "NORMAL",
+						Anchor: reporter.BitBucketPendingCommentAnchor{
+							Path:     "rule.yaml",
+							Line:     2,
+							LineType: "ADDED",
+							FileType: "TO",
+							DiffType: "EFFECTIVE",
 						},
 					}).
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes?start=0").
-					ReturnCode(http.StatusInternalServerError).
-					Return("Internal error").
-					Once()
-			}),
-			errorHandler: func(err error) error {
-				if err.Error() != "failed to get pull request changes from BitBucket: GET request failed" {
-					return fmt.Errorf("Unpexpected error: %w", err)
-				}
-				return nil
-			},
-		},
-		{
-			description: "pull request comments get fails",
-			gitCmd:      fakeGit,
-			mock: httpmock.New(func(s *httpmock.Server) {
-				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
-					ReturnJSON(reporter.BitBucketPullRequests{
-						IsLastPage: true,
-						Values: []reporter.BitBucketPullRequest{
-							{
-								ID:   102,
-								Open: true,
-								FromRef: reporter.BitBucketRef{
-									ID:     "refs/heads/fake-branch",
-									Commit: "fake-commit-id",
-								},
-								ToRef: reporter.BitBucketRef{
-									ID:     "refs/heads/main",
-									Commit: "main-commit-id",
-								},
-							},
-						},
-					}).
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes?start=0").
-					ReturnJSON(reporter.BitBucketPullRequestChanges{
-						IsLastPage: true,
-						Values:     []reporter.BitBucketPullRequestChange{},
-					}).
-					Once()
-				s.ExpectGet("/plugins/servlet/applinks/whoami").
-					Return("testuser").
-					Once()
-				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/pull-requests/102/activities?start=0").
-					ReturnCode(http.StatusInternalServerError).
-					Return("Internal error").
-					Once()
-			}),
-			errorHandler: func(err error) error {
-				if err.Error() != "failed to get pull request comments from BitBucket: GET request failed" {
-					return fmt.Errorf("Unpexpected error: %w", err)
-				}
-				return nil
-			},
-		},
-		{
-			description: "sends a correct report",
-			gitCmd:      fakeGit,
-			mock: httpmock.New(func(s *httpmock.Server) {
-				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
-					ReturnJSON(reporter.BitBucketPullRequests{IsLastPage: true}).
-					Once()
-				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint/annotations").
-					Once()
-				s.ExpectPost("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint/annotations").
-					Once()
+					ReturnCode(http.StatusCreated)
 			}),
 			reports: []reporter.Report{
 				{
 					Path: discovery.Path{
-						SymlinkTarget: "foo.txt",
-						Name:          "foo.txt",
+						Name:          "rule.yaml",
+						SymlinkTarget: "rule.yaml",
 					},
 					Changes: &discovery.Changes{
-						OldPath: "",
-						Lines: []git.LineNumber{
-							{Before: 0, After: 2, Modified: true},
-							{Before: 0, After: 4, Modified: true},
-						},
-					},
-					Rule: mockFile.Groups[0].Rules[1],
-					Problem: checks.Problem{
-						Lines: diags.LineRange{
-							First: 1,
-							Last:  1,
-						},
-						Reporter: "mock",
-						Summary:  "line is not part of the diff",
-						Severity: checks.Bug,
-					},
-				},
-				{
-					Path: discovery.Path{
-						SymlinkTarget: "foo.txt",
-						Name:          "foo.txt",
-					},
-					Changes: &discovery.Changes{
-						OldPath: "",
-						Lines: []git.LineNumber{
-							{Before: 0, After: 2, Modified: true},
-							{Before: 0, After: 4, Modified: true},
-						},
-					},
-					Rule: mockFile.Groups[0].Rules[1],
-					Problem: checks.Problem{
-						Lines: diags.LineRange{
-							First: 2,
-							Last:  2,
-						},
-						Reporter: "mock",
-						Summary:  "bad name",
-						Severity: checks.Fatal,
-					},
-				},
-				{
-					Path: discovery.Path{
-						SymlinkTarget: "foo.txt",
-						Name:          "foo.txt",
-					},
-					Changes: &discovery.Changes{
-						OldPath: "",
-						Lines: []git.LineNumber{
-							{Before: 0, After: 2, Modified: true},
-							{Before: 0, After: 4, Modified: true},
-						},
+						Lines: git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
-						Lines: diags.LineRange{
-							First: 2,
-							Last:  2,
-						},
+						Lines:    diags.LineRange{First: 2, Last: 2},
 						Reporter: "mock",
-						Summary:  "mock text",
+						Summary:  "mock error",
 						Severity: checks.Bug,
+						Anchor:   checks.AnchorAfter,
 					},
 				},
-				{
-					Path: discovery.Path{
-						SymlinkTarget: "foo.txt",
-						Name:          "foo.txt",
-					},
-					Changes: &discovery.Changes{
-						OldPath: "",
-						Lines: []git.LineNumber{
-							{Before: 0, After: 2, Modified: true},
-							{Before: 0, After: 4, Modified: true},
-						},
-					},
-					Rule: mockFile.Groups[0].Rules[1],
-					Problem: checks.Problem{
-						Lines: diags.LineRange{
-							First: 4,
-							Last:  4,
-						},
-						Reporter: "mock",
-						Summary:  "mock text 2",
-						Severity: checks.Warning,
-					},
-				},
-			},
-			errorHandler: func(err error) error {
-				if err.Error() != "fatal error(s) reported" {
-					return fmt.Errorf("Unpexpected error: %w", err)
-				}
-				return nil
 			},
 		},
 		{
-			description: "FATAL errors are always reported, regardless of line number",
-			gitCmd:      fakeGit,
+			description: "fatal problem comment created",
+			maxComments: 50,
 			mock: httpmock.New(func(s *httpmock.Server) {
-				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
-					ReturnJSON(reporter.BitBucketPullRequests{IsLastPage: true}).
-					Once()
-				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint/annotations").
-					Once()
-				s.ExpectPost("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint/annotations").
-					Once()
+				bbExpectPR(s)
+				bbExpectWhoami(s)
+				bbExpectEmptyActivities(s)
+				s.ExpectPost(bbComments).
+					WithBodyJSON(reporter.BitBucketPendingComment{
+						Text:     bbCommentText("Fatal", "mock", "fatal problem"),
+						Severity: "NORMAL",
+						Anchor: reporter.BitBucketPendingCommentAnchor{
+							Path:     "rule.yaml",
+							Line:     2,
+							LineType: "ADDED",
+							FileType: "TO",
+							DiffType: "EFFECTIVE",
+						},
+					}).
+					ReturnCode(http.StatusCreated)
 			}),
 			reports: []reporter.Report{
 				{
 					Path: discovery.Path{
-						SymlinkTarget: "foo.txt",
-						Name:          "foo.txt",
+						Name:          "rule.yaml",
+						SymlinkTarget: "rule.yaml",
 					},
 					Changes: &discovery.Changes{
-						OldPath: "",
-						Lines: git.LineNumbers{
-							{Before: 0, After: 3, Modified: true},
-							{Before: 0, After: 4, Modified: true},
-						},
-					},
-					Rule: mockFile.Groups[0].Rules[1],
-					Problem: checks.Problem{
-						Lines: diags.LineRange{
-							First: 1,
-							Last:  1,
-						},
-						Reporter: "test/mock",
-						Summary:  "syntax error",
-						Severity: checks.Fatal,
-					},
-				},
-			},
-			errorHandler: func(err error) error {
-				if err.Error() != "fatal error(s) reported" {
-					return fmt.Errorf("Unpexpected error: %w", err)
-				}
-				return nil
-			},
-		},
-		{
-			// Covers bitbucket.go:49-51 — deleteReport error is logged but does not stop the flow.
-			description: "deleteReport fails but flow continues",
-			gitCmd:      fakeGit,
-			mock: httpmock.New(func(s *httpmock.Server) {
-				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					ReturnCode(http.StatusInternalServerError).
-					Once()
-				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
-					ReturnJSON(reporter.BitBucketPullRequests{IsLastPage: true}).
-					Once()
-				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint/annotations").
-					Once()
-			}),
-			errorHandler: func(err error) error {
-				if err != nil {
-					return fmt.Errorf("Unpexpected error: %w", err)
-				}
-				return nil
-			},
-		},
-		{
-			description: "sends a correct empty report",
-			gitCmd:      fakeGit,
-			mock: httpmock.New(func(s *httpmock.Server) {
-				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
-					ReturnJSON(reporter.BitBucketPullRequests{IsLastPage: true}).
-					Once()
-				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint/annotations").
-					Once()
-			}),
-			errorHandler: func(err error) error {
-				if err != nil {
-					return fmt.Errorf("Unpexpected error: %w", err)
-				}
-				return nil
-			},
-		},
-		{
-			description: "reports failures from unmodified lines",
-			gitCmd:      fakeGit,
-			mock: httpmock.New(func(s *httpmock.Server) {
-				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
-					ReturnJSON(reporter.BitBucketPullRequests{IsLastPage: true}).
-					Once()
-				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint/annotations").
-					Once()
-				s.ExpectPost("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint/annotations").
-					Once()
-			}),
-			reports: []reporter.Report{
-				{
-					Path: discovery.Path{
-						SymlinkTarget: "foo.txt",
-						Name:          "foo.txt",
-					},
-					Rule: mockFile.Groups[0].Rules[1],
-					Changes: &discovery.Changes{
-						OldPath: "",
-						Lines: []git.LineNumber{
-							{Before: 0, After: 2, Modified: true},
-							{Before: 0, After: 4, Modified: true},
-						},
-					},
-					Problem: checks.Problem{
-						Lines: diags.LineRange{
-							First: 1,
-							Last:  1,
-						},
-						Reporter: "mock",
-						Summary:  "this line is not part of the diff",
-						Severity: checks.Bug,
-					},
-				},
-				{
-					Path: discovery.Path{
-						SymlinkTarget: "foo.txt",
-						Name:          "foo.txt",
-					},
-					Rule: mockFile.Groups[0].Rules[1],
-					Changes: &discovery.Changes{
-						OldPath: "",
-						Lines: []git.LineNumber{
-							{Before: 0, After: 2, Modified: true},
-							{Before: 0, After: 4, Modified: true},
-						},
-					},
-					Problem: checks.Problem{
-						Lines: diags.LineRange{
-							First: 2,
-							Last:  2,
-						},
-						Reporter: "mock",
-						Summary:  "bad name",
-						Severity: checks.Bug,
-					},
-				},
-				{
-					Path: discovery.Path{
-						SymlinkTarget: "foo.txt",
-						Name:          "foo.txt",
+						Lines: git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
-					Changes: &discovery.Changes{
-						OldPath: "",
-						Lines: []git.LineNumber{
-							{Before: 0, After: 2, Modified: true},
-							{Before: 0, After: 4, Modified: true},
-						},
-					},
 					Problem: checks.Problem{
-						Lines: diags.LineRange{
-							First: 2,
-							Last:  2,
-						},
+						Lines:    diags.LineRange{First: 2, Last: 2},
 						Reporter: "mock",
-						Summary:  "mock text",
-						Severity: checks.Bug,
+						Summary:  "fatal problem",
+						Severity: checks.Fatal,
+						Anchor:   checks.AnchorAfter,
 					},
 				},
+			},
+		},
+		{
+			description: "stale comment deleted",
+			maxComments: 50,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				bbExpectPR(s)
+				bbExpectWhoami(s)
+				s.ExpectGet(bbActivities + "?start=0").ReturnJSON(
+					reporter.BitBucketPullRequestActivities{
+						Values: []reporter.BitBucketPullRequestActivity{
+							{
+								Action:        "COMMENTED",
+								CommentAction: "ADDED",
+								Comment: reporter.BitBucketPullRequestComment{
+									ID:       100,
+									Version:  1,
+									State:    "OPEN",
+									Severity: "NORMAL",
+									Text:     "stale comment text",
+									Author:   reporter.BitBucketCommentAuthor{Name: "user"},
+								},
+								CommentAnchor: reporter.BitBucketCommentAnchor{
+									Path: "old.yaml",
+									Line: 5,
+								},
+							},
+						},
+						IsLastPage: true,
+					},
+				)
+				s.ExpectPost(bbComments).
+					WithBodyJSON(reporter.BitBucketPendingComment{
+						Text:     bbCommentText("Warning", "mock", "new problem"),
+						Severity: "NORMAL",
+						Anchor: reporter.BitBucketPendingCommentAnchor{
+							Path:     "rule.yaml",
+							Line:     2,
+							LineType: "ADDED",
+							FileType: "TO",
+							DiffType: "EFFECTIVE",
+						},
+					}).
+					ReturnCode(http.StatusCreated)
+				s.ExpectDelete(bbComment(100) + "?version=1")
+			}),
+			reports: []reporter.Report{
 				{
 					Path: discovery.Path{
-						SymlinkTarget: "foo.txt",
-						Name:          "foo.txt",
+						Name:          "rule.yaml",
+						SymlinkTarget: "rule.yaml",
 					},
-					Rule: mockFile.Groups[0].Rules[1],
 					Changes: &discovery.Changes{
-						OldPath: "",
-						Lines: []git.LineNumber{
-							{Before: 0, After: 2, Modified: true},
-							{Before: 0, After: 4, Modified: true},
-						},
+						Lines: git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
+					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
-						Lines: diags.LineRange{
-							First: 4,
-							Last:  4,
-						},
+						Lines:    diags.LineRange{First: 2, Last: 2},
 						Reporter: "mock",
-						Summary:  "mock text 2",
+						Summary:  "new problem",
 						Severity: checks.Warning,
+						Anchor:   checks.AnchorAfter,
 					},
 				},
 			},
-			errorHandler: func(err error) error {
-				if err != nil {
-					return fmt.Errorf("Unpexpected error: %w", err)
-				}
-				return nil
-			},
 		},
 		{
-			description: "sends a correct report with pull request open",
-			gitCmd:      fakeGit,
+			description: "comment with replies resolved instead of deleted",
+			maxComments: 50,
 			mock: httpmock.New(func(s *httpmock.Server) {
-				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
-					ReturnJSON(reporter.BitBucketPullRequests{
-						IsLastPage: true,
-						Values: []reporter.BitBucketPullRequest{
+				bbExpectPR(s)
+				bbExpectWhoami(s)
+				s.ExpectGet(bbActivities + "?start=0").ReturnJSON(
+					reporter.BitBucketPullRequestActivities{
+						Values: []reporter.BitBucketPullRequestActivity{
 							{
-								ID:   101,
-								Open: false,
-								FromRef: reporter.BitBucketRef{
-									ID:     "refs/heads/feature",
-									Commit: "pr-commit-id",
+								Action:        "COMMENTED",
+								CommentAction: "ADDED",
+								Comment: reporter.BitBucketPullRequestComment{
+									ID:       200,
+									Version:  3,
+									State:    "OPEN",
+									Severity: "NORMAL",
+									Text:     "stale comment with reply",
+									Author:   reporter.BitBucketCommentAuthor{Name: "user"},
+									Comments: []reporter.BitBucketPullRequestComment{
+										{ID: 201, Text: "reply"},
+									},
 								},
-								ToRef: reporter.BitBucketRef{
-									ID:     "refs/heads/main",
-									Commit: "main-commit-id",
-								},
-							},
-							{
-								ID:   102,
-								Open: true,
-								FromRef: reporter.BitBucketRef{
-									ID:     "refs/heads/fake-branch",
-									Commit: "fake-commit-id",
-								},
-								ToRef: reporter.BitBucketRef{
-									ID:     "refs/heads/main",
-									Commit: "main-commit-id",
+								CommentAnchor: reporter.BitBucketCommentAnchor{
+									Path: "old.yaml",
+									Line: 5,
 								},
 							},
 						},
-					}).
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes?start=0").
-					ReturnJSON(reporter.BitBucketPullRequestChanges{IsLastPage: true}).
-					Once()
-				s.ExpectGet("/plugins/servlet/applinks/whoami").
-					Return("pint_user").
-					Once()
-				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/pull-requests/102/activities?start=0").
-					ReturnJSON(reporter.BitBucketPullRequestActivities{IsLastPage: true}).
-					Once()
+						IsLastPage: true,
+					},
+				)
+				s.ExpectPut(bbComment(200)).
+					WithBodyJSON(reporter.BitBucketCommentSeverityUpdate{
+						Severity: "BLOCKER",
+						Version:  3,
+					})
+				s.ExpectPut(bbComment(200)).
+					WithBodyJSON(reporter.BitBucketCommentStateUpdate{
+						State:   "RESOLVED",
+						Version: 3,
+					})
+			}),
+		},
+		{
+			description: "whoami failure returns error",
+			maxComments: 50,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				bbExpectPR(s)
+				s.ExpectGet(bbWhoami).ReturnCode(http.StatusInternalServerError)
 			}),
 			errorHandler: func(err error) error {
-				if err != nil {
-					return fmt.Errorf("Unpexpected error: %w", err)
+				if err != nil && err.Error() == "GET request failed" {
+					return nil
 				}
-				return nil
+				return fmt.Errorf("unexpected error: %w", err)
 			},
 		},
 		{
-			description: "sends a correct report using comments, deleting stale ones",
-			gitCmd:      fakeGit,
+			description: "post comment failure returns error",
+			maxComments: 50,
 			mock: httpmock.New(func(s *httpmock.Server) {
-				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
-					ReturnJSON(reporter.BitBucketPullRequests{
+				bbExpectPR(s)
+				bbExpectWhoami(s)
+				bbExpectEmptyActivities(s)
+				s.ExpectPost(bbComments).ReturnCode(http.StatusInternalServerError)
+			}),
+			errorHandler: func(err error) error {
+				if err != nil && err.Error() == "POST request failed" {
+					return nil
+				}
+				return fmt.Errorf("unexpected error: %w", err)
+			},
+			reports: []reporter.Report{
+				{
+					Path: discovery.Path{
+						Name:          "rule.yaml",
+						SymlinkTarget: "rule.yaml",
+					},
+					Changes: &discovery.Changes{
+						Lines: git.LineNumbers{{Before: 0, After: 2, Modified: true}},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Lines:    diags.LineRange{First: 2, Last: 2},
+						Reporter: "mock",
+						Summary:  "mock error",
+						Severity: checks.Bug,
+						Anchor:   checks.AnchorAfter,
+					},
+				},
+			},
+		},
+		{
+			description: "existing comment kept when content matches",
+			maxComments: 50,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				bbExpectPR(s)
+				bbExpectWhoami(s)
+				s.ExpectGet(bbActivities + "?start=0").ReturnJSON(
+					reporter.BitBucketPullRequestActivities{
+						Values: []reporter.BitBucketPullRequestActivity{
+							{
+								Action:        "COMMENTED",
+								CommentAction: "ADDED",
+								Comment: reporter.BitBucketPullRequestComment{
+									ID:       300,
+									Version:  1,
+									State:    "OPEN",
+									Severity: "NORMAL",
+									Text:     bbCommentText("Warning", "mock", "this matches"),
+									Author:   reporter.BitBucketCommentAuthor{Name: "user"},
+								},
+								CommentAnchor: reporter.BitBucketCommentAnchor{
+									Path: "rule.yaml",
+									Line: 2,
+								},
+							},
+						},
 						IsLastPage: true,
-						Values: []reporter.BitBucketPullRequest{
-							{
-								ID:   102,
-								Open: true,
-								FromRef: reporter.BitBucketRef{
-									ID:     "refs/heads/fake-branch",
-									Commit: "fake-commit-id",
-								},
-								ToRef: reporter.BitBucketRef{
-									ID:     "refs/heads/main",
-									Commit: "main-commit-id",
-								},
+					},
+				)
+			}),
+			reports: []reporter.Report{
+				{
+					Path: discovery.Path{
+						Name:          "rule.yaml",
+						SymlinkTarget: "rule.yaml",
+					},
+					Changes: &discovery.Changes{
+						Lines: git.LineNumbers{{Before: 0, After: 2, Modified: true}},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Lines:    diags.LineRange{First: 2, Last: 2},
+						Reporter: "mock",
+						Summary:  "this matches",
+						Severity: checks.Warning,
+						Anchor:   checks.AnchorAfter,
+					},
+				},
+			},
+		},
+		{
+			description: "PR found on second page of results",
+			maxComments: 50,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(bbPRPath + "?start=0").ReturnJSON(reporter.BitBucketPullRequests{
+					IsLastPage:    false,
+					NextPageStart: 1,
+					Values: []reporter.BitBucketPullRequest{
+						{
+							ID:      99,
+							Open:    true,
+							FromRef: reporter.BitBucketRef{ID: "refs/heads/other-branch"},
+							ToRef:   reporter.BitBucketRef{ID: "refs/heads/main"},
+						},
+					},
+				})
+				s.ExpectGet(bbPRPath + "?start=1").ReturnJSON(reporter.BitBucketPullRequests{
+					IsLastPage: true,
+					Values: []reporter.BitBucketPullRequest{
+						{
+							ID:   1,
+							Open: true,
+							FromRef: reporter.BitBucketRef{
+								ID:     "refs/heads/fake-branch",
+								Commit: "fake-commit-id",
+							},
+							ToRef: reporter.BitBucketRef{
+								ID:     "refs/heads/main",
+								Commit: "main-commit-id",
 							},
 						},
+					},
+				})
+				bbExpectWhoami(s)
+				bbExpectEmptyActivities(s)
+				s.ExpectPost(bbComments).
+					WithBodyJSON(reporter.BitBucketPendingComment{
+						Text:     bbCommentText("Bug", "mock", "mock error"),
+						Severity: "NORMAL",
+						Anchor: reporter.BitBucketPendingCommentAnchor{
+							Path:     "rule.yaml",
+							Line:     2,
+							LineType: "ADDED",
+							FileType: "TO",
+							DiffType: "EFFECTIVE",
+						},
 					}).
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes?start=0").
-					ReturnJSON(reporter.BitBucketPullRequestChanges{
+					ReturnCode(http.StatusCreated)
+			}),
+			reports: []reporter.Report{
+				{
+					Path: discovery.Path{
+						Name:          "rule.yaml",
+						SymlinkTarget: "rule.yaml",
+					},
+					Changes: &discovery.Changes{
+						Lines: git.LineNumbers{{Before: 0, After: 2, Modified: true}},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Lines:    diags.LineRange{First: 2, Last: 2},
+						Reporter: "mock",
+						Summary:  "mock error",
+						Severity: checks.Bug,
+						Anchor:   checks.AnchorAfter,
+					},
+				},
+			},
+		},
+		{
+			description: "comment filtering skips non-matching activities",
+			maxComments: 50,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				bbExpectPR(s)
+				bbExpectWhoami(s)
+				s.ExpectGet(bbActivities + "?start=0").ReturnJSON(
+					reporter.BitBucketPullRequestActivities{
+						Values: []reporter.BitBucketPullRequestActivity{
+							{
+								Action:        "APPROVED",
+								CommentAction: "ADDED",
+								Comment: reporter.BitBucketPullRequestComment{
+									ID:     10,
+									State:  "OPEN",
+									Author: reporter.BitBucketCommentAuthor{Name: "user"},
+								},
+							},
+							{
+								Action:        "COMMENTED",
+								CommentAction: "EDITED",
+								Comment: reporter.BitBucketPullRequestComment{
+									ID:     11,
+									State:  "OPEN",
+									Author: reporter.BitBucketCommentAuthor{Name: "user"},
+								},
+							},
+							{
+								Action:        "COMMENTED",
+								CommentAction: "ADDED",
+								Comment: reporter.BitBucketPullRequestComment{
+									ID:     12,
+									State:  "RESOLVED",
+									Author: reporter.BitBucketCommentAuthor{Name: "user"},
+								},
+							},
+							{
+								Action:        "COMMENTED",
+								CommentAction: "ADDED",
+								Comment: reporter.BitBucketPullRequestComment{
+									ID:     13,
+									State:  "OPEN",
+									Author: reporter.BitBucketCommentAuthor{Name: "otheruser"},
+								},
+							},
+							{
+								Action:        "COMMENTED",
+								CommentAction: "ADDED",
+								Comment: reporter.BitBucketPullRequestComment{
+									ID:       14,
+									State:    "OPEN",
+									Author:   reporter.BitBucketCommentAuthor{Name: "user"},
+									Severity: "BLOCKER",
+									Resolved: true,
+								},
+							},
+							{
+								Action:        "COMMENTED",
+								CommentAction: "ADDED",
+								Comment: reporter.BitBucketPullRequestComment{
+									ID:       15,
+									State:    "OPEN",
+									Author:   reporter.BitBucketCommentAuthor{Name: "user"},
+									Severity: "NORMAL",
+								},
+								CommentAnchor: reporter.BitBucketCommentAnchor{Orphaned: true},
+							},
+						},
 						IsLastPage: true,
-						Values: []reporter.BitBucketPullRequestChange{
-							{Path: reporter.BitBucketPath{ToString: "index.txt"}},
-							{Path: reporter.BitBucketPath{ToString: "foo.txt"}},
+					},
+				)
+				s.ExpectPost(bbComments).
+					WithBodyJSON(reporter.BitBucketPendingComment{
+						Text:     bbCommentText("Bug", "mock", "mock error"),
+						Severity: "NORMAL",
+						Anchor: reporter.BitBucketPendingCommentAnchor{
+							Path:     "rule.yaml",
+							Line:     2,
+							LineType: "ADDED",
+							FileType: "TO",
+							DiffType: "EFFECTIVE",
 						},
 					}).
-					Once()
-				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/index.txt?contextLines=10000&since=main-commit-id&whitespace=show&withComments=false").
-					ReturnJSON(reporter.BitBucketFileDiffs{
-						Diffs: []reporter.BitBucketFileDiff{
+					ReturnCode(http.StatusCreated)
+			}),
+			reports: []reporter.Report{
+				{
+					Path: discovery.Path{
+						Name:          "rule.yaml",
+						SymlinkTarget: "rule.yaml",
+					},
+					Changes: &discovery.Changes{
+						Lines: git.LineNumbers{{Before: 0, After: 2, Modified: true}},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Lines:    diags.LineRange{First: 2, Last: 2},
+						Reporter: "mock",
+						Summary:  "mock error",
+						Severity: checks.Bug,
+						Anchor:   checks.AnchorAfter,
+					},
+				},
+			},
+		},
+		{
+			description: "activities pagination across two pages",
+			maxComments: 50,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				bbExpectPR(s)
+				bbExpectWhoami(s)
+				s.ExpectGet(bbActivities + "?start=0").ReturnJSON(
+					reporter.BitBucketPullRequestActivities{
+						IsLastPage:    false,
+						NextPageStart: 1,
+						Values: []reporter.BitBucketPullRequestActivity{
 							{
-								Hunks: []reporter.BitBucketDiffHunk{
-									{
-										Segments: []reporter.BitBucketDiffSegment{
-											{
-												Type: "ADDED",
-												Lines: []reporter.BitBucketDiffLine{
-													{Source: 1, Destination: 1},
-													{Source: 5, Destination: 5},
-												},
-											},
-											{
-												Type: "CONTEXT",
-												Lines: []reporter.BitBucketDiffLine{
-													{Source: 10, Destination: 6},
-												},
-											},
-										},
-									},
+								Action:        "COMMENTED",
+								CommentAction: "ADDED",
+								Comment: reporter.BitBucketPullRequestComment{
+									ID:       500,
+									Version:  1,
+									State:    "OPEN",
+									Severity: "NORMAL",
+									Text:     "stale page 1",
+									Author:   reporter.BitBucketCommentAuthor{Name: "user"},
+								},
+								CommentAnchor: reporter.BitBucketCommentAnchor{
+									Path: "old.yaml",
+									Line: 5,
 								},
 							},
 						},
-					}).
-					Once()
-				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/foo.txt?contextLines=10000&since=main-commit-id&whitespace=show&withComments=false").
-					ReturnJSON(reporter.BitBucketFileDiffs{
-						Diffs: []reporter.BitBucketFileDiff{
-							{
-								Hunks: []reporter.BitBucketDiffHunk{
-									{
-										Segments: []reporter.BitBucketDiffSegment{
-											{
-												Type: "ADDED",
-												Lines: []reporter.BitBucketDiffLine{
-													{Source: 2, Destination: 2},
-												},
-											},
-										},
-									},
-								},
-							},
-							{
-								Hunks: []reporter.BitBucketDiffHunk{
-									{
-										Segments: []reporter.BitBucketDiffSegment{
-											{
-												Type: "MODIFIED",
-												Lines: []reporter.BitBucketDiffLine{
-													{Source: 3, Destination: 4},
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					}).
-					Once()
-				s.ExpectGet("/plugins/servlet/applinks/whoami").
-					Return("pint_user").
-					Once()
-				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/pull-requests/102/activities?start=0").
-					ReturnJSON(reporter.BitBucketPullRequestActivities{
+					},
+				)
+				s.ExpectGet(bbActivities + "?start=1").ReturnJSON(
+					reporter.BitBucketPullRequestActivities{
 						IsLastPage: true,
 						Values: []reporter.BitBucketPullRequestActivity{
-							{Action: "APPROVED"},
 							{
 								Action:        "COMMENTED",
 								CommentAction: "ADDED",
-								CommentAnchor: reporter.BitBucketCommentAnchor{
-									Orphaned: true,
-									LineType: "CONTEXT",
-									DiffType: "EFFECTIVE",
-									Path:     "foo.txt",
-									Line:     3,
-								},
 								Comment: reporter.BitBucketPullRequestComment{
-									ID:      1001,
-									Version: 0,
-									State:   "OPEN",
-									Author:  reporter.BitBucketCommentAuthor{Name: "pint_user"},
+									ID:       501,
+									Version:  1,
+									State:    "OPEN",
+									Severity: "NORMAL",
+									Text:     "stale page 2",
+									Author:   reporter.BitBucketCommentAuthor{Name: "user"},
+								},
+								CommentAnchor: reporter.BitBucketCommentAnchor{
+									Path: "old.yaml",
+									Line: 10,
 								},
 							},
+						},
+					},
+				)
+				s.ExpectPost(bbComments).
+					WithBodyJSON(reporter.BitBucketPendingComment{
+						Text:     bbCommentText("Bug", "mock", "mock error"),
+						Severity: "NORMAL",
+						Anchor: reporter.BitBucketPendingCommentAnchor{
+							Path:     "rule.yaml",
+							Line:     2,
+							LineType: "ADDED",
+							FileType: "TO",
+							DiffType: "EFFECTIVE",
+						},
+					}).
+					ReturnCode(http.StatusCreated)
+				s.ExpectDelete(bbComment(500) + "?version=1")
+				s.ExpectDelete(bbComment(501) + "?version=1")
+			}),
+			reports: []reporter.Report{
+				{
+					Path: discovery.Path{
+						Name:          "rule.yaml",
+						SymlinkTarget: "rule.yaml",
+					},
+					Changes: &discovery.Changes{
+						Lines: git.LineNumbers{{Before: 0, After: 2, Modified: true}},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Lines:    diags.LineRange{First: 2, Last: 2},
+						Reporter: "mock",
+						Summary:  "mock error",
+						Severity: checks.Bug,
+						Anchor:   checks.AnchorAfter,
+					},
+				},
+			},
+		},
+		{
+			description: "stale blocker comment with replies resolved directly",
+			maxComments: 50,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				bbExpectPR(s)
+				bbExpectWhoami(s)
+				s.ExpectGet(bbActivities + "?start=0").ReturnJSON(
+					reporter.BitBucketPullRequestActivities{
+						Values: []reporter.BitBucketPullRequestActivity{
 							{
 								Action:        "COMMENTED",
 								CommentAction: "ADDED",
-								CommentAnchor: reporter.BitBucketCommentAnchor{
-									Orphaned: true,
-									DiffType: "COMMIT",
-									Path:     "foo.txt",
-									Line:     10,
-								},
 								Comment: reporter.BitBucketPullRequestComment{
-									ID:      1002,
-									Version: 1,
-									State:   "OPEN",
-									Author:  reporter.BitBucketCommentAuthor{Name: "pint_user"},
-								},
-							},
-							{
-								Action:        "COMMENTED",
-								CommentAction: "ADDED",
-								CommentAnchor: reporter.BitBucketCommentAnchor{
-									Orphaned: true,
-									LineType: "REMOVED",
-									DiffType: "COMMIT",
-									Path:     "foo.txt",
-									Line:     14,
-								},
-								Comment: reporter.BitBucketPullRequestComment{
-									ID:       1003,
+									ID:       650,
 									Version:  1,
 									State:    "OPEN",
 									Severity: "BLOCKER",
-									Author:   reporter.BitBucketCommentAuthor{Name: "pint_user"},
+									Text:     "stale blocker with reply",
+									Author:   reporter.BitBucketCommentAuthor{Name: "user"},
+									Comments: []reporter.BitBucketPullRequestComment{
+										{ID: 651, Text: "a reply"},
+									},
 								},
-							},
-							{
-								Action:        "COMMENTED",
-								CommentAction: "ADDED",
 								CommentAnchor: reporter.BitBucketCommentAnchor{
-									Orphaned: false,
-									DiffType: "EFFECTIVE",
-									Path:     "foo.txt",
-									Line:     3,
-								},
-								Comment: reporter.BitBucketPullRequestComment{
-									ID:      2001,
-									Version: 0,
-									State:   "OPEN",
-									Author:  reporter.BitBucketCommentAuthor{Name: "pint_user"},
-								},
-							},
-							{
-								Action:        "COMMENTED",
-								CommentAction: "ADDED",
-								CommentAnchor: reporter.BitBucketCommentAnchor{
-									Orphaned: false,
-									DiffType: "COMMIT",
-									Path:     "foo.txt",
-									Line:     4,
-								},
-								Comment: reporter.BitBucketPullRequestComment{
-									ID:      2002,
-									Version: 1,
-									State:   "OPEN",
-									Author:  reporter.BitBucketCommentAuthor{Name: "pint_user"},
+									Path: "old.yaml",
+									Line: 5,
 								},
 							},
 						},
+						IsLastPage: true,
+					},
+				)
+				s.ExpectPost(bbComments).
+					WithBodyJSON(reporter.BitBucketPendingComment{
+						Text:     bbCommentText("Warning", "mock", "new problem"),
+						Severity: "NORMAL",
+						Anchor: reporter.BitBucketPendingCommentAnchor{
+							Path:     "rule.yaml",
+							Line:     2,
+							LineType: "ADDED",
+							FileType: "TO",
+							DiffType: "EFFECTIVE",
+						},
 					}).
-					Once()
-				// pruneComments deletes stale comments.
-				s.ExpectDelete("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments/1001?version=0").
-					Once()
-				s.ExpectDelete("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments/1002?version=1").
-					Once()
-				// 1003 has 0 replies -> deleteComment.
-				s.ExpectDelete("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments/1003?version=1").
-					Once()
-				s.ExpectDelete("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments/2001?version=0").
-					Once()
-				s.ExpectDelete("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments/2002?version=1").
-					Once()
-				// addComments posts 4 new comments.
-				s.ExpectPost("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments").
-					Once()
-				s.ExpectPost("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments").
-					Once()
-				s.ExpectPost("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments").
-					Once()
-				s.ExpectPost("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments").
-					Once()
+					ReturnCode(http.StatusCreated)
+				s.ExpectPut(bbComment(650)).
+					WithBodyJSON(reporter.BitBucketCommentStateUpdate{
+						State:   "RESOLVED",
+						Version: 1,
+					})
 			}),
 			reports: []reporter.Report{
 				{
 					Path: discovery.Path{
-						SymlinkTarget: "foo.txt",
-						Name:          "foo.txt",
+						Name:          "rule.yaml",
+						SymlinkTarget: "rule.yaml",
 					},
 					Changes: &discovery.Changes{
-						OldPath: "",
-						Lines: []git.LineNumber{
-							{Before: 0, After: 2, Modified: true},
-							{Before: 0, After: 4, Modified: true},
-						},
-					},
-					Rule: mockFile.Groups[0].Rules[1],
-					Problem: checks.Problem{
-						Lines: diags.LineRange{
-							First: 1,
-							Last:  1,
-						},
-						Reporter: "mock",
-						Summary:  "this should be ignored, line is not part of the diff",
-						Severity: checks.Bug,
-					},
-				},
-				{
-					Path: discovery.Path{
-						SymlinkTarget: "foo.txt",
-						Name:          "foo.txt",
-					},
-					Changes: &discovery.Changes{
-						OldPath: "",
-						Lines: []git.LineNumber{
-							{Before: 0, After: 2, Modified: true},
-							{Before: 0, After: 4, Modified: true},
-						},
-					},
-					Rule: mockFile.Groups[0].Rules[1],
-					Problem: checks.Problem{
-						Lines: diags.LineRange{
-							First: 2,
-							Last:  2,
-						},
-						Reporter: "mock",
-						Summary:  "bad name",
-						Severity: checks.Fatal,
-					},
-				},
-				{
-					Path: discovery.Path{
-						SymlinkTarget: "foo.txt",
-						Name:          "foo.txt",
-					},
-					Changes: &discovery.Changes{
-						OldPath: "",
-						Lines: []git.LineNumber{
-							{Before: 0, After: 2, Modified: true},
-							{Before: 0, After: 4, Modified: true},
-						},
+						Lines: git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
-						Lines: diags.LineRange{
-							First: 2,
-							Last:  2,
-						},
+						Lines:    diags.LineRange{First: 2, Last: 2},
 						Reporter: "mock",
-						Summary:  "mock text",
-						Details:  "mock details",
-						Severity: checks.Bug,
-					},
-				},
-				{
-					Path: discovery.Path{
-						SymlinkTarget: "foo.txt",
-						Name:          "symlink.txt",
-					},
-					Changes: &discovery.Changes{
-						OldPath: "",
-						Lines: []git.LineNumber{
-							{Before: 0, After: 2, Modified: true},
-							{Before: 0, After: 4, Modified: true},
-						},
-					},
-					Rule: mockFile.Groups[0].Rules[1],
-					Problem: checks.Problem{
-						Lines: diags.LineRange{
-							First: 4,
-							Last:  4,
-						},
-						Reporter: "mock",
-						Summary:  "mock text 2",
+						Summary:  "new problem",
 						Severity: checks.Warning,
+						Anchor:   checks.AnchorAfter,
 					},
 				},
-			},
-			errorHandler: func(err error) error {
-				if err.Error() != "fatal error(s) reported" {
-					return fmt.Errorf("Unpexpected error: %w", err)
-				}
-				return nil
 			},
 		},
 		{
-			description: "sends a correct report using comments, fails to delete stale comments",
-			gitCmd:      fakeGit,
+			description: "stale comment with replies and non-BLOCKER severity gets upgraded then resolved",
+			maxComments: 50,
 			mock: httpmock.New(func(s *httpmock.Server) {
-				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
-					ReturnJSON(reporter.BitBucketPullRequests{
-						IsLastPage: true,
-						Values: []reporter.BitBucketPullRequest{
-							{
-								ID:   102,
-								Open: true,
-								FromRef: reporter.BitBucketRef{
-									ID:     "refs/heads/fake-branch",
-									Commit: "fake-commit-id",
-								},
-								ToRef: reporter.BitBucketRef{
-									ID:     "refs/heads/main",
-									Commit: "main-commit-id",
-								},
-							},
-						},
-					}).
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes?start=0").
-					ReturnJSON(reporter.BitBucketPullRequestChanges{
-						IsLastPage: true,
-						Values: []reporter.BitBucketPullRequestChange{
-							{
-								Path: reporter.BitBucketPath{
-									ToString: "index.txt",
-								},
-							},
-						},
-					}).
-					Once()
-				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/index.txt?contextLines=10000&since=main-commit-id&whitespace=show&withComments=false").
-					ReturnJSON(reporter.BitBucketFileDiffs{
-						Diffs: []reporter.BitBucketFileDiff{
-							{
-								Hunks: []reporter.BitBucketDiffHunk{
-									{
-										Segments: []reporter.BitBucketDiffSegment{
-											{
-												Type: "ADDED",
-												Lines: []reporter.BitBucketDiffLine{
-													{Source: 1, Destination: 1},
-													{Source: 5, Destination: 5},
-												},
-											},
-											{
-												Type: "CONTEXT",
-												Lines: []reporter.BitBucketDiffLine{
-													{Source: 10, Destination: 6},
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					}).
-					Once()
-				s.ExpectGet("/plugins/servlet/applinks/whoami").
-					Return("pint_user").
-					Once()
-				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/pull-requests/102/activities?start=0").
-					ReturnJSON(reporter.BitBucketPullRequestActivities{
-						IsLastPage: true,
+				bbExpectPR(s)
+				bbExpectWhoami(s)
+				s.ExpectGet(bbActivities + "?start=0").ReturnJSON(
+					reporter.BitBucketPullRequestActivities{
 						Values: []reporter.BitBucketPullRequestActivity{
 							{
 								Action:        "COMMENTED",
 								CommentAction: "ADDED",
-								CommentAnchor: reporter.BitBucketCommentAnchor{
-									Orphaned: false,
-									DiffType: "EFFECTIVE",
-									Path:     "index.txt",
-									Line:     3,
-								},
 								Comment: reporter.BitBucketPullRequestComment{
-									ID:      1001,
-									Version: 0,
-									State:   "OPEN",
-									Author: reporter.BitBucketCommentAuthor{
-										Name: "pint_user",
+									ID:       600,
+									Version:  2,
+									State:    "OPEN",
+									Severity: "NORMAL",
+									Text:     "stale non-blocker with reply",
+									Author:   reporter.BitBucketCommentAuthor{Name: "user"},
+									Comments: []reporter.BitBucketPullRequestComment{
+										{ID: 601, Text: "a reply"},
 									},
 								},
-							},
-							{
-								Action:        "COMMENTED",
-								CommentAction: "ADDED",
 								CommentAnchor: reporter.BitBucketCommentAnchor{
-									Orphaned: false,
-									DiffType: "COMMIT",
-									Path:     "index.txt",
-									Line:     10,
-								},
-								Comment: reporter.BitBucketPullRequestComment{
-									ID:      1002,
-									Version: 1,
-									State:   "OPEN",
-									Author: reporter.BitBucketCommentAuthor{
-										Name: "pint_user",
-									},
+									Path: "old.yaml",
+									Line: 5,
 								},
 							},
 						},
-					}).
-					Once()
-				// pruneComments will try to delete both comments, which fails (500), but errors are only logged.
-				s.ExpectDelete("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments/1001?version=0").
-					ReturnCode(http.StatusInternalServerError).
-					Once()
-				s.ExpectDelete("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments/1002?version=1").
-					ReturnCode(http.StatusInternalServerError).
-					Once()
-			}),
-			errorHandler: func(err error) error {
-				if err != nil {
-					return fmt.Errorf("Unpexpected error: %w", err)
-				}
-				return nil
-			},
-		},
-		{
-			description: "sends a correct report using comments, fails to get username",
-			gitCmd:      fakeGit,
-			mock: httpmock.New(func(s *httpmock.Server) {
-				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
-					ReturnJSON(reporter.BitBucketPullRequests{
 						IsLastPage: true,
-						Values: []reporter.BitBucketPullRequest{
-							{
-								ID:   102,
-								Open: true,
-								FromRef: reporter.BitBucketRef{
-									ID:     "refs/heads/fake-branch",
-									Commit: "fake-commit-id",
-								},
-								ToRef: reporter.BitBucketRef{
-									ID:     "refs/heads/main",
-									Commit: "main-commit-id",
-								},
-							},
-						},
-					}).
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes?start=0").
-					ReturnJSON(reporter.BitBucketPullRequestChanges{
-						IsLastPage: true,
-						Values: []reporter.BitBucketPullRequestChange{
-							{
-								Path: reporter.BitBucketPath{
-									ToString: "index.txt",
-								},
-							},
-						},
-					}).
-					Once()
-				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/index.txt?contextLines=10000&since=main-commit-id&whitespace=show&withComments=false").
-					ReturnJSON(reporter.BitBucketFileDiffs{
-						Diffs: []reporter.BitBucketFileDiff{
-							{
-								Hunks: []reporter.BitBucketDiffHunk{
-									{
-										Segments: []reporter.BitBucketDiffSegment{
-											{
-												Type: "ADDED",
-												Lines: []reporter.BitBucketDiffLine{
-													{Source: 1, Destination: 1},
-													{Source: 5, Destination: 5},
-												},
-											},
-											{
-												Type: "CONTEXT",
-												Lines: []reporter.BitBucketDiffLine{
-													{Source: 10, Destination: 6},
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					}).
-					Once()
-				s.ExpectGet("/plugins/servlet/applinks/whoami").
-					ReturnCode(http.StatusInternalServerError).
-					Once()
-			}),
-			errorHandler: func(err error) error {
-				if err.Error() != "failed to get pull request comments from BitBucket: GET request failed" {
-					return fmt.Errorf("Unpexpected error: %w", err)
-				}
-				return nil
-			},
-		},
-		{
-			description: "sends a correct report using comments, fails to create new comments",
-			gitCmd:      fakeGit,
-			reports: []reporter.Report{
-				{
-					Path: discovery.Path{
-						SymlinkTarget: "index.txt",
-						Name:          "foo.txt",
 					},
-					Changes: &discovery.Changes{
-						OldPath: "",
-						Lines: []git.LineNumber{
-							{Before: 0, After: 2, Modified: true},
-							{Before: 0, After: 4, Modified: true},
-						},
-					},
-					Rule: mockFile.Groups[0].Rules[1],
-					Problem: checks.Problem{
-						Lines: diags.LineRange{
-							First: 1,
-							Last:  1,
-						},
-						Reporter: "mock",
-						Summary:  "this should be ignored, line is not part of the diff",
-						Severity: checks.Bug,
-					},
-				},
-			},
-			mock: httpmock.New(func(s *httpmock.Server) {
-				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
-					ReturnJSON(reporter.BitBucketPullRequests{
-						IsLastPage: true,
-						Values: []reporter.BitBucketPullRequest{
-							{
-								ID:   102,
-								Open: true,
-								FromRef: reporter.BitBucketRef{
-									ID:     "refs/heads/fake-branch",
-									Commit: "fake-commit-id",
-								},
-								ToRef: reporter.BitBucketRef{
-									ID:     "refs/heads/main",
-									Commit: "main-commit-id",
-								},
-							},
+				)
+				s.ExpectPost(bbComments).
+					WithBodyJSON(reporter.BitBucketPendingComment{
+						Text:     bbCommentText("Warning", "mock", "new problem"),
+						Severity: "NORMAL",
+						Anchor: reporter.BitBucketPendingCommentAnchor{
+							Path:     "rule.yaml",
+							Line:     2,
+							LineType: "ADDED",
+							FileType: "TO",
+							DiffType: "EFFECTIVE",
 						},
 					}).
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes?start=0").
-					ReturnJSON(reporter.BitBucketPullRequestChanges{
-						IsLastPage: true,
-						Values: []reporter.BitBucketPullRequestChange{
-							{
-								Path: reporter.BitBucketPath{
-									ToString: "index.txt",
-								},
-							},
-						},
-					}).
-					Once()
-				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/index.txt?contextLines=10000&since=main-commit-id&whitespace=show&withComments=false").
-					ReturnJSON(reporter.BitBucketFileDiffs{
-						Diffs: []reporter.BitBucketFileDiff{
-							{
-								Hunks: []reporter.BitBucketDiffHunk{
-									{
-										Segments: []reporter.BitBucketDiffSegment{
-											{
-												Type: "ADDED",
-												Lines: []reporter.BitBucketDiffLine{
-													{Source: 1, Destination: 1},
-													{Source: 5, Destination: 5},
-												},
-											},
-											{
-												Type: "CONTEXT",
-												Lines: []reporter.BitBucketDiffLine{
-													{Source: 10, Destination: 6},
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					}).
-					Once()
-				s.ExpectGet("/plugins/servlet/applinks/whoami").
-					Return("pint_user").
-					Once()
-				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/pull-requests/102/activities?start=0").
-					ReturnJSON(reporter.BitBucketPullRequestActivities{
-						IsLastPage: true,
-						Values: []reporter.BitBucketPullRequestActivity{
-							{
-								Action:        "COMMENTED",
-								CommentAction: "ADDED",
-								CommentAnchor: reporter.BitBucketCommentAnchor{
-									Orphaned: false,
-									DiffType: "EFFECTIVE",
-									Path:     "index.txt",
-									Line:     3,
-								},
-								Comment: reporter.BitBucketPullRequestComment{
-									ID:      1001,
-									Version: 0,
-									State:   "OPEN",
-									Author: reporter.BitBucketCommentAuthor{
-										Name: "pint_user",
-									},
-								},
-							},
-							{
-								Action:        "COMMENTED",
-								CommentAction: "ADDED",
-								CommentAnchor: reporter.BitBucketCommentAnchor{
-									Orphaned: false,
-									DiffType: "COMMIT",
-									Path:     "index.txt",
-									Line:     10,
-								},
-								Comment: reporter.BitBucketPullRequestComment{
-									ID:      1002,
-									Version: 1,
-									State:   "OPEN",
-									Author: reporter.BitBucketCommentAuthor{
-										Name: "pint_user",
-									},
-								},
-							},
-						},
-					}).
-					Once()
-				// pruneComments deletes both stale comments.
-				s.ExpectDelete("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments/1001?version=0").
-					Once()
-				s.ExpectDelete("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments/1002?version=1").
-					Once()
-				// addComments tries to POST new comment, which fails.
-				s.ExpectPost("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments").
-					ReturnCode(http.StatusInternalServerError).
-					Once()
-			}),
-			errorHandler: func(err error) error {
-				if err != nil && err.Error() == "failed to create BitBucket pull request comments: POST request failed" {
-					return nil
-				}
-				return fmt.Errorf("Expected failed to create BitBucket pull request comments: POST request failed, got %w", err)
-			},
-		},
-		{
-			description: "sends a correct report with deduped comments",
-			gitCmd:      fakeGit,
-			mock: httpmock.New(func(s *httpmock.Server) {
-				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
-					ReturnJSON(reporter.BitBucketPullRequests{
-						IsLastPage: true,
-						Values: []reporter.BitBucketPullRequest{
-							{
-								ID:   102,
-								Open: true,
-								FromRef: reporter.BitBucketRef{
-									ID:     "refs/heads/fake-branch",
-									Commit: "fake-commit-id",
-								},
-								ToRef: reporter.BitBucketRef{
-									ID:     "refs/heads/main",
-									Commit: "main-commit-id",
-								},
-							},
-						},
-					}).
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes?start=0").
-					ReturnJSON(reporter.BitBucketPullRequestChanges{
-						IsLastPage: true,
-						Values: []reporter.BitBucketPullRequestChange{
-							{Path: reporter.BitBucketPath{ToString: "index.txt"}},
-							{Path: reporter.BitBucketPath{ToString: "foo.txt"}},
-						},
-					}).
-					Once()
-				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/index.txt?contextLines=10000&since=main-commit-id&whitespace=show&withComments=false").
-					ReturnJSON(reporter.BitBucketFileDiffs{
-						Diffs: []reporter.BitBucketFileDiff{
-							{
-								Hunks: []reporter.BitBucketDiffHunk{
-									{
-										Segments: []reporter.BitBucketDiffSegment{
-											{
-												Type: "ADDED",
-												Lines: []reporter.BitBucketDiffLine{
-													{Source: 1, Destination: 1},
-													{Source: 5, Destination: 5},
-												},
-											},
-											{
-												Type: "CONTEXT",
-												Lines: []reporter.BitBucketDiffLine{
-													{Source: 10, Destination: 6},
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					}).
-					Once()
-				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/foo.txt?contextLines=10000&since=main-commit-id&whitespace=show&withComments=false").
-					ReturnJSON(reporter.BitBucketFileDiffs{
-						Diffs: []reporter.BitBucketFileDiff{
-							{
-								Hunks: []reporter.BitBucketDiffHunk{
-									{
-										Segments: []reporter.BitBucketDiffSegment{
-											{
-												Type: "ADDED",
-												Lines: []reporter.BitBucketDiffLine{
-													{Source: 2, Destination: 2},
-												},
-											},
-										},
-									},
-								},
-							},
-							{
-								Hunks: []reporter.BitBucketDiffHunk{
-									{
-										Segments: []reporter.BitBucketDiffSegment{
-											{
-												Type: "MODIFIED",
-												Lines: []reporter.BitBucketDiffLine{
-													{Source: 3, Destination: 4},
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					}).
-					Once()
-				s.ExpectGet("/plugins/servlet/applinks/whoami").
-					Return("pint_user").
-					Once()
-				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/pull-requests/102/activities?start=0").
-					ReturnJSON(reporter.BitBucketPullRequestActivities{
-						IsLastPage: true,
-						Values: []reporter.BitBucketPullRequestActivity{
-							{Action: "APPROVED"},
-							{
-								Action:        "COMMENTED",
-								CommentAction: "ADDED",
-								CommentAnchor: reporter.BitBucketCommentAnchor{
-									Orphaned: true,
-									DiffType: "EFFECTIVE",
-									Path:     "foo.txt",
-									Line:     3,
-								},
-								Comment: reporter.BitBucketPullRequestComment{
-									ID:      1001,
-									Version: 0,
-									State:   "OPEN",
-									Author:  reporter.BitBucketCommentAuthor{Name: "pint_user"},
-								},
-							},
-							{
-								Action:        "COMMENTED",
-								CommentAction: "ADDED",
-								CommentAnchor: reporter.BitBucketCommentAnchor{
-									Orphaned: true,
-									DiffType: "COMMIT",
-									Path:     "foo.txt",
-									Line:     10,
-								},
-								Comment: reporter.BitBucketPullRequestComment{
-									ID:      1002,
-									Version: 1,
-									State:   "OPEN",
-									Author:  reporter.BitBucketCommentAuthor{Name: "pint_user"},
-								},
-							},
-							{
-								Action:        "COMMENTED",
-								CommentAction: "ADDED",
-								CommentAnchor: reporter.BitBucketCommentAnchor{
-									Orphaned: false,
-									DiffType: "EFFECTIVE",
-									Path:     "foo.txt",
-									Line:     3,
-								},
-								Comment: reporter.BitBucketPullRequestComment{
-									ID:      2001,
-									Version: 0,
-									State:   "OPEN",
-									Author:  reporter.BitBucketCommentAuthor{Name: "pint_user"},
-								},
-							},
-							{
-								Action:        "COMMENTED",
-								CommentAction: "ADDED",
-								CommentAnchor: reporter.BitBucketCommentAnchor{
-									Orphaned: false,
-									DiffType: "COMMIT",
-									Path:     "foo.txt",
-									Line:     4,
-								},
-								Comment: reporter.BitBucketPullRequestComment{
-									ID:      2002,
-									Version: 1,
-									State:   "OPEN",
-									Author:  reporter.BitBucketCommentAuthor{Name: "pint_user"},
-								},
-							},
-						},
-					}).
-					Once()
-				// pruneComments deletes all stale comments.
-				s.ExpectDelete("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments/1001?version=0").
-					Once()
-				s.ExpectDelete("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments/1002?version=1").
-					Once()
-				s.ExpectDelete("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments/2001?version=0").
-					Once()
-				s.ExpectDelete("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments/2002?version=1").
-					Once()
-				// addComments posts 2 deduped comments.
-				s.ExpectPost("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments").
-					Once()
-				s.ExpectPost("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments").
-					Once()
+					ReturnCode(http.StatusCreated)
+				s.ExpectPut(bbComment(600)).
+					WithBodyJSON(reporter.BitBucketCommentSeverityUpdate{
+						Severity: "BLOCKER",
+						Version:  2,
+					})
+				s.ExpectPut(bbComment(600)).
+					WithBodyJSON(reporter.BitBucketCommentStateUpdate{
+						State:   "RESOLVED",
+						Version: 2,
+					})
 			}),
 			reports: []reporter.Report{
 				{
 					Path: discovery.Path{
-						SymlinkTarget: "foo.txt",
-						Name:          "foo.txt",
+						Name:          "rule.yaml",
+						SymlinkTarget: "rule.yaml",
 					},
 					Changes: &discovery.Changes{
-						OldPath: "",
-						Lines: []git.LineNumber{
-							{Before: 0, After: 2, Modified: true},
-							{Before: 0, After: 4, Modified: true},
-						},
-					},
-					Rule: mockFile.Groups[0].Rules[1],
-					Problem: checks.Problem{
-						Lines: diags.LineRange{
-							First: 1,
-							Last:  1,
-						},
-						Reporter: "mock",
-						Summary:  "this should be ignored, line is not part of the diff",
-						Severity: checks.Bug,
-					},
-				},
-				{
-					Path: discovery.Path{
-						SymlinkTarget: "foo.txt",
-						Name:          "foo.txt",
-					},
-					Changes: &discovery.Changes{
-						OldPath: "",
-						Lines: []git.LineNumber{
-							{Before: 0, After: 2, Modified: true},
-							{Before: 0, After: 4, Modified: true},
-						},
-					},
-					Rule: mockFile.Groups[0].Rules[1],
-					Problem: checks.Problem{
-						Lines: diags.LineRange{
-							First: 1,
-							Last:  1,
-						},
-						Reporter: "mock",
-						Summary:  "this should be ignored, line is not part of the diff",
-						Severity: checks.Bug,
-					},
-				},
-				{
-					Path: discovery.Path{
-						SymlinkTarget: "foo.txt",
-						Name:          "foo.txt",
-					},
-					Changes: &discovery.Changes{
-						OldPath: "",
-						Lines: []git.LineNumber{
-							{Before: 0, After: 2, Modified: true},
-							{Before: 0, After: 4, Modified: true},
-						},
-					},
-					Rule: mockFile.Groups[0].Rules[1],
-					Problem: checks.Problem{
-						Lines: diags.LineRange{
-							First: 2,
-							Last:  2,
-						},
-						Reporter: "mock",
-						Summary:  "bad name",
-						Details:  "bad name details",
-						Severity: checks.Warning,
-					},
-				},
-				{
-					Path: discovery.Path{
-						SymlinkTarget: "foo.txt",
-						Name:          "foo.txt",
-					},
-					Changes: &discovery.Changes{
-						OldPath: "",
-						Lines: []git.LineNumber{
-							{Before: 0, After: 2, Modified: true},
-							{Before: 0, After: 4, Modified: true},
-						},
+						Lines: git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
-						Lines: diags.LineRange{
-							First: 2,
-							Last:  2,
-						},
+						Lines:    diags.LineRange{First: 2, Last: 2},
 						Reporter: "mock",
-						Summary:  "mock text 1",
-						Details:  "mock details",
+						Summary:  "new problem",
 						Severity: checks.Warning,
+						Anchor:   checks.AnchorAfter,
 					},
 				},
-				{
-					Path: discovery.Path{
-						SymlinkTarget: "foo.txt",
-						Name:          "symlink.txt",
-					},
-					Changes: &discovery.Changes{
-						OldPath: "",
-						Lines: []git.LineNumber{
-							{Before: 0, After: 2, Modified: true},
-							{Before: 0, After: 4, Modified: true},
-						},
-					},
-					Rule: mockFile.Groups[0].Rules[1],
-					Problem: checks.Problem{
-						Lines: diags.LineRange{
-							First: 2,
-							Last:  2,
-						},
-						Reporter: "mock",
-						Summary:  "mock text 2",
-						Details:  "mock details",
-						Severity: checks.Warning,
-					},
-				},
-			},
-			errorHandler: func(err error) error {
-				if err != nil {
-					return fmt.Errorf("Unpexpected error: %w", err)
-				}
-				return nil
 			},
 		},
 		{
-			description: "annotation on unmodified lines",
-			gitCmd:      fakeGit,
+			description: "comment limit exceeded posts general comment",
+			maxComments: 1,
 			mock: httpmock.New(func(s *httpmock.Server) {
-				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
-					ReturnJSON(reporter.BitBucketPullRequests{IsLastPage: true}).
-					Once()
-				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint/annotations").
-					Once()
+				bbExpectPR(s)
+				bbExpectWhoami(s)
+				bbExpectEmptyActivities(s)
+				s.ExpectPost(bbComments).
+					WithBodyJSON(reporter.BitBucketPendingComment{
+						Text:     bbCommentText("Bug", "mock", "error one"),
+						Severity: "NORMAL",
+						Anchor: reporter.BitBucketPendingCommentAnchor{
+							Path:     "rule.yaml",
+							Line:     2,
+							LineType: "ADDED",
+							FileType: "TO",
+							DiffType: "EFFECTIVE",
+						},
+					}).
+					ReturnCode(http.StatusCreated)
+				s.ExpectPost(bbComments).
+					WithBodyJSON(reporter.BitBucketPendingComment{
+						Text:     "This pint run would create 2 comment(s), which is more than the limit configured for pint (1).\n1 comment(s) were skipped and won't be visible on this PR.",
+						Severity: "NORMAL",
+						Anchor: reporter.BitBucketPendingCommentAnchor{
+							DiffType: "EFFECTIVE",
+						},
+					}).
+					ReturnCode(http.StatusCreated)
 			}),
 			reports: []reporter.Report{
 				{
 					Path: discovery.Path{
-						SymlinkTarget: "foo.txt",
-						Name:          "foo.txt",
+						Name:          "rule.yaml",
+						SymlinkTarget: "rule.yaml",
 					},
 					Changes: &discovery.Changes{
-						OldPath: "",
-						Lines:   git.LineNumbers{},
-					},
-					Rule: mockFile.Groups[0].Rules[1],
-					Problem: checks.Problem{
-						Lines: diags.LineRange{
-							First: 1,
-							Last:  1,
-						},
-						Reporter: "mock",
-						Summary:  "line is not part of the diff",
-						Severity: checks.Bug,
-					},
-				},
-			},
-			errorHandler: func(err error) error {
-				if err != nil {
-					return fmt.Errorf("Unpexpected error: %w", err)
-				}
-				return nil
-			},
-		},
-		{
-			// Covers bitbucket_api.go:633-652 — diagnostics rendering in makeComments.
-			description: "comment includes diagnostics when file is readable",
-			gitCmd:      fakeGit,
-			reports: []reporter.Report{
-				{
-					Path: discovery.Path{
-						SymlinkTarget: "index.txt",
-						Name:          diagFile,
-					},
-					Changes: &discovery.Changes{
-						OldPath: "",
-						Lines:   git.LineNumbers{{Before: 0, After: 1, Modified: true}},
+						Lines: git.LineNumbers{{Before: 0, After: 2, Modified: true}},
 					},
 					Rule: mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
-						Lines: diags.LineRange{
-							First: 1,
-							Last:  1,
-						},
+						Lines:    diags.LineRange{First: 2, Last: 2},
 						Reporter: "mock",
-						Summary:  "problem with diagnostics",
+						Summary:  "error one",
 						Severity: checks.Bug,
 						Anchor:   checks.AnchorAfter,
-						Diagnostics: []diags.Diagnostic{
+					},
+				},
+				{
+					Path: discovery.Path{
+						Name:          "rule.yaml",
+						SymlinkTarget: "rule.yaml",
+					},
+					Changes: &discovery.Changes{
+						Lines: git.LineNumbers{{Before: 0, After: 4, Modified: true}},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
+					Problem: checks.Problem{
+						Lines:    diags.LineRange{First: 4, Last: 4},
+						Reporter: "mock",
+						Summary:  "error two",
+						Severity: checks.Bug,
+						Anchor:   checks.AnchorAfter,
+					},
+				},
+			},
+		},
+		{
+			description: "report on deleted line uses before anchor",
+			maxComments: 50,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				bbExpectPR(s)
+				bbExpectWhoami(s)
+				bbExpectEmptyActivities(s)
+				s.ExpectPost(bbComments).
+					WithBodyJSON(reporter.BitBucketPendingComment{
+						Text:     bbCommentText("Warning", "mock", "deleted line problem"),
+						Severity: "NORMAL",
+						Anchor: reporter.BitBucketPendingCommentAnchor{
+							Path:     "rule.yaml",
+							Line:     2,
+							LineType: "REMOVED",
+							FileType: "FROM",
+							DiffType: "EFFECTIVE",
+						},
+					}).
+					ReturnCode(http.StatusCreated)
+			}),
+			reports: []reporter.Report{
+				{
+					Path: discovery.Path{
+						Name:          "rule.yaml",
+						SymlinkTarget: "rule.yaml",
+					},
+					Changes: &discovery.Changes{
+						Lines: git.LineNumbers{
+							{Before: 2, After: 0, Modified: true},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Lines:    diags.LineRange{First: 2, Last: 2},
+						Reporter: "mock",
+						Summary:  "deleted line problem",
+						Severity: checks.Warning,
+						Anchor:   checks.AnchorBefore,
+					},
+				},
+			},
+		},
+		{
+			description: "report on context line uses old line number",
+			maxComments: 50,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				bbExpectPR(s)
+				bbExpectWhoami(s)
+				bbExpectEmptyActivities(s)
+				s.ExpectPost(bbComments).
+					WithBodyJSON(reporter.BitBucketPendingComment{
+						Text:     bbCommentText("Warning", "mock", "context line problem"),
+						Severity: "NORMAL",
+						Anchor: reporter.BitBucketPendingCommentAnchor{
+							Path:     "rule.yaml",
+							Line:     3,
+							LineType: "CONTEXT",
+							FileType: "FROM",
+							DiffType: "EFFECTIVE",
+						},
+					}).
+					ReturnCode(http.StatusCreated)
+			}),
+			reports: []reporter.Report{
+				{
+					Path: discovery.Path{
+						Name:          "rule.yaml",
+						SymlinkTarget: "rule.yaml",
+					},
+					Changes: &discovery.Changes{
+						Lines: git.LineNumbers{
+							{Before: 3, After: 3, Modified: false},
+						},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Lines:    diags.LineRange{First: 3, Last: 3},
+						Reporter: "mock",
+						Summary:  "context line problem",
+						Severity: checks.Warning,
+						Anchor:   checks.AnchorAfter,
+					},
+				},
+			},
+		},
+		{
+			description: "existing comment with same path and line but different text is replaced",
+			maxComments: 50,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				bbExpectPR(s)
+				bbExpectWhoami(s)
+				s.ExpectGet(bbActivities + "?start=0").ReturnJSON(
+					reporter.BitBucketPullRequestActivities{
+						Values: []reporter.BitBucketPullRequestActivity{
 							{
-								Message: "this is wrong",
-								Pos: diags.PositionRanges{
-									{Line: 1, FirstColumn: 3, LastColumn: 8},
+								Action:        "COMMENTED",
+								CommentAction: "ADDED",
+								Comment: reporter.BitBucketPullRequestComment{
+									ID:       800,
+									Version:  1,
+									State:    "OPEN",
+									Severity: "NORMAL",
+									Text:     "old text that no longer matches",
+									Author:   reporter.BitBucketCommentAuthor{Name: "user"},
 								},
-								FirstColumn: 3,
-								LastColumn:  8,
+								CommentAnchor: reporter.BitBucketCommentAnchor{
+									Path: "rule.yaml",
+									Line: 2,
+								},
 							},
+							{
+								Action:        "COMMENTED",
+								CommentAction: "ADDED",
+								Comment: reporter.BitBucketPullRequestComment{
+									ID:       801,
+									Version:  1,
+									State:    "OPEN",
+									Severity: "NORMAL",
+									Text:     "comment on same path different line",
+									Author:   reporter.BitBucketCommentAuthor{Name: "user"},
+								},
+								CommentAnchor: reporter.BitBucketCommentAnchor{
+									Path: "rule.yaml",
+									Line: 99,
+								},
+							},
+						},
+						IsLastPage: true,
+					},
+				)
+				s.ExpectPost(bbComments).
+					WithBodyJSON(reporter.BitBucketPendingComment{
+						Text:     bbCommentText("Warning", "mock", "new text for same location"),
+						Severity: "NORMAL",
+						Anchor: reporter.BitBucketPendingCommentAnchor{
+							Path:     "rule.yaml",
+							Line:     2,
+							LineType: "ADDED",
+							FileType: "TO",
+							DiffType: "EFFECTIVE",
+						},
+					}).
+					ReturnCode(http.StatusCreated)
+				s.ExpectDelete(bbComment(800) + "?version=1")
+				s.ExpectDelete(bbComment(801) + "?version=1")
+			}),
+			reports: []reporter.Report{
+				{
+					Path: discovery.Path{
+						Name:          "rule.yaml",
+						SymlinkTarget: "rule.yaml",
+					},
+					Changes: &discovery.Changes{
+						Lines: git.LineNumbers{{Before: 0, After: 2, Modified: true}},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Lines:    diags.LineRange{First: 2, Last: 2},
+						Reporter: "mock",
+						Summary:  "new text for same location",
+						Severity: checks.Warning,
+						Anchor:   checks.AnchorAfter,
+					},
+				},
+			},
+		},
+		{
+			description: "general comment failure on prometheus details",
+			maxComments: 50,
+			setupSummary: func(s *reporter.Summary) {
+				s.MarkCheckDisabled("prom1", "config1", []string{"alerts/count"})
+			},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				bbExpectPR(s)
+				bbExpectWhoami(s)
+				bbExpectEmptyActivities(s)
+				s.ExpectPost(bbComments).ReturnCode(http.StatusCreated)
+				s.ExpectPost(bbComments).ReturnCode(http.StatusInternalServerError)
+			}),
+			errorHandler: func(err error) error {
+				if err != nil && err.Error() == "failed to create general comment: POST request failed" {
+					return nil
+				}
+				return fmt.Errorf("unexpected error: %w", err)
+			},
+			reports: []reporter.Report{
+				{
+					Path: discovery.Path{
+						Name:          "rule.yaml",
+						SymlinkTarget: "rule.yaml",
+					},
+					Changes: &discovery.Changes{
+						Lines: git.LineNumbers{{Before: 0, After: 2, Modified: true}},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Lines:    diags.LineRange{First: 2, Last: 2},
+						Reporter: "mock",
+						Summary:  "some error",
+						Severity: checks.Bug,
+						Anchor:   checks.AnchorAfter,
+					},
+				},
+			},
+		},
+		{
+			description: "pull request lookup returns API error",
+			maxComments: 50,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(bbPRPath + "?start=0").ReturnCode(http.StatusInternalServerError)
+			}),
+			errorHandler: func(err error) error {
+				if err != nil && err.Error() == "failed to get open pull requests from BitBucket: GET request failed" {
+					return nil
+				}
+				return fmt.Errorf("unexpected error: %w", err)
+			},
+		},
+		{
+			description: "pull request lookup returns invalid JSON",
+			maxComments: 50,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(bbPRPath + "?start=0").Return("not json")
+			}),
+			errorHandler: func(err error) error {
+				if err != nil && err.Error() == "failed to get open pull requests from BitBucket: invalid character 'o' in literal null (expecting 'u')" {
+					return nil
+				}
+				return fmt.Errorf("unexpected error: %w", err)
+			},
+		},
+		{
+			description: "activities endpoint returns invalid JSON",
+			maxComments: 50,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				bbExpectPR(s)
+				bbExpectWhoami(s)
+				s.ExpectGet(bbActivities + "?start=0").Return("bad json")
+			}),
+			errorHandler: func(err error) error {
+				if err != nil && err.Error() == "invalid character 'b' looking for beginning of value" {
+					return nil
+				}
+				return fmt.Errorf("unexpected error: %w", err)
+			},
+			reports: []reporter.Report{
+				{
+					Path: discovery.Path{
+						Name:          "rule.yaml",
+						SymlinkTarget: "rule.yaml",
+					},
+					Changes: &discovery.Changes{
+						Lines: git.LineNumbers{{Before: 0, After: 2, Modified: true}},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Lines:    diags.LineRange{First: 2, Last: 2},
+						Reporter: "mock",
+						Summary:  "problem",
+						Severity: checks.Warning,
+						Anchor:   checks.AnchorAfter,
+					},
+				},
+			},
+		},
+		{
+			description: "general comment failure on too many comments",
+			maxComments: 1,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				bbExpectPR(s)
+				bbExpectWhoami(s)
+				bbExpectEmptyActivities(s)
+				s.ExpectPost(bbComments).ReturnCode(http.StatusCreated)
+				s.ExpectPost(bbComments).Times(2).ReturnCode(http.StatusInternalServerError)
+			}),
+			errorHandler: func(err error) error {
+				if err != nil && err.Error() == "failed to create general comment: POST request failed" {
+					return nil
+				}
+				return fmt.Errorf("unexpected error: %w", err)
+			},
+			reports: []reporter.Report{
+				{
+					Path: discovery.Path{
+						Name:          "rule.yaml",
+						SymlinkTarget: "rule.yaml",
+					},
+					Changes: &discovery.Changes{
+						Lines: git.LineNumbers{{Before: 0, After: 2, Modified: true}},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Lines:    diags.LineRange{First: 2, Last: 2},
+						Reporter: "mock",
+						Summary:  "error one",
+						Severity: checks.Bug,
+						Anchor:   checks.AnchorAfter,
+					},
+				},
+				{
+					Path: discovery.Path{
+						Name:          "rule.yaml",
+						SymlinkTarget: "rule.yaml",
+					},
+					Changes: &discovery.Changes{
+						Lines: git.LineNumbers{{Before: 0, After: 4, Modified: true}},
+					},
+					Rule: mockFile.Groups[0].Rules[1],
+					Problem: checks.Problem{
+						Lines:    diags.LineRange{First: 4, Last: 4},
+						Reporter: "mock",
+						Summary:  "error two",
+						Severity: checks.Bug,
+						Anchor:   checks.AnchorAfter,
+					},
+				},
+			},
+		},
+		{
+			description: "severity update failure during stale comment removal",
+			maxComments: 50,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				bbExpectPR(s)
+				bbExpectWhoami(s)
+				s.ExpectGet(bbActivities + "?start=0").ReturnJSON(
+					reporter.BitBucketPullRequestActivities{
+						Values: []reporter.BitBucketPullRequestActivity{
+							{
+								Action:        "COMMENTED",
+								CommentAction: "ADDED",
+								Comment: reporter.BitBucketPullRequestComment{
+									ID:       700,
+									Version:  1,
+									State:    "OPEN",
+									Severity: "NORMAL",
+									Text:     "stale non-blocker with reply",
+									Author:   reporter.BitBucketCommentAuthor{Name: "user"},
+									Comments: []reporter.BitBucketPullRequestComment{
+										{ID: 701, Text: "reply"},
+									},
+								},
+								CommentAnchor: reporter.BitBucketCommentAnchor{
+									Path: "old.yaml",
+									Line: 5,
+								},
+							},
+						},
+						IsLastPage: true,
+					},
+				)
+				s.ExpectPost(bbComments).
+					WithBodyJSON(reporter.BitBucketPendingComment{
+						Text:     bbCommentText("Warning", "mock", "new problem"),
+						Severity: "NORMAL",
+						Anchor: reporter.BitBucketPendingCommentAnchor{
+							Path:     "rule.yaml",
+							Line:     2,
+							LineType: "ADDED",
+							FileType: "TO",
+							DiffType: "EFFECTIVE",
+						},
+					}).
+					ReturnCode(http.StatusCreated)
+				s.ExpectPut(bbComment(700)).
+					WithBodyJSON(reporter.BitBucketCommentSeverityUpdate{
+						Severity: "BLOCKER",
+						Version:  1,
+					}).
+					ReturnCode(http.StatusInternalServerError)
+				s.ExpectPost(bbComments).ReturnCode(http.StatusInternalServerError)
+			}),
+			errorHandler: func(err error) error {
+				if err != nil && err.Error() == "failed to create general comment: POST request failed" {
+					return nil
+				}
+				return fmt.Errorf("unexpected error: %w", err)
+			},
+			reports: []reporter.Report{
+				{
+					Path: discovery.Path{
+						Name:          "rule.yaml",
+						SymlinkTarget: "rule.yaml",
+					},
+					Changes: &discovery.Changes{
+						Lines: git.LineNumbers{{Before: 0, After: 2, Modified: true}},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Lines:    diags.LineRange{First: 2, Last: 2},
+						Reporter: "mock",
+						Summary:  "new problem",
+						Severity: checks.Warning,
+						Anchor:   checks.AnchorAfter,
+					},
+				},
+			},
+		},
+		{
+			description: "report on line outside diff becomes general comment",
+			maxComments: 50,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				bbExpectPR(s)
+				bbExpectWhoami(s)
+				bbExpectEmptyActivities(s)
+				s.ExpectPost(bbComments).
+					WithBodyJSON(reporter.BitBucketPendingComment{
+						Text:     bbCommentText("Warning", "mock", "far away problem"),
+						Severity: "NORMAL",
+						Anchor: reporter.BitBucketPendingCommentAnchor{
+							DiffType: "EFFECTIVE",
+						},
+					}).
+					ReturnCode(http.StatusCreated)
+			}),
+			reports: []reporter.Report{
+				{
+					Path: discovery.Path{
+						Name:          "rule.yaml",
+						SymlinkTarget: "rule.yaml",
+					},
+					Changes: &discovery.Changes{
+						Lines: git.LineNumbers{},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Lines:    diags.LineRange{First: 50, Last: 50},
+						Reporter: "mock",
+						Summary:  "far away problem",
+						Severity: checks.Warning,
+						Anchor:   checks.AnchorAfter,
+					},
+				},
+			},
+		},
+		{
+			description: "closed PR skipped in pagination",
+			maxComments: 50,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(bbPRPath + "?start=0").ReturnJSON(reporter.BitBucketPullRequests{
+					Values: []reporter.BitBucketPullRequest{
+						{
+							ID:      1,
+							Open:    false,
+							FromRef: reporter.BitBucketRef{ID: "refs/heads/fake-branch"},
+							ToRef:   reporter.BitBucketRef{ID: "refs/heads/main"},
+						},
+					},
+					IsLastPage: true,
+				})
+			}),
+			reports: []reporter.Report{
+				{
+					Path: discovery.Path{
+						Name:          "rule.yaml",
+						SymlinkTarget: "rule.yaml",
+					},
+					Changes: &discovery.Changes{
+						Lines: git.LineNumbers{{Before: 0, After: 2, Modified: true}},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Lines:    diags.LineRange{First: 2, Last: 2},
+						Reporter: "mock",
+						Summary:  "mock error",
+						Severity: checks.Bug,
+						Anchor:   checks.AnchorAfter,
+					},
+				},
+			},
+		},
+		{
+			description: "activities request returns 500",
+			maxComments: 50,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				bbExpectPR(s)
+				bbExpectWhoami(s)
+				s.ExpectGet(bbActivities + "?start=0").ReturnCode(http.StatusInternalServerError)
+			}),
+			errorHandler: func(err error) error {
+				if err != nil && err.Error() == "GET request failed" {
+					return nil
+				}
+				return fmt.Errorf("unexpected error: %w", err)
+			},
+			reports: []reporter.Report{
+				{
+					Path: discovery.Path{
+						Name:          "rule.yaml",
+						SymlinkTarget: "rule.yaml",
+					},
+					Changes: &discovery.Changes{
+						Lines: git.LineNumbers{{Before: 0, After: 2, Modified: true}},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Lines:    diags.LineRange{First: 2, Last: 2},
+						Reporter: "mock",
+						Summary:  "problem",
+						Severity: checks.Warning,
+						Anchor:   checks.AnchorAfter,
+					},
+				},
+			},
+		},
+		{
+			description: "comment creation fails with 500",
+			maxComments: 50,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				bbExpectPR(s)
+				bbExpectWhoami(s)
+				bbExpectEmptyActivities(s)
+				s.ExpectPost(bbComments).ReturnCode(http.StatusInternalServerError)
+			}),
+			errorHandler: func(err error) error {
+				if err != nil && err.Error() == "POST request failed" {
+					return nil
+				}
+				return fmt.Errorf("unexpected error: %w", err)
+			},
+			reports: []reporter.Report{
+				{
+					Path: discovery.Path{
+						Name:          "rule.yaml",
+						SymlinkTarget: "rule.yaml",
+					},
+					Changes: &discovery.Changes{
+						Lines: git.LineNumbers{{Before: 0, After: 2, Modified: true}},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Lines:    diags.LineRange{First: 2, Last: 2},
+						Reporter: "mock",
+						Summary:  "problem",
+						Severity: checks.Warning,
+						Anchor:   checks.AnchorAfter,
+					},
+				},
+			},
+		},
+		{
+			description: "exact duplicate reports are deduplicated",
+			maxComments: 50,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				bbExpectPR(s)
+				bbExpectWhoami(s)
+				bbExpectEmptyActivities(s)
+				s.ExpectPost(bbComments).Times(3).ReturnCode(http.StatusCreated)
+			}),
+			reports: []reporter.Report{
+				{
+					Path: discovery.Path{
+						Name:          "rule.yaml",
+						SymlinkTarget: "rule.yaml",
+					},
+					Changes: &discovery.Changes{
+						Lines: git.LineNumbers{{Before: 0, After: 2, Modified: true}},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Lines:    diags.LineRange{First: 2, Last: 2},
+						Reporter: "mock",
+						Summary:  "same problem",
+						Details:  "same details",
+						Severity: checks.Warning,
+						Anchor:   checks.AnchorAfter,
+						Diagnostics: []diags.Diagnostic{
+							{Message: "diag A"},
+						},
+					},
+				},
+				{
+					Path: discovery.Path{
+						Name:          "rule.yaml",
+						SymlinkTarget: "rule.yaml",
+					},
+					Changes: &discovery.Changes{
+						Lines: git.LineNumbers{{Before: 0, After: 2, Modified: true}},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Lines:    diags.LineRange{First: 2, Last: 2},
+						Reporter: "mock",
+						Summary:  "same problem",
+						Details:  "same details",
+						Severity: checks.Warning,
+						Anchor:   checks.AnchorAfter,
+						Diagnostics: []diags.Diagnostic{
+							{Message: "diag B"},
+						},
+					},
+				},
+				{
+					Path: discovery.Path{
+						Name:          "other.yaml",
+						SymlinkTarget: "other.yaml",
+					},
+					Changes: &discovery.Changes{
+						Lines: git.LineNumbers{{Before: 0, After: 2, Modified: true}},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Lines:    diags.LineRange{First: 2, Last: 2},
+						Reporter: "mock",
+						Summary:  "same problem",
+						Details:  "same details",
+						Severity: checks.Warning,
+						Anchor:   checks.AnchorAfter,
+						Diagnostics: []diags.Diagnostic{
+							{Message: "diag C"},
+						},
+					},
+				},
+				{
+					Path: discovery.Path{
+						Name:          "rule.yaml",
+						SymlinkTarget: "rule.yaml",
+					},
+					Changes: &discovery.Changes{
+						Lines: git.LineNumbers{{Before: 0, After: 2, Modified: true}},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Lines:    diags.LineRange{First: 2, Last: 2},
+						Reporter: "mock",
+						Summary:  "same problem",
+						Details:  "same details",
+						Severity: checks.Warning,
+						Anchor:   checks.AnchorBefore,
+						Diagnostics: []diags.Diagnostic{
+							{Message: "diag D"},
 						},
 					},
 				},
 			},
-			mock: httpmock.New(func(s *httpmock.Server) {
-				s.ExpectDelete("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectPut("/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint").
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0").
-					ReturnJSON(reporter.BitBucketPullRequests{
-						IsLastPage: true,
-						Values: []reporter.BitBucketPullRequest{
-							{
-								ID:   102,
-								Open: true,
-								FromRef: reporter.BitBucketRef{
-									ID:     "refs/heads/fake-branch",
-									Commit: "fake-commit-id",
-								},
-								ToRef: reporter.BitBucketRef{
-									ID:     "refs/heads/main",
-									Commit: "main-commit-id",
-								},
-							},
-						},
-					}).
-					Once()
-				s.ExpectGet("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes?start=0").
-					ReturnJSON(reporter.BitBucketPullRequestChanges{
-						IsLastPage: true,
-						Values: []reporter.BitBucketPullRequestChange{
-							{
-								Path: reporter.BitBucketPath{
-									ToString: "index.txt",
-								},
-							},
-						},
-					}).
-					Once()
-				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/index.txt?contextLines=10000&since=main-commit-id&whitespace=show&withComments=false").
-					ReturnJSON(reporter.BitBucketFileDiffs{
-						Diffs: []reporter.BitBucketFileDiff{
-							{
-								Hunks: []reporter.BitBucketDiffHunk{
-									{
-										Segments: []reporter.BitBucketDiffSegment{
-											{
-												Type: "ADDED",
-												Lines: []reporter.BitBucketDiffLine{
-													{Source: 1, Destination: 1},
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					}).
-					Once()
-				s.ExpectGet("/plugins/servlet/applinks/whoami").
-					Return("pint_user").
-					Once()
-				s.ExpectGet("/rest/api/latest/projects/proj/repos/repo/pull-requests/102/activities?start=0").
-					ReturnJSON(reporter.BitBucketPullRequestActivities{IsLastPage: true}).
-					Once()
-				// addComments posts 1 new comment with diagnostics content.
-				s.ExpectPost("/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments").
-					Once()
-			}),
-			errorHandler: func(err error) error {
-				if err != nil {
-					return fmt.Errorf("Unpexpected error: %w", err)
-				}
-				return nil
-			},
 		},
-	}
-
-	for _, tc := range testCases {
+	} {
 		t.Run(tc.description, func(t *testing.T) {
 			slog.SetDefault(slogt.New(t))
 
 			srv := tc.mock(t)
+			t.Cleanup(srv.Close)
 
 			r := reporter.NewBitBucketReporter(
-				"v0.0.0",
 				srv.URL(),
 				time.Second,
 				"token",
 				"proj",
 				"repo",
-				50,
-				tc.showDuplicates,
-				tc.gitCmd,
+				bbFakeBranch,
+				bbFakeCommitID,
+				tc.maxComments,
 			)
-			summary := reporter.NewSummary(tc.reports)
-			err := r.Submit(t.Context(), summary)
 
-			if e := tc.errorHandler(err); e != nil {
-				t.Errorf("error check failure: %s", e)
-				return
+			summary := reporter.NewSummary(tc.reports)
+			summary.SortReports()
+			summary.Dedup()
+			if tc.setupSummary != nil {
+				tc.setupSummary(&summary)
+			}
+			err := reporter.Submit(t.Context(), summary, r, tc.showDuplicates)
+
+			if tc.errorHandler != nil {
+				require.NoError(t, tc.errorHandler(err))
+			} else {
+				require.NoError(t, err)
 			}
 		})
 	}
+}
+
+func TestBitBucketReporterInvalidURI(t *testing.T) {
+	slog.SetDefault(slogt.New(t))
+
+	r := reporter.NewBitBucketReporter(
+		"http://\x01",
+		time.Second,
+		"token",
+		"proj",
+		"repo",
+		bbFakeBranch,
+		bbFakeCommitID,
+		50,
+	)
+
+	summary := reporter.NewSummary(nil)
+	err := reporter.Submit(t.Context(), summary, r, false)
+	require.EqualError(
+		t, err,
+		`failed to get open pull requests from BitBucket: parse "http://\x01/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests?start=0": net/url: invalid control character in URL`,
+	)
+}
+
+func TestBitBucketReporterConnectionRefused(t *testing.T) {
+	slog.SetDefault(slogt.New(t))
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+	closedURL := srv.URL
+	srv.Close()
+
+	r := reporter.NewBitBucketReporter(
+		closedURL,
+		time.Second,
+		"token",
+		"proj",
+		"repo",
+		bbFakeBranch,
+		bbFakeCommitID,
+		50,
+	)
+
+	summary := reporter.NewSummary(nil)
+	err := reporter.Submit(t.Context(), summary, r, false)
+	require.Error(t, err)
+}
+
+func TestBitBucketReporterTruncatedResponseBody(t *testing.T) {
+	slog.SetDefault(slogt.New(t))
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet && strings.Contains(r.URL.Path, "/pull-requests") {
+			w.Header().Set("Content-Length", "1000")
+			_, _ = w.Write([]byte(`{`))
+			if f, ok := w.(http.Flusher); ok {
+				f.Flush()
+			}
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	}))
+	t.Cleanup(srv.Close)
+
+	r := reporter.NewBitBucketReporter(
+		srv.URL,
+		time.Second,
+		"token",
+		"proj",
+		"repo",
+		bbFakeBranch,
+		bbFakeCommitID,
+		50,
+	)
+
+	summary := reporter.NewSummary(nil)
+	err := reporter.Submit(t.Context(), summary, r, false)
+	require.EqualError(t, err, "failed to get open pull requests from BitBucket: unexpected EOF")
+}
+
+func TestBitBucketReporterRequestValidatesToken(t *testing.T) {
+	slog.SetDefault(slogt.New(t))
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		auth := r.Header.Get("Authorization")
+		if auth != "Bearer test-token" {
+			w.WriteHeader(http.StatusUnauthorized)
+			_, _ = fmt.Fprintln(w, "bad token")
+			return
+		}
+
+		switch {
+		case strings.Contains(r.URL.Path, "/pull-requests"):
+			noPRs, _ := json.Marshal(reporter.BitBucketPullRequests{IsLastPage: true})
+			_, _ = w.Write(noPRs)
+		default:
+			w.WriteHeader(http.StatusOK)
+		}
+	}))
+	t.Cleanup(srv.Close)
+
+	r := reporter.NewBitBucketReporter(
+		srv.URL,
+		time.Second,
+		"test-token",
+		"proj",
+		"repo",
+		"branch",
+		"abc123",
+		50,
+	)
+
+	summary := reporter.NewSummary(nil)
+	err := reporter.Submit(t.Context(), summary, r, false)
+	require.NoError(t, err)
 }
