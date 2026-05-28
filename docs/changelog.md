@@ -7,6 +7,11 @@
 - Added [promql/offset](checks/promql/offset.md) check that warns when a PromQL
   query uses an `offset` larger than configured Prometheus retention.
 
+### Changed
+
+- BitBucket reporter no longer creates Code Insight annotations.
+  All problems are now reported as pull request comments.
+
 ## v0.84.0
 
 ### Added

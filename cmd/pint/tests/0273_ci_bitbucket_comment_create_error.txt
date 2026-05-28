@@ -1,8 +1,8 @@
 http response bitbucket /plugins/servlet/applinks/whoami 200 pint
 http response bitbucket /rest/api/1.0/projects/prometheus/repos/rules/commits/.*/pull-requests 200 {"size":1,"isLastPage":true,"values":[{"id":1,"open":true,"fromRef":{"id":"refs/heads/v2","latestCommit":"fake-commit-id"},"toRef":{"id":"refs/heads/main","latestCommit":"fake-commit-id"}}]}
 http response bitbucket /rest/api/latest/projects/prometheus/repos/rules/pull-requests/1/activities 200 {"size":0,"isLastPage":true,"values":[]}
-http response bitbucket /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments 200 {}
-http start bitbucket 127.0.0.1:6068
+http method bitbucket POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments 500 error
+http start bitbucket 127.0.0.1:7273
 
 mkdir testrepo
 cd testrepo
@@ -19,28 +19,27 @@ exec git commit -am 'import rules and config'
 
 exec git checkout -b v2
 cp ../src/v2.yml rules.yml
-exec git commit -am '[skip ci] v2'
+exec git commit -am 'v2'
 
 env BITBUCKET_AUTH_TOKEN="12345"
-exec pint -l debug --no-color ci
+! exec pint --no-color ci
 ! stdout .
-stderr 'level=INFO msg="Found a commit with ''\[skip ci\]'', skipping all checks" commit=.*'
-cmp bitbucket.got ../bitbucket.expected
+stderr 'msg="Problems found"'
+stderr 'submitting reports: POST request failed'
 
 -- src/v1.yml --
-- alert: rule1
-  expr: sum(foo) by(job)
-- alert: rule2
-  expr: sum(foo) by(job)
-  for: 0s
+groups:
+- name: foo
+  rules:
+  - record: up:count
+    expr: count(up == 1)
 
 -- src/v2.yml --
-- alert: rule1
-  expr: sum(
-  for: 0s
-- alert: rule2
-  expr: sum(foo) by(job)0)
-  for: 0s
+groups:
+- name: foo
+  rules:
+  - record: up:count
+    expr: count(up == 1) bie(job)
 
 -- src/.pint.hcl --
 ci {
@@ -48,26 +47,9 @@ ci {
 }
 repository {
   bitbucket {
-    uri        = "http://127.0.0.1:6068"
+    uri        = "http://127.0.0.1:7273"
     timeout    = "10s"
     project    = "prometheus"
     repository = "rules"
   }
 }
-
--- bitbucket.expected --
-GET /rest/api/1.0/projects/prometheus/repos/rules/commits/.*/pull-requests
-  Accept-Encoding: gzip
-  Authorization: Bearer "12345"
-  Content-Type: application/json
-
-GET /plugins/servlet/applinks/whoami
-  Accept-Encoding: gzip
-  Authorization: Bearer "12345"
-  Content-Type: application/json
-
-GET /rest/api/latest/projects/prometheus/repos/rules/pull-requests/1/activities
-  Accept-Encoding: gzip
-  Authorization: Bearer "12345"
-  Content-Type: application/json
-

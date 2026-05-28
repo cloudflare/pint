@@ -5,7 +5,7 @@ go 1.26.0
 require (
 	github.com/cespare/xxhash/v2 v2.3.0
 	github.com/gkampitakis/go-snaps v0.5.22
-	github.com/go-json-experiment/json v0.0.0-20260505212615-e40f80bf6836
+	github.com/go-json-experiment/json v0.0.0-20260520185125-572e7c383686
 	github.com/google/go-cmp v0.7.0
 	github.com/google/go-github/v88 v88.0.0
 	github.com/hashicorp/hcl/v2 v2.24.0

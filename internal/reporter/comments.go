@@ -283,23 +283,6 @@ func dedupReports(src []Report, showDuplicates bool) (dst [][]Report) {
 	return dst
 }
 
-func identicalDetails(src []Report) bool {
-	if len(src) <= 1 {
-		return false
-	}
-	var details string
-	for _, report := range src {
-		if details == "" {
-			details = report.Problem.Details
-			continue
-		}
-		if details != report.Problem.Details {
-			return false
-		}
-	}
-	return true
-}
-
 func problemIcon(s checks.Severity) string {
 	// nolint:exhaustive
 	switch s {
