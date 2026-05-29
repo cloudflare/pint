@@ -91,17 +91,17 @@ func (c RateCheck) Check(ctx context.Context, entry *discovery.Entry, entries []
 		return problems
 	}
 
-	metadataNames := c.collectRateMetricNames(expr.Query(), entries)
+	metadataNames := c.collectRateMetricNames(expr, entries)
 	pending := make(map[string]*promapi.Request[*promapi.MetadataResult], len(metadataNames))
 	for _, name := range metadataNames {
 		pending[name] = c.prom.Metadata(ctx, name)
 	}
 
-	problems = append(problems, c.checkNode(ctx, entry.Rule, expr, expr.Query(), entries, cfg, pending, &completedList{values: nil})...)
+	problems = append(problems, c.checkSources(entry.Rule, expr, entries, cfg, pending)...)
 	return problems
 }
 
-func (c RateCheck) collectRateMetricNames(node *parser.PromQLNode, entries []*discovery.Entry) []string {
+func (c RateCheck) collectRateMetricNames(expr *parser.PromQLExpr, entries []*discovery.Entry) []string {
 	seen := map[string]struct{}{}
 	var names []string
 
@@ -113,65 +113,65 @@ func (c RateCheck) collectRateMetricNames(node *parser.PromQLNode, entries []*di
 		names = append(names, name)
 	}
 
-	c.walkMetricNames(node, entries, add)
-	return names
-}
-
-func (c RateCheck) walkMetricNames(node *parser.PromQLNode, entries []*discovery.Entry, add func(string)) {
-	if n, ok := node.Expr.(*promParser.Call); ok && (n.Func.Name == "rate" || n.Func.Name == "irate" || n.Func.Name == "deriv") {
-		for _, arg := range n.Args {
-			m, ok := arg.(*promParser.MatrixSelector)
-			if !ok {
-				continue
+	for _, src := range expr.Source() {
+		src.WalkSources(func(s source.Source, _ *source.Join, _ *source.Unless) {
+			call, found := findRateCall(s)
+			// deriv() doesn't require a counter, skip metadata collection for it.
+			if !found || call.Func.Name == "deriv" {
+				return
 			}
-			if n.Func.Name == "deriv" {
-				continue
+			// Skip subqueries like rate(foo[5m:1m]) — only collect names from range selectors.
+			if _, ok := source.MostOuterOperation[*promParser.MatrixSelector](s); !ok {
+				return
 			}
-			if s, ok := m.VectorSelector.(*promParser.VectorSelector); ok {
-				add(s.Name)
-				for _, e := range entries {
-					if e.PathError != nil {
-						continue
-					}
-					if e.Rule.Error.Err != nil {
-						continue
-					}
-					if e.Rule.RecordingRule != nil && e.Rule.RecordingRule.Expr.SyntaxError() == nil && e.Rule.RecordingRule.Record.Value == s.Name {
-						for _, src := range e.Rule.RecordingRule.Expr.Source() {
-							if src.Type != source.AggregateSource {
-								continue
-							}
-							if vs, ok := source.MostOuterOperation[*promParser.VectorSelector](src); ok {
-								add(vs.Name)
-							}
+			// We confirmed MatrixSelector above, which always wraps a VectorSelector.
+			vs, _ := source.MostOuterOperation[*promParser.VectorSelector](s)
+			add(vs.Name)
+			for _, e := range entries {
+				if e.PathError != nil {
+					continue
+				}
+				if e.Rule.Error.Err != nil {
+					continue
+				}
+				if e.Rule.RecordingRule != nil && e.Rule.RecordingRule.Expr.SyntaxError() == nil && e.Rule.RecordingRule.Record.Value == vs.Name {
+					for _, rsrc := range e.Rule.RecordingRule.Expr.Source() {
+						if rsrc.Type != source.AggregateSource {
+							continue
+						}
+						if rvs, ok := source.MostOuterOperation[*promParser.VectorSelector](rsrc); ok {
+							add(rvs.Name)
 						}
 					}
 				}
 			}
-		}
+		})
 	}
 
-	for _, child := range node.Children {
-		c.walkMetricNames(child, entries, add)
-	}
+	return names
 }
 
-func (c RateCheck) checkNode(
-	ctx context.Context,
+func (c RateCheck) checkSources(
 	rule parser.Rule,
 	expr *parser.PromQLExpr,
-	node *parser.PromQLNode,
 	entries []*discovery.Entry,
 	cfg *promapi.ConfigResult,
 	pending map[string]*promapi.Request[*promapi.MetadataResult],
-	done *completedList,
 ) (problems []Problem) {
-	if n, ok := node.Expr.(*promParser.Call); ok && (n.Func.Name == "rate" || n.Func.Name == "irate" || n.Func.Name == "deriv") {
-		for _, arg := range n.Args {
-			m, ok := arg.(*promParser.MatrixSelector)
+	done := map[string]struct{}{}
+
+	for _, src := range expr.Source() {
+		src.WalkSources(func(s source.Source, _ *source.Join, _ *source.Unless) {
+			call, ok := findRateCall(s)
 			if !ok {
-				continue
+				return
 			}
+
+			m, ok := source.MostOuterOperation[*promParser.MatrixSelector](s)
+			if !ok {
+				return
+			}
+
 			if m.Range < cfg.Config.Global.ScrapeInterval*time.Duration(c.minIntervals) {
 				problems = append(problems, Problem{
 					Anchor:   AnchorAfter,
@@ -182,131 +182,151 @@ func (c RateCheck) checkNode(
 					Severity: Bug,
 					Diagnostics: []diags.Diagnostic{
 						{
-							Message: fmt.Sprintf("Duration for `%s()` must be at least %d x scrape_interval, %s is using `%s` scrape_interval.",
-								n.Func.Name, c.minIntervals, promText(c.prom.Name(), cfg.URI), output.HumanizeDuration(cfg.Config.Global.ScrapeInterval)),
+							Message: fmt.Sprintf(
+								"Duration for `%s()` must be at least %d x scrape_interval, %s is using `%s` scrape_interval.",
+								call.Func.Name, c.minIntervals,
+								promText(c.prom.Name(), cfg.URI),
+								output.HumanizeDuration(cfg.Config.Global.ScrapeInterval),
+							),
 							Pos:         expr.Value.Pos,
 							Expr:        expr.Query().Expr,
-							FirstColumn: int(n.PosRange.Start) + 1,
-							LastColumn:  int(n.PosRange.End),
+							FirstColumn: int(call.PosRange.Start) + 1,
+							LastColumn:  int(call.PosRange.End),
 							Kind:        diags.Issue,
 						},
 					},
 				})
 			}
-			if n.Func.Name == "deriv" {
-				continue
-			}
-			if s, ok := m.VectorSelector.(*promParser.VectorSelector); ok {
-				if slices.Contains(done.values, s.Name) {
-					continue
-				}
-				done.values = append(done.values, s.Name)
-				metadata, err := pending[s.Name].Wait()
-				if err != nil {
-					if errors.Is(err, promapi.ErrUnsupported) {
-						continue
-					}
-					problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug))
-					continue
-				}
-				for _, m := range metadata.Metadata {
-					if !slices.Contains(allowedRateTypes, m.Type) {
-						problems = append(problems, Problem{
-							Anchor:   AnchorAfter,
-							Lines:    expr.Value.Pos.Lines(),
-							Reporter: c.Reporter(),
-							Summary:  "counter based function called on a non-counter",
-							Details:  RateCheckDetails,
-							Severity: Bug,
-							Diagnostics: []diags.Diagnostic{
-								{
-									Message: fmt.Sprintf("`%s()` should only be used with counters but `%s` is a %s according to metrics metadata from %s.",
-										n.Func.Name, s.Name, m.Type, promText(c.prom.Name(), metadata.URI)),
-									Pos:         expr.Value.Pos,
-									Expr:        expr.Query().Expr,
-									FirstColumn: int(n.PosRange.Start) + 1,
-									LastColumn:  int(n.PosRange.End),
-									Kind:        diags.Issue,
-								},
-							},
-						})
-					}
-				}
 
-				for _, e := range entries {
-					if e.PathError != nil {
-						continue
-					}
-					if e.Rule.Error.Err != nil {
-						continue
-					}
-					if e.Rule.RecordingRule != nil && e.Rule.RecordingRule.Expr.SyntaxError() == nil && e.Rule.RecordingRule.Record.Value == s.Name {
-						for _, src := range e.Rule.RecordingRule.Expr.Source() {
-							if src.Type != source.AggregateSource {
+			// deriv() works on gauges, no need to check metric type via metadata.
+			if call.Func.Name == "deriv" {
+				return
+			}
+
+			// MatrixSelector always wraps a VectorSelector, so this can't fail.
+			vs, _ := source.MostOuterOperation[*promParser.VectorSelector](s)
+
+			if _, ok := done[vs.Name]; ok {
+				return
+			}
+			done[vs.Name] = struct{}{}
+
+			metadata, err := pending[vs.Name].Wait()
+			if err != nil {
+				if errors.Is(err, promapi.ErrUnsupported) {
+					return
+				}
+				problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug))
+				return
+			}
+			for _, md := range metadata.Metadata {
+				if !slices.Contains(allowedRateTypes, md.Type) {
+					problems = append(problems, Problem{
+						Anchor:   AnchorAfter,
+						Lines:    expr.Value.Pos.Lines(),
+						Reporter: c.Reporter(),
+						Summary:  "counter based function called on a non-counter",
+						Details:  RateCheckDetails,
+						Severity: Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: fmt.Sprintf(
+									"`%s()` should only be used with counters but `%s` is a %s according to metrics metadata from %s.",
+									call.Func.Name, vs.Name, md.Type,
+									promText(c.prom.Name(), metadata.URI),
+								),
+								Pos:         expr.Value.Pos,
+								Expr:        expr.Query().Expr,
+								FirstColumn: int(call.PosRange.Start) + 1,
+								LastColumn:  int(call.PosRange.End),
+								Kind:        diags.Issue,
+							},
+						},
+					})
+				}
+			}
+
+			for _, e := range entries {
+				if e.PathError != nil {
+					continue
+				}
+				if e.Rule.Error.Err != nil {
+					continue
+				}
+				if e.Rule.RecordingRule != nil && e.Rule.RecordingRule.Expr.SyntaxError() == nil && e.Rule.RecordingRule.Record.Value == vs.Name {
+					for _, rsrc := range e.Rule.RecordingRule.Expr.Source() {
+						if rsrc.Type != source.AggregateSource {
+							continue
+						}
+						if rvs, ok := source.MostOuterOperation[*promParser.VectorSelector](rsrc); ok {
+							metadata, err := pending[rvs.Name].Wait()
+							if err != nil {
+								if errors.Is(err, promapi.ErrUnsupported) {
+									continue
+								}
+								problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug))
 								continue
 							}
-							if vs, ok := source.MostOuterOperation[*promParser.VectorSelector](src); ok {
-								metadata, err := pending[vs.Name].Wait()
-								if err != nil {
-									if errors.Is(err, promapi.ErrUnsupported) {
-										continue
-									}
-									problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug))
-									continue
+							canReport := true
+							severity := Warning
+							for _, md := range metadata.Metadata {
+								// nolint:exhaustive
+								switch md.Type {
+								case v1.MetricTypeCounter:
+									severity = Bug
+								default:
+									canReport = false
 								}
-								canReport := true
-								severity := Warning
-								for _, m := range metadata.Metadata {
-									// nolint:exhaustive
-									switch m.Type {
-									case v1.MetricTypeCounter:
-										severity = Bug
-									default:
-										canReport = false
-									}
-								}
-								if !canReport {
-									continue
-								}
-								problems = append(problems, Problem{
-									Anchor:   AnchorAfter,
-									Lines:    expr.Value.Pos.Lines(),
-									Reporter: c.Reporter(),
-									Summary:  "chained rate call",
-									Details: fmt.Sprintf(
-										"You can only calculate `rate()` directly from a counter metric. "+
-											"Calling `rate()` on `%s()` results will return bogus results because `%s()` will hide information on when each counter resets. "+
-											"You must first calculate `rate()` before calling any aggregation function. Always `sum(rate(counter))`, never `rate(sum(counter))`",
-										src.Operation(), src.Operation(),
-									),
-									Severity: severity,
-									Diagnostics: []diags.Diagnostic{
-										{
-											Message: fmt.Sprintf("`rate(%s(counter))` chain detected, `%s` is called here on results of `%s(%s)`.",
-												src.Operation(), node.Expr, src.Operation(), vs),
-											Pos:         expr.Value.Pos,
-											Expr:        expr.Query().Expr,
-											FirstColumn: int(src.Position.Start) + 1,
-											LastColumn:  int(src.Position.End),
-											Kind:        diags.Issue,
-										},
-									},
-								})
 							}
+							if !canReport {
+								continue
+							}
+							problems = append(problems, Problem{
+								Anchor:   AnchorAfter,
+								Lines:    expr.Value.Pos.Lines(),
+								Reporter: c.Reporter(),
+								Summary:  "chained rate call",
+								Details: fmt.Sprintf(
+									"You can only calculate `rate()` directly from a counter metric. "+
+										"Calling `rate()` on `%s()` results will return bogus results because `%s()` will hide information on when each counter resets. "+
+										"You must first calculate `rate()` before calling any aggregation function. Always `sum(rate(counter))`, never `rate(sum(counter))`",
+									rsrc.Operation(), rsrc.Operation(),
+								),
+								Severity: severity,
+								Diagnostics: []diags.Diagnostic{
+									{
+										Message: fmt.Sprintf(
+											"`rate(%s(counter))` chain detected, `%s` is called here on results of `%s(%s)`.",
+											rsrc.Operation(), call, rsrc.Operation(), rvs,
+										),
+										Pos:         expr.Value.Pos,
+										Expr:        expr.Query().Expr,
+										FirstColumn: int(rsrc.Position.Start) + 1,
+										LastColumn:  int(rsrc.Position.End),
+										Kind:        diags.Issue,
+									},
+								},
+							})
 						}
 					}
 				}
 			}
-		}
-	}
-
-	for _, child := range node.Children {
-		problems = append(problems, c.checkNode(ctx, rule, expr, child, entries, cfg, pending, done)...)
+		})
 	}
 
 	return problems
 }
 
-type completedList struct {
-	values []string
+func findRateCall(s source.Source) (*promParser.Call, bool) {
+	for _, op := range s.Operations {
+		call, ok := op.Node.(*promParser.Call)
+		if !ok {
+			continue
+		}
+		switch call.Func.Name {
+		case "rate", "irate", "deriv":
+			return call, true
+		}
+	}
+	return nil, false
 }
