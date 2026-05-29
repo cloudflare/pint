@@ -169,6 +169,26 @@ func newDefaultFeatures() *Features {
 		MinVersion:    ver(3, 11, 0),
 		StableVersion: ver(0, 0, 0),
 	})
+	f.Register("start", FeatureVersion{
+		Flag:          FeatureExperimentalFunctions,
+		MinVersion:    ver(3, 12, 0),
+		StableVersion: ver(0, 0, 0),
+	})
+	f.Register("end", FeatureVersion{
+		Flag:          FeatureExperimentalFunctions,
+		MinVersion:    ver(3, 12, 0),
+		StableVersion: ver(0, 0, 0),
+	})
+	f.Register("range", FeatureVersion{
+		Flag:          FeatureExperimentalFunctions,
+		MinVersion:    ver(3, 12, 0),
+		StableVersion: ver(0, 0, 0),
+	})
+	f.Register("step", FeatureVersion{
+		Flag:          FeatureExperimentalFunctions,
+		MinVersion:    ver(3, 12, 0),
+		StableVersion: ver(0, 0, 0),
+	})
 
 	// Experimental aggregation operators behind promql-experimental-functions.
 	f.Register(promParser.ItemTypeStr[promParser.LIMITK], FeatureVersion{

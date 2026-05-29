@@ -802,6 +802,46 @@ func TestLabelsSourceWithFeatures(t *testing.T) {
 			description: "limit_ratio with without",
 			expr:        `limit_ratio(0.5, foo) without(job)`,
 		},
+		// Experimental function: start() and end() used to compute query range.
+		{
+			description: "start and end functions",
+			expr:        `foo / (end() - start())`,
+		},
+		// Experimental function: range() used as matrix selector duration.
+		{
+			description: "range function in rate",
+			expr:        `rate(foo_total[range()])`,
+		},
+		// Experimental function: step() used as matrix selector duration.
+		{
+			description: "step function in rate",
+			expr:        `rate(foo_total[step() * 4])`,
+		},
+		// @ start() on a vector selector requires start feature.
+		{
+			description: "vector selector with @ start()",
+			expr:        `foo @ start()`,
+		},
+		// @ end() on a vector selector requires end feature.
+		{
+			description: "vector selector with @ end()",
+			expr:        `foo @ end()`,
+		},
+		// @ start() on a matrix selector via rate().
+		{
+			description: "rate with @ start()",
+			expr:        `rate(foo[5m] @ start())`,
+		},
+		// range() used inside a duration expression requires both features.
+		{
+			description: "range() inside duration expression",
+			expr:        `foo[5m+range()]`,
+		},
+		// Smoothed vector selector with @ modifier in binary operation.
+		{
+			description: "smoothed with @ modifier in binop",
+			expr:        `rate(foo[5m] smoothed @ 1609459200) + bar`,
+		},
 	}
 
 	for _, tc := range testCases {

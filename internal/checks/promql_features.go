@@ -159,7 +159,10 @@ func requiredFeatures(expr *parser.PromQLExpr) []source.FeatureRequirement {
 		features = append(features, *req)
 	}
 	slices.SortFunc(features, func(a, b source.FeatureRequirement) int {
-		return cmp.Compare(a.Feature, b.Feature)
+		if c := cmp.Compare(a.Feature, b.Feature); c != 0 {
+			return c
+		}
+		return cmp.Compare(a.Name, b.Name)
 	})
 	return features
 }

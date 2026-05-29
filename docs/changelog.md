@@ -6,6 +6,8 @@
 
 - Added [promql/offset](checks/promql/offset.md) check that warns when a PromQL
   query uses an `offset` larger than configured Prometheus retention.
+- Added support for Prometheus v3.12.0 experimental PromQL functions:
+  `start()`, `end()`, `range()`, `step()`.
 
 ### Changed
 
