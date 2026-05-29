@@ -575,9 +575,7 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 	case *promParser.MatrixSelector:
 		for _, s := range walkNode(expr, n.VectorSelector) {
 			s.Returns = promParser.ValueTypeMatrix
-			if n.RangeExpr != nil {
-				s.requireFeature("duration_expr", n.RangeExpr.PositionRange())
-			}
+			s.requireDurationExprFeatures(n.RangeExpr)
 			/*
 				// Prepend Matrix operation
 				s.Operations = append(SourceOperations{
@@ -593,15 +591,10 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 
 	case *promParser.SubqueryExpr:
 		for _, s := range walkNode(expr, n.Expr) {
-			if n.RangeExpr != nil {
-				s.requireFeature("duration_expr", n.RangeExpr.PositionRange())
-			}
-			if n.StepExpr != nil {
-				s.requireFeature("duration_expr", n.StepExpr.PositionRange())
-			}
-			if n.OriginalOffsetExpr != nil {
-				s.requireFeature("duration_expr", n.OriginalOffsetExpr.PositionRange())
-			}
+			s.requireDurationExprFeatures(n.RangeExpr)
+			s.requireDurationExprFeatures(n.StepExpr)
+			s.requireDurationExprFeatures(n.OriginalOffsetExpr)
+			s.requireStartOrEndFeature(expr, n.StartOrEnd, n.PositionRange())
 			src = append(src, s)
 		}
 
@@ -650,9 +643,8 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 			s.RangeSelectorMode = RangeSelectorSmoothed
 			s.requireFeature(promParser.ItemTypeStr[promParser.SMOOTHED], n.PosRange)
 		}
-		if n.OriginalOffsetExpr != nil {
-			s.requireFeature("duration_expr", n.OriginalOffsetExpr.PositionRange())
-		}
+		s.requireDurationExprFeatures(n.OriginalOffsetExpr)
+		s.requireStartOrEndFeature(expr, n.StartOrEnd, n.PosRange)
 		s.Operations = append(s.Operations, Operation{
 			Operation: "",
 			Node:      n,
@@ -1050,7 +1042,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
 
-	case "time":
+	case "time", "start", "end", "range", "step":
 		s.Returns = promParser.ValueTypeScalar
 		s.ReturnInfo.AlwaysReturns = true
 		s.ReturnInfo.ValuePosition = n.PosRange
@@ -1179,6 +1171,38 @@ func fillFromMatching(vm *promParser.VectorMatching) *Fill {
 	return &f
 }
 
+func (s *Source) requireDurationExprFeatures(de *promParser.DurationExpr) {
+	if de == nil {
+		return
+	}
+	s.requireFeature("duration_expr", de.PositionRange())
+	walkDurationExprFeatures(s, de)
+}
+
+func (s *Source) requireStartOrEndFeature(expr string, startOrEnd promParser.ItemType, pos posrange.PositionRange) {
+	switch startOrEnd {
+	case promParser.START:
+		s.requireFeature("start", FindFuncPosition(expr, pos, "start", nil))
+	case promParser.END:
+		s.requireFeature("end", FindFuncPosition(expr, pos, "end", nil))
+	}
+}
+
+func walkDurationExprFeatures(s *Source, de *promParser.DurationExpr) {
+	switch de.Op {
+	case promParser.RANGE:
+		s.requireFeature("range", de.PositionRange())
+	case promParser.STEP:
+		s.requireFeature("step", de.PositionRange())
+	}
+	if lhs, ok := de.LHS.(*promParser.DurationExpr); ok {
+		walkDurationExprFeatures(s, lhs)
+	}
+	if rhs, ok := de.RHS.(*promParser.DurationExpr); ok {
+		walkDurationExprFeatures(s, rhs)
+	}
+}
+
 func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 	pos := n.PositionRange()
 	src = make([]Source, 0, 2)
@@ -1194,17 +1218,21 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 			ls.IsConditional, ls.ReturnInfo.IsReturnBool = checkConditions(ls, n.Op, n.ReturnBool)
 			for _, rs := range rhs {
 				rs.IsConditional, rs.ReturnInfo.IsReturnBool = checkConditions(rs, n.Op, n.ReturnBool)
-				var side Source
+				var side, other Source
 				switch {
 				case ls.Returns == promParser.ValueTypeVector, ls.Returns == promParser.ValueTypeMatrix:
 					// Use labels from LHS
 					side = ls
+					other = rs
 				case rs.Returns == promParser.ValueTypeVector, rs.Returns == promParser.ValueTypeMatrix:
 					// Use labels from RHS
 					side = rs
+					other = ls
 				default:
 					side = ls
+					other = rs
 				}
+				side.NeedsFeatures = append(side.NeedsFeatures, other.NeedsFeatures...)
 				if ls.ReturnInfo.AlwaysReturns && rs.ReturnInfo.AlwaysReturns && ls.ReturnInfo.KnownReturn && rs.ReturnInfo.KnownReturn {
 					// Both sides always return something
 					side.ReturnInfo, side.DeadInfo = calculateStaticReturn(expr, ls, rs, n)

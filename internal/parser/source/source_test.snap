@@ -11980,6 +11980,12 @@ output:
       operations:
         - node: '[*parser.VectorSelector] foo @ start()'
           op: ""
+      needsFeatures:
+        - feature: promql-experimental-functions
+          name: start
+          fragments:
+            - start: 6
+              end: 13
       position:
         start: 0
         end: 13
@@ -11994,6 +12000,12 @@ output:
       operations:
         - node: '[*parser.VectorSelector] foo @ end()'
           op: ""
+      needsFeatures:
+        - feature: promql-experimental-functions
+          name: end
+          fragments:
+            - start: 6
+              end: 11
       position:
         start: 0
         end: 11
@@ -12024,6 +12036,12 @@ output:
           op: ""
         - node: '[*parser.Call] rate(foo[5m] @ start())'
           op: rate
+      needsFeatures:
+        - feature: promql-experimental-functions
+          name: start
+          fragments:
+            - start: 5
+              end: 8
       position:
         start: 5
         end: 22
@@ -14745,6 +14763,80 @@ output:
 
 ---
 
+[TestLabelsSourceWithFeatures/range()_inside_duration_expression - 1]
+expr: foo[5m+range()]
+output:
+    - returns: matrix
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+      needsFeatures:
+        - feature: promql-duration-expr
+          name: duration_expr
+          fragments:
+            - start: 4
+              end: 14
+        - feature: promql-experimental-functions
+          name: range
+          fragments:
+            - start: 7
+              end: 14
+      position:
+        start: 0
+        end: 3
+      type: selector
+
+---
+
+[TestLabelsSourceWithFeatures/range_function_in_rate - 1]
+expr: rate(foo_total[range()])
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo_total'
+          op: ""
+        - node: '[*parser.Call] rate(foo_total[range()])'
+          op: rate
+      needsFeatures:
+        - feature: promql-duration-expr
+          name: duration_expr
+          fragments:
+            - start: 15
+              end: 22
+        - feature: promql-experimental-functions
+          name: range
+          fragments:
+            - start: 15
+              end: 22
+      position:
+        start: 5
+        end: 23
+      type: function
+
+---
+
+[TestLabelsSourceWithFeatures/rate_with_@_start() - 1]
+expr: rate(foo[5m] @ start())
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo @ start()'
+          op: ""
+        - node: '[*parser.Call] rate(foo[5m] @ start())'
+          op: rate
+      needsFeatures:
+        - feature: promql-experimental-functions
+          name: start
+          fragments:
+            - start: 5
+              end: 8
+      position:
+        start: 5
+        end: 22
+      type: function
+
+---
+
 [TestLabelsSourceWithFeatures/smoothed_matrix_selector_inside_rate - 1]
 expr: rate(foo[5m] smoothed)
 output:
@@ -14763,6 +14855,51 @@ output:
       position:
         start: 5
         end: 12
+      type: function
+      rangeSelectorMode: smoothed
+
+---
+
+[TestLabelsSourceWithFeatures/smoothed_with_@_modifier_in_binop - 1]
+expr: rate(foo[5m] smoothed @ 1609459200) + bar
+output:
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 41
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo @ 1609459200.000 smoothed'
+          op: ""
+        - node: '[*parser.Call] rate(foo[5m] smoothed @ 1609459200.000)'
+          op: rate
+      joins:
+        - addedlabels: []
+          depth: 0
+          ison: false
+          matchinglabels: []
+          op: +
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+            position:
+                start: 38
+                end: 41
+            type: selector
+      needsFeatures:
+        - feature: promql-extended-range-selectors
+          name: smoothed
+          fragments:
+            - start: 5
+              end: 8
+      position:
+        start: 5
+        end: 34
       type: function
       rangeSelectorMode: smoothed
 
@@ -14789,5 +14926,97 @@ output:
         start: 14
         end: 17
       type: function
+
+---
+
+[TestLabelsSourceWithFeatures/start_and_end_functions - 1]
+expr: foo / (end() - start())
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+      needsFeatures:
+        - feature: promql-experimental-functions
+          name: end
+          fragments:
+            - start: 7
+              end: 10
+        - feature: promql-experimental-functions
+          name: start
+          fragments:
+            - start: 15
+              end: 20
+      position:
+        start: 0
+        end: 3
+      type: selector
+
+---
+
+[TestLabelsSourceWithFeatures/step_function_in_rate - 1]
+expr: rate(foo_total[step() * 4])
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo_total'
+          op: ""
+        - node: '[*parser.Call] rate(foo_total[step() * 4])'
+          op: rate
+      needsFeatures:
+        - feature: promql-duration-expr
+          name: duration_expr
+          fragments:
+            - start: 15
+              end: 25
+        - feature: promql-experimental-functions
+          name: step
+          fragments:
+            - start: 15
+              end: 21
+      position:
+        start: 5
+        end: 26
+      type: function
+
+---
+
+[TestLabelsSourceWithFeatures/vector_selector_with_@_end() - 1]
+expr: foo @ end()
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo @ end()'
+          op: ""
+      needsFeatures:
+        - feature: promql-experimental-functions
+          name: end
+          fragments:
+            - start: 6
+              end: 11
+      position:
+        start: 0
+        end: 11
+      type: selector
+
+---
+
+[TestLabelsSourceWithFeatures/vector_selector_with_@_start() - 1]
+expr: foo @ start()
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo @ start()'
+          op: ""
+      needsFeatures:
+        - feature: promql-experimental-functions
+          name: start
+          fragments:
+            - start: 6
+              end: 13
+      position:
+        start: 0
+        end: 13
+      type: selector
 
 ---

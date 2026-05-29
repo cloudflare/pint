@@ -357,6 +357,434 @@ func TestFeaturesCheck(t *testing.T) {
 				},
 			},
 		},
+		// Verifies that start() and end() produce problems when the flag is missing.
+		{
+			description: "start() missing feature flag",
+			content:     "- record: foo\n  expr: foo / (end() - start())\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp:  flagsResponse{flags: map[string]string{}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.12.0"},
+				},
+			},
+		},
+		// Verifies that start() and end() produce no problems when the flag is enabled.
+		{
+			description: "start() with feature flag enabled",
+			content:     "- record: foo\n  expr: foo / (end() - start())\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp: flagsResponse{flags: map[string]string{
+						"enable-feature": "promql-experimental-functions",
+					}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.12.0"},
+				},
+			},
+		},
+		// Verifies that start() on a version too old produces a problem even with the flag.
+		{
+			description: "start() version too old with flag",
+			content:     "- record: foo\n  expr: foo / (end() - start())\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp: flagsResponse{flags: map[string]string{
+						"enable-feature": "promql-experimental-functions",
+					}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.11.0"},
+				},
+			},
+		},
+		// Verifies that start() on a version too old without the flag produces a problem.
+		{
+			description: "start() version too old without flag",
+			content:     "- record: foo\n  expr: foo / (end() - start())\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp:  flagsResponse{flags: map[string]string{}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.11.0"},
+				},
+			},
+		},
+		// Verifies that end() in a different expression produces a problem.
+		{
+			description: "end() missing feature flag",
+			content:     "- record: foo\n  expr: foo / (end() - start()) + bar\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp:  flagsResponse{flags: map[string]string{}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.12.0"},
+				},
+			},
+		},
+		// Verifies that end() in a different expression produces no problem.
+		{
+			description: "end() with feature flag enabled",
+			content:     "- record: foo\n  expr: foo / (end() - start()) + bar\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp: flagsResponse{flags: map[string]string{
+						"enable-feature": "promql-experimental-functions",
+					}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.12.0"},
+				},
+			},
+		},
+		// Verifies that range() as a duration in rate() produces a problem.
+		{
+			description: "range() missing feature flag",
+			content:     "- record: foo\n  expr: rate(foo_total[range()])\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp:  flagsResponse{flags: map[string]string{}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.12.0"},
+				},
+			},
+		},
+		// Verifies that range() as a duration in rate() produces no problem.
+		{
+			description: "range() with feature flag enabled",
+			content:     "- record: foo\n  expr: rate(foo_total[range()])\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp: flagsResponse{flags: map[string]string{
+						"enable-feature": "promql-experimental-functions,promql-duration-expr",
+					}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.12.0"},
+				},
+			},
+		},
+		// Verifies that range() with only duration-expr enabled still reports
+		// missing experimental-functions flag.
+		{
+			description: "range() with only duration-expr flag",
+			content:     "- record: foo\n  expr: rate(foo_total[range()])\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp: flagsResponse{flags: map[string]string{
+						"enable-feature": "promql-duration-expr",
+					}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.12.0"},
+				},
+			},
+		},
+		// Verifies that range() with only experimental-functions enabled still
+		// reports missing duration-expr flag.
+		{
+			description: "range() with only experimental-functions flag",
+			content:     "- record: foo\n  expr: rate(foo_total[range()])\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp: flagsResponse{flags: map[string]string{
+						"enable-feature": "promql-experimental-functions",
+					}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.12.0"},
+				},
+			},
+		},
+		// Verifies that step() as a duration in rate() produces a problem.
+		{
+			description: "step() missing feature flag",
+			content:     "- record: foo\n  expr: rate(foo_total[step() * 4])\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp:  flagsResponse{flags: map[string]string{}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.12.0"},
+				},
+			},
+		},
+		// Verifies that step() as a duration in rate() produces no problem.
+		{
+			description: "step() with feature flag enabled",
+			content:     "- record: foo\n  expr: rate(foo_total[step() * 4])\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp: flagsResponse{flags: map[string]string{
+						"enable-feature": "promql-experimental-functions,promql-duration-expr",
+					}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.12.0"},
+				},
+			},
+		},
+		// @ start() on a vector selector requires the start feature.
+		{
+			description: "@ start() missing feature flag",
+			content:     "- record: foo\n  expr: bar @ start()\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp:  flagsResponse{flags: map[string]string{}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.12.0"},
+				},
+			},
+		},
+		// @ start() with the flag enabled produces no problem.
+		{
+			description: "@ start() with feature flag enabled",
+			content:     "- record: foo\n  expr: bar @ start()\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp: flagsResponse{flags: map[string]string{
+						"enable-feature": "promql-experimental-functions",
+					}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.12.0"},
+				},
+			},
+		},
+		// @ end() on a vector selector requires the end feature.
+		{
+			description: "@ end() missing feature flag",
+			content:     "- record: foo\n  expr: bar @ end()\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp:  flagsResponse{flags: map[string]string{}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.12.0"},
+				},
+			},
+		},
+		// @ end() with the flag enabled produces no problem.
+		{
+			description: "@ end() with feature flag enabled",
+			content:     "- record: foo\n  expr: bar @ end()\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp: flagsResponse{flags: map[string]string{
+						"enable-feature": "promql-experimental-functions",
+					}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.12.0"},
+				},
+			},
+		},
+		// start() on the RHS of a scalar-vector binop (VectorMatching==nil).
+		{
+			description: "start() in scalar-vector binop",
+			content:     "- record: foo\n  expr: foo / (end() - start())\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp:  flagsResponse{flags: map[string]string{}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.12.0"},
+				},
+			},
+		},
+		// start() on the RHS of a one-to-one binop (CardOneToOne).
+		{
+			description: "start() in one-to-one binop",
+			content:     "- record: foo\n  expr: foo + on(job) bar / (end() - start())\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp:  flagsResponse{flags: map[string]string{}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.12.0"},
+				},
+			},
+		},
+		// start() on the RHS of a many-to-one binop (CardManyToOne / group_left).
+		{
+			description: "start() in group_left binop",
+			content:     "- record: foo\n  expr: foo * on(job) group_left() bar / (end() - start())\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp:  flagsResponse{flags: map[string]string{}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.12.0"},
+				},
+			},
+		},
+		// start() on the LHS of a one-to-many binop (CardOneToMany / group_right).
+		{
+			description: "start() in group_right binop",
+			content:     "- record: foo\n  expr: foo / (end() - start()) * on(job) group_right() bar\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp:  flagsResponse{flags: map[string]string{}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.12.0"},
+				},
+			},
+		},
+		// start() on the RHS of a many-to-many binop (or).
+		{
+			description: "start() in or binop",
+			content:     "- record: foo\n  expr: foo or bar / (end() - start())\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp:  flagsResponse{flags: map[string]string{}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.12.0"},
+				},
+			},
+		},
+		// start() on the RHS of a many-to-many binop (and).
+		{
+			description: "start() in and binop",
+			content:     "- record: foo\n  expr: foo and bar / (end() - start())\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp:  flagsResponse{flags: map[string]string{}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.12.0"},
+				},
+			},
+		},
+		// start() on the RHS of a many-to-many binop (unless).
+		{
+			description: "start() in unless binop",
+			content:     "- record: foo\n  expr: foo unless bar / (end() - start())\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp:  flagsResponse{flags: map[string]string{}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.12.0"},
+				},
+			},
+		},
 	}
 	runTests(t, testCases)
 }
