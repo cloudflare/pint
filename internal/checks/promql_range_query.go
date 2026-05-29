@@ -13,6 +13,7 @@ import (
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
+	"github.com/cloudflare/pint/internal/parser/source"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -74,10 +75,8 @@ func (c RangeQueryCheck) Check(ctx context.Context, entry *discovery.Entry, _ []
 
 	if c.limit > 0 {
 		problems = append(
-			problems, c.checkNode(
-				ctx,
+			problems, c.checkSources(
 				expr,
-				expr.Query(),
 				c.limit,
 				fmt.Sprintf("%s is the maximum allowed range query.", model.Duration(c.limit)),
 				c.severity,
@@ -105,10 +104,8 @@ func (c RangeQueryCheck) Check(ctx context.Context, entry *discovery.Entry, _ []
 	}
 
 	problems = append(
-		problems, c.checkNode(
-			ctx,
+		problems, c.checkSources(
 			expr,
-			expr.Query(),
 			retention,
 			fmt.Sprintf("%s is configured to only keep %s of metrics history.", promText(c.prom.Name(), flags.URI),
 				model.Duration(retention)),
@@ -119,9 +116,16 @@ func (c RangeQueryCheck) Check(ctx context.Context, entry *discovery.Entry, _ []
 	return problems
 }
 
-func (c RangeQueryCheck) checkNode(ctx context.Context, expr *parser.PromQLExpr, node *parser.PromQLNode, retention time.Duration, reason string, s Severity) (problems []Problem) {
-	if n, ok := node.Expr.(*promParser.MatrixSelector); ok {
-		if n.Range > retention {
+func (c RangeQueryCheck) checkSources(expr *parser.PromQLExpr, retention time.Duration, reason string, s Severity) (problems []Problem) {
+	for _, src := range expr.Source() {
+		src.WalkSources(func(src source.Source, _ *source.Join, _ *source.Unless) {
+			n, ok := source.MostOuterOperation[*promParser.MatrixSelector](src)
+			if !ok {
+				return
+			}
+			if n.Range <= retention {
+				return
+			}
 			problems = append(problems, Problem{
 				Anchor:   AnchorAfter,
 				Lines:    expr.Value.Pos.Lines(),
@@ -131,8 +135,10 @@ func (c RangeQueryCheck) checkNode(ctx context.Context, expr *parser.PromQLExpr,
 				Severity: s,
 				Diagnostics: []diags.Diagnostic{
 					{
-						Message: fmt.Sprintf("`%s` selector is trying to query Prometheus for %s worth of metrics, but %s",
-							node.Expr, model.Duration(n.Range), reason),
+						Message: fmt.Sprintf(
+							"`%s` selector is trying to query Prometheus for %s worth of metrics, but %s",
+							n, model.Duration(n.Range), reason,
+						),
 						Pos:         expr.Value.Pos,
 						Expr:        expr.Query().Expr,
 						FirstColumn: int(n.PositionRange().Start) + 1,
@@ -141,12 +147,7 @@ func (c RangeQueryCheck) checkNode(ctx context.Context, expr *parser.PromQLExpr,
 					},
 				},
 			})
-		}
+		})
 	}
-
-	for _, child := range node.Children {
-		problems = append(problems, c.checkNode(ctx, expr, child, retention, reason, s)...)
-	}
-
 	return problems
 }
