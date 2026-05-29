@@ -38,6 +38,29 @@ output:
                 start: 0
                 end: 1
       returns: scalar
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 4
+                    end: 5
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 4
+                end: 5
+            returnednumber: 5
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 4
+            end: 5
+          type: number
+          fixedLabels: true
       returnInfo:
         logicalexpr: 1 / 5
         valueposition:
@@ -71,6 +94,52 @@ output:
             start: 1
             end: 2
       returns: scalar
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 5
+                    end: 6
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 5
+                end: 6
+            returnednumber: 5
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 5
+            end: 6
+          type: number
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 16
+                    end: 17
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 16
+                end: 17
+            returnednumber: 5
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: true
+          position:
+            start: 16
+            end: 17
+          type: number
+          fixedLabels: true
+          isConditional: true
       returnInfo:
         logicalexpr: 2 ^ 5
         valueposition:
@@ -105,6 +174,96 @@ output:
             start: 1
             end: 2
       returns: scalar
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 5
+                    end: 6
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 5
+                end: 6
+            returnednumber: 5
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 5
+            end: 6
+          type: number
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 9
+                    end: 11
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 9
+                end: 11
+            returnednumber: 11
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 9
+            end: 11
+          type: number
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 15
+                    end: 16
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 15
+                end: 16
+            returnednumber: 5
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 15
+            end: 16
+          type: number
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 25
+                    end: 26
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 25
+                end: 26
+            returnednumber: 2
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: true
+          position:
+            start: 25
+            end: 26
+          type: number
+          fixedLabels: true
+          isConditional: true
       returnInfo:
         logicalexpr: 2 ^ 5 + 11 % 5
         valueposition:
@@ -139,6 +298,96 @@ output:
             start: 1
             end: 2
       returns: scalar
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 5
+                    end: 6
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 5
+                end: 6
+            returnednumber: 5
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 5
+            end: 6
+          type: number
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 9
+                    end: 11
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 9
+                end: 11
+            returnednumber: 11
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 9
+            end: 11
+          type: number
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 15
+                    end: 16
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 15
+                end: 16
+            returnednumber: 5
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 15
+            end: 16
+          type: number
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 25
+                    end: 27
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 25
+                end: 27
+            returnednumber: 20
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: true
+          position:
+            start: 25
+            end: 27
+          type: number
+          fixedLabels: true
+          isConditional: true
       returnInfo:
         logicalexpr: 2 ^ 5 + 11 % 5
         valueposition:
@@ -168,6 +417,96 @@ output:
                 start: 1
                 end: 2
       returns: scalar
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 5
+                    end: 6
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 5
+                end: 6
+            returnednumber: 5
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 5
+            end: 6
+          type: number
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 9
+                    end: 11
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 9
+                end: 11
+            returnednumber: 11
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 9
+            end: 11
+          type: number
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 15
+                    end: 16
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 15
+                end: 16
+            returnednumber: 5
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 15
+            end: 16
+          type: number
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 25
+                    end: 26
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 25
+                end: 26
+            returnednumber: 3
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: true
+          position:
+            start: 25
+            end: 26
+          type: number
+          fixedLabels: true
+          isConditional: true
       returnInfo:
         logicalexpr: 2 ^ 5 + 11 % 5
         valueposition:
@@ -202,6 +541,96 @@ output:
             start: 1
             end: 2
       returns: scalar
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 5
+                    end: 6
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 5
+                end: 6
+            returnednumber: 5
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 5
+            end: 6
+          type: number
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 9
+                    end: 11
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 9
+                end: 11
+            returnednumber: 11
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 9
+            end: 11
+          type: number
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 15
+                    end: 16
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 15
+                end: 16
+            returnednumber: 5
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 15
+            end: 16
+          type: number
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 24
+                    end: 25
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 24
+                end: 25
+            returnednumber: 1
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: true
+          position:
+            start: 24
+            end: 25
+          type: number
+          fixedLabels: true
+          isConditional: true
       returnInfo:
         logicalexpr: 2 ^ 5 + 11 % 5
         valueposition:
@@ -236,6 +665,52 @@ output:
             start: 0
             end: 2
       returns: scalar
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 5
+                    end: 7
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 5
+                end: 7
+            returnednumber: 15
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 5
+            end: 7
+          type: number
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 15
+                    end: 16
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 15
+                end: 16
+            returnednumber: 1
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: true
+          position:
+            start: 15
+            end: 16
+          type: number
+          fixedLabels: true
+          isConditional: true
       returnInfo:
         logicalexpr: 20 - 15
         valueposition:
@@ -265,6 +740,29 @@ output:
                 start: 0
                 end: 1
       returns: scalar
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 4
+                    end: 5
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 4
+                end: 5
+            returnednumber: 5
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 4
+            end: 5
+          type: number
+          fixedLabels: true
       returnInfo:
         logicalexpr: 2 * 5
         valueposition:
@@ -289,6 +787,29 @@ output:
       operations:
         - node: '[*parser.VectorSelector] foo'
           op: ""
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 15
+                    end: 16
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 15
+                end: 16
+            returnednumber: 5
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 15
+            end: 16
+          type: number
+          fixedLabels: true
       position:
         start: 1
         end: 4
@@ -297,6 +818,29 @@ output:
       operations:
         - node: '[*parser.VectorSelector] bar'
           op: ""
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 15
+                    end: 16
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 15
+                end: 16
+            returnednumber: 5
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 15
+            end: 16
+          type: number
+          fixedLabels: true
       position:
         start: 8
         end: 11
@@ -311,6 +855,29 @@ output:
       operations:
         - node: '[*parser.VectorSelector] foo'
           op: ""
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 21
+                    end: 22
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 21
+                end: 22
+            returnednumber: 5
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 21
+            end: 22
+          type: number
+          fixedLabels: true
       position:
         start: 1
         end: 4
@@ -328,6 +895,51 @@ output:
             - "2"
           node: '[*parser.Call] vector(2)'
           op: vector
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 15
+                    end: 16
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 15
+                end: 16
+            returnednumber: 2
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 15
+            end: 16
+          type: number
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 21
+                    end: 22
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 21
+                end: 22
+            returnednumber: 5
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 21
+            end: 22
+          type: number
+          fixedLabels: true
       returnInfo:
         logicalexpr: vector(2) * 5
         valueposition:
@@ -379,6 +991,29 @@ output:
                     - "2"
                   node: '[*parser.Call] vector(2)'
                   op: vector
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 29
+                            end: 30
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 29
+                        end: 30
+                    returnednumber: 2
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 29
+                    end: 30
+                  type: number
+                  fixedLabels: true
             returnInfo:
                 logicalexpr: ""
                 valueposition:
@@ -455,6 +1090,29 @@ output:
                     - "2"
                   node: '[*parser.Call] vector(2)'
                   op: vector
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 29
+                            end: 30
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 29
+                        end: 30
+                    returnednumber: 2
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 29
+                    end: 30
+                  type: number
+                  fixedLabels: true
             returnInfo:
                 logicalexpr: ""
                 valueposition:
@@ -488,6 +1146,29 @@ output:
                 start: 35
                 end: 38
             type: selector
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 15
+                    end: 16
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 15
+                end: 16
+            returnednumber: 5
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 15
+            end: 16
+          type: number
+          fixedLabels: true
       returnInfo:
         logicalexpr: vector(5) * vector(2)
         valueposition:
@@ -516,6 +1197,30 @@ output:
                 start: 0
                 end: 1
       returns: scalar
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 9
+                    end: 10
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 9
+                end: 10
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: true
+          position:
+            start: 9
+            end: 10
+          type: number
+          fixedLabels: true
+          isConditional: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -545,6 +1250,30 @@ output:
                 start: 0
                 end: 2
       returns: scalar
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 10
+                    end: 12
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 10
+                end: 12
+            returnednumber: 10
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: true
+          position:
+            start: 10
+            end: 12
+          type: number
+          fixedLabels: true
+          isConditional: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -612,6 +1341,53 @@ output:
       operations:
         - node: '[*parser.VectorSelector] foo'
           op: ""
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 7
+                    end: 8
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 7
+                end: 8
+            returnednumber: 1
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 7
+            end: 8
+          type: number
+          fixedLabels: true
+          isConditional: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 17
+                    end: 18
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 17
+                end: 18
+            returnednumber: 1
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: true
+          position:
+            start: 17
+            end: 18
+          type: number
+          fixedLabels: true
+          isConditional: true
       position:
         start: 1
         end: 4
@@ -627,6 +1403,30 @@ output:
       operations:
         - node: '[*parser.VectorSelector] foo'
           op: ""
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 11
+                    end: 12
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 11
+                end: 12
+            returnednumber: 5
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: true
+          position:
+            start: 11
+            end: 12
+          type: number
+          fixedLabels: true
+          isConditional: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -651,6 +1451,53 @@ output:
       operations:
         - node: '[*parser.VectorSelector] foo'
           op: ""
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 11
+                    end: 12
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 11
+                end: 12
+            returnednumber: 5
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: true
+          position:
+            start: 11
+            end: 12
+          type: number
+          fixedLabels: true
+          isConditional: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 16
+                    end: 17
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 16
+                end: 17
+            returnednumber: 1
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 16
+            end: 17
+          type: number
+          fixedLabels: true
+          isConditional: true
       position:
         start: 0
         end: 3
@@ -734,6 +1581,30 @@ output:
                 start: 12
                 end: 15
             type: selector
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 20
+                    end: 21
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 20
+                end: 21
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 20
+            end: 21
+          type: number
+          fixedLabels: true
+          isConditional: true
       position:
         start: 1
         end: 4
@@ -846,6 +1717,30 @@ output:
                 start: 25
                 end: 28
             type: selector
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 33
+                    end: 34
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 33
+                end: 34
+            returnednumber: 1
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 33
+            end: 34
+          type: number
+          fixedLabels: true
+          isConditional: true
       usedLabels:
         - instance
       position:
@@ -999,6 +1894,30 @@ output:
             operations:
                 - node: '[*parser.VectorSelector] bar'
                   op: ""
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 19
+                            end: 20
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 19
+                        end: 20
+                    returnednumber: 0
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: true
+                  position:
+                    start: 19
+                    end: 20
+                  type: number
+                  fixedLabels: true
+                  isConditional: true
             returnInfo:
                 logicalexpr: ""
                 valueposition:
@@ -1214,6 +2133,29 @@ output:
       operations:
         - node: '[*parser.VectorSelector] foo'
           op: ""
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 6
+                    end: 7
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 6
+                end: 7
+            returnednumber: 1
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 6
+            end: 7
+          type: number
+          fixedLabels: true
       position:
         start: 0
         end: 3
@@ -1228,6 +2170,29 @@ output:
       operations:
         - node: '[*parser.VectorSelector] foo'
           op: ""
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 6
+                    end: 7
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 6
+                end: 7
+            returnednumber: 5
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 6
+            end: 7
+          type: number
+          fixedLabels: true
       position:
         start: 0
         end: 3
@@ -1357,6 +2322,30 @@ output:
           op: ""
         - node: '[*parser.AggregateExpr] sum(foo{job="myjob"})'
           op: sum
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 24
+                    end: 26
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 24
+                end: 26
+            returnednumber: 20
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 24
+            end: 26
+          type: number
+          fixedLabels: true
+          isConditional: true
       position:
         start: 4
         end: 20
@@ -2175,6 +3164,30 @@ output:
             - "10"
           node: '[*parser.AggregateExpr] topk(10, foo{job="myjob"})'
           op: topk
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 29
+                    end: 31
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 29
+                end: 31
+            returnednumber: 10
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 29
+            end: 31
+          type: number
+          fixedLabels: true
+          isConditional: true
       position:
         start: 9
         end: 25
@@ -3043,6 +4056,30 @@ output:
             operations:
                 - node: '[*parser.VectorSelector] bar'
                   op: ""
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 17
+                            end: 18
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 17
+                        end: 18
+                    returnednumber: 5
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 17
+                    end: 18
+                  type: number
+                  fixedLabels: true
+                  isConditional: true
             position:
                 start: 11
                 end: 14
@@ -3129,6 +4166,30 @@ output:
           op: sum
         - node: '[*parser.AggregateExpr] count without (job, cluster) (sum by (job, cluster) (up{cluster="dev",job="foo"}) == 0)'
           op: count
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 60
+                    end: 61
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 60
+                end: 61
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 60
+            end: 61
+          type: number
+          fixedLabels: true
+          isConditional: true
       position:
         start: 10
         end: 38
@@ -3231,6 +4292,117 @@ output:
             - '"src3"'
           node: '[*parser.Call] label_join(up{job="api-server",src1="a",src2="b",src3="c"}, "foo", ",", "src1", "src2", "src3")'
           op: label_join
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 60
+                    end: 65
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 60
+            end: 65
+          type: string
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 67
+                    end: 70
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 67
+            end: 70
+          type: string
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 72
+                    end: 78
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 72
+            end: 78
+          type: string
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 80
+                    end: 86
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 80
+            end: 86
+          type: string
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 88
+                    end: 94
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 88
+            end: 94
+          type: string
+          fixedLabels: true
       usedLabels:
         - src1
         - src2
@@ -3327,6 +4499,30 @@ output:
                   op: ""
                 - node: '[*parser.AggregateExpr] sum by (job) (foo:count)'
                   op: sum
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 118
+                            end: 120
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 118
+                        end: 120
+                    returnednumber: 20
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 118
+                    end: 120
+                  type: number
+                  fixedLabels: true
+                  isConditional: true
             usedLabels:
                 - job
             position:
@@ -3335,6 +4531,30 @@ output:
             type: aggregation
             fixedLabels: true
             isConditional: true
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 18
+                    end: 19
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 18
+                end: 19
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 18
+            end: 19
+          type: number
+          fixedLabels: true
+          isConditional: true
       usedLabels:
         - job
       position:
@@ -3711,6 +4931,29 @@ output:
           op: ""
         - node: '[*parser.AggregateExpr] sum by (notjob) (foo)'
           op: sum
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 0
+                    end: 1
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 1
+            returnednumber: 1
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 0
+            end: 1
+          type: number
+          fixedLabels: true
       usedLabels:
         - notjob
       position:
@@ -3916,6 +5159,29 @@ output:
           op: vector
         - node: '[*parser.Call] absent(vector(1))'
           op: absent
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 14
+                    end: 15
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 14
+                end: 15
+            returnednumber: 1
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 14
+            end: 15
+          type: number
+          fixedLabels: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -4133,6 +5399,29 @@ output:
             - "1"
           node: '[*parser.Call] vector(1)'
           op: vector
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 7
+                    end: 8
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 7
+                end: 8
+            returnednumber: 1
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 7
+            end: 8
+          type: number
+          fixedLabels: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -4166,6 +5455,34 @@ output:
             - scalar(foo)
           node: '[*parser.Call] vector(scalar(foo))'
           op: vector
+      indirect:
+        - labels:
+            "":
+                reason: Calling `scalar()` will return a scalar value with no labels.
+                kind: excluded
+                fragment:
+                    start: 7
+                    end: 18
+          returns: scalar
+          operations:
+            - node: '[*parser.VectorSelector] foo'
+              op: ""
+            - node: '[*parser.Call] scalar(foo)'
+              op: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 14
+            end: 17
+          type: function
+          fixedLabels: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -4204,6 +5521,82 @@ output:
             - 0 >= bool 0.5
           node: '[*parser.Call] vector(0 >= bool 0.5)'
           op: vector
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 7
+                    end: 10
+          deadInfo:
+            reason: '`0.0 >= 0.5` always evaluates to `0 >= 0.5` and uses the `bool` modifier which means it will always return 0'
+            fragment:
+                start: 7
+                end: 10
+          returns: scalar
+          indirect:
+            - labels:
+                "":
+                    reason: This query returns a number value with no labels.
+                    kind: excluded
+                    fragment:
+                        start: 20
+                        end: 23
+              returns: scalar
+              returnInfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 20
+                    end: 23
+                returnednumber: 0.5
+                alwaysreturns: true
+                knownreturn: true
+                isreturnbool: true
+              position:
+                start: 20
+                end: 23
+              type: number
+              fixedLabels: true
+              isConditional: true
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 7
+                end: 10
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: true
+          position:
+            start: 7
+            end: 10
+          type: number
+          fixedLabels: true
+          isConditional: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 28
+                    end: 29
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 28
+                end: 29
+            returnednumber: 1
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 28
+            end: 29
+          type: number
+          fixedLabels: true
+          isConditional: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -4334,6 +5727,95 @@ output:
             - '"(.*):.*"'
           node: '[*parser.Call] label_replace(up{job="api-server",service="a:c"}, "foo", "$1", "service", "(.*):.*")'
           op: label_replace
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 50
+                    end: 55
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 50
+            end: 55
+          type: string
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 57
+                    end: 61
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 57
+            end: 61
+          type: string
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 63
+                    end: 72
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 63
+            end: 72
+          type: string
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 74
+                    end: 83
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 74
+            end: 83
+          type: string
+          fixedLabels: true
       usedLabels:
         - service
       position:
@@ -4384,6 +5866,118 @@ output:
             - '"(.*)"'
           node: '[*parser.Call] label_replace(sum by (pod) (pod_status) > 0, "cluster", "$1", "pod", "(.*)")'
           op: label_replace
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 42
+                    end: 43
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 42
+                end: 43
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 42
+            end: 43
+          type: number
+          fixedLabels: true
+          isConditional: true
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 45
+                    end: 54
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 45
+            end: 54
+          type: string
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 56
+                    end: 60
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 56
+            end: 60
+          type: string
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 62
+                    end: 67
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 62
+            end: 67
+          type: string
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 69
+                    end: 75
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 69
+            end: 75
+          type: string
+          fixedLabels: true
       usedLabels:
         - pod
       position:
@@ -4402,6 +5996,78 @@ output:
       operations:
         - node: '[*parser.VectorSelector] my_metric'
           op: ""
+      indirect:
+        - labels:
+            "":
+                reason: Calling `time()` will return a scalar value with no labels.
+                kind: excluded
+                fragment:
+                    start: 1
+                    end: 7
+          returns: scalar
+          operations:
+            - node: '[*parser.Call] time()'
+              op: time
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 1
+                end: 7
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 1
+            end: 7
+          type: function
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 23
+                    end: 24
+          returns: scalar
+          indirect:
+            - labels:
+                "":
+                    reason: This query returns a number value with no labels.
+                    kind: excluded
+                    fragment:
+                        start: 25
+                        end: 29
+              returns: scalar
+              returnInfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 25
+                    end: 29
+                returnednumber: 3600
+                alwaysreturns: true
+                knownreturn: true
+                isreturnbool: false
+              position:
+                start: 25
+                end: 29
+              type: number
+              fixedLabels: true
+          returnInfo:
+            logicalexpr: 5 * 3600
+            valueposition:
+                start: 23
+                end: 24
+            returnednumber: 18000
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 23
+            end: 24
+          type: number
+          fixedLabels: true
+          isConditional: true
       position:
         start: 10
         end: 19
@@ -4515,6 +6181,53 @@ output:
           op: ""
         - node: '[*parser.AggregateExpr] avg without (router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"})'
           op: avg
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 104
+                    end: 107
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 104
+                end: 107
+            returnednumber: 0.5
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 104
+            end: 107
+          type: number
+          fixedLabels: true
+          isConditional: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 110
+                    end: 111
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 110
+                end: 111
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 110
+            end: 111
+          type: number
+          fixedLabels: true
+          isConditional: true
       position:
         start: 41
         end: 100
@@ -4601,11 +6314,58 @@ output:
                   op: ""
                 - node: '[*parser.AggregateExpr] count(colo_router_tier:disabled_pops:max{router=~"edge.*",tier="1"})'
                   op: count
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 292
+                            end: 295
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 292
+                        end: 295
+                    returnednumber: 0.4
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 292
+                    end: 295
+                  type: number
+                  fixedLabels: true
             position:
                 start: 227
                 end: 288
             type: aggregation
             fixedLabels: true
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 298
+                    end: 299
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 298
+                end: 299
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 298
+            end: 299
+          type: number
+          fixedLabels: true
+          isConditional: true
       position:
         start: 155
         end: 212
@@ -4649,6 +6409,53 @@ output:
           op: ""
         - node: '[*parser.AggregateExpr] avg without (router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*regional.*"})'
           op: avg
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 407
+                    end: 410
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 407
+                end: 410
+            returnednumber: 0.1
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 407
+            end: 410
+          type: number
+          fixedLabels: true
+          isConditional: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 413
+                    end: 414
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 413
+                end: 414
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 413
+            end: 414
+          type: number
+          fixedLabels: true
+          isConditional: true
       position:
         start: 343
         end: 403
@@ -4686,6 +6493,95 @@ output:
             - '""'
           node: '[*parser.Call] label_replace(sum without (instance) (foo), "instance", "none", "", "")'
           op: label_replace
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 42
+                    end: 52
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 42
+            end: 52
+          type: string
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 54
+                    end: 60
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 54
+            end: 60
+          type: string
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 62
+                    end: 64
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 62
+            end: 64
+          type: string
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 66
+                    end: 68
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 66
+            end: 68
+          type: string
+          fixedLabels: true
       usedLabels:
         - ""
       position:
@@ -4751,6 +6647,30 @@ output:
           op: sum_over_time
         - node: '[*parser.AggregateExpr] sum by (region, target, colo_name) (sum_over_time(probe_success{job="abc"}[5m]) or vector(1))'
           op: sum
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 106
+                    end: 107
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 106
+                end: 107
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 106
+            end: 107
+          type: number
+          fixedLabels: true
+          isConditional: true
       usedLabels:
         - region
         - target
@@ -4836,6 +6756,52 @@ output:
           op: vector
         - node: '[*parser.AggregateExpr] sum by (region, target, colo_name) (sum_over_time(probe_success{job="abc"}[5m]) or vector(1))'
           op: sum
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 98
+                    end: 99
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 98
+                end: 99
+            returnednumber: 1
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 98
+            end: 99
+          type: number
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 106
+                    end: 107
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 106
+                end: 107
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 106
+            end: 107
+          type: number
+          fixedLabels: true
+          isConditional: true
       usedLabels:
         - region
         - target
@@ -4874,6 +6840,29 @@ output:
             - "1"
           node: '[*parser.Call] vector(1)'
           op: vector
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 7
+                    end: 8
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 7
+                end: 8
+            returnednumber: 1
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 7
+            end: 8
+          type: number
+          fixedLabels: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -4925,6 +6914,52 @@ output:
             - "0"
           node: '[*parser.Call] vector(0)'
           op: vector
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 7
+                    end: 8
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 7
+                end: 8
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 7
+            end: 8
+          type: number
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 12
+                    end: 13
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 12
+                end: 13
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 12
+            end: 13
+          type: number
+          fixedLabels: true
+          isConditional: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -4990,6 +7025,29 @@ output:
                     - "1"
                   node: '[*parser.Call] vector(1)'
                   op: vector
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 19
+                            end: 20
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 19
+                        end: 20
+                    returnednumber: 1
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 19
+                    end: 20
+                  type: number
+                  fixedLabels: true
             returnInfo:
                 logicalexpr: ""
                 valueposition:
@@ -5004,6 +7062,29 @@ output:
                 end: 21
             type: function
             fixedLabels: true
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 7
+                    end: 8
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 7
+                end: 8
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 7
+            end: 8
+          type: number
+          fixedLabels: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -5044,6 +7125,30 @@ output:
           op: ""
         - node: '[*parser.AggregateExpr] sum(foo or vector(0))'
           op: sum
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 24
+                    end: 25
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 24
+                end: 25
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 24
+            end: 25
+          type: number
+          fixedLabels: true
+          isConditional: true
       position:
         start: 4
         end: 7
@@ -5076,6 +7181,52 @@ output:
           op: vector
         - node: '[*parser.AggregateExpr] sum(foo or vector(0))'
           op: sum
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 18
+                    end: 19
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 18
+                end: 19
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 18
+            end: 19
+          type: number
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 24
+                    end: 25
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 24
+                end: 25
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 24
+            end: 25
+          type: number
+          fixedLabels: true
+          isConditional: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -5116,6 +7267,53 @@ output:
           op: ""
         - node: '[*parser.AggregateExpr] sum(foo or vector(1))'
           op: sum
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 25
+                    end: 26
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 25
+                end: 26
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 25
+            end: 26
+          type: number
+          fixedLabels: true
+          isConditional: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 31
+                    end: 32
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 31
+                end: 32
+            returnednumber: 2
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 31
+            end: 32
+          type: number
+          fixedLabels: true
+          isConditional: true
       position:
         start: 5
         end: 8
@@ -5148,6 +7346,75 @@ output:
           op: vector
         - node: '[*parser.AggregateExpr] sum(foo or vector(1))'
           op: sum
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 19
+                    end: 20
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 19
+                end: 20
+            returnednumber: 1
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 19
+            end: 20
+          type: number
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 25
+                    end: 26
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 25
+                end: 26
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 25
+            end: 26
+          type: number
+          fixedLabels: true
+          isConditional: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 31
+                    end: 32
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 31
+                end: 32
+            returnednumber: 2
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 31
+            end: 32
+          type: number
+          fixedLabels: true
+          isConditional: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -5188,6 +7455,53 @@ output:
           op: ""
         - node: '[*parser.AggregateExpr] sum(foo or vector(1))'
           op: sum
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 25
+                    end: 26
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 25
+                end: 26
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 25
+            end: 26
+          type: number
+          fixedLabels: true
+          isConditional: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 31
+                    end: 32
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 31
+                end: 32
+            returnednumber: 2
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 31
+            end: 32
+          type: number
+          fixedLabels: true
+          isConditional: true
       position:
         start: 5
         end: 8
@@ -5215,6 +7529,75 @@ output:
           op: vector
         - node: '[*parser.AggregateExpr] sum(foo or vector(1))'
           op: sum
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 19
+                    end: 20
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 19
+                end: 20
+            returnednumber: 1
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 19
+            end: 20
+          type: number
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 25
+                    end: 26
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 25
+                end: 26
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 25
+            end: 26
+          type: number
+          fixedLabels: true
+          isConditional: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 31
+                    end: 32
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 31
+                end: 32
+            returnednumber: 2
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 31
+            end: 32
+          type: number
+          fixedLabels: true
+          isConditional: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -5255,6 +7638,53 @@ output:
           op: ""
         - node: '[*parser.AggregateExpr] sum(foo or vector(2))'
           op: sum
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 25
+                    end: 26
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 25
+                end: 26
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 25
+            end: 26
+          type: number
+          fixedLabels: true
+          isConditional: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 31
+                    end: 32
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 31
+                end: 32
+            returnednumber: 2
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 31
+            end: 32
+          type: number
+          fixedLabels: true
+          isConditional: true
       position:
         start: 5
         end: 8
@@ -5287,6 +7717,75 @@ output:
           op: vector
         - node: '[*parser.AggregateExpr] sum(foo or vector(2))'
           op: sum
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 19
+                    end: 20
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 19
+                end: 20
+            returnednumber: 2
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 19
+            end: 20
+          type: number
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 25
+                    end: 26
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 25
+                end: 26
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 25
+            end: 26
+          type: number
+          fixedLabels: true
+          isConditional: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 31
+                    end: 32
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 31
+                end: 32
+            returnednumber: 2
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 31
+            end: 32
+          type: number
+          fixedLabels: true
+          isConditional: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -5356,6 +7855,29 @@ output:
           op: vector
         - node: '[*parser.AggregateExpr] sum(sometimes{foo!="bar"} or vector(0))'
           op: sum
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 37
+                    end: 38
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 37
+                end: 38
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 37
+            end: 38
+          type: number
+          fixedLabels: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -5374,6 +7896,30 @@ output:
       operations:
         - node: '[*parser.VectorSelector] bob'
           op: ""
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 53
+                    end: 55
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 53
+                end: 55
+            returnednumber: 10
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 53
+            end: 55
+          type: number
+          fixedLabels: true
+          isConditional: true
       position:
         start: 47
         end: 50
@@ -5416,6 +7962,29 @@ output:
             - "1"
           node: '[*parser.Call] vector(1)'
           op: vector
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 79
+                    end: 80
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 79
+                end: 80
+            returnednumber: 1
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 79
+            end: 80
+          type: number
+          fixedLabels: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -5476,6 +8045,30 @@ output:
             operations:
                 - node: '[*parser.VectorSelector] bob'
                   op: ""
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 63
+                            end: 65
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 63
+                        end: 65
+                    returnednumber: 10
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 63
+                    end: 65
+                  type: number
+                  fixedLabels: true
+                  isConditional: true
             position:
                 start: 57
                 end: 60
@@ -5521,6 +8114,30 @@ output:
             operations:
                 - node: '[*parser.VectorSelector] notfound'
                   op: ""
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 96
+                            end: 97
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 96
+                        end: 97
+                    returnednumber: 0
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 96
+                    end: 97
+                  type: number
+                  fixedLabels: true
+                  isConditional: true
             position:
                 start: 85
                 end: 93
@@ -5556,6 +8173,30 @@ output:
             operations:
                 - node: '[*parser.VectorSelector] bob'
                   op: ""
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 63
+                            end: 65
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 63
+                        end: 65
+                    returnednumber: 10
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 63
+                    end: 65
+                  type: number
+                  fixedLabels: true
+                  isConditional: true
             position:
                 start: 57
                 end: 60
@@ -5601,11 +8242,58 @@ output:
             operations:
                 - node: '[*parser.VectorSelector] notfound'
                   op: ""
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 96
+                            end: 97
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 96
+                        end: 97
+                    returnednumber: 0
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 96
+                    end: 97
+                  type: number
+                  fixedLabels: true
+                  isConditional: true
             position:
                 start: 85
                 end: 93
             type: selector
             isConditional: true
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 43
+                    end: 44
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 43
+                end: 44
+            returnednumber: 1
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 43
+            end: 44
+          type: number
+          fixedLabels: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -5631,6 +8319,30 @@ output:
       operations:
         - node: '[*parser.VectorSelector] foo offset 5m'
           op: ""
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 16
+                    end: 17
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 16
+                end: 17
+            returnednumber: 5
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 16
+            end: 17
+          type: number
+          fixedLabels: true
+          isConditional: true
       position:
         start: 0
         end: 13
@@ -5699,6 +8411,29 @@ output:
                     - "1"
                   node: '[*parser.Call] vector(1)'
                   op: vector
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 65
+                            end: 66
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 65
+                        end: 66
+                    returnednumber: 1
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 65
+                    end: 66
+                  type: number
+                  fixedLabels: true
             returnInfo:
                 logicalexpr: ""
                 valueposition:
@@ -5759,6 +8494,29 @@ output:
                     - "2"
                   node: '[*parser.Call] vector(2)'
                   op: vector
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 121
+                            end: 122
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 121
+                        end: 122
+                    returnednumber: 2
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 121
+                    end: 122
+                  type: number
+                  fixedLabels: true
             returnInfo:
                 logicalexpr: ""
                 valueposition:
@@ -5773,6 +8531,30 @@ output:
                 end: 123
             type: function
             fixedLabels: true
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 127
+                    end: 128
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 127
+                end: 128
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 127
+            end: 128
+          type: number
+          fixedLabels: true
+          isConditional: true
       position:
         start: 7
         end: 18
@@ -5835,6 +8617,29 @@ output:
                     - "1"
                   node: '[*parser.Call] vector(1)'
                   op: vector
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 65
+                            end: 66
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 65
+                        end: 66
+                    returnednumber: 1
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 65
+                    end: 66
+                  type: number
+                  fixedLabels: true
             returnInfo:
                 logicalexpr: ""
                 valueposition:
@@ -5895,6 +8700,29 @@ output:
                     - "2"
                   node: '[*parser.Call] vector(2)'
                   op: vector
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 121
+                            end: 122
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 121
+                        end: 122
+                    returnednumber: 2
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 121
+                    end: 122
+                  type: number
+                  fixedLabels: true
             returnInfo:
                 logicalexpr: ""
                 valueposition:
@@ -5909,6 +8737,52 @@ output:
                 end: 123
             type: function
             fixedLabels: true
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 30
+                    end: 31
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 30
+                end: 31
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 30
+            end: 31
+          type: number
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 127
+                    end: 128
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 127
+                end: 128
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 127
+            end: 128
+          type: number
+          fixedLabels: true
+          isConditional: true
       returnInfo:
         logicalexpr: vector(0) + vector(1) + vector(2)
         valueposition:
@@ -5956,6 +8830,117 @@ output:
             - '"(.+)"'
           node: '[*parser.Call] label_replace(vector(1), "nexthop_tag", "$1", "nexthop", "(.+)")'
           op: label_replace
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 21
+                    end: 22
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 21
+                end: 22
+            returnednumber: 1
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 21
+            end: 22
+          type: number
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 25
+                    end: 38
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 25
+            end: 38
+          type: string
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 40
+                    end: 44
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 40
+            end: 44
+          type: string
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 46
+                    end: 55
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 46
+            end: 55
+          type: string
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 57
+                    end: 63
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 57
+            end: 63
+          type: string
+          fixedLabels: true
       usedLabels:
         - nexthop
       returnInfo:
@@ -6063,6 +9048,52 @@ output:
           op: vector
         - node: '[*parser.AggregateExpr] group(vector(0))'
           op: group
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 18
+                    end: 19
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 18
+                end: 19
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 18
+            end: 19
+          type: number
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 28
+                    end: 29
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 28
+                end: 29
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 28
+            end: 29
+          type: number
+          fixedLabels: true
+          isConditional: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -6097,6 +9128,30 @@ output:
             start: 0
             end: 1
       returns: scalar
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 9
+                    end: 10
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 9
+                end: 10
+            returnednumber: 5
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: true
+          position:
+            start: 9
+            end: 10
+          type: number
+          fixedLabels: true
+          isConditional: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -6150,6 +9205,29 @@ output:
                     - "0"
                   node: '[*parser.Call] vector(0)'
                   op: vector
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 49
+                            end: 50
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 49
+                        end: 50
+                    returnednumber: 0
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 49
+                    end: 50
+                  type: number
+                  fixedLabels: true
             returnInfo:
                 logicalexpr: ""
                 valueposition:
@@ -6209,6 +9287,29 @@ output:
                     - "0"
                   node: '[*parser.Call] vector(0)'
                   op: vector
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 54
+                            end: 55
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 54
+                        end: 55
+                    returnednumber: 0
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 54
+                    end: 55
+                  type: number
+                  fixedLabels: true
             returnInfo:
                 logicalexpr: ""
                 valueposition:
@@ -6267,6 +9368,29 @@ output:
                     - "0"
                   node: '[*parser.Call] vector(0)'
                   op: vector
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 57
+                            end: 58
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 57
+                        end: 58
+                    returnednumber: 0
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 57
+                    end: 58
+                  type: number
+                  fixedLabels: true
             returnInfo:
                 logicalexpr: ""
                 valueposition:
@@ -6413,6 +9537,32 @@ output:
                         start: 247
                         end: 303
                     type: selector
+            indirect:
+                - labels:
+                    "":
+                        reason: Calling `time()` will return a scalar value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 123
+                            end: 129
+                  returns: scalar
+                  operations:
+                    - node: '[*parser.Call] time()'
+                      op: time
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 123
+                        end: 129
+                    returnednumber: 0
+                    alwaysreturns: true
+                    knownreturn: false
+                    isreturnbool: false
+                  position:
+                    start: 123
+                    end: 129
+                  type: function
+                  fixedLabels: true
             usedLabels:
                 - instance
                 - cluster
@@ -7245,6 +10395,95 @@ output:
                     - '"(.+)"'
                   node: '[*parser.Call] label_replace(salt_highstate_runner_configured_minions, "instance", "$1", "minion", "(.+)")'
                   op: label_replace
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a string value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 407
+                            end: 417
+                  returns: string
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 0
+                        end: 0
+                    returnednumber: 0
+                    alwaysreturns: true
+                    knownreturn: false
+                    isreturnbool: false
+                  position:
+                    start: 407
+                    end: 417
+                  type: string
+                  fixedLabels: true
+                - labels:
+                    "":
+                        reason: This query returns a string value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 419
+                            end: 423
+                  returns: string
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 0
+                        end: 0
+                    returnednumber: 0
+                    alwaysreturns: true
+                    knownreturn: false
+                    isreturnbool: false
+                  position:
+                    start: 419
+                    end: 423
+                  type: string
+                  fixedLabels: true
+                - labels:
+                    "":
+                        reason: This query returns a string value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 425
+                            end: 433
+                  returns: string
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 0
+                        end: 0
+                    returnednumber: 0
+                    alwaysreturns: true
+                    knownreturn: false
+                    isreturnbool: false
+                  position:
+                    start: 425
+                    end: 433
+                  type: string
+                  fixedLabels: true
+                - labels:
+                    "":
+                        reason: This query returns a string value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 435
+                            end: 441
+                  returns: string
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 0
+                        end: 0
+                    returnednumber: 0
+                    alwaysreturns: true
+                    knownreturn: false
+                    isreturnbool: false
+                  position:
+                    start: 435
+                    end: 441
+                  type: string
+                  fixedLabels: true
             usedLabels:
                 - minion
             position:
@@ -7290,12 +10529,59 @@ output:
                         start: 222
                         end: 257
                     type: function
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 209
+                            end: 210
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 209
+                        end: 210
+                    returnednumber: 2
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 209
+                    end: 210
+                  type: number
+                  fixedLabels: true
             position:
                 start: 149
                 end: 207
             type: function
             isConditional: true
           ison: true
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 103
+                    end: 104
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 103
+                end: 104
+            returnednumber: 3
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 103
+            end: 104
+          type: number
+          fixedLabels: true
+          isConditional: true
       usedLabels:
         - instance
         - device
@@ -7551,6 +10837,95 @@ output:
                         end: 226
                     type: aggregation
                     fixedLabels: true
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a string value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 245
+                            end: 257
+                  returns: string
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 0
+                        end: 0
+                    returnednumber: 0
+                    alwaysreturns: true
+                    knownreturn: false
+                    isreturnbool: false
+                  position:
+                    start: 245
+                    end: 257
+                  type: string
+                  fixedLabels: true
+                - labels:
+                    "":
+                        reason: This query returns a string value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 259
+                            end: 263
+                  returns: string
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 0
+                        end: 0
+                    returnednumber: 0
+                    alwaysreturns: true
+                    knownreturn: false
+                    isreturnbool: false
+                  position:
+                    start: 259
+                    end: 263
+                  type: string
+                  fixedLabels: true
+                - labels:
+                    "":
+                        reason: This query returns a string value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 267
+                            end: 277
+                  returns: string
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 0
+                        end: 0
+                    returnednumber: 0
+                    alwaysreturns: true
+                    knownreturn: false
+                    isreturnbool: false
+                  position:
+                    start: 267
+                    end: 277
+                  type: string
+                  fixedLabels: true
+                - labels:
+                    "":
+                        reason: This query returns a string value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 279
+                            end: 285
+                  returns: string
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 0
+                        end: 0
+                    returnednumber: 0
+                    alwaysreturns: true
+                    knownreturn: false
+                    isreturnbool: false
+                  position:
+                    start: 279
+                    end: 285
+                  type: string
+                  fixedLabels: true
             usedLabels:
                 - instance
             position:
@@ -7599,6 +10974,30 @@ output:
             operations:
                 - node: '[*parser.Call] hour()'
                   op: hour
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 33
+                            end: 34
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 33
+                        end: 34
+                    returnednumber: 1
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 33
+                    end: 34
+                  type: number
+                  fixedLabels: true
+                  isConditional: true
             returnInfo:
                 logicalexpr: ""
                 valueposition:
@@ -7614,6 +11013,30 @@ output:
             type: function
             fixedLabels: true
             isConditional: true
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 18
+                    end: 19
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 18
+                end: 19
+            returnednumber: 6
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 18
+            end: 19
+          type: number
+          fixedLabels: true
+          isConditional: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -7642,6 +11065,29 @@ output:
             - "1"
           node: '[*parser.Call] vector(1)'
           op: vector
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 46
+                    end: 47
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 46
+                end: 47
+            returnednumber: 1
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 46
+            end: 47
+          type: number
+          fixedLabels: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -7778,6 +11224,52 @@ output:
       operations:
         - node: '[*parser.VectorSelector] foo'
           op: ""
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 0
+                    end: 1
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 1
+            returnednumber: 1
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 0
+            end: 1
+          type: number
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 25
+                    end: 30
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 25
+                end: 30
+            returnednumber: 0.999
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 25
+            end: 30
+          type: number
+          fixedLabels: true
+          isConditional: true
       position:
         start: 5
         end: 8
@@ -7801,6 +11293,74 @@ output:
             - "0"
           node: '[*parser.Call] vector(0)'
           op: vector
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 19
+                    end: 20
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 19
+                end: 20
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 19
+            end: 20
+          type: number
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 0
+                    end: 1
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 1
+            returnednumber: 1
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 0
+            end: 1
+          type: number
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 25
+                    end: 30
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 25
+                end: 30
+            returnednumber: 0.999
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 25
+            end: 30
+          type: number
+          fixedLabels: true
+          isConditional: true
       returnInfo:
         logicalexpr: 1 - vector(0)
         valueposition:
@@ -7857,6 +11417,30 @@ output:
             operations:
                 - node: '[*parser.Call] month()'
                   op: month
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 30
+                            end: 31
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 30
+                        end: 31
+                    returnednumber: 2
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 30
+                    end: 31
+                  type: number
+                  fixedLabels: true
+                  isConditional: true
             returnInfo:
                 logicalexpr: ""
                 valueposition:
@@ -7872,6 +11456,29 @@ output:
             type: function
             fixedLabels: true
             isConditional: true
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 12
+                    end: 13
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 12
+                end: 13
+            returnednumber: 1
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 12
+            end: 13
+          type: number
+          fixedLabels: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -7900,6 +11507,29 @@ output:
             - "0"
           node: '[*parser.Call] vector(0)'
           op: vector
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 44
+                    end: 45
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 44
+                end: 45
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 44
+            end: 45
+          type: number
+          fixedLabels: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -8113,6 +11743,29 @@ output:
                   op: vector
                 - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h]) or vector(1))'
                   op: avg
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 138
+                            end: 139
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 138
+                        end: 139
+                    returnednumber: 1
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 138
+                    end: 139
+                  type: number
+                  fixedLabels: true
             usedLabels:
                 - colo_name
             returnInfo:
@@ -8251,6 +11904,29 @@ output:
                           op: vector
                         - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h] offset 1d) or vector(1))'
                           op: avg
+                    indirect:
+                        - labels:
+                            "":
+                                reason: This query returns a number value with no labels.
+                                kind: excluded
+                                fragment:
+                                    start: 313
+                                    end: 314
+                          returns: scalar
+                          returnInfo:
+                            logicalexpr: ""
+                            valueposition:
+                                start: 313
+                                end: 314
+                            returnednumber: 1
+                            alwaysreturns: true
+                            knownreturn: true
+                            isreturnbool: false
+                          position:
+                            start: 313
+                            end: 314
+                          type: number
+                          fixedLabels: true
                     usedLabels:
                         - colo_name
                     returnInfo:
@@ -8267,6 +11943,29 @@ output:
                         end: 315
                     type: aggregation
                     fixedLabels: true
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 170
+                            end: 171
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 170
+                        end: 171
+                    returnednumber: 5
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 170
+                    end: 171
+                  type: number
+                  fixedLabels: true
             usedLabels:
                 - colo_name
             position:
@@ -8405,6 +12104,29 @@ output:
                           op: vector
                         - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h] offset 1d) or vector(1))'
                           op: avg
+                    indirect:
+                        - labels:
+                            "":
+                                reason: This query returns a number value with no labels.
+                                kind: excluded
+                                fragment:
+                                    start: 313
+                                    end: 314
+                          returns: scalar
+                          returnInfo:
+                            logicalexpr: ""
+                            valueposition:
+                                start: 313
+                                end: 314
+                            returnednumber: 1
+                            alwaysreturns: true
+                            knownreturn: true
+                            isreturnbool: false
+                          position:
+                            start: 313
+                            end: 314
+                          type: number
+                          fixedLabels: true
                     usedLabels:
                         - colo_name
                     returnInfo:
@@ -8421,6 +12143,51 @@ output:
                         end: 315
                     type: aggregation
                     fixedLabels: true
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 234
+                            end: 235
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 234
+                        end: 235
+                    returnednumber: 0
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 234
+                    end: 235
+                  type: number
+                  fixedLabels: true
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 170
+                            end: 171
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 170
+                        end: 171
+                    returnednumber: 5
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 170
+                    end: 171
+                  type: number
+                  fixedLabels: true
             usedLabels:
                 - colo_name
             returnInfo:
@@ -8448,6 +12215,30 @@ output:
             operations:
                 - node: '[*parser.VectorSelector] colo_job:foo_total:rate2m'
                   op: ""
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 399
+                            end: 401
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 399
+                        end: 401
+                    returnednumber: 80
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 399
+                    end: 401
+                  type: number
+                  fixedLabels: true
+                  isConditional: true
             position:
                 start: 357
                 end: 382
@@ -8478,6 +12269,52 @@ output:
                     - "0"
                   node: '[*parser.Call] vector(0)'
                   op: vector
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 393
+                            end: 394
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 393
+                        end: 394
+                    returnednumber: 0
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 393
+                    end: 394
+                  type: number
+                  fixedLabels: true
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 399
+                            end: 401
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 399
+                        end: 401
+                    returnednumber: 80
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 399
+                    end: 401
+                  type: number
+                  fixedLabels: true
+                  isConditional: true
             returnInfo:
                 logicalexpr: ""
                 valueposition:
@@ -8504,6 +12341,30 @@ output:
             operations:
                 - node: '[*parser.VectorSelector] colo_job:foo_total:rate2m offset 1d'
                   op: ""
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 476
+                            end: 478
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 476
+                        end: 478
+                    returnednumber: 80
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 476
+                    end: 478
+                  type: number
+                  fixedLabels: true
+                  isConditional: true
             position:
                 start: 424
                 end: 459
@@ -8534,6 +12395,52 @@ output:
                     - "0"
                   node: '[*parser.Call] vector(0)'
                   op: vector
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 470
+                            end: 471
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 470
+                        end: 471
+                    returnednumber: 0
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 470
+                    end: 471
+                  type: number
+                  fixedLabels: true
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 476
+                            end: 478
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 476
+                        end: 478
+                    returnednumber: 80
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 476
+                    end: 478
+                  type: number
+                  fixedLabels: true
+                  isConditional: true
             returnInfo:
                 logicalexpr: ""
                 valueposition:
@@ -8697,6 +12604,29 @@ output:
                   op: vector
                 - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h]) or vector(1))'
                   op: avg
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 138
+                            end: 139
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 138
+                        end: 139
+                    returnednumber: 1
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 138
+                    end: 139
+                  type: number
+                  fixedLabels: true
             usedLabels:
                 - colo_name
             returnInfo:
@@ -8835,6 +12765,29 @@ output:
                           op: vector
                         - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h] offset 1d) or vector(1))'
                           op: avg
+                    indirect:
+                        - labels:
+                            "":
+                                reason: This query returns a number value with no labels.
+                                kind: excluded
+                                fragment:
+                                    start: 313
+                                    end: 314
+                          returns: scalar
+                          returnInfo:
+                            logicalexpr: ""
+                            valueposition:
+                                start: 313
+                                end: 314
+                            returnednumber: 1
+                            alwaysreturns: true
+                            knownreturn: true
+                            isreturnbool: false
+                          position:
+                            start: 313
+                            end: 314
+                          type: number
+                          fixedLabels: true
                     usedLabels:
                         - colo_name
                     returnInfo:
@@ -8851,6 +12804,29 @@ output:
                         end: 315
                     type: aggregation
                     fixedLabels: true
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 170
+                            end: 171
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 170
+                        end: 171
+                    returnednumber: 5
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 170
+                    end: 171
+                  type: number
+                  fixedLabels: true
             usedLabels:
                 - colo_name
             position:
@@ -8989,6 +12965,29 @@ output:
                           op: vector
                         - node: '[*parser.AggregateExpr] avg by (colo_name) (rate(foo_total[6h] offset 1d) or vector(1))'
                           op: avg
+                    indirect:
+                        - labels:
+                            "":
+                                reason: This query returns a number value with no labels.
+                                kind: excluded
+                                fragment:
+                                    start: 313
+                                    end: 314
+                          returns: scalar
+                          returnInfo:
+                            logicalexpr: ""
+                            valueposition:
+                                start: 313
+                                end: 314
+                            returnednumber: 1
+                            alwaysreturns: true
+                            knownreturn: true
+                            isreturnbool: false
+                          position:
+                            start: 313
+                            end: 314
+                          type: number
+                          fixedLabels: true
                     usedLabels:
                         - colo_name
                     returnInfo:
@@ -9005,6 +13004,51 @@ output:
                         end: 315
                     type: aggregation
                     fixedLabels: true
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 234
+                            end: 235
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 234
+                        end: 235
+                    returnednumber: 0
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 234
+                    end: 235
+                  type: number
+                  fixedLabels: true
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 170
+                            end: 171
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 170
+                        end: 171
+                    returnednumber: 5
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 170
+                    end: 171
+                  type: number
+                  fixedLabels: true
             usedLabels:
                 - colo_name
             returnInfo:
@@ -9032,6 +13076,30 @@ output:
             operations:
                 - node: '[*parser.VectorSelector] colo_job:foo_total:rate2m'
                   op: ""
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 399
+                            end: 401
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 399
+                        end: 401
+                    returnednumber: 80
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 399
+                    end: 401
+                  type: number
+                  fixedLabels: true
+                  isConditional: true
             position:
                 start: 357
                 end: 382
@@ -9062,6 +13130,52 @@ output:
                     - "0"
                   node: '[*parser.Call] vector(0)'
                   op: vector
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 393
+                            end: 394
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 393
+                        end: 394
+                    returnednumber: 0
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 393
+                    end: 394
+                  type: number
+                  fixedLabels: true
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 399
+                            end: 401
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 399
+                        end: 401
+                    returnednumber: 80
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 399
+                    end: 401
+                  type: number
+                  fixedLabels: true
+                  isConditional: true
             returnInfo:
                 logicalexpr: ""
                 valueposition:
@@ -9088,6 +13202,30 @@ output:
             operations:
                 - node: '[*parser.VectorSelector] colo_job:foo_total:rate2m offset 1d'
                   op: ""
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 476
+                            end: 478
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 476
+                        end: 478
+                    returnednumber: 80
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 476
+                    end: 478
+                  type: number
+                  fixedLabels: true
+                  isConditional: true
             position:
                 start: 424
                 end: 459
@@ -9118,6 +13256,52 @@ output:
                     - "0"
                   node: '[*parser.Call] vector(0)'
                   op: vector
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 470
+                            end: 471
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 470
+                        end: 471
+                    returnednumber: 0
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 470
+                    end: 471
+                  type: number
+                  fixedLabels: true
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 476
+                            end: 478
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 476
+                        end: 478
+                    returnednumber: 80
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 476
+                    end: 478
+                  type: number
+                  fixedLabels: true
+                  isConditional: true
             returnInfo:
                 logicalexpr: ""
                 valueposition:
@@ -9133,6 +13317,29 @@ output:
             type: function
             fixedLabels: true
             isConditional: true
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 57
+                    end: 58
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 57
+                end: 58
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 57
+            end: 58
+          type: number
+          fixedLabels: true
       usedLabels:
         - colo_name
       returnInfo:
@@ -9206,6 +13413,30 @@ output:
                 end: 39
             type: aggregation
             fixedLabels: true
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 43
+                    end: 44
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 43
+                end: 44
+            returnednumber: 5
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 43
+            end: 44
+          type: number
+          fixedLabels: true
+          isConditional: true
       position:
         start: 4
         end: 12
@@ -9295,6 +13526,123 @@ output:
                   op: ""
                 - node: '[*parser.AggregateExpr] max by (instance) (0 < (token_expiration - time()) < (6 * 60 * 60))'
                   op: max
+            indirect:
+                - labels:
+                    "":
+                        reason: Calling `time()` will return a scalar value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 47
+                            end: 53
+                  returns: scalar
+                  operations:
+                    - node: '[*parser.Call] time()'
+                      op: time
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 47
+                        end: 53
+                    returnednumber: 0
+                    alwaysreturns: true
+                    knownreturn: false
+                    isreturnbool: false
+                  position:
+                    start: 47
+                    end: 53
+                  type: function
+                  fixedLabels: true
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 23
+                            end: 24
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 23
+                        end: 24
+                    returnednumber: 0
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 23
+                    end: 24
+                  type: number
+                  fixedLabels: true
+                  isConditional: true
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 58
+                            end: 59
+                  returns: scalar
+                  indirect:
+                    - labels:
+                        "":
+                            reason: This query returns a number value with no labels.
+                            kind: excluded
+                            fragment:
+                                start: 60
+                                end: 62
+                      returns: scalar
+                      returnInfo:
+                        logicalexpr: ""
+                        valueposition:
+                            start: 60
+                            end: 62
+                        returnednumber: 60
+                        alwaysreturns: true
+                        knownreturn: true
+                        isreturnbool: false
+                      position:
+                        start: 60
+                        end: 62
+                      type: number
+                      fixedLabels: true
+                    - labels:
+                        "":
+                            reason: This query returns a number value with no labels.
+                            kind: excluded
+                            fragment:
+                                start: 63
+                                end: 65
+                      returns: scalar
+                      returnInfo:
+                        logicalexpr: ""
+                        valueposition:
+                            start: 63
+                            end: 65
+                        returnednumber: 60
+                        alwaysreturns: true
+                        knownreturn: true
+                        isreturnbool: false
+                      position:
+                        start: 63
+                        end: 65
+                      type: number
+                      fixedLabels: true
+                  returnInfo:
+                    logicalexpr: 6 * 60 * 60
+                    valueposition:
+                        start: 58
+                        end: 59
+                    returnednumber: 21600
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 58
+                    end: 59
+                  type: number
+                  fixedLabels: true
+                  isConditional: true
             usedLabels:
                 - instance
             position:
@@ -9303,6 +13651,118 @@ output:
             type: aggregation
             fixedLabels: true
             isConditional: true
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 151
+                    end: 161
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 151
+            end: 161
+          type: string
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 163
+                    end: 167
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 163
+            end: 167
+          type: string
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 169
+                    end: 177
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 169
+            end: 177
+          type: string
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 179
+                    end: 185
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 179
+            end: 185
+          type: string
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 193
+                    end: 194
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 193
+                end: 194
+            returnednumber: 5
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 193
+            end: 194
+          type: number
+          fixedLabels: true
+          isConditional: true
       usedLabels:
         - dc
       position:
@@ -9406,6 +13866,51 @@ output:
             - "0.1"
           node: '[*parser.Call] histogram_fraction(0, 0.1, metric)'
           op: histogram_fraction
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 19
+                    end: 20
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 19
+                end: 20
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 19
+            end: 20
+          type: number
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 22
+                    end: 25
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 22
+                end: 25
+            returnednumber: 0.1
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 22
+            end: 25
+          type: number
+          fixedLabels: true
       position:
         start: 27
         end: 33
@@ -9655,6 +14160,30 @@ output:
             operations:
                 - node: '[*parser.VectorSelector] services_enabled'
                   op: ""
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 97
+                            end: 100
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 97
+                        end: 100
+                    returnednumber: 999
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 97
+                    end: 100
+                  type: number
+                  fixedLabels: true
+                  isConditional: true
             position:
                 start: 77
                 end: 93
@@ -9754,6 +14283,30 @@ output:
             operations:
                 - node: '[*parser.VectorSelector] services_enabled'
                   op: ""
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 95
+                            end: 98
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 95
+                        end: 98
+                    returnednumber: 999
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 95
+                    end: 98
+                  type: number
+                  fixedLabels: true
+                  isConditional: true
             position:
                 start: 75
                 end: 91
@@ -10337,6 +14890,30 @@ output:
                         start: 298
                         end: 330
                     type: selector
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 163
+                            end: 166
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 163
+                        end: 166
+                    returnednumber: 999
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 163
+                    end: 166
+                  type: number
+                  fixedLabels: true
+                  isConditional: true
             usedLabels:
                 - colo_name
                 - instance
@@ -10795,6 +15372,30 @@ output:
                 start: 210
                 end: 250
             type: selector
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 189
+                    end: 192
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 189
+                end: 192
+            returnednumber: 999
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 189
+            end: 192
+          type: number
+          fixedLabels: true
+          isConditional: true
       usedLabels:
         - instance
       position:
@@ -11015,6 +15616,30 @@ output:
                         start: 92
                         end: 124
                     type: selector
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 189
+                            end: 192
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 189
+                        end: 192
+                    returnednumber: 999
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 189
+                    end: 192
+                  type: number
+                  fixedLabels: true
+                  isConditional: true
             usedLabels:
                 - instance
             position:
@@ -11141,6 +15766,30 @@ output:
                 start: 162
                 end: 192
             type: selector
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 98
+                    end: 101
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 98
+                end: 101
+            returnednumber: 999
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 98
+            end: 101
+          type: number
+          fixedLabels: true
+          isConditional: true
       usedLabels:
         - instance
         - colo_name
@@ -11699,6 +16348,205 @@ output:
                 end: 515
             type: aggregation
             fixedLabels: true
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 245
+                    end: 255
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 245
+            end: 255
+          type: string
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 257
+                    end: 259
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 257
+            end: 259
+          type: string
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 261
+                    end: 273
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 261
+            end: 273
+          type: string
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 530
+                    end: 540
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 530
+            end: 540
+          type: string
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 542
+                    end: 544
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 542
+            end: 544
+          type: string
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 546
+                    end: 558
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 546
+            end: 558
+          type: string
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 564
+                    end: 579
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 564
+            end: 579
+          type: string
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 581
+                    end: 583
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 581
+            end: 583
+          type: string
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 585
+                    end: 597
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 585
+            end: 597
+          type: string
+          fixedLabels: true
       usedLabels:
         - cluster
         - namespace
@@ -11969,6 +16817,30 @@ output:
                 end: 145
             type: aggregation
             fixedLabels: true
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 166
+                    end: 170
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 166
+                end: 170
+            returnednumber: 0.01
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 166
+            end: 170
+          type: number
+          fixedLabels: true
+          isConditional: true
       usedLabels:
         - colo_name
         - module_name
@@ -12140,6 +17012,29 @@ output:
             - "0.9"
           node: '[*parser.Call] histogram_quantile(0.9, rate(foo[5m]))'
           op: histogram_quantile
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 19
+                    end: 22
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 19
+                end: 22
+            returnednumber: 0.9
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 19
+            end: 22
+          type: number
+          fixedLabels: true
       position:
         start: 24
         end: 37
@@ -12160,6 +17055,29 @@ output:
             - "3600"
           node: '[*parser.Call] predict_linear(foo[5m], 3600)'
           op: predict_linear
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 24
+                    end: 28
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 24
+                end: 28
+            returnednumber: 3600
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 24
+            end: 28
+          type: number
+          fixedLabels: true
       position:
         start: 15
         end: 22
@@ -12179,6 +17097,51 @@ output:
             - "100"
           node: '[*parser.Call] clamp(foo, 0, 100)'
           op: clamp
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 11
+                    end: 12
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 11
+                end: 12
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 11
+            end: 12
+          type: number
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 14
+                    end: 17
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 14
+                end: 17
+            returnednumber: 100
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 14
+            end: 17
+          type: number
+          fixedLabels: true
       position:
         start: 6
         end: 9
@@ -12400,6 +17363,29 @@ output:
             - "0"
           node: '[*parser.Call] clamp_min(foo, 0)'
           op: clamp_min
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 15
+                    end: 16
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 15
+                end: 16
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 15
+            end: 16
+          type: number
+          fixedLabels: true
       position:
         start: 10
         end: 13
@@ -12418,6 +17404,29 @@ output:
             - "100"
           node: '[*parser.Call] clamp_max(foo, 100)'
           op: clamp_max
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 15
+                    end: 18
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 15
+                end: 18
+            returnednumber: 100
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 15
+            end: 18
+          type: number
+          fixedLabels: true
       position:
         start: 10
         end: 13
@@ -12436,6 +17445,29 @@ output:
             - "0.1"
           node: '[*parser.Call] round(foo, 0.1)'
           op: round
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 11
+                    end: 14
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 11
+                end: 14
+            returnednumber: 0.1
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 11
+            end: 14
+          type: number
+          fixedLabels: true
       position:
         start: 6
         end: 9
@@ -12676,6 +17708,29 @@ output:
             - "0.9"
           node: '[*parser.Call] quantile_over_time(0.9, foo[5m])'
           op: quantile_over_time
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 19
+                    end: 22
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 19
+                end: 22
+            returnednumber: 0.9
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 19
+            end: 22
+          type: number
+          fixedLabels: true
       position:
         start: 24
         end: 31
@@ -12998,6 +18053,51 @@ output:
             - "0.1"
           node: '[*parser.Call] histogram_fraction(0, 0.1, foo)'
           op: histogram_fraction
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 19
+                    end: 20
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 19
+                end: 20
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 19
+            end: 20
+          type: number
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 22
+                    end: 25
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 22
+                end: 25
+            returnednumber: 0.1
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 22
+            end: 25
+          type: number
+          fixedLabels: true
       position:
         start: 27
         end: 30
@@ -13888,6 +18988,42 @@ output:
           op: ""
         - node: '[*parser.AggregateExpr] sum by (colo) (metric_a)'
           op: sum
+      indirect:
+        - labels:
+            "":
+                reason: Calling `scalar()` will return a scalar value with no labels.
+                kind: excluded
+                fragment:
+                    start: 27
+                    end: 47
+            __name__:
+                reason: Aggregation removes metric name.
+                kind: excluded
+                fragment:
+                    start: 34
+                    end: 47
+          returns: scalar
+          operations:
+            - node: '[*parser.VectorSelector] metric_b'
+              op: ""
+            - node: '[*parser.AggregateExpr] sum(metric_b)'
+              op: sum
+            - node: '[*parser.Call] scalar(sum(metric_b))'
+              op: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 34
+            end: 47
+          type: function
+          fixedLabels: true
       usedLabels:
         - colo
       position:
@@ -13895,6 +19031,267 @@ output:
         end: 23
       type: aggregation
       fixedLabels: true
+
+---
+
+[TestLabelsSource/262 - 1]
+expr: clamp(foo, scalar(bar{job=~"test"}), 10)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - args:
+            - scalar(bar{job=~"test"})
+            - "10"
+          node: '[*parser.Call] clamp(foo, scalar(bar{job=~"test"}), 10)'
+          op: clamp
+      indirect:
+        - labels:
+            "":
+                reason: Calling `scalar()` will return a scalar value with no labels.
+                kind: excluded
+                fragment:
+                    start: 11
+                    end: 35
+            job:
+                reason: Calling `scalar()` will return a scalar value with no labels.
+                kind: excluded
+                fragment:
+                    start: 11
+                    end: 35
+          returns: scalar
+          operations:
+            - node: '[*parser.VectorSelector] bar{job=~"test"}'
+              op: ""
+            - node: '[*parser.Call] scalar(bar{job=~"test"})'
+              op: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 18
+            end: 34
+          type: function
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 37
+                    end: 39
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 37
+                end: 39
+            returnednumber: 10
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 37
+            end: 39
+          type: number
+          fixedLabels: true
+      position:
+        start: 6
+        end: 9
+      type: function
+
+---
+
+[TestLabelsSource/263 - 1]
+expr: histogram_quantile(scalar(threshold), rate(foo[5m]))
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.MatrixSelector] foo[5m]'
+          op: ""
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.Call] rate(foo[5m])'
+          op: rate
+        - args:
+            - scalar(threshold)
+          node: '[*parser.Call] histogram_quantile(scalar(threshold), rate(foo[5m]))'
+          op: histogram_quantile
+      indirect:
+        - labels:
+            "":
+                reason: Calling `scalar()` will return a scalar value with no labels.
+                kind: excluded
+                fragment:
+                    start: 19
+                    end: 36
+          returns: scalar
+          operations:
+            - node: '[*parser.VectorSelector] threshold'
+              op: ""
+            - node: '[*parser.Call] scalar(threshold)'
+              op: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 26
+            end: 35
+          type: function
+          fixedLabels: true
+      position:
+        start: 38
+        end: 51
+      type: function
+
+---
+
+[TestLabelsSource/264 - 1]
+expr: round(foo, scalar(precision_metric))
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - args:
+            - scalar(precision_metric)
+          node: '[*parser.Call] round(foo, scalar(precision_metric))'
+          op: round
+      indirect:
+        - labels:
+            "":
+                reason: Calling `scalar()` will return a scalar value with no labels.
+                kind: excluded
+                fragment:
+                    start: 11
+                    end: 35
+          returns: scalar
+          operations:
+            - node: '[*parser.VectorSelector] precision_metric'
+              op: ""
+            - node: '[*parser.Call] scalar(precision_metric)'
+              op: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 18
+            end: 34
+          type: function
+          fixedLabels: true
+      position:
+        start: 6
+        end: 9
+      type: function
+
+---
+
+[TestLabelsSource/265 - 1]
+expr: predict_linear(foo[5m], scalar(horizon))
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.MatrixSelector] foo[5m]'
+          op: ""
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - args:
+            - scalar(horizon)
+          node: '[*parser.Call] predict_linear(foo[5m], scalar(horizon))'
+          op: predict_linear
+      indirect:
+        - labels:
+            "":
+                reason: Calling `scalar()` will return a scalar value with no labels.
+                kind: excluded
+                fragment:
+                    start: 24
+                    end: 39
+          returns: scalar
+          operations:
+            - node: '[*parser.VectorSelector] horizon'
+              op: ""
+            - node: '[*parser.Call] scalar(horizon)'
+              op: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 31
+            end: 38
+          type: function
+          fixedLabels: true
+      position:
+        start: 15
+        end: 22
+      type: function
+
+---
+
+[TestLabelsSource/266 - 1]
+expr: foo + scalar(bar)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+      indirect:
+        - labels:
+            "":
+                reason: Calling `scalar()` will return a scalar value with no labels.
+                kind: excluded
+                fragment:
+                    start: 6
+                    end: 17
+          returns: scalar
+          operations:
+            - node: '[*parser.VectorSelector] bar'
+              op: ""
+            - node: '[*parser.Call] scalar(bar)'
+              op: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 13
+            end: 16
+          type: function
+          fixedLabels: true
+      position:
+        start: 0
+        end: 3
+      type: selector
 
 ---
 
@@ -14379,6 +19776,29 @@ output:
       operations:
         - node: '[*parser.VectorSelector] foo offset 5m'
           op: ""
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 14
+                    end: 16
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 14
+                end: 16
+            returnednumber: 60
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 14
+            end: 16
+          type: number
+          fixedLabels: true
       position:
         start: 0
         end: 13
@@ -15060,6 +20480,29 @@ output:
             - '"job"'
           node: '[*parser.Call] sort_by_label(foo, "job")'
           op: sort_by_label
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a string value with no labels.
+                kind: excluded
+                fragment:
+                    start: 19
+                    end: 24
+          returns: string
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 0
+                end: 0
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 19
+            end: 24
+          type: string
+          fixedLabels: true
       needsFeatures:
         - feature: promql-experimental-functions
           name: sort_by_label
@@ -15080,17 +20523,70 @@ output:
       operations:
         - node: '[*parser.VectorSelector] foo'
           op: ""
-      needsFeatures:
-        - feature: promql-experimental-functions
-          name: end
-          fragments:
-            - start: 7
-              end: 10
-        - feature: promql-experimental-functions
-          name: start
-          fragments:
-            - start: 15
-              end: 20
+      indirect:
+        - labels:
+            "":
+                reason: Calling `end()` will return a scalar value with no labels.
+                kind: excluded
+                fragment:
+                    start: 7
+                    end: 12
+          returns: scalar
+          operations:
+            - node: '[*parser.Call] end()'
+              op: end
+          indirect:
+            - labels:
+                "":
+                    reason: Calling `start()` will return a scalar value with no labels.
+                    kind: excluded
+                    fragment:
+                        start: 15
+                        end: 22
+              returns: scalar
+              operations:
+                - node: '[*parser.Call] start()'
+                  op: start
+              needsFeatures:
+                - feature: promql-experimental-functions
+                  name: start
+                  fragments:
+                    - start: 15
+                      end: 20
+              returnInfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 15
+                    end: 22
+                returnednumber: 0
+                alwaysreturns: true
+                knownreturn: false
+                isreturnbool: false
+              position:
+                start: 15
+                end: 22
+              type: function
+              fixedLabels: true
+          needsFeatures:
+            - feature: promql-experimental-functions
+              name: end
+              fragments:
+                - start: 7
+                  end: 10
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 7
+                end: 12
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: false
+            isreturnbool: false
+          position:
+            start: 7
+            end: 12
+          type: function
+          fixedLabels: true
       position:
         start: 0
         end: 3

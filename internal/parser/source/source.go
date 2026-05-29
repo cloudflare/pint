@@ -226,7 +226,9 @@ type Source struct {
 	// Any other sources this source joins with.
 	Joins []Join `yaml:"joins,omitempty"`
 	// Any other sources this source is suppressed by.
-	Unless        []Unless               `yaml:"unless,omitempty"`
+	Unless []Unless `yaml:"unless,omitempty"`
+	// Any other sources used indirectly, not contributing labels.
+	Indirect      []Source               `yaml:"indirect,omitempty"`
 	NeedsFeatures []FeatureRequirement   `yaml:"needsFeatures,omitempty"`
 	UsedLabels    []string               `yaml:"usedLabels,omitempty"`
 	ReturnInfo    ReturnInfo             `yaml:"returnInfo,omitempty"`
@@ -550,6 +552,9 @@ func innerWalk(fn Visitor, s Source, j *Join, u *Unless) {
 	}
 	for _, u := range s.Unless {
 		innerWalk(fn, u.Src, nil, &u)
+	}
+	for _, ind := range s.Indirect {
+		innerWalk(fn, ind, nil, nil)
 	}
 }
 
@@ -1120,6 +1125,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 func parseCall(expr string, n *promParser.Call) (src []Source) {
 	var args []string
 	var exprs []promParser.Expr
+	var indirect []Source
 
 	var vt promParser.ValueType
 	for i, e := range n.Args {
@@ -1134,6 +1140,7 @@ func parseCall(expr string, n *promParser.Call) (src []Source) {
 			exprs = append(exprs, e)
 		case promParser.ValueTypeNone, promParser.ValueTypeScalar, promParser.ValueTypeString:
 			args = append(args, e.String())
+			indirect = append(indirect, walkNode(expr, e)...)
 		}
 	}
 
@@ -1149,11 +1156,15 @@ func parseCall(expr string, n *promParser.Call) (src []Source) {
 			src = append(src, parsePromQLFunc(es, expr, n))
 		}
 	}
+	for i := range src {
+		src[i].Indirect = append(src[i].Indirect, indirect...)
+	}
 
 	if len(src) == 0 {
 		s := Source{ // nolint: exhaustruct
-			Labels: map[string]LabelTransform{},
-			Type:   FuncSource,
+			Labels:   map[string]LabelTransform{},
+			Type:     FuncSource,
+			Indirect: indirect,
 			Operations: Operations{
 				{
 					Operation: n.Func.Name,
@@ -1244,7 +1255,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					side = ls
 					other = rs
 				}
-				side.NeedsFeatures = append(side.NeedsFeatures, other.NeedsFeatures...)
+				side.Indirect = append(side.Indirect, other)
 				if ls.ReturnInfo.AlwaysReturns && rs.ReturnInfo.AlwaysReturns && ls.ReturnInfo.KnownReturn && rs.ReturnInfo.KnownReturn {
 					// Both sides always return something
 					side.ReturnInfo, side.DeadInfo = calculateStaticReturn(expr, ls, rs, n)

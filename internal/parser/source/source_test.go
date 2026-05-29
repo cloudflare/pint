@@ -461,6 +461,11 @@ group by (cluster, namespace, workload, workload_type, pod) (
 	`foo ^ bar`,
 	`sum(foo * on(job) group_left(cluster) bar) by(job) * on(job) group_left(cluster) baz`,
 	`sum by (colo) (metric_a) / scalar(sum(metric_b))`, // {colo} / <number> to avoid on()
+	`clamp(foo, scalar(bar{job=~"test"}), 10)`,
+	`histogram_quantile(scalar(threshold), rate(foo[5m]))`,
+	`round(foo, scalar(precision_metric))`,
+	`predict_linear(foo[5m], scalar(horizon))`,
+	`foo + scalar(bar)`,
 }
 
 func TestLabelsSource(t *testing.T) {
