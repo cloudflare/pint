@@ -6999,6 +6999,112 @@ data:
 				},
 			},
 		},
+		{
+			input: []byte(`
+groups:
+- name: v2
+  rules:
+  - record: comment:inside:expr
+    expr: |
+      count(
+        foo
+        # pint disable promql/series
+        + bar
+      )
+`),
+			strict: true,
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: parser.YamlNode{
+							Value: "v2",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 10},
+							},
+						},
+						Rules: []parser.Rule{
+							// FIXME should we parse comments inside PromQL?
+							{
+								Lines: diags.LineRange{First: 5, Last: 11},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "comment:inside:expr",
+										Pos: diags.PositionRanges{
+											{Line: 5, FirstColumn: 13, LastColumn: 31},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "count(\n  foo\n  # pint disable promql/series\n  + bar\n)\n",
+											Pos: diags.PositionRanges{
+												{Line: 7, FirstColumn: 7, LastColumn: 13},
+												{Line: 8, FirstColumn: 7, LastColumn: 12},
+												{Line: 9, FirstColumn: 7, LastColumn: 37},
+												{Line: 10, FirstColumn: 7, LastColumn: 14},
+												{Line: 11, FirstColumn: 7, LastColumn: 7},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			input: []byte(`
+groups:
+- name: v2
+  rules:
+  - record: comment:inside:expr
+    expr: |
+      count(
+        foo
+        # pint disable promql/series
+        + bar
+      )
+`),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Name: parser.YamlNode{
+							Value: "v2",
+							Pos: diags.PositionRanges{
+								{Line: 3, FirstColumn: 9, LastColumn: 10},
+							},
+						},
+						Rules: []parser.Rule{
+							// FIXME should we parse comments inside PromQL?
+							{
+								Lines: diags.LineRange{First: 5, Last: 11},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "comment:inside:expr",
+										Pos: diags.PositionRanges{
+											{Line: 5, FirstColumn: 13, LastColumn: 31},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "count(\n  foo\n  # pint disable promql/series\n  + bar\n)\n",
+											Pos: diags.PositionRanges{
+												{Line: 7, FirstColumn: 7, LastColumn: 13},
+												{Line: 8, FirstColumn: 7, LastColumn: 12},
+												{Line: 9, FirstColumn: 7, LastColumn: 37},
+												{Line: 10, FirstColumn: 7, LastColumn: 14},
+												{Line: 11, FirstColumn: 7, LastColumn: 7},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	alwaysEqual := cmp.Comparer(func(_, _ any) bool { return true })
