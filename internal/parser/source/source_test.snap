@@ -1174,6 +1174,8 @@ expr: prometheus_build_info[2m:1m]
 output:
     - returns: vector
       operations:
+        - node: '[*parser.SubqueryExpr] prometheus_build_info[2m:1m]'
+          op: ""
         - node: '[*parser.VectorSelector] prometheus_build_info'
           op: ""
       position:
@@ -1188,6 +1190,8 @@ expr: deriv(rate(distance_covered_meters_total[1m])[5m:1m])
 output:
     - returns: vector
       operations:
+        - node: '[*parser.SubqueryExpr] rate(distance_covered_meters_total[1m])[5m:1m]'
+          op: ""
         - node: '[*parser.MatrixSelector] distance_covered_meters_total[1m]'
           op: ""
         - node: '[*parser.VectorSelector] distance_covered_meters_total'
@@ -14267,6 +14271,8 @@ expr: max_over_time(foo[1h:5m] offset (5m+1m))
 output:
     - returns: vector
       operations:
+        - node: '[*parser.SubqueryExpr] foo[1h:5m] offset (5m + 1m)'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
         - node: '[*parser.Call] max_over_time(foo[1h:5m] offset (5m + 1m))'
@@ -14289,6 +14295,8 @@ expr: max_over_time(rate(foo[5m])[1h+10m:5m])
 output:
     - returns: vector
       operations:
+        - node: '[*parser.SubqueryExpr] rate(foo[5m])[1h + 10m:5m]'
+          op: ""
         - node: '[*parser.MatrixSelector] foo[5m]'
           op: ""
         - node: '[*parser.VectorSelector] foo'
@@ -14315,6 +14323,8 @@ expr: max_over_time(rate(foo[5m])[1h+10m:5m+1m])
 output:
     - returns: vector
       operations:
+        - node: '[*parser.SubqueryExpr] rate(foo[5m])[1h + 10m:5m + 1m]'
+          op: ""
         - node: '[*parser.MatrixSelector] foo[5m]'
           op: ""
         - node: '[*parser.VectorSelector] foo'
@@ -14343,6 +14353,8 @@ expr: max_over_time(foo[1h:5m+1m])
 output:
     - returns: vector
       operations:
+        - node: '[*parser.SubqueryExpr] foo[1h:5m + 1m]'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
         - node: '[*parser.Call] max_over_time(foo[1h:5m + 1m])'

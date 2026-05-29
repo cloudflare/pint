@@ -592,6 +592,17 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 
 	case *promParser.SubqueryExpr:
 		for _, s := range walkNode(expr, n.Expr) {
+			// Prepend Subquery operation
+			s.Operations = append(
+				Operations{
+					{
+						Operation: "",
+						Node:      node,
+						Arguments: nil,
+					},
+				},
+				s.Operations...,
+			)
 			s.requireDurationExprFeatures(n.RangeExpr)
 			s.requireDurationExprFeatures(n.StepExpr)
 			s.requireDurationExprFeatures(n.OriginalOffsetExpr)
