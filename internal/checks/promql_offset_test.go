@@ -230,6 +230,31 @@ func TestOffsetCheck(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "nested subquery with inner offset exceeding retention",
+			content:     "- record: foo\n  expr: max_over_time(min_over_time(foo[5m:1m] offset 20d)[1h:5m])\n",
+			checker:     newOffsetCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp:  flagsResponse{flags: map[string]string{}},
+				},
+			},
+		},
+		{
+			description: "nested subquery with inner offset within retention",
+			content:     "- record: foo\n  expr: max_over_time(min_over_time(foo[5m:1m] offset 10d)[1h:5m])\n",
+			checker:     newOffsetCheck,
+			prometheus:  newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp:  flagsResponse{flags: map[string]string{}},
+				},
+			},
+		},
 	}
 	runTests(t, testCases)
 }
