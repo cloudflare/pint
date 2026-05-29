@@ -1158,6 +1158,8 @@ expr: foo[5m]
 output:
     - returns: matrix
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m]'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
       position:
@@ -1186,6 +1188,8 @@ expr: deriv(rate(distance_covered_meters_total[1m])[5m:1m])
 output:
     - returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] distance_covered_meters_total[1m]'
+          op: ""
         - node: '[*parser.VectorSelector] distance_covered_meters_total'
           op: ""
         - node: '[*parser.Call] rate(distance_covered_meters_total[1m])'
@@ -1869,6 +1873,8 @@ output:
                 end: 21
       returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m]'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
         - node: '[*parser.Call] rate(foo[5m])'
@@ -1901,6 +1907,8 @@ output:
                 end: 21
       returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m]'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
         - node: '[*parser.Call] rate(foo[5m])'
@@ -1920,6 +1928,8 @@ expr: stddev_over_time(foo[5m])
 output:
     - returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m]'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
         - node: '[*parser.Call] stddev_over_time(foo[5m])'
@@ -1936,6 +1946,8 @@ expr: stdvar_over_time(foo[5m])
 output:
     - returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m]'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
         - node: '[*parser.Call] stdvar_over_time(foo[5m])'
@@ -1965,6 +1977,8 @@ output:
                 end: 28
       returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m]'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
         - node: '[*parser.Call] rate(foo[5m])'
@@ -2200,6 +2214,8 @@ expr: rate(foo[10m])
 output:
     - returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[10m]'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
         - node: '[*parser.Call] rate(foo[10m])'
@@ -2229,6 +2245,8 @@ output:
                 end: 36
       returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[10m]'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
         - node: '[*parser.Call] rate(foo[10m])'
@@ -2880,6 +2898,8 @@ output:
                 end: 42
       returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m]'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
         - node: '[*parser.Call] rate(foo[5m])'
@@ -3926,6 +3946,8 @@ output:
                 end: 16
       returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m]'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
         - node: '[*parser.Call] absent_over_time(foo[5m])'
@@ -4208,6 +4230,8 @@ output:
                 end: 35
       returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo{job="myjob"}[5m]'
+          op: ""
         - node: '[*parser.VectorSelector] foo{job="myjob"}'
           op: ""
         - node: '[*parser.Call] sum_over_time(foo{job="myjob"}[5m])'
@@ -4715,6 +4739,8 @@ output:
                 end: 23
       returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] probe_success{job="abc"}[5m]'
+          op: ""
         - node: '[*parser.VectorSelector] probe_success{job="abc"}'
           op: ""
         - node: '[*parser.Call] sum_over_time(probe_success{job="abc"}[5m])'
@@ -5625,6 +5651,8 @@ output:
                 end: 124
       returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] metric2[5m]'
+          op: ""
         - node: '[*parser.VectorSelector] metric2'
           op: ""
         - node: '[*parser.Call] rate(metric2[5m])'
@@ -5638,6 +5666,8 @@ output:
           src:
             returns: vector
             operations:
+                - node: '[*parser.MatrixSelector] metric1[5m]'
+                  op: ""
                 - node: '[*parser.VectorSelector] metric1'
                   op: ""
                 - node: '[*parser.Call] rate(metric1[5m])'
@@ -5694,6 +5724,8 @@ output:
                         end: 110
             returns: vector
             operations:
+                - node: '[*parser.MatrixSelector] metric3{log_name="samplerd"}[5m]'
+                  op: ""
                 - node: '[*parser.VectorSelector] metric3{log_name="samplerd"}'
                   op: ""
                 - node: '[*parser.Call] rate(metric3{log_name="samplerd"}[5m])'
@@ -5770,6 +5802,8 @@ output:
           src:
             returns: vector
             operations:
+                - node: '[*parser.MatrixSelector] metric1[5m]'
+                  op: ""
                 - node: '[*parser.VectorSelector] metric1'
                   op: ""
                 - node: '[*parser.Call] rate(metric1[5m])'
@@ -5826,6 +5860,8 @@ output:
                         end: 110
             returns: vector
             operations:
+                - node: '[*parser.MatrixSelector] metric3{log_name="samplerd"}[5m]'
+                  op: ""
                 - node: '[*parser.VectorSelector] metric3{log_name="samplerd"}'
                   op: ""
                 - node: '[*parser.Call] rate(metric3{log_name="samplerd"}[5m])'
@@ -7129,6 +7165,8 @@ output:
                 end: 30
       returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] kernel_device_io_errors_total{device!~"loop.+"}[2h]'
+          op: ""
         - node: '[*parser.VectorSelector] kernel_device_io_errors_total{device!~"loop.+"}'
           op: ""
         - node: '[*parser.Call] increase(kernel_device_io_errors_total{device!~"loop.+"}[2h])'
@@ -7223,6 +7261,8 @@ output:
                         end: 258
             returns: vector
             operations:
+                - node: '[*parser.MatrixSelector] kernel_device_io_soft_errors_total{device!~"loop.+"}[2h5m]'
+                  op: ""
                 - node: '[*parser.VectorSelector] kernel_device_io_soft_errors_total{device!~"loop.+"}'
                   op: ""
                 - node: '[*parser.Call] increase(kernel_device_io_soft_errors_total{device!~"loop.+"}[2h5m])'
@@ -7236,6 +7276,8 @@ output:
                   src:
                     returns: vector
                     operations:
+                        - node: '[*parser.MatrixSelector] kernel_device_io_errors_total[2h]'
+                          op: ""
                         - node: '[*parser.VectorSelector] kernel_device_io_errors_total'
                           op: ""
                         - node: '[*parser.Call] increase(kernel_device_io_errors_total[2h])'
@@ -7447,6 +7489,8 @@ output:
                         end: 287
             returns: vector
             operations:
+                - node: '[*parser.MatrixSelector] go_memstats_alloc_bytes{job="prometheus"}[2h]'
+                  op: ""
                 - node: '[*parser.VectorSelector] go_memstats_alloc_bytes{job="prometheus"}'
                   op: ""
                 - node: '[*parser.Call] max_over_time(go_memstats_alloc_bytes{job="prometheus"}[2h])'
@@ -7488,6 +7532,8 @@ output:
                                 end: 240
                     returns: vector
                     operations:
+                        - node: '[*parser.MatrixSelector] prometheus_tsdb_head_series[2h]'
+                          op: ""
                         - node: '[*parser.VectorSelector] prometheus_tsdb_head_series'
                           op: ""
                         - node: '[*parser.Call] max_over_time(prometheus_tsdb_head_series[2h])'
@@ -7684,6 +7730,8 @@ output:
           kind: 3
       returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] errors_total[5m]'
+          op: ""
         - node: '[*parser.VectorSelector] errors_total'
           op: ""
         - node: '[*parser.Call] rate(errors_total[5m])'
@@ -7966,6 +8014,8 @@ output:
                 end: 421
       returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo_rejections[6h]'
+          op: ""
         - node: '[*parser.VectorSelector] foo_rejections'
           op: ""
         - node: '[*parser.Call] rate(foo_rejections[6h])'
@@ -8000,6 +8050,8 @@ output:
                         end: 160
             returns: vector
             operations:
+                - node: '[*parser.MatrixSelector] foo_total[6h]'
+                  op: ""
                 - node: '[*parser.VectorSelector] foo_total'
                   op: ""
                 - node: '[*parser.Call] rate(foo_total[6h])'
@@ -8100,6 +8152,8 @@ output:
                         end: 254
             returns: vector
             operations:
+                - node: '[*parser.MatrixSelector] foo_rejections[6h] offset 1d'
+                  op: ""
                 - node: '[*parser.VectorSelector] foo_rejections offset 1d'
                   op: ""
                 - node: '[*parser.Call] rate(foo_rejections[6h] offset 1d)'
@@ -8134,6 +8188,8 @@ output:
                                 end: 333
                     returns: vector
                     operations:
+                        - node: '[*parser.MatrixSelector] foo_total[6h] offset 1d'
+                          op: ""
                         - node: '[*parser.VectorSelector] foo_total offset 1d'
                           op: ""
                         - node: '[*parser.Call] rate(foo_total[6h] offset 1d)'
@@ -8286,6 +8342,8 @@ output:
                                 end: 333
                     returns: vector
                     operations:
+                        - node: '[*parser.MatrixSelector] foo_total[6h] offset 1d'
+                          op: ""
                         - node: '[*parser.VectorSelector] foo_total offset 1d'
                           op: ""
                         - node: '[*parser.Call] rate(foo_total[6h] offset 1d)'
@@ -8576,6 +8634,8 @@ output:
                         end: 160
             returns: vector
             operations:
+                - node: '[*parser.MatrixSelector] foo_total[6h]'
+                  op: ""
                 - node: '[*parser.VectorSelector] foo_total'
                   op: ""
                 - node: '[*parser.Call] rate(foo_total[6h])'
@@ -8676,6 +8736,8 @@ output:
                         end: 254
             returns: vector
             operations:
+                - node: '[*parser.MatrixSelector] foo_rejections[6h] offset 1d'
+                  op: ""
                 - node: '[*parser.VectorSelector] foo_rejections offset 1d'
                   op: ""
                 - node: '[*parser.Call] rate(foo_rejections[6h] offset 1d)'
@@ -8710,6 +8772,8 @@ output:
                                 end: 333
                     returns: vector
                     operations:
+                        - node: '[*parser.MatrixSelector] foo_total[6h] offset 1d'
+                          op: ""
                         - node: '[*parser.VectorSelector] foo_total offset 1d'
                           op: ""
                         - node: '[*parser.Call] rate(foo_total[6h] offset 1d)'
@@ -8862,6 +8926,8 @@ output:
                                 end: 333
                     returns: vector
                     operations:
+                        - node: '[*parser.MatrixSelector] foo_total[6h] offset 1d'
+                          op: ""
                         - node: '[*parser.VectorSelector] foo_total offset 1d'
                           op: ""
                         - node: '[*parser.Call] rate(foo_total[6h] offset 1d)'
@@ -11851,6 +11917,8 @@ output:
                 end: 50
       returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] panics_total{module_name=~".+"}[5m]'
+          op: ""
         - node: '[*parser.VectorSelector] panics_total{module_name=~".+"}'
           op: ""
         - node: '[*parser.Call] rate(panics_total{module_name=~".+"}[5m])'
@@ -12018,6 +12086,8 @@ expr: foo[5m] @ 1609459200
 output:
     - returns: matrix
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m] @ 1609459200.000'
+          op: ""
         - node: '[*parser.VectorSelector] foo @ 1609459200.000'
           op: ""
       position:
@@ -12032,6 +12102,8 @@ expr: rate(foo[5m] @ start())
 output:
     - returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m] @ start()'
+          op: ""
         - node: '[*parser.VectorSelector] foo @ start()'
           op: ""
         - node: '[*parser.Call] rate(foo[5m] @ start())'
@@ -12054,6 +12126,8 @@ expr: histogram_quantile(0.9, rate(foo[5m]))
 output:
     - returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m]'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
         - node: '[*parser.Call] rate(foo[5m])'
@@ -12074,6 +12148,8 @@ expr: predict_linear(foo[5m], 3600)
 output:
     - returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m]'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
         - args:
@@ -12111,6 +12187,8 @@ expr: irate(foo[5m])
 output:
     - returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m]'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
         - node: '[*parser.Call] irate(foo[5m])'
@@ -12127,6 +12205,8 @@ expr: delta(foo[5m])
 output:
     - returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m]'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
         - node: '[*parser.Call] delta(foo[5m])'
@@ -12143,6 +12223,8 @@ expr: idelta(foo[5m])
 output:
     - returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m]'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
         - node: '[*parser.Call] idelta(foo[5m])'
@@ -12159,6 +12241,8 @@ expr: increase(foo[5m])
 output:
     - returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m]'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
         - node: '[*parser.Call] increase(foo[5m])'
@@ -12175,6 +12259,8 @@ expr: changes(foo[5m])
 output:
     - returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m]'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
         - node: '[*parser.Call] changes(foo[5m])'
@@ -12191,6 +12277,8 @@ expr: resets(foo[5m])
 output:
     - returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m]'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
         - node: '[*parser.Call] resets(foo[5m])'
@@ -12468,6 +12556,8 @@ expr: avg_over_time(foo[5m])
 output:
     - returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m]'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
         - node: '[*parser.Call] avg_over_time(foo[5m])'
@@ -12484,6 +12574,8 @@ expr: min_over_time(foo[5m])
 output:
     - returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m]'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
         - node: '[*parser.Call] min_over_time(foo[5m])'
@@ -12500,6 +12592,8 @@ expr: max_over_time(foo[5m])
 output:
     - returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m]'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
         - node: '[*parser.Call] max_over_time(foo[5m])'
@@ -12516,6 +12610,8 @@ expr: count_over_time(foo[5m])
 output:
     - returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m]'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
         - node: '[*parser.Call] count_over_time(foo[5m])'
@@ -12532,6 +12628,8 @@ expr: last_over_time(foo[5m])
 output:
     - returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m]'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
         - node: '[*parser.Call] last_over_time(foo[5m])'
@@ -12548,6 +12646,8 @@ expr: present_over_time(foo[5m])
 output:
     - returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m]'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
         - node: '[*parser.Call] present_over_time(foo[5m])'
@@ -12564,6 +12664,8 @@ expr: quantile_over_time(0.9, foo[5m])
 output:
     - returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m]'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
         - args:
@@ -12594,6 +12696,8 @@ output:
                 end: 16
       returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m]'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
         - node: '[*parser.Call] absent_over_time(foo[5m])'
@@ -13814,6 +13918,8 @@ output:
                 end: 43
       returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m + 1m] smoothed'
+          op: ""
         - node: '[*parser.VectorSelector] foo smoothed'
           op: ""
         - node: '[*parser.Call] mad_over_time(foo[5m + 1m] smoothed)'
@@ -14139,6 +14245,8 @@ expr: foo[11s+10s]
 output:
     - returns: matrix
       operations:
+        - node: '[*parser.MatrixSelector] foo[11s + 10s]'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
       needsFeatures:
@@ -14181,6 +14289,8 @@ expr: max_over_time(rate(foo[5m])[1h+10m:5m])
 output:
     - returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m]'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
         - node: '[*parser.Call] rate(foo[5m])'
@@ -14205,6 +14315,8 @@ expr: max_over_time(rate(foo[5m])[1h+10m:5m+1m])
 output:
     - returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m]'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
         - node: '[*parser.Call] rate(foo[5m])'
@@ -14287,6 +14399,8 @@ expr: rate(foo[5m+1m])
 output:
     - returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m + 1m]'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
         - node: '[*parser.Call] rate(foo[5m + 1m])'
@@ -14309,6 +14423,8 @@ expr: rate(foo[5m+1m] smoothed)
 output:
     - returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m + 1m] smoothed'
+          op: ""
         - node: '[*parser.VectorSelector] foo smoothed'
           op: ""
         - node: '[*parser.Call] rate(foo[5m + 1m] smoothed)'
@@ -14356,6 +14472,8 @@ output:
                 end: 31
       returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m]'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
         - node: '[*parser.Call] mad_over_time(foo[5m])'
@@ -14405,6 +14523,8 @@ expr: mad_over_time(foo[5m] smoothed)
 output:
     - returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m] smoothed'
+          op: ""
         - node: '[*parser.VectorSelector] foo smoothed'
           op: ""
         - node: '[*parser.Call] mad_over_time(foo[5m] smoothed)'
@@ -14746,6 +14866,8 @@ expr: mad_over_time(foo[5m])
 output:
     - returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m]'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
         - node: '[*parser.Call] mad_over_time(foo[5m])'
@@ -14768,6 +14890,8 @@ expr: foo[5m+range()]
 output:
     - returns: matrix
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m + range()]'
+          op: ""
         - node: '[*parser.VectorSelector] foo'
           op: ""
       needsFeatures:
@@ -14793,6 +14917,8 @@ expr: rate(foo_total[range()])
 output:
     - returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo_total[range()]'
+          op: ""
         - node: '[*parser.VectorSelector] foo_total'
           op: ""
         - node: '[*parser.Call] rate(foo_total[range()])'
@@ -14820,6 +14946,8 @@ expr: rate(foo[5m] @ start())
 output:
     - returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m] @ start()'
+          op: ""
         - node: '[*parser.VectorSelector] foo @ start()'
           op: ""
         - node: '[*parser.Call] rate(foo[5m] @ start())'
@@ -14842,6 +14970,8 @@ expr: rate(foo[5m] smoothed)
 output:
     - returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m] smoothed'
+          op: ""
         - node: '[*parser.VectorSelector] foo smoothed'
           op: ""
         - node: '[*parser.Call] rate(foo[5m] smoothed)'
@@ -14872,6 +15002,8 @@ output:
                 end: 41
       returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo[5m] smoothed @ 1609459200.000'
+          op: ""
         - node: '[*parser.VectorSelector] foo @ 1609459200.000 smoothed'
           op: ""
         - node: '[*parser.Call] rate(foo[5m] smoothed @ 1609459200.000)'
@@ -14959,6 +15091,8 @@ expr: rate(foo_total[step() * 4])
 output:
     - returns: vector
       operations:
+        - node: '[*parser.MatrixSelector] foo_total[step() * 4]'
+          op: ""
         - node: '[*parser.VectorSelector] foo_total'
           op: ""
         - node: '[*parser.Call] rate(foo_total[step() * 4])'

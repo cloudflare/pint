@@ -575,17 +575,18 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 	case *promParser.MatrixSelector:
 		for _, s := range walkNode(expr, n.VectorSelector) {
 			s.Returns = promParser.ValueTypeMatrix
-			s.requireDurationExprFeatures(n.RangeExpr)
-			/*
-				// Prepend Matrix operation
-				s.Operations = append(SourceOperations{
+			// Prepend Matrix operation
+			s.Operations = append(
+				Operations{
 					{
 						Operation: "",
 						Node:      node,
 						Arguments: nil,
 					},
-				}, s.Operations...)
-			*/
+				},
+				s.Operations...,
+			)
+			s.requireDurationExprFeatures(n.RangeExpr)
 			src = append(src, s)
 		}
 
