@@ -11,21 +11,27 @@ import (
 var aliases = "{{ $alert := .Alert }}{{ $record := .Record }}{{ $for := .For }}{{ $labels := .Labels }}{{ $annotations := .Annotations }}"
 
 func NewTemplatedRegexp(s string) (*TemplatedRegexp, error) {
-	tr := TemplatedRegexp{anchored: "^" + s + "$", original: s}
-	_, err := tr.Expand(parser.Rule{})
+	tr := TemplatedRegexp{anchored: "^" + s + "$", original: s, static: nil}
+	re, expanded, err := tr.expand(parser.Rule{})
 	if err != nil {
 		return nil, err
 	}
-	return &tr, err
+	if expanded == tr.anchored {
+		tr.static = re
+	}
+	return &tr, nil
 }
 
 func NewRawTemplatedRegexp(s string) (*TemplatedRegexp, error) {
-	tr := TemplatedRegexp{anchored: s, original: s}
-	_, err := tr.Expand(parser.Rule{})
+	tr := TemplatedRegexp{anchored: s, original: s, static: nil}
+	re, expanded, err := tr.expand(parser.Rule{})
 	if err != nil {
 		return nil, err
 	}
-	return &tr, err
+	if expanded == tr.anchored {
+		tr.static = re
+	}
+	return &tr, nil
 }
 
 func MustTemplatedRegexp(re string) *TemplatedRegexp {
@@ -39,24 +45,37 @@ func MustRawTemplatedRegexp(re string) *TemplatedRegexp {
 }
 
 type TemplatedRegexp struct {
+	static   *regexp.Regexp
 	anchored string
 	original string
 }
 
 func (tr TemplatedRegexp) Expand(rule parser.Rule) (*regexp.Regexp, error) {
+	if tr.static != nil {
+		return tr.static, nil
+	}
+	re, _, err := tr.expand(rule)
+	return re, err
+}
+
+func (tr TemplatedRegexp) expand(rule parser.Rule) (*regexp.Regexp, string, error) {
 	tctx := newTemplateContext(rule)
 	tmpl, err := newTemplateFromContext(tr.anchored)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	var buf bytes.Buffer
-	err = tmpl.Execute(&buf, tctx)
-	if err != nil {
-		return nil, err
+	if err = tmpl.Execute(&buf, tctx); err != nil {
+		return nil, "", err
 	}
 
-	return regexp.Compile(buf.String())
+	s := buf.String()
+	re, err := regexp.Compile(s)
+	if err != nil {
+		return nil, "", err
+	}
+	return re, s, nil
 }
 
 func (tr TemplatedRegexp) MustExpand(rule parser.Rule) *regexp.Regexp {
