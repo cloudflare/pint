@@ -217,3 +217,107 @@
     anchor: 0
 
 ---
+
+[TestRangeQueryCheck/limit_/_5h_inside_binary_expression - 1]
+- description: limit / 5h inside binary expression
+  content: |
+    - record: foo
+      expr: bar / rate(foo[5h])
+  output: |
+    2 |   expr: bar / rate(foo[5h])
+                           ^^^^^^^
+                           `foo[5h]` selector is trying to query Prometheus for 5h worth of metrics, but 4h
+                           is the maximum allowed range query.
+  problem:
+    reporter: promql/range_query
+    summary: query beyond configured retention
+    details: 'Rule comment: some text'
+    diagnostics:
+        - message: '`foo[5h]` selector is trying to query Prometheus for 5h worth of metrics, but 4h is the maximum allowed range query.'
+          firstcolumn: 12
+          lastcolumn: 18
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestRangeQueryCheck/limit_/_6h_inside_unless_clause - 1]
+- description: limit / 6h inside unless clause
+  content: |
+    - alert: foo
+      expr: rate(foo[3h]) == 0 unless rate(foo[6h]) > 0
+  output: |
+    2 |   expr: rate(foo[3h]) == 0 unless rate(foo[6h]) > 0
+                                               ^^^^^^^
+                                               `foo[6h]` selector is trying to query Prometheus for 6h worth
+                                               of metrics, but 4h is the maximum allowed range query.
+  problem:
+    reporter: promql/range_query
+    summary: query beyond configured retention
+    details: 'Rule comment: some text'
+    diagnostics:
+        - message: '`foo[6h]` selector is trying to query Prometheus for 6h worth of metrics, but 4h is the maximum allowed range query.'
+          firstcolumn: 32
+          lastcolumn: 38
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestRangeQueryCheck/limit_/_both_sides_of_binary_expression_exceed_limit - 1]
+- description: limit / both sides of binary expression exceed limit
+  content: |
+    - record: foo
+      expr: rate(foo[6h]) / rate(bar[7h])
+  output: |
+    2 |   expr: rate(foo[6h]) / rate(bar[7h])
+                     ^^^^^^^
+                     `foo[6h]` selector is trying to query Prometheus for 6h worth of metrics, but 4h is the
+                     maximum allowed range query.
+  problem:
+    reporter: promql/range_query
+    summary: query beyond configured retention
+    details: 'Rule comment: some text'
+    diagnostics:
+        - message: '`foo[6h]` selector is trying to query Prometheus for 6h worth of metrics, but 4h is the maximum allowed range query.'
+          firstcolumn: 6
+          lastcolumn: 12
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+- description: limit / both sides of binary expression exceed limit
+  content: |
+    - record: foo
+      expr: rate(foo[6h]) / rate(bar[7h])
+  output: |
+    2 |   expr: rate(foo[6h]) / rate(bar[7h])
+                                     ^^^^^^^
+                                     `bar[7h]` selector is trying to query Prometheus for 7h worth of
+                                     metrics, but 4h is the maximum allowed range query.
+  problem:
+    reporter: promql/range_query
+    summary: query beyond configured retention
+    details: 'Rule comment: some text'
+    diagnostics:
+        - message: '`bar[7h]` selector is trying to query Prometheus for 7h worth of metrics, but 4h is the maximum allowed range query.'
+          firstcolumn: 22
+          lastcolumn: 28
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---

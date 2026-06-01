@@ -232,6 +232,39 @@
 
 ---
 
+[TestOffsetCheck/nested_subquery_with_inner_offset_exceeding_retention - 1]
+- description: nested subquery with inner offset exceeding retention
+  content: |
+    - record: foo
+      expr: max_over_time(min_over_time(foo[5m:1m] offset 20d)[1h:5m])
+  output: |
+    2 |   expr: max_over_time(min_over_time(foo[5m:1m] offset 20d)[1h:5m])
+                                                       ^^^^^^^^^^
+        `foo[5m:1m] offset 20d` selector is using 20d offset, but
+        `prom` Prometheus server at https://simple.example.com is
+        configured to only keep 15d of metrics history.
+  problem:
+    reporter: promql/offset
+    summary: query offset beyond configured retention
+    details: ""
+    diagnostics:
+        - message: '`foo[5m:1m] offset 20d` selector is using 20d offset, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.'
+          firstcolumn: 40
+          lastcolumn: 49
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestOffsetCheck/nested_subquery_with_inner_offset_within_retention - 1]
+[]
+
+---
+
 [TestOffsetCheck/no_offset_used - 1]
 []
 

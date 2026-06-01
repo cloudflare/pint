@@ -12,7 +12,6 @@ import (
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser/source"
-	"github.com/cloudflare/pint/internal/parser/utils"
 
 	"github.com/prometheus/prometheus/model/labels"
 	promParser "github.com/prometheus/prometheus/promql/parser"
@@ -97,8 +96,8 @@ func (c RuleDependencyCheck) checkRemovedDependency(entry *discovery.Entry, entr
 	}
 
 	var broken []*brokenDependency
-	var dep *brokenDependency
 	for _, flt := range filtered {
+		var dep *brokenDependency
 		if entry.Rule.RecordingRule != nil {
 			dep = c.usesVector(flt, entry.Rule.RecordingRule.Record.Value)
 		}
@@ -280,15 +279,25 @@ func (c RuleDependencyCheck) usesVector(entry *discovery.Entry, name string) *br
 		return nil
 	}
 
-	for _, vs := range utils.HasVectorSelector(expr.Query()) {
-		if vs.Name == name {
-			return &brokenDependency{
-				kind:   "recording",
-				metric: name,
-				path:   entry.Path.SymlinkTarget,
-				line:   expr.Value.Pos.Lines().First,
-				name:   entry.Rule.Name(),
+	var dep *brokenDependency
+	for _, src := range expr.Source() {
+		src.WalkSources(func(s source.Source, _ *source.Join, _ *source.Unless) {
+			vs, ok := source.MostOuterOperation[*promParser.VectorSelector](s)
+			if !ok {
+				return
 			}
+			if vs.Name == name {
+				dep = &brokenDependency{
+					kind:   "recording",
+					metric: name,
+					path:   entry.Path.SymlinkTarget,
+					line:   expr.Value.Pos.Lines().First,
+					name:   entry.Rule.Name(),
+				}
+			}
+		})
+		if dep != nil {
+			return dep
 		}
 	}
 
@@ -301,20 +310,30 @@ func (c RuleDependencyCheck) usesAlert(entry *discovery.Entry, name string) *bro
 		return nil
 	}
 
-	for _, vs := range utils.HasVectorSelector(expr.Query()) {
-		if vs.Name != "ALERTS" && vs.Name != "ALERTS_FOR_STATE" {
-			continue
-		}
-		for _, lm := range vs.LabelMatchers {
-			if lm.Name == "alertname" && lm.Type == labels.MatchEqual && lm.Value == name {
-				return &brokenDependency{
-					kind:   "alerting",
-					metric: vs.String(),
-					path:   entry.Path.SymlinkTarget,
-					line:   expr.Value.Pos.Lines().First,
-					name:   entry.Rule.Name(),
+	var dep *brokenDependency
+	for _, src := range expr.Source() {
+		src.WalkSources(func(s source.Source, _ *source.Join, _ *source.Unless) {
+			vs, ok := source.MostOuterOperation[*promParser.VectorSelector](s)
+			if !ok {
+				return
+			}
+			if vs.Name != "ALERTS" && vs.Name != "ALERTS_FOR_STATE" {
+				return
+			}
+			for _, lm := range vs.LabelMatchers {
+				if lm.Name == "alertname" && lm.Type == labels.MatchEqual && lm.Value == name {
+					dep = &brokenDependency{
+						kind:   "alerting",
+						metric: vs.String(),
+						path:   entry.Path.SymlinkTarget,
+						line:   expr.Value.Pos.Lines().First,
+						name:   entry.Rule.Name(),
+					}
 				}
 			}
+		})
+		if dep != nil {
+			return dep
 		}
 	}
 

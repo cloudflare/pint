@@ -13,6 +13,7 @@ import (
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
+	"github.com/cloudflare/pint/internal/parser/source"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -77,32 +78,34 @@ func (c OffsetCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*dis
 		promText(c.prom.Name(), flags.URI),
 		model.Duration(retention),
 	)
-	problems = append(problems, c.checkNode(ctx, expr, expr.Query(), retention, reason)...)
+	problems = append(problems, c.checkSources(expr, retention, reason)...)
 
 	return problems
 }
 
-func (c OffsetCheck) checkNode(ctx context.Context, expr *parser.PromQLExpr, node *parser.PromQLNode, retention time.Duration, reason string) (problems []Problem) {
-	switch n := node.Expr.(type) {
-	case *promParser.VectorSelector:
-		if n.OriginalOffset > retention {
-			problems = append(problems, c.offsetProblem(expr, node, n.OriginalOffset, reason))
-		}
-	case *promParser.SubqueryExpr:
-		if n.OriginalOffset > retention {
-			problems = append(problems, c.offsetProblem(expr, node, n.OriginalOffset, reason))
-		}
+func (c OffsetCheck) checkSources(expr *parser.PromQLExpr, retention time.Duration, reason string) (problems []Problem) {
+	for _, src := range expr.Source() {
+		src.WalkSources(func(s source.Source, _ *source.Join, _ *source.Unless) {
+			if vs, ok := source.MostOuterOperation[*promParser.VectorSelector](s); ok && vs.OriginalOffset > retention {
+				problems = append(problems, c.offsetProblem(expr, s, vs, vs.OriginalOffset, reason))
+			}
+			// A source can have multiple SubqueryExprs (nested subqueries), check all of them.
+			for _, op := range s.Operations {
+				sq, ok := op.Node.(*promParser.SubqueryExpr)
+				if !ok {
+					continue
+				}
+				if sq.OriginalOffset > retention {
+					problems = append(problems, c.offsetProblem(expr, s, sq, sq.OriginalOffset, reason))
+				}
+			}
+		})
 	}
-
-	for _, child := range node.Children {
-		problems = append(problems, c.checkNode(ctx, expr, child, retention, reason)...)
-	}
-
 	return problems
 }
 
-func (c OffsetCheck) offsetProblem(expr *parser.PromQLExpr, node *parser.PromQLNode, offset time.Duration, reason string) Problem {
-	firstColumn, lastColumn := findOffsetColumns(expr.Value.Value, node)
+func (c OffsetCheck) offsetProblem(expr *parser.PromQLExpr, s source.Source, node promParser.Node, offset time.Duration, reason string) Problem {
+	firstColumn, lastColumn := findOffsetColumns(expr.Value.Value, s, node)
 	return Problem{
 		Anchor:   AnchorAfter,
 		Lines:    expr.Value.Pos.Lines(),
@@ -114,7 +117,7 @@ func (c OffsetCheck) offsetProblem(expr *parser.PromQLExpr, node *parser.PromQLN
 			{
 				Message: fmt.Sprintf(
 					"`%s` selector is using %s offset, but %s",
-					node.Expr,
+					node,
 					model.Duration(offset),
 					reason,
 				),
@@ -128,21 +131,20 @@ func (c OffsetCheck) offsetProblem(expr *parser.PromQLExpr, node *parser.PromQLN
 	}
 }
 
-func findOffsetColumns(query string, node *parser.PromQLNode) (firstColumn, lastColumn int) {
-	nodeStart := int(node.Expr.PositionRange().Start)
+func findOffsetColumns(query string, s source.Source, node promParser.Node) (firstColumn, lastColumn int) {
+	nodeStart := int(node.PositionRange().Start)
 
 	var endPos int
-	switch node.Expr.(type) {
+	switch node.(type) {
 	case *promParser.VectorSelector:
-		if node.Parent != nil {
-			if _, ok := node.Parent.Expr.(*promParser.MatrixSelector); ok {
-				endPos = int(node.Parent.Expr.PositionRange().End)
-				break
-			}
+		// If VectorSelector is inside a MatrixSelector, use the MatrixSelector's end position.
+		if m, ok := source.MostOuterOperation[*promParser.MatrixSelector](s); ok {
+			endPos = int(m.PositionRange().End)
+		} else {
+			endPos = int(node.PositionRange().End)
 		}
-		endPos = int(node.Expr.PositionRange().End)
 	case *promParser.SubqueryExpr:
-		endPos = int(node.Expr.PositionRange().End)
+		endPos = int(node.PositionRange().End)
 	}
 
 	idx := strings.LastIndex(strings.ToLower(query[nodeStart:endPos]), "offset")

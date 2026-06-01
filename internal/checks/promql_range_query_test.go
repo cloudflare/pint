@@ -165,6 +165,27 @@ func TestRangeQueryCheck(t *testing.T) {
 			prometheus:  noProm,
 			problems:    true,
 		},
+		{
+			description: "limit / 5h inside binary expression",
+			content:     "- record: foo\n  expr: bar / rate(foo[5h])\n",
+			checker:     newRangeQueryCheckWithLimit,
+			prometheus:  noProm,
+			problems:    true,
+		},
+		{
+			description: "limit / 6h inside unless clause",
+			content:     "- alert: foo\n  expr: rate(foo[3h]) == 0 unless rate(foo[6h]) > 0\n",
+			checker:     newRangeQueryCheckWithLimit,
+			prometheus:  noProm,
+			problems:    true,
+		},
+		{
+			description: "limit / both sides of binary expression exceed limit",
+			content:     "- record: foo\n  expr: rate(foo[6h]) / rate(bar[7h])\n",
+			checker:     newRangeQueryCheckWithLimit,
+			prometheus:  noProm,
+			problems:    true,
+		},
 	}
 	runTests(t, testCases)
 }

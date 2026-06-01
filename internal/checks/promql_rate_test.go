@@ -138,6 +138,25 @@ func TestRateCheck(t *testing.T) {
 			},
 		},
 		{
+			description: "rate wrapped in clamp_min < 2x scrape_interval",
+			content:     "- record: foo\n  expr: clamp_min(rate(foo[1m]), 0)\n",
+			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
+				},
+				{
+					conds: []requestCondition{requireMetadataPath},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{
+						"foo": {{Type: "counter"}},
+					}},
+				},
+			},
+		},
+		{
 			description: "irate < 3x scrape_interval",
 			content:     "- record: foo\n  expr: irate(foo[2m])\n",
 			checker:     newRateCheck,

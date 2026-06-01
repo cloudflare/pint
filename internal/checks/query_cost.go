@@ -413,41 +413,8 @@ func (c CostCheck) isSuggestionFor(src, potential source.Source, join *source.Jo
 		return nil, "", false, false
 	}
 
-	if join != nil && join.IsOn {
-		// Check if potential can have all the labels we use in a join.
-		for _, name := range join.MatchingLabels {
-			if src.CanHaveLabel(name) && !potential.CanHaveLabel(name) {
-				return nil, "", false, false
-			}
-		}
-	}
-	if unless != nil && unless.IsOn {
-		// Check if potential can have all the labels we use in unless.
-		for _, name := range unless.MatchingLabels {
-			if src.CanHaveLabel(name) && !potential.CanHaveLabel(name) {
-				return nil, "", false, false
-			}
-		}
-	}
-	for _, j := range src.Joins {
-		if !j.IsOn {
-			continue
-		}
-		for _, name := range j.MatchingLabels {
-			if !potential.CanHaveLabel(name) {
-				return nil, "", false, false
-			}
-		}
-	}
-	for _, u := range src.Unless {
-		if !u.IsOn {
-			continue
-		}
-		for _, name := range u.MatchingLabels {
-			if !potential.CanHaveLabel(name) {
-				return nil, "", false, false
-			}
-		}
+	if !c.joinLabelsCompatible(src, potential, join, unless) {
+		return nil, "", false, false
 	}
 
 	// Check if we part of the source query can be substitute with a recording rule
@@ -476,51 +443,103 @@ func (c CostCheck) isSuggestionFor(src, potential source.Source, join *source.Jo
 		ops := src.Operations[:i]
 		if c.equalOperations(ops, potential.Operations) {
 			slog.LogAttrs(context.Background(), slog.LevelDebug, "Equal operations", slog.Any("query", ops), slog.Any("suggestion", potential.Operations))
-			if c.metricName(ops) != c.metricName(potential.Operations) {
+			lms := c.selectorLabels(ops)
+			if !c.labelsCompatible(src, potential, lms, i == len(src.Operations)) {
 				goto NEXT
 			}
-
-			lms := c.selectorLabels(ops)
-			for _, lm := range lms {
-				if lm.Name == model.MetricNameLabel {
-					continue
-				}
-				if !potential.CanHaveLabel(lm.Name) {
-					goto NEXT
-				}
-			}
-			for _, name := range src.TransformedLabels(source.PossibleLabel, source.GuaranteedLabel) {
-				if !potential.CanHaveLabel(name) {
-					goto NEXT
-				}
-			}
-			var extra string
-			if len(lms) > 0 {
-				var buf strings.Builder
-				var added int
-				for _, lm := range lms {
-					if lm.Name == model.MetricNameLabel {
-						continue
-					}
-					if added == 0 {
-						buf.WriteRune('{')
-					} else if added > 0 {
-						buf.WriteString(", ")
-					}
-					buf.WriteString(lm.String())
-					added++
-				}
-				if added > 0 {
-					buf.WriteRune('}')
-				}
-				extra = buf.String()
-			}
-			return src.Operations[i-1].Node, extra, false, true
+			return src.Operations[i-1].Node, extraMatchers(lms), false, true
 		}
 	NEXT:
 	}
 
 	return nil, "", false, false
+}
+
+func (c CostCheck) joinLabelsCompatible(src, potential source.Source, join *source.Join, unless *source.Unless) bool {
+	if join != nil && join.IsOn {
+		for _, name := range join.MatchingLabels {
+			if src.CanHaveLabel(name) && !potential.CanHaveLabel(name) {
+				return false
+			}
+		}
+	}
+	if unless != nil && unless.IsOn {
+		for _, name := range unless.MatchingLabels {
+			if src.CanHaveLabel(name) && !potential.CanHaveLabel(name) {
+				return false
+			}
+		}
+	}
+	for _, j := range src.Joins {
+		if !j.IsOn {
+			continue
+		}
+		for _, name := range j.MatchingLabels {
+			if !potential.CanHaveLabel(name) {
+				return false
+			}
+		}
+	}
+	for _, u := range src.Unless {
+		if !u.IsOn {
+			continue
+		}
+		for _, name := range u.MatchingLabels {
+			if !potential.CanHaveLabel(name) {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+func (c CostCheck) labelsCompatible(src, potential source.Source, queryMatchers []*labels.Matcher, fullMatch bool) bool {
+	for _, lm := range queryMatchers {
+		if lm.Name == model.MetricNameLabel {
+			continue
+		}
+		if !potential.CanHaveLabel(lm.Name) {
+			return false
+		}
+	}
+	if !c.matchingSelectors(queryMatchers, c.selectorLabels(potential.Operations)) {
+		return false
+	}
+	if fullMatch && src.FixedLabels != potential.FixedLabels {
+		return false
+	}
+	for _, name := range src.TransformedLabels(source.PossibleLabel, source.GuaranteedLabel) {
+		if !potential.CanHaveLabel(name) {
+			return false
+		}
+	}
+	for _, name := range potential.TransformedLabels(source.PossibleLabel, source.GuaranteedLabel) {
+		if !src.CanHaveLabel(name) {
+			return false
+		}
+	}
+	return true
+}
+
+func extraMatchers(lms []*labels.Matcher) string {
+	var buf strings.Builder
+	var added int
+	for _, lm := range lms {
+		if lm.Name == model.MetricNameLabel {
+			continue
+		}
+		if added == 0 {
+			buf.WriteRune('{')
+		} else {
+			buf.WriteString(", ")
+		}
+		buf.WriteString(lm.String())
+		added++
+	}
+	if added > 0 {
+		buf.WriteRune('}')
+	}
+	return buf.String()
 }
 
 func (c CostCheck) equalOperations(a, b source.Operations) bool {
@@ -548,17 +567,31 @@ func (c CostCheck) normalizeFuncName(s string) string {
 	}
 }
 
-func (c CostCheck) metricName(ops source.Operations) string {
-	for _, op := range ops {
-		if vs, ok := op.Node.(*promParser.VectorSelector); ok {
-			for _, lm := range vs.LabelMatchers {
-				if lm.Type == labels.MatchEqual && lm.Name == model.MetricNameLabel {
-					return lm.Value
-				}
-			}
+// matchingSelectors returns true if every label matcher used by the recording rule
+// is also present in the query with the same type and value.
+// Both selectors must use the same __name__, and at least one must have it set.
+func (c CostCheck) matchingSelectors(query, rule []*labels.Matcher) bool {
+	var rName, qName string
+	for _, qm := range query {
+		if qm.Name == model.MetricNameLabel && qm.Type == labels.MatchEqual {
+			qName = qm.Value
 		}
 	}
-	return ""
+	for _, rm := range rule {
+		if rm.Name == model.MetricNameLabel && rm.Type == labels.MatchEqual {
+			rName = rm.Value
+			continue
+		}
+		if !slices.ContainsFunc(query, func(qm *labels.Matcher) bool {
+			return qm.Name == rm.Name && qm.Type == rm.Type && qm.Value == rm.Value
+		}) {
+			return false
+		}
+	}
+	if qName != rName || (qName == "" && rName == "") {
+		return false
+	}
+	return true
 }
 
 func (c CostCheck) selectorLabels(ops source.Operations) (lms []*labels.Matcher) {
