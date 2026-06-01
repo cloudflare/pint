@@ -157,7 +157,8 @@ func (c TemplateCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*d
 				},
 			})
 		}
-		for _, msg := range checkForValueInLabels(label.Value.Value) {
+		la := analyzeTemplate(label.Value.Value)
+		for _, msg := range checkForValueInLabels(la) {
 			problems = append(problems, Problem{
 				Anchor: AnchorAfter,
 				Lines: diags.LineRange{
@@ -181,7 +182,7 @@ func (c TemplateCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*d
 			})
 		}
 
-		problems = append(problems, c.checkQueryLabels(entry.Group, entry.Rule, label, src)...)
+		problems = append(problems, c.checkQueryLabels(entry.Group, entry.Rule, label, src, la)...)
 	}
 
 	if entry.Rule.AlertingRule.Annotations != nil {
@@ -215,32 +216,27 @@ func (c TemplateCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*d
 					},
 				})
 			}
-			problems = append(problems, c.checkQueryLabels(entry.Group, entry.Rule, annotation, src)...)
-			problems = append(problems, c.checkHumanizeIsNeeded(entry.Rule.AlertingRule.Expr, annotation)...)
+			aa := analyzeTemplate(annotation.Value.Value)
+			problems = append(problems, c.checkQueryLabels(entry.Group, entry.Rule, annotation, src, aa)...)
+			problems = append(problems, c.checkHumanizeIsNeeded(entry.Rule.AlertingRule.Expr, annotation, aa)...)
 		}
 	}
 
 	return problems
 }
 
-func (c TemplateCheck) checkHumanizeIsNeeded(expr parser.PromQLExpr, ann *parser.YamlKeyValue) (problems []Problem) {
-	t := templatePool.Get().(*textTemplate.Template)
-	defer templatePool.Put(t)
-
-	tt, err := t.Parse(templateDefsString + ann.Value.Value)
-	if err != nil {
+func (c TemplateCheck) checkHumanizeIsNeeded(expr parser.PromQLExpr, ann *parser.YamlKeyValue, a templateMeta) (problems []Problem) {
+	if !a.isValid {
 		return problems
 	}
-	aliases := aliasesForTemplate(tt)
-
-	if !hasValue(tt, aliases) {
+	if !a.hasValue {
 		return problems
 	}
-	if hasHumanize(tt, aliases) {
+	if a.hasHumanize {
 		return problems
 	}
 
-	vars, tmplAliases, _ := findTemplateVariables(ann.Key.Value, ann.Value.Value)
+	valAliases := a.aliases.varAliases(".Value")
 	for _, src := range expr.Source() {
 		call := isRateResult(src)
 		if call != nil {
@@ -254,10 +250,9 @@ func (c TemplateCheck) checkHumanizeIsNeeded(expr parser.PromQLExpr, ann *parser
 					Kind:        diags.Context,
 				},
 			}
-			labelsAliases := tmplAliases.varAliases(".Value")
-			for _, v := range vars {
-				for _, a := range labelsAliases {
-					if v.value[0] == a {
+			for _, v := range a.vars {
+				for _, va := range valAliases {
+					if v.value[0] == va {
 						dgs = append(dgs, diags.Diagnostic{
 							Message:     "Use one of humanize template functions to make the result more readable.",
 							Pos:         ann.Value.Pos,
@@ -418,20 +413,55 @@ func checkTemplateSyntax(ctx context.Context, name, text string, data any) error
 	return nil
 }
 
-func checkForValueInLabels(text string) (msgs []string) {
+type templateMeta struct {
+	aliases     aliasMap
+	vars        []tmplVar
+	hasValue    bool
+	hasHumanize bool
+	isValid     bool
+}
+
+func analyzeTemplate(text string) templateMeta {
 	t := templatePool.Get().(*textTemplate.Template)
 	defer templatePool.Put(t)
 
 	tt, err := t.Parse(templateDefsString + text)
 	if err != nil {
-		// no need to double report errors
+		return templateMeta{
+			aliases:     aliasMap{aliases: nil},
+			vars:        nil,
+			hasValue:    false,
+			hasHumanize: false,
+			isValid:     false,
+		}
+	}
+
+	aliases := aliasesForTemplate(tt)
+	var vars []tmplVar
+	for _, node := range tt.Root.Nodes {
+		vars = append(vars, getVariables(node)...)
+	}
+
+	return templateMeta{
+		aliases:     aliases,
+		vars:        vars,
+		hasValue:    hasValue(tt, aliases),
+		hasHumanize: hasHumanize(tt, aliases),
+		isValid:     true,
+	}
+}
+
+func checkForValueInLabels(a templateMeta) (msgs []string) {
+	if !a.isValid {
 		return nil
 	}
-	aliases := aliasesForTemplate(tt)
-	for _, node := range tt.Root.Nodes {
-		if v, ok := containsAliasedNode(aliases, node, ".Value"); ok {
-			msg := fmt.Sprintf("Using `%s` in labels will generate a new alert on every value change, move it to annotations.", v)
-			msgs = append(msgs, msg)
+	valAliases := a.aliases.varAliases(".Value")
+	for _, v := range a.vars {
+		for _, name := range v.value {
+			if slices.Contains(valAliases, name) {
+				msg := fmt.Sprintf("Using `%s` in labels will generate a new alert on every value change, move it to annotations.", name)
+				msgs = append(msgs, msg)
+			}
 		}
 	}
 	return msgs
@@ -540,9 +570,11 @@ func getVariables(node parse.Node) (vars []tmplVar) {
 			vars = append(vars, getVariables(arg)...)
 		}
 	case *parse.FieldNode:
-		n.Ident[0] = "." + n.Ident[0]
+		ident := make([]string, len(n.Ident))
+		copy(ident, n.Ident)
+		ident[0] = "." + ident[0]
 		vars = append(vars, tmplVar{
-			value:  n.Ident,
+			value:  ident,
 			column: int(n.Pos) + 1 - templateDefsLen,
 		})
 	case *parse.VariableNode:
@@ -573,17 +605,16 @@ func findTemplateVariables(_, text string) (vars []tmplVar, aliases aliasMap, ok
 	return vars, aliases, true
 }
 
-func (c TemplateCheck) checkQueryLabels(group *parser.Group, rule parser.Rule, label *parser.YamlKeyValue, src []source.Source) (problems []Problem) {
-	vars, aliases, ok := findTemplateVariables(label.Key.Value, label.Value.Value)
-	if !ok {
+func (c TemplateCheck) checkQueryLabels(group *parser.Group, rule parser.Rule, label *parser.YamlKeyValue, src []source.Source, a templateMeta) (problems []Problem) {
+	if !a.isValid {
 		return nil
 	}
 
 	done := map[string]struct{}{}
-	labelsAliases := aliases.varAliases(".Labels")
-	for _, v := range vars {
-		for _, a := range labelsAliases {
-			if len(v.value) > 1 && v.value[0] == a {
+	labelsAliases := a.aliases.varAliases(".Labels")
+	for _, v := range a.vars {
+		for _, la := range labelsAliases {
+			if len(v.value) > 1 && v.value[0] == la {
 				if _, ok := done[v.value[1]]; ok {
 					continue
 				}
