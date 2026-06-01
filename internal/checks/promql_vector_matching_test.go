@@ -1186,15 +1186,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: sum by(instance) (foo) * on(instance, job) bar\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			mocks: []*prometheusMock{
-				{
-					conds: []requestCondition{
-						requireQueryPath,
-						formCond{key: "query", value: "count(\nsum by (instance) (foo) * on (instance, job) bar\n)"},
-					},
-					resp: respondWithEmptyVector(),
-				},
-			},
 		},
 		// Verifies that vector_matching doesn't report when the join is statically
 		// impossible due to label mismatch without on/ignoring modifiers.
@@ -1205,15 +1196,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo{instance=\"a\"} / sum(bar)\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			mocks: []*prometheusMock{
-				{
-					conds: []requestCondition{
-						requireQueryPath,
-						formCond{key: "query", value: "count(\nfoo{instance=\"a\"} / sum(bar)\n)"},
-					},
-					resp: respondWithEmptyVector(),
-				},
-			},
 		},
 		// Verifies that vector_matching skips when on() label is structurally
 		// impossible on the RHS. LHS (foo) can have job, but RHS sum by(instance)
@@ -1223,15 +1205,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo * on(instance, job) sum by(instance) (bar)\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			mocks: []*prometheusMock{
-				{
-					conds: []requestCondition{
-						requireQueryPath,
-						formCond{key: "query", value: "count(\nfoo * on (instance, job) sum by (instance) (bar)\n)"},
-					},
-					resp: respondWithEmptyVector(),
-				},
-			},
 		},
 		// Verifies that ignoring() with a guaranteed label in the ignore list
 		// doesn't cause a false skip. LHS guarantees instance via the selector,
