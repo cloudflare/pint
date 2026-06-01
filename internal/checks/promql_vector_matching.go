@@ -75,6 +75,12 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 		n.Op != promParser.LOR &&
 		n.Op != promParser.LUNLESS {
 
+		lhsSources := source.LabelsSource(expr.Value.Value, node.Expr.(*promParser.BinaryExpr).LHS)
+		rhsSources := source.LabelsSource(expr.Value.Value, node.Expr.(*promParser.BinaryExpr).RHS)
+		if !canJoinStatically(lhsSources, rhsSources, n.VectorMatching) {
+			goto NEXT
+		}
+
 		q := wrapExpr(n.String(), "count")
 		qr, err := c.prom.Query(ctx, q).Wait()
 		if err != nil {
@@ -138,12 +144,6 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 					return problems
 				}
 			}
-		}
-
-		lhsSources := source.LabelsSource(expr.Value.Value, node.Expr.(*promParser.BinaryExpr).LHS)
-		rhsSources := source.LabelsSource(expr.Value.Value, node.Expr.(*promParser.BinaryExpr).RHS)
-		if !canJoinStatically(lhsSources, rhsSources, n.VectorMatching) {
-			goto NEXT
 		}
 
 		leftLabels, leftURI, err := c.seriesLabels(ctx, n.LHS.String(), ignored...)
