@@ -736,6 +736,8 @@ func TestCostCheck(t *testing.T) {
 			},
 		},
 		{
+			// Query uses sum by(instance)(irate(...)), recording rule uses sum without(cpu)(rate(...)),
+			// different aggregation grouping means different label sets, no suggestion.
 			description: "suggest recording rule / irate vs rate",
 			content: `
 - alert: Host_CPU_Utilization_High
@@ -761,7 +763,6 @@ func TestCostCheck(t *testing.T) {
 - record: colo_instance:node_cpu:count
   expr: count(node_cpu_seconds_total{mode="idle"}) without (cpu, mode)
 `),
-			problems: true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -792,7 +793,35 @@ func TestCostCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "count(\nserver_role{role=\"foo\"}\nand on(instance)\ninstance_mode:node_cpu:rate2m{job=\"foo\", mode!=\"idle\"} > 20\n\n)"},
+						formCond{key: "query", value: checks.BytesPerSampleQuery},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSampleWithValue(map[string]string{}, 2048),
+						},
+					},
+				},
+			},
+		},
+		{
+			// Query uses sum(irate(...)), recording rule uses sum(rate(...)),
+			// same aggregation without any by/without clause, suggestion should be emitted.
+			description: "suggest recording rule / irate vs rate with bare sum",
+			content:     "- alert: foo\n  expr: sum(irate(foo_total[5m])) > 10\n",
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 100, 100, 0, 0, "check comment", checks.Warning)
+			},
+			prometheus: newSimpleProm,
+			entries: mustParseContent(`
+- record: foo:rate5m
+  expr: sum(rate(foo_total[5m]))
+`),
+			problems: true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(\nsum(irate(foo_total[5m])) > 10\n)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -806,11 +835,105 @@ func TestCostCheck(t *testing.T) {
 						},
 						stats: promapi.QueryStats{
 							Samples: promapi.QuerySamples{
-								TotalQueryableSamples: 29,
-								PeakSamples:           11,
+								TotalQueryableSamples: 100,
+								PeakSamples:           50,
 							},
-							Timings: promapi.QueryTimings{
-								EvalTotalTime: 21.3,
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(\nfoo:rate5m > 10\n)"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 10,
+								PeakSamples:           9,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: checks.BytesPerSampleQuery},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSampleWithValue(map[string]string{}, 2048),
+						},
+					},
+				},
+			},
+		},
+		{
+			// Query uses irate(), recording rule uses rate(), both with sum by(instance),
+			// same aggregation grouping and compatible labels, suggestion should be emitted.
+			description: "suggest recording rule / irate vs rate with matching aggregation",
+			content:     "- alert: foo\n  expr: sum by(instance) (irate(foo_total[5m])) > 10\n",
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 100, 100, 0, 0, "check comment", checks.Warning)
+			},
+			prometheus: newSimpleProm,
+			entries: mustParseContent(`
+- record: foo:rate5m
+  expr: sum by(instance) (rate(foo_total[5m]))
+`),
+			problems: true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(\nsum by(instance) (irate(foo_total[5m])) > 10\n)"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 100,
+								PeakSamples:           50,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(\nfoo:rate5m > 10\n)"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 10,
+								PeakSamples:           9,
 							},
 						},
 					},
@@ -1680,8 +1803,9 @@ func TestCostCheck(t *testing.T) {
 			},
 		},
 		{
-			// Query uses by(instance) aggregation but the recording rule uses without(instance),
-			// suggesting this rule would produce different label sets and is not a valid substitution.
+			// Query uses by(instance) and the recording rule uses without(instance),
+			// so they produce different label sets.
+			// The recording rule should not be suggested.
 			description: "suggest recording rule / by vs without mismatch",
 			content:     "- alert: foo\n  expr: sum by(instance) (rate(foo_total[5m])) > 10\n",
 			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
@@ -1715,6 +1839,450 @@ func TestCostCheck(t *testing.T) {
 							},
 							Timings: promapi.QueryTimings{
 								EvalTotalTime: 60.3,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: checks.BytesPerSampleQuery},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSampleWithValue(map[string]string{}, 2048),
+						},
+					},
+				},
+			},
+		},
+		{
+			// Query uses sum by(job), recording rule uses sum without(instance),
+			// different aggregation grouping produces different label sets,
+			// so no suggestion should be emitted.
+			description: "suggest recording rule / by(job) vs without(instance) same series count",
+			content:     "- alert: foo\n  expr: sum by(job) (rate(foo_total[5m])) > 10\n",
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 100, 100, 0, 0, "check comment", checks.Warning)
+			},
+			prometheus: newSimpleProm,
+			entries: mustParseContent(`
+- record: colo:foo
+  expr: sum(rate(foo_total[5m])) without(instance)
+`),
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(\nsum by(job) (rate(foo_total[5m])) > 10\n)"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 100,
+								PeakSamples:           50,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: checks.BytesPerSampleQuery},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSampleWithValue(map[string]string{}, 2048),
+						},
+					},
+				},
+			},
+		},
+		{
+			// Query and recording rule select completely different time series,
+			// neither uses a metric name.
+			// No suggestion should be emitted.
+			description: "suggest recording rule / no metric name on both sides",
+			content:     "- alert: foo\n  expr: sum by(job) (rate({job=\"foo\"}[5m])) > 10\n",
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 100, 100, 0, 0, "check comment", checks.Warning)
+			},
+			prometheus: newSimpleProm,
+			entries: mustParseContent(`
+- record: colo:bar
+  expr: sum by(job) (rate({cluster="bar"}[5m]))
+`),
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(\nsum by(job) (rate({job=\"foo\"}[5m])) > 10\n)"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 100,
+								PeakSamples:           50,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: checks.BytesPerSampleQuery},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSampleWithValue(map[string]string{}, 2048),
+						},
+					},
+				},
+			},
+		},
+		{
+			// Recording rule has an extra label selector that the query doesn't,
+			// so it matches a subset of results the query should match.
+			// The recording rule should not be suggested.
+			description: "suggest recording rule / recording rule has extra selector labels",
+			content:     "- alert: foo\n  expr: sum(rate(foo_total[5m])) > 10\n",
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 100, 100, 0, 0, "check comment", checks.Warning)
+			},
+			prometheus: newSimpleProm,
+			entries: mustParseContent(`
+- record: foo:rate5m
+  expr: rate(foo_total{cluster="us"}[5m])
+`),
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(\nsum(rate(foo_total[5m])) > 10\n)"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 100,
+								PeakSamples:           50,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: checks.BytesPerSampleQuery},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSampleWithValue(map[string]string{}, 2048),
+						},
+					},
+				},
+			},
+		},
+		{
+			// Recording rule has a label selector with a different value than the query,
+			// so substituting would produce conflicting filters.
+			// No suggestion should be emitted.
+			description: "suggest recording rule / recording rule selector value conflicts with query",
+			content:     "- alert: foo\n  expr: sum(rate(foo_total{env=\"prod\"}[5m])) > 10\n",
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 100, 100, 0, 0, "check comment", checks.Warning)
+			},
+			prometheus: newSimpleProm,
+			entries: mustParseContent(`
+- record: foo:rate5m
+  expr: rate(foo_total{env="dev"}[5m])
+`),
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(\nsum(rate(foo_total{env=\"prod\"}[5m])) > 10\n)"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 100,
+								PeakSamples:           50,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: checks.BytesPerSampleQuery},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSampleWithValue(map[string]string{}, 2048),
+						},
+					},
+				},
+			},
+		},
+		{
+			// Suggestion carries selector labels from the original query into the replacement.
+			description: "suggest recording rule / fuzzy match with extra matchers",
+			content:     "- alert: foo\n  expr: sum by(job) (irate(foo_total{job=\"bar\"}[5m])) > 10\n",
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 100, 100, 0, 0, "check comment", checks.Warning)
+			},
+			prometheus: newSimpleProm,
+			entries: mustParseContent(`
+- record: foo:rate5m
+  expr: sum by(job) (rate(foo_total{job="bar"}[5m]))
+`),
+			problems: true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(\nsum by(job) (irate(foo_total{job=\"bar\"}[5m])) > 10\n)"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 100,
+								PeakSamples:           50,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(\nfoo:rate5m{job=\"bar\"} > 10\n)"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 10,
+								PeakSamples:           9,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: checks.BytesPerSampleQuery},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSampleWithValue(map[string]string{}, 2048),
+						},
+					},
+				},
+			},
+		},
+		{
+			// Suggestion carries multiple selector labels from the original query into the replacement.
+			description: "suggest recording rule / fuzzy match with multiple extra matchers",
+			content:     "- alert: foo\n  expr: sum by(job, env) (irate(foo_total{job=\"bar\", env=\"prod\"}[5m])) > 10\n",
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 100, 100, 0, 0, "check comment", checks.Warning)
+			},
+			prometheus: newSimpleProm,
+			entries: mustParseContent(`
+- record: foo:rate5m
+  expr: sum by(job, env) (rate(foo_total{job="bar", env="prod"}[5m]))
+`),
+			problems: true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(\nsum by(job, env) (irate(foo_total{job=\"bar\", env=\"prod\"}[5m])) > 10\n)"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 100,
+								PeakSamples:           50,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(\nfoo:rate5m{job=\"bar\", env=\"prod\"} > 10\n)"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 10,
+								PeakSamples:           9,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: checks.BytesPerSampleQuery},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSampleWithValue(map[string]string{}, 2048),
+						},
+					},
+				},
+			},
+		},
+		{
+			// Query aggregates by a label the recording rule doesn't preserve, so it can't be suggested.
+			description: "suggest recording rule / src transformed label not in potential",
+			content:     "- alert: foo\n  expr: sum by(job, cluster) (irate(foo_total[5m])) > 10\n",
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 100, 100, 0, 0, "check comment", checks.Warning)
+			},
+			prometheus: newSimpleProm,
+			entries: mustParseContent(`
+- record: foo:rate5m
+  expr: sum by(job) (rate(foo_total[5m]))
+`),
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(\nsum by(job, cluster) (irate(foo_total[5m])) > 10\n)"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 100,
+								PeakSamples:           50,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: checks.BytesPerSampleQuery},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSampleWithValue(map[string]string{}, 2048),
+						},
+					},
+				},
+			},
+		},
+		{
+			// Recording rule preserves a label the query doesn't have, so it can't be suggested.
+			description: "suggest recording rule / potential transformed label not in src",
+			content:     "- alert: foo\n  expr: sum by(job) (irate(foo_total[5m])) > 10\n",
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 100, 100, 0, 0, "check comment", checks.Warning)
+			},
+			prometheus: newSimpleProm,
+			entries: mustParseContent(`
+- record: foo:rate5m
+  expr: sum by(job, region) (rate(foo_total[5m]))
+`),
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(\nsum by(job) (irate(foo_total[5m])) > 10\n)"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+						},
+						stats: promapi.QueryStats{
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 100,
+								PeakSamples:           50,
 							},
 						},
 					},

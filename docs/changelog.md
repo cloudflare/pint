@@ -14,6 +14,14 @@
 - BitBucket reporter no longer creates Code Insight annotations.
   All problems are now reported as pull request comments.
 
+### Fixed
+
+- Fixed [query/cost](checks/query/cost.md) suggesting recording rules with
+  incompatible label matchers.
+- Fixed [query/cost](checks/query/cost.md) suggesting recording rules when
+  the query and recording rule use different aggregation grouping
+  (e.g. `sum by(job)` vs `sum without(instance)`).
+
 ## v0.84.0
 
 ### Added

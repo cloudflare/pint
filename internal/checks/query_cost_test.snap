@@ -429,6 +429,11 @@
 
 ---
 
+[TestCostCheck/suggest_recording_rule_/_by(job)_vs_without(instance)_same_series_count - 1]
+[]
+
+---
+
 [TestCostCheck/suggest_recording_rule_/_by_vs_without_mismatch - 1]
 []
 
@@ -483,6 +488,92 @@
 
 ---
 
+[TestCostCheck/suggest_recording_rule_/_fuzzy_match_with_extra_matchers - 1]
+- description: suggest recording rule / fuzzy match with extra matchers
+  content: |
+    - alert: foo
+      expr: sum by(job) (irate(foo_total{job="bar"}[5m])) > 10
+  output: |
+    2 |   expr: sum by(job) (irate(foo_total{job="bar"}[5m])) > 10
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                Use `foo:rate5m` here instead to speed up the query.
+  problem:
+    reporter: query/cost
+    summary: query could use a recording rule
+    details: |
+        There is a recording rule that stores result of a query that might work the same, you can try to use it here to speed up this query.
+
+        ```yaml
+        - record: foo:rate5m
+          expr: sum by(job) (rate(foo_total{job="bar"}[5m]))
+        ```
+
+        Using `foo:rate5m` rule would speed up this query:
+
+        - Total queried samples would be 10 instead of 100 (-90.00%)
+        - Peak queried samples would be 9 instead of 50 (-82.00%)
+        - Query evaluation time would be 0 (no change)
+
+        To get results for both original and suggested query click below:
+
+        - [Original query](https://simple.example.com/graph?g0.expr=sum+by%28job%29+%28irate%28foo_total%7Bjob%3D%22bar%22%7D%5B5m%5D%29%29+%3E+10&g0.tab=table)
+        - [Suggested query](https://simple.example.com/graph?g0.expr=foo%3Arate5m%7Bjob%3D%22bar%22%7D+%3E+10&g0.tab=table)
+    diagnostics:
+        - message: Use `foo:rate5m` here instead to speed up the query.
+          firstcolumn: 1
+          lastcolumn: 45
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 0
+    anchor: 0
+
+---
+
+[TestCostCheck/suggest_recording_rule_/_fuzzy_match_with_multiple_extra_matchers - 1]
+- description: suggest recording rule / fuzzy match with multiple extra matchers
+  content: |
+    - alert: foo
+      expr: sum by(job, env) (irate(foo_total{job="bar", env="prod"}[5m])) > 10
+  output: |
+    2 |   expr: sum by(job, env) (irate(foo_total{job="bar", env="prod"}[5m])) > 10
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                Use `foo:rate5m` here instead to speed up the query.
+  problem:
+    reporter: query/cost
+    summary: query could use a recording rule
+    details: |
+        There is a recording rule that stores result of a query that might work the same, you can try to use it here to speed up this query.
+
+        ```yaml
+        - record: foo:rate5m
+          expr: sum by(job, env) (rate(foo_total{job="bar", env="prod"}[5m]))
+        ```
+
+        Using `foo:rate5m` rule would speed up this query:
+
+        - Total queried samples would be 10 instead of 100 (-90.00%)
+        - Peak queried samples would be 9 instead of 50 (-82.00%)
+        - Query evaluation time would be 0 (no change)
+
+        To get results for both original and suggested query click below:
+
+        - [Original query](https://simple.example.com/graph?g0.expr=sum+by%28job%2C+env%29+%28irate%28foo_total%7Bjob%3D%22bar%22%2C+env%3D%22prod%22%7D%5B5m%5D%29%29+%3E+10&g0.tab=table)
+        - [Suggested query](https://simple.example.com/graph?g0.expr=foo%3Arate5m%7Bjob%3D%22bar%22%2C+env%3D%22prod%22%7D+%3E+10&g0.tab=table)
+    diagnostics:
+        - message: Use `foo:rate5m` here instead to speed up the query.
+          firstcolumn: 1
+          lastcolumn: 62
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 0
+    anchor: 0
+
+---
+
 [TestCostCheck/suggest_recording_rule_/_histogram_fraction - 1]
 []
 
@@ -514,20 +605,18 @@
 ---
 
 [TestCostCheck/suggest_recording_rule_/_irate_vs_rate - 1]
-- description: suggest recording rule / irate vs rate
-  content: |4
+[]
 
-    - alert: Host_CPU_Utilization_High
-      expr: |
-        server_role{role="foo"}
-        and on(instance)
-        sum by (instance) (irate(node_cpu_seconds_total{job="foo", mode!="idle"}[5m])) > 20
+---
+
+[TestCostCheck/suggest_recording_rule_/_irate_vs_rate_with_bare_sum - 1]
+- description: suggest recording rule / irate vs rate with bare sum
+  content: |
+    - alert: foo
+      expr: sum(irate(foo_total[5m])) > 10
   output: |
-    4 |     server_role{role="foo"}
-    5 |     and on(instance)
-    6 |     sum by (instance) (irate(node_cpu_seconds_total{job="foo", mode!="idle"}[5m])) > 20
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-            Use `instance_mode:node_cpu:rate2m` here instead to speed up the query.
+    2 |   expr: sum(irate(foo_total[5m])) > 10
+                ^^^^^^^^^^^^^^^^^^^^^^^^^ Use `foo:rate5m` here instead to speed up the query.
   problem:
     reporter: query/cost
     summary: query could use a recording rule
@@ -535,28 +624,70 @@
         There is a recording rule that stores result of a query that might work the same, you can try to use it here to speed up this query.
 
         ```yaml
-        - record: instance_mode:node_cpu:rate2m
-          expr: sum(rate(node_cpu_seconds_total[2m])) without (cpu)
+        - record: foo:rate5m
+          expr: sum(rate(foo_total[5m]))
         ```
 
-        Using `instance_mode:node_cpu:rate2m` rule would speed up this query:
+        Using `foo:rate5m` rule would speed up this query:
 
-        - Total queried samples would be 29 instead of 99 (-70.71%)
-        - Peak queried samples would be 11 instead of 19 (-42.11%)
-        - Query evaluation time would be 21s300ms instead of 1m300ms (-64.68%)
+        - Total queried samples would be 10 instead of 100 (-90.00%)
+        - Peak queried samples would be 9 instead of 50 (-82.00%)
+        - Query evaluation time would be 0 (no change)
 
         To get results for both original and suggested query click below:
 
-        - [Original query](https://simple.example.com/graph?g0.expr=server_role%7Brole%3D%22foo%22%7D%0Aand+on%28instance%29%0Asum+by+%28instance%29+%28irate%28node_cpu_seconds_total%7Bjob%3D%22foo%22%2C+mode%21%3D%22idle%22%7D%5B5m%5D%29%29+%3E+20%0A&g0.tab=table)
-        - [Suggested query](https://simple.example.com/graph?g0.expr=server_role%7Brole%3D%22foo%22%7D%0Aand+on%28instance%29%0Ainstance_mode%3Anode_cpu%3Arate2m%7Bjob%3D%22foo%22%2C+mode%21%3D%22idle%22%7D+%3E+20%0A&g0.tab=table)
+        - [Original query](https://simple.example.com/graph?g0.expr=sum%28irate%28foo_total%5B5m%5D%29%29+%3E+10&g0.tab=table)
+        - [Suggested query](https://simple.example.com/graph?g0.expr=foo%3Arate5m+%3E+10&g0.tab=table)
     diagnostics:
-        - message: Use `instance_mode:node_cpu:rate2m` here instead to speed up the query.
-          firstcolumn: 42
-          lastcolumn: 119
+        - message: Use `foo:rate5m` here instead to speed up the query.
+          firstcolumn: 1
+          lastcolumn: 25
           kind: 0
     lines:
-        first: 4
-        last: 6
+        first: 2
+        last: 2
+    severity: 0
+    anchor: 0
+
+---
+
+[TestCostCheck/suggest_recording_rule_/_irate_vs_rate_with_matching_aggregation - 1]
+- description: suggest recording rule / irate vs rate with matching aggregation
+  content: |
+    - alert: foo
+      expr: sum by(instance) (irate(foo_total[5m])) > 10
+  output: |
+    2 |   expr: sum by(instance) (irate(foo_total[5m])) > 10
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Use `foo:rate5m` here instead to speed up the query.
+  problem:
+    reporter: query/cost
+    summary: query could use a recording rule
+    details: |
+        There is a recording rule that stores result of a query that might work the same, you can try to use it here to speed up this query.
+
+        ```yaml
+        - record: foo:rate5m
+          expr: sum by(instance) (rate(foo_total[5m]))
+        ```
+
+        Using `foo:rate5m` rule would speed up this query:
+
+        - Total queried samples would be 10 instead of 100 (-90.00%)
+        - Peak queried samples would be 9 instead of 50 (-82.00%)
+        - Query evaluation time would be 0 (no change)
+
+        To get results for both original and suggested query click below:
+
+        - [Original query](https://simple.example.com/graph?g0.expr=sum+by%28instance%29+%28irate%28foo_total%5B5m%5D%29%29+%3E+10&g0.tab=table)
+        - [Suggested query](https://simple.example.com/graph?g0.expr=foo%3Arate5m+%3E+10&g0.tab=table)
+    diagnostics:
+        - message: Use `foo:rate5m` here instead to speed up the query.
+          firstcolumn: 1
+          lastcolumn: 39
+          kind: 0
+    lines:
+        first: 2
+        last: 2
     severity: 0
     anchor: 0
 
@@ -625,6 +756,16 @@
 
 ---
 
+[TestCostCheck/suggest_recording_rule_/_no_metric_name_on_both_sides - 1]
+[]
+
+---
+
+[TestCostCheck/suggest_recording_rule_/_potential_transformed_label_not_in_src - 1]
+[]
+
+---
+
 [TestCostCheck/suggest_recording_rule_/_rate - 1]
 - description: suggest recording rule / rate
   content: |
@@ -667,6 +808,16 @@
 
 ---
 
+[TestCostCheck/suggest_recording_rule_/_recording_rule_has_extra_selector_labels - 1]
+[]
+
+---
+
+[TestCostCheck/suggest_recording_rule_/_recording_rule_selector_value_conflicts_with_query - 1]
+[]
+
+---
+
 [TestCostCheck/suggest_recording_rule_/_replacement_is_more_expensive - 1]
 []
 
@@ -678,6 +829,11 @@
 ---
 
 [TestCostCheck/suggest_recording_rule_/_rule_mismatch - 1]
+[]
+
+---
+
+[TestCostCheck/suggest_recording_rule_/_src_transformed_label_not_in_potential - 1]
 []
 
 ---
