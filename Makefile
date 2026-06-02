@@ -60,7 +60,7 @@ coverhtml: test
 benchmark:
 	go test \
 		-timeout=20m \
-		-count=10 \
+		-count=6 \
 		-run=none \
 		-short \
 		-bench=. \
