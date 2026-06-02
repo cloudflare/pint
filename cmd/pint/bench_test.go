@@ -157,7 +157,7 @@ rule {
 	}
 }
 
-func BenchmarkCheckPerCheck(b *testing.B) {
+func BenchmarkCheck(b *testing.B) {
 	log.Setup(slog.LevelError, true)
 
 	finder := discovery.NewGlobFinder(

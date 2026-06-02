@@ -676,12 +676,13 @@ func TestMatch(t *testing.T) {
 		},
 	}
 
-	for i, tc := range testCases {
+	for i := range testCases {
 		t.Run(strconv.Itoa(i+1), func(t *testing.T) {
 			slog.SetDefault(slogt.New(t))
-			ctx := context.WithValue(t.Context(), config.CommandKey, tc.cmd)
-			isMatch := tc.match.IsMatch(ctx, tc.path, tc.entry)
-			require.Equal(t, tc.isMatch, isMatch)
+			require.NoError(t, testCases[i].match.Validate(true))
+			ctx := context.WithValue(t.Context(), config.CommandKey, testCases[i].cmd)
+			isMatch := testCases[i].match.IsMatch(ctx, testCases[i].path, testCases[i].entry)
+			require.Equal(t, testCases[i].isMatch, isMatch)
 		})
 	}
 }

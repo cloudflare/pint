@@ -36,15 +36,15 @@ type Rule struct {
 	Locked        bool                       `hcl:"locked,optional" json:"locked,omitempty"`
 }
 
-func (rule Rule) validate() (err error) {
-	for _, match := range rule.Match {
-		if err = match.validate(true); err != nil {
+func (rule *Rule) validate() (err error) {
+	for i := range rule.Match {
+		if err = rule.Match[i].Validate(true); err != nil {
 			return err
 		}
 	}
 
-	for _, ignore := range rule.Ignore {
-		if err = ignore.validate(false); err != nil {
+	for i := range rule.Ignore {
+		if err = rule.Ignore[i].Validate(false); err != nil {
 			return err
 		}
 	}
