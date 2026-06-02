@@ -154,6 +154,9 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 
 	selectors := getSelectors(expr)
 
+	var promUptime *promapi.RangeQueryResult
+	var promUptimeErr error
+
 	done := map[string]bool{}
 	for _, si := range selectors {
 		if si.hasFallback {
@@ -262,41 +265,43 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 			continue
 		}
 
-		promUptime, err := c.prom.RangeQuery(ctx, wrapExpr(c.prom.UptimeMetric(), "count"), params).Wait()
-		if err != nil {
-			slog.LogAttrs(ctx, slog.LevelWarn, "Cannot detect Prometheus uptime gaps", slog.Any("err", err), slog.String("name", c.prom.Name()))
-		}
-		if promUptime != nil && len(promUptime.Series.Ranges) == 0 {
-			slog.LogAttrs(
-				ctx, slog.LevelWarn,
-				"No results for Prometheus uptime metric, you might have set uptime config option to a missing metric, please check your config",
-				slog.String("name", c.prom.Name()),
-				slog.String("metric", c.prom.UptimeMetric()),
-			)
-		}
-		if promUptime == nil || len(promUptime.Series.Ranges) == 0 {
-			slog.LogAttrs(
-				ctx, slog.LevelWarn,
-				"Using dummy Prometheus uptime metric results with no gaps",
-				slog.String("name", c.prom.Name()),
-				slog.String("metric", c.prom.UptimeMetric()),
-			)
-			promUptime = &promapi.RangeQueryResult{ // nolint: exhaustruct
-				URI: c.prom.URI(),
-				Series: promapi.SeriesTimeRanges{
-					From:  params.Start(),
-					Until: params.End(),
-					Step:  params.Step(),
-					Ranges: promapi.MetricTimeRanges{
-						{
-							Fingerprint: 0,
-							Labels:      labels.Labels{},
-							Start:       params.Start(),
-							End:         params.End(),
+		if promUptime == nil {
+			promUptime, promUptimeErr = c.prom.RangeQuery(ctx, wrapExpr(c.prom.UptimeMetric(), "count"), params).Wait()
+			if promUptimeErr != nil {
+				slog.LogAttrs(ctx, slog.LevelWarn, "Cannot detect Prometheus uptime gaps", slog.Any("err", promUptimeErr), slog.String("name", c.prom.Name()))
+			}
+			if promUptime != nil && len(promUptime.Series.Ranges) == 0 {
+				slog.LogAttrs(
+					ctx, slog.LevelWarn,
+					"No results for Prometheus uptime metric, you might have set uptime config option to a missing metric, please check your config",
+					slog.String("name", c.prom.Name()),
+					slog.String("metric", c.prom.UptimeMetric()),
+				)
+			}
+			if promUptime == nil || len(promUptime.Series.Ranges) == 0 {
+				slog.LogAttrs(
+					ctx, slog.LevelWarn,
+					"Using dummy Prometheus uptime metric results with no gaps",
+					slog.String("name", c.prom.Name()),
+					slog.String("metric", c.prom.UptimeMetric()),
+				)
+				promUptime = &promapi.RangeQueryResult{ // nolint: exhaustruct
+					URI: c.prom.URI(),
+					Series: promapi.SeriesTimeRanges{
+						From:  params.Start(),
+						Until: params.End(),
+						Step:  params.Step(),
+						Ranges: promapi.MetricTimeRanges{
+							{
+								Fingerprint: 0,
+								Labels:      labels.Labels{},
+								Start:       params.Start(),
+								End:         params.End(),
+							},
 						},
+						Gaps: nil,
 					},
-					Gaps: nil,
-				},
+				}
 			}
 		}
 
