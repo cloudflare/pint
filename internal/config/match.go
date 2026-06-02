@@ -41,24 +41,36 @@ type (
 )
 
 type Match struct {
-	Label         *MatchLabel        `hcl:"label,block" json:"label,omitempty"`
-	Annotation    *MatchAnnotation   `hcl:"annotation,block" json:"annotation,omitempty"`
-	Command       *ContextCommandVal `hcl:"command,optional" json:"command,omitempty"`
-	Path          string             `hcl:"path,optional" json:"path,omitempty"`
-	Name          string             `hcl:"name,optional" json:"name,omitempty"`
-	Kind          string             `hcl:"kind,optional" json:"kind,omitempty"`
-	For           string             `hcl:"for,optional" json:"for,omitempty"`
-	KeepFiringFor string             `hcl:"keep_firing_for,optional" json:"keep_firing_for,omitempty"`
-	State         []string           `hcl:"state,optional" json:"state,omitempty"`
+	Label      *MatchLabel        `hcl:"label,block" json:"label,omitempty"`
+	Annotation *MatchAnnotation   `hcl:"annotation,block" json:"annotation,omitempty"`
+	Command    *ContextCommandVal `hcl:"command,optional" json:"command,omitempty"`
+
+	pathRe                     *regexp.Regexp
+	nameRe                     *regexp.Regexp
+	forDurationMatch           *durationMatch
+	keepFiringForDurationMatch *durationMatch
+
+	Path          string   `hcl:"path,optional" json:"path,omitempty"`
+	Name          string   `hcl:"name,optional" json:"name,omitempty"`
+	Kind          string   `hcl:"kind,optional" json:"kind,omitempty"`
+	For           string   `hcl:"for,optional" json:"for,omitempty"`
+	KeepFiringFor string   `hcl:"keep_firing_for,optional" json:"keep_firing_for,omitempty"`
+	State         []string `hcl:"state,optional" json:"state,omitempty"`
 }
 
-func (m Match) validate(allowEmpty bool) error {
-	if _, err := regexp.Compile(m.Path); err != nil {
-		return err
+func (m *Match) Validate(allowEmpty bool) (err error) {
+	if m.Path != "" {
+		m.pathRe, err = regexp.Compile("^" + m.Path + "$")
+		if err != nil {
+			return err
+		}
 	}
 
-	if _, err := regexp.Compile(m.Name); err != nil {
-		return err
+	if m.Name != "" {
+		m.nameRe, err = regexp.Compile("^" + m.Name + "$")
+		if err != nil {
+			return err
+		}
 	}
 
 	switch m.Kind {
@@ -71,27 +83,31 @@ func (m Match) validate(allowEmpty bool) error {
 	}
 
 	if m.Label != nil {
-		if err := m.Label.validate(); err != nil {
+		if err := m.Label.Validate(); err != nil {
 			return err
 		}
 	}
 
 	if m.Annotation != nil {
-		if err := m.Annotation.validate(); err != nil {
+		if err := m.Annotation.Validate(); err != nil {
 			return err
 		}
 	}
 
 	if m.For != "" {
-		if _, err := parseDurationMatch(m.For); err != nil {
+		dm, err := parseDurationMatch(m.For)
+		if err != nil {
 			return err
 		}
+		m.forDurationMatch = &dm
 	}
 
 	if m.KeepFiringFor != "" {
-		if _, err := parseDurationMatch(m.KeepFiringFor); err != nil {
+		dm, err := parseDurationMatch(m.KeepFiringFor)
+		if err != nil {
 			return err
 		}
+		m.keepFiringForDurationMatch = &dm
 	}
 
 	for _, s := range m.State {
@@ -141,19 +157,17 @@ func (m Match) IsMatch(ctx context.Context, path string, e *discovery.Entry) boo
 		}
 	}
 
-	if m.Path != "" {
-		re := strictRegex(m.Path)
-		if !re.MatchString(path) {
+	if m.pathRe != nil {
+		if !m.pathRe.MatchString(path) {
 			return false
 		}
 	}
 
-	if m.Name != "" {
-		re := strictRegex(m.Name)
-		if e.Rule.AlertingRule != nil && !re.MatchString(e.Rule.AlertingRule.Alert.Value) {
+	if m.nameRe != nil {
+		if e.Rule.AlertingRule != nil && !m.nameRe.MatchString(e.Rule.AlertingRule.Alert.Value) {
 			return false
 		}
-		if e.Rule.RecordingRule != nil && !re.MatchString(e.Rule.RecordingRule.Record.Value) {
+		if e.Rule.RecordingRule != nil && !m.nameRe.MatchString(e.Rule.RecordingRule.Record.Value) {
 			return false
 		}
 	}
@@ -170,10 +184,9 @@ func (m Match) IsMatch(ctx context.Context, path string, e *discovery.Entry) boo
 		}
 	}
 
-	if m.For != "" {
+	if m.forDurationMatch != nil {
 		if e.Rule.AlertingRule != nil && e.Rule.AlertingRule.For != nil && e.Rule.AlertingRule.For.ParseError == nil {
-			dm, _ := parseDurationMatch(m.For)
-			if !dm.isMatch(e.Rule.AlertingRule.For.Value) {
+			if !m.forDurationMatch.isMatch(e.Rule.AlertingRule.For.Value) {
 				return false
 			}
 		} else {
@@ -181,10 +194,9 @@ func (m Match) IsMatch(ctx context.Context, path string, e *discovery.Entry) boo
 		}
 	}
 
-	if m.KeepFiringFor != "" {
+	if m.keepFiringForDurationMatch != nil {
 		if e.Rule.AlertingRule != nil && e.Rule.AlertingRule.KeepFiringFor != nil && e.Rule.AlertingRule.KeepFiringFor.ParseError == nil {
-			dm, _ := parseDurationMatch(m.KeepFiringFor)
-			if !dm.isMatch(e.Rule.AlertingRule.KeepFiringFor.Value) {
+			if !m.keepFiringForDurationMatch.isMatch(e.Rule.AlertingRule.KeepFiringFor.Value) {
 				return false
 			}
 		} else {
@@ -196,26 +208,29 @@ func (m Match) IsMatch(ctx context.Context, path string, e *discovery.Entry) boo
 }
 
 type MatchLabel struct {
+	keyRe *regexp.Regexp
+	valRe *regexp.Regexp
 	Key   string `hcl:",label" json:"key"`
 	Value string `hcl:"value" json:"value"`
 }
 
-func (ml MatchLabel) validate() error {
-	if _, err := regexp.Compile(ml.Key); err != nil {
+func (ml *MatchLabel) Validate() (err error) {
+	ml.keyRe, err = regexp.Compile("^" + ml.Key + "$")
+	if err != nil {
 		return err
 	}
-	if _, err := regexp.Compile(ml.Value); err != nil {
+
+	ml.valRe, err = regexp.Compile("^" + ml.Value + "$")
+	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
 func (ml MatchLabel) isMatching(entry *discovery.Entry) bool {
-	keyRe := strictRegex(ml.Key)
-	valRe := strictRegex(ml.Value)
-
 	for _, label := range entry.Labels().Items {
-		if keyRe.MatchString(label.Key.Value) && valRe.MatchString(label.Value.Value) {
+		if ml.keyRe.MatchString(label.Key.Value) && ml.valRe.MatchString(label.Value.Value) {
 			return true
 		}
 	}
@@ -224,29 +239,32 @@ func (ml MatchLabel) isMatching(entry *discovery.Entry) bool {
 }
 
 type MatchAnnotation struct {
+	keyRe *regexp.Regexp
+	valRe *regexp.Regexp
 	Key   string `hcl:",label" json:"key"`
 	Value string `hcl:"value" json:"value"`
 }
 
-func (ma MatchAnnotation) validate() error {
-	if _, err := regexp.Compile(ma.Key); err != nil {
+func (ma *MatchAnnotation) Validate() (err error) {
+	ma.keyRe, err = regexp.Compile("^" + ma.Key + "$")
+	if err != nil {
 		return err
 	}
-	if _, err := regexp.Compile(ma.Value); err != nil {
+
+	ma.valRe, err = regexp.Compile("^" + ma.Value + "$")
+	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
 func (ma MatchAnnotation) isMatching(rule parser.Rule) bool {
-	keyRe := strictRegex(ma.Key)
-	valRe := strictRegex(ma.Value)
-
 	if rule.AlertingRule == nil || rule.AlertingRule.Annotations == nil {
 		return false
 	}
 	for _, ann := range rule.AlertingRule.Annotations.Items {
-		if keyRe.MatchString(ann.Key.Value) && valRe.MatchString(ann.Value.Value) {
+		if ma.keyRe.MatchString(ann.Key.Value) && ma.valRe.MatchString(ann.Value.Value) {
 			return true
 		}
 	}

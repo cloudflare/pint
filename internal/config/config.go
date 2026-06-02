@@ -219,8 +219,8 @@ func Load(path string, failOnMissing bool) (cfg Config, fromFile bool, err error
 		}
 	}
 
-	for _, rule := range cfg.Rules {
-		if err = rule.validate(); err != nil {
+	for i := range cfg.Rules {
+		if err = cfg.Rules[i].validate(); err != nil {
 			return cfg, fromFile, err
 		}
 	}
