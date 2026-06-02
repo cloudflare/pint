@@ -96,14 +96,13 @@ func (rule parsedRule) isEnabled(ctx context.Context, enabled, disabled []string
 		return false
 	}
 	// Check if rule was already enabled.
-	var v bool
+	s := rule.check.String()
 	for _, er := range checks {
-		if er.String() == rule.check.String() {
-			v = true
-			break
+		if er.String() == s {
+			return false
 		}
 	}
-	return !v
+	return true
 }
 
 func defaultMatchStates(cmd ContextCommandVal) []string {
