@@ -59,6 +59,7 @@ coverhtml: test
 .PHONY: benchmark
 benchmark:
 	go test \
+		-cpu=1 \
 		-timeout=20m \
 		-count=6 \
 		-run=none \
