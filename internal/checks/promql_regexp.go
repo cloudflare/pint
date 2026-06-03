@@ -339,14 +339,18 @@ func hasSmellyWildcard(subs iter.Seq2[int, *syntax.Regexp], anchorOp syntax.Op) 
 	return false
 }
 
+// findMatcherPos locates 'name op "value"' (e.g. job=~"foo") in the expression fragment
+// and returns the position from "name" to just before the closing quote.
 func findMatcherPos(expr string, within posrange.PositionRange, m *labels.Matcher) posrange.PositionRange {
-	re := regexp.MustCompile("(" + m.Name + ")(?: *)" + m.Type.String() + "(?: *)" + `"` + regexp.QuoteMeta(m.Value) + `"`)
-	idx := re.FindStringSubmatchIndex(source.GetQueryFragment(expr, within))
-	if idx == nil {
+	fragment := source.GetQueryFragment(expr, within)
+	// Build the full pattern: name + op + "value" (e.g. job=~"foo").
+	pattern := m.Name + m.Type.String() + `"` + m.Value + `"`
+	idx := strings.Index(fragment, pattern)
+	if idx < 0 {
 		return within
 	}
 	return posrange.PositionRange{
-		Start: within.Start + posrange.Pos(idx[0]),
-		End:   within.Start + posrange.Pos(idx[1]-1),
+		Start: within.Start + posrange.Pos(idx),
+		End:   within.Start + posrange.Pos(idx+len(pattern)-1),
 	}
 }

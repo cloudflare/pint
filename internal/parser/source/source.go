@@ -1800,15 +1800,36 @@ func isOutside(pos posrange.PositionRange, outside []posrange.PositionRange) boo
 	return true
 }
 
+// FindFuncNamePosition finds "fn(" (case-insensitive, optional whitespace before paren)
+// and returns the position of "fn" without the paren.
 func FindFuncNamePosition(expr string, within posrange.PositionRange, fn string) posrange.PositionRange {
-	re := regexp.MustCompile("(?si)(" + regexp.QuoteMeta(fn) + ")(?:[ \n\t]*?)\\(")
-	idx := re.FindStringSubmatchIndex(GetQueryFragment(expr, within))
-	if idx == nil {
-		return within
-	}
-	return posrange.PositionRange{
-		Start: within.Start + posrange.Pos(idx[0]),
-		End:   within.Start + posrange.Pos(idx[1]-1),
+	fragment := GetQueryFragment(expr, within)
+	lower := strings.ToLower(fragment)
+	fnLower := strings.ToLower(fn)
+	offset := 0
+	for {
+		// Find next case-insensitive occurrence of fn.
+		idx := strings.Index(lower[offset:], fnLower)
+		if idx < 0 {
+			return within
+		}
+		idx += offset
+		end := idx + len(fn)
+		// Check that fn is followed by optional whitespace then '('.
+		// This skips false positives like "by" inside "bytes".
+		for i := end; i < len(fragment); i++ {
+			c := fragment[i]
+			if c == '(' {
+				return posrange.PositionRange{
+					Start: within.Start + posrange.Pos(idx),
+					End:   within.Start + posrange.Pos(i),
+				}
+			}
+			if c != ' ' && c != '\n' && c != '\t' {
+				break // Not whitespace, not '(' — this occurrence is inside a word.
+			}
+		}
+		offset = idx + 1 // Try next occurrence.
 	}
 }
 
