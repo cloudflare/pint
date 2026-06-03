@@ -84,7 +84,7 @@ func (c RegexpCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*dis
 
 	done := map[string]struct{}{}
 	for _, src := range expr.Source() {
-		src.WalkSources(func(s source.Source, _ *source.Join, _ *source.Unless) {
+		src.WalkSources(func(s *source.Source, _ *source.Join, _ *source.Unless) {
 			vs, ok := source.MostOuterOperation[*promParser.VectorSelector](s)
 			if !ok {
 				return

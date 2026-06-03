@@ -47,62 +47,81 @@ func (c ImpossibleCheck) Check(_ context.Context, entry *discovery.Entry, _ []*d
 	}
 
 	for _, src := range expr.Source() {
-		src.WalkSources(func(s source.Source, _ *source.Join, _ *source.Unless) {
+		src.WalkSources(func(s *source.Source, j *source.Join, u *source.Unless) {
 			problems = append(problems, c.checkSource(expr, s)...)
+			if j != nil {
+				problems = append(problems, c.checkDeadInfo(expr, j.DeadInfo)...)
+				for _, dl := range j.DeadLabels {
+					problems = append(problems, c.deadLabelProblem(expr, dl))
+				}
+			}
+			if u != nil {
+				problems = append(problems, c.checkDeadInfo(expr, u.DeadInfo)...)
+			}
 		})
 	}
 
 	return problems
 }
 
-func (c ImpossibleCheck) checkSource(expr *parser.PromQLExpr, s source.Source) (problems []Problem) {
-	if s.DeadInfo != nil {
-		problems = append(problems, Problem{
-			Anchor:   AnchorAfter,
-			Lines:    expr.Value.Pos.Lines(),
-			Reporter: c.Reporter(),
-			Summary:  "dead code in query",
-			Details:  "",
-			Diagnostics: []diags.Diagnostic{
-				{
-					Pos:         expr.Value.Pos,
-					Expr:        expr.Query().Expr,
-					FirstColumn: int(s.DeadInfo.Fragment.Start) + 1,
-					LastColumn:  int(s.DeadInfo.Fragment.End),
-					Message:     s.DeadInfo.Reason,
-					Kind:        diags.Issue,
-				},
-			},
-			Severity: Warning,
-		})
-	}
+func (c ImpossibleCheck) checkSource(expr *parser.PromQLExpr, s *source.Source) (problems []Problem) {
+	problems = append(problems, c.checkDeadInfo(expr, s.DeadInfo)...)
 	for _, dl := range s.DeadLabels {
-		problems = append(problems, Problem{
-			Anchor:   AnchorAfter,
-			Lines:    expr.Value.Pos.Lines(),
-			Reporter: c.Reporter(),
-			Summary:  dl.Kind.String(),
-			Details:  "",
-			Diagnostics: []diags.Diagnostic{
-				{
-					Pos:         expr.Value.Pos,
-					Expr:        expr.Query().Expr,
-					FirstColumn: int(dl.UsageFragment.Start) + 1,
-					LastColumn:  int(dl.UsageFragment.End),
-					Message:     dl.Reason,
-					Kind:        diags.Issue,
-				},
-				{
-					Pos:         expr.Value.Pos,
-					Expr:        expr.Query().Expr,
-					FirstColumn: int(dl.LabelFragment.Start) + 1,
-					LastColumn:  int(dl.LabelFragment.End),
-					Message:     dl.LabelReason,
-					Kind:        diags.Context,
-				},
-			},
-			Severity: Warning,
-		})
+		problems = append(problems, c.deadLabelProblem(expr, dl))
 	}
 	return problems
+}
+
+func (c ImpossibleCheck) checkDeadInfo(expr *parser.PromQLExpr, di *source.DeadInfo) (problems []Problem) {
+	if di == nil {
+		return problems
+	}
+	problems = append(problems, Problem{
+		Anchor:   AnchorAfter,
+		Lines:    expr.Value.Pos.Lines(),
+		Reporter: c.Reporter(),
+		Summary:  "dead code in query",
+		Details:  "",
+		Diagnostics: []diags.Diagnostic{
+			{
+				Pos:         expr.Value.Pos,
+				Expr:        expr.Query().Expr,
+				FirstColumn: int(di.Fragment.Start) + 1,
+				LastColumn:  int(di.Fragment.End),
+				Message:     di.Reason,
+				Kind:        diags.Issue,
+			},
+		},
+		Severity: Warning,
+	})
+	return problems
+}
+
+func (c ImpossibleCheck) deadLabelProblem(expr *parser.PromQLExpr, dl source.DeadLabel) Problem {
+	return Problem{
+		Anchor:   AnchorAfter,
+		Lines:    expr.Value.Pos.Lines(),
+		Reporter: c.Reporter(),
+		Summary:  dl.Kind.String(),
+		Details:  "",
+		Diagnostics: []diags.Diagnostic{
+			{
+				Pos:         expr.Value.Pos,
+				Expr:        expr.Query().Expr,
+				FirstColumn: int(dl.UsageFragment.Start) + 1,
+				LastColumn:  int(dl.UsageFragment.End),
+				Message:     dl.Reason,
+				Kind:        diags.Issue,
+			},
+			{
+				Pos:         expr.Value.Pos,
+				Expr:        expr.Query().Expr,
+				FirstColumn: int(dl.LabelFragment.Start) + 1,
+				LastColumn:  int(dl.LabelFragment.End),
+				Message:     dl.LabelReason,
+				Kind:        diags.Context,
+			},
+		},
+		Severity: Warning,
+	}
 }

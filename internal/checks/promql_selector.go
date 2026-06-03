@@ -75,7 +75,7 @@ func (c SelectorCheck) Check(_ context.Context, entry *discovery.Entry, _ []*dis
 	}
 
 	for _, src := range expr.Source() {
-		src.WalkSources(func(s source.Source, _ *source.Join, _ *source.Unless) {
+		src.WalkSources(func(s *source.Source, _ *source.Join, _ *source.Unless) {
 			problems = append(problems, c.checkSource(keyRe, callRe, s, expr.Value.Pos)...)
 		})
 	}
@@ -83,7 +83,7 @@ func (c SelectorCheck) Check(_ context.Context, entry *discovery.Entry, _ []*dis
 	return problems
 }
 
-func (c SelectorCheck) findSelector(callRe *regexp.Regexp, s source.Source) (*promParser.VectorSelector, *promParser.Call) {
+func (c SelectorCheck) findSelector(callRe *regexp.Regexp, s *source.Source) (*promParser.VectorSelector, *promParser.Call) {
 	var call *promParser.Call
 	for _, op := range slices.Backward(s.Operations) {
 		if callRe != nil && call == nil {
@@ -103,7 +103,7 @@ func (c SelectorCheck) findSelector(callRe *regexp.Regexp, s source.Source) (*pr
 	return nil, nil
 }
 
-func (c SelectorCheck) checkSource(keyRe, callRe *regexp.Regexp, s source.Source, pos diags.PositionRanges) (problems []Problem) {
+func (c SelectorCheck) checkSource(keyRe, callRe *regexp.Regexp, s *source.Source, pos diags.PositionRanges) (problems []Problem) {
 	vs, call := c.findSelector(callRe, s)
 	if vs == nil {
 		return problems

@@ -133,13 +133,12 @@ output:
             returnednumber: 5
             alwaysreturns: true
             knownreturn: true
-            isreturnbool: true
+            isreturnbool: false
           position:
             start: 16
             end: 17
           type: number
           fixedLabels: true
-          isConditional: true
       returnInfo:
         logicalexpr: 2 ^ 5
         valueposition:
@@ -148,7 +147,7 @@ output:
         returnednumber: 32
         alwaysreturns: true
         knownreturn: true
-        isreturnbool: true
+        isreturnbool: false
       position:
         start: 1
         end: 2
@@ -257,13 +256,12 @@ output:
             returnednumber: 2
             alwaysreturns: true
             knownreturn: true
-            isreturnbool: true
+            isreturnbool: false
           position:
             start: 25
             end: 26
           type: number
           fixedLabels: true
-          isConditional: true
       returnInfo:
         logicalexpr: 2 ^ 5 + 11 % 5
         valueposition:
@@ -272,7 +270,7 @@ output:
         returnednumber: 3
         alwaysreturns: true
         knownreturn: true
-        isreturnbool: true
+        isreturnbool: false
       position:
         start: 1
         end: 2
@@ -381,13 +379,12 @@ output:
             returnednumber: 20
             alwaysreturns: true
             knownreturn: true
-            isreturnbool: true
+            isreturnbool: false
           position:
             start: 25
             end: 27
           type: number
           fixedLabels: true
-          isConditional: true
       returnInfo:
         logicalexpr: 2 ^ 5 + 11 % 5
         valueposition:
@@ -396,7 +393,7 @@ output:
         returnednumber: 3
         alwaysreturns: true
         knownreturn: true
-        isreturnbool: true
+        isreturnbool: false
       position:
         start: 1
         end: 2
@@ -500,13 +497,12 @@ output:
             returnednumber: 3
             alwaysreturns: true
             knownreturn: true
-            isreturnbool: true
+            isreturnbool: false
           position:
             start: 25
             end: 26
           type: number
           fixedLabels: true
-          isConditional: true
       returnInfo:
         logicalexpr: 2 ^ 5 + 11 % 5
         valueposition:
@@ -515,7 +511,7 @@ output:
         returnednumber: 3
         alwaysreturns: true
         knownreturn: true
-        isreturnbool: true
+        isreturnbool: false
       position:
         start: 1
         end: 2
@@ -624,13 +620,12 @@ output:
             returnednumber: 1
             alwaysreturns: true
             knownreturn: true
-            isreturnbool: true
+            isreturnbool: false
           position:
             start: 24
             end: 25
           type: number
           fixedLabels: true
-          isConditional: true
       returnInfo:
         logicalexpr: 2 ^ 5 + 11 % 5
         valueposition:
@@ -639,7 +634,7 @@ output:
         returnednumber: 3
         alwaysreturns: true
         knownreturn: true
-        isreturnbool: true
+        isreturnbool: false
       position:
         start: 1
         end: 2
@@ -704,13 +699,12 @@ output:
             returnednumber: 1
             alwaysreturns: true
             knownreturn: true
-            isreturnbool: true
+            isreturnbool: false
           position:
             start: 15
             end: 16
           type: number
           fixedLabels: true
-          isConditional: true
       returnInfo:
         logicalexpr: 20 - 15
         valueposition:
@@ -719,7 +713,7 @@ output:
         returnednumber: 5
         alwaysreturns: true
         knownreturn: true
-        isreturnbool: true
+        isreturnbool: false
       position:
         start: 0
         end: 2
@@ -1214,13 +1208,12 @@ output:
             returnednumber: 0
             alwaysreturns: true
             knownreturn: true
-            isreturnbool: true
+            isreturnbool: false
           position:
             start: 9
             end: 10
           type: number
           fixedLabels: true
-          isConditional: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -1229,7 +1222,7 @@ output:
         returnednumber: 1
         alwaysreturns: true
         knownreturn: true
-        isreturnbool: true
+        isreturnbool: false
       position:
         start: 0
         end: 1
@@ -1267,13 +1260,12 @@ output:
             returnednumber: 10
             alwaysreturns: true
             knownreturn: true
-            isreturnbool: true
+            isreturnbool: false
           position:
             start: 10
             end: 12
           type: number
           fixedLabels: true
-          isConditional: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -1282,7 +1274,7 @@ output:
         returnednumber: 20
         alwaysreturns: true
         knownreturn: true
-        isreturnbool: true
+        isreturnbool: false
       position:
         start: 0
         end: 2
@@ -1364,7 +1356,6 @@ output:
             end: 8
           type: number
           fixedLabels: true
-          isConditional: true
         - labels:
             "":
                 reason: This query returns a number value with no labels.
@@ -1381,13 +1372,12 @@ output:
             returnednumber: 1
             alwaysreturns: true
             knownreturn: true
-            isreturnbool: true
+            isreturnbool: false
           position:
             start: 17
             end: 18
           type: number
           fixedLabels: true
-          isConditional: true
       position:
         start: 1
         end: 4
@@ -1420,13 +1410,12 @@ output:
             returnednumber: 5
             alwaysreturns: true
             knownreturn: true
-            isreturnbool: true
+            isreturnbool: false
           position:
             start: 11
             end: 12
           type: number
           fixedLabels: true
-          isConditional: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -1468,13 +1457,12 @@ output:
             returnednumber: 5
             alwaysreturns: true
             knownreturn: true
-            isreturnbool: true
+            isreturnbool: false
           position:
             start: 11
             end: 12
           type: number
           fixedLabels: true
-          isConditional: true
         - labels:
             "":
                 reason: This query returns a number value with no labels.
@@ -1497,7 +1485,6 @@ output:
             end: 17
           type: number
           fixedLabels: true
-          isConditional: true
       position:
         start: 0
         end: 3
@@ -1604,7 +1591,6 @@ output:
             end: 21
           type: number
           fixedLabels: true
-          isConditional: true
       position:
         start: 1
         end: 4
@@ -1740,7 +1726,6 @@ output:
             end: 34
           type: number
           fixedLabels: true
-          isConditional: true
       usedLabels:
         - instance
       position:
@@ -1911,13 +1896,12 @@ output:
                     returnednumber: 0
                     alwaysreturns: true
                     knownreturn: true
-                    isreturnbool: true
+                    isreturnbool: false
                   position:
                     start: 19
                     end: 20
                   type: number
                   fixedLabels: true
-                  isConditional: true
             returnInfo:
                 logicalexpr: ""
                 valueposition:
@@ -2345,7 +2329,6 @@ output:
             end: 26
           type: number
           fixedLabels: true
-          isConditional: true
       position:
         start: 4
         end: 20
@@ -3187,7 +3170,6 @@ output:
             end: 31
           type: number
           fixedLabels: true
-          isConditional: true
       position:
         start: 9
         end: 25
@@ -4024,7 +4006,8 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       unless:
-        - matchinglabels: []
+        - ison: false
+          matchinglabels: []
           src:
             returns: vector
             operations:
@@ -4034,7 +4017,6 @@ output:
                 start: 11
                 end: 14
             type: selector
-          ison: false
       position:
         start: 0
         end: 3
@@ -4050,7 +4032,8 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       unless:
-        - matchinglabels: []
+        - ison: false
+          matchinglabels: []
           src:
             returns: vector
             operations:
@@ -4079,13 +4062,11 @@ output:
                     end: 18
                   type: number
                   fixedLabels: true
-                  isConditional: true
             position:
                 start: 11
                 end: 14
             type: selector
             isConditional: true
-          ison: false
       position:
         start: 0
         end: 3
@@ -4101,7 +4082,8 @@ output:
         - node: '[*parser.VectorSelector] foo'
           op: ""
       unless:
-        - matchinglabels: []
+        - ison: false
+          matchinglabels: []
           src:
             returns: vector
             operations:
@@ -4111,8 +4093,8 @@ output:
                 start: 11
                 end: 14
             type: selector
-          ison: false
-        - matchinglabels: []
+        - ison: false
+          matchinglabels: []
           src:
             returns: vector
             operations:
@@ -4122,7 +4104,6 @@ output:
                 start: 22
                 end: 25
             type: selector
-          ison: false
       position:
         start: 0
         end: 3
@@ -4189,7 +4170,6 @@ output:
             end: 61
           type: number
           fixedLabels: true
-          isConditional: true
       position:
         start: 10
         end: 38
@@ -4522,7 +4502,6 @@ output:
                     end: 120
                   type: number
                   fixedLabels: true
-                  isConditional: true
             usedLabels:
                 - job
             position:
@@ -4554,7 +4533,6 @@ output:
             end: 19
           type: number
           fixedLabels: true
-          isConditional: true
       usedLabels:
         - job
       position:
@@ -5007,6 +4985,17 @@ output:
       joins:
         - addedlabels:
             - foo
+          deadlabels:
+            - name: foo
+              reason: You can't use `foo` because this label is not possible here.
+              labelreason: Query is using aggregation with `by(instance, version, package)`, only labels included inside `by(...)` will be present on the results.
+              usagefragment:
+                start: 95
+                end: 98
+              labelfragment:
+                start: 127
+                end: 130
+              kind: 0
           depth: 0
           ison: false
           matchinglabels:
@@ -5045,17 +5034,6 @@ output:
                     fragment:
                         start: 141
                         end: 148
-            deadLabels:
-                - name: foo
-                  reason: You can't use `foo` because this label is not possible here.
-                  labelreason: Query is using aggregation with `by(instance, version, package)`, only labels included inside `by(...)` will be present on the results.
-                  usagefragment:
-                    start: 95
-                    end: 98
-                  labelfragment:
-                    start: 127
-                    end: 130
-                  kind: 0
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] deb_package_version'
@@ -5552,13 +5530,12 @@ output:
                 returnednumber: 0.5
                 alwaysreturns: true
                 knownreturn: true
-                isreturnbool: true
+                isreturnbool: false
               position:
                 start: 20
                 end: 23
               type: number
               fixedLabels: true
-              isConditional: true
           returnInfo:
             logicalexpr: ""
             valueposition:
@@ -5567,7 +5544,7 @@ output:
             returnednumber: 0
             alwaysreturns: true
             knownreturn: true
-            isreturnbool: true
+            isreturnbool: false
           position:
             start: 7
             end: 10
@@ -5596,7 +5573,6 @@ output:
             end: 29
           type: number
           fixedLabels: true
-          isConditional: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -5889,7 +5865,6 @@ output:
             end: 43
           type: number
           fixedLabels: true
-          isConditional: true
         - labels:
             "":
                 reason: This query returns a string value with no labels.
@@ -6067,7 +6042,6 @@ output:
             end: 24
           type: number
           fixedLabels: true
-          isConditional: true
       position:
         start: 10
         end: 19
@@ -6204,7 +6178,6 @@ output:
             end: 107
           type: number
           fixedLabels: true
-          isConditional: true
         - labels:
             "":
                 reason: This query returns a number value with no labels.
@@ -6227,7 +6200,6 @@ output:
             end: 111
           type: number
           fixedLabels: true
-          isConditional: true
       position:
         start: 41
         end: 100
@@ -6365,7 +6337,6 @@ output:
             end: 299
           type: number
           fixedLabels: true
-          isConditional: true
       position:
         start: 155
         end: 212
@@ -6432,7 +6403,6 @@ output:
             end: 410
           type: number
           fixedLabels: true
-          isConditional: true
         - labels:
             "":
                 reason: This query returns a number value with no labels.
@@ -6455,7 +6425,6 @@ output:
             end: 414
           type: number
           fixedLabels: true
-          isConditional: true
       position:
         start: 343
         end: 403
@@ -6670,7 +6639,6 @@ output:
             end: 107
           type: number
           fixedLabels: true
-          isConditional: true
       usedLabels:
         - region
         - target
@@ -6801,7 +6769,6 @@ output:
             end: 107
           type: number
           fixedLabels: true
-          isConditional: true
       usedLabels:
         - region
         - target
@@ -6959,7 +6926,6 @@ output:
             end: 13
           type: number
           fixedLabels: true
-          isConditional: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -7148,7 +7114,6 @@ output:
             end: 25
           type: number
           fixedLabels: true
-          isConditional: true
       position:
         start: 4
         end: 7
@@ -7226,7 +7191,6 @@ output:
             end: 25
           type: number
           fixedLabels: true
-          isConditional: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -7290,7 +7254,6 @@ output:
             end: 26
           type: number
           fixedLabels: true
-          isConditional: true
         - labels:
             "":
                 reason: This query returns a number value with no labels.
@@ -7313,7 +7276,6 @@ output:
             end: 32
           type: number
           fixedLabels: true
-          isConditional: true
       position:
         start: 5
         end: 8
@@ -7391,7 +7353,6 @@ output:
             end: 26
           type: number
           fixedLabels: true
-          isConditional: true
         - labels:
             "":
                 reason: This query returns a number value with no labels.
@@ -7414,7 +7375,6 @@ output:
             end: 32
           type: number
           fixedLabels: true
-          isConditional: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -7478,7 +7438,6 @@ output:
             end: 26
           type: number
           fixedLabels: true
-          isConditional: true
         - labels:
             "":
                 reason: This query returns a number value with no labels.
@@ -7501,7 +7460,6 @@ output:
             end: 32
           type: number
           fixedLabels: true
-          isConditional: true
       position:
         start: 5
         end: 8
@@ -7574,7 +7532,6 @@ output:
             end: 26
           type: number
           fixedLabels: true
-          isConditional: true
         - labels:
             "":
                 reason: This query returns a number value with no labels.
@@ -7597,7 +7554,6 @@ output:
             end: 32
           type: number
           fixedLabels: true
-          isConditional: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -7661,7 +7617,6 @@ output:
             end: 26
           type: number
           fixedLabels: true
-          isConditional: true
         - labels:
             "":
                 reason: This query returns a number value with no labels.
@@ -7684,7 +7639,6 @@ output:
             end: 32
           type: number
           fixedLabels: true
-          isConditional: true
       position:
         start: 5
         end: 8
@@ -7762,7 +7716,6 @@ output:
             end: 26
           type: number
           fixedLabels: true
-          isConditional: true
         - labels:
             "":
                 reason: This query returns a number value with no labels.
@@ -7785,7 +7738,6 @@ output:
             end: 32
           type: number
           fixedLabels: true
-          isConditional: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -7919,7 +7871,6 @@ output:
             end: 55
           type: number
           fixedLabels: true
-          isConditional: true
       position:
         start: 47
         end: 50
@@ -8068,7 +8019,6 @@ output:
                     end: 65
                   type: number
                   fixedLabels: true
-                  isConditional: true
             position:
                 start: 57
                 end: 60
@@ -8137,7 +8087,6 @@ output:
                     end: 97
                   type: number
                   fixedLabels: true
-                  isConditional: true
             position:
                 start: 85
                 end: 93
@@ -8196,7 +8145,6 @@ output:
                     end: 65
                   type: number
                   fixedLabels: true
-                  isConditional: true
             position:
                 start: 57
                 end: 60
@@ -8265,7 +8213,6 @@ output:
                     end: 97
                   type: number
                   fixedLabels: true
-                  isConditional: true
             position:
                 start: 85
                 end: 93
@@ -8342,7 +8289,6 @@ output:
             end: 17
           type: number
           fixedLabels: true
-          isConditional: true
       position:
         start: 0
         end: 13
@@ -8554,7 +8500,6 @@ output:
             end: 128
           type: number
           fixedLabels: true
-          isConditional: true
       position:
         start: 7
         end: 18
@@ -8782,7 +8727,6 @@ output:
             end: 128
           type: number
           fixedLabels: true
-          isConditional: true
       returnInfo:
         logicalexpr: vector(0) + vector(1) + vector(2)
         valueposition:
@@ -9093,7 +9037,6 @@ output:
             end: 29
           type: number
           fixedLabels: true
-          isConditional: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -9145,13 +9088,12 @@ output:
             returnednumber: 5
             alwaysreturns: true
             knownreturn: true
-            isreturnbool: true
+            isreturnbool: false
           position:
             start: 9
             end: 10
           type: number
           fixedLabels: true
-          isConditional: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -9160,7 +9102,7 @@ output:
         returnednumber: 1
         alwaysreturns: true
         knownreturn: true
-        isreturnbool: true
+        isreturnbool: false
       position:
         start: 0
         end: 1
@@ -9185,7 +9127,13 @@ output:
         - node: '[*parser.VectorSelector] prometheus_ready{job="prometheus"}'
           op: ""
       unless:
-        - matchinglabels: []
+        - deadinfo:
+            reason: The right hand side will never be matched because it doesn't have the `job` label while the left hand side will. Calling `vector()` will return a vector value with no labels.
+            fragment:
+                start: 42
+                end: 48
+          ison: false
+          matchinglabels: []
           src:
             labels:
                 "":
@@ -9194,11 +9142,6 @@ output:
                     fragment:
                         start: 42
                         end: 48
-            deadInfo:
-                reason: The right hand side will never be matched because it doesn't have the `job` label while the left hand side will. Calling `vector()` will return a vector value with no labels.
-                fragment:
-                    start: 42
-                    end: 48
             returns: vector
             operations:
                 - args:
@@ -9242,7 +9185,6 @@ output:
                 end: 51
             type: function
             fixedLabels: true
-          ison: false
       usedLabels:
         - job
       position:
@@ -9272,7 +9214,8 @@ output:
         - node: '[*parser.VectorSelector] prometheus_ready{job="prometheus"}'
           op: ""
       unless:
-        - matchinglabels: []
+        - ison: true
+          matchinglabels: []
           src:
             labels:
                 "":
@@ -9324,7 +9267,6 @@ output:
                 end: 56
             type: function
             fixedLabels: true
-          ison: true
       position:
         start: 0
         end: 34
@@ -9347,7 +9289,13 @@ output:
         - node: '[*parser.VectorSelector] prometheus_ready{job="prometheus"}'
           op: ""
       unless:
-        - matchinglabels:
+        - deadinfo:
+            reason: The right hand side will never be matched because it doesn't have the `job` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
+            fragment:
+                start: 50
+                end: 56
+          ison: true
+          matchinglabels:
             - job
           src:
             labels:
@@ -9357,11 +9305,6 @@ output:
                     fragment:
                         start: 50
                         end: 56
-            deadInfo:
-                reason: The right hand side will never be matched because it doesn't have the `job` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
-                fragment:
-                    start: 50
-                    end: 56
             returns: vector
             operations:
                 - args:
@@ -9405,7 +9348,6 @@ output:
                 end: 59
             type: function
             fixedLabels: true
-          ison: true
       usedLabels:
         - job
       position:
@@ -9468,7 +9410,8 @@ output:
         - node: '[*parser.AggregateExpr] max by (instance, cluster) (cf_node_role{kubernetes_role="master",role="kubernetes"})'
           op: max
       unless:
-        - matchinglabels: []
+        - ison: false
+          matchinglabels: []
           src:
             labels:
                 "":
@@ -9571,7 +9514,6 @@ output:
                 end: 201
             type: aggregation
             fixedLabels: true
-          ison: false
       usedLabels:
         - instance
         - cluster
@@ -9817,6 +9759,11 @@ output:
           op: ""
       joins:
         - addedlabels: []
+          deadinfo:
+            reason: The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
+            fragment:
+                start: 26
+                end: 29
           depth: 0
           ison: true
           matchinglabels:
@@ -9842,11 +9789,6 @@ output:
                     fragment:
                         start: 26
                         end: 29
-            deadInfo:
-                reason: The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
-                fragment:
-                    start: 26
-                    end: 29
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar{b="2"}'
@@ -9910,6 +9852,32 @@ output:
         - addedlabels:
             - c
             - d
+          deadinfo:
+            reason: The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
+            fragment:
+                start: 42
+                end: 45
+          deadlabels:
+            - name: c
+              reason: You can't use `c` because this label is not possible here.
+              labelreason: Query is using aggregation that removes all labels.
+              usagefragment:
+                start: 37
+                end: 38
+              labelfragment:
+                start: 42
+                end: 45
+              kind: 0
+            - name: d
+              reason: You can't use `d` because this label is not possible here.
+              labelreason: Query is using aggregation that removes all labels.
+              usagefragment:
+                start: 39
+                end: 40
+              labelfragment:
+                start: 42
+                end: 45
+              kind: 0
           depth: 0
           ison: true
           matchinglabels:
@@ -9935,32 +9903,6 @@ output:
                     fragment:
                         start: 42
                         end: 45
-            deadInfo:
-                reason: The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
-                fragment:
-                    start: 42
-                    end: 45
-            deadLabels:
-                - name: c
-                  reason: You can't use `c` because this label is not possible here.
-                  labelreason: Query is using aggregation that removes all labels.
-                  usagefragment:
-                    start: 37
-                    end: 38
-                  labelfragment:
-                    start: 42
-                    end: 45
-                  kind: 0
-                - name: d
-                  reason: You can't use `d` because this label is not possible here.
-                  labelreason: Query is using aggregation that removes all labels.
-                  usagefragment:
-                    start: 39
-                    end: 40
-                  labelfragment:
-                    start: 42
-                    end: 45
-                  kind: 0
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar{b="2"}'
@@ -10023,6 +9965,32 @@ output:
         - addedlabels:
             - c
             - d
+          deadinfo:
+            reason: The left hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
+            fragment:
+                start: 0
+                end: 3
+          deadlabels:
+            - name: c
+              reason: You can't use `c` because this label is not possible here.
+              labelreason: Query is using aggregation that removes all labels.
+              usagefragment:
+                start: 43
+                end: 44
+              labelfragment:
+                start: 0
+                end: 3
+              kind: 0
+            - name: d
+              reason: You can't use `d` because this label is not possible here.
+              labelreason: Query is using aggregation that removes all labels.
+              usagefragment:
+                start: 45
+                end: 46
+              labelfragment:
+                start: 0
+                end: 3
+              kind: 0
           depth: 0
           ison: true
           matchinglabels:
@@ -10048,32 +10016,6 @@ output:
                     fragment:
                         start: 0
                         end: 3
-            deadInfo:
-                reason: The left hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
-                fragment:
-                    start: 0
-                    end: 3
-            deadLabels:
-                - name: c
-                  reason: You can't use `c` because this label is not possible here.
-                  labelreason: Query is using aggregation that removes all labels.
-                  usagefragment:
-                    start: 43
-                    end: 44
-                  labelfragment:
-                    start: 0
-                    end: 3
-                  kind: 0
-                - name: d
-                  reason: You can't use `d` because this label is not possible here.
-                  labelreason: Query is using aggregation that removes all labels.
-                  usagefragment:
-                    start: 45
-                    end: 46
-                  labelfragment:
-                    start: 0
-                    end: 3
-                  kind: 0
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] foo{a="1"}'
@@ -10136,6 +10078,11 @@ output:
         - addedlabels:
             - c
             - d
+          deadinfo:
+            reason: The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
+            fragment:
+                start: 66
+                end: 74
           depth: 0
           ison: true
           matchinglabels:
@@ -10161,11 +10108,6 @@ output:
                     fragment:
                         start: 66
                         end: 74
-            deadInfo:
-                reason: The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
-                fragment:
-                    start: 66
-                    end: 74
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar{b="2"}'
@@ -10227,6 +10169,11 @@ output:
         - addedlabels:
             - c
             - d
+          deadinfo:
+            reason: The left hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
+            fragment:
+                start: 24
+                end: 32
           depth: 0
           ison: true
           matchinglabels:
@@ -10252,11 +10199,6 @@ output:
                     fragment:
                         start: 24
                         end: 32
-            deadInfo:
-                reason: The left hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
-                fragment:
-                    start: 24
-                    end: 32
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] foo{a="1"}'
@@ -10329,6 +10271,16 @@ output:
           op: max
       joins:
         - addedlabels: []
+          deadinfo:
+            reason: |-
+                The right hand side will never be matched because it doesn't have the `device` label from `on(...)`. The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+                You will only get any results back if the metric selector you pass doesn't match anything.
+                Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+                This means that the only labels you can get back from absent call are the ones you pass to it.
+                If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+            fragment:
+                start: 292
+                end: 298
           depth: 1
           ison: true
           matchinglabels:
@@ -10348,16 +10300,6 @@ output:
                     fragment:
                         start: 292
                         end: 298
-            deadInfo:
-                reason: |-
-                    The right hand side will never be matched because it doesn't have the `device` label from `on(...)`. The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
-                    You will only get any results back if the metric selector you pass doesn't match anything.
-                    Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
-                    This means that the only labels you can get back from absent call are the ones you pass to it.
-                    If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
-                fragment:
-                    start: 292
-                    end: 298
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] node_disk_info'
@@ -10491,7 +10433,8 @@ output:
                 end: 405
             type: function
       unless:
-        - matchinglabels:
+        - ison: true
+          matchinglabels:
             - instance
             - device
           src:
@@ -10557,7 +10500,6 @@ output:
                 end: 207
             type: function
             isConditional: true
-          ison: true
       indirect:
         - labels:
             "":
@@ -10581,7 +10523,6 @@ output:
             end: 104
           type: number
           fixedLabels: true
-          isConditional: true
       usedLabels:
         - instance
         - device
@@ -10997,7 +10938,6 @@ output:
                     end: 34
                   type: number
                   fixedLabels: true
-                  isConditional: true
             returnInfo:
                 logicalexpr: ""
                 valueposition:
@@ -11036,7 +10976,6 @@ output:
             end: 19
           type: number
           fixedLabels: true
-          isConditional: true
       returnInfo:
         logicalexpr: ""
         valueposition:
@@ -11269,7 +11208,6 @@ output:
             end: 30
           type: number
           fixedLabels: true
-          isConditional: true
       position:
         start: 5
         end: 8
@@ -11360,7 +11298,6 @@ output:
             end: 30
           type: number
           fixedLabels: true
-          isConditional: true
       returnInfo:
         logicalexpr: 1 - vector(0)
         valueposition:
@@ -11440,7 +11377,6 @@ output:
                     end: 31
                   type: number
                   fixedLabels: true
-                  isConditional: true
             returnInfo:
                 logicalexpr: ""
                 valueposition:
@@ -12238,13 +12174,17 @@ output:
                     end: 401
                   type: number
                   fixedLabels: true
-                  isConditional: true
             position:
                 start: 357
                 end: 382
             type: selector
             isConditional: true
         - addedlabels: []
+          deadinfo:
+            reason: The right hand side will never be matched because it doesn't have the `colo_name` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
+            fragment:
+                start: 386
+                end: 392
           depth: 0
           ison: true
           matchinglabels:
@@ -12259,10 +12199,10 @@ output:
                         start: 386
                         end: 392
             deadInfo:
-                reason: The right hand side will never be matched because it doesn't have the `colo_name` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
+                reason: '`vector(0) > 80` always evaluates to `0 > 80` which is not possible, so it will never return anything.'
                 fragment:
                     start: 386
-                    end: 392
+                    end: 395
             returns: vector
             operations:
                 - args:
@@ -12314,7 +12254,6 @@ output:
                     end: 401
                   type: number
                   fixedLabels: true
-                  isConditional: true
             returnInfo:
                 logicalexpr: ""
                 valueposition:
@@ -12364,13 +12303,17 @@ output:
                     end: 478
                   type: number
                   fixedLabels: true
-                  isConditional: true
             position:
                 start: 424
                 end: 459
             type: selector
             isConditional: true
         - addedlabels: []
+          deadinfo:
+            reason: The right hand side will never be matched because it doesn't have the `colo_name` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
+            fragment:
+                start: 463
+                end: 469
           depth: 0
           ison: true
           matchinglabels:
@@ -12385,10 +12328,10 @@ output:
                         start: 463
                         end: 469
             deadInfo:
-                reason: The right hand side will never be matched because it doesn't have the `colo_name` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
+                reason: '`vector(0) > 80` always evaluates to `0 > 80` which is not possible, so it will never return anything.'
                 fragment:
                     start: 463
-                    end: 469
+                    end: 472
             returns: vector
             operations:
                 - args:
@@ -12440,7 +12383,6 @@ output:
                     end: 478
                   type: number
                   fixedLabels: true
-                  isConditional: true
             returnInfo:
                 logicalexpr: ""
                 valueposition:
@@ -13099,13 +13041,17 @@ output:
                     end: 401
                   type: number
                   fixedLabels: true
-                  isConditional: true
             position:
                 start: 357
                 end: 382
             type: selector
             isConditional: true
         - addedlabels: []
+          deadinfo:
+            reason: The right hand side will never be matched because it doesn't have the `colo_name` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
+            fragment:
+                start: 386
+                end: 392
           depth: 0
           ison: true
           matchinglabels:
@@ -13120,10 +13066,10 @@ output:
                         start: 386
                         end: 392
             deadInfo:
-                reason: The right hand side will never be matched because it doesn't have the `colo_name` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
+                reason: '`vector(0) > 80` always evaluates to `0 > 80` which is not possible, so it will never return anything.'
                 fragment:
                     start: 386
-                    end: 392
+                    end: 395
             returns: vector
             operations:
                 - args:
@@ -13175,7 +13121,6 @@ output:
                     end: 401
                   type: number
                   fixedLabels: true
-                  isConditional: true
             returnInfo:
                 logicalexpr: ""
                 valueposition:
@@ -13225,13 +13170,17 @@ output:
                     end: 478
                   type: number
                   fixedLabels: true
-                  isConditional: true
             position:
                 start: 424
                 end: 459
             type: selector
             isConditional: true
         - addedlabels: []
+          deadinfo:
+            reason: The right hand side will never be matched because it doesn't have the `colo_name` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
+            fragment:
+                start: 463
+                end: 469
           depth: 0
           ison: true
           matchinglabels:
@@ -13246,10 +13195,10 @@ output:
                         start: 463
                         end: 469
             deadInfo:
-                reason: The right hand side will never be matched because it doesn't have the `colo_name` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
+                reason: '`vector(0) > 80` always evaluates to `0 > 80` which is not possible, so it will never return anything.'
                 fragment:
                     start: 463
-                    end: 469
+                    end: 472
             returns: vector
             operations:
                 - args:
@@ -13301,7 +13250,6 @@ output:
                     end: 478
                   type: number
                   fixedLabels: true
-                  isConditional: true
             returnInfo:
                 logicalexpr: ""
                 valueposition:
@@ -13436,7 +13384,6 @@ output:
             end: 44
           type: number
           fixedLabels: true
-          isConditional: true
       position:
         start: 4
         end: 12
@@ -13574,7 +13521,6 @@ output:
                     end: 24
                   type: number
                   fixedLabels: true
-                  isConditional: true
                 - labels:
                     "":
                         reason: This query returns a number value with no labels.
@@ -13642,7 +13588,6 @@ output:
                     end: 59
                   type: number
                   fixedLabels: true
-                  isConditional: true
             usedLabels:
                 - instance
             position:
@@ -13762,7 +13707,6 @@ output:
             end: 194
           type: number
           fixedLabels: true
-          isConditional: true
       usedLabels:
         - dc
       position:
@@ -14183,7 +14127,6 @@ output:
                     end: 100
                   type: number
                   fixedLabels: true
-                  isConditional: true
             position:
                 start: 77
                 end: 93
@@ -14306,7 +14249,6 @@ output:
                     end: 98
                   type: number
                   fixedLabels: true
-                  isConditional: true
             position:
                 start: 75
                 end: 91
@@ -14351,6 +14293,11 @@ output:
           op: ""
       joins:
         - addedlabels: []
+          deadinfo:
+            reason: The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
+            fragment:
+                start: 19
+                end: 22
           depth: 0
           ison: true
           matchinglabels:
@@ -14370,11 +14317,6 @@ output:
                     fragment:
                         start: 19
                         end: 27
-            deadInfo:
-                reason: The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
-                fragment:
-                    start: 19
-                    end: 22
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar'
@@ -14425,6 +14367,22 @@ output:
       joins:
         - addedlabels:
             - cluster
+          deadinfo:
+            reason: The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
+            fragment:
+                start: 39
+                end: 42
+          deadlabels:
+            - name: cluster
+              reason: You can't use `cluster` because this label is not possible here.
+              labelreason: Query is using aggregation that removes all labels.
+              usagefragment:
+                start: 30
+                end: 37
+              labelfragment:
+                start: 39
+                end: 42
+              kind: 0
           depth: 0
           ison: true
           matchinglabels:
@@ -14444,22 +14402,6 @@ output:
                     fragment:
                         start: 39
                         end: 47
-            deadInfo:
-                reason: The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
-                fragment:
-                    start: 39
-                    end: 42
-            deadLabels:
-                - name: cluster
-                  reason: You can't use `cluster` because this label is not possible here.
-                  labelreason: Query is using aggregation that removes all labels.
-                  usagefragment:
-                    start: 30
-                    end: 37
-                  labelfragment:
-                    start: 39
-                    end: 42
-                  kind: 0
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar'
@@ -14509,6 +14451,22 @@ output:
       joins:
         - addedlabels:
             - cluster
+          deadinfo:
+            reason: The left hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
+            fragment:
+                start: 0
+                end: 3
+          deadlabels:
+            - name: cluster
+              reason: You can't use `cluster` because this label is not possible here.
+              labelreason: Query is using aggregation that removes all labels.
+              usagefragment:
+                start: 36
+                end: 43
+              labelfragment:
+                start: 0
+                end: 3
+              kind: 0
           depth: 0
           ison: true
           matchinglabels:
@@ -14528,22 +14486,6 @@ output:
                     fragment:
                         start: 0
                         end: 8
-            deadInfo:
-                reason: The left hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
-                fragment:
-                    start: 0
-                    end: 3
-            deadLabels:
-                - name: cluster
-                  reason: You can't use `cluster` because this label is not possible here.
-                  labelreason: Query is using aggregation that removes all labels.
-                  usagefragment:
-                    start: 36
-                    end: 43
-                  labelfragment:
-                    start: 0
-                    end: 3
-                  kind: 0
             returns: vector
             operations:
                 - node: '[*parser.VectorSelector] bar'
@@ -14913,7 +14855,6 @@ output:
                     end: 166
                   type: number
                   fixedLabels: true
-                  isConditional: true
             usedLabels:
                 - colo_name
                 - instance
@@ -15395,7 +15336,6 @@ output:
             end: 192
           type: number
           fixedLabels: true
-          isConditional: true
       usedLabels:
         - instance
       position:
@@ -15639,7 +15579,6 @@ output:
                     end: 192
                   type: number
                   fixedLabels: true
-                  isConditional: true
             usedLabels:
                 - instance
             position:
@@ -15789,7 +15728,6 @@ output:
             end: 101
           type: number
           fixedLabels: true
-          isConditional: true
       usedLabels:
         - instance
         - colo_name
@@ -16840,7 +16778,6 @@ output:
             end: 170
           type: number
           fixedLabels: true
-          isConditional: true
       usedLabels:
         - colo_name
         - module_name

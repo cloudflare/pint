@@ -263,7 +263,7 @@ func (c CostCheck) suggestRecordingRules(
 			continue
 		}
 		for _, s := range src {
-			s.WalkSources(func(s source.Source, j *source.Join, u *source.Unless) {
+			s.WalkSources(func(s *source.Source, j *source.Join, u *source.Unless) {
 				for _, os := range otherSrc {
 					op, extra, exact, ok := c.isSuggestionFor(s, os, j, u)
 					if !ok {
@@ -395,7 +395,7 @@ func formatDelta(delta float64) string {
 	return fmt.Sprintf("+%0.2f", delta)
 }
 
-func (c CostCheck) isSuggestionFor(src, potential source.Source, join *source.Join, unless *source.Unless) (promParser.Node, string, bool, bool) {
+func (c CostCheck) isSuggestionFor(src, potential *source.Source, join *source.Join, unless *source.Unless) (promParser.Node, string, bool, bool) {
 	if potential.Type != source.FuncSource && potential.Type != source.AggregateSource {
 		return nil, "", false, false
 	}
@@ -455,7 +455,7 @@ func (c CostCheck) isSuggestionFor(src, potential source.Source, join *source.Jo
 	return nil, "", false, false
 }
 
-func (c CostCheck) joinLabelsCompatible(src, potential source.Source, join *source.Join, unless *source.Unless) bool {
+func (c CostCheck) joinLabelsCompatible(src, potential *source.Source, join *source.Join, unless *source.Unless) bool {
 	if join != nil && join.IsOn {
 		for _, name := range join.MatchingLabels {
 			if src.CanHaveLabel(name) && !potential.CanHaveLabel(name) {
@@ -493,7 +493,7 @@ func (c CostCheck) joinLabelsCompatible(src, potential source.Source, join *sour
 	return true
 }
 
-func (c CostCheck) labelsCompatible(src, potential source.Source, queryMatchers []*labels.Matcher, fullMatch bool) bool {
+func (c CostCheck) labelsCompatible(src, potential *source.Source, queryMatchers []*labels.Matcher, fullMatch bool) bool {
 	for _, lm := range queryMatchers {
 		if lm.Name == model.MetricNameLabel {
 			continue
@@ -604,7 +604,7 @@ func (c CostCheck) selectorLabels(ops source.Operations) (lms []*labels.Matcher)
 	return lms
 }
 
-func hasVectorSelector(sources []source.Source) bool {
+func hasVectorSelector(sources []*source.Source) bool {
 	for _, src := range sources {
 		if _, ok := source.MostOuterOperation[*promParser.VectorSelector](src); ok {
 			return true

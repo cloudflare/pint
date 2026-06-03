@@ -297,7 +297,7 @@ NEXT:
 	return problems
 }
 
-func canJoinStatically(lhsSources, rhsSources []source.Source, vm *promParser.VectorMatching) bool {
+func canJoinStatically(lhsSources, rhsSources []*source.Source, vm *promParser.VectorMatching) bool {
 	for _, ls := range lhsSources {
 		for _, rs := range rhsSources {
 			switch {

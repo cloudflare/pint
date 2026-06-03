@@ -24,7 +24,7 @@ type PromQLExpr struct {
 	Value       *YamlNode
 	query       *PromQLNode
 	mu          *sync.Mutex
-	source      []source.Source
+	source      []*source.Source
 	hasSource   bool
 }
 
@@ -34,7 +34,7 @@ func (pn *PromQLExpr) parse() {
 	}
 }
 
-func (pn *PromQLExpr) Source() []source.Source {
+func (pn *PromQLExpr) Source() []*source.Source {
 	pn.mu.Lock()
 	defer pn.mu.Unlock()
 	pn.parse()

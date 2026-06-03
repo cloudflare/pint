@@ -142,7 +142,7 @@ type featureKey struct {
 func requiredFeatures(expr *parser.PromQLExpr) []source.FeatureRequirement {
 	seen := map[featureKey]*source.FeatureRequirement{}
 	for _, src := range expr.Source() {
-		src.WalkSources(func(s source.Source, _ *source.Join, _ *source.Unless) {
+		src.WalkSources(func(s *source.Source, _ *source.Join, _ *source.Unless) {
 			for _, req := range s.NeedsFeatures {
 				key := featureKey{feature: req.Feature, name: req.Name}
 				if existing, ok := seen[key]; ok {

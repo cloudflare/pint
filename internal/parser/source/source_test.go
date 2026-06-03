@@ -471,7 +471,7 @@ group by (cluster, namespace, workload, workload_type, pod) (
 func TestLabelsSource(t *testing.T) {
 	type Snapshot struct {
 		Expr   string
-		Output []source.Source
+		Output []*source.Source
 	}
 
 	_, file, _, ok := runtime.Caller(0)
@@ -495,7 +495,7 @@ func TestLabelsSource(t *testing.T) {
 			output := source.LabelsSource(expr, n.Expr)
 
 			for _, src := range output {
-				src.WalkSources(func(s source.Source, _ *source.Join, _ *source.Unless) {
+				src.WalkSources(func(s *source.Source, _ *source.Join, _ *source.Unless) {
 					require.Positive(t, s.Position.End, "empty position %+v", s)
 					if s.DeadInfo != nil {
 						require.Positive(t, s.DeadInfo.Fragment.End, "empty dead position %+v", s)
@@ -657,7 +657,7 @@ func TestRangeSelectorModeDefaultMarshalYAML(t *testing.T) {
 func TestLabelsSourceWithFeatures(t *testing.T) {
 	type Snapshot struct {
 		Expr   string
-		Output []source.Source
+		Output []*source.Source
 	}
 
 	_, file, _, ok := runtime.Caller(0)

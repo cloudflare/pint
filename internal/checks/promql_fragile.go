@@ -70,7 +70,7 @@ func (c FragileCheck) Check(_ context.Context, entry *discovery.Entry, _ []*disc
 	return problems
 }
 
-func (c FragileCheck) checkTopK(expr *parser.PromQLExpr, src source.Source) (problems []Problem) {
+func (c FragileCheck) checkTopK(expr *parser.PromQLExpr, src *source.Source) (problems []Problem) {
 	if src.Type != source.AggregateSource {
 		return problems
 	}
@@ -101,7 +101,7 @@ func (c FragileCheck) checkTopK(expr *parser.PromQLExpr, src source.Source) (pro
 	return problems
 }
 
-func (c FragileCheck) checkPartialData(expr *parser.PromQLExpr, src source.Source, forVal *parser.YamlDuration) (problems []Problem) {
+func (c FragileCheck) checkPartialData(expr *parser.PromQLExpr, src *source.Source, forVal *parser.YamlDuration) (problems []Problem) {
 	if src.Type != source.AggregateSource {
 		return problems
 	}
