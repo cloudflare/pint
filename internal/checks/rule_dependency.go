@@ -65,7 +65,9 @@ func (c RuleDependencyCheck) Reporter() string {
 }
 
 func (c RuleDependencyCheck) Check(ctx context.Context, entry *discovery.Entry, entries []*discovery.Entry) (problems []Problem) {
-	problems = append(problems, c.checkRemovedDependency(entry, entries)...)
+	filtered := nonRemovedEntries(entries)
+
+	problems = append(problems, c.checkRemovedDependency(entry, filtered)...)
 
 	var settings *RuleDependencySettings
 	if s := ctx.Value(SettingsKey(c.Reporter())); s != nil {
@@ -76,7 +78,7 @@ func (c RuleDependencyCheck) Check(ctx context.Context, entry *discovery.Entry, 
 		_ = settings.Validate()
 	}
 
-	problems = append(problems, c.checkCrossGroupDependency(entry, entries, settings.ignoreGroupMismatchRe)...)
+	problems = append(problems, c.checkCrossGroupDependency(entry, filtered, settings.ignoreGroupMismatchRe)...)
 	return problems
 }
 
@@ -86,9 +88,7 @@ func (c RuleDependencyCheck) checkRemovedDependency(entry *discovery.Entry, entr
 		return problems
 	}
 
-	filtered := nonRemovedEntries(entries)
-
-	for _, flt := range filtered {
+	for _, flt := range entries {
 		if flt.Rule.Type() == entry.Rule.Type() && flt.Rule.Name() == entry.Rule.Name() {
 			// There's another rule with same type & name, do nothing.
 			return problems
@@ -96,7 +96,7 @@ func (c RuleDependencyCheck) checkRemovedDependency(entry *discovery.Entry, entr
 	}
 
 	var broken []*brokenDependency
-	for _, flt := range filtered {
+	for _, flt := range entries {
 		var dep *brokenDependency
 		if entry.Rule.RecordingRule != nil {
 			dep = c.usesVector(flt, entry.Rule.RecordingRule.Record.Value)
@@ -185,8 +185,6 @@ func (c RuleDependencyCheck) checkCrossGroupDependency(entry *discovery.Entry, e
 		return problems
 	}
 
-	filtered := nonRemovedEntries(entries)
-
 	var deps []*crossGroupDep
 	for _, src := range expr.Source() {
 		src.WalkSources(func(s *source.Source, _ *source.Join, _ *source.Unless) {
@@ -199,7 +197,7 @@ func (c RuleDependencyCheck) checkCrossGroupDependency(entry *discovery.Entry, e
 					return
 				}
 			}
-			for _, other := range filtered {
+			for _, other := range entries {
 				if other.Rule.RecordingRule == nil {
 					continue
 				}
