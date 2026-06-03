@@ -5,13 +5,13 @@ go 1.26.0
 require (
 	github.com/cespare/xxhash/v2 v2.3.0
 	github.com/gkampitakis/go-snaps v0.5.22
-	github.com/go-json-experiment/json v0.0.0-20260520185125-572e7c383686
+	github.com/go-json-experiment/json v0.0.0-20260601182631-00ed12fed2a6
 	github.com/google/go-cmp v0.7.0
 	github.com/google/go-github/v88 v88.0.0
 	github.com/hashicorp/hcl/v2 v2.24.0
 	github.com/itchyny/json2yaml v0.1.5
 	github.com/klauspost/compress v1.18.6
-	github.com/neilotoole/slogt v1.1.0
+	github.com/neilotoole/slogt/v2 v2.0.0
 	github.com/prometheus/client_golang v1.23.2
 	github.com/prometheus/client_model v0.6.2
 	github.com/prometheus/common v0.68.1
@@ -20,7 +20,7 @@ require (
 	github.com/stretchr/testify v1.11.1
 	github.com/urfave/cli/v3 v3.9.0
 	github.com/zclconf/go-cty v1.18.1
-	gitlab.com/gitlab-org/api/client-go v1.46.0
+	gitlab.com/gitlab-org/api/client-go/v2 v2.36.0
 	go.nhat.io/httpmock v0.11.0
 	go.uber.org/ratelimit v0.3.1
 	go.yaml.in/yaml/v3 v3.0.4

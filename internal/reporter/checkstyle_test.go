@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/neilotoole/slogt"
+	"github.com/neilotoole/slogt/v2"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/checks"
