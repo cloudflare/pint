@@ -1,6 +1,8 @@
 /pint
 /.cover
 /dist/
-/.vscode/
 /cmd/pint/bench/rules
 /.tmp/
+
+/.vscode/
+/.devin/

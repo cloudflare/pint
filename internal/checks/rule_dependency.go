@@ -189,7 +189,7 @@ func (c RuleDependencyCheck) checkCrossGroupDependency(entry *discovery.Entry, e
 
 	var deps []*crossGroupDep
 	for _, src := range expr.Source() {
-		src.WalkSources(func(s source.Source, _ *source.Join, _ *source.Unless) {
+		src.WalkSources(func(s *source.Source, _ *source.Join, _ *source.Unless) {
 			vs, ok := source.MostOuterOperation[*promParser.VectorSelector](s)
 			if !ok {
 				return
@@ -281,7 +281,7 @@ func (c RuleDependencyCheck) usesVector(entry *discovery.Entry, name string) *br
 
 	var dep *brokenDependency
 	for _, src := range expr.Source() {
-		src.WalkSources(func(s source.Source, _ *source.Join, _ *source.Unless) {
+		src.WalkSources(func(s *source.Source, _ *source.Join, _ *source.Unless) {
 			vs, ok := source.MostOuterOperation[*promParser.VectorSelector](s)
 			if !ok {
 				return
@@ -312,7 +312,7 @@ func (c RuleDependencyCheck) usesAlert(entry *discovery.Entry, name string) *bro
 
 	var dep *brokenDependency
 	for _, src := range expr.Source() {
-		src.WalkSources(func(s source.Source, _ *source.Join, _ *source.Unless) {
+		src.WalkSources(func(s *source.Source, _ *source.Join, _ *source.Unless) {
 			vs, ok := source.MostOuterOperation[*promParser.VectorSelector](s)
 			if !ok {
 				return

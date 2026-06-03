@@ -92,32 +92,6 @@
         {job="foo"} unless on(__name__) count(sum({job="foo"})) by(__name__)
   output: |
     4 |     {job="foo"} unless on(__name__) count(sum({job="foo"})) by(__name__)
-                                                  ^^^^^^^^^^^^^^^^
-                                                  The right hand side will never be matched because it
-                                                  doesn't have the `__name__` label from `on(...)`.
-                                                  Aggregation removes metric name.
-  problem:
-    reporter: promql/impossible
-    summary: dead code in query
-    details: ""
-    diagnostics:
-        - message: The right hand side will never be matched because it doesn't have the `__name__` label from `on(...)`. Aggregation removes metric name.
-          firstcolumn: 39
-          lastcolumn: 54
-          kind: 0
-    lines:
-        first: 4
-        last: 4
-    severity: 1
-    anchor: 0
-- description: __name__ is stripped
-  content: |4
-
-    - record: count:sum:foo
-      expr: |
-        {job="foo"} unless on(__name__) count(sum({job="foo"})) by(__name__)
-  output: |
-    4 |     {job="foo"} unless on(__name__) count(sum({job="foo"})) by(__name__)
                                                                        ^^^^^^^^
               You can't use `__name__` because this label is not possible here.
                                                   ^^^^^^^^^^^^^^^^ Aggregation removes metric name.
@@ -134,6 +108,32 @@
           firstcolumn: 39
           lastcolumn: 54
           kind: 1
+    lines:
+        first: 4
+        last: 4
+    severity: 1
+    anchor: 0
+- description: __name__ is stripped
+  content: |4
+
+    - record: count:sum:foo
+      expr: |
+        {job="foo"} unless on(__name__) count(sum({job="foo"})) by(__name__)
+  output: |
+    4 |     {job="foo"} unless on(__name__) count(sum({job="foo"})) by(__name__)
+                                                  ^^^^^^^^^^^^^^^^
+                                                  The right hand side will never be matched because it
+                                                  doesn't have the `__name__` label from `on(...)`.
+                                                  Aggregation removes metric name.
+  problem:
+    reporter: promql/impossible
+    summary: dead code in query
+    details: ""
+    diagnostics:
+        - message: The right hand side will never be matched because it doesn't have the `__name__` label from `on(...)`. Aggregation removes metric name.
+          firstcolumn: 39
+          lastcolumn: 54
+          kind: 0
     lines:
         first: 4
         last: 4
@@ -359,6 +359,48 @@
      9 |     # inside the query
     10 |     and on (colo_name)
     11 |       (colo_job:foo_total:rate2m or vector(0)) > 80
+                                             ^^^^^^^^^
+                                             `vector(0) > 80` always evaluates to `0 > 80` which is not
+                                             possible, so it will never return anything.
+    12 |     and on (colo_name)
+    13 |       (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
+  problem:
+    reporter: promql/impossible
+    summary: dead code in query
+    details: ""
+    diagnostics:
+        - message: '`vector(0) > 80` always evaluates to `0 > 80` which is not possible, so it will never return anything.'
+          firstcolumn: 354
+          lastcolumn: 362
+          kind: 0
+    lines:
+        first: 4
+        last: 13
+    severity: 1
+    anchor: 0
+- description: complex query with or vector()
+  content: |4
+
+    - alert: Foo
+      expr: |
+        (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
+          (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
+        > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
+          avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
+        # Multi-line comment
+        # inside the query
+        and on (colo_name)
+          (colo_job:foo_total:rate2m or vector(0)) > 80
+        and on (colo_name)
+          (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
+      annotations:
+        summary: High rejectsion rate in {{ $labels.colo_name }}
+  output: |4
+     4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
+       |     [...]
+     9 |     # inside the query
+    10 |     and on (colo_name)
+    11 |       (colo_job:foo_total:rate2m or vector(0)) > 80
                                              ^^^^^^
                                              The right hand side will never be matched because it doesn't
                                              have the `colo_name` label from `on(...)`. Calling `vector()`
@@ -373,6 +415,46 @@
         - message: The right hand side will never be matched because it doesn't have the `colo_name` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
           firstcolumn: 354
           lastcolumn: 359
+          kind: 0
+    lines:
+        first: 4
+        last: 13
+    severity: 1
+    anchor: 0
+- description: complex query with or vector()
+  content: |4
+
+    - alert: Foo
+      expr: |
+        (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
+          (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
+        > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
+          avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
+        # Multi-line comment
+        # inside the query
+        and on (colo_name)
+          (colo_job:foo_total:rate2m or vector(0)) > 80
+        and on (colo_name)
+          (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
+      annotations:
+        summary: High rejectsion rate in {{ $labels.colo_name }}
+  output: |4
+     4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
+       |     [...]
+    11 |       (colo_job:foo_total:rate2m or vector(0)) > 80
+    12 |     and on (colo_name)
+    13 |       (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
+                                                       ^^^^^^^^^
+          `vector(0) > 80` always evaluates to `0 > 80` which is
+          not possible, so it will never return anything.
+  problem:
+    reporter: promql/impossible
+    summary: dead code in query
+    details: ""
+    diagnostics:
+        - message: '`vector(0) > 80` always evaluates to `0 > 80` which is not possible, so it will never return anything.'
+          firstcolumn: 431
+          lastcolumn: 439
           kind: 0
     lines:
         first: 4
@@ -773,6 +855,48 @@
      9 |     # inside the query
     10 |     and on (colo_name)
     11 |       (colo_job:foo_total:rate2m or vector(0)) > 80
+                                             ^^^^^^^^^
+                                             `vector(0) > 80` always evaluates to `0 > 80` which is not
+                                             possible, so it will never return anything.
+    12 |     and on (colo_name)
+    13 |       (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
+  problem:
+    reporter: promql/impossible
+    summary: dead code in query
+    details: ""
+    diagnostics:
+        - message: '`vector(0) > 80` always evaluates to `0 > 80` which is not possible, so it will never return anything.'
+          firstcolumn: 354
+          lastcolumn: 362
+          kind: 0
+    lines:
+        first: 4
+        last: 13
+    severity: 1
+    anchor: 0
+- description: complex query with or vector()
+  content: |4
+
+    - alert: Foo
+      expr: |
+        (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
+          (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
+        > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
+          avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
+        # Multi-line comment
+        # inside the query
+        and on (colo_name)
+          (colo_job:foo_total:rate2m or vector(0)) > 80
+        and on (colo_name)
+          (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
+      annotations:
+        summary: High rejectsion rate in {{ $labels.colo_name }}
+  output: |4
+     4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
+       |     [...]
+     9 |     # inside the query
+    10 |     and on (colo_name)
+    11 |       (colo_job:foo_total:rate2m or vector(0)) > 80
                                              ^^^^^^
                                              The right hand side will never be matched because it doesn't
                                              have the `colo_name` label from `on(...)`. Calling `vector()`
@@ -787,6 +911,46 @@
         - message: The right hand side will never be matched because it doesn't have the `colo_name` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
           firstcolumn: 354
           lastcolumn: 359
+          kind: 0
+    lines:
+        first: 4
+        last: 13
+    severity: 1
+    anchor: 0
+- description: complex query with or vector()
+  content: |4
+
+    - alert: Foo
+      expr: |
+        (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
+          (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
+        > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
+          avg(rate(foo_total[6h] offset 1d) or vector(1)) by (colo_name))
+        # Multi-line comment
+        # inside the query
+        and on (colo_name)
+          (colo_job:foo_total:rate2m or vector(0)) > 80
+        and on (colo_name)
+          (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
+      annotations:
+        summary: High rejectsion rate in {{ $labels.colo_name }}
+  output: |4
+     4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
+       |     [...]
+    11 |       (colo_job:foo_total:rate2m or vector(0)) > 80
+    12 |     and on (colo_name)
+    13 |       (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
+                                                       ^^^^^^^^^
+          `vector(0) > 80` always evaluates to `0 > 80` which is
+          not possible, so it will never return anything.
+  problem:
+    reporter: promql/impossible
+    summary: dead code in query
+    details: ""
+    diagnostics:
+        - message: '`vector(0) > 80` always evaluates to `0 > 80` which is not possible, so it will never return anything.'
+          firstcolumn: 431
+          lastcolumn: 439
           kind: 0
     lines:
         first: 4
@@ -2673,20 +2837,23 @@
     5 |       max(...) by(region)
     6 |       +
     7 |       max(... or vector(0)) by(region)
-                         ^^^^^^
-                         The right hand side will never be matched because it doesn't have the `region`
-                         label while the left hand side will. Calling `vector()` will return a vector value
-                         with no labels.
+                                       ^^^^^^
+                                       You can't use `region` because this label is not possible here.
+                         ^^^^^^ Calling `vector()` will return a vector value with no labels.
     8 |     ) / sum(rate(records_total{region=~"wnam|weur"}[5m])) by (region) < 0.90
   problem:
     reporter: promql/impossible
-    summary: dead code in query
+    summary: impossible label
     details: ""
     diagnostics:
-        - message: The right hand side will never be matched because it doesn't have the `region` label while the left hand side will. Calling `vector()` will return a vector value with no labels.
+        - message: You can't use `region` because this label is not possible here.
+          firstcolumn: 213
+          lastcolumn: 218
+          kind: 0
+        - message: Calling `vector()` will return a vector value with no labels.
           firstcolumn: 199
           lastcolumn: 204
-          kind: 0
+          kind: 1
     lines:
         first: 4
         last: 8
@@ -2709,23 +2876,20 @@
     5 |       max(...) by(region)
     6 |       +
     7 |       max(... or vector(0)) by(region)
-                                       ^^^^^^
-                                       You can't use `region` because this label is not possible here.
-                         ^^^^^^ Calling `vector()` will return a vector value with no labels.
+                         ^^^^^^
+                         The right hand side will never be matched because it doesn't have the `region`
+                         label while the left hand side will. Calling `vector()` will return a vector value
+                         with no labels.
     8 |     ) / sum(rate(records_total{region=~"wnam|weur"}[5m])) by (region) < 0.90
   problem:
     reporter: promql/impossible
-    summary: impossible label
+    summary: dead code in query
     details: ""
     diagnostics:
-        - message: You can't use `region` because this label is not possible here.
-          firstcolumn: 213
-          lastcolumn: 218
-          kind: 0
-        - message: Calling `vector()` will return a vector value with no labels.
+        - message: The right hand side will never be matched because it doesn't have the `region` label while the left hand side will. Calling `vector()` will return a vector value with no labels.
           firstcolumn: 199
           lastcolumn: 204
-          kind: 1
+          kind: 0
     lines:
         first: 4
         last: 8

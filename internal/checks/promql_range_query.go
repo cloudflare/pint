@@ -118,7 +118,7 @@ func (c RangeQueryCheck) Check(ctx context.Context, entry *discovery.Entry, _ []
 
 func (c RangeQueryCheck) checkSources(expr *parser.PromQLExpr, retention time.Duration, reason string, s Severity) (problems []Problem) {
 	for _, src := range expr.Source() {
-		src.WalkSources(func(src source.Source, _ *source.Join, _ *source.Unless) {
+		src.WalkSources(func(src *source.Source, _ *source.Join, _ *source.Unless) {
 			n, ok := source.MostOuterOperation[*promParser.MatrixSelector](src)
 			if !ok {
 				return

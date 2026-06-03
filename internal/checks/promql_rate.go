@@ -114,7 +114,7 @@ func (c RateCheck) collectRateMetricNames(expr *parser.PromQLExpr, entries []*di
 	}
 
 	for _, src := range expr.Source() {
-		src.WalkSources(func(s source.Source, _ *source.Join, _ *source.Unless) {
+		src.WalkSources(func(s *source.Source, _ *source.Join, _ *source.Unless) {
 			call, found := findRateCall(s)
 			// deriv() doesn't require a counter, skip metadata collection for it.
 			if !found || call.Func.Name == "deriv" {
@@ -161,7 +161,7 @@ func (c RateCheck) checkSources(
 	done := map[string]struct{}{}
 
 	for _, src := range expr.Source() {
-		src.WalkSources(func(s source.Source, _ *source.Join, _ *source.Unless) {
+		src.WalkSources(func(s *source.Source, _ *source.Join, _ *source.Unless) {
 			call, ok := findRateCall(s)
 			if !ok {
 				return
@@ -317,7 +317,7 @@ func (c RateCheck) checkSources(
 	return problems
 }
 
-func findRateCall(s source.Source) (*promParser.Call, bool) {
+func findRateCall(s *source.Source) (*promParser.Call, bool) {
 	for _, op := range s.Operations {
 		call, ok := op.Node.(*promParser.Call)
 		if !ok {

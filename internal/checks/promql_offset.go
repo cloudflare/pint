@@ -85,7 +85,7 @@ func (c OffsetCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*dis
 
 func (c OffsetCheck) checkSources(expr *parser.PromQLExpr, retention time.Duration, reason string) (problems []Problem) {
 	for _, src := range expr.Source() {
-		src.WalkSources(func(s source.Source, _ *source.Join, _ *source.Unless) {
+		src.WalkSources(func(s *source.Source, _ *source.Join, _ *source.Unless) {
 			if vs, ok := source.MostOuterOperation[*promParser.VectorSelector](s); ok && vs.OriginalOffset > retention {
 				problems = append(problems, c.offsetProblem(expr, s, vs, vs.OriginalOffset, reason))
 			}
@@ -104,7 +104,7 @@ func (c OffsetCheck) checkSources(expr *parser.PromQLExpr, retention time.Durati
 	return problems
 }
 
-func (c OffsetCheck) offsetProblem(expr *parser.PromQLExpr, s source.Source, node promParser.Node, offset time.Duration, reason string) Problem {
+func (c OffsetCheck) offsetProblem(expr *parser.PromQLExpr, s *source.Source, node promParser.Node, offset time.Duration, reason string) Problem {
 	firstColumn, lastColumn := findOffsetColumns(expr.Value.Value, s, node)
 	return Problem{
 		Anchor:   AnchorAfter,
@@ -131,7 +131,7 @@ func (c OffsetCheck) offsetProblem(expr *parser.PromQLExpr, s source.Source, nod
 	}
 }
 
-func findOffsetColumns(query string, s source.Source, node promParser.Node) (firstColumn, lastColumn int) {
+func findOffsetColumns(query string, s *source.Source, node promParser.Node) (firstColumn, lastColumn int) {
 	nodeStart := int(node.PositionRange().Start)
 
 	var endPos int

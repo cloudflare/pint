@@ -165,7 +165,7 @@ func (so Operation) MarshalYAML() (any, error) {
 
 type Operations []Operation
 
-func MostOuterOperation[T promParser.Node](s Source) (T, bool) {
+func MostOuterOperation[T promParser.Node](s *Source) (T, bool) {
 	for _, op := range slices.Backward(s.Operations) {
 		if o, ok := op.Node.(T); ok {
 			return o, true
@@ -181,9 +181,11 @@ type Fill struct {
 
 type Join struct {
 	Fill           *Fill // Fill values for unmatched series (binop fill modifiers).
+	DeadInfo       *DeadInfo
+	Src            *Source     // The source we're joining with.
+	DeadLabels     []DeadLabel // Per-pairing dead labels from checkJoinedLabels/checkIncludedLabels.
 	MatchingLabels []string
 	AddedLabels    []string
-	Src            Source              // The source we're joining with.
 	Op             promParser.ItemType // The binary operation used for this join.
 	Depth          int                 // Zero if this is a direct join, non-zero otherwise. sum(foo * bar) would be in-direct join.
 	IsOn           bool
@@ -202,12 +204,32 @@ func (j Join) MarshalYAML() (any, error) {
 	if j.Fill != nil {
 		m["fill"] = j.Fill
 	}
+	if j.DeadInfo != nil {
+		m["deadinfo"] = j.DeadInfo
+	}
+	if len(j.DeadLabels) > 0 {
+		m["deadlabels"] = j.DeadLabels
+	}
+	return m, nil
+}
+
+// Used for test snapshots.
+func (u Unless) MarshalYAML() (any, error) {
+	m := map[string]any{
+		"matchinglabels": u.MatchingLabels,
+		"src":            u.Src,
+		"ison":           u.IsOn,
+	}
+	if u.DeadInfo != nil {
+		m["deadinfo"] = u.DeadInfo
+	}
 	return m, nil
 }
 
 type Unless struct {
+	DeadInfo       *DeadInfo
+	Src            *Source
 	MatchingLabels []string
-	Src            Source
 	IsOn           bool
 }
 
@@ -228,7 +250,7 @@ type Source struct {
 	// Any other sources this source is suppressed by.
 	Unless []Unless `yaml:"unless,omitempty"`
 	// Any other sources used indirectly, not contributing labels.
-	Indirect      []Source               `yaml:"indirect,omitempty"`
+	Indirect      []*Source              `yaml:"indirect,omitempty"`
 	NeedsFeatures []FeatureRequirement   `yaml:"needsFeatures,omitempty"`
 	UsedLabels    []string               `yaml:"usedLabels,omitempty"`
 	ReturnInfo    ReturnInfo             `yaml:"returnInfo,omitempty"`
@@ -267,6 +289,12 @@ func (s *Source) requireFeature(name string, pos posrange.PositionRange) {
 		Name:      name,
 		Fragments: []posrange.PositionRange{pos},
 	})
+}
+
+func (s *Source) clone() *Source {
+	c := new(Source)
+	*c = *s
+	return c
 }
 
 func (s Source) Operation() string {
@@ -418,11 +446,12 @@ func (s *Source) guaranteeLabel(reason string, fragment posrange.PositionRange, 
 	}
 }
 
-func (s *Source) checkIncludedLabels(expr string, pos posrange.PositionRange, names []string) {
+func findDeadIncludedLabels(s *Source, expr string, pos posrange.PositionRange, names []string) []DeadLabel {
+	var dead []DeadLabel
 	for _, name := range names {
 		if !s.CanHaveLabel(name) {
 			reason, fragment := s.LabelExcludeReason(name)
-			s.DeadLabels = append(s.DeadLabels, DeadLabel{
+			dead = append(dead, DeadLabel{
 				Kind:          ImpossibleDeadLabel,
 				Name:          name,
 				Reason:        "You can't use `" + name + "` because this label is not possible here.",
@@ -432,6 +461,11 @@ func (s *Source) checkIncludedLabels(expr string, pos posrange.PositionRange, na
 			})
 		}
 	}
+	return dead
+}
+
+func (s *Source) checkIncludedLabels(expr string, pos posrange.PositionRange, names []string) {
+	s.DeadLabels = append(s.DeadLabels, findDeadIncludedLabels(s, expr, pos, names)...)
 }
 
 func (s *Source) checkAggregationLabels(expr string, n *promParser.AggregateExpr) {
@@ -488,7 +522,7 @@ func (s *Source) findLabelTransform(name string) *LabelTransform {
 	return nil
 }
 
-func (s *Source) checkJoinedLabels(expr string, n *promParser.BinaryExpr, dst Source) (dead []DeadLabel) {
+func (s *Source) checkJoinedLabels(expr string, n *promParser.BinaryExpr, dst *Source) (dead []DeadLabel) {
 	pos := findBinOpsOperatorPosition(expr, n, promParser.ItemTypeStr[n.Op])
 	for _, j := range s.Joins {
 		for _, name := range j.AddedLabels {
@@ -543,30 +577,30 @@ func (s *Source) useLabelsNotExcluded(excluded []string) {
 	s.UsedLabels = appendToSlice(s.UsedLabels, toAdd...)
 }
 
-type Visitor func(s Source, j *Join, u *Unless)
+type Visitor func(s *Source, j *Join, u *Unless)
 
-func innerWalk(fn Visitor, s Source, j *Join, u *Unless) {
+func innerWalk(fn Visitor, s *Source, j *Join, u *Unless) {
 	fn(s, j, u)
-	for _, j := range s.Joins {
-		innerWalk(fn, j.Src, &j, nil)
+	for i := range s.Joins {
+		innerWalk(fn, s.Joins[i].Src, &s.Joins[i], nil)
 	}
-	for _, u := range s.Unless {
-		innerWalk(fn, u.Src, nil, &u)
+	for i := range s.Unless {
+		innerWalk(fn, s.Unless[i].Src, nil, &s.Unless[i])
 	}
 	for _, ind := range s.Indirect {
 		innerWalk(fn, ind, nil, nil)
 	}
 }
 
-func (s Source) WalkSources(fn Visitor) {
+func (s *Source) WalkSources(fn Visitor) {
 	innerWalk(fn, s, nil, nil)
 }
 
-func LabelsSource(expr string, node promParser.Node) (src []Source) {
+func LabelsSource(expr string, node promParser.Node) (src []*Source) {
 	return walkNode(expr, node)
 }
 
-func walkNode(expr string, node promParser.Node) (src []Source) {
+func walkNode(expr string, node promParser.Node) (src []*Source) {
 	switch n := node.(type) {
 	case *promParser.AggregateExpr:
 		src = append(src, walkAggregation(expr, n)...)
@@ -616,7 +650,7 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 		}
 
 	case *promParser.NumberLiteral:
-		var s Source
+		s := new(Source)
 		s.Labels = map[string]LabelTransform{}
 		s.Type = NumberSource
 		s.Returns = promParser.ValueTypeScalar
@@ -632,7 +666,7 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 		src = append(src, walkNode(expr, n.Expr)...)
 
 	case *promParser.StringLiteral:
-		var s Source
+		s := new(Source)
 		s.Labels = map[string]LabelTransform{}
 		s.Type = StringSource
 		s.Returns = promParser.ValueTypeString
@@ -648,7 +682,7 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 	// Not possible to get this from the parser.
 
 	case *promParser.VectorSelector:
-		var s Source
+		s := new(Source)
 		s.Labels = map[string]LabelTransform{}
 		s.Type = SelectorSource
 		s.Returns = promParser.ValueTypeVector
@@ -727,8 +761,8 @@ func GetQueryFragment(expr string, pos posrange.PositionRange) string {
 	return expr[pos.Start:pos.End]
 }
 
-func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
-	var s Source
+func walkAggregation(expr string, n *promParser.AggregateExpr) (src []*Source) {
+	var s *Source
 
 	var args []string
 	if n.Param != nil {
@@ -787,8 +821,8 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 	return src
 }
 
-func parseAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
-	var s Source
+func parseAggregation(expr string, n *promParser.AggregateExpr) (src []*Source) {
+	var s *Source
 	for _, s = range walkNode(expr, n.Expr) {
 		// If we have sum(foo * bar) then we start with:
 		// - source: foo
@@ -849,7 +883,7 @@ func parseAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 	return src
 }
 
-func parsePromQLFunc(s Source, expr string, n *promParser.Call) Source {
+func parsePromQLFunc(s *Source, expr string, n *promParser.Call) *Source {
 	s.requireFeature(n.Func.Name, FindFuncNamePosition(expr, n.PositionRange(), n.Func.Name))
 	switch n.Func.Name {
 	case "abs", "sgn",
@@ -1117,15 +1151,15 @@ If you're hoping to get instance specific labels this way and alert when some ta
 
 	default:
 		// Unsupported function
-		return Source{} // nolint: exhaustruct
+		return new(Source)
 	}
 	return s
 }
 
-func parseCall(expr string, n *promParser.Call) (src []Source) {
+func parseCall(expr string, n *promParser.Call) (src []*Source) {
 	var args []string
 	var exprs []promParser.Expr
-	var indirect []Source
+	var indirect []*Source
 
 	var vt promParser.ValueType
 	for i, e := range n.Args {
@@ -1161,19 +1195,18 @@ func parseCall(expr string, n *promParser.Call) (src []Source) {
 	}
 
 	if len(src) == 0 {
-		s := Source{ // nolint: exhaustruct
-			Labels:   map[string]LabelTransform{},
-			Type:     FuncSource,
-			Indirect: indirect,
-			Operations: Operations{
-				{
-					Operation: n.Func.Name,
-					Node:      n,
-					Arguments: args,
-				},
+		s := new(Source)
+		s.Labels = map[string]LabelTransform{}
+		s.Type = FuncSource
+		s.Indirect = indirect
+		s.Operations = Operations{
+			{
+				Operation: n.Func.Name,
+				Node:      n,
+				Arguments: args,
 			},
-			Position: n.PosRange,
 		}
+		s.Position = n.PosRange
 		src = append(src, parsePromQLFunc(s, expr, n))
 	}
 
@@ -1226,9 +1259,9 @@ func walkDurationExprFeatures(s *Source, de *promParser.DurationExpr) {
 	}
 }
 
-func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
+func parseBinOps(expr string, n *promParser.BinaryExpr) (src []*Source) {
 	pos := n.PositionRange()
-	src = make([]Source, 0, 2)
+	src = make([]*Source, 0, 2)
 	switch {
 	// foo{} + 1
 	// 1 + foo{}
@@ -1238,10 +1271,8 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 		lhs := walkNode(expr, n.LHS)
 		rhs := walkNode(expr, n.RHS)
 		for _, ls := range lhs {
-			ls.IsConditional, ls.ReturnInfo.IsReturnBool = checkConditions(ls, n.Op, n.ReturnBool)
 			for _, rs := range rhs {
-				rs.IsConditional, rs.ReturnInfo.IsReturnBool = checkConditions(rs, n.Op, n.ReturnBool)
-				var side, other Source
+				var side, other *Source
 				switch {
 				case ls.Returns == promParser.ValueTypeVector, ls.Returns == promParser.ValueTypeMatrix:
 					// Use labels from LHS
@@ -1255,12 +1286,22 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					side = ls
 					other = rs
 				}
-				side.Indirect = append(side.Indirect, other)
+				// We walk RHS multiple times because we might have query like:
+				// foo or bar > 0
+				// Where LHS is [foo, bar] while RHS is [0]
+				// And we end up with multiple sources:
+				// - foo > 0
+				// - bar > 0
+				// As we walk RHS multiple times we might end up mutating the same
+				// Source, and so to avoid that we need to clone it first.
+				result := side.clone()
+				result.Indirect = append(result.Indirect, other)
+				result.IsConditional, result.ReturnInfo.IsReturnBool = checkConditions(result, n.Op, n.ReturnBool)
 				if ls.ReturnInfo.AlwaysReturns && rs.ReturnInfo.AlwaysReturns && ls.ReturnInfo.KnownReturn && rs.ReturnInfo.KnownReturn {
 					// Both sides always return something
-					side.ReturnInfo, side.DeadInfo = calculateStaticReturn(expr, ls, rs, n)
+					result.ReturnInfo, result.DeadInfo = calculateStaticReturn(expr, ls, rs, n)
 				}
-				src = append(src, side)
+				src = append(src, result)
 			}
 		}
 
@@ -1306,7 +1347,6 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					)
 				}
 				for _, rs := range rhs {
-					rs.IsConditional, rs.ReturnInfo.IsReturnBool = checkConditions(rs, n.Op, n.ReturnBool)
 					if ls.ReturnInfo.AlwaysReturns && rs.ReturnInfo.AlwaysReturns && ls.ReturnInfo.KnownReturn && rs.ReturnInfo.KnownReturn {
 						// Both sides always return something
 						ls.ReturnInfo, ls.DeadInfo = calculateStaticReturn(expr, ls, rs, n)
@@ -1314,9 +1354,10 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 				}
 			}
 			for _, rs := range rhs {
-				rs.DeadLabels = append(rs.DeadLabels, rs.checkJoinedLabels(expr, n, rs)...)
+				deadLabels := rs.checkJoinedLabels(expr, n, rs)
+				var deadInfo *DeadInfo
 				if ok, s, p := canJoin(ls, rs, n.VectorMatching); !ok {
-					rs.DeadInfo = &DeadInfo{
+					deadInfo = &DeadInfo{
 						Reason:   s,
 						Fragment: p,
 					}
@@ -1325,6 +1366,8 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 				ls.Joins = append(ls.Joins, Join{
 					Src:            rs,
 					Fill:           fill,
+					DeadInfo:       deadInfo,
+					DeadLabels:     deadLabels,
 					Op:             n.Op,
 					Depth:          0,
 					MatchingLabels: n.VectorMatching.MatchingLabels,
@@ -1377,7 +1420,8 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 				rs.useLabelsNotExcluded(n.VectorMatching.MatchingLabels)
 			}
 			for _, ls := range lhs {
-				ls.checkIncludedLabels(
+				deadLabels := findDeadIncludedLabels(
+					ls,
 					expr,
 					FindFuncPosition(expr, pos, promParser.ItemTypeStr[promParser.GROUP_RIGHT], []posrange.PositionRange{
 						n.LHS.PositionRange(),
@@ -1386,8 +1430,9 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					n.VectorMatching.Include,
 				)
 				rs.DeadLabels = append(rs.DeadLabels, ls.checkJoinedLabels(expr, n, rs)...)
+				var deadInfo *DeadInfo
 				if ok, s, p := canJoin(rs, ls, n.VectorMatching); !ok {
-					ls.DeadInfo = &DeadInfo{
+					deadInfo = &DeadInfo{
 						Reason:   s,
 						Fragment: p,
 					}
@@ -1396,6 +1441,8 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 				rs.Joins = append(rs.Joins, Join{
 					Src:            ls,
 					Fill:           fill,
+					DeadInfo:       deadInfo,
+					DeadLabels:     deadLabels,
 					Op:             n.Op,
 					Depth:          0,
 					MatchingLabels: n.VectorMatching.MatchingLabels,
@@ -1444,7 +1491,8 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 				ls.useLabelsNotExcluded(n.VectorMatching.MatchingLabels)
 			}
 			for _, rs := range rhs {
-				rs.checkIncludedLabels(
+				deadLabels := findDeadIncludedLabels(
+					rs,
 					expr,
 					FindFuncPosition(expr, pos, promParser.ItemTypeStr[promParser.GROUP_LEFT], []posrange.PositionRange{
 						n.LHS.PositionRange(),
@@ -1453,8 +1501,9 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					n.VectorMatching.Include,
 				)
 				ls.DeadLabels = append(ls.DeadLabels, rs.checkJoinedLabels(expr, n, ls)...)
+				var deadInfo *DeadInfo
 				if ok, s, p := canJoin(ls, rs, n.VectorMatching); !ok {
-					rs.DeadInfo = &DeadInfo{
+					deadInfo = &DeadInfo{
 						Reason:   s,
 						Fragment: p,
 					}
@@ -1463,6 +1512,8 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 				ls.Joins = append(ls.Joins, Join{
 					Src:            rs,
 					Fill:           fill,
+					DeadInfo:       deadInfo,
+					DeadLabels:     deadLabels,
 					Op:             n.Op,
 					Depth:          0,
 					MatchingLabels: n.VectorMatching.MatchingLabels,
@@ -1536,8 +1587,9 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 				if isConditional {
 					rhsConditional = true
 				}
+				var deadInfo *DeadInfo
 				if ok, s, p := canJoin(ls, rs, n.VectorMatching); !ok {
-					rs.DeadInfo = &DeadInfo{
+					deadInfo = &DeadInfo{
 						Reason:   s,
 						Fragment: p,
 					}
@@ -1551,6 +1603,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 						}
 					}
 					ls.Unless = append(ls.Unless, Unless{
+						DeadInfo:       deadInfo,
 						Src:            rs,
 						MatchingLabels: n.VectorMatching.MatchingLabels,
 						IsOn:           n.VectorMatching.On,
@@ -1559,6 +1612,8 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					ls.Joins = append(ls.Joins, Join{
 						Src:            rs,
 						Fill:           nil,
+						DeadInfo:       deadInfo,
+						DeadLabels:     nil,
 						Op:             n.Op,
 						Depth:          0,
 						MatchingLabels: n.VectorMatching.MatchingLabels,
@@ -1589,7 +1644,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 	return src
 }
 
-func checkConditions(s Source, op promParser.ItemType, isBool bool) (isConditional, isReturnBool bool) {
+func checkConditions(s *Source, op promParser.ItemType, isBool bool) (isConditional, isReturnBool bool) {
 	if !s.IsConditional && isBool {
 		isReturnBool = isBool
 	}
@@ -1601,7 +1656,7 @@ func checkConditions(s Source, op promParser.ItemType, isBool bool) (isCondition
 	return isConditional, isReturnBool
 }
 
-func canJoin(ls, rs Source, vm *promParser.VectorMatching) (bool, string, posrange.PositionRange) {
+func canJoin(ls, rs *Source, vm *promParser.VectorMatching) (bool, string, posrange.PositionRange) {
 	var side string
 	if vm.Card == promParser.CardOneToMany {
 		side = "left"
@@ -1638,7 +1693,7 @@ func canJoin(ls, rs Source, vm *promParser.VectorMatching) (bool, string, posran
 	return true, "", posrange.PositionRange{}
 }
 
-func describeDeadCode(expr string, ls, rs Source, op *promParser.BinaryExpr, match string) *DeadInfo {
+func describeDeadCode(expr string, ls, rs *Source, op *promParser.BinaryExpr, match string) *DeadInfo {
 	var lse, rse string
 	if ls.ReturnInfo.LogicalExpr != "" {
 		lse = ls.ReturnInfo.LogicalExpr
@@ -1672,7 +1727,7 @@ func describeDeadCode(expr string, ls, rs Source, op *promParser.BinaryExpr, mat
 	}
 }
 
-func calculateStaticReturn(expr string, ls, rs Source, op *promParser.BinaryExpr) (ret ReturnInfo, deadinfo *DeadInfo) {
+func calculateStaticReturn(expr string, ls, rs *Source, op *promParser.BinaryExpr) (ret ReturnInfo, deadinfo *DeadInfo) {
 	ret = ls.ReturnInfo
 	switch op.Op {
 	case promParser.EQLC:
@@ -1721,7 +1776,7 @@ func calculateStaticReturn(expr string, ls, rs Source, op *promParser.BinaryExpr
 	return ret, deadinfo
 }
 
-func formatDesc(expr string, ls, rs Source, op string) string {
+func formatDesc(expr string, ls, rs *Source, op string) string {
 	var lse, rse string
 	if ls.ReturnInfo.LogicalExpr != "" {
 		lse = ls.ReturnInfo.LogicalExpr

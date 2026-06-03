@@ -1002,7 +1002,7 @@ func selectorWithoutOffset(vs *promParser.VectorSelector) *promParser.VectorSele
 	return s
 }
 
-func sourceHasFallback(src []source.Source) bool {
+func sourceHasFallback(src []*source.Source) bool {
 	for _, ls := range src {
 		if ls.ReturnInfo.AlwaysReturns {
 			return true

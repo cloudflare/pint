@@ -282,7 +282,7 @@ func (c TemplateCheck) checkHumanizeIsNeeded(expr parser.PromQLExpr, ann *parser
 	return problems
 }
 
-func isRateResult(src source.Source) *promParser.Call {
+func isRateResult(src *source.Source) *promParser.Call {
 	if src.Type == source.AggregateSource {
 		switch src.Operation() {
 		case "count", "count_values", "group":
@@ -605,7 +605,7 @@ func findTemplateVariables(_, text string) (vars []tmplVar, aliases aliasMap, ok
 	return vars, aliases, true
 }
 
-func (c TemplateCheck) checkQueryLabels(group *parser.Group, rule parser.Rule, label *parser.YamlKeyValue, src []source.Source, a templateMeta) (problems []Problem) {
+func (c TemplateCheck) checkQueryLabels(group *parser.Group, rule parser.Rule, label *parser.YamlKeyValue, src []*source.Source, a templateMeta) (problems []Problem) {
 	if !a.isValid {
 		return nil
 	}
