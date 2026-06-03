@@ -362,7 +362,7 @@ func (s *Source) excludeAllLabels(expr, reason string, fragment, allFragment pos
 			s.Labels[name] = LabelTransform{
 				Kind:     PossibleLabel,
 				Reason:   reason,
-				Fragment: FindArgumentPosition(expr, fragment, name),
+				Fragment: findArgumentPosition(expr, fragment, name),
 			}
 		} else {
 			r, f := s.LabelExcludeReason(name)
@@ -400,7 +400,7 @@ func (s *Source) joinLabels(expr string, within posrange.PositionRange, op promP
 				Kind:   DuplicatedJoin,
 				Name:   name,
 				Reason: "Query is trying to join the `" + name + "` label that is already present on the other side of the query.",
-				UsageFragment: FindArgumentPosition(
+				UsageFragment: findArgumentPosition(
 					expr,
 					FindFuncPosition(expr, within, promParser.ItemTypeStr[op], outside),
 					name,
@@ -416,7 +416,7 @@ func (s *Source) joinLabels(expr string, within posrange.PositionRange, op promP
 				"Query is using `%s(%s)`, all labels included inside `%s(...)` will be joined to the results on the other side of the query.",
 				promParser.ItemTypeStr[op], strings.Join(names, ", "), promParser.ItemTypeStr[op],
 			),
-			Fragment: FindArgumentPosition(
+			Fragment: findArgumentPosition(
 				expr,
 				FindFuncPosition(expr, within, promParser.ItemTypeStr[op], outside),
 				name,
@@ -432,7 +432,7 @@ func (s *Source) includeLabel(expr, reason string, fragment posrange.PositionRan
 	s.Labels[name] = LabelTransform{
 		Kind:     PossibleLabel,
 		Reason:   reason,
-		Fragment: FindArgumentPosition(expr, fragment, name),
+		Fragment: findArgumentPosition(expr, fragment, name),
 	}
 }
 
@@ -455,7 +455,7 @@ func findDeadIncludedLabels(s *Source, expr string, pos posrange.PositionRange, 
 				Kind:          ImpossibleDeadLabel,
 				Name:          name,
 				Reason:        "You can't use `" + name + "` because this label is not possible here.",
-				UsageFragment: FindArgumentPosition(expr, pos, name),
+				UsageFragment: findArgumentPosition(expr, pos, name),
 				LabelReason:   reason,
 				LabelFragment: fragment,
 			})
@@ -502,7 +502,7 @@ func (s *Source) checkAggregationLabels(expr string, n *promParser.AggregateExpr
 				Kind:          UnusedLabel,
 				Name:          name,
 				Reason:        fmt.Sprintf("Previously joined label `%s` is being removed from the results.", name),
-				UsageFragment: FindArgumentPosition(expr, pos, name),
+				UsageFragment: findArgumentPosition(expr, pos, name),
 				LabelReason:   labelReason,
 				LabelFragment: labelPos,
 			})
@@ -841,7 +841,7 @@ func parseAggregation(expr string, n *promParser.AggregateExpr) (src []*Source) 
 				s.excludeLabel(
 					fmt.Sprintf("Query is using aggregation with `%s(%s)`, all labels included inside `%s(...)` will be removed from the results.",
 						promParser.ItemTypeStr[promParser.WITHOUT], strings.Join(n.Grouping, ", "), promParser.ItemTypeStr[promParser.WITHOUT]),
-					FindArgumentPosition(
+					findArgumentPosition(
 						expr,
 						FindFuncPosition(expr, n.PosRange, promParser.ItemTypeStr[promParser.WITHOUT], nil),
 						name,
@@ -1336,7 +1336,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []*Source) {
 							"Query is using %s vector matching with `%s(%s)`, all labels included inside `%s(...)` will be removed on the results.",
 							n.VectorMatching.Card, promParser.ItemTypeStr[promParser.IGNORING], strings.Join(n.VectorMatching.MatchingLabels, ", "), promParser.ItemTypeStr[promParser.IGNORING],
 						),
-						FindArgumentPosition(
+						findArgumentPosition(
 							expr,
 							FindFuncPosition(expr, pos, promParser.ItemTypeStr[promParser.IGNORING], []posrange.PositionRange{
 								n.LHS.PositionRange(), n.RHS.PositionRange(),
@@ -1406,7 +1406,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []*Source) {
 							"Query is using %s vector matching with `on(%s)`, labels included inside `on(...)` will be present on the results.",
 							n.VectorMatching.Card, strings.Join(n.VectorMatching.MatchingLabels, ", "),
 						),
-						FindArgumentPosition(
+						findArgumentPosition(
 							expr,
 							FindFuncPosition(expr, pos, promParser.ItemTypeStr[promParser.ON], []posrange.PositionRange{
 								n.LHS.PositionRange(), n.RHS.PositionRange(),
@@ -1477,7 +1477,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []*Source) {
 							"Query is using %s vector matching with `on(%s)`, labels included inside `on(...)` will be present on the results.",
 							n.VectorMatching.Card, strings.Join(n.VectorMatching.MatchingLabels, ", "),
 						),
-						FindArgumentPosition(
+						findArgumentPosition(
 							expr,
 							FindFuncPosition(expr, pos, promParser.ItemTypeStr[promParser.ON], []posrange.PositionRange{
 								n.LHS.PositionRange(), n.RHS.PositionRange(),
@@ -1566,7 +1566,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []*Source) {
 							"Query is using %s vector matching with `on(%s)`, labels included inside `on(...)` will be present on the results if matched time series have them.",
 							n.VectorMatching.Card, strings.Join(n.VectorMatching.MatchingLabels, ", "),
 						),
-						FindArgumentPosition(
+						findArgumentPosition(
 							expr,
 							FindFuncPosition(expr, pos, promParser.ItemTypeStr[promParser.ON], []posrange.PositionRange{
 								n.LHS.PositionRange(), n.RHS.PositionRange(),
@@ -1852,7 +1852,7 @@ func FindFuncPosition(expr string, within posrange.PositionRange, fn string, out
 	return within
 }
 
-func FindArgumentPosition(expr string, within posrange.PositionRange, name string) posrange.PositionRange {
+func findArgumentPosition(expr string, within posrange.PositionRange, name string) posrange.PositionRange {
 	re := regexp.MustCompile("(?s)\\((?:(.*,?))(?:[ \n\t]*?)(" + regexp.QuoteMeta(name) + ")(?:[ \n\t]*?)(?:(,.*)?)\\)")
 	idx := re.FindStringSubmatchIndex(GetQueryFragment(expr, within))
 	if idx == nil {
