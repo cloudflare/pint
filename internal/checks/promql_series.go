@@ -776,15 +776,19 @@ func (c SeriesCheck) checkOtherServer(ctx context.Context, query string, setting
 		return SeriesCheckCommonProblemDetails, true
 	}
 
-	queryCtx, cancel := context.WithTimeout(ctx, settings.fallbackTimeout)
-	defer cancel()
-
 	type pendingQuery struct {
 		prom    *promapi.FailoverGroup
 		pending *promapi.Request[*promapi.QueryResult]
 	}
 
+	queryCtx, cancel := context.WithTimeout(ctx, settings.fallbackTimeout)
 	pending := make([]pendingQuery, 0, len(servers))
+	defer func() {
+		cancel()
+		for _, pq := range pending {
+			_, _ = pq.pending.Wait()
+		}
+	}()
 	for _, prom := range servers {
 		slog.LogAttrs(
 			ctx, slog.LevelDebug, "Checking if metric exists on any other Prometheus server",
