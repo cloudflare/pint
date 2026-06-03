@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/neilotoole/slogt"
+	"github.com/neilotoole/slogt/v2"
 
 	"github.com/cloudflare/pint/internal/config"
 	"github.com/cloudflare/pint/internal/discovery"

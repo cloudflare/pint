@@ -15,9 +15,9 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/neilotoole/slogt"
+	"github.com/neilotoole/slogt/v2"
 	"github.com/stretchr/testify/require"
-	gitlab "gitlab.com/gitlab-org/api/client-go"
+	gitlab "gitlab.com/gitlab-org/api/client-go/v2"
 	"go.nhat.io/httpmock"
 
 	"github.com/cloudflare/pint/internal/checks"

@@ -78,5 +78,5 @@ benchmark-diff:
 
 .PHONY: update-major-imports
 update-major-imports:
-	@grep '/v' go.mod | grep -v '// indirect' | cut -d/ -f -3 | while read L ; do echo ">>> $$L" ; go tool -modfile=tools/gomajor/go.mod gomajor get -major "$$L"@latest ; done
+	@go tool -modfile=tools/gomajor/go.mod gomajor list | cut -d: -f1 | while read -r L ; do echo ">>> $$L" ; go tool -modfile=tools/gomajor/go.mod gomajor get -major "$$L"@latest ; done
 	go mod tidy

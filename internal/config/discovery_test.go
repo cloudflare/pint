@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/neilotoole/slogt"
+	"github.com/neilotoole/slogt/v2"
 	"github.com/stretchr/testify/require"
 )
 

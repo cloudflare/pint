@@ -20,7 +20,7 @@ import (
 	"time"
 
 	"github.com/gkampitakis/go-snaps/snaps"
-	"github.com/neilotoole/slogt"
+	"github.com/neilotoole/slogt/v2"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/model"
