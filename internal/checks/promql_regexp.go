@@ -83,6 +83,7 @@ func (c RegexpCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*dis
 	}
 
 	done := map[string]struct{}{}
+	syntaxCache := map[string]*syntax.Regexp{}
 	for _, src := range expr.Source() {
 		src.WalkSources(func(s *source.Source, _ *source.Join, _ *source.Unless) {
 			vs, ok := source.MostOuterOperation[*promParser.VectorSelector](s)
@@ -123,7 +124,11 @@ func (c RegexpCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*dis
 				var hasFlags, isUseful, isWildcard, isLiteral, isBad bool
 				var beginText, endText int
 				var literalValue strings.Builder
-				r, _ := syntax.Parse(re, syntax.Perl)
+				r, ok := syntaxCache[re]
+				if !ok {
+					r, _ = syntax.Parse(re, syntax.Perl)
+					syntaxCache[re] = r
+				}
 				for _, s := range r.Sub {
 					// nolint: exhaustive
 					switch s.Op {
