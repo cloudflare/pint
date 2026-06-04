@@ -220,7 +220,7 @@ func (c RegexpCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*dis
 						b.lm, b.lm.Name, b.op, b.literalValue)
 
 				}
-				pos := findMatcherPos(expr.Value.Value, b.pos, b.lm)
+				pos := source.FindMatcherPos(expr.Value.Value, b.pos, b.lm)
 				problems = append(problems, Problem{
 					Anchor:   AnchorAfter,
 					Lines:    expr.Value.Pos.Lines(),
@@ -234,7 +234,7 @@ func (c RegexpCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*dis
 							Pos:         expr.Value.Pos,
 							Expr:        expr.Query().Expr,
 							FirstColumn: int(pos.Start) + 1,
-							LastColumn:  int(pos.End) + 1,
+							LastColumn:  int(pos.End),
 							Kind:        diags.Issue,
 						},
 					},
@@ -337,20 +337,4 @@ func hasSmellyWildcard(subs iter.Seq2[int, *syntax.Regexp], anchorOp syntax.Op) 
 		}
 	}
 	return false
-}
-
-// findMatcherPos locates 'name op "value"' (e.g. job=~"foo") in the expression fragment
-// and returns the position from "name" to just before the closing quote.
-func findMatcherPos(expr string, within posrange.PositionRange, m *labels.Matcher) posrange.PositionRange {
-	fragment := source.GetQueryFragment(expr, within)
-	// Build the full pattern: name + op + "value" (e.g. job=~"foo").
-	pattern := m.Name + m.Type.String() + `"` + m.Value + `"`
-	idx := strings.Index(fragment, pattern)
-	if idx < 0 {
-		return within
-	}
-	return posrange.PositionRange{
-		Start: within.Start + posrange.Pos(idx),
-		End:   within.Start + posrange.Pos(idx+len(pattern)-1),
-	}
 }

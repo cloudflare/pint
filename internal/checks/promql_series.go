@@ -511,7 +511,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 			}
 			lms := lm.String()
 
-			pos := findMatcherPos(expr.Value.Value, selector.PosRange, lm)
+			pos := source.FindMatcherPos(expr.Value.Value, selector.PosRange, lm)
 			labelSelector := &promParser.VectorSelector{
 				Name:          metricName,
 				LabelMatchers: []*labels.Matcher{lm},
@@ -553,7 +553,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 							Pos:         expr.Value.Pos,
 							Expr:        expr.Query().Expr,
 							FirstColumn: int(pos.Start) + 1,
-							LastColumn:  int(pos.End) + 1,
+							LastColumn:  int(pos.End),
 							Kind:        diags.Issue,
 						},
 					},
@@ -627,7 +627,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 							Pos:         expr.Value.Pos,
 							Expr:        expr.Query().Expr,
 							FirstColumn: int(pos.Start) + 1,
-							LastColumn:  int(pos.End) + 1,
+							LastColumn:  int(pos.End),
 							Kind:        diags.Issue,
 						},
 					},
@@ -661,7 +661,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 							Pos:         expr.Value.Pos,
 							Expr:        expr.Query().Expr,
 							FirstColumn: int(pos.Start) + 1,
-							LastColumn:  int(pos.End) + 1,
+							LastColumn:  int(pos.End),
 							Kind:        diags.Issue,
 						},
 					},

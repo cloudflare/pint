@@ -1,0 +1,364 @@
+
+[TestFindFuncNamePosition/matches_across_newline_and_tab_before_the_paren - 1]
+fn: sum
+expr:
+SuM
+^^^
+    (x)
+---
+
+[TestFindFuncNamePosition/matches_an_aggregation_wrapping_a_nested_call - 1]
+fn: sum
+expr:
+sum(rate(foo[5m]))
+^^^               
+---
+
+[TestFindFuncNamePosition/matches_case-insensitively - 1]
+fn: sum
+expr:
+SUM(foo)
+^^^     
+---
+
+[TestFindFuncNamePosition/matches_the_call_and_not_a_longer_identifier_with_the_same_prefix - 1]
+fn: sum
+expr:
+sum(summary)
+^^^         
+---
+
+[TestFindFuncNamePosition/matches_the_function_name_before_the_paren - 1]
+fn: sum
+expr:
+sum(foo)
+^^^     
+---
+
+[TestFindFuncNamePosition/matches_with_whitespace_before_the_paren - 1]
+fn: sum
+expr:
+sum (foo)
+^^^^     
+---
+
+[TestFindFuncNamePosition/respects_the_within_offset - 1]
+fn: sum
+expr:
+xx sum(foo)
+   ^^^     
+---
+
+[TestFindFuncNamePosition/returns_the_first_occurrence_when_the_name_repeats - 1]
+fn: sum
+expr:
+sum(sum) by(sum)
+^^^             
+---
+
+[TestFindFuncNamePosition/returns_within_when_fn_is_absent - 1]
+fn: rate
+expr:
+sum(foo)
+^^^^^^^^
+---
+
+[TestFindFuncNamePosition/returns_within_when_the_name_is_followed_by_a_non-paren_token - 1]
+fn: by
+expr:
+by job
+^^^^^^
+---
+
+[TestFindFuncNamePosition/returns_within_when_the_name_only_appears_inside_a_word - 1]
+fn: by
+expr:
+bytes
+^^^^^
+---
+
+[TestFindFuncNamePosition/skips_an_occurrence_inside_a_word_and_matches_the_call - 1]
+fn: sum
+expr:
+sumx + sum(foo)
+       ^^^     
+---
+
+[TestFindFuncNamePosition/skips_the_name_inside_a_leading_word_and_matches_the_later_call - 1]
+fn: sum
+expr:
+summary + sum(x)
+          ^^^   
+---
+
+[TestFindFuncPosition/ends_a_nested_call_at_the_first_closing_paren - 1]
+fn: scalar
+outside: none
+expr:
+scalar(vector(1))
+^^^^^^^^^^^^^^^^ 
+---
+
+[TestFindFuncPosition/finds_the_keyword_between_operands_when_the_operands_are_excluded - 1]
+fn: on
+outside: 0-2, 11-13
+expr:
+aa * on(b) cc
+     ^^^^^   
+---
+
+[TestFindFuncPosition/matches_a_grouping_keyword_call - 1]
+fn: by
+outside: none
+expr:
+sum(sum) by(sum)
+         ^^^^^^^
+---
+
+[TestFindFuncPosition/matches_a_multiline_grouping_with_mixed_whitespace - 1]
+fn: by
+outside: none
+expr:
+sum(foo)
+by(
+^^^
+    job
+    ^^^
+)
+^
+---
+
+[TestFindFuncPosition/matches_the_first_call_when_the_name_repeats - 1]
+fn: sum
+outside: none
+expr:
+sum(sum) by(sum)
+^^^^^^^^        
+---
+
+[TestFindFuncPosition/matches_the_whole_call_when_no_outside_ranges_are_given - 1]
+fn: sum
+outside: none
+expr:
+x sum(foo)
+  ^^^^^^^^
+---
+
+[TestFindFuncPosition/matches_when_the_outside_range_does_not_contain_the_match - 1]
+fn: sum
+outside: 50-60
+expr:
+x sum(foo)
+  ^^^^^^^^
+---
+
+[TestFindFuncPosition/returns_within_when_every_match_is_contained_in_an_outside_range - 1]
+fn: sum
+outside: 0-100
+expr:
+x sum(foo)
+^^^^^^^^^^
+---
+
+[TestFindFuncPosition/returns_within_when_fn_is_absent - 1]
+fn: rate
+outside: none
+expr:
+x sum(foo)
+^^^^^^^^^^
+---
+
+[TestFindFuncPosition/returns_within_when_the_call_has_no_closing_paren - 1]
+fn: sum
+outside: none
+expr:
+sum(foo
+^^^^^^^
+---
+
+[TestFindFuncPosition/returns_within_when_the_only_match_is_contained_in_an_outside_range - 1]
+fn: on
+outside: 0-100
+expr:
+x on(b)
+^^^^^^^
+---
+
+[TestFindFuncPosition/skips_fn_not_followed_by_a_paren_and_matches_a_later_call - 1]
+fn: sum
+outside: none
+expr:
+sumx + sum(foo)
+       ^^^^^^^^
+---
+
+[TestFindMatcherPos/matches_a_negative_equality_matcher - 1]
+matcher: job!="bar"
+expr:
+foo{job!="bar"}
+    ^^^^^^^^^^ 
+---
+
+[TestFindMatcherPos/matches_a_negative_regexp_matcher - 1]
+matcher: job!~"bar"
+expr:
+foo{job!~"bar"}
+    ^^^^^^^^^^ 
+---
+
+[TestFindMatcherPos/matches_an_equality_matcher - 1]
+matcher: job="bar"
+expr:
+foo{job="bar"}
+    ^^^^^^^^^ 
+---
+
+[TestFindMatcherPos/matches_name_op_and_quoted_value - 1]
+matcher: job=~"bar"
+expr:
+foo{job=~"bar"}
+    ^^^^^^^^^^ 
+---
+
+[TestFindMatcherPos/matches_the_requested_matcher_among_several - 1]
+matcher: job=~"bar"
+expr:
+foo{a="1",job=~"bar"}
+          ^^^^^^^^^^ 
+---
+
+[TestFindMatcherPos/returns_within_when_the_matcher_is_absent - 1]
+matcher: job=~"baz"
+expr:
+foo{job=~"bar"}
+^^^^^^^^^^^^^^^
+---
+
+[TestFindMatcherPos/returns_within_when_the_value_contains_an_escaped_quote - 1]
+matcher: job="a\"b"
+expr:
+foo{job="a\"b"}
+^^^^^^^^^^^^^^^
+---
+
+[TestLabelsSourceFindArgumentPositionCoverage/find_first_label_in_multiline_grouping_with_tabs_and_spaces - 1]
+label: job
+expr:
+sum(foo) by(
+    job,
+    ^^^ 
+       instance,
+        region
+)
+---
+
+[TestLabelsSourceFindArgumentPositionCoverage/find_label_in_deeply_nested_aggregation_grouping - 1]
+label: job
+expr:
+sum(sum(sum(foo) by(job)) by(job)) by(job)
+                    ^^^                   
+---
+
+[TestLabelsSourceFindArgumentPositionCoverage/find_last_label_in_multiline_grouping_with_tabs_and_spaces - 1]
+label: region
+expr:
+sum(foo) by(
+    job,
+       instance,
+        region
+        ^^^^^^
+)
+---
+
+[TestLabelsSourceFindArgumentPositionCoverage/find_middle_label_in_multiline_grouping_with_tabs_and_spaces - 1]
+label: instance
+expr:
+sum(foo) by(
+    job,
+       instance,
+       ^^^^^^^^ 
+        region
+)
+---
+
+[TestLabelsSourceFindArgumentPositionCoverage/label_named_like_the_aggregation_it_groups - 1]
+label: sum
+expr:
+sum(sum) by(sum)
+            ^^^ 
+---
+
+[TestLabelsSourceFindArgumentPositionCoverage/label_named_like_the_metric_inside_without_grouping - 1]
+label: rate
+expr:
+sum(rate) without(rate)
+                  ^^^^ 
+---
+
+[TestLabelsSourceFindArgumentPositionCoverage/skip_invalid_suffix_and_keep_searching_for_earlier_valid_match - 1]
+label: job
+expr:
+(foo * on(job) group_left(cluster) bar) and on(job) baz{job="x"}
+                                               ^^^              
+---
+
+[TestLabelsSourceFindArgumentPositionCoverage/skip_label_name_embedded_in_another_identifier - 1]
+label: job
+expr:
+sum(foo) by(job, notjob)
+            ^^^         
+---
+
+[TestLabelsSourceFindArgumentPositionCoverage/skip_label_name_that_is_a_prefix_of_an_earlier_argument - 1]
+label: job
+expr:
+sum(foo) by(jobx, job)
+                  ^^^ 
+---
+
+[TestLabelsSourceFindArgumentPositionCoverage/skip_mixed_whitespace_in_multi-argument_list - 1]
+label: job
+expr:
+sum(foo) by(
+  job,
+  ^^^ 
+  instance
+)
+---
+
+[TestLabelsSourceFindArgumentPositionCoverage/skip_multiple_spaces_around_label_name - 1]
+label: job
+expr:
+sum(foo) by(   job   )
+               ^^^    
+---
+
+[TestLabelsSourceFindArgumentPositionCoverage/skip_newlines_around_label_name - 1]
+label: job
+expr:
+sum(foo) by(
+job
+^^^
+)
+---
+
+[TestLabelsSourceFindArgumentPositionCoverage/skip_tabs_around_label_name - 1]
+label: job
+expr:
+sum(foo) by( job )
+             ^^^  
+---
+
+[TestLabelsSourceFindArgumentPositionCoverage/skip_whitespace_before_closing_delimiter - 1]
+label: job
+expr:
+sum(foo) by(job )
+            ^^^  
+---
+
+[TestLabelsSourceFindArgumentPositionCoverage/skip_whitespace_before_label_name - 1]
+label: job
+expr:
+sum(foo) by( job)
+             ^^^ 
+---

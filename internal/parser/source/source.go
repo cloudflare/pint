@@ -3,7 +3,6 @@ package source
 import (
 	"fmt"
 	"math"
-	"regexp"
 	"slices"
 	"strconv"
 	"strings"
@@ -755,10 +754,6 @@ func labelsWithEmptyValueSelector(selector *promParser.VectorSelector) (names []
 		}
 	}
 	return names
-}
-
-func GetQueryFragment(expr string, pos posrange.PositionRange) string {
-	return expr[pos.Start:pos.End]
 }
 
 func walkAggregation(expr string, n *promParser.AggregateExpr) (src []*Source) {
@@ -1789,92 +1784,4 @@ func formatDesc(expr string, ls, rs *Source, op string) string {
 		rse = GetQueryFragment(expr, rs.ReturnInfo.ValuePosition)
 	}
 	return lse + " " + op + " " + rse
-}
-
-func isOutside(pos posrange.PositionRange, outside []posrange.PositionRange) bool {
-	for _, out := range outside {
-		if pos.Start >= out.Start && pos.End <= out.End {
-			return false
-		}
-	}
-	return true
-}
-
-// FindFuncNamePosition finds "fn(" (case-insensitive, optional whitespace before paren)
-// and returns the position of "fn" without the paren.
-func FindFuncNamePosition(expr string, within posrange.PositionRange, fn string) posrange.PositionRange {
-	fragment := GetQueryFragment(expr, within)
-	lower := strings.ToLower(fragment)
-	fnLower := strings.ToLower(fn)
-	offset := 0
-	for {
-		// Find next case-insensitive occurrence of fn.
-		idx := strings.Index(lower[offset:], fnLower)
-		if idx < 0 {
-			return within
-		}
-		idx += offset
-		end := idx + len(fn)
-		// Check that fn is followed by optional whitespace then '('.
-		// This skips false positives like "by" inside "bytes".
-		for i := end; i < len(fragment); i++ {
-			c := fragment[i]
-			if c == '(' {
-				return posrange.PositionRange{
-					Start: within.Start + posrange.Pos(idx),
-					End:   within.Start + posrange.Pos(i),
-				}
-			}
-			if c != ' ' && c != '\n' && c != '\t' {
-				break // Not whitespace, not '(' — this occurrence is inside a word.
-			}
-		}
-		offset = idx + 1 // Try next occurrence.
-	}
-}
-
-func FindFuncPosition(expr string, within posrange.PositionRange, fn string, outside []posrange.PositionRange) posrange.PositionRange {
-	re := regexp.MustCompile("(?si)(" + regexp.QuoteMeta(fn) + ")(?:[ \n\t]*?)\\((?:.*?)\\)")
-	idx := re.FindStringSubmatchIndex(GetQueryFragment(expr, within))
-	if idx == nil {
-		return within
-	}
-	var pos posrange.PositionRange
-	for chk := range slices.Chunk(idx, 2) {
-		pos = posrange.PositionRange{
-			Start: within.Start + posrange.Pos(chk[0]),
-			End:   within.Start + posrange.Pos(chk[1]),
-		}
-		if isOutside(pos, outside) {
-			return pos
-		}
-	}
-	return within
-}
-
-func findArgumentPosition(expr string, within posrange.PositionRange, name string) posrange.PositionRange {
-	re := regexp.MustCompile("(?s)\\((?:(.*,?))(?:[ \n\t]*?)(" + regexp.QuoteMeta(name) + ")(?:[ \n\t]*?)(?:(,.*)?)\\)")
-	idx := re.FindStringSubmatchIndex(GetQueryFragment(expr, within))
-	if idx == nil {
-		return within
-	}
-	return posrange.PositionRange{
-		Start: within.Start + posrange.Pos(idx[4]),
-		End:   within.Start + posrange.Pos(idx[5]),
-	}
-}
-
-func findBinOpsOperatorPosition(expr string, n *promParser.BinaryExpr, op string) posrange.PositionRange {
-	within := posrange.PositionRange{
-		Start: n.LHS.PositionRange().End + 1,
-		End:   n.RHS.PositionRange().Start,
-	}
-	idx := strings.Index(GetQueryFragment(expr, within), op)
-	if idx < 0 {
-		return within
-	}
-	return posrange.PositionRange{
-		Start: within.Start + posrange.Pos(idx),
-		End:   within.Start + posrange.Pos(idx+len(op)),
-	}
 }

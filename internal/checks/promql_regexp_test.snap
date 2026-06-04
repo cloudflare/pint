@@ -591,7 +591,7 @@
     diagnostics:
         - message: Unnecessary regexp match on static string `job=~"foo\"bar"`, use `job="foo\"bar"` instead.
           firstcolumn: 1
-          lastcolumn: 21
+          lastcolumn: 20
           kind: 0
     lines:
         first: 2
