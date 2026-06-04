@@ -109,30 +109,30 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Content-Type: application/json
 --- BODY ---
 text: |
-  :stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **rule/owner** check.
+    :stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **rule/owner** check.
 
-  <details>
-  <summary>missing owner</summary>
+    <details>
+    <summary>missing owner</summary>
 
-  ```yaml
-  5 |     expr: up > 0
-                ^^^
-  ```
+    ```yaml
+    5 |     expr: up > 0
+                  ^^^
+    ```
 
-  `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule.
+    `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule.
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/rule/owner.html).
+    :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/rule/owner.html).
 severity: NORMAL
 anchor:
-  path: rules.yml
-  lineType: ADDED
-  fileType: TO
-  diffType: EFFECTIVE
-  line: 4
+    path: rules.yml
+    lineType: ADDED
+    fileType: TO
+    diffType: EFFECTIVE
+    line: 4
 --- END ---
 
 POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
@@ -141,29 +141,29 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Content-Type: application/json
 --- BODY ---
 text: |
-  :stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **rule/owner** check.
+    :stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **rule/owner** check.
 
-  <details>
-  <summary>invalid owner</summary>
+    <details>
+    <summary>invalid owner</summary>
 
-  ```yaml
-  8 |     expr: up == 0
-                ^^^
-  ```
+    ```yaml
+    8 |     expr: up == 0
+                  ^^^
+    ```
 
-  This rule is set as owned by `bob` but `bob` doesn't match any of the allowed owner values.
+    This rule is set as owned by `bob` but `bob` doesn't match any of the allowed owner values.
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/rule/owner.html).
+    :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/rule/owner.html).
 severity: NORMAL
 anchor:
-  path: rules.yml
-  lineType: ADDED
-  fileType: TO
-  diffType: EFFECTIVE
-  line: 7
+    path: rules.yml
+    lineType: ADDED
+    fileType: TO
+    diffType: EFFECTIVE
+    line: 7
 --- END ---
 

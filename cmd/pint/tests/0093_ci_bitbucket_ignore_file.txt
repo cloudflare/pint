@@ -79,29 +79,29 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Content-Type: application/json
 --- BODY ---
 text: |
-  :information_source: **Information** reported by [pint](https://cloudflare.github.io/pint/) **ignore/file** check.
+    :information_source: **Information** reported by [pint](https://cloudflare.github.io/pint/) **ignore/file** check.
 
-  <details>
-  <summary>This file was excluded from pint checks.</summary>
+    <details>
+    <summary>This file was excluded from pint checks.</summary>
 
-  ```yaml
-  1 | # pint ignore/file
-      ^^^^^^^^^^^^^^^^^^
-  ```
+    ```yaml
+    1 | # pint ignore/file
+        ^^^^^^^^^^^^^^^^^^
+    ```
 
-  This file was excluded from pint checks.
+    This file was excluded from pint checks.
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/ignore/file.html).
+    :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/ignore/file.html).
 severity: NORMAL
 anchor:
-  path: rules.yml
-  lineType: ADDED
-  fileType: TO
-  diffType: EFFECTIVE
-  line: 3
+    path: rules.yml
+    lineType: ADDED
+    fileType: TO
+    diffType: EFFECTIVE
+    line: 3
 --- END ---
 

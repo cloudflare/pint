@@ -116,24 +116,24 @@ POST /api/v3/repos/foo/bar/pulls/123/comments
   X-Github-Api-Version: 2022-11-28
 --- BODY ---
 body: |
-  :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **rule/dependency** check.
+    :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **rule/dependency** check.
 
-  ------
+    ------
 
-  rule results used by another rule
+    rule results used by another rule
 
-  <details>
-  <summary>More information</summary>
-  If you remove the recording rule generating `up:sum`, and there is no other source of this metric, then any other rule depending on it will break.
-  List of found rules that are using `up:sum`:
+    <details>
+    <summary>More information</summary>
+    If you remove the recording rule generating `up:sum`, and there is no other source of this metric, then any other rule depending on it will break.
+    List of found rules that are using `up:sum`:
 
-  - `AlertBroken` at `alert.yml:5`
+    - `AlertBroken` at `alert.yml:5`
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/rule/dependency.html).
+    :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/rule/dependency.html).
 path: record.yml
 line: 6
 side: LEFT
@@ -155,38 +155,38 @@ POST /api/v3/repos/foo/bar/pulls/123/reviews
 --- BODY ---
 commit_id: <COMMIT ID>
 body: |+
-  ### This pull request was validated by [pint](https://github.com/cloudflare/pint).
-  :heavy_exclamation_mark:	Problems found.
-  | Severity | Number of problems |
-  | --- | --- |
-  | Warning | 1 |
-  <details><summary>Stats</summary>
-  <p>
+    ### This pull request was validated by [pint](https://github.com/cloudflare/pint).
+    :heavy_exclamation_mark:	Problems found.
+    | Severity | Number of problems |
+    | --- | --- |
+    | Warning | 1 |
+    <details><summary>Stats</summary>
+    <p>
 
-  | Stat | Value |
-  | --- | --- |
-  | Version | unknown |
-  | Number of rules parsed | 5 |
-  | Number of rules checked | 5 |
-  | Number of problems found | 1 |
-  | Number of offline checks | 2 |
-  | Number of online checks | 0 |
-  | Checks duration | 0 |
+    | Stat | Value |
+    | --- | --- |
+    | Version | unknown |
+    | Number of rules parsed | 5 |
+    | Number of rules checked | 5 |
+    | Number of problems found | 1 |
+    | Number of offline checks | 2 |
+    | Number of online checks | 0 |
+    | Checks duration | 0 |
 
-  </p>
-  </details>
+    </p>
+    </details>
 
-  <details><summary>Problems</summary>
-  <p>
+    <details><summary>Problems</summary>
+    <p>
 
-  ```
-  Warning: rule results used by another rule (rule/dependency)
-    ---> record.yml:6 (deleted) -> `up:sum`
+    ```
+    Warning: rule results used by another rule (rule/dependency)
+      ---> record.yml:6 (deleted) -> `up:sum`
 
-  ```
+    ```
 
-  </p>
-  </details>
+    </p>
+    </details>
 
 event: COMMENT
 --- END ---

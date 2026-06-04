@@ -99,47 +99,47 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Content-Type: application/json
 --- BODY ---
 text: |
-  :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **alerts/comparison** check.
+    :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **alerts/comparison** check.
 
-  <details>
-  <summary>always firing alert</summary>
+    <details>
+    <summary>always firing alert</summary>
 
-  ```yaml
-  2 |   expr: sum(foo{job=~"xxx"}) by(job)
-                  ^^^^^^^^^^^^^^^
-  ```
+    ```yaml
+    2 |   expr: sum(foo{job=~"xxx"}) by(job)
+                    ^^^^^^^^^^^^^^^
+    ```
 
-  This query doesn't have any condition and so this alert will always fire if it matches anything.
+    This query doesn't have any condition and so this alert will always fire if it matches anything.
 
-  Prometheus alerting rules will trigger an alert for each query that returns *any* result.
-  Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.
-  In most cases this can be achieved by having some condition in the query expression.
-  For example `up == 0` or `rate(error_total[2m]) > 0`.
-  Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
+    Prometheus alerting rules will trigger an alert for each query that returns *any* result.
+    Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.
+    In most cases this can be achieved by having some condition in the query expression.
+    For example `up == 0` or `rate(error_total[2m]) > 0`.
+    Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  The same issue was reported 1 more time(s), duplicates where suppressed.
+    The same issue was reported 1 more time(s), duplicates where suppressed.
 
-  <details>
-  <summary>Show affected rules</summary>
+    <details>
+    <summary>Show affected rules</summary>
 
-  - `rule2b` at `rules.yml:5`
+    - `rule2b` at `rules.yml:5`
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/comparison.html).
+    :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/comparison.html).
 severity: NORMAL
 anchor:
-  path: rules.yml
-  lineType: ADDED
-  fileType: TO
-  diffType: EFFECTIVE
-  line: 1
+    path: rules.yml
+    lineType: ADDED
+    fileType: TO
+    diffType: EFFECTIVE
+    line: 1
 --- END ---
 
 POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
@@ -148,43 +148,43 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Content-Type: application/json
 --- BODY ---
 text: |
-  :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **promql/regexp** check.
+    :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **promql/regexp** check.
 
-  <details>
-  <summary>redundant regexp</summary>
+    <details>
+    <summary>redundant regexp</summary>
 
-  ```yaml
-  2 |   expr: sum(foo{job=~"xxx"}) by(job)
-                      ^^^^^^^^^^
-  ```
+    ```yaml
+    2 |   expr: sum(foo{job=~"xxx"}) by(job)
+                        ^^^^^^^^^^
+    ```
 
-  Unnecessary regexp match on static string `job=~"xxx"`, use `job="xxx"` instead.
+    Unnecessary regexp match on static string `job=~"xxx"`, use `job="xxx"` instead.
 
-  See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  The same issue was reported 1 more time(s), duplicates where suppressed.
+    The same issue was reported 1 more time(s), duplicates where suppressed.
 
-  <details>
-  <summary>Show affected rules</summary>
+    <details>
+    <summary>Show affected rules</summary>
 
-  - `rule2b` at `rules.yml:5`
+    - `rule2b` at `rules.yml:5`
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/regexp.html).
+    :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/regexp.html).
 severity: NORMAL
 anchor:
-  path: rules.yml
-  lineType: ADDED
-  fileType: TO
-  diffType: EFFECTIVE
-  line: 1
+    path: rules.yml
+    lineType: ADDED
+    fileType: TO
+    diffType: EFFECTIVE
+    line: 1
 --- END ---
 
 POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
@@ -193,40 +193,40 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Content-Type: application/json
 --- BODY ---
 text: |
-  :information_source: **Information** reported by [pint](https://cloudflare.github.io/pint/) **alerts/for** check.
+    :information_source: **Information** reported by [pint](https://cloudflare.github.io/pint/) **alerts/for** check.
 
-  <details>
-  <summary>redundant field with default value</summary>
+    <details>
+    <summary>redundant field with default value</summary>
 
-  ```yaml
-  3 |   for: 0s
-             ^^
-  ```
+    ```yaml
+    3 |   for: 0s
+               ^^
+    ```
 
-  `0s` is the default value of `for`, this line is unnecessary.
+    `0s` is the default value of `for`, this line is unnecessary.
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  The same issue was reported 1 more time(s), duplicates where suppressed.
+    The same issue was reported 1 more time(s), duplicates where suppressed.
 
-  <details>
-  <summary>Show affected rules</summary>
+    <details>
+    <summary>Show affected rules</summary>
 
-  - `rule2b` at `rules.yml:6`
+    - `rule2b` at `rules.yml:6`
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/for.html).
+    :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/for.html).
 severity: NORMAL
 anchor:
-  path: rules.yml
-  lineType: ADDED
-  fileType: TO
-  diffType: EFFECTIVE
-  line: 3
+    path: rules.yml
+    lineType: ADDED
+    fileType: TO
+    diffType: EFFECTIVE
+    line: 3
 --- END ---
 

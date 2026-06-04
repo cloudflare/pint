@@ -84,37 +84,37 @@ POST /api/v4/projects/1234/merge_requests/1/discussions
   Private-Token: secret
 --- BODY ---
 body: |
-  :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **alerts/comparison** check.
+    :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **alerts/comparison** check.
 
-  <details>
-  <summary>always firing alert</summary>
+    <details>
+    <summary>always firing alert</summary>
 
-  ```yaml
-  7 |     expr: sum(foo) by(job)
-                    ^^^
-  ```
+    ```yaml
+    7 |     expr: sum(foo) by(job)
+                      ^^^
+    ```
 
-  This query doesn't have any condition and so this alert will always fire if it matches anything.
+    This query doesn't have any condition and so this alert will always fire if it matches anything.
 
-  Prometheus alerting rules will trigger an alert for each query that returns *any* result.
-  Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.
-  In most cases this can be achieved by having some condition in the query expression.
-  For example `up == 0` or `rate(error_total[2m]) > 0`.
-  Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
+    Prometheus alerting rules will trigger an alert for each query that returns *any* result.
+    Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.
+    In most cases this can be achieved by having some condition in the query expression.
+    For example `up == 0` or `rate(error_total[2m]) > 0`.
+    Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/comparison.html).
+    :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/comparison.html).
 position:
-  base_sha: base
-  head_sha: head
-  start_sha: start
-  new_path: rules.yml
-  old_path: rules.yml
-  position_type: text
-  new_line: 8
+    base_sha: base
+    head_sha: head
+    start_sha: start
+    new_path: rules.yml
+    old_path: rules.yml
+    position_type: text
+    new_line: 8
 --- END ---
 
 POST /api/v4/projects/1234/merge_requests/1/discussions
@@ -124,30 +124,30 @@ POST /api/v4/projects/1234/merge_requests/1/discussions
   Private-Token: secret
 --- BODY ---
 body: |
-  :information_source: **Information** reported by [pint](https://cloudflare.github.io/pint/) **alerts/for** check.
+    :information_source: **Information** reported by [pint](https://cloudflare.github.io/pint/) **alerts/for** check.
 
-  <details>
-  <summary>redundant field with default value</summary>
+    <details>
+    <summary>redundant field with default value</summary>
 
-  ```yaml
-  8 |     for: 0s
-               ^^
-  ```
+    ```yaml
+    8 |     for: 0s
+                 ^^
+    ```
 
-  `0s` is the default value of `for`, this line is unnecessary.
+    `0s` is the default value of `for`, this line is unnecessary.
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/for.html).
+    :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/for.html).
 position:
-  base_sha: base
-  head_sha: head
-  start_sha: start
-  new_path: rules.yml
-  old_path: rules.yml
-  position_type: text
-  new_line: 8
+    base_sha: base
+    head_sha: head
+    start_sha: start
+    new_path: rules.yml
+    old_path: rules.yml
+    position_type: text
+    new_line: 8
 --- END ---
 

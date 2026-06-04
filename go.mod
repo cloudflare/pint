@@ -9,7 +9,6 @@ require (
 	github.com/google/go-cmp v0.7.0
 	github.com/google/go-github/v88 v88.0.0
 	github.com/hashicorp/hcl/v2 v2.24.0
-	github.com/itchyny/json2yaml v0.1.5
 	github.com/klauspost/compress v1.18.6
 	github.com/neilotoole/slogt/v2 v2.0.0
 	github.com/prometheus/client_golang v1.23.2

@@ -93,30 +93,30 @@ POST /api/v3/repos/cloudflare/pint/pulls/1/reviews
 --- BODY ---
 commit_id: <COMMIT ID>
 body: |+
-  ### This pull request was validated by [pint](https://github.com/cloudflare/pint).
-  :heavy_check_mark: No problems found
-  <details><summary>Stats</summary>
-  <p>
+    ### This pull request was validated by [pint](https://github.com/cloudflare/pint).
+    :heavy_check_mark: No problems found
+    <details><summary>Stats</summary>
+    <p>
 
-  | Stat | Value |
-  | --- | --- |
-  | Version | unknown |
-  | Number of rules parsed | 1 |
-  | Number of rules checked | 1 |
-  | Number of problems found | 0 |
-  | Number of offline checks | 9 |
-  | Number of online checks | 0 |
-  | Checks duration | 0 |
+    | Stat | Value |
+    | --- | --- |
+    | Version | unknown |
+    | Number of rules parsed | 1 |
+    | Number of rules checked | 1 |
+    | Number of problems found | 0 |
+    | Number of offline checks | 9 |
+    | Number of online checks | 0 |
+    | Checks duration | 0 |
 
-  </p>
-  </details>
+    </p>
+    </details>
 
-  <details><summary>Problems</summary>
-  <p>
+    <details><summary>Problems</summary>
+    <p>
 
-  No problems reported
-  </p>
-  </details>
+    No problems reported
+    </p>
+    </details>
 
 event: COMMENT
 --- END ---

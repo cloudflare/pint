@@ -74,30 +74,30 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Content-Type: application/json
 --- BODY ---
 text: |
-  :stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **rule/owner** check.
+    :stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **rule/owner** check.
 
-  <details>
-  <summary>missing owner</summary>
+    <details>
+    <summary>missing owner</summary>
 
-  ```yaml
-  5 |     expr: sum(foo) by(job
-                ^^^
-  ```
+    ```yaml
+    5 |     expr: sum(foo) by(job
+                  ^^^
+    ```
 
-  `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule.
+    `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule.
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/rule/owner.html).
+    :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/rule/owner.html).
 severity: NORMAL
 anchor:
-  path: rules.yml
-  lineType: ADDED
-  fileType: TO
-  diffType: EFFECTIVE
-  line: 5
+    path: rules.yml
+    lineType: ADDED
+    fileType: TO
+    diffType: EFFECTIVE
+    line: 5
 --- END ---
 
 POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
@@ -106,31 +106,31 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Content-Type: application/json
 --- BODY ---
 text: |
-  :stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **promql/syntax** check.
+    :stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **promql/syntax** check.
 
-  <details>
-  <summary>PromQL syntax error</summary>
+    <details>
+    <summary>PromQL syntax error</summary>
 
-  ```yaml
-  5 |     expr: sum(foo) by(job
-                              ^
-  ```
+    ```yaml
+    5 |     expr: sum(foo) by(job
+                                ^
+    ```
 
-  unclosed left parenthesis
+    unclosed left parenthesis
 
-  [Click here](https://prometheus.io/docs/prometheus/latest/querying/basics/) for PromQL documentation.
+    [Click here](https://prometheus.io/docs/prometheus/latest/querying/basics/) for PromQL documentation.
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/syntax.html).
+    :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/syntax.html).
 severity: NORMAL
 anchor:
-  path: rules.yml
-  lineType: ADDED
-  fileType: TO
-  diffType: EFFECTIVE
-  line: 5
+    path: rules.yml
+    lineType: ADDED
+    fileType: TO
+    diffType: EFFECTIVE
+    line: 5
 --- END ---
 

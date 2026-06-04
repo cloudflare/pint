@@ -127,31 +127,31 @@ POST /api/v4/projects/1234/merge_requests/1/discussions
   Private-Token: secret
 --- BODY ---
 body: |
-  :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **rule/dependency** check.
+    :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **rule/dependency** check.
 
-  ------
+    ------
 
-  rule results used by another rule
+    rule results used by another rule
 
-  <details>
-  <summary>More information</summary>
-  If you remove the recording rule generating `up:sum`, and there is no other source of this metric, then any other rule depending on it will break.
-  List of found rules that are using `up:sum`:
+    <details>
+    <summary>More information</summary>
+    If you remove the recording rule generating `up:sum`, and there is no other source of this metric, then any other rule depending on it will break.
+    List of found rules that are using `up:sum`:
 
-  - `AlertBroken` at `alert.yml:5`
+    - `AlertBroken` at `alert.yml:5`
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/rule/dependency.html).
+    :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/rule/dependency.html).
 position:
-  base_sha: base
-  head_sha: head
-  start_sha: start
-  new_path: record.yml
-  old_path: record.yml
-  position_type: text
-  old_line: 6
+    base_sha: base
+    head_sha: head
+    start_sha: start
+    new_path: record.yml
+    old_path: record.yml
+    position_type: text
+    old_line: 6
 --- END ---
 

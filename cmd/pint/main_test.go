@@ -24,8 +24,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/itchyny/json2yaml"
 	"github.com/rogpeppe/go-internal/testscript"
+	"go.yaml.in/yaml/v3"
 )
 
 func TestMain(m *testing.M) {
@@ -399,10 +399,24 @@ func sanitizePayload(payload []byte) []byte {
 	commitIDRe := regexp.MustCompile(`"commit_id":"([0-9a-zA-Z]{40})"`)
 	payload = commitIDRe.ReplaceAll(payload, []byte(`"commit_id":"<COMMIT ID>"`))
 
-	var output bytes.Buffer
-	if err := json2yaml.Convert(&output, bytes.NewReader(payload)); err != nil {
+	var node yaml.Node
+	if err := yaml.Unmarshal(payload, &node); err != nil {
+		return payload
+	}
+	// Without this we'd emit flow style ({...}) instead of block style (| ...).
+	forceBlockStyle(&node)
+
+	output, err := yaml.Marshal(&node)
+	if err != nil {
 		return payload
 	}
 
-	return output.Bytes()
+	return output
+}
+
+func forceBlockStyle(node *yaml.Node) {
+	node.Style = 0
+	for _, child := range node.Content {
+		forceBlockStyle(child)
+	}
 }
