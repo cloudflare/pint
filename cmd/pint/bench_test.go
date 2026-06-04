@@ -80,6 +80,81 @@ func BenchmarkGitFinder(b *testing.B) {
 	}
 }
 
+func benchmarkConfig(uri string) []byte {
+	return fmt.Appendf(nil, `prometheus "prom" {
+  uri         = "%s"
+  timeout     = "30s"
+  uptime      = "prometheus_ready"
+  concurrency = 10
+  rateLimit   = 5000
+}
+
+rule {
+  alerts {
+    range    = "1h"
+    step     = "1m"
+    resolve  = "5m"
+    minCount = 50
+  }
+}
+rule {
+  reject "https?://.+" {
+    label_keys   = true
+    label_values = true
+  }
+}
+
+rule {
+  match {
+    kind = "alerting"
+  }
+  annotation "summary" {
+    severity = "bug"
+    required = true
+  }
+  annotation "dashboard" {
+    severity = "warning"
+    value    = "https://(.+)"
+  }
+
+  label "priority" {
+    severity = "bug"
+    value    = "(1|2|3|4)"
+    required = true
+  }
+
+  label "component" {
+    severity = "bug"
+    required = true
+  }
+
+  annotation "link" {
+    severity = "warning"
+    value    = "https://(.+)"
+  }
+}
+
+rule {
+  match {
+    kind = "recording"
+  }
+  aggregate ".+" {
+    severity = "bug"
+    keep     = ["job"]
+  }
+}
+
+rule {
+  cost {
+    maxSeries             = 2000
+    maxPeakSamples        = 200000
+    maxEvaluationDuration = "30s"
+    severity              = "warning"
+  }
+}
+`, uri)
+}
+
 func BenchmarkCheck(b *testing.B) {
 	log.Setup(slog.LevelError, true)
 
@@ -125,72 +200,7 @@ func BenchmarkCheck(b *testing.B) {
 	b.Cleanup(srv.Close)
 
 	tmp := b.TempDir()
-	content := fmt.Appendf(nil, `prometheus "prom" {
-  uri         = "%s"
-  timeout     = "30s"
-  uptime      = "prometheus_ready"
-  concurrency = 10
-  rateLimit   = 5000
-}
-
-rule {
-  alerts {
-    range    = "1h"
-    step     = "1m"
-    resolve  = "5m"
-    minCount = 50
-  }
-}
-rule {
-  reject "https?://.+" {
-    label_keys   = true
-    label_values = true
-  }
-}
-rule {
-  match {
-    kind = "alerting"
-  }
-  annotation "summary" {
-    severity = "bug"
-    required = true
-  }
-  annotation "dashboard" {
-    severity = "warning"
-    value    = "https://(.+)"
-  }
-  label "priority" {
-    severity = "bug"
-    value    = "(1|2|3|4)"
-    required = true
-  }
-  label "component" {
-    severity = "bug"
-    required = true
-  }
-  annotation "link" {
-    severity = "warning"
-    value    = "https://(.+)"
-  }
-}
-rule {
-  match {
-    kind = "recording"
-  }
-  aggregate ".+" {
-    severity = "bug"
-    keep     = ["job"]
-  }
-}
-rule {
-  cost {
-    maxSeries             = 2000
-    maxPeakSamples        = 200000
-    maxEvaluationDuration = "30s"
-    severity              = "warning"
-  }
-}
-`, srv.URL)
+	content := benchmarkConfig(srv.URL)
 	require.NoError(b, os.WriteFile(tmp+"/.pint.hcl", content, 0o644))
 
 	cfg, _, err := config.Load(tmp+"/.pint.hcl", false)
@@ -216,6 +226,11 @@ rule {
 
 	for reporter, items := range byReporter {
 		b.Run(reporter, func(b *testing.B) {
+			// Warm up the cache, without this first run is super expensive
+			// compared to all other runs, which creates huge variance in benchmark output.
+			for _, item := range items {
+				item.check.Check(b.Context(), item.entry, entries)
+			}
 			for b.Loop() {
 				for _, item := range items {
 					item.check.Check(b.Context(), item.entry, entries)
@@ -266,79 +281,7 @@ func BenchmarkGetChecksForEntry(b *testing.B) {
 	}
 
 	tmp := b.TempDir()
-	content := []byte(`
-prometheus "prom" {
-  uri         = "http://localhost:9090"
-  timeout     = "30s"
-  uptime      = "prometheus_ready"
-  concurrency = 10
-  rateLimit   = 5000
-}
-
-rule {
-  alerts {
-    range    = "1h"
-    step     = "1m"
-    resolve  = "5m"
-    minCount = 50
-  }
-}
-rule {
-  reject "https?://.+" {
-    label_keys   = true
-    label_values = true
-  }
-}
-
-rule {
-  match {
-    kind = "alerting"
-  }
-  annotation "summary" {
-    severity = "bug"
-    required = true
-  }
-  annotation "dashboard" {
-    severity = "warning"
-	value    = "https://(.+)"
-  }
-
-  label "priority" {
-    severity = "bug"
-    value    = "(1|2|3|4)"
-    required = true
-  }
-
-  label "component" {
-    severity = "bug"
-    required = true
-  }
-
-  annotation "link" {
-    severity = "warning"
-    value    = "https://(.+)"
-  }
-}
-
-rule {
-  match {
-    kind = "recording"
-  }
-  aggregate ".+" {
-    severity = "bug"
-    keep     = ["job"]
-  }
-}
-
-rule {
-  cost {
-    maxSeries             = 2000
-    maxPeakSamples        = 200000
-    maxEvaluationDuration = "30s"
-    severity              = "warning"
-  }
-}
-`)
+	content := benchmarkConfig("http://localhost:9090")
 	require.NoError(b, os.WriteFile(tmp+"/.pint.hcl", content, 0o644))
 
 	cfg, _, err := config.Load(tmp+"/.pint.hcl", false)
