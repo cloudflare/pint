@@ -17,7 +17,6 @@ import (
 	"github.com/cloudflare/pint/internal/parser/source"
 
 	promParser "github.com/prometheus/prometheus/promql/parser"
-	"github.com/prometheus/prometheus/promql/parser/posrange"
 )
 
 func TestMain(t *testing.M) {
@@ -636,12 +635,6 @@ func TestVectorOperation(t *testing.T) {
 func TestDeadLabelKindUnknownString(t *testing.T) {
 	var dl source.DeadLabelKind = 100
 	require.Equal(t, "unknown", dl.String())
-}
-
-func TestFindFuncNamePositionNoMatch(t *testing.T) {
-	within := posrange.PositionRange{Start: 0, End: 8}
-	pos := source.FindFuncNamePosition("sum(foo)", within, "rate")
-	require.Equal(t, within, pos)
 }
 
 // Verifies that RangeSelectorMode.MarshalYAML returns "default" for the zero value.

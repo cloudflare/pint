@@ -83,6 +83,7 @@ func (c RegexpCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*dis
 	}
 
 	done := map[string]struct{}{}
+	syntaxCache := map[string]*syntax.Regexp{}
 	for _, src := range expr.Source() {
 		src.WalkSources(func(s *source.Source, _ *source.Join, _ *source.Unless) {
 			vs, ok := source.MostOuterOperation[*promParser.VectorSelector](s)
@@ -123,7 +124,11 @@ func (c RegexpCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*dis
 				var hasFlags, isUseful, isWildcard, isLiteral, isBad bool
 				var beginText, endText int
 				var literalValue strings.Builder
-				r, _ := syntax.Parse(re, syntax.Perl)
+				r, ok := syntaxCache[re]
+				if !ok {
+					r, _ = syntax.Parse(re, syntax.Perl)
+					syntaxCache[re] = r
+				}
 				for _, s := range r.Sub {
 					// nolint: exhaustive
 					switch s.Op {
@@ -220,7 +225,7 @@ func (c RegexpCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*dis
 						b.lm, b.lm.Name, b.op, b.literalValue)
 
 				}
-				pos := findMatcherPos(expr.Value.Value, b.pos, b.lm)
+				pos := source.FindMatcherPos(expr.Value.Value, b.pos, b.lm)
 				problems = append(problems, Problem{
 					Anchor:   AnchorAfter,
 					Lines:    expr.Value.Pos.Lines(),
@@ -234,7 +239,7 @@ func (c RegexpCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*dis
 							Pos:         expr.Value.Pos,
 							Expr:        expr.Query().Expr,
 							FirstColumn: int(pos.Start) + 1,
-							LastColumn:  int(pos.End) + 1,
+							LastColumn:  int(pos.End),
 							Kind:        diags.Issue,
 						},
 					},
@@ -337,16 +342,4 @@ func hasSmellyWildcard(subs iter.Seq2[int, *syntax.Regexp], anchorOp syntax.Op) 
 		}
 	}
 	return false
-}
-
-func findMatcherPos(expr string, within posrange.PositionRange, m *labels.Matcher) posrange.PositionRange {
-	re := regexp.MustCompile("(" + m.Name + ")(?: *)" + m.Type.String() + "(?: *)" + `"` + regexp.QuoteMeta(m.Value) + `"`)
-	idx := re.FindStringSubmatchIndex(source.GetQueryFragment(expr, within))
-	if idx == nil {
-		return within
-	}
-	return posrange.PositionRange{
-		Start: within.Start + posrange.Pos(idx[0]),
-		End:   within.Start + posrange.Pos(idx[1]-1),
-	}
 }
