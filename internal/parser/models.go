@@ -181,18 +181,12 @@ func (ym *YamlMap) IsIdentical(b *YamlMap) bool {
 		return false
 	}
 
+	bMap := make(map[string]string, len(bItems))
+	for _, bi := range bItems {
+		bMap[bi.Key.Value] = bi.Value.Value
+	}
 	for _, ai := range aItems {
-		var found bool
-		for _, bi := range bItems {
-			if ai.Key.Value == bi.Key.Value {
-				if ai.Value.Value != bi.Value.Value {
-					return false
-				}
-				found = true
-				break
-			}
-		}
-		if !found {
+		if bMap[ai.Key.Value] != ai.Value.Value {
 			return false
 		}
 	}
