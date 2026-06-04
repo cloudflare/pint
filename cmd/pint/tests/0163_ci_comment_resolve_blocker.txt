@@ -93,32 +93,32 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/123/comments
   Content-Type: application/json
 --- BODY ---
 text: |
-  :stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **promql/syntax** check.
+    :stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **promql/syntax** check.
 
-  <details>
-  <summary>PromQL syntax error</summary>
+    <details>
+    <summary>PromQL syntax error</summary>
 
-  ```yaml
-  5 |     expr: count(up == 1) bie(job)
-                               ^^^
-  ```
+    ```yaml
+    5 |     expr: count(up == 1) bie(job)
+                                 ^^^
+    ```
 
-  unexpected identifier "bie"
+    unexpected identifier "bie"
 
-  [Click here](https://prometheus.io/docs/prometheus/latest/querying/basics/) for PromQL documentation.
+    [Click here](https://prometheus.io/docs/prometheus/latest/querying/basics/) for PromQL documentation.
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/syntax.html).
+    :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/syntax.html).
 severity: NORMAL
 anchor:
-  path: rules.yml
-  lineType: ADDED
-  fileType: TO
-  diffType: EFFECTIVE
-  line: 5
+    path: rules.yml
+    lineType: ADDED
+    fileType: TO
+    diffType: EFFECTIVE
+    line: 5
 --- END ---
 
 PUT /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/123/comments
@@ -152,32 +152,32 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/123/comments
   Content-Type: application/json
 --- BODY ---
 text: |
-  :stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **promql/syntax** check.
+    :stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **promql/syntax** check.
 
-  <details>
-  <summary>PromQL syntax error</summary>
+    <details>
+    <summary>PromQL syntax error</summary>
 
-  ```yaml
-  5 |     expr: count(up == 1) bie(job)
-                               ^^^
-  ```
+    ```yaml
+    5 |     expr: count(up == 1) bie(job)
+                                 ^^^
+    ```
 
-  unexpected identifier "bie"
+    unexpected identifier "bie"
 
-  [Click here](https://prometheus.io/docs/prometheus/latest/querying/basics/) for PromQL documentation.
+    [Click here](https://prometheus.io/docs/prometheus/latest/querying/basics/) for PromQL documentation.
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/syntax.html).
+    :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/syntax.html).
 severity: NORMAL
 anchor:
-  path: rules.yml
-  lineType: ADDED
-  fileType: TO
-  diffType: EFFECTIVE
-  line: 5
+    path: rules.yml
+    lineType: ADDED
+    fileType: TO
+    diffType: EFFECTIVE
+    line: 5
 --- END ---
 
 PUT /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/123/comments

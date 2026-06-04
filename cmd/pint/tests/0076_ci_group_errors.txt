@@ -247,46 +247,46 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Content-Type: application/json
 --- BODY ---
 text: |
-  :stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **alerts/annotation** check.
+    :stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **alerts/annotation** check.
 
-  <details>
-  <summary>required annotation not set</summary>
+    <details>
+    <summary>required annotation not set</summary>
 
-  ```yaml
-  5 |     expr: sum(foo) bar
-                ^^^
-  ```
+    ```yaml
+    5 |     expr: sum(foo) bar
+                  ^^^
+    ```
 
-  `link` annotation is required.
+    `link` annotation is required.
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  The same issue was reported 6 more time(s), duplicates where suppressed.
+    The same issue was reported 6 more time(s), duplicates where suppressed.
 
-  <details>
-  <summary>Show affected rules</summary>
+    <details>
+    <summary>Show affected rules</summary>
 
-  - `missing required fields` at `rules.yml:7`
-  - `count` at `rules.yml:13`
-  - `for_and_rate` at `rules.yml:19`
-  - `template` at `rules.yml:25`
-  - `fragile` at `rules.yml:32`
-  - `dups` at `rules.yml:38`
+    - `missing required fields` at `rules.yml:7`
+    - `count` at `rules.yml:13`
+    - `for_and_rate` at `rules.yml:19`
+    - `template` at `rules.yml:25`
+    - `fragile` at `rules.yml:32`
+    - `dups` at `rules.yml:38`
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/annotation.html).
+    :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/annotation.html).
 severity: NORMAL
 anchor:
-  path: rules.yml
-  lineType: ADDED
-  fileType: TO
-  diffType: EFFECTIVE
-  line: 5
+    path: rules.yml
+    lineType: ADDED
+    fileType: TO
+    diffType: EFFECTIVE
+    line: 5
 --- END ---
 
 POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
@@ -295,44 +295,44 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Content-Type: application/json
 --- BODY ---
 text: |
-  :stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **rule/label** check.
+    :stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **rule/label** check.
 
-  <details>
-  <summary>required label not set</summary>
+    <details>
+    <summary>required label not set</summary>
 
-  ```yaml
-  5 |     expr: sum(foo) bar
-                ^^^
-  ```
+    ```yaml
+    5 |     expr: sum(foo) bar
+                  ^^^
+    ```
 
-  `component` label is required.
+    `component` label is required.
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  The same issue was reported 4 more time(s), duplicates where suppressed.
+    The same issue was reported 4 more time(s), duplicates where suppressed.
 
-  <details>
-  <summary>Show affected rules</summary>
+    <details>
+    <summary>Show affected rules</summary>
 
-  - `missing required fields` at `rules.yml:7`
-  - `template` at `rules.yml:25`
-  - `fragile` at `rules.yml:32`
-  - `dups` at `rules.yml:38`
+    - `missing required fields` at `rules.yml:7`
+    - `template` at `rules.yml:25`
+    - `fragile` at `rules.yml:32`
+    - `dups` at `rules.yml:38`
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/rule/label.html).
+    :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/rule/label.html).
 severity: NORMAL
 anchor:
-  path: rules.yml
-  lineType: ADDED
-  fileType: TO
-  diffType: EFFECTIVE
-  line: 5
+    path: rules.yml
+    lineType: ADDED
+    fileType: TO
+    diffType: EFFECTIVE
+    line: 5
 --- END ---
 
 POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
@@ -341,48 +341,48 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Content-Type: application/json
 --- BODY ---
 text: |
-  :stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **rule/owner** check.
+    :stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **rule/owner** check.
 
-  <details>
-  <summary>missing owner</summary>
+    <details>
+    <summary>missing owner</summary>
 
-  ```yaml
-  5 |     expr: sum(foo) bar
-                ^^^
-  ```
+    ```yaml
+    5 |     expr: sum(foo) bar
+                  ^^^
+    ```
 
-  `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule.
+    `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule.
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  The same issue was reported 8 more time(s), duplicates where suppressed.
+    The same issue was reported 8 more time(s), duplicates where suppressed.
 
-  <details>
-  <summary>Show affected rules</summary>
+    <details>
+    <summary>Show affected rules</summary>
 
-  - `missing required fields` at `rules.yml:7`
-  - `vector_matching` at `rules.yml:10`
-  - `count` at `rules.yml:13`
-  - `for_and_rate` at `rules.yml:19`
-  - `template` at `rules.yml:25`
-  - `fragile` at `rules.yml:32`
-  - `regexp` at `rules.yml:35`
-  - `dups` at `rules.yml:38`
+    - `missing required fields` at `rules.yml:7`
+    - `vector_matching` at `rules.yml:10`
+    - `count` at `rules.yml:13`
+    - `for_and_rate` at `rules.yml:19`
+    - `template` at `rules.yml:25`
+    - `fragile` at `rules.yml:32`
+    - `regexp` at `rules.yml:35`
+    - `dups` at `rules.yml:38`
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/rule/owner.html).
+    :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/rule/owner.html).
 severity: NORMAL
 anchor:
-  path: rules.yml
-  lineType: ADDED
-  fileType: TO
-  diffType: EFFECTIVE
-  line: 5
+    path: rules.yml
+    lineType: ADDED
+    fileType: TO
+    diffType: EFFECTIVE
+    line: 5
 --- END ---
 
 POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
@@ -391,32 +391,32 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Content-Type: application/json
 --- BODY ---
 text: |
-  :stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **promql/syntax** check.
+    :stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **promql/syntax** check.
 
-  <details>
-  <summary>PromQL syntax error</summary>
+    <details>
+    <summary>PromQL syntax error</summary>
 
-  ```yaml
-  5 |     expr: sum(foo) bar
-                         ^^^
-  ```
+    ```yaml
+    5 |     expr: sum(foo) bar
+                           ^^^
+    ```
 
-  unexpected identifier "bar"
+    unexpected identifier "bar"
 
-  [Click here](https://prometheus.io/docs/prometheus/latest/querying/basics/) for PromQL documentation.
+    [Click here](https://prometheus.io/docs/prometheus/latest/querying/basics/) for PromQL documentation.
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/syntax.html).
+    :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/syntax.html).
 severity: NORMAL
 anchor:
-  path: rules.yml
-  lineType: ADDED
-  fileType: TO
-  diffType: EFFECTIVE
-  line: 5
+    path: rules.yml
+    lineType: ADDED
+    fileType: TO
+    diffType: EFFECTIVE
+    line: 5
 --- END ---
 
 POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
@@ -425,49 +425,49 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Content-Type: application/json
 --- BODY ---
 text: |
-  :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **alerts/comparison** check.
+    :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **alerts/comparison** check.
 
-  <details>
-  <summary>always firing alert</summary>
+    <details>
+    <summary>always firing alert</summary>
 
-  ```yaml
-  8 |     expr: no_such_metric{job="fake"}
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  ```
+    ```yaml
+    8 |     expr: no_such_metric{job="fake"}
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ```
 
-  This query doesn't have any condition and so this alert will always fire if it matches anything.
+    This query doesn't have any condition and so this alert will always fire if it matches anything.
 
-  Prometheus alerting rules will trigger an alert for each query that returns *any* result.
-  Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.
-  In most cases this can be achieved by having some condition in the query expression.
-  For example `up == 0` or `rate(error_total[2m]) > 0`.
-  Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
+    Prometheus alerting rules will trigger an alert for each query that returns *any* result.
+    Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.
+    In most cases this can be achieved by having some condition in the query expression.
+    For example `up == 0` or `rate(error_total[2m]) > 0`.
+    Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  The same issue was reported 3 more time(s), duplicates where suppressed.
+    The same issue was reported 3 more time(s), duplicates where suppressed.
 
-  <details>
-  <summary>Show affected rules</summary>
+    <details>
+    <summary>Show affected rules</summary>
 
-  - `for_and_rate` at `rules.yml:20`
-  - `fragile` at `rules.yml:33`
-  - `dups` at `rules.yml:39`
+    - `for_and_rate` at `rules.yml:20`
+    - `fragile` at `rules.yml:33`
+    - `dups` at `rules.yml:39`
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/comparison.html).
+    :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/comparison.html).
 severity: NORMAL
 anchor:
-  path: rules.yml
-  lineType: ADDED
-  fileType: TO
-  diffType: EFFECTIVE
-  line: 8
+    path: rules.yml
+    lineType: ADDED
+    fileType: TO
+    diffType: EFFECTIVE
+    line: 8
 --- END ---
 
 POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
@@ -476,30 +476,30 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Content-Type: application/json
 --- BODY ---
 text: |
-  :information_source: **Information** reported by [pint](https://cloudflare.github.io/pint/) **alerts/for** check.
+    :information_source: **Information** reported by [pint](https://cloudflare.github.io/pint/) **alerts/for** check.
 
-  <details>
-  <summary>redundant field with default value</summary>
+    <details>
+    <summary>redundant field with default value</summary>
 
-  ```yaml
-  21 |     for: 0m
-                ^^
-  ```
+    ```yaml
+    21 |     for: 0m
+                  ^^
+    ```
 
-  `0m` is the default value of `for`, this line is unnecessary.
+    `0m` is the default value of `for`, this line is unnecessary.
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/for.html).
+    :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/for.html).
 severity: NORMAL
 anchor:
-  path: rules.yml
-  lineType: ADDED
-  fileType: TO
-  diffType: EFFECTIVE
-  line: 21
+    path: rules.yml
+    lineType: ADDED
+    fileType: TO
+    diffType: EFFECTIVE
+    line: 21
 --- END ---
 
 POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
@@ -508,37 +508,37 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Content-Type: application/json
 --- BODY ---
 text: |
-  :stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **alerts/template** check.
+    :stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **alerts/template** check.
 
-  <details>
-  <summary>template uses non-existent label</summary>
+    <details>
+    <summary>template uses non-existent label</summary>
 
-  ```yaml
-  26 |     expr: sum(no_such_metric) by(foo) > 0
-                                     ^^
-  ```
+    ```yaml
+    26 |     expr: sum(no_such_metric) by(foo) > 0
+                                       ^^
+    ```
 
-  Query is using aggregation with `by(foo)`, only labels included inside `by(...)` will be present on the results.
+    Query is using aggregation with `by(foo)`, only labels included inside `by(...)` will be present on the results.
 
-  ```yaml
-  30 |       instance: 'sum on {{ $labels.instance }} is {{ $value }}'
-                                         ^^^^^^^^^
-  ```
+    ```yaml
+    30 |       instance: 'sum on {{ $labels.instance }} is {{ $value }}'
+                                           ^^^^^^^^^
+    ```
 
-  Template is using `instance` label but the query results won't have this label.
+    Template is using `instance` label but the query results won't have this label.
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/template.html).
+    :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/template.html).
 severity: NORMAL
 anchor:
-  path: rules.yml
-  lineType: ADDED
-  fileType: TO
-  diffType: EFFECTIVE
-  line: 30
+    path: rules.yml
+    lineType: ADDED
+    fileType: TO
+    diffType: EFFECTIVE
+    line: 30
 --- END ---
 
 POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
@@ -547,30 +547,30 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Content-Type: application/json
 --- BODY ---
 text: |
-  :stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **alerts/template** check.
+    :stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **alerts/template** check.
 
-  <details>
-  <summary>value used in labels</summary>
+    <details>
+    <summary>value used in labels</summary>
 
-  ```yaml
-  28 |       value: '{{ $value }}'
-                     ^^^^^^^^^^^^
-  ```
+    ```yaml
+    28 |       value: '{{ $value }}'
+                       ^^^^^^^^^^^^
+    ```
 
-  Using `$value` in labels will generate a new alert on every value change, move it to annotations.
+    Using `$value` in labels will generate a new alert on every value change, move it to annotations.
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/template.html).
+    :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/template.html).
 severity: NORMAL
 anchor:
-  path: rules.yml
-  lineType: ADDED
-  fileType: TO
-  diffType: EFFECTIVE
-  line: 28
+    path: rules.yml
+    lineType: ADDED
+    fileType: TO
+    diffType: EFFECTIVE
+    line: 28
 --- END ---
 
 POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
@@ -579,32 +579,32 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Content-Type: application/json
 --- BODY ---
 text: |
-  :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **promql/regexp** check.
+    :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **promql/regexp** check.
 
-  <details>
-  <summary>redundant regexp</summary>
+    <details>
+    <summary>redundant regexp</summary>
 
-  ```yaml
-  36 |     expr: sum(no_such_metric{job=~"fake"})
-                                    ^^^^^^^^^^^
-  ```
+    ```yaml
+    36 |     expr: sum(no_such_metric{job=~"fake"})
+                                      ^^^^^^^^^^^
+    ```
 
-  Unnecessary regexp match on static string `job=~"fake"`, use `job="fake"` instead.
+    Unnecessary regexp match on static string `job=~"fake"`, use `job="fake"` instead.
 
-  See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/regexp.html).
+    :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/regexp.html).
 severity: NORMAL
 anchor:
-  path: rules.yml
-  lineType: ADDED
-  fileType: TO
-  diffType: EFFECTIVE
-  line: 36
+    path: rules.yml
+    lineType: ADDED
+    fileType: TO
+    diffType: EFFECTIVE
+    line: 36
 --- END ---
 
 POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
@@ -613,31 +613,31 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Content-Type: application/json
 --- BODY ---
 text: |
-  :stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **promql/aggregate** check.
+    :stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **promql/aggregate** check.
 
-  <details>
-  <summary>required label is being removed via aggregation</summary>
+    <details>
+    <summary>required label is being removed via aggregation</summary>
 
-  ```yaml
-  36 |     expr: sum(no_such_metric{job=~"fake"})
-                 ^^^
-  ```
+    ```yaml
+    36 |     expr: sum(no_such_metric{job=~"fake"})
+                   ^^^
+    ```
 
-  Query is using aggregation that removes all labels.
+    Query is using aggregation that removes all labels.
 
-  `job` label is required and should be preserved when aggregating all rules.
+    `job` label is required and should be preserved when aggregating all rules.
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/aggregate.html).
+    :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/aggregate.html).
 severity: NORMAL
 anchor:
-  path: rules.yml
-  lineType: ADDED
-  fileType: TO
-  diffType: EFFECTIVE
-  line: 36
+    path: rules.yml
+    lineType: ADDED
+    fileType: TO
+    diffType: EFFECTIVE
+    line: 36
 --- END ---
 

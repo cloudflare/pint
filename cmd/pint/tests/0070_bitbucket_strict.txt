@@ -76,29 +76,29 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Content-Type: application/json
 --- BODY ---
 text: |
-  :stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **yaml/parse** check.
+    :stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **yaml/parse** check.
 
-  ------
+    ------
 
-  top level field must be a groups key, got list
+    top level field must be a groups key, got list
 
-  <details>
-  <summary>More information</summary>
-  pint cannot read this file because YAML parser returned an error.
-  This usually means that you have an indention error or the file doesn't have the YAML structure required by Prometheus for [recording](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/) and [alerting](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/) rules.
-  If this file is a template that will be rendered into valid YAML then you can instruct pint to ignore some lines using comments, see [pint docs](https://cloudflare.github.io/pint/ignoring.html).
+    <details>
+    <summary>More information</summary>
+    pint cannot read this file because YAML parser returned an error.
+    This usually means that you have an indention error or the file doesn't have the YAML structure required by Prometheus for [recording](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/) and [alerting](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/) rules.
+    If this file is a template that will be rendered into valid YAML then you can instruct pint to ignore some lines using comments, see [pint docs](https://cloudflare.github.io/pint/ignoring.html).
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/yaml/parse.html).
+    :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/yaml/parse.html).
 severity: NORMAL
 anchor:
-  path: rules.yml
-  lineType: ADDED
-  fileType: TO
-  diffType: EFFECTIVE
-  line: 3
+    path: rules.yml
+    lineType: ADDED
+    fileType: TO
+    diffType: EFFECTIVE
+    line: 3
 --- END ---
 

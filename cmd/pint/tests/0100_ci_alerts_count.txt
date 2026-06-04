@@ -105,42 +105,42 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Content-Type: application/json
 --- BODY ---
 text: |
-  :information_source: **Information** reported by [pint](https://cloudflare.github.io/pint/) **alerts/count** check.
+    :information_source: **Information** reported by [pint](https://cloudflare.github.io/pint/) **alerts/count** check.
 
-  <details>
-  <summary>alert count estimate</summary>
+    <details>
+    <summary>alert count estimate</summary>
 
-  ```yaml
-  4 |     up{job="foo"} == 0
-          ^^^^^^^^^^^^^^^^^^
-  ```
+    ```yaml
+    4 |     up{job="foo"} == 0
+            ^^^^^^^^^^^^^^^^^^
+    ```
 
-  `prom` Prometheus server at http://127.0.0.1:2100 would trigger 0 alert(s) in the last 1d.
+    `prom` Prometheus server at http://127.0.0.1:2100 would trigger 0 alert(s) in the last 1d.
 
-  To get a preview of the alerts that would fire please [click here](http://127.0.0.1:2100/graph?g0.expr=up%7Bjob%3D%22foo%22%7D+%3D%3D+0%0A&g0.tab=0&g0.range_input=1d).
+    To get a preview of the alerts that would fire please [click here](http://127.0.0.1:2100/graph?g0.expr=up%7Bjob%3D%22foo%22%7D+%3D%3D+0%0A&g0.tab=0&g0.range_input=1d).
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  The same issue was reported 1 more time(s), duplicates where suppressed.
+    The same issue was reported 1 more time(s), duplicates where suppressed.
 
-  <details>
-  <summary>Show affected rules</summary>
+    <details>
+    <summary>Show affected rules</summary>
 
-  - `alert2` at `rules.yml:9`
+    - `alert2` at `rules.yml:9`
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/count.html).
+    :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/count.html).
 severity: NORMAL
 anchor:
-  path: rules.yml
-  lineType: ADDED
-  fileType: TO
-  diffType: EFFECTIVE
-  line: 4
+    path: rules.yml
+    lineType: ADDED
+    fileType: TO
+    diffType: EFFECTIVE
+    line: 4
 --- END ---
 

@@ -88,25 +88,25 @@ POST /api/v3/repos/cloudflare/pint/pulls/1/comments
   X-Github-Api-Version: 2022-11-28
 --- BODY ---
 body: |
-  :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **rule/label** check.
+    :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **rule/label** check.
 
-  <details>
-  <summary>required label not set</summary>
+    <details>
+    <summary>required label not set</summary>
 
-  ```yaml
-  3 |   for: 0s
-             ^^
-  ```
+    ```yaml
+    3 |   for: 0s
+               ^^
+    ```
 
-  `severity` label is required.
+    `severity` label is required.
 
-  Rule comment: Use correct severity
+    Rule comment: Use correct severity
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/rule/label.html).
+    :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/rule/label.html).
 path: rules.yml
 line: 3
 side: RIGHT
@@ -121,29 +121,29 @@ POST /api/v3/repos/cloudflare/pint/pulls/1/comments
   X-Github-Api-Version: 2022-11-28
 --- BODY ---
 body: |
-  :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **alerts/comparison** check.
+    :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **alerts/comparison** check.
 
-  <details>
-  <summary>always firing alert</summary>
+    <details>
+    <summary>always firing alert</summary>
 
-  ```yaml
-  2 |   expr: sum(foo) by(job)
-                  ^^^
-  ```
+    ```yaml
+    2 |   expr: sum(foo) by(job)
+                    ^^^
+    ```
 
-  This query doesn't have any condition and so this alert will always fire if it matches anything.
+    This query doesn't have any condition and so this alert will always fire if it matches anything.
 
-  Prometheus alerting rules will trigger an alert for each query that returns *any* result.
-  Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.
-  In most cases this can be achieved by having some condition in the query expression.
-  For example `up == 0` or `rate(error_total[2m]) > 0`.
-  Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
+    Prometheus alerting rules will trigger an alert for each query that returns *any* result.
+    Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.
+    In most cases this can be achieved by having some condition in the query expression.
+    For example `up == 0` or `rate(error_total[2m]) > 0`.
+    Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/comparison.html).
+    :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/comparison.html).
 path: rules.yml
 line: 3
 side: RIGHT
@@ -158,23 +158,23 @@ POST /api/v3/repos/cloudflare/pint/pulls/1/comments
   X-Github-Api-Version: 2022-11-28
 --- BODY ---
 body: |
-  :information_source: **Information** reported by [pint](https://cloudflare.github.io/pint/) **alerts/for** check.
+    :information_source: **Information** reported by [pint](https://cloudflare.github.io/pint/) **alerts/for** check.
 
-  <details>
-  <summary>redundant field with default value</summary>
+    <details>
+    <summary>redundant field with default value</summary>
 
-  ```yaml
-  3 |   for: 0s
-             ^^
-  ```
+    ```yaml
+    3 |   for: 0s
+               ^^
+    ```
 
-  `0s` is the default value of `for`, this line is unnecessary.
+    `0s` is the default value of `for`, this line is unnecessary.
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/for.html).
+    :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/for.html).
 path: rules.yml
 line: 3
 side: RIGHT
@@ -196,53 +196,53 @@ POST /api/v3/repos/cloudflare/pint/pulls/1/reviews
 --- BODY ---
 commit_id: <COMMIT ID>
 body: |+
-  ### This pull request was validated by [pint](https://github.com/cloudflare/pint).
-  :heavy_exclamation_mark:	Problems found.
-  | Severity | Number of problems |
-  | --- | --- |
-  | Warning | 2 |
-  | Information | 1 |
-  <details><summary>Stats</summary>
-  <p>
+    ### This pull request was validated by [pint](https://github.com/cloudflare/pint).
+    :heavy_exclamation_mark:	Problems found.
+    | Severity | Number of problems |
+    | --- | --- |
+    | Warning | 2 |
+    | Information | 1 |
+    <details><summary>Stats</summary>
+    <p>
 
-  | Stat | Value |
-  | --- | --- |
-  | Version | unknown |
-  | Number of rules parsed | 2 |
-  | Number of rules checked | 2 |
-  | Number of problems found | 3 |
-  | Number of offline checks | 10 |
-  | Number of online checks | 0 |
-  | Checks duration | 0 |
+    | Stat | Value |
+    | --- | --- |
+    | Version | unknown |
+    | Number of rules parsed | 2 |
+    | Number of rules checked | 2 |
+    | Number of problems found | 3 |
+    | Number of offline checks | 10 |
+    | Number of online checks | 0 |
+    | Checks duration | 0 |
 
-  </p>
-  </details>
+    </p>
+    </details>
 
-  <details><summary>Problems</summary>
-  <p>
+    <details><summary>Problems</summary>
+    <p>
 
-  ```
-  Warning: required label not set (rule/label)
-    ---> rules.yml:1-3 -> `rule1`
-  3 |   for: 0s
-             ^^ `severity` label is required.
+    ```
+    Warning: required label not set (rule/label)
+      ---> rules.yml:1-3 -> `rule1`
+    3 |   for: 0s
+               ^^ `severity` label is required.
 
-  Warning: always firing alert (alerts/comparison)
-    ---> rules.yml:2 -> `rule1`
-  2 |   expr: sum(foo) by(job)
-                  ^^^
-                  This query doesn't have any condition and so this alert will always fire if it matches
-                  anything.
+    Warning: always firing alert (alerts/comparison)
+      ---> rules.yml:2 -> `rule1`
+    2 |   expr: sum(foo) by(job)
+                    ^^^
+                    This query doesn't have any condition and so this alert will always fire if it matches
+                    anything.
 
-  Information: redundant field with default value (alerts/for)
-    ---> rules.yml:3 -> `rule1`
-  3 |   for: 0s
-             ^^ `0s` is the default value of `for`, this line is unnecessary.
+    Information: redundant field with default value (alerts/for)
+      ---> rules.yml:3 -> `rule1`
+    3 |   for: 0s
+               ^^ `0s` is the default value of `for`, this line is unnecessary.
 
-  ```
+    ```
 
-  </p>
-  </details>
+    </p>
+    </details>
 
 event: COMMENT
 --- END ---

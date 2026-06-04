@@ -107,38 +107,38 @@ POST /api/v4/projects/1234/merge_requests/1/discussions
   Private-Token: secret
 --- BODY ---
 body: |
-  :stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **alerts/template** check.
+    :stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **alerts/template** check.
 
-  <details>
-  <summary>template uses non-existent label</summary>
+    <details>
+    <summary>template uses non-existent label</summary>
 
-  ```yaml
-  5 |       expr: count(...) by (instance, version) != ignoring(package) group_left(foo) ...
-                             ^^^
-  ```
+    ```yaml
+    5 |       expr: count(...) by (instance, version) != ignoring(package) group_left(foo) ...
+                               ^^^
+    ```
 
-  Query is using aggregation with `by(instance, version)`, only labels included inside `by(...)` will be present on the results.
+    Query is using aggregation with `by(instance, version)`, only labels included inside `by(...)` will be present on the results.
 
-  ```yaml
-  8 |         help: '{{ $labels.ixtance }}'
-                               ^^^^^^^^
-  ```
+    ```yaml
+    8 |         help: '{{ $labels.ixtance }}'
+                                 ^^^^^^^^
+    ```
 
-  Template is using `ixtance` label but the query results won't have this label.
+    Template is using `ixtance` label but the query results won't have this label.
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/template.html).
+    :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/template.html).
 position:
-  base_sha: base
-  head_sha: head
-  start_sha: start
-  new_path: rules.yml
-  old_path: rules.yml
-  position_type: text
-  new_line: 8
+    base_sha: base
+    head_sha: head
+    start_sha: start
+    new_path: rules.yml
+    old_path: rules.yml
+    position_type: text
+    new_line: 8
 --- END ---
 
 POST /api/v4/projects/1234/merge_requests/1/discussions
@@ -148,38 +148,38 @@ POST /api/v4/projects/1234/merge_requests/1/discussions
   Private-Token: secret
 --- BODY ---
 body: |
-  :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **promql/impossible** check.
+    :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **promql/impossible** check.
 
-  <details>
-  <summary>impossible label</summary>
+    <details>
+    <summary>impossible label</summary>
 
-  ```yaml
-  5 |       expr: ... != ignoring(package) group_left(foo) count(...) by (instance, version, package)
-                                                                      ^^^
-  ```
+    ```yaml
+    5 |       expr: ... != ignoring(package) group_left(foo) count(...) by (instance, version, package)
+                                                                        ^^^
+    ```
 
-  Query is using aggregation with `by(instance, version, package)`, only labels included inside `by(...)` will be present on the results.
+    Query is using aggregation with `by(instance, version, package)`, only labels included inside `by(...)` will be present on the results.
 
-  ```yaml
-  5 |       expr: ... != ignoring(package) group_left(foo) ...
-                                                      ^^^
-  ```
+    ```yaml
+    5 |       expr: ... != ignoring(package) group_left(foo) ...
+                                                        ^^^
+    ```
 
-  You can't use `foo` because this label is not possible here.
+    You can't use `foo` because this label is not possible here.
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/impossible.html).
+    :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/impossible.html).
 position:
-  base_sha: base
-  head_sha: head
-  start_sha: start
-  new_path: rules.yml
-  old_path: rules.yml
-  position_type: text
-  new_line: 8
+    base_sha: base
+    head_sha: head
+    start_sha: start
+    new_path: rules.yml
+    old_path: rules.yml
+    position_type: text
+    new_line: 8
 --- END ---
 
 POST /api/v4/projects/1234/merge_requests/1/discussions
@@ -189,36 +189,36 @@ POST /api/v4/projects/1234/merge_requests/1/discussions
   Private-Token: secret
 --- BODY ---
 body: |
-  :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **promql/regexp** check.
+    :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **promql/regexp** check.
 
-  <details>
-  <summary>smelly regexp selector</summary>
+    <details>
+    <summary>smelly regexp selector</summary>
 
-  ```yaml
-  13 |         sum by (exporter, colo_name) (rate(otelcol_exporter_send_failed_log_records{node_status="v", exporter=~"(failover|otlp)/.*", job=~"foo_.+_bar"}[5m]))
-                                                                                                                                            ^^^^^^^^^^^^^^^^^
-  14 |         /
-  15 |         (
-     |         [...]
-  20 |         ... > 10
-  ```
+    ```yaml
+    13 |         sum by (exporter, colo_name) (rate(otelcol_exporter_send_failed_log_records{node_status="v", exporter=~"(failover|otlp)/.*", job=~"foo_.+_bar"}[5m]))
+                                                                                                                                              ^^^^^^^^^^^^^^^^^
+    14 |         /
+    15 |         (
+       |         [...]
+    20 |         ... > 10
+    ```
 
-  `{job=~"foo_.+_bar"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels
+    `{job=~"foo_.+_bar"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels
 
-  See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/regexp.html).
+    :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/regexp.html).
 position:
-  base_sha: base
-  head_sha: head
-  start_sha: start
-  new_path: rules.yml
-  old_path: rules.yml
-  position_type: text
-  new_line: 20
+    base_sha: base
+    head_sha: head
+    start_sha: start
+    new_path: rules.yml
+    old_path: rules.yml
+    position_type: text
+    new_line: 20
 --- END ---
 

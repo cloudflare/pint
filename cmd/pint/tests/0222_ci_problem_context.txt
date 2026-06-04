@@ -88,34 +88,34 @@ POST /api/v4/projects/1234/merge_requests/1/discussions
   Private-Token: secret
 --- BODY ---
 body: |
-  :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **promql/aggregate** check.
+    :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **promql/aggregate** check.
 
-  <details>
-  <summary>required label is being removed via aggregation</summary>
+    <details>
+    <summary>required label is being removed via aggregation</summary>
 
-  ```yaml
-  5 |     expr: count by (a, b, c) (bar)
-                      ^^^
-  ```
+    ```yaml
+    5 |     expr: count by (a, b, c) (bar)
+                        ^^^
+    ```
 
-  Query is using aggregation with `by(a, b, c)`, only labels included inside `by(...)` will be present on the results.
+    Query is using aggregation with `by(a, b, c)`, only labels included inside `by(...)` will be present on the results.
 
-  `job` label is required and should be preserved when aggregating all rules.
+    `job` label is required and should be preserved when aggregating all rules.
 
-  Rule comment: Must keep job label
+    Rule comment: Must keep job label
 
-  </details>
+    </details>
 
-  ------
+    ------
 
-  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/aggregate.html).
+    :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/aggregate.html).
 position:
-  base_sha: base
-  head_sha: head
-  start_sha: start
-  new_path: rules.yml
-  old_path: rules.yml
-  position_type: text
-  new_line: 5
+    base_sha: base
+    head_sha: head
+    start_sha: start
+    new_path: rules.yml
+    old_path: rules.yml
+    position_type: text
+    new_line: 5
 --- END ---
 
