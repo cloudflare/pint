@@ -16,7 +16,6 @@ import (
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/parser/source"
-	"github.com/cloudflare/pint/internal/parser/utils"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -70,13 +69,25 @@ func (c VectorMatchingCheck) Check(ctx context.Context, entry *discovery.Entry, 
 }
 
 func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, expr *parser.PromQLExpr, node *parser.PromQLNode) (problems []Problem) {
-	if n, ok := utils.RemoveConditions(node.Expr.String()).(*promParser.BinaryExpr); ok &&
-		n.VectorMatching != nil &&
-		n.Op != promParser.LOR &&
-		n.Op != promParser.LUNLESS {
+	binExpr, ok := node.Expr.(*promParser.BinaryExpr)
+	if !ok {
+		goto NEXT
+	}
 
-		lhsSources := source.LabelsSource(expr.Value.Value, node.Expr.(*promParser.BinaryExpr).LHS)
-		rhsSources := source.LabelsSource(expr.Value.Value, node.Expr.(*promParser.BinaryExpr).RHS)
+	{
+		binPos := binExpr.PositionRange()
+		lhsPos := binExpr.LHS.PositionRange()
+		rhsPos := binExpr.RHS.PositionRange()
+		lhsSources := source.LabelsSource(expr.Value.Value, binExpr.LHS)
+		rhsSources := source.LabelsSource(expr.Value.Value, binExpr.RHS)
+
+		n, ok := removeConditions(binExpr).(*promParser.BinaryExpr)
+		if !ok || n.VectorMatching == nil ||
+			n.Op == promParser.LOR ||
+			n.Op == promParser.LUNLESS {
+			goto NEXT
+		}
+
 		if !canJoinStatically(lhsSources, rhsSources, n.VectorMatching) {
 			goto NEXT
 		}
@@ -135,8 +146,8 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 								Message:     fmt.Sprintf("The left hand side uses `{%s=%q}` while the right hand side uses `{%s=%q}`, this will never match.", k, lv, k, rv),
 								Pos:         expr.Value.Pos,
 								Expr:        expr.Query().Expr,
-								FirstColumn: int(n.PositionRange().Start) + 1,
-								LastColumn:  int(n.PositionRange().End),
+								FirstColumn: int(binPos.Start) + 1,
+								LastColumn:  int(binPos.End),
 								Kind:        diags.Issue,
 							},
 						},
@@ -167,7 +178,9 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 		if n.VectorMatching.On {
 			for _, name := range n.VectorMatching.MatchingLabels {
 				if !leftLabels.hasName(name) && rightLabels.hasName(name) {
-					pos := node.Expr.(*promParser.BinaryExpr).LHS.PositionRange()
+					onPos := source.FindFuncPosition(expr.Value.Value, binPos, "on", []posrange.PositionRange{
+						lhsPos, rhsPos,
+					})
 					link := fmt.Sprintf("%s/query?g0.expr=%s&&g0.tab=table", leftURI, url.QueryEscape(n.LHS.String()))
 					problems = append(problems, Problem{
 						Anchor:   AnchorAfter,
@@ -184,15 +197,17 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 								),
 								Pos:         expr.Value.Pos,
 								Expr:        expr.Query().Expr,
-								FirstColumn: int(pos.Start) + 1,
-								LastColumn:  int(pos.End),
+								FirstColumn: int(onPos.Start) + 1,
+								LastColumn:  int(onPos.End),
 								Kind:        diags.Issue,
 							},
 						},
 					})
 				}
 				if leftLabels.hasName(name) && !rightLabels.hasName(name) {
-					pos := node.Expr.(*promParser.BinaryExpr).RHS.PositionRange()
+					onPos := source.FindFuncPosition(expr.Value.Value, binPos, "on", []posrange.PositionRange{
+						lhsPos, rhsPos,
+					})
 					link := fmt.Sprintf("%s/query?g0.expr=%s&&g0.tab=table", rightURI, url.QueryEscape(n.RHS.String()))
 					problems = append(problems, Problem{
 						Anchor:   AnchorAfter,
@@ -207,16 +222,16 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 									name, promText(c.prom.Name(), qr.URI), link, name),
 								Pos:         expr.Value.Pos,
 								Expr:        expr.Query().Expr,
-								FirstColumn: int(pos.Start) + 1,
-								LastColumn:  int(pos.End),
+								FirstColumn: int(onPos.Start) + 1,
+								LastColumn:  int(onPos.End),
 								Kind:        diags.Issue,
 							},
 						},
 					})
 				}
 				if !leftLabels.hasName(name) && !rightLabels.hasName(name) {
-					pos := source.FindFuncPosition(expr.Value.Value, node.Expr.PositionRange(), "on", []posrange.PositionRange{
-						n.LHS.PositionRange(), n.RHS.PositionRange(),
+					pos := source.FindFuncPosition(expr.Value.Value, binPos, "on", []posrange.PositionRange{
+						lhsPos, rhsPos,
 					})
 					link := fmt.Sprintf("%s/query?g0.expr=%s&&g0.tab=table", leftURI, url.QueryEscape(n.String()))
 					problems = append(problems, Problem{
@@ -242,50 +257,66 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 			}
 		} else if !leftLabels.overlaps(rightLabels) {
 			l, r := leftLabels.getFirstNonOverlap(rightLabels)
-			if len(n.VectorMatching.MatchingLabels) == 0 {
-				problems = append(problems, Problem{
-					Anchor:   AnchorAfter,
-					Lines:    expr.Value.Pos.Lines(),
-					Reporter: c.Reporter(),
-					Summary:  "impossible binary operation",
-					Details:  VectorMatchingCheckDetails,
-					Severity: Bug,
-					Diagnostics: []diags.Diagnostic{
-						{
-							Message: fmt.Sprintf("This query will never return anything on %s because results from the right and the left hand side have different labels: `%s` != `%s`.",
-								promText(c.prom.Name(), qr.URI), l, r),
-							Pos:         expr.Value.Pos,
-							Expr:        expr.Query().Expr,
-							FirstColumn: int(n.PositionRange().Start) + 1,
-							LastColumn:  int(n.PositionRange().End),
-							Kind:        diags.Issue,
-						},
-					},
-				})
+			var lhsDiag, rhsDiag diags.Diagnostic
+			if n.VectorMatching.Card == promParser.CardOneToMany {
+				rhsDiag = diags.Diagnostic{
+					Message: fmt.Sprintf(
+						"The right hand side of the query on %s returns labels: `%s`, which don't match the left hand side labels: `%s`. This query will never return any results.",
+						promText(c.prom.Name(), qr.URI), r, l,
+					),
+					Pos:         expr.Value.Pos,
+					Expr:        expr.Query().Expr,
+					FirstColumn: int(rhsPos.Start) + 1,
+					LastColumn:  int(rhsPos.End),
+					Kind:        diags.Issue,
+				}
+				lhsDiag = diags.Diagnostic{
+					Message: fmt.Sprintf(
+						"The left hand side of the query on %s returns labels: `%s`.",
+						promText(c.prom.Name(), qr.URI), l,
+					),
+					Pos:         expr.Value.Pos,
+					Expr:        expr.Query().Expr,
+					FirstColumn: int(lhsPos.Start) + 1,
+					LastColumn:  int(lhsPos.End),
+					Kind:        diags.Issue,
+				}
 			} else {
-				pos := source.FindFuncPosition(expr.Value.Value, n.PositionRange(), "ignoring", []posrange.PositionRange{
-					n.LHS.PositionRange(), n.RHS.PositionRange(),
-				})
-				problems = append(problems, Problem{
-					Anchor:   AnchorAfter,
-					Lines:    expr.Value.Pos.Lines(),
-					Reporter: c.Reporter(),
-					Summary:  "impossible binary operation",
-					Details:  VectorMatchingCheckDetails,
-					Severity: Bug,
-					Diagnostics: []diags.Diagnostic{
-						{
-							Message: fmt.Sprintf("Using `ignoring()` won't produce any results on %s because results from both sides of the query have different labels: `%s` != `%s`.",
-								promText(c.prom.Name(), qr.URI), l, r),
-							Pos:         expr.Value.Pos,
-							Expr:        expr.Query().Expr,
-							FirstColumn: int(pos.Start) + 1,
-							LastColumn:  int(pos.End),
-							Kind:        diags.Issue,
-						},
-					},
-				})
+				lhsDiag = diags.Diagnostic{
+					Message: fmt.Sprintf(
+						"The left hand side of the query on %s returns labels: `%s`, which don't match the right hand side labels: `%s`. This query will never return any results.",
+						promText(c.prom.Name(), qr.URI), l, r,
+					),
+					Pos:         expr.Value.Pos,
+					Expr:        expr.Query().Expr,
+					FirstColumn: int(lhsPos.Start) + 1,
+					LastColumn:  int(lhsPos.End),
+					Kind:        diags.Issue,
+				}
+				rhsDiag = diags.Diagnostic{
+					Message: fmt.Sprintf(
+						"The right hand side of the query on %s returns labels: `%s`.",
+						promText(c.prom.Name(), qr.URI), r,
+					),
+					Pos:         expr.Value.Pos,
+					Expr:        expr.Query().Expr,
+					FirstColumn: int(rhsPos.Start) + 1,
+					LastColumn:  int(rhsPos.End),
+					Kind:        diags.Issue,
+				}
 			}
+			problems = append(problems, Problem{
+				Anchor:   AnchorAfter,
+				Lines:    expr.Value.Pos.Lines(),
+				Reporter: c.Reporter(),
+				Summary:  "impossible binary operation",
+				Details:  VectorMatchingCheckDetails,
+				Severity: Bug,
+				Diagnostics: []diags.Diagnostic{
+					lhsDiag,
+					rhsDiag,
+				},
+			})
 		}
 	}
 
@@ -328,6 +359,81 @@ func canJoinStatically(lhsSources, rhsSources []*source.Source, vm *promParser.V
 		}
 	}
 	return true
+}
+
+// removeConditions recursively strips scalar comparisons from a PromQL AST.
+// It walks through aggregations, function calls (vector/matrix args only),
+// subqueries, parens, and unary expressions to find and remove binary
+// operations where one side is a number literal or empty selector.
+// "foo / bar > 0" becomes "foo / bar".
+// "min_over_time((foo > 0)[5m:1m]) / bar" becomes "min_over_time(foo[5m:1m]) / bar".
+func removeConditions(node promParser.Node) promParser.Node {
+	switch n := node.(type) {
+	case *promParser.AggregateExpr:
+		n.Expr = removeConditions(n.Expr).(promParser.Expr)
+		return n
+	case *promParser.BinaryExpr:
+		lhs := removeConditions(n.LHS)
+		rhs := removeConditions(n.RHS)
+		ln := isNumberOrEmpty(lhs)
+		rn := isNumberOrEmpty(rhs)
+		if ln && rn {
+			return &promParser.VectorSelector{}
+		}
+		if ln {
+			return rhs
+		}
+		if rn {
+			return lhs
+		}
+		n.LHS = lhs.(promParser.Expr)
+		n.RHS = rhs.(promParser.Expr)
+		return n
+	case *promParser.Call:
+		ret := promParser.Expressions{}
+		for i, e := range n.Args {
+			var vt promParser.ValueType
+			if i >= len(n.Func.ArgTypes) {
+				vt = n.Func.ArgTypes[len(n.Func.ArgTypes)-1]
+			} else {
+				vt = n.Func.ArgTypes[i]
+			}
+			switch vt {
+			case promParser.ValueTypeVector, promParser.ValueTypeMatrix:
+				ret = append(ret, removeConditions(e).(promParser.Expr))
+			case promParser.ValueTypeScalar, promParser.ValueTypeString, promParser.ValueTypeNone:
+				ret = append(ret, e)
+			}
+		}
+		n.Args = ret
+		return n
+	case *promParser.SubqueryExpr:
+		n.Expr = removeConditions(n.Expr).(promParser.Expr)
+		return n
+	case *promParser.ParenExpr:
+		n.Expr = removeConditions(n.Expr).(promParser.Expr)
+		switch n.Expr.(type) {
+		case *promParser.NumberLiteral, *promParser.StringLiteral, *promParser.VectorSelector, *promParser.MatrixSelector:
+			return n.Expr
+		}
+		return n
+	case *promParser.UnaryExpr:
+		n.Expr = removeConditions(n.Expr).(promParser.Expr)
+		return n
+	default:
+		return node
+	}
+}
+
+func isNumberOrEmpty(node promParser.Node) bool {
+	if _, ok := node.(*promParser.NumberLiteral); ok {
+		return true
+	}
+	v, ok := node.(*promParser.VectorSelector)
+	if !ok {
+		return false
+	}
+	return v.Name == ""
 }
 
 func (c VectorMatchingCheck) seriesLabels(ctx context.Context, query string, ignored ...model.LabelName) (labelSets, string, error) {

@@ -1251,6 +1251,141 @@ func TestVectorMatchingCheck(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "group_right label mismatch",
+			content:     "- alert: foo\n  expr: foo_with_notfound / ignoring(notfound) group_right() bar\n",
+			checker:     newVectorMatchingCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(\nfoo_with_notfound / ignoring (notfound) group_right () bar\n)"},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(\nfoo_with_notfound\n) without(__name__,notfound)"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{
+								"instance": "aaa",
+								"job":      "bbb",
+							}),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(\nbar\n) without(__name__,notfound)"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{
+								"instance": "aaa",
+								"job":      "bbb",
+								"dev":      "ccc",
+							}),
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "label_join with variadic args",
+			content:     "- alert: foo\n  expr: label_join(foo_with_notfound > 0, \"dst\", \",\", \"instance\", \"job\") / bar\n",
+			checker:     newVectorMatchingCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(\nlabel_join(foo_with_notfound, \"dst\", \",\", \"instance\", \"job\") / bar\n)"},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(\nlabel_join(foo_with_notfound, \"dst\", \",\", \"instance\", \"job\")\n) without(__name__)"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{
+								"instance": "aaa",
+								"job":      "bbb",
+								"notfound": "ccc",
+							}),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(\nbar\n) without(__name__)"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{
+								"instance": "aaa",
+								"job":      "bbb",
+							}),
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "unary expression is handled",
+			content:     "- alert: foo\n  expr: -foo_with_notfound / bar\n",
+			checker:     newVectorMatchingCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(\n-foo_with_notfound / bar\n)"},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(\n-foo_with_notfound\n) without(__name__)"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{
+								"instance": "aaa",
+								"job":      "bbb",
+								"notfound": "ccc",
+							}),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(\nbar\n) without(__name__)"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{
+								"instance": "aaa",
+								"job":      "bbb",
+							}),
+						},
+					},
+				},
+			},
+		},
 	}
 	runTests(t, testCases)
 }
