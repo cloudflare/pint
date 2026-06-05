@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.86.0
+
+### Changed
+
+- [promql/vector_matching](checks/promql/vector_matching.md) was refactored heavily
+  to be faster and more accurate.
+
 ## v0.85.0
 
 ### Added

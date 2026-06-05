@@ -6,10 +6,13 @@
       expr: (foo / ignoring(notfound) foo_with_notfound) / (memory_bytes / ignoring(job) memory_limit)
   output: |
     2 |   expr: (foo / ignoring(notfound) foo_with_notfound) / (memory_bytes / ignoring(job) memory_limit)
+                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        The right hand side of the query on `prom` Prometheus server at https://simple.example.com returns
+        labels: `[dev, instance, job]`.
                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                This query will never return anything on `prom` Prometheus server at
-                https://simple.example.com because results from the right and the left hand side have
-                different labels: `[instance, job]` != `[dev, instance, job]`.
+                The left hand side of the query on `prom` Prometheus server at https://simple.example.com
+                returns labels: `[instance, job]`, which don't match the right hand side labels: `[dev,
+                instance, job]`. This query will never return any results.
   problem:
     reporter: promql/vector_matching
     summary: impossible binary operation
@@ -18,9 +21,13 @@
         You can match time series with different labels by using special keywords and follow the rules set by PromQL.
         [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
-        - message: 'This query will never return anything on `prom` Prometheus server at https://simple.example.com because results from the right and the left hand side have different labels: `[instance, job]` != `[dev, instance, job]`.'
+        - message: 'The left hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[instance, job]`, which don''t match the right hand side labels: `[dev, instance, job]`. This query will never return any results.'
           firstcolumn: 1
           lastcolumn: 44
+          kind: 0
+        - message: 'The right hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[dev, instance, job]`.'
+          firstcolumn: 48
+          lastcolumn: 90
           kind: 0
     lines:
         first: 2
@@ -143,6 +150,45 @@
 
 ---
 
+[TestVectorMatchingCheck/group_right_label_mismatch - 1]
+- description: group_right label mismatch
+  content: |
+    - alert: foo
+      expr: foo_with_notfound / ignoring(notfound) group_right() bar
+  output: |
+    2 |   expr: foo_with_notfound / ignoring(notfound) group_right() bar
+                                                                     ^^^
+         The right hand side of the query on `prom` Prometheus server at
+         https://simple.example.com returns labels: `[dev, instance,
+         job]`, which don't match the left hand side labels: `[instance,
+         job]`. This query will never return any results.
+                ^^^^^^^^^^^^^^^^^
+                The left hand side of the query on `prom` Prometheus server at https://simple.example.com
+                returns labels: `[instance, job]`.
+  problem:
+    reporter: promql/vector_matching
+    summary: impossible binary operation
+    details: |-
+        Trying to match two different time series together will only work if both have the exact same set of labels.
+        You can match time series with different labels by using special keywords and follow the rules set by PromQL.
+        [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
+    diagnostics:
+        - message: 'The left hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[instance, job]`.'
+          firstcolumn: 1
+          lastcolumn: 17
+          kind: 0
+        - message: 'The right hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[dev, instance, job]`, which don''t match the left hand side labels: `[instance, job]`. This query will never return any results.'
+          firstcolumn: 54
+          lastcolumn: 56
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
 [TestVectorMatchingCheck/ignore_missing_left_side - 1]
 []
 
@@ -170,10 +216,13 @@
       expr: foo / ignoring(xxx) app_registry
   output: |
     2 |   expr: foo / ignoring(xxx) app_registry
-                ^^^^^^^^^^^^
-                Using `ignoring()` won't produce any results on `prom` Prometheus server at
-                https://simple.example.com because results from both sides of the query have different
-                labels: `[instance, job]` != `[app_name]`.
+                                    ^^^^^^^^^^^^
+                                    The right hand side of the query on `prom` Prometheus server at
+                                    https://simple.example.com returns labels: `[app_name]`.
+                ^^^
+                The left hand side of the query on `prom` Prometheus server at https://simple.example.com
+                returns labels: `[instance, job]`, which don't match the right hand side labels:
+                `[app_name]`. This query will never return any results.
   problem:
     reporter: promql/vector_matching
     summary: impossible binary operation
@@ -182,9 +231,13 @@
         You can match time series with different labels by using special keywords and follow the rules set by PromQL.
         [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
-        - message: 'Using `ignoring()` won''t produce any results on `prom` Prometheus server at https://simple.example.com because results from both sides of the query have different labels: `[instance, job]` != `[app_name]`.'
+        - message: 'The left hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[instance, job]`, which don''t match the right hand side labels: `[app_name]`. This query will never return any results.'
           firstcolumn: 1
-          lastcolumn: 12
+          lastcolumn: 3
+          kind: 0
+        - message: 'The right hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[app_name]`.'
+          firstcolumn: 21
+          lastcolumn: 32
           kind: 0
     lines:
         first: 2
@@ -209,6 +262,44 @@
 
 ---
 
+[TestVectorMatchingCheck/label_join_with_variadic_args - 1]
+- description: label_join with variadic args
+  content: |
+    - alert: foo
+      expr: label_join(foo_with_notfound > 0, "dst", ",", "instance", "job") / bar
+  output: |
+    2 |   expr: label_join(foo_with_notfound > 0, "dst", ",", "instance", "job") / bar
+                                                                                   ^^^
+                       The right hand side of the query on `prom` Prometheus server at
+                       https://simple.example.com returns labels: `[instance, job]`.
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                The left hand side of the query on `prom` Prometheus server at https://simple.example.com
+                returns labels: `[instance, job, notfound]`, which don't match the right hand side labels:
+                `[instance, job]`. This query will never return any results.
+  problem:
+    reporter: promql/vector_matching
+    summary: impossible binary operation
+    details: |-
+        Trying to match two different time series together will only work if both have the exact same set of labels.
+        You can match time series with different labels by using special keywords and follow the rules set by PromQL.
+        [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
+    diagnostics:
+        - message: 'The left hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[instance, job, notfound]`, which don''t match the right hand side labels: `[instance, job]`. This query will never return any results.'
+          firstcolumn: 1
+          lastcolumn: 64
+          kind: 0
+        - message: 'The right hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[instance, job]`.'
+          firstcolumn: 68
+          lastcolumn: 70
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
 [TestVectorMatchingCheck/max()_by(a)_and_on(a)_foo - 1]
 - description: max() by(a) and on(a) foo
   content: "\n- record: foo\n  expr: |\n    max by (cluster, env) (\n      increase(error_total{}[10m])\n    ) > 0\n    and on (cluster)\n    cluster_metadata{cluster=\"foo\", environment=\"prod\"} > 0\n  "
@@ -216,12 +307,12 @@
     4 |     max by (cluster, env) (
     5 |       increase(error_total{}[10m])
     6 |     ) > 0
-            ^^^^^
-            Using `on(cluster)` won't produce any results on `prom` Prometheus server at
-            https://simple.example.com because [series returned by this
-            query](https://simple.example.com/query?g0.expr=max+by+%28cluster%2C+env%29+%28increase%28error_total%5B10m%5D%29%29&&g0.tab=table)
-            doesn't have the `cluster` label.
     7 |     and on (cluster)
+                ^^^^^^^^^^^^
+                Using `on(cluster)` won't produce any results on `prom` Prometheus server at
+                https://simple.example.com because [series returned by this
+                query](https://simple.example.com/query?g0.expr=max+by+%28cluster%2C+env%29+%28increase%28error_total%5B10m%5D%29%29&&g0.tab=table)
+                doesn't have the `cluster` label.
     8 |     cluster_metadata{cluster="foo", environment="prod"} > 0
   problem:
     reporter: promql/vector_matching
@@ -232,8 +323,8 @@
         [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
         - message: Using `on(cluster)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned by this query](https://simple.example.com/query?g0.expr=max+by+%28cluster%2C+env%29+%28increase%28error_total%5B10m%5D%29%29&&g0.tab=table) doesn't have the `cluster` label.
-          firstcolumn: 1
-          lastcolumn: 60
+          firstcolumn: 66
+          lastcolumn: 77
           kind: 0
     lines:
         first: 4
@@ -249,12 +340,12 @@
     - alert: foo
       expr: (memory_bytes / ignoring(job) (memory_limit > 0)) * on(app_name) group_left(a,b,c) app_registry
   output: |
-    2 |   expr: (memory_bytes / ignoring(job) (memory_limit > 0)) * on(app_name) group_left(a,b,c) ...
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                Using `on(app_name)` won't produce any results on `prom` Prometheus server at
-                https://simple.example.com because [series returned by this
-                query](https://simple.example.com/query?g0.expr=%28memory_bytes+%2F+ignoring+%28job%29+memory_limit%29&&g0.tab=table)
-                doesn't have the `app_name` label.
+    2 |   expr: ... * on(app_name) group_left(a,b,c) ...
+                      ^^^^^^^^^^^^
+                      Using `on(app_name)` won't produce any results on `prom` Prometheus server at
+                      https://simple.example.com because [series returned by this
+                      query](https://simple.example.com/query?g0.expr=%28memory_bytes+%2F+ignoring+%28job%29+memory_limit%29&&g0.tab=table)
+                      doesn't have the `app_name` label.
   problem:
     reporter: promql/vector_matching
     summary: impossible binary operation
@@ -264,8 +355,8 @@
         [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
         - message: Using `on(app_name)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned by this query](https://simple.example.com/query?g0.expr=%28memory_bytes+%2F+ignoring+%28job%29+memory_limit%29&&g0.tab=table) doesn't have the `app_name` label.
-          firstcolumn: 1
-          lastcolumn: 49
+          firstcolumn: 53
+          lastcolumn: 64
           kind: 0
     lines:
         first: 2
@@ -282,10 +373,13 @@
       expr: foo_with_notfound / bar
   output: |
     2 |   expr: foo_with_notfound / bar
-                ^^^
-                This query will never return anything on `prom` Prometheus server at
-                https://simple.example.com because results from the right and the left hand side have
-                different labels: `[instance, job, notfound]` != `[instance, job]`.
+                                    ^^^
+                                    The right hand side of the query on `prom` Prometheus server at
+                                    https://simple.example.com returns labels: `[instance, job]`.
+                ^^^^^^^^^^^^^^^^^
+                The left hand side of the query on `prom` Prometheus server at https://simple.example.com
+                returns labels: `[instance, job, notfound]`, which don't match the right hand side labels:
+                `[instance, job]`. This query will never return any results.
   problem:
     reporter: promql/vector_matching
     summary: impossible binary operation
@@ -294,9 +388,13 @@
         You can match time series with different labels by using special keywords and follow the rules set by PromQL.
         [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
-        - message: 'This query will never return anything on `prom` Prometheus server at https://simple.example.com because results from the right and the left hand side have different labels: `[instance, job, notfound]` != `[instance, job]`.'
+        - message: 'The left hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[instance, job, notfound]`, which don''t match the right hand side labels: `[instance, job]`. This query will never return any results.'
           firstcolumn: 1
-          lastcolumn: 3
+          lastcolumn: 17
+          kind: 0
+        - message: 'The right hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[instance, job]`.'
+          firstcolumn: 21
+          lastcolumn: 23
           kind: 0
     lines:
         first: 2
@@ -381,11 +479,11 @@
       expr: foo / on(notfound) bar_with_notfound
   output: |
     2 |   expr: foo / on(notfound) bar_with_notfound
-                ^^^
-                Using `on(notfound)` won't produce any results on `prom` Prometheus server at
-                https://simple.example.com because [series returned by this
-                query](https://simple.example.com/query?g0.expr=foo&&g0.tab=table) doesn't have the
-                `notfound` label.
+                      ^^^^^^^^^^^^
+                      Using `on(notfound)` won't produce any results on `prom` Prometheus server at
+                      https://simple.example.com because [series returned by this
+                      query](https://simple.example.com/query?g0.expr=foo&&g0.tab=table) doesn't have the
+                      `notfound` label.
   problem:
     reporter: promql/vector_matching
     summary: impossible binary operation
@@ -395,8 +493,8 @@
         [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
         - message: Using `on(notfound)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned by this query](https://simple.example.com/query?g0.expr=foo&&g0.tab=table) doesn't have the `notfound` label.
-          firstcolumn: 1
-          lastcolumn: 3
+          firstcolumn: 7
+          lastcolumn: 18
           kind: 0
     lines:
         first: 2
@@ -413,12 +511,11 @@
       expr: foo_with_notfound / on(notfound) bar
   output: |
     2 |   expr: foo_with_notfound / on(notfound) bar
-                                                 ^^^
-                                                 Using `on(notfound)` won't produce any results on `prom`
-                                                 Prometheus server at https://simple.example.com because
-                                                 [series returned by this
-                                                 query](https://simple.example.com/query?g0.expr=bar&&g0.tab=table)
-                                                 don't have the `notfound` label.
+                                    ^^^^^^^^^^^^
+                                    Using `on(notfound)` won't produce any results on `prom` Prometheus
+                                    server at https://simple.example.com because [series returned by this
+                                    query](https://simple.example.com/query?g0.expr=bar&&g0.tab=table) don't
+                                    have the `notfound` label.
   problem:
     reporter: promql/vector_matching
     summary: impossible binary operation
@@ -428,8 +525,8 @@
         [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
         - message: Using `on(notfound)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned by this query](https://simple.example.com/query?g0.expr=bar&&g0.tab=table) don't have the `notfound` label.
-          firstcolumn: 34
-          lastcolumn: 36
+          firstcolumn: 21
+          lastcolumn: 32
           kind: 0
     lines:
         first: 2
@@ -481,10 +578,14 @@
       expr: min_over_time((foo_with_notfound > 0)[30m:1m]) / bar
   output: |
     2 |   expr: min_over_time((foo_with_notfound > 0)[30m:1m]) / bar
-                ^^^
-                This query will never return anything on `prom` Prometheus server at
-                https://simple.example.com because results from the right and the left hand side have
-                different labels: `[instance, job, notfound]` != `[instance, job]`.
+                                                                 ^^^
+        The right hand side of the query on `prom` Prometheus server
+        at https://simple.example.com returns labels: `[instance,
+        job]`.
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                The left hand side of the query on `prom` Prometheus server at https://simple.example.com
+                returns labels: `[instance, job, notfound]`, which don't match the right hand side labels:
+                `[instance, job]`. This query will never return any results.
   problem:
     reporter: promql/vector_matching
     summary: impossible binary operation
@@ -493,9 +594,51 @@
         You can match time series with different labels by using special keywords and follow the rules set by PromQL.
         [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
-        - message: 'This query will never return anything on `prom` Prometheus server at https://simple.example.com because results from the right and the left hand side have different labels: `[instance, job, notfound]` != `[instance, job]`.'
+        - message: 'The left hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[instance, job, notfound]`, which don''t match the right hand side labels: `[instance, job]`. This query will never return any results.'
           firstcolumn: 1
-          lastcolumn: 3
+          lastcolumn: 46
+          kind: 0
+        - message: 'The right hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[instance, job]`.'
+          firstcolumn: 50
+          lastcolumn: 52
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestVectorMatchingCheck/unary_expression_is_handled - 1]
+- description: unary expression is handled
+  content: |
+    - alert: foo
+      expr: -foo_with_notfound / bar
+  output: |
+    2 |   expr: -foo_with_notfound / bar
+                                     ^^^
+                                     The right hand side of the query on `prom` Prometheus server at
+                                     https://simple.example.com returns labels: `[instance, job]`.
+                ^^^^^^^^^^^^^^^^^^
+                The left hand side of the query on `prom` Prometheus server at https://simple.example.com
+                returns labels: `[instance, job, notfound]`, which don't match the right hand side labels:
+                `[instance, job]`. This query will never return any results.
+  problem:
+    reporter: promql/vector_matching
+    summary: impossible binary operation
+    details: |-
+        Trying to match two different time series together will only work if both have the exact same set of labels.
+        You can match time series with different labels by using special keywords and follow the rules set by PromQL.
+        [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
+    diagnostics:
+        - message: 'The left hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[instance, job, notfound]`, which don''t match the right hand side labels: `[instance, job]`. This query will never return any results.'
+          firstcolumn: 1
+          lastcolumn: 18
+          kind: 0
+        - message: 'The right hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[instance, job]`.'
+          firstcolumn: 22
+          lastcolumn: 24
           kind: 0
     lines:
         first: 2
@@ -522,7 +665,7 @@
       expr: up{job="a"} / up{job="b"}
   output: |
     2 |   expr: up{job="a"} / up{job="b"}
-                ^^^^^^^^^^^
+                ^^^^^^^^^^^^^^^^^^^^^^^^^
                 The left hand side uses `{job="a"}` while the right hand side uses `{job="b"}`, this will
                 never match.
   problem:
@@ -535,7 +678,7 @@
     diagnostics:
         - message: The left hand side uses `{job="a"}` while the right hand side uses `{job="b"}`, this will never match.
           firstcolumn: 1
-          lastcolumn: 11
+          lastcolumn: 25
           kind: 0
     lines:
         first: 2
