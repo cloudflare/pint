@@ -279,7 +279,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 					Expr:        expr.Query().Expr,
 					FirstColumn: int(lhsPos.Start) + 1,
 					LastColumn:  int(lhsPos.End),
-					Kind:        diags.Issue,
+					Kind:        diags.Context,
 				}
 			} else {
 				lhsDiag = diags.Diagnostic{
@@ -302,7 +302,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 					Expr:        expr.Query().Expr,
 					FirstColumn: int(rhsPos.Start) + 1,
 					LastColumn:  int(rhsPos.End),
-					Kind:        diags.Issue,
+					Kind:        diags.Context,
 				}
 			}
 			problems = append(problems, Problem{

@@ -28,7 +28,7 @@
         - message: 'The right hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[dev, instance, job]`.'
           firstcolumn: 48
           lastcolumn: 90
-          kind: 0
+          kind: 1
     lines:
         first: 2
         last: 2
@@ -176,7 +176,7 @@
         - message: 'The left hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[instance, job]`.'
           firstcolumn: 1
           lastcolumn: 17
-          kind: 0
+          kind: 1
         - message: 'The right hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[dev, instance, job]`, which don''t match the left hand side labels: `[instance, job]`. This query will never return any results.'
           firstcolumn: 54
           lastcolumn: 56
@@ -238,7 +238,7 @@
         - message: 'The right hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[app_name]`.'
           firstcolumn: 21
           lastcolumn: 32
-          kind: 0
+          kind: 1
     lines:
         first: 2
         last: 2
@@ -291,7 +291,7 @@
         - message: 'The right hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[instance, job]`.'
           firstcolumn: 68
           lastcolumn: 70
-          kind: 0
+          kind: 1
     lines:
         first: 2
         last: 2
@@ -395,7 +395,7 @@
         - message: 'The right hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[instance, job]`.'
           firstcolumn: 21
           lastcolumn: 23
-          kind: 0
+          kind: 1
     lines:
         first: 2
         last: 2
@@ -601,7 +601,7 @@
         - message: 'The right hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[instance, job]`.'
           firstcolumn: 50
           lastcolumn: 52
-          kind: 0
+          kind: 1
     lines:
         first: 2
         last: 2
@@ -639,7 +639,7 @@
         - message: 'The right hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[instance, job]`.'
           firstcolumn: 22
           lastcolumn: 24
-          kind: 0
+          kind: 1
     lines:
         first: 2
         last: 2
