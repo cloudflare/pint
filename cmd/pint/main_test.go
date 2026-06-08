@@ -28,6 +28,10 @@ import (
 	"go.yaml.in/yaml/v3"
 )
 
+type snapshotRecorder struct {
+	mtx sync.Mutex
+}
+
 func TestMain(m *testing.M) {
 	testscript.Main(m, map[string]func(){
 		"pint": main,
@@ -44,6 +48,7 @@ func TestScripts(t *testing.T) {
 		},
 		Setup: func(env *testscript.Env) error {
 			env.Values["mocks"] = &httpMocks{resps: map[string][]httpMock{}}
+			env.Values["snapshots"] = &snapshotRecorder{}
 			return nil
 		},
 	})
@@ -51,6 +56,7 @@ func TestScripts(t *testing.T) {
 
 func httpServer(ts *testscript.TestScript, _ bool, args []string) {
 	mocks := ts.Value("mocks").(*httpMocks)
+	recorder := ts.Value("snapshots").(*snapshotRecorder)
 
 	if len(args) == 0 {
 		ts.Fatalf("! http command requires arguments")
@@ -68,7 +74,7 @@ func httpServer(ts *testscript.TestScript, _ bool, args []string) {
 		ts.Check(err)
 		body := strings.Join(args[4:], " ")
 		mocks.add(name, httpMock{pattern: path, handler: func(w http.ResponseWriter, r *http.Request) {
-			snapshotRequest(ts, r, name, path)
+			snapshotRequest(ts, recorder, r, name, path)
 			w.WriteHeader(code)
 			_, err = w.Write([]byte(body))
 			ts.Check(err)
@@ -84,7 +90,7 @@ func httpServer(ts *testscript.TestScript, _ bool, args []string) {
 		ts.Check(err)
 		body := strings.Join(args[5:], " ")
 		mocks.add(name, httpMock{pattern: path, method: meth, handler: func(w http.ResponseWriter, r *http.Request) {
-			snapshotRequest(ts, r, name, path)
+			snapshotRequest(ts, recorder, r, name, path)
 			w.WriteHeader(code)
 			_, err := w.Write([]byte(body))
 			ts.Check(err)
@@ -104,7 +110,7 @@ func httpServer(ts *testscript.TestScript, _ bool, args []string) {
 		mocks.add(name, httpMock{pattern: path, handler: func(w http.ResponseWriter, r *http.Request) {
 			username, password, ok := r.BasicAuth()
 			if ok && username == user && password == pass {
-				snapshotRequest(ts, r, name, path)
+				snapshotRequest(ts, recorder, r, name, path)
 				w.WriteHeader(code)
 				_, err := w.Write([]byte(body))
 				ts.Check(err)
@@ -125,7 +131,7 @@ func httpServer(ts *testscript.TestScript, _ bool, args []string) {
 		ts.Check(err)
 		body := strings.Join(args[5:], " ")
 		mocks.add(name, httpMock{pattern: path, handler: func(w http.ResponseWriter, r *http.Request) {
-			snapshotRequest(ts, r, name, path)
+			snapshotRequest(ts, recorder, r, name, path)
 			time.Sleep(delay)
 			w.WriteHeader(code)
 			_, err := w.Write([]byte(body))
@@ -140,7 +146,7 @@ func httpServer(ts *testscript.TestScript, _ bool, args []string) {
 		srcpath := regexp.MustCompile(args[2])
 		dstpath := args[3]
 		mocks.add(name, httpMock{pattern: srcpath, handler: func(w http.ResponseWriter, r *http.Request) {
-			snapshotRequest(ts, r, name, srcpath)
+			snapshotRequest(ts, recorder, r, name, srcpath)
 			w.Header().Set("Location", dstpath)
 			w.WriteHeader(http.StatusFound)
 		}})
@@ -343,7 +349,7 @@ func writeCert(ts *testscript.TestScript, dirname, filename string, block *pem.B
 	ts.Logf("Wrote PEM file to %s", filename)
 }
 
-func snapshotRequest(ts *testscript.TestScript, r *http.Request, name string, path *regexp.Regexp) {
+func snapshotRequest(ts *testscript.TestScript, recorder *snapshotRecorder, r *http.Request, name string, path *regexp.Regexp) {
 	payload, err := io.ReadAll(r.Body)
 	ts.Check(err)
 	r.Body.Close()
@@ -381,6 +387,9 @@ func snapshotRequest(ts *testscript.TestScript, r *http.Request, name string, pa
 		buf.WriteString("--- END ---\n")
 	}
 	buf.WriteRune('\n')
+
+	recorder.mtx.Lock()
+	defer recorder.mtx.Unlock()
 
 	f, err := os.OpenFile(ts.MkAbs(name+".got"), os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0o644)
 	ts.Check(err)
