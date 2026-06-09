@@ -165,11 +165,13 @@ func httpServer(ts *testscript.TestScript, _ bool, args []string) {
 			tlsKey = args[4]
 		}
 
-		var mtx sync.Mutex
 		mux := http.NewServeMux()
 		mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			mocks.mtx.Lock()
+			defer mocks.mtx.Unlock()
+
 			var done bool
-			for n, mockList := range mocks.responses() {
+			for n, mockList := range mocks.resps {
 				if n == name {
 					for _, mock := range mockList {
 						if mock.method != "" && mock.method != r.Method {
@@ -178,10 +180,8 @@ func httpServer(ts *testscript.TestScript, _ bool, args []string) {
 						if !mock.pattern.MatchString(r.URL.Path) {
 							continue
 						}
-						mtx.Lock()
 						mock.handler(w, r)
 						done = true
-						mtx.Unlock()
 						break
 					}
 					break
@@ -237,12 +237,6 @@ func (m *httpMocks) add(name string, mock httpMock) {
 		m.resps[name] = []httpMock{}
 	}
 	m.resps[name] = append(m.resps[name], mock)
-}
-
-func (m *httpMocks) responses() map[string][]httpMock {
-	m.mtx.Lock()
-	defer m.mtx.Unlock()
-	return m.resps
 }
 
 func tlsCert(ts *testscript.TestScript, _ bool, args []string) {
