@@ -143,6 +143,21 @@
 
 ---
 
+[TestImpossibleCheck/abs_wrapping_sum_with_label_selector_in_division - 1]
+[]
+
+---
+
+[TestImpossibleCheck/ceil_wrapping_sum_with_label_selector_in_division - 1]
+[]
+
+---
+
+[TestImpossibleCheck/clamp_min_with_subtraction_and_vector(0) - 1]
+[]
+
+---
+
 [TestImpossibleCheck/complex_query_with_or_vector() - 1]
 - description: complex query with or vector()
   content: |4
@@ -1817,8 +1832,75 @@
 
 ---
 
+[TestImpossibleCheck/histogram_quantile_wrapping_sum_with_label_selector_in_division - 1]
+[]
+
+---
+
+[TestImpossibleCheck/hour_wrapping_sum_with_label_selector_in_division - 1]
+[]
+
+---
+
 [TestImpossibleCheck/ignores_rules_with_syntax_errors - 1]
 []
+
+---
+
+[TestImpossibleCheck/impossible_/_ignoring_group_right_side_message - 1]
+- description: impossible / ignoring group_right side message
+  content: |4
+
+    - record: foo
+      expr: sum(bar) / ignoring(instance) group_right(cluster) foo{job="bar"}
+  output: |
+    3 |   expr: sum(bar) / ignoring(instance) group_right(cluster) foo{job="bar"}
+                ^^^
+                The left hand side will never be matched because it doesn't have the `job` label while the
+                right hand side will. Query is using aggregation that removes all labels.
+  problem:
+    reporter: promql/impossible
+    summary: dead code in query
+    details: ""
+    diagnostics:
+        - message: The left hand side will never be matched because it doesn't have the `job` label while the right hand side will. Query is using aggregation that removes all labels.
+          firstcolumn: 1
+          lastcolumn: 3
+          kind: 0
+    lines:
+        first: 3
+        last: 3
+    severity: 1
+    anchor: 0
+- description: impossible / ignoring group_right side message
+  content: |4
+
+    - record: foo
+      expr: sum(bar) / ignoring(instance) group_right(cluster) foo{job="bar"}
+  output: |
+    3 |   expr: sum(bar) / ignoring(instance) group_right(cluster) foo{job="bar"}
+                                                          ^^^^^^^
+                You can't use `cluster` because this label is not
+                possible here.
+                ^^^ Query is using aggregation that removes all labels.
+  problem:
+    reporter: promql/impossible
+    summary: impossible label
+    details: ""
+    diagnostics:
+        - message: You can't use `cluster` because this label is not possible here.
+          firstcolumn: 43
+          lastcolumn: 49
+          kind: 0
+        - message: Query is using aggregation that removes all labels.
+          firstcolumn: 1
+          lastcolumn: 3
+          kind: 1
+    lines:
+        first: 3
+        last: 3
+    severity: 1
+    anchor: 0
 
 ---
 
@@ -2810,6 +2892,11 @@
 
 ---
 
+[TestImpossibleCheck/ln_wrapping_sum_with_label_selector_in_division - 1]
+[]
+
+---
+
 [TestImpossibleCheck/match_on_group_right_label - 1]
 []
 
@@ -3708,6 +3795,11 @@
         last: 3
     severity: 1
     anchor: 0
+
+---
+
+[TestImpossibleCheck/timestamp_wrapping_sum_with_label_selector_in_division - 1]
+[]
 
 ---
 

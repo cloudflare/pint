@@ -195,6 +195,16 @@ func TestImpossibleCheck(t *testing.T) {
 			problems:   true,
 		},
 		{
+			description: "impossible / ignoring group_right side message",
+			content: `
+- record: foo
+  expr: sum(bar) / ignoring(instance) group_right(cluster) foo{job="bar"}
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
+		{
 			description: "impossible sum * on sum",
 			content: `
 - record: foo
@@ -717,6 +727,79 @@ func TestImpossibleCheck(t *testing.T) {
       / ignoring(module_name) group_left
       sum(colo:requests:rate5m) by (colo_name)
     ) > 0.01
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+		},
+		{
+			description: "clamp_min with subtraction and vector(0)",
+			content: `
+- alert: foo
+  expr: |
+    (
+      clamp_min(
+        sum(global:token_security_proxy_service_proxy_request_total:rate5m{status_class="5xx"})
+        -
+        (sum(global:token_security_proxy_service_upstream_fetch_total:rate5m{status_class="5xx"}) or vector(0)),
+        0
+      )
+      /
+      sum(global:token_security_proxy_service_proxy_request_total:rate5m)
+    ) > 0.05
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+		},
+		{
+			description: "abs wrapping sum with label selector in division",
+			content: `
+- alert: foo
+  expr: abs(sum(foo{job="bar"})) / sum(foo)
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+		},
+		{
+			description: "ceil wrapping sum with label selector in division",
+			content: `
+- alert: foo
+  expr: ceil(sum(foo{job="bar"})) / sum(foo)
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+		},
+		{
+			description: "hour wrapping sum with label selector in division",
+			content: `
+- alert: foo
+  expr: hour(sum(foo{job="bar"})) / sum(foo)
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+		},
+		{
+			description: "ln wrapping sum with label selector in division",
+			content: `
+- alert: foo
+  expr: ln(sum(foo{job="bar"})) / sum(foo)
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+		},
+		{
+			description: "histogram_quantile wrapping sum with label selector in division",
+			content: `
+- alert: foo
+  expr: histogram_quantile(0.9, sum(foo{job="bar"})) / sum(foo)
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+		},
+		{
+			description: "timestamp wrapping sum with label selector in division",
+			content: `
+- alert: foo
+  expr: timestamp(sum(foo{job="bar"})) / sum(foo)
 `,
 			checker:    newImpossibleCheck,
 			prometheus: newSimpleProm,

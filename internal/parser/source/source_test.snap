@@ -2451,8 +2451,8 @@ output:
             reason: Query will only return series where these labels are present.
             kind: guaranteed
             fragment:
-                start: 0
-                end: 31
+                start: 4
+                end: 30
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{job="myjob"} offset 5m'
@@ -2474,8 +2474,8 @@ output:
             reason: Query will only return series where these labels are present.
             kind: guaranteed
             fragment:
-                start: 0
-                end: 43
+                start: 4
+                end: 20
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{job="myjob"}'
@@ -2493,8 +2493,8 @@ output:
             reason: Query will only return series where these labels are present.
             kind: guaranteed
             fragment:
-                start: 0
-                end: 43
+                start: 24
+                end: 42
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] bar{cluster="dev"}'
@@ -5599,8 +5599,8 @@ output:
             reason: Query will only return series where these labels are present.
             kind: guaranteed
             fragment:
-                start: 0
-                end: 35
+                start: 14
+                end: 30
       returns: vector
       operations:
         - node: '[*parser.MatrixSelector] foo{job="myjob"}[5m]'
@@ -5655,8 +5655,8 @@ output:
             reason: Query will only return series where these labels are present.
             kind: guaranteed
             fragment:
-                start: 0
-                end: 29
+                start: 14
+                end: 28
       returns: vector
       operations:
         - node: '[*parser.VectorSelector] foo{job="foo"}'
@@ -8405,8 +8405,8 @@ output:
                     reason: Query will only return series where these labels are present.
                     kind: guaranteed
                     fragment:
-                        start: 72
-                        end: 110
+                        start: 77
+                        end: 105
             returns: vector
             operations:
                 - node: '[*parser.MatrixSelector] metric3{log_name="samplerd"}[5m]'
@@ -8610,8 +8610,8 @@ output:
                     reason: Query will only return series where these labels are present.
                     kind: guaranteed
                     fragment:
-                        start: 72
-                        end: 110
+                        start: 77
+                        end: 105
             returns: vector
             operations:
                 - node: '[*parser.MatrixSelector] metric3{log_name="samplerd"}[5m]'
@@ -16703,8 +16703,8 @@ output:
             reason: Query will only return series where these labels are present.
             kind: guaranteed
             fragment:
-                start: 9
-                end: 50
+                start: 14
+                end: 45
       returns: vector
       operations:
         - node: '[*parser.MatrixSelector] panics_total{module_name=~".+"}[5m]'
@@ -19229,6 +19229,479 @@ output:
         start: 0
         end: 3
       type: selector
+
+---
+
+[TestLabelsSource/267 - 1]
+expr: |4-
+
+    (
+      clamp_min(
+        sum(foo{status_class="5xx"})
+        -
+        (sum(bar{status_class="5xx"}) or vector(0)),
+        0
+      )
+      /
+      sum(foo)
+    ) > 0.05
+output:
+    - labels:
+        "":
+            reason: Query is using aggregation that removes all labels.
+            kind: excluded
+            fragment:
+                start: 20
+                end: 23
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 5
+                end: 128
+        status_class:
+            reason: Query is using aggregation that removes all labels.
+            kind: excluded
+            fragment:
+                start: 20
+                end: 23
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo{status_class="5xx"}'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum(foo{status_class="5xx"})'
+          op: sum
+        - args:
+            - "0"
+          node: '[*parser.Call] clamp_min(sum(foo{status_class="5xx"}) - (sum(bar{status_class="5xx"}) or vector(0)), 0)'
+          op: clamp_min
+      joins:
+        - addedlabels: []
+          depth: 0
+          ison: false
+          matchinglabels: []
+          op: '-'
+          src:
+            labels:
+                "":
+                    reason: Query is using aggregation that removes all labels.
+                    kind: excluded
+                    fragment:
+                        start: 60
+                        end: 63
+                __name__:
+                    reason: Aggregation removes metric name.
+                    kind: excluded
+                    fragment:
+                        start: 60
+                        end: 88
+                status_class:
+                    reason: Query is using aggregation that removes all labels.
+                    kind: excluded
+                    fragment:
+                        start: 60
+                        end: 63
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar{status_class="5xx"}'
+                  op: ""
+                - node: '[*parser.AggregateExpr] sum(bar{status_class="5xx"})'
+                  op: sum
+            position:
+                start: 64
+                end: 87
+            type: aggregation
+            fixedLabels: true
+        - addedlabels: []
+          depth: 0
+          ison: false
+          matchinglabels: []
+          op: '-'
+          src:
+            labels:
+                "":
+                    reason: Calling `vector()` will return a vector value with no labels.
+                    kind: excluded
+                    fragment:
+                        start: 92
+                        end: 98
+            returns: vector
+            operations:
+                - args:
+                    - "0"
+                  node: '[*parser.Call] vector(0)'
+                  op: vector
+            indirect:
+                - labels:
+                    "":
+                        reason: This query returns a number value with no labels.
+                        kind: excluded
+                        fragment:
+                            start: 99
+                            end: 100
+                  returns: scalar
+                  returnInfo:
+                    logicalexpr: ""
+                    valueposition:
+                        start: 99
+                        end: 100
+                    returnednumber: 0
+                    alwaysreturns: true
+                    knownreturn: true
+                    isreturnbool: false
+                  position:
+                    start: 99
+                    end: 100
+                  type: number
+                  fixedLabels: true
+            returnInfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 92
+                    end: 101
+                returnednumber: 0
+                alwaysreturns: true
+                knownreturn: true
+                isreturnbool: false
+            position:
+                start: 92
+                end: 101
+            type: function
+            fixedLabels: true
+        - addedlabels: []
+          depth: 0
+          ison: false
+          matchinglabels: []
+          op: /
+          src:
+            labels:
+                "":
+                    reason: Query is using aggregation that removes all labels.
+                    kind: excluded
+                    fragment:
+                        start: 120
+                        end: 123
+                __name__:
+                    reason: Aggregation removes metric name.
+                    kind: excluded
+                    fragment:
+                        start: 120
+                        end: 128
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] foo'
+                  op: ""
+                - node: '[*parser.AggregateExpr] sum(foo)'
+                  op: sum
+            position:
+                start: 124
+                end: 127
+            type: aggregation
+            fixedLabels: true
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 108
+                    end: 109
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 108
+                end: 109
+            returnednumber: 0
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 108
+            end: 109
+          type: number
+          fixedLabels: true
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 133
+                    end: 137
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 133
+                end: 137
+            returnednumber: 0.05
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 133
+            end: 137
+          type: number
+          fixedLabels: true
+      position:
+        start: 20
+        end: 102
+      type: function
+      fixedLabels: true
+      isConditional: true
+
+---
+
+[TestLabelsSource/268 - 1]
+expr: abs(sum(foo{job="bar"}))
+output:
+    - labels:
+        "":
+            reason: Query is using aggregation that removes all labels.
+            kind: excluded
+            fragment:
+                start: 4
+                end: 7
+        __name__:
+            reason: Aggregation removes metric name.
+            kind: excluded
+            fragment:
+                start: 4
+                end: 23
+        job:
+            reason: Query is using aggregation that removes all labels.
+            kind: excluded
+            fragment:
+                start: 4
+                end: 7
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo{job="bar"}'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum(foo{job="bar"})'
+          op: sum
+        - node: '[*parser.Call] abs(sum(foo{job="bar"}))'
+          op: abs
+      position:
+        start: 4
+        end: 23
+      type: function
+      fixedLabels: true
+
+---
+
+[TestLabelsSource/269 - 1]
+expr: ceil(sum(foo{job="bar"}))
+output:
+    - labels:
+        "":
+            reason: Query is using aggregation that removes all labels.
+            kind: excluded
+            fragment:
+                start: 5
+                end: 8
+        __name__:
+            reason: Aggregation removes metric name.
+            kind: excluded
+            fragment:
+                start: 5
+                end: 24
+        job:
+            reason: Query is using aggregation that removes all labels.
+            kind: excluded
+            fragment:
+                start: 5
+                end: 8
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo{job="bar"}'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum(foo{job="bar"})'
+          op: sum
+        - node: '[*parser.Call] ceil(sum(foo{job="bar"}))'
+          op: ceil
+      position:
+        start: 5
+        end: 24
+      type: function
+      fixedLabels: true
+
+---
+
+[TestLabelsSource/270 - 1]
+expr: hour(sum(foo{job="bar"}))
+output:
+    - labels:
+        "":
+            reason: Query is using aggregation that removes all labels.
+            kind: excluded
+            fragment:
+                start: 5
+                end: 8
+        __name__:
+            reason: Aggregation removes metric name.
+            kind: excluded
+            fragment:
+                start: 5
+                end: 24
+        job:
+            reason: Query is using aggregation that removes all labels.
+            kind: excluded
+            fragment:
+                start: 5
+                end: 8
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo{job="bar"}'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum(foo{job="bar"})'
+          op: sum
+        - node: '[*parser.Call] hour(sum(foo{job="bar"}))'
+          op: hour
+      position:
+        start: 5
+        end: 24
+      type: function
+      fixedLabels: true
+
+---
+
+[TestLabelsSource/271 - 1]
+expr: ln(sum(foo{job="bar"}))
+output:
+    - labels:
+        "":
+            reason: Query is using aggregation that removes all labels.
+            kind: excluded
+            fragment:
+                start: 3
+                end: 6
+        __name__:
+            reason: Aggregation removes metric name.
+            kind: excluded
+            fragment:
+                start: 3
+                end: 22
+        job:
+            reason: Query is using aggregation that removes all labels.
+            kind: excluded
+            fragment:
+                start: 3
+                end: 6
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo{job="bar"}'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum(foo{job="bar"})'
+          op: sum
+        - node: '[*parser.Call] ln(sum(foo{job="bar"}))'
+          op: ln
+      position:
+        start: 3
+        end: 22
+      type: function
+      fixedLabels: true
+
+---
+
+[TestLabelsSource/272 - 1]
+expr: histogram_quantile(0.9, sum(foo{job="bar"}))
+output:
+    - labels:
+        "":
+            reason: Query is using aggregation that removes all labels.
+            kind: excluded
+            fragment:
+                start: 24
+                end: 27
+        __name__:
+            reason: Aggregation removes metric name.
+            kind: excluded
+            fragment:
+                start: 24
+                end: 43
+        job:
+            reason: Query is using aggregation that removes all labels.
+            kind: excluded
+            fragment:
+                start: 24
+                end: 27
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo{job="bar"}'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum(foo{job="bar"})'
+          op: sum
+        - args:
+            - "0.9"
+          node: '[*parser.Call] histogram_quantile(0.9, sum(foo{job="bar"}))'
+          op: histogram_quantile
+      indirect:
+        - labels:
+            "":
+                reason: This query returns a number value with no labels.
+                kind: excluded
+                fragment:
+                    start: 19
+                    end: 22
+          returns: scalar
+          returnInfo:
+            logicalexpr: ""
+            valueposition:
+                start: 19
+                end: 22
+            returnednumber: 0.9
+            alwaysreturns: true
+            knownreturn: true
+            isreturnbool: false
+          position:
+            start: 19
+            end: 22
+          type: number
+          fixedLabels: true
+      position:
+        start: 24
+        end: 43
+      type: function
+      fixedLabels: true
+
+---
+
+[TestLabelsSource/273 - 1]
+expr: timestamp(sum(foo{job="bar"}))
+output:
+    - labels:
+        "":
+            reason: Query is using aggregation that removes all labels.
+            kind: excluded
+            fragment:
+                start: 10
+                end: 13
+        __name__:
+            reason: Aggregation removes metric name.
+            kind: excluded
+            fragment:
+                start: 10
+                end: 29
+        job:
+            reason: Query is using aggregation that removes all labels.
+            kind: excluded
+            fragment:
+                start: 10
+                end: 13
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo{job="bar"}'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum(foo{job="bar"})'
+          op: sum
+        - node: '[*parser.Call] timestamp(sum(foo{job="bar"}))'
+          op: timestamp
+      position:
+        start: 10
+        end: 29
+      type: function
+      fixedLabels: true
 
 ---
 

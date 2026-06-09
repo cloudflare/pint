@@ -94,8 +94,10 @@ To avoid false positives pint won't run series checks here but that doesn't guar
 To fully validate your changes it's best to first deploy the rules that generate the time series needed by other rules.
 [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#your-query-is-using-recording-rules) for more details.
 `
-	SeriesCheckCommonProblemDetails = `[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.`
-	SeriesCheckMinAgeDetails        = `You have a comment that tells pint how long a metric can be missing before it warns you about it but this comment is not formatted correctly.
+
+	SeriesCheckSometimesPresentDetail = "If this metric is expected to exist only under certain conditions, you might want to add a `# pint disable promql/series(...)` comment to avoid pint reports when it's missing. [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) for docs about disable comment syntax."
+	SeriesCheckCommonProblemDetails   = `[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.`
+	SeriesCheckMinAgeDetails          = `You have a comment that tells pint how long a metric can be missing before it warns you about it but this comment is not formatted correctly.
 [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#min-age) to see supported syntax.`
 	SeriesCheckUnusedDisableComment = "One of the `# pint disable promql/series` comments used in this rule doesn't have any effect and won't disable anything. Make sure that the comment targets series that are used in the rule query and are not already ignored.\n[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax."
 	SeriesCheckUnusedRuleSetComment = "One of the `# pint rule/set promql/series` comments used in this rule doesn't have any effect. Make sure that the comment targets series and labels that are used in the rule query and are not already ignored.\n[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#ignorelabel-value) for docs about comment syntax."
@@ -648,7 +650,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 					Anchor:   AnchorAfter,
 					Lines:    expr.Value.Pos.Lines(),
 					Reporter: c.Reporter(),
-					Details:  SeriesCheckCommonProblemDetails,
+					Details:  SeriesCheckCommonProblemDetails + "\n" + SeriesCheckSometimesPresentDetail,
 					Severity: Warning,
 					Summary:  "query on nonexistent series",
 					Diagnostics: []diags.Diagnostic{
