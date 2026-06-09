@@ -465,6 +465,23 @@ group by (cluster, namespace, workload, workload_type, pod) (
 	`round(foo, scalar(precision_metric))`,
 	`predict_linear(foo[5m], scalar(horizon))`,
 	`foo + scalar(bar)`,
+	`
+(
+  clamp_min(
+    sum(foo{status_class="5xx"})
+    -
+    (sum(bar{status_class="5xx"}) or vector(0)),
+    0
+  )
+  /
+  sum(foo)
+) > 0.05`,
+	`abs(sum(foo{job="bar"}))`,
+	`ceil(sum(foo{job="bar"}))`,
+	`hour(sum(foo{job="bar"}))`,
+	`ln(sum(foo{job="bar"}))`,
+	`histogram_quantile(0.9, sum(foo{job="bar"}))`,
+	`timestamp(sum(foo{job="bar"}))`,
 }
 
 func TestLabelsSource(t *testing.T) {

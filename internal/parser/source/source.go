@@ -886,42 +886,18 @@ func parsePromQLFunc(s *Source, expr string, n *promParser.Call) *Source {
 		"cos", "cosh", "sin", "sinh", "tan", "tanh":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		vs, _ := MostOuterOperation[*promParser.VectorSelector](s)
-		s.guaranteeLabel(
-			"Query will only return series where these labels are present.",
-			n.PosRange,
-			labelsFromSelectors(guaranteedLabelsMatches, vs)...,
-		)
 
 	case "ceil", "floor", "round":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		vs, _ := MostOuterOperation[*promParser.VectorSelector](s)
-		s.guaranteeLabel(
-			"Query will only return series where these labels are present.",
-			n.PosRange,
-			labelsFromSelectors(guaranteedLabelsMatches, vs)...,
-		)
 
 	case "changes", "resets":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		vs, _ := MostOuterOperation[*promParser.VectorSelector](s)
-		s.guaranteeLabel(
-			"Query will only return series where these labels are present.",
-			n.PosRange,
-			labelsFromSelectors(guaranteedLabelsMatches, vs)...,
-		)
 
 	case "clamp", "clamp_max", "clamp_min":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		vs, _ := MostOuterOperation[*promParser.VectorSelector](s)
-		s.guaranteeLabel(
-			"Query will only return series where these labels are present.",
-			n.PosRange,
-			labelsFromSelectors(guaranteedLabelsMatches, vs)...,
-		)
 
 	case "absent", "absent_over_time":
 		s.Returns = promParser.ValueTypeVector
@@ -960,12 +936,6 @@ If you're hoping to get instance specific labels this way and alert when some ta
 		"sum_over_time":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		vs, _ := MostOuterOperation[*promParser.VectorSelector](s)
-		s.guaranteeLabel(
-			"Query will only return series where these labels are present.",
-			n.PosRange,
-			labelsFromSelectors(guaranteedLabelsMatches, vs)...,
-		)
 
 	case "days_in_month", "day_of_month", "day_of_week", "day_of_year", "hour", "minute", "month", "year":
 		s.Returns = promParser.ValueTypeVector
@@ -981,33 +951,15 @@ If you're hoping to get instance specific labels this way and alert when some ta
 				n.PosRange,
 				nil,
 			)
-		} else {
-			vs, _ := MostOuterOperation[*promParser.VectorSelector](s)
-			s.guaranteeLabel(
-				"Query will only return series where these labels are present.",
-				n.PosRange,
-				labelsFromSelectors(guaranteedLabelsMatches, vs)...,
-			)
 		}
 
 	case "deg", "rad", "ln", "log10", "log2", "sqrt", "exp":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		vs, _ := MostOuterOperation[*promParser.VectorSelector](s)
-		s.guaranteeLabel(
-			"Query will only return series where these labels are present.",
-			n.PosRange,
-			labelsFromSelectors(guaranteedLabelsMatches, vs)...,
-		)
+
 	case "delta", "idelta", "increase", "deriv", "irate", "rate":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		vs, _ := MostOuterOperation[*promParser.VectorSelector](s)
-		s.guaranteeLabel(
-			"Query will only return series where these labels are present.",
-			n.PosRange,
-			labelsFromSelectors(guaranteedLabelsMatches, vs)...,
-		)
 
 	case "histogram_avg",
 		"histogram_count",
@@ -1019,22 +971,11 @@ If you're hoping to get instance specific labels this way and alert when some ta
 		"histogram_sum":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		vs, _ := MostOuterOperation[*promParser.VectorSelector](s)
-		s.guaranteeLabel(
-			"Query will only return series where these labels are present.",
-			n.PosRange,
-			labelsFromSelectors(guaranteedLabelsMatches, vs)...,
-		)
 
 	case "double_exponential_smoothing", "holt_winters", "predict_linear":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		vs, _ := MostOuterOperation[*promParser.VectorSelector](s)
-		s.guaranteeLabel(
-			"Query will only return series where these labels are present.",
-			n.PosRange,
-			labelsFromSelectors(guaranteedLabelsMatches, vs)...,
-		)
+
 	case "label_join":
 		// One label added to the results.
 		// label_join(v instant-vector, dst_label string, separator string, src_label_1 string, src_label_2 string, ...)
@@ -1047,6 +988,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 		for i := 3; i < len(n.Args); i++ {
 			s.UsedLabels = appendToSlice(s.UsedLabels, n.Args[i].(*promParser.StringLiteral).Val)
 		}
+
 	case "label_replace":
 		// One label added to the results.
 		// label_replace(v instant-vector, dst_label string, replacement string, src_label string, regex string)
@@ -1107,23 +1049,11 @@ If you're hoping to get instance specific labels this way and alert when some ta
 		"ts_of_min_over_time":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		vs, _ := MostOuterOperation[*promParser.VectorSelector](s)
-		s.guaranteeLabel(
-			"Query will only return series where these labels are present.",
-			n.PosRange,
-			labelsFromSelectors(guaranteedLabelsMatches, vs)...,
-		)
 
 	case "info":
 		// info() joins labels from an info-series onto the input vector.
 		// The joined labels are dynamic so we treat this as no label change.
 		s.Returns = promParser.ValueTypeVector
-		vs, _ := MostOuterOperation[*promParser.VectorSelector](s)
-		s.guaranteeLabel(
-			"Query will only return series where these labels are present.",
-			n.PosRange,
-			labelsFromSelectors(guaranteedLabelsMatches, vs)...,
-		)
 
 	case "vector":
 		s.Returns = promParser.ValueTypeVector

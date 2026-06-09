@@ -7,6 +7,13 @@
 - [promql/vector_matching](checks/promql/vector_matching.md) was refactored heavily
   to be faster and more accurate.
 
+### Fixed
+
+- Fixed false positive reports from [promql/impossible](checks/promql/impossible.md)
+  when functions like `abs()`, `clamp_min()`, `hour()`, `ln()`,
+  `histogram_quantile()`, or `timestamp()` wrap aggregations that already remove
+  labels.
+
 ## v0.85.0
 
 ### Added
