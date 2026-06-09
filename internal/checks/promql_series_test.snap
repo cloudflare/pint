@@ -964,7 +964,9 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: |-
+        [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.
+        If this metric is expected to exist only under certain conditions, you might want to add a `# pint disable promql/series(...)` comment to avoid pint reports when it's missing. [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) for docs about disable comment syntax.
     diagnostics:
         - message: The `found` metric with label `{sometimes="xxx"}` is only sometimes present on `prom` Prometheus server at https://simple.example.com with an average life span of 18h45m.
           firstcolumn: 11
