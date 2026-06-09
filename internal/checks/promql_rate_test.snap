@@ -74,12 +74,12 @@
     details: |-
         Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) and [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) function comes with a few requirements:
 
-        - The metric you calculate (i)rate from must be a counter or native histograms.
+        - The metric you calculate (i)rate from must be a counter or a native histogram.
         - The time window of the (i)rate function must have at least 2 samples.
 
         The type of your metric is defined by the application that exports that metric.
         The number of samples depends on how often your application is being scraped by Prometheus.
-        Each scrape produces a sample, so if your application is scrape every minute then the minimal time window you can use is two minutes.
+        Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
     diagnostics:
         - message: Duration for `deriv()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
           firstcolumn: 1
@@ -179,12 +179,12 @@
     details: |-
         Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) and [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) function comes with a few requirements:
 
-        - The metric you calculate (i)rate from must be a counter or native histograms.
+        - The metric you calculate (i)rate from must be a counter or a native histogram.
         - The time window of the (i)rate function must have at least 2 samples.
 
         The type of your metric is defined by the application that exports that metric.
         The number of samples depends on how often your application is being scraped by Prometheus.
-        Each scrape produces a sample, so if your application is scrape every minute then the minimal time window you can use is two minutes.
+        Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
     diagnostics:
         - message: Duration for `irate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
           firstcolumn: 1
@@ -254,12 +254,12 @@
     details: |-
         Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) and [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) function comes with a few requirements:
 
-        - The metric you calculate (i)rate from must be a counter or native histograms.
+        - The metric you calculate (i)rate from must be a counter or a native histogram.
         - The time window of the (i)rate function must have at least 2 samples.
 
         The type of your metric is defined by the application that exports that metric.
         The number of samples depends on how often your application is being scraped by Prometheus.
-        Each scrape produces a sample, so if your application is scrape every minute then the minimal time window you can use is two minutes.
+        Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
     diagnostics:
         - message: Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
           firstcolumn: 1
@@ -312,12 +312,12 @@
     details: |-
         Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) and [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) function comes with a few requirements:
 
-        - The metric you calculate (i)rate from must be a counter or native histograms.
+        - The metric you calculate (i)rate from must be a counter or a native histogram.
         - The time window of the (i)rate function must have at least 2 samples.
 
         The type of your metric is defined by the application that exports that metric.
         The number of samples depends on how often your application is being scraped by Prometheus.
-        Each scrape produces a sample, so if your application is scrape every minute then the minimal time window you can use is two minutes.
+        Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
     diagnostics:
         - message: Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
           firstcolumn: 1
@@ -348,12 +348,12 @@
     details: |-
         Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) and [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) function comes with a few requirements:
 
-        - The metric you calculate (i)rate from must be a counter or native histograms.
+        - The metric you calculate (i)rate from must be a counter or a native histogram.
         - The time window of the (i)rate function must have at least 2 samples.
 
         The type of your metric is defined by the application that exports that metric.
         The number of samples depends on how often your application is being scraped by Prometheus.
-        Each scrape produces a sample, so if your application is scrape every minute then the minimal time window you can use is two minutes.
+        Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
     diagnostics:
         - message: Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
           firstcolumn: 26
@@ -384,12 +384,12 @@
     details: |-
         Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) and [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) function comes with a few requirements:
 
-        - The metric you calculate (i)rate from must be a counter or native histograms.
+        - The metric you calculate (i)rate from must be a counter or a native histogram.
         - The time window of the (i)rate function must have at least 2 samples.
 
         The type of your metric is defined by the application that exports that metric.
         The number of samples depends on how often your application is being scraped by Prometheus.
-        Each scrape produces a sample, so if your application is scrape every minute then the minimal time window you can use is two minutes.
+        Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
     diagnostics:
         - message: '`rate()` should only be used with counters but `bar_g` is a gauge according to metrics metadata from `prom` Prometheus server at https://simple.example.com.'
           firstcolumn: 19
@@ -419,12 +419,12 @@
     details: |-
         Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) and [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) function comes with a few requirements:
 
-        - The metric you calculate (i)rate from must be a counter or native histograms.
+        - The metric you calculate (i)rate from must be a counter or a native histogram.
         - The time window of the (i)rate function must have at least 2 samples.
 
         The type of your metric is defined by the application that exports that metric.
         The number of samples depends on how often your application is being scraped by Prometheus.
-        Each scrape produces a sample, so if your application is scrape every minute then the minimal time window you can use is two minutes.
+        Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
     diagnostics:
         - message: '`rate()` should only be used with counters but `foo` is a gauge according to metrics metadata from `prom` Prometheus server at https://simple.example.com.'
           firstcolumn: 1
@@ -454,12 +454,12 @@
     details: |-
         Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) and [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) function comes with a few requirements:
 
-        - The metric you calculate (i)rate from must be a counter or native histograms.
+        - The metric you calculate (i)rate from must be a counter or a native histogram.
         - The time window of the (i)rate function must have at least 2 samples.
 
         The type of your metric is defined by the application that exports that metric.
         The number of samples depends on how often your application is being scraped by Prometheus.
-        Each scrape produces a sample, so if your application is scrape every minute then the minimal time window you can use is two minutes.
+        Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
     diagnostics:
         - message: Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
           firstcolumn: 1
@@ -485,12 +485,12 @@
     details: |-
         Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) and [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) function comes with a few requirements:
 
-        - The metric you calculate (i)rate from must be a counter or native histograms.
+        - The metric you calculate (i)rate from must be a counter or a native histogram.
         - The time window of the (i)rate function must have at least 2 samples.
 
         The type of your metric is defined by the application that exports that metric.
         The number of samples depends on how often your application is being scraped by Prometheus.
-        Each scrape produces a sample, so if your application is scrape every minute then the minimal time window you can use is two minutes.
+        Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
     diagnostics:
         - message: '`rate()` should only be used with counters but `foo` is a gauge according to metrics metadata from `prom` Prometheus server at https://simple.example.com.'
           firstcolumn: 1
@@ -535,12 +535,12 @@
     details: |-
         Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) and [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) function comes with a few requirements:
 
-        - The metric you calculate (i)rate from must be a counter or native histograms.
+        - The metric you calculate (i)rate from must be a counter or a native histogram.
         - The time window of the (i)rate function must have at least 2 samples.
 
         The type of your metric is defined by the application that exports that metric.
         The number of samples depends on how often your application is being scraped by Prometheus.
-        Each scrape produces a sample, so if your application is scrape every minute then the minimal time window you can use is two minutes.
+        Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
     diagnostics:
         - message: Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
           firstcolumn: 1
@@ -659,12 +659,12 @@
     details: |-
         Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) and [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) function comes with a few requirements:
 
-        - The metric you calculate (i)rate from must be a counter or native histograms.
+        - The metric you calculate (i)rate from must be a counter or a native histogram.
         - The time window of the (i)rate function must have at least 2 samples.
 
         The type of your metric is defined by the application that exports that metric.
         The number of samples depends on how often your application is being scraped by Prometheus.
-        Each scrape produces a sample, so if your application is scrape every minute then the minimal time window you can use is two minutes.
+        Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
     diagnostics:
         - message: Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
           firstcolumn: 11

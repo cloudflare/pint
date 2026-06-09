@@ -46,8 +46,8 @@
     reporter: alerts/absent
     summary: absent() based alert with insufficient for
     details: |-
-        When Prometheus restart this alert rule might be evaluated before your service is scraped, which can cause false positives from absent() call.
-        Adding `for` option that is at least 2x scrape interval will prevent this from happening.
+        When Prometheus restarts this alert rule might be evaluated before your service is scraped, which can cause false positives from absent() call.
+        Adding a `for` option that is at least 2x scrape interval will prevent this from happening.
     diagnostics:
         - message: Using `absent()` might cause false positive alerts when Prometheus restarts.
           firstcolumn: 1
@@ -80,8 +80,8 @@
     reporter: alerts/absent
     summary: absent() based alert with insufficient for
     details: |-
-        When Prometheus restart this alert rule might be evaluated before your service is scraped, which can cause false positives from absent() call.
-        Adding `for` option that is at least 2x scrape interval will prevent this from happening.
+        When Prometheus restarts this alert rule might be evaluated before your service is scraped, which can cause false positives from absent() call.
+        Adding a `for` option that is at least 2x scrape interval will prevent this from happening.
     diagnostics:
         - message: Using `absent()` might cause false positive alerts when Prometheus restarts.
           firstcolumn: 1
@@ -114,8 +114,8 @@
     reporter: alerts/absent
     summary: absent() based alert with insufficient for
     details: |-
-        When Prometheus restart this alert rule might be evaluated before your service is scraped, which can cause false positives from absent() call.
-        Adding `for` option that is at least 2x scrape interval will prevent this from happening.
+        When Prometheus restarts this alert rule might be evaluated before your service is scraped, which can cause false positives from absent() call.
+        Adding a `for` option that is at least 2x scrape interval will prevent this from happening.
     diagnostics:
         - message: Using `absent()` might cause false positive alerts when Prometheus restarts.
           firstcolumn: 1
@@ -150,8 +150,8 @@
     reporter: alerts/absent
     summary: absent() based alert without for
     details: |-
-        When Prometheus restart this alert rule might be evaluated before your service is scraped, which can cause false positives from absent() call.
-        Adding `for` option that is at least 2x scrape interval will prevent this from happening.
+        When Prometheus restarts this alert rule might be evaluated before your service is scraped, which can cause false positives from absent() call.
+        Adding a `for` option that is at least 2x scrape interval will prevent this from happening.
     diagnostics:
         - message: Using `absent()` might cause false positive alerts when Prometheus restarts.
           firstcolumn: 1
@@ -234,8 +234,8 @@
     reporter: alerts/absent
     summary: absent() based alert without for
     details: |-
-        When Prometheus restart this alert rule might be evaluated before your service is scraped, which can cause false positives from absent() call.
-        Adding `for` option that is at least 2x scrape interval will prevent this from happening.
+        When Prometheus restarts this alert rule might be evaluated before your service is scraped, which can cause false positives from absent() call.
+        Adding a `for` option that is at least 2x scrape interval will prevent this from happening.
     diagnostics:
         - message: Using `absent()` might cause false positive alerts when Prometheus restarts.
           firstcolumn: 19

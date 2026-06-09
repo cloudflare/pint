@@ -4231,7 +4231,7 @@ expr: label_join(up{job="api-server",src1="a",src2="b",src3="c"}, "foo", ",", "s
 output:
     - labels:
         foo:
-            reason: This label will be added to the result by label_join() call.
+            reason: This label will be added to the result by a label_join() call.
             kind: guaranteed
             fragment:
                 start: 0
@@ -4676,7 +4676,7 @@ output:
     - labels:
         "":
             reason: |-
-                The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+                The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if the provided query doesn't match any time series.
                 You will only get any results back if the metric selector you pass doesn't match anything.
                 Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
                 This means that the only labels you can get back from absent call are the ones you pass to it.
@@ -4686,7 +4686,7 @@ output:
                 start: 0
                 end: 6
         job:
-            reason: All labels passed to absent() call will be present on the results if the query doesn't match anything.
+            reason: All labels passed to a absent() call will be present on the results if the query doesn't match anything.
             kind: guaranteed
             fragment:
                 start: 0
@@ -4713,7 +4713,7 @@ output:
     - labels:
         "":
             reason: |-
-                The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+                The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if the provided query doesn't match any time series.
                 You will only get any results back if the metric selector you pass doesn't match anything.
                 Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
                 This means that the only labels you can get back from absent call are the ones you pass to it.
@@ -4723,14 +4723,14 @@ output:
                 start: 0
                 end: 6
         env:
-            reason: All labels passed to absent() call will be present on the results if the query doesn't match anything.
+            reason: All labels passed to a absent() call will be present on the results if the query doesn't match anything.
             kind: guaranteed
             fragment:
                 start: 0
                 end: 66
         instance:
             reason: |-
-                The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+                The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if the provided query doesn't match any time series.
                 You will only get any results back if the metric selector you pass doesn't match anything.
                 Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
                 This means that the only labels you can get back from absent call are the ones you pass to it.
@@ -4740,7 +4740,7 @@ output:
                 start: 0
                 end: 6
         job:
-            reason: All labels passed to absent() call will be present on the results if the query doesn't match anything.
+            reason: All labels passed to a absent() call will be present on the results if the query doesn't match anything.
             kind: guaranteed
             fragment:
                 start: 0
@@ -4768,7 +4768,7 @@ output:
     - labels:
         "":
             reason: |-
-                The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+                The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if the provided query doesn't match any time series.
                 You will only get any results back if the metric selector you pass doesn't match anything.
                 Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
                 This means that the only labels you can get back from absent call are the ones you pass to it.
@@ -4785,7 +4785,7 @@ output:
                 end: 33
         instance:
             reason: |-
-                The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+                The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if the provided query doesn't match any time series.
                 You will only get any results back if the metric selector you pass doesn't match anything.
                 Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
                 This means that the only labels you can get back from absent call are the ones you pass to it.
@@ -4796,7 +4796,7 @@ output:
                 end: 6
         job:
             reason: |-
-                The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+                The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if the provided query doesn't match any time series.
                 You will only get any results back if the metric selector you pass doesn't match anything.
                 Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
                 This means that the only labels you can get back from absent call are the ones you pass to it.
@@ -4827,7 +4827,7 @@ output:
     - labels:
         "":
             reason: |-
-                The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+                The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if the provided query doesn't match any time series.
                 You will only get any results back if the metric selector you pass doesn't match anything.
                 Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
                 This means that the only labels you can get back from absent call are the ones you pass to it.
@@ -4837,13 +4837,13 @@ output:
                 start: 0
                 end: 6
         job:
-            reason: All labels passed to absent() call will be present on the results if the query doesn't match anything.
+            reason: All labels passed to a absent() call will be present on the results if the query doesn't match anything.
             kind: guaranteed
             fragment:
                 start: 0
                 end: 38
         xxx:
-            reason: All labels passed to absent() call will be present on the results if the query doesn't match anything.
+            reason: All labels passed to a absent() call will be present on the results if the query doesn't match anything.
             kind: guaranteed
             fragment:
                 start: 0
@@ -5068,7 +5068,7 @@ output:
     - labels:
         "":
             reason: |-
-                The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+                The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if the provided query doesn't match any time series.
                 You will only get any results back if the metric selector you pass doesn't match anything.
                 Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
                 This means that the only labels you can get back from absent call are the ones you pass to it.
@@ -5091,7 +5091,7 @@ output:
     - labels:
         "":
             reason: |-
-                The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+                The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if the provided query doesn't match any time series.
                 You will only get any results back if the metric selector you pass doesn't match anything.
                 Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
                 This means that the only labels you can get back from absent call are the ones you pass to it.
@@ -5120,7 +5120,7 @@ output:
     - labels:
         "":
             reason: |-
-                The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+                The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if the provided query doesn't match any time series.
                 You will only get any results back if the metric selector you pass doesn't match anything.
                 Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
                 This means that the only labels you can get back from absent call are the ones you pass to it.
@@ -5183,7 +5183,7 @@ output:
     - labels:
         "":
             reason: |-
-                The [absent_over_time()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent_over_time) function is used to check if provided query doesn't match any time series.
+                The [absent_over_time()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent_over_time) function is used to check if the provided query doesn't match any time series.
                 You will only get any results back if the metric selector you pass doesn't match anything.
                 Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
                 This means that the only labels you can get back from absent call are the ones you pass to it.
@@ -5208,7 +5208,7 @@ output:
     - labels:
         "":
             reason: |-
-                The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+                The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if the provided query doesn't match any time series.
                 You will only get any results back if the metric selector you pass doesn't match anything.
                 Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
                 This means that the only labels you can get back from absent call are the ones you pass to it.
@@ -5237,7 +5237,7 @@ output:
     - labels:
         "":
             reason: |-
-                The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+                The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if the provided query doesn't match any time series.
                 You will only get any results back if the metric selector you pass doesn't match anything.
                 Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
                 This means that the only labels you can get back from absent call are the ones you pass to it.
@@ -5265,7 +5265,7 @@ output:
                 start: 32
                 end: 35
         job:
-            reason: All labels passed to absent() call will be present on the results if the query doesn't match anything.
+            reason: All labels passed to a absent() call will be present on the results if the query doesn't match anything.
             kind: guaranteed
             fragment:
                 start: 37
@@ -5309,7 +5309,7 @@ output:
     - labels:
         "":
             reason: |-
-                The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+                The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if the provided query doesn't match any time series.
                 You will only get any results back if the metric selector you pass doesn't match anything.
                 Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
                 This means that the only labels you can get back from absent call are the ones you pass to it.
@@ -5325,7 +5325,7 @@ output:
                 start: 0
                 end: 47
         job:
-            reason: All labels passed to absent() call will be present on the results if the query doesn't match anything.
+            reason: All labels passed to a absent() call will be present on the results if the query doesn't match anything.
             kind: guaranteed
             fragment:
                 start: 25
@@ -5675,7 +5675,7 @@ expr: label_replace(up{job="api-server",service="a:c"}, "foo", "$1", "service", 
 output:
     - labels:
         foo:
-            reason: This label will be added to the result by label_replace() call.
+            reason: This label will be added to the result by a label_replace() call.
             kind: guaranteed
             fragment:
                 start: 0
@@ -5818,7 +5818,7 @@ output:
                 start: 14
                 end: 39
         cluster:
-            reason: This label will be added to the result by label_replace() call.
+            reason: This label will be added to the result by a label_replace() call.
             kind: guaranteed
             fragment:
                 start: 0
@@ -6444,7 +6444,7 @@ output:
                 start: 14
                 end: 40
         instance:
-            reason: This label will be added to the result by label_replace() call.
+            reason: This label will be added to the result by a label_replace() call.
             kind: guaranteed
             fragment:
                 start: 0
@@ -8756,7 +8756,7 @@ output:
                 start: 14
                 end: 20
         nexthop_tag:
-            reason: This label will be added to the result by label_replace() call.
+            reason: This label will be added to the result by a label_replace() call.
             kind: guaranteed
             fragment:
                 start: 0
@@ -10273,7 +10273,7 @@ output:
         - addedlabels: []
           deadinfo:
             reason: |-
-                The right hand side will never be matched because it doesn't have the `device` label from `on(...)`. The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+                The right hand side will never be matched because it doesn't have the `device` label from `on(...)`. The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if the provided query doesn't match any time series.
                 You will only get any results back if the metric selector you pass doesn't match anything.
                 Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
                 This means that the only labels you can get back from absent call are the ones you pass to it.
@@ -10291,7 +10291,7 @@ output:
             labels:
                 "":
                     reason: |-
-                        The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+                        The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if the provided query doesn't match any time series.
                         You will only get any results back if the metric selector you pass doesn't match anything.
                         Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
                         This means that the only labels you can get back from absent call are the ones you pass to it.
@@ -10321,7 +10321,7 @@ output:
           src:
             labels:
                 instance:
-                    reason: This label will be added to the result by label_replace() call.
+                    reason: This label will be added to the result by a label_replace() call.
                     kind: guaranteed
                     fragment:
                         start: 351
@@ -10713,7 +10713,7 @@ output:
                         start: 158
                         end: 170
                 prometheus:
-                    reason: This label will be added to the result by label_replace() call.
+                    reason: This label will be added to the result by a label_replace() call.
                     kind: guaranteed
                     fragment:
                         start: 75
@@ -16171,13 +16171,13 @@ output:
                 start: 56
                 end: 59
         workload:
-            reason: This label will be added to the result by label_join() call.
+            reason: This label will be added to the result by a label_join() call.
             kind: guaranteed
             fragment:
                 start: 81
                 end: 559
         workload_type:
-            reason: This label will be added to the result by label_join() call.
+            reason: This label will be added to the result by a label_join() call.
             kind: guaranteed
             fragment:
                 start: 65
@@ -17681,7 +17681,7 @@ output:
     - labels:
         "":
             reason: |-
-                The [absent_over_time()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent_over_time) function is used to check if provided query doesn't match any time series.
+                The [absent_over_time()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent_over_time) function is used to check if the provided query doesn't match any time series.
                 You will only get any results back if the metric selector you pass doesn't match anything.
                 Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
                 This means that the only labels you can get back from absent call are the ones you pass to it.

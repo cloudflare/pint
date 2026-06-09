@@ -87,7 +87,7 @@ var watchCmd = &cli.Command{
 					return fmt.Errorf("no Prometheus named %q configured in pint", args[0])
 				}
 
-				slog.LogAttrs(ctx, slog.LevelDebug, "Starting rule_fules watch", slog.String("name", args[0]))
+				slog.LogAttrs(ctx, slog.LevelDebug, "Starting rule_files watch", slog.String("name", args[0]))
 
 				return actionWatch(c, meta, func(ctx context.Context) ([]string, error) {
 					cfg, err := prom.Config(ctx, time.Millisecond).Wait()

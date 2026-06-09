@@ -101,7 +101,7 @@ const (
 	// Information doesn't count as a problem, it's a comment.
 	Information Severity = iota
 
-	// Warning is not consider an error.
+	// Warning is not considered an error.
 	Warning
 
 	// Bug is an error that should be corrected.

@@ -15,7 +15,7 @@ pint will run checks on Prometheus alerting & recording rules to detect potentia
 with those rules.
 Some checks rely only on the rule itself and can be run "offline" - without talking to any
 Prometheus server.
-You can run pint in "offline" if you:
+You can run pint in "offline" mode if you:
 
 - Don't pass any configuration file to pint.
 - You pass configuration file to pint that **doesn't** contain any `prometheus` definition.
@@ -42,8 +42,8 @@ we started to use them ourselves.
 There are three modes it works in:
 
 - CI PR linting
-- Ad-hoc linting of a selected files or directories
-- A daemon that continuously checks selected files or directories and expose metrics describing
+- Ad-hoc linting of selected files or directories
+- A daemon that continuously checks selected files or directories and exposes metrics describing
   all discovered problems.
 
 ### Pull Requests
@@ -52,7 +52,7 @@ Run it with `pint ci`. Git is currently the only supported VCS.
 
 When `pint ci` runs it will find all files in the current working directory and try to parse
 them as Prometheus rules. Then it will look for all commits on the current branch that are not
-present in the parent branch and to decide which rules were modified.
+present in the parent branch and decide which rules were modified.
 Checks are run only on modified rules but they require the full list of all rules to find any
 cross-rule dependencies.
 

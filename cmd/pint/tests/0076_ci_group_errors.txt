@@ -201,7 +201,7 @@ Bug: template uses non-existent label (alerts/template)
    |     [...]
 30 |       instance: 'sum on {{ $labels.instance }} is {{ $value }}'
                                        ^^^^^^^^^
-                                       Template is using `instance` label but the query results won't
+                                       The template is using `instance` label but the query results won't
                                        have this label.
 
 Bug: value used in labels (alerts/template)
@@ -263,7 +263,7 @@ text: |
 
     ------
 
-    The same issue was reported 6 more time(s), duplicates where suppressed.
+    The same issue was reported 6 more time(s), duplicates were suppressed.
 
     <details>
     <summary>Show affected rules</summary>
@@ -311,7 +311,7 @@ text: |
 
     ------
 
-    The same issue was reported 4 more time(s), duplicates where suppressed.
+    The same issue was reported 4 more time(s), duplicates were suppressed.
 
     <details>
     <summary>Show affected rules</summary>
@@ -357,7 +357,7 @@ text: |
 
     ------
 
-    The same issue was reported 8 more time(s), duplicates where suppressed.
+    The same issue was reported 8 more time(s), duplicates were suppressed.
 
     <details>
     <summary>Show affected rules</summary>
@@ -447,7 +447,7 @@ text: |
 
     ------
 
-    The same issue was reported 3 more time(s), duplicates where suppressed.
+    The same issue was reported 3 more time(s), duplicates were suppressed.
 
     <details>
     <summary>Show affected rules</summary>
@@ -525,7 +525,7 @@ text: |
                                            ^^^^^^^^^
     ```
 
-    Template is using `instance` label but the query results won't have this label.
+    The template is using `instance` label but the query results won't have this label.
 
     </details>
 

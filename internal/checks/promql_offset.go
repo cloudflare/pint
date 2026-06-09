@@ -116,7 +116,7 @@ func (c OffsetCheck) offsetProblem(expr *parser.PromQLExpr, s *source.Source, no
 		Diagnostics: []diags.Diagnostic{
 			{
 				Message: fmt.Sprintf(
-					"`%s` selector is using %s offset, but %s",
+					"`%s` selector is using a %s offset, but %s",
 					node,
 					model.Duration(offset),
 					reason,

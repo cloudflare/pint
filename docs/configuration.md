@@ -73,7 +73,7 @@ parser {
 ```
 
 - `schema` - rule file schema to use when using `strict` parser mode, valid values are `prometheus` and `thanos`.
-  This option is has no effect when `relaxed` mode is enabled, see below.
+  This option has no effect when `relaxed` mode is enabled, see below.
   Setting it to `prometheus` means that pint will assume that all rule files have the schema
   as defined in [alerting rules](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/)
   and [recording rules](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/)
@@ -82,7 +82,7 @@ parser {
   in [Thanos Rule](https://thanos.io/tip/components/rule.md/) docs, which currently allows for setting
   an extra key on the rule group object - `partial_response_strategy`.
   Default value is `prometheus`.
-- `names` - validation scheme for label names. This control if Prometheus libraries are
+- `names` - validation scheme for label names. This controls whether Prometheus libraries are
   allowing UTF-8 in label **names** or not. See [utf-8 guide](https://prometheus.io/docs/guides/utf8/).
   Default value is `utf-8`.
 - `include` - list of regexp patterns to check when running checks. Only files
@@ -457,7 +457,7 @@ filepath {
 
 - `directory` - the base directory to scan for paths.
 - `match` - a regexp expression to match. Any named capture group defined here
-  will be accessible when rendering Prometheus the template.
+  will be accessible when rendering the Prometheus template.
 - `ignore` - a list of regexp rules, any path matching any of these rules will
   be ignored.
 - `template` - a template for generating Prometheus server definitions.
@@ -566,7 +566,7 @@ filepath {
 
 ## Matching rules to checks
 
-Most checks, except basic syntax verification, requires some configuration to decide
+Most checks, except basic syntax verification, require some configuration to decide
 which checks to run against which files and rules.
 
 Syntax:
@@ -631,7 +631,7 @@ rule {
   - `unmodified` - a rule is not being modified in a git commit when running `pint ci` or other pint command was run that doesn't try to detect which rules were modified.
 - `match:name` - only rules with names (`record` for recording rules and `alert` for alerting
   rules) matching this regexp pattern will be checked rule.
-- `match:kind` - optional rule type filter, only rule of this type will be checked.
+- `match:kind` - optional rule type filter, only rules of this type will be checked.
 - `match:command` - optional command type filter, this allows to include or ignore rules
   based on the command pint is run with `pint ci`, `pint lint` or `pint watch`.
 - `match:annotation` - optional annotation filter, only alert rules with at least one
@@ -649,7 +649,7 @@ rule {
   matching all conditions defined on `ignore` will not be checked by this `rule` block.
 - `enable` - list of check names to enable for any Prometheus rule matching this block.
   Enabling checks here will overwrite `check { disable = [...] }` settings, but won't
-  enable checks disable specifically for some Prometheus rule via `# pint disable ...` comments.
+  enable checks disabled specifically for some Prometheus rule via `# pint disable ...` comments.
 - `disable` - list of check names to disable for any Prometheus rule matching this block.
   This takes precedence over `enable` option above.
 

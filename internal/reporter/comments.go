@@ -156,7 +156,7 @@ func makeComments(summary Summary, showDuplicates bool) (comments []PendingComme
 			buf.WriteString("------\n\n")
 			buf.WriteString("The same issue was reported ")
 			buf.WriteString(strconv.Itoa(len(reports[0].Duplicates)))
-			buf.WriteString(" more time(s), duplicates where suppressed.\n\n")
+			buf.WriteString(" more time(s), duplicates were suppressed.\n\n")
 			buf.WriteString("<details>\n")
 			buf.WriteString("<summary>Show affected rules</summary>\n\n")
 			for _, dup := range reports[0].Duplicates {

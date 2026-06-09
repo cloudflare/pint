@@ -10,7 +10,7 @@ This check enforces use of a comparison operator in alert queries.
 Any result returned by alerting rule query will trigger an alert, so it's
 recommended for all alert queries to have some condition `errors > 10`, so we
 only get `errors` series if the value is above 10.
-If we would remove `> 10` part query would always return `errors` and so it
+If we removed the `> 10` part, the query would always return `errors` and so it
 would always trigger an alert, even when `errors` value is `0`.
 
 In some cases time series or specific label values will only be exported to
@@ -20,7 +20,7 @@ This means that an alert with a query `http_responses_total{code="504"}` might
 work perfectly fine, since in practice we'll never have this specific time
 series in Prometheus with zero value.
 But this setup is fragile and unpredictable, so it's highly recommended to
-have always set conditions on alerts, especially that adding `> 0` shouldn't
+always set conditions on alerts, especially since adding `> 0` shouldn't
 have any negative side effects.
 
 ## Configuration
