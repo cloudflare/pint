@@ -97,7 +97,7 @@ body: |
                                                ^^^^^^^^^
     ```
 
-    Template is using `instance` label but the query results won't have this label.
+    The template is using `instance` label but the query results won't have this label.
 
     ```yaml
     2 |   expr: sum(foo)
@@ -110,7 +110,7 @@ body: |
 
     ------
 
-    The same issue was reported 1 more time(s), duplicates where suppressed.
+    The same issue was reported 1 more time(s), duplicates were suppressed.
 
     <details>
     <summary>Show affected rules</summary>
@@ -158,7 +158,7 @@ body: |
 
     ------
 
-    The same issue was reported 1 more time(s), duplicates where suppressed.
+    The same issue was reported 1 more time(s), duplicates were suppressed.
 
     <details>
     <summary>Show affected rules</summary>
@@ -224,7 +224,7 @@ body: |+
       |   [...]
     4 |     summary: 'foo is down on {{ $labels.instance }}'
                                                ^^^^^^^^^
-                                               Template is using `instance` label but the query results
+                                               The template is using `instance` label but the query results
                                                won't have this label.
 
     Warning: always firing alert (alerts/comparison)

@@ -11,8 +11,8 @@ that are using metrics not currently present in Prometheus.
 It parses `expr` query from every rule, finds individual metric selectors and
 runs a series of checks for each of them.
 
-Let's say we have a rule this query: `sum(my_metric{foo="bar"}) > 10`.
-This checks would first try to determine if `my_metric{foo="bar"}`
+Let's say we have a rule with this query: `sum(my_metric{foo="bar"}) > 10`.
+This check would first try to determine if `my_metric{foo="bar"}`
 returns anything via instant query and if it doesn't it will try
 to determine why, by checking if:
 
@@ -42,9 +42,9 @@ this query implies that the presence of `bar` is not guaranteed.
 `bar` is only tested for being present and so it's likely that it might be missing.
 
 Note that using `foo unless bar > 5` doesn't follow the same pattern and will have
-both `foo` and `bar` tested by this check
-Having `bar > 5` means it's assumed to be always present as we're testing it's value,
-rather than it's existence.
+both `foo` and `bar` tested by this check.
+Having `bar > 5` means it's assumed to be always present as we're testing its value,
+rather than its existence.
 
 ## Common problems
 
@@ -83,7 +83,7 @@ Example with alert rule that depends on two recording rules:
   expr: (job:up:sum / job:up:count) < 0.5
 ```
 
-If all three rules where added in a single PR and pint didn't try to match
+If all three rules were added in a single PR and pint didn't try to match
 metrics to recording rule then `pint ci` would block such PR because metrics
 this alert is using are not present in Prometheus.
 
@@ -103,7 +103,7 @@ problems like label mismatch.
   never present on that metric.
 - You are using label value as a filter, but that value is never present.
 
-If that's the case you need to fix you query. Make sure your metric is present
+If that's the case you need to fix your query. Make sure your metric is present
 and it has all the labels you expect to see.
 
 ### Metrics you are using have unstable labelling scheme
@@ -121,7 +121,7 @@ Best solution here is to fix labelling scheme.
 ### Metric labels are generated dynamically in response to some activity
 
 Some label values will appear only temporarily, for example if metrics
-are generated for serviced HTTP request and they include some details of
+are generated for each serviced HTTP request and they include some details of
 those requests that cannot be known ahead of time, like request path or
 method.
 
@@ -190,7 +190,7 @@ check "promql/series" {
   is the list of label names.
 - `fallbackTimeout` - if a query uses a metric that is missing from a Prometheus server pint will
   check if that metric is present on any other Prometheus server and report any findings.
-  This option controls how long can these extra checks take if there a long list of additional
+  This option controls how long these extra checks can take if there is a long list of additional
   servers to check. pint will abort checking more Prometheus servers when it reaches that time limit.
   This is a timeout for the whole operation of checking other Prometheus servers. With the default limit
   of 5 minutes and if there's 10 extra Prometheus servers to check and it takes 5 minutes to check first

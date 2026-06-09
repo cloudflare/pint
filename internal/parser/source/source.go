@@ -930,7 +930,7 @@ func parsePromQLFunc(s *Source, expr string, n *promParser.Call) *Source {
 		funcNamePos := FindFuncNamePosition(expr, n.PosRange, n.Func.Name)
 		s.excludeAllLabels(
 			expr,
-			fmt.Sprintf(`The [%s()](https://prometheus.io/docs/prometheus/latest/querying/functions/#%s) function is used to check if provided query doesn't match any time series.
+			fmt.Sprintf(`The [%s()](https://prometheus.io/docs/prometheus/latest/querying/functions/#%s) function is used to check if the provided query doesn't match any time series.
 You will only get any results back if the metric selector you pass doesn't match anything.
 Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
 This means that the only labels you can get back from absent call are the ones you pass to it.
@@ -941,7 +941,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 			names,
 		)
 		s.guaranteeLabel(
-			fmt.Sprintf("All labels passed to %s() call will be present on the results if the query doesn't match anything.", n.Func.Name),
+			fmt.Sprintf("All labels passed to a %s() call will be present on the results if the query doesn't match anything.", n.Func.Name),
 			n.PosRange,
 			names...,
 		)
@@ -1040,7 +1040,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 		// label_join(v instant-vector, dst_label string, separator string, src_label_1 string, src_label_2 string, ...)
 		s.Returns = promParser.ValueTypeVector
 		s.guaranteeLabel(
-			fmt.Sprintf("This label will be added to the result by %s() call.", n.Func.Name),
+			fmt.Sprintf("This label will be added to the result by a %s() call.", n.Func.Name),
 			n.PosRange,
 			n.Args[1].(*promParser.StringLiteral).Val,
 		)
@@ -1052,7 +1052,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 		// label_replace(v instant-vector, dst_label string, replacement string, src_label string, regex string)
 		s.Returns = promParser.ValueTypeVector
 		s.guaranteeLabel(
-			fmt.Sprintf("This label will be added to the result by %s() call.", n.Func.Name),
+			fmt.Sprintf("This label will be added to the result by a %s() call.", n.Func.Name),
 			n.PosRange,
 			n.Args[1].(*promParser.StringLiteral).Val,
 		)

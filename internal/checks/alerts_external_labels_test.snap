@@ -115,14 +115,14 @@
   output: |
     9 |     twice: "{{ $externalLabels.cluster }} / {{ $externalLabels.cluster }}"
                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                    Template is using `cluster` external label but `prom` Prometheus server at
+                    The template is using `cluster` external label but `prom` Prometheus server at
                     https://simple.example.com doesn't have this label configured in global:external_labels.
   problem:
     reporter: alerts/external_labels
     summary: invalid label
     details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus runtime configuration.'
     diagnostics:
-        - message: Template is using `cluster` external label but `prom` Prometheus server at https://simple.example.com doesn't have this label configured in global:external_labels.
+        - message: The template is using `cluster` external label but `prom` Prometheus server at https://simple.example.com doesn't have this label configured in global:external_labels.
           firstcolumn: 1
           lastcolumn: 61
           kind: 0
@@ -146,7 +146,7 @@
   output: |
     10 |     cluster: "{{ $externalLabels.cluster }}"
                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                       Template is using `cluster` external label but `prom` Prometheus server at
+                       The template is using `cluster` external label but `prom` Prometheus server at
                        https://simple.example.com doesn't have this label configured in
                        global:external_labels.
   problem:
@@ -154,7 +154,7 @@
     summary: invalid label
     details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus runtime configuration.'
     diagnostics:
-        - message: Template is using `cluster` external label but `prom` Prometheus server at https://simple.example.com doesn't have this label configured in global:external_labels.
+        - message: The template is using `cluster` external label but `prom` Prometheus server at https://simple.example.com doesn't have this label configured in global:external_labels.
           firstcolumn: 1
           lastcolumn: 29
           kind: 0
@@ -178,7 +178,7 @@
   output: |
     6 |     cluster: "This is {{ .ExternalLabels.cluster }} cluster"
                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                      Template is using `cluster` external label but `prom` Prometheus server at
+                      The template is using `cluster` external label but `prom` Prometheus server at
                       https://simple.example.com doesn't have this label configured in
                       global:external_labels.
   problem:
@@ -186,7 +186,7 @@
     summary: invalid label
     details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus runtime configuration.'
     diagnostics:
-        - message: Template is using `cluster` external label but `prom` Prometheus server at https://simple.example.com doesn't have this label configured in global:external_labels.
+        - message: The template is using `cluster` external label but `prom` Prometheus server at https://simple.example.com doesn't have this label configured in global:external_labels.
           firstcolumn: 1
           lastcolumn: 45
           kind: 0
@@ -212,7 +212,7 @@
   output: |
     5 |     cluster: "{{ $externalLabels.cluster }}"
                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                      Template is using `cluster` external label but `prom` Prometheus server at
+                      The template is using `cluster` external label but `prom` Prometheus server at
                       https://simple.example.com doesn't have this label configured in
                       global:external_labels.
   problem:
@@ -220,7 +220,7 @@
     summary: invalid label
     details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus runtime configuration.'
     diagnostics:
-        - message: Template is using `cluster` external label but `prom` Prometheus server at https://simple.example.com doesn't have this label configured in global:external_labels.
+        - message: The template is using `cluster` external label but `prom` Prometheus server at https://simple.example.com doesn't have this label configured in global:external_labels.
           firstcolumn: 1
           lastcolumn: 29
           kind: 0
@@ -246,7 +246,7 @@
   output: |
     5 |     cluster: "{{ $externalLabels.cluster }}"
                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                      Template is using `cluster` external label but `prom` Prometheus server at
+                      The template is using `cluster` external label but `prom` Prometheus server at
                       https://simple.example.com doesn't have this label configured in
                       global:external_labels.
   problem:
@@ -254,7 +254,7 @@
     summary: invalid label
     details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus runtime configuration.'
     diagnostics:
-        - message: Template is using `cluster` external label but `prom` Prometheus server at https://simple.example.com doesn't have this label configured in global:external_labels.
+        - message: The template is using `cluster` external label but `prom` Prometheus server at https://simple.example.com doesn't have this label configured in global:external_labels.
           firstcolumn: 1
           lastcolumn: 29
           kind: 0

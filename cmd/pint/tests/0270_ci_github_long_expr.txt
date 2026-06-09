@@ -120,7 +120,7 @@ body: |
                                  ^^^^^^^^
     ```
 
-    Template is using `ixtance` label but the query results won't have this label.
+    The template is using `ixtance` label but the query results won't have this label.
 
     </details>
 
@@ -258,7 +258,7 @@ body: |+
       |       [...]
     8 |         help: '{{ $labels.ixtance }}'
                                  ^^^^^^^^
-                                 Template is using `ixtance` label but the query results won't have this
+                                 The template is using `ixtance` label but the query results won't have this
                                  label.
 
     Warning: impossible label (promql/impossible)

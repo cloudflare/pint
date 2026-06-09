@@ -17,7 +17,7 @@ import (
 
 const (
 	AlertsAbsentCheckName    = "alerts/absent"
-	AlertsAbsentCheckDetails = "When Prometheus restart this alert rule might be evaluated before your service is scraped, which can cause false positives from absent() call.\nAdding `for` option that is at least 2x scrape interval will prevent this from happening."
+	AlertsAbsentCheckDetails = "When Prometheus restarts this alert rule might be evaluated before your service is scraped, which can cause false positives from absent() call.\nAdding a `for` option that is at least 2x scrape interval will prevent this from happening."
 )
 
 func NewAlertsAbsentCheck(prom *promapi.FailoverGroup) AlertsAbsentCheck {

@@ -7,14 +7,14 @@
   output: |
     2 |   expr: foo + foo offset 20d
                           ^^^^^^^^^^
-                          `foo offset 20d` selector is using 20d offset, but `prom` Prometheus server at
+                          `foo offset 20d` selector is using a 20d offset, but `prom` Prometheus server at
                           https://simple.example.com is configured to only keep 15d of metrics history.
   problem:
     reporter: promql/offset
     summary: query offset beyond configured retention
     details: ""
     diagnostics:
-        - message: '`foo offset 20d` selector is using 20d offset, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.'
+        - message: '`foo offset 20d` selector is using a 20d offset, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.'
           firstcolumn: 11
           lastcolumn: 20
           kind: 0
@@ -39,14 +39,14 @@
   output: |
     2 |   expr: foo offset 20d
                     ^^^^^^^^^^
-                    `foo offset 20d` selector is using 20d offset, but `prom` Prometheus server at
+                    `foo offset 20d` selector is using a 20d offset, but `prom` Prometheus server at
                     https://simple.example.com is configured to only keep 15d of metrics history.
   problem:
     reporter: promql/offset
     summary: query offset beyond configured retention
     details: ""
     diagnostics:
-        - message: '`foo offset 20d` selector is using 20d offset, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.'
+        - message: '`foo offset 20d` selector is using a 20d offset, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.'
           firstcolumn: 5
           lastcolumn: 14
           kind: 0
@@ -89,14 +89,14 @@
   output: |
     2 |   expr: foo offset 30d
                     ^^^^^^^^^^
-                    `foo offset 30d` selector is using 30d offset, but `prom` Prometheus server at
+                    `foo offset 30d` selector is using a 30d offset, but `prom` Prometheus server at
                     https://simple.example.com is configured to only keep 0s of metrics history.
   problem:
     reporter: promql/offset
     summary: query offset beyond configured retention
     details: ""
     diagnostics:
-        - message: '`foo offset 30d` selector is using 30d offset, but `prom` Prometheus server at https://simple.example.com is configured to only keep 0s of metrics history.'
+        - message: '`foo offset 30d` selector is using a 30d offset, but `prom` Prometheus server at https://simple.example.com is configured to only keep 0s of metrics history.'
           firstcolumn: 5
           lastcolumn: 14
           kind: 0
@@ -153,14 +153,14 @@
   output: |
     2 |   expr: foo offset 20d
                     ^^^^^^^^^^
-                    `foo offset 20d` selector is using 20d offset, but `prom` Prometheus server at
+                    `foo offset 20d` selector is using a 20d offset, but `prom` Prometheus server at
                     https://simple.example.com is configured to only keep 15d of metrics history.
   problem:
     reporter: promql/offset
     summary: query offset beyond configured retention
     details: ""
     diagnostics:
-        - message: '`foo offset 20d` selector is using 20d offset, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.'
+        - message: '`foo offset 20d` selector is using a 20d offset, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.'
           firstcolumn: 5
           lastcolumn: 14
           kind: 0
@@ -185,14 +185,15 @@
   output: |
     2 |   expr: rate(foo[5m] offset 20d)
                              ^^^^^^^^^^
-                             `foo offset 20d` selector is using 20d offset, but `prom` Prometheus server at
-                             https://simple.example.com is configured to only keep 15d of metrics history.
+                             `foo offset 20d` selector is using a 20d offset, but `prom` Prometheus server
+                             at https://simple.example.com is configured to only keep 15d of metrics
+                             history.
   problem:
     reporter: promql/offset
     summary: query offset beyond configured retention
     details: ""
     diagnostics:
-        - message: '`foo offset 20d` selector is using 20d offset, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.'
+        - message: '`foo offset 20d` selector is using a 20d offset, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.'
           firstcolumn: 14
           lastcolumn: 23
           kind: 0
@@ -212,7 +213,7 @@
   output: |
     2 |   expr: foo_offset_offset offset 20d
                                   ^^^^^^^^^^
-                                  `foo_offset_offset offset 20d` selector is using 20d offset, but `prom`
+                                  `foo_offset_offset offset 20d` selector is using a 20d offset, but `prom`
                                   Prometheus server at https://simple.example.com is configured to only keep
                                   15d of metrics history.
   problem:
@@ -220,7 +221,7 @@
     summary: query offset beyond configured retention
     details: ""
     diagnostics:
-        - message: '`foo_offset_offset offset 20d` selector is using 20d offset, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.'
+        - message: '`foo_offset_offset offset 20d` selector is using a 20d offset, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.'
           firstcolumn: 19
           lastcolumn: 28
           kind: 0
@@ -240,15 +241,16 @@
   output: |
     2 |   expr: max_over_time(min_over_time(foo[5m:1m] offset 20d)[1h:5m])
                                                        ^^^^^^^^^^
-        `foo[5m:1m] offset 20d` selector is using 20d offset, but
-        `prom` Prometheus server at https://simple.example.com is
-        configured to only keep 15d of metrics history.
+          `foo[5m:1m] offset 20d` selector is using a 20d offset,
+          but `prom` Prometheus server at
+          https://simple.example.com is configured to only keep 15d
+          of metrics history.
   problem:
     reporter: promql/offset
     summary: query offset beyond configured retention
     details: ""
     diagnostics:
-        - message: '`foo[5m:1m] offset 20d` selector is using 20d offset, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.'
+        - message: '`foo[5m:1m] offset 20d` selector is using a 20d offset, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.'
           firstcolumn: 40
           lastcolumn: 49
           kind: 0
@@ -283,14 +285,14 @@
   output: |
     2 |   expr: foo offset 11d1h
                     ^^^^^^^^^^^^
-                    `foo offset 11d1h` selector is using 11d1h offset, but `prom` Prometheus server at
+                    `foo offset 11d1h` selector is using a 11d1h offset, but `prom` Prometheus server at
                     https://simple.example.com is configured to only keep 11d of metrics history.
   problem:
     reporter: promql/offset
     summary: query offset beyond configured retention
     details: ""
     diagnostics:
-        - message: '`foo offset 11d1h` selector is using 11d1h offset, but `prom` Prometheus server at https://simple.example.com is configured to only keep 11d of metrics history.'
+        - message: '`foo offset 11d1h` selector is using a 11d1h offset, but `prom` Prometheus server at https://simple.example.com is configured to only keep 11d of metrics history.'
           firstcolumn: 5
           lastcolumn: 16
           kind: 0
@@ -310,7 +312,7 @@
   output: |
     2 |   expr: max_over_time(foo[1h:5m] offset 20d)
                                          ^^^^^^^^^^
-                                         `foo[1h:5m] offset 20d` selector is using 20d offset, but `prom`
+                                         `foo[1h:5m] offset 20d` selector is using a 20d offset, but `prom`
                                          Prometheus server at https://simple.example.com is configured to
                                          only keep 15d of metrics history.
   problem:
@@ -318,7 +320,7 @@
     summary: query offset beyond configured retention
     details: ""
     diagnostics:
-        - message: '`foo[1h:5m] offset 20d` selector is using 20d offset, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.'
+        - message: '`foo[1h:5m] offset 20d` selector is using a 20d offset, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.'
           firstcolumn: 26
           lastcolumn: 35
           kind: 0

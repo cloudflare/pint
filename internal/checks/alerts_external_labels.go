@@ -80,7 +80,7 @@ func (c AlertsExternalLabelsCheck) Check(ctx context.Context, entry *discovery.E
 				Severity: Bug,
 				Diagnostics: []diags.Diagnostic{
 					{
-						Message:     fmt.Sprintf("Template is using `%s` external label but %s doesn't have this label configured in global:external_labels.", name, promText(c.prom.Name(), cfg.URI)),
+						Message:     fmt.Sprintf("The template is using `%s` external label but %s doesn't have this label configured in global:external_labels.", name, promText(c.prom.Name(), cfg.URI)),
 						Pos:         label.Value.Pos,
 						Expr:        nil,
 						FirstColumn: 1,
@@ -107,7 +107,7 @@ func (c AlertsExternalLabelsCheck) Check(ctx context.Context, entry *discovery.E
 					Severity: Bug,
 					Diagnostics: []diags.Diagnostic{
 						{
-							Message:     fmt.Sprintf("Template is using `%s` external label but %s doesn't have this label configured in global:external_labels.", name, promText(c.prom.Name(), cfg.URI)),
+							Message:     fmt.Sprintf("The template is using `%s` external label but %s doesn't have this label configured in global:external_labels.", name, promText(c.prom.Name(), cfg.URI)),
 							Pos:         annotation.Value.Pos,
 							Expr:        nil,
 							FirstColumn: 1,

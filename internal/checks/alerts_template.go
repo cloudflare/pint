@@ -242,7 +242,7 @@ func (c TemplateCheck) checkHumanizeIsNeeded(expr parser.PromQLExpr, ann *parser
 		if call != nil {
 			dgs := []diags.Diagnostic{
 				{
-					Message:     fmt.Sprintf("`%s()` will produce results that are hard to read for humans.", call.Func.Name),
+					Message:     fmt.Sprintf("`%s()` will produce results that are hard for humans to read.", call.Func.Name),
 					Pos:         expr.Value.Pos,
 					Expr:        expr.Query().Expr,
 					FirstColumn: int(call.PosRange.Start) + 1,
@@ -254,7 +254,7 @@ func (c TemplateCheck) checkHumanizeIsNeeded(expr parser.PromQLExpr, ann *parser
 				for _, va := range valAliases {
 					if v.value[0] == va {
 						dgs = append(dgs, diags.Diagnostic{
-							Message:     "Use one of humanize template functions to make the result more readable.",
+							Message:     "Use one of the humanize template functions to make the result more readable.",
 							Pos:         ann.Value.Pos,
 							Expr:        nil,
 							FirstColumn: v.column,
@@ -636,7 +636,7 @@ func (c TemplateCheck) checkQueryLabels(group *parser.Group, rule parser.Rule, l
 							Severity: Bug,
 							Diagnostics: []diags.Diagnostic{
 								{
-									Message:     fmt.Sprintf("Template is using `%s` label but the query results won't have this label.", v.value[1]),
+									Message:     fmt.Sprintf("The template is using `%s` label but the query results won't have this label.", v.value[1]),
 									Pos:         label.Value.Pos,
 									Expr:        nil,
 									FirstColumn: v.column,

@@ -124,7 +124,7 @@ body: |
                                  ^^^^^^^^
     ```
 
-    Template is using `ixtance` label but the query results won't have this label.
+    The template is using `ixtance` label but the query results won't have this label.
 
     </details>
 

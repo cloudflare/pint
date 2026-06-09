@@ -104,7 +104,7 @@ body: |
 
     ------
 
-    The same issue was reported 1 more time(s), duplicates where suppressed.
+    The same issue was reported 1 more time(s), duplicates were suppressed.
 
     <details>
     <summary>Show affected rules</summary>

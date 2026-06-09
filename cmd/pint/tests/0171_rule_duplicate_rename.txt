@@ -42,7 +42,7 @@ Bug: query on nonexistent series (promql/series)
   ---> renamed.yaml:2 -> `rule1`
 2 |   expr: sum(foo)
                 ^^^
-                `prom` Prometheus server at http://127.0.0.1:7171 didn't have any series for `foo`
+                `prom` Prometheus server at http://127.0.0.1:7171 didn't have any series for the `foo`
                 metric in the last 1w.
 
 level=ERROR msg="Execution completed with error(s)" err="problems found"

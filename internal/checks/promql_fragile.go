@@ -23,8 +23,8 @@ This can happen when using one of the aggregation operation like topk or bottomk
 	FragileCheckPartialData = `This alerting rule performs arithmetic operation on results of two aggregations, this might cause false positive alerts when Prometheus restarts.
 When Prometheus is started it doesn't scrape all targets at once, it spreads it over the first scrape interval.
 Until it finishes scraping all target queries that use aggregation will return results calculated from only a subset of targets.
-If each of these aggregates comes from a different scrape job then one aggregate might have data from more targets then the other.
-The easiest way to avoid such issues is to add ` + "`for: 2m` to you alerting rule."
+If each of these aggregates comes from a different scrape job then one aggregate might have data from more targets than the other.
+The easiest way to avoid such issues is to add ` + "`for: 2m` to your alerting rule."
 )
 
 func NewFragileCheck() FragileCheck {

@@ -312,7 +312,7 @@
                 Using `on(cluster)` won't produce any results on `prom` Prometheus server at
                 https://simple.example.com because [series returned by this
                 query](https://simple.example.com/query?g0.expr=max+by+%28cluster%2C+env%29+%28increase%28error_total%5B10m%5D%29%29&&g0.tab=table)
-                doesn't have the `cluster` label.
+                don't have the `cluster` label.
     8 |     cluster_metadata{cluster="foo", environment="prod"} > 0
   problem:
     reporter: promql/vector_matching
@@ -322,7 +322,7 @@
         You can match time series with different labels by using special keywords and follow the rules set by PromQL.
         [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
-        - message: Using `on(cluster)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned by this query](https://simple.example.com/query?g0.expr=max+by+%28cluster%2C+env%29+%28increase%28error_total%5B10m%5D%29%29&&g0.tab=table) doesn't have the `cluster` label.
+        - message: Using `on(cluster)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned by this query](https://simple.example.com/query?g0.expr=max+by+%28cluster%2C+env%29+%28increase%28error_total%5B10m%5D%29%29&&g0.tab=table) don't have the `cluster` label.
           firstcolumn: 66
           lastcolumn: 77
           kind: 0
@@ -345,7 +345,7 @@
                       Using `on(app_name)` won't produce any results on `prom` Prometheus server at
                       https://simple.example.com because [series returned by this
                       query](https://simple.example.com/query?g0.expr=%28memory_bytes+%2F+ignoring+%28job%29+memory_limit%29&&g0.tab=table)
-                      doesn't have the `app_name` label.
+                      don't have the `app_name` label.
   problem:
     reporter: promql/vector_matching
     summary: impossible binary operation
@@ -354,7 +354,7 @@
         You can match time series with different labels by using special keywords and follow the rules set by PromQL.
         [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
-        - message: Using `on(app_name)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned by this query](https://simple.example.com/query?g0.expr=%28memory_bytes+%2F+ignoring+%28job%29+memory_limit%29&&g0.tab=table) doesn't have the `app_name` label.
+        - message: Using `on(app_name)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned by this query](https://simple.example.com/query?g0.expr=%28memory_bytes+%2F+ignoring+%28job%29+memory_limit%29&&g0.tab=table) don't have the `app_name` label.
           firstcolumn: 53
           lastcolumn: 64
           kind: 0
@@ -482,7 +482,7 @@
                       ^^^^^^^^^^^^
                       Using `on(notfound)` won't produce any results on `prom` Prometheus server at
                       https://simple.example.com because [series returned by this
-                      query](https://simple.example.com/query?g0.expr=foo&&g0.tab=table) doesn't have the
+                      query](https://simple.example.com/query?g0.expr=foo&&g0.tab=table) don't have the
                       `notfound` label.
   problem:
     reporter: promql/vector_matching
@@ -492,7 +492,7 @@
         You can match time series with different labels by using special keywords and follow the rules set by PromQL.
         [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
-        - message: Using `on(notfound)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned by this query](https://simple.example.com/query?g0.expr=foo&&g0.tab=table) doesn't have the `notfound` label.
+        - message: Using `on(notfound)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned by this query](https://simple.example.com/query?g0.expr=foo&&g0.tab=table) don't have the `notfound` label.
           firstcolumn: 7
           lastcolumn: 18
           kind: 0

@@ -8,7 +8,7 @@ grand_parent: Documentation
 
 This check will try to find queries that try to
 [match vectors](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching)
-but have different sets of labels on both side of the query.
+but have different sets of labels on both sides of the query.
 
 Consider these two time series:
 
@@ -23,20 +23,20 @@ cluster:http_errors{job="node-exporter", cluster="prod"}
 ```
 
 One of them tracks specific instance and one aggregates series for the whole cluster.
-Because they have different set of labels if we want to calculate some value using both
+Because they have different sets of labels if we want to calculate some value using both
 of them, for example:
 
 ```js
 http_errors / cluster:http_errors
 ```
 
-we wouldn't get any results. To fix that we need ignore extra labels:
+we wouldn't get any results. To fix that we need to ignore extra labels:
 
 ```js
 http_errors / ignoring(instance) cluster:http_errors
 ```
 
-This check aims to find all queries that using vector matching where both sides
+This check aims to find all queries using vector matching where both sides
 of the query have different sets of labels causing no results to be returned.
 
 **NOTE**: it's impossible for this check to inspect all time series in Prometheus

@@ -78,7 +78,7 @@ groups:
 
 ## Disabling checks globally
 
-To disable specific check globally, for all files and rules, add it to pint configuration
+To disable a specific check globally, for all files and rules, add it to pint configuration
 file. Syntax:
 
 ```js
@@ -123,7 +123,7 @@ Checks can also be disabled for specific Prometheus servers using
 of the Prometheus configuration block in pint that you want to disable it for.
 Examples:
 
-If you have a `stating` Prometheus configuration block in pint config file:
+If you have a `staging` Prometheus configuration block in pint config file:
 
 ```js
 prometheus "staging" {

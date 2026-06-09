@@ -528,14 +528,14 @@
   output: |
     2 |   expr: foo{job=~"^.+$"}
                     ^^^^^^^^^^^
-                    Prometheus regexp matchers are automatically fully anchored so match for `job=~"^.+$"`
+                    Prometheus regexp matchers are automatically fully anchored so a match for `job=~"^.+$"`
                     will result in `job=~"^^.+$$"`, remove regexp anchors `^` and/or `$`.
   problem:
     reporter: promql/regexp
     summary: redundant regexp anchors
     details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
     diagnostics:
-        - message: Prometheus regexp matchers are automatically fully anchored so match for `job=~"^.+$"` will result in `job=~"^^.+$$"`, remove regexp anchors `^` and/or `$`.
+        - message: Prometheus regexp matchers are automatically fully anchored so a match for `job=~"^.+$"` will result in `job=~"^^.+$$"`, remove regexp anchors `^` and/or `$`.
           firstcolumn: 5
           lastcolumn: 15
           kind: 0
@@ -555,7 +555,7 @@
   output: |
     2 |   expr: foo{job=~"(foo|^.+)$"}
                     ^^^^^^^^^^^^^^^^^
-                    Prometheus regexp matchers are automatically fully anchored so match for
+                    Prometheus regexp matchers are automatically fully anchored so a match for
                     `job=~"(foo|^.+)$"` will result in `job=~"^(foo|^.+)$$"`, remove regexp anchors `^`
                     and/or `$`.
   problem:
@@ -563,7 +563,7 @@
     summary: redundant regexp anchors
     details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
     diagnostics:
-        - message: Prometheus regexp matchers are automatically fully anchored so match for `job=~"(foo|^.+)$"` will result in `job=~"^(foo|^.+)$$"`, remove regexp anchors `^` and/or `$`.
+        - message: Prometheus regexp matchers are automatically fully anchored so a match for `job=~"(foo|^.+)$"` will result in `job=~"^(foo|^.+)$$"`, remove regexp anchors `^` and/or `$`.
           firstcolumn: 5
           lastcolumn: 21
           kind: 0

@@ -44,7 +44,7 @@ when you run `max(...)` on a query that returns a huge number of results.
 ## Series returned by the query
 
 For recording rules anything returned by the query will be saved into Prometheus
-as new time series. Checking how many time series does a rule return allows us
+as new time series. Checking how many time series a rule returns allows us
 to estimate how much extra memory will be needed.
 `pint` will try to estimate the number of bytes needed per single time series
 and use that to estimate the amount of memory needed to store all the time series
@@ -55,7 +55,7 @@ The `bytes per time series` number is calculated using this query:
 avg(avg_over_time(go_memstats_alloc_bytes[2h]) / avg_over_time(prometheus_tsdb_head_series[2h]))
 ```
 
-Since Go uses garbage collector total Prometheus process memory will be more than the
+Since Go uses a garbage collector, total Prometheus process memory will be more than the
 sum of all memory allocations, depending on many factors like memory pressure,
 Go version, `GOGC` settings etc. The estimate `pint` gives you should be considered
 `best case` scenario.

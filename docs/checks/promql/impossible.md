@@ -69,7 +69,7 @@ But doing it this way splits our query in two parts:
 - A: `service_ready`
 - B: `(service_errors == 0) * on (cluster) group_left(env, location) cluster_info`
 
-When we the evaluate `A and on(instance) B` we no longer propagate `env` and `location` to the results, because
+When we evaluate `A and on(instance) B` we no longer propagate `env` and `location` to the results, because
 these labels are only added to the results on the `B` side.
 One way to fix this is to ensure that we join extra labels with the entire
 `service_ready and on (instance) (service_errors == 0)` expression by wrapping it in parentheses.

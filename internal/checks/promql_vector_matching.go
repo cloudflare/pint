@@ -192,7 +192,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 						Diagnostics: []diags.Diagnostic{
 							{
 								Message: fmt.Sprintf(
-									"Using `on(%s)` won't produce any results on %s because [series returned by this query](%s) doesn't have the `%s` label.",
+									"Using `on(%s)` won't produce any results on %s because [series returned by this query](%s) don't have the `%s` label.",
 									name, promText(c.prom.Name(), qr.URI), link, name,
 								),
 								Pos:         expr.Value.Pos,

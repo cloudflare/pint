@@ -12,7 +12,7 @@ This means that the absolute value of a counter doesn't matter, it will be a ran
 To use the value of a counter in PromQL you most likely want to calculate the rate of events using the [rate()](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) function, or any other function that is safe to use with counters.
 Once you calculate the rate you can use that result in other functions or aggregations that are not counter safe, like [sum()](https://prometheus.io/docs/prometheus/latest/querying/operators/#aggregation-operators).
 
-Here's an example of invalid alerting rules that uses a counter metric called `errors_total`.
+Here's an example of an invalid alerting rule that uses a counter metric called `errors_total`.
 This metric will be incremented every time there's an error.
 
 A bad rule could look like this:
@@ -29,7 +29,7 @@ The problem here is that a counter like `errors_total` will only go up in value 
 
 Once there are 11 errors observed since your application started `Too many errors` alert will fire and will keep firing
 until your application restarts.
-This kind of alerts is usually unhelpful and what you really want to track is the health of your application
+This kind of alert is usually unhelpful and what you really want to track is the health of your application
 **right now**. This alert should be triggered if, for example, in the last 1 hour there were more than N errors.
 If there's a spike of errors but then errors stop, then the alert should stop firing.
 
