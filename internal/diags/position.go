@@ -100,7 +100,10 @@ func NewPositionRange(lines []string, val *yaml.Node, minColumn int) (offsets Po
 
 	for lineIndex <= len(lines) {
 		// Append new line but only if we already have any tokens.
-		if len(offsets) > 0 {
+		// Also append when we have no tokens yet but already consumed
+		// leading whitespace (needIndex > 0), so that characters like
+		// a leading '\n' in block scalars still get a position entry.
+		if len(offsets) > 0 || (needIndex > 0 && lineIndex >= 2) {
 			offsets = appendPosition(offsets, lineIndex-1, len(lines[lineIndex-2])+1)
 		}
 

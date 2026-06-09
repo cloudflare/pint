@@ -114,7 +114,7 @@ body: |
 
     ```yaml
     5 |       expr: count(...) by (instance, version) != ignoring(package) group_left(foo) ...
-                               ^^^
+                               ^^
     ```
 
     Query is using aggregation with `by(instance, version)`, only labels included inside `by(...)` will be present on the results.
@@ -155,7 +155,7 @@ body: |
 
     ```yaml
     5 |       expr: ... != ignoring(package) group_left(foo) count(...) by (instance, version, package)
-                                                                        ^^^
+                                                                        ^^
     ```
 
     Query is using aggregation with `by(instance, version, package)`, only labels included inside `by(...)` will be present on the results.

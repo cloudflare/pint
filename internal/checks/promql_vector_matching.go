@@ -370,8 +370,14 @@ func canJoinStatically(lhsSources, rhsSources []*source.Source, vm *promParser.V
 func removeConditions(node promParser.Node) promParser.Node {
 	switch n := node.(type) {
 	case *promParser.AggregateExpr:
-		n.Expr = removeConditions(n.Expr).(promParser.Expr)
-		return n
+		return &promParser.AggregateExpr{
+			Op:       n.Op,
+			Expr:     removeConditions(n.Expr).(promParser.Expr),
+			Param:    n.Param,
+			Grouping: n.Grouping,
+			Without:  n.Without,
+			PosRange: n.PosRange,
+		}
 	case *promParser.BinaryExpr:
 		lhs := removeConditions(n.LHS)
 		rhs := removeConditions(n.RHS)
@@ -386,11 +392,15 @@ func removeConditions(node promParser.Node) promParser.Node {
 		if rn {
 			return lhs
 		}
-		n.LHS = lhs.(promParser.Expr)
-		n.RHS = rhs.(promParser.Expr)
-		return n
+		return &promParser.BinaryExpr{
+			Op:             n.Op,
+			LHS:            lhs.(promParser.Expr),
+			RHS:            rhs.(promParser.Expr),
+			VectorMatching: n.VectorMatching,
+			ReturnBool:     n.ReturnBool,
+		}
 	case *promParser.Call:
-		ret := promParser.Expressions{}
+		args := make(promParser.Expressions, 0, len(n.Args))
 		for i, e := range n.Args {
 			var vt promParser.ValueType
 			if i >= len(n.Func.ArgTypes) {
@@ -400,26 +410,43 @@ func removeConditions(node promParser.Node) promParser.Node {
 			}
 			switch vt {
 			case promParser.ValueTypeVector, promParser.ValueTypeMatrix:
-				ret = append(ret, removeConditions(e).(promParser.Expr))
+				args = append(args, removeConditions(e).(promParser.Expr))
 			case promParser.ValueTypeScalar, promParser.ValueTypeString, promParser.ValueTypeNone:
-				ret = append(ret, e)
+				args = append(args, e)
 			}
 		}
-		n.Args = ret
-		return n
-	case *promParser.SubqueryExpr:
-		n.Expr = removeConditions(n.Expr).(promParser.Expr)
-		return n
-	case *promParser.ParenExpr:
-		n.Expr = removeConditions(n.Expr).(promParser.Expr)
-		switch n.Expr.(type) {
-		case *promParser.NumberLiteral, *promParser.StringLiteral, *promParser.VectorSelector, *promParser.MatrixSelector:
-			return n.Expr
+		return &promParser.Call{
+			Func:     n.Func,
+			Args:     args,
+			PosRange: n.PosRange,
 		}
-		return n
+	case *promParser.SubqueryExpr:
+		return &promParser.SubqueryExpr{
+			Expr:           removeConditions(n.Expr).(promParser.Expr),
+			Range:          n.Range,
+			OriginalOffset: n.OriginalOffset,
+			Offset:         n.Offset,
+			Timestamp:      n.Timestamp,
+			StartOrEnd:     n.StartOrEnd,
+			Step:           n.Step,
+			EndPos:         n.EndPos,
+		}
+	case *promParser.ParenExpr:
+		inner := removeConditions(n.Expr).(promParser.Expr)
+		switch inner.(type) {
+		case *promParser.NumberLiteral, *promParser.StringLiteral, *promParser.VectorSelector, *promParser.MatrixSelector:
+			return inner
+		}
+		return &promParser.ParenExpr{
+			Expr:     inner,
+			PosRange: n.PosRange,
+		}
 	case *promParser.UnaryExpr:
-		n.Expr = removeConditions(n.Expr).(promParser.Expr)
-		return n
+		return &promParser.UnaryExpr{
+			Op:       n.Op,
+			Expr:     removeConditions(n.Expr).(promParser.Expr),
+			StartPos: n.StartPos,
+		}
 	default:
 		return node
 	}

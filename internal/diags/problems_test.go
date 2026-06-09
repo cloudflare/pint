@@ -317,6 +317,23 @@ expr: >-
 				{FirstColumn: 323, LastColumn: 352, Message: "smelly regexp selector"},
 			},
 		},
+		{
+			name: "multi-line folded expression keeps caret on leading sum after trimming",
+			input: `
+expr: |2-
+  
+                                (
+                                  sum(rate(prometheus_rule_evaluation_failures_total{kubernetes_namespace="thanos", pod_app="ruler-core", pod_component="ruler"}[2m]))
+                                  by (job,kubernetes_name,pod, pod_app, pod_component)
+                                /
+                                  sum(rate(prometheus_rule_evaluations_total{kubernetes_namespace="thanos", pod_app="ruler-core", pod_component="ruler"}[2m]))
+                                  by (job,kubernetes_name,pod, pod_app, pod_component)
+                                * 100 > 5
+                                )`,
+			diags: []Diagnostic{
+				{FirstColumn: 66, LastColumn: 68, Message: "unsafe division in aggregation"},
+			},
+		},
 	}
 
 	_, file, _, ok := runtime.Caller(0)

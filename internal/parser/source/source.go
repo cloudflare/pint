@@ -144,6 +144,13 @@ type ReturnInfo struct {
 	IsReturnBool   bool    // True if this source uses the 'bool' modifier.
 }
 
+type Condition struct {
+	Op         promParser.ItemType `yaml:"op,omitempty"`
+	Value      float64             `yaml:"value,omitempty"`
+	Present    bool                `yaml:"present,omitempty"`
+	KnownValue bool                `yaml:"knownValue,omitempty"`
+}
+
 type Operation struct {
 	Node      promParser.Node
 	Operation string
@@ -232,6 +239,19 @@ type Unless struct {
 	IsOn           bool
 }
 
+type Side uint8
+
+const (
+	LHS Side = iota
+	RHS
+)
+
+type Indirect struct {
+	Src  *Source             `yaml:"src"`
+	Op   promParser.ItemType `yaml:"op"`
+	Side Side                `yaml:"side"`
+}
+
 type FeatureRequirement struct {
 	Feature   string                   `yaml:"feature"`
 	Name      string                   `yaml:"name"`
@@ -241,24 +261,23 @@ type FeatureRequirement struct {
 type Source struct {
 	Labels     map[string]LabelTransform `yaml:"labels,omitempty"`
 	DeadInfo   *DeadInfo                 `yaml:"deadInfo,omitempty"`
-	DeadLabels []DeadLabel               `yaml:"deadLabels,omitempty"`
 	Returns    promParser.ValueType      `yaml:"returns"`
+	DeadLabels []DeadLabel               `yaml:"deadLabels,omitempty"`
 	Operations Operations                `yaml:"operations,omitempty"`
 	// Any other sources this source joins with.
 	Joins []Join `yaml:"joins,omitempty"`
 	// Any other sources this source is suppressed by.
 	Unless []Unless `yaml:"unless,omitempty"`
 	// Any other sources used indirectly, not contributing labels.
-	Indirect      []*Source              `yaml:"indirect,omitempty"`
+	Indirect      []Indirect             `yaml:"indirect,omitempty"`
 	NeedsFeatures []FeatureRequirement   `yaml:"needsFeatures,omitempty"`
 	UsedLabels    []string               `yaml:"usedLabels,omitempty"`
 	ReturnInfo    ReturnInfo             `yaml:"returnInfo,omitempty"`
+	Condition     Condition              `yaml:"condition,omitempty"`
 	Position      posrange.PositionRange `yaml:"position"`
 	Type          Type                   `yaml:"type"`
 	// Labels are fixed and only allowed labels can be present.
-	FixedLabels bool `yaml:"fixedLabels,omitempty"`
-	// True if this source is guarded by 'foo > 5' or other condition.
-	IsConditional     bool              `yaml:"isConditional,omitempty"`
+	FixedLabels       bool              `yaml:"fixedLabels,omitempty"`
 	RangeSelectorMode RangeSelectorMode `yaml:"rangeSelectorMode,omitempty"`
 }
 
@@ -587,7 +606,7 @@ func innerWalk(fn Visitor, s *Source, j *Join, u *Unless) {
 		innerWalk(fn, s.Unless[i].Src, nil, &s.Unless[i])
 	}
 	for _, ind := range s.Indirect {
-		innerWalk(fn, ind, nil, nil)
+		innerWalk(fn, ind.Src, nil, nil)
 	}
 }
 
@@ -1084,7 +1103,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 func parseCall(expr string, n *promParser.Call) (src []*Source) {
 	var args []string
 	var exprs []promParser.Expr
-	var indirect []*Source
+	var indirect []Indirect
 
 	var vt promParser.ValueType
 	for i, e := range n.Args {
@@ -1099,7 +1118,13 @@ func parseCall(expr string, n *promParser.Call) (src []*Source) {
 			exprs = append(exprs, e)
 		case promParser.ValueTypeNone, promParser.ValueTypeScalar, promParser.ValueTypeString:
 			args = append(args, e.String())
-			indirect = append(indirect, walkNode(expr, e)...)
+			for _, s := range walkNode(expr, e) {
+				indirect = append(indirect, Indirect{
+					Src:  s,
+					Op:   0,
+					Side: LHS,
+				})
+			}
 		}
 	}
 
@@ -1220,8 +1245,16 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []*Source) {
 				// As we walk RHS multiple times we might end up mutating the same
 				// Source, and so to avoid that we need to clone it first.
 				result := side.clone()
-				result.Indirect = append(result.Indirect, other)
-				result.IsConditional, result.ReturnInfo.IsReturnBool = checkConditions(result, n.Op, n.ReturnBool)
+				indSide := RHS
+				if other == ls {
+					indSide = LHS
+				}
+				result.Indirect = append(result.Indirect, Indirect{
+					Src:  other,
+					Op:   n.Op,
+					Side: indSide,
+				})
+				result.Condition, result.ReturnInfo.IsReturnBool = checkConditions(result, n.Op, n.ReturnBool)
 				if ls.ReturnInfo.AlwaysReturns && rs.ReturnInfo.AlwaysReturns && ls.ReturnInfo.KnownReturn && rs.ReturnInfo.KnownReturn {
 					// Both sides always return something
 					result.ReturnInfo, result.DeadInfo = calculateStaticReturn(expr, ls, rs, n)
@@ -1306,7 +1339,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []*Source) {
 			}
 			ls.DeadLabels = append(ls.DeadLabels, ls.checkJoinedLabels(expr, n, ls)...)
 			ls.excludeLabel("Binary operation between two vectors removes metric names.", pos, model.MetricNameLabel)
-			ls.IsConditional, ls.ReturnInfo.IsReturnBool = checkConditions(ls, n.Op, n.ReturnBool)
+			ls.Condition, ls.ReturnInfo.IsReturnBool = checkConditions(ls, n.Op, n.ReturnBool)
 			src = append(src, ls)
 		}
 
@@ -1380,7 +1413,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []*Source) {
 				}
 			}
 			rs.excludeLabel("Binary operation between two vectors removes metric names.", pos, model.MetricNameLabel)
-			rs.IsConditional, rs.ReturnInfo.IsReturnBool = checkConditions(rs, n.Op, n.ReturnBool)
+			rs.Condition, rs.ReturnInfo.IsReturnBool = checkConditions(rs, n.Op, n.ReturnBool)
 			src = append(src, rs)
 		}
 
@@ -1451,7 +1484,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []*Source) {
 				}
 			}
 			ls.excludeLabel("Binary operation between two vectors removes metric names.", pos, model.MetricNameLabel)
-			ls.IsConditional, ls.ReturnInfo.IsReturnBool = checkConditions(ls, n.Op, n.ReturnBool)
+			ls.Condition, ls.ReturnInfo.IsReturnBool = checkConditions(ls, n.Op, n.ReturnBool)
 			src = append(src, ls)
 		}
 
@@ -1504,12 +1537,12 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []*Source) {
 			} else {
 				ls.useLabelsNotExcluded(n.VectorMatching.MatchingLabels)
 			}
-			if !ls.ReturnInfo.AlwaysReturns || ls.IsConditional {
+			if !ls.ReturnInfo.AlwaysReturns || ls.Condition.Present {
 				lhsCanBeEmpty = true
 			}
 			for _, rs := range rhs {
-				isConditional, _ := checkConditions(rs, n.Op, n.ReturnBool)
-				if isConditional {
+				condition, _ := checkConditions(rs, n.Op, n.ReturnBool)
+				if condition.Present {
 					rhsConditional = true
 				}
 				var deadInfo *DeadInfo
@@ -1521,7 +1554,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []*Source) {
 				}
 				switch {
 				case n.Op == promParser.LUNLESS:
-					if n.VectorMatching.On && len(n.VectorMatching.MatchingLabels) == 0 && rs.ReturnInfo.AlwaysReturns && !rs.IsConditional {
+					if n.VectorMatching.On && len(n.VectorMatching.MatchingLabels) == 0 && rs.ReturnInfo.AlwaysReturns && !rs.Condition.Present {
 						ls.DeadInfo = &DeadInfo{
 							Reason:   "This query will never return anything because the `unless` query always returns something.",
 							Fragment: rs.Position,
@@ -1549,7 +1582,12 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []*Source) {
 				ls.DeadLabels = append(ls.DeadLabels, rs.checkJoinedLabels(expr, n, ls)...)
 			}
 			if n.Op == promParser.LAND && rhsConditional {
-				ls.IsConditional = true
+				ls.Condition = Condition{
+					Present:    true,
+					Op:         n.Op,
+					Value:      0,
+					KnownValue: false,
+				}
 			}
 			src = append(src, ls)
 		}
@@ -1569,16 +1607,39 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []*Source) {
 	return src
 }
 
-func checkConditions(s *Source, op promParser.ItemType, isBool bool) (isConditional, isReturnBool bool) {
-	if !s.IsConditional && isBool {
+func checkConditions(s *Source, op promParser.ItemType, isBool bool) (condition Condition, isReturnBool bool) {
+	if !s.Condition.Present && isBool {
 		isReturnBool = isBool
 	}
-	if s.IsConditional {
-		isConditional = s.IsConditional
-	} else {
-		isConditional = op.IsComparisonOperator()
+	if s.Condition.Present {
+		return s.Condition, isReturnBool
 	}
-	return isConditional, isReturnBool
+	if !op.IsComparisonOperator() {
+		return condition, isReturnBool
+	}
+	condition = Condition{
+		Present:    true,
+		Op:         op,
+		Value:      0,
+		KnownValue: false,
+	}
+	for _, j := range s.Joins {
+		if j.Op != op || j.Src == nil || !j.Src.ReturnInfo.KnownReturn {
+			continue
+		}
+		condition.Value = j.Src.ReturnInfo.ReturnedNumber
+		condition.KnownValue = true
+		return condition, isReturnBool
+	}
+	for _, ind := range s.Indirect {
+		if ind.Op != op || ind.Src == nil || !ind.Src.ReturnInfo.KnownReturn {
+			continue
+		}
+		condition.Value = ind.Src.ReturnInfo.ReturnedNumber
+		condition.KnownValue = true
+		return condition, isReturnBool
+	}
+	return condition, isReturnBool
 }
 
 func canJoin(ls, rs *Source, vm *promParser.VectorMatching) (bool, string, posrange.PositionRange) {

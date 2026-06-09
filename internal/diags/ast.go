@@ -68,7 +68,7 @@ func posAtOffset(pos PositionRanges, offset int) (line, col int, ok bool) {
 func offsetForCol(reps []intRange, exprStart, col int) int {
 	var offset int
 	for _, r := range reps {
-		if exprStart+r.end < col {
+		if exprStart+r.end <= col {
 			offset += 3 - (r.end - r.start)
 		}
 	}

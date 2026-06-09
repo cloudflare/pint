@@ -30,6 +30,7 @@ var (
 		FragileCheckName,
 		GroupIntervalCheckName,
 		ImpossibleCheckName,
+		NaNCheckName,
 		OffsetCheckName,
 		RangeQueryCheckName,
 		RateCheckName,

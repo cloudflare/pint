@@ -202,6 +202,9 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 			var arEntry *discovery.Entry
 			if alertname != "" {
 				for _, entry := range entries {
+					if entry.State == discovery.Removed {
+						continue
+					}
 					if entry.Rule.AlertingRule != nil &&
 						entry.Rule.Error.Err == nil &&
 						entry.Rule.AlertingRule.Alert.Value == alertname {
@@ -326,6 +329,9 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 			// Check if we have recording rule that provides this metric before we give up
 			var rrEntry *discovery.Entry
 			for ei := range entries {
+				if entries[ei].State == discovery.Removed {
+					continue
+				}
 				if entries[ei].Rule.RecordingRule != nil &&
 					entries[ei].Rule.Error.Err == nil &&
 					entries[ei].Rule.RecordingRule.Record.Value == bareSelectorString {
@@ -1074,7 +1080,7 @@ func getSelectors(n *parser.PromQLExpr) (selectors []selectorInfo) {
 			}
 		}
 		for _, us := range ls.Unless {
-			if !us.Src.IsConditional {
+			if !us.Src.Condition.Present {
 				continue
 			}
 			if vs, ok := source.MostOuterOperation[*promParser.VectorSelector](us.Src); ok {

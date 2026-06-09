@@ -25,6 +25,7 @@ config: |-
           "promql/fragile",
           "group/interval",
           "promql/impossible",
+          "promql/nan",
           "promql/offset",
           "promql/range_query",
           "promql/rate",
@@ -76,6 +77,7 @@ checks:
     - promql/regexp
     - rule/dependency
     - promql/impossible
+    - promql/nan
     - group/interval
     - alerts/annotation(summary:true)
 

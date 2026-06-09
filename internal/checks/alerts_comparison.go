@@ -63,7 +63,7 @@ func (c ComparisonCheck) Check(_ context.Context, entry *discovery.Entry, _ []*d
 			continue
 		}
 		for _, s := range src.Joins {
-			if s.DeadInfo == nil && s.Src.IsConditional {
+			if s.DeadInfo == nil && s.Src.Condition.Present {
 				goto NEXT
 			}
 		}
@@ -72,7 +72,7 @@ func (c ComparisonCheck) Check(_ context.Context, entry *discovery.Entry, _ []*d
 		}
 
 		switch {
-		case src.ReturnInfo.AlwaysReturns && !src.IsConditional:
+		case src.ReturnInfo.AlwaysReturns && !src.Condition.Present:
 			if len(srcs) == 1 {
 				msg = "This query will always return a result and so this alert will always fire."
 			} else {
@@ -80,7 +80,7 @@ func (c ComparisonCheck) Check(_ context.Context, entry *discovery.Entry, _ []*d
 			}
 		case src.ReturnInfo.IsReturnBool:
 			msg = "Results of this query are using the `bool` modifier, which means it will always return a result and the alert will always fire."
-		case !src.IsConditional:
+		case !src.Condition.Present:
 			msg = "This query doesn't have any condition and so this alert will always fire if it matches anything."
 		default:
 			msg = ""

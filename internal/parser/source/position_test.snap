@@ -39,7 +39,7 @@ sum(foo)
 fn: sum
 expr:
 sum (foo)
-^^^^     
+^^^      
 ---
 
 [TestFindFuncNamePosition/respects_the_within_offset - 1]

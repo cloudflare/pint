@@ -128,6 +128,9 @@ func (c RateCheck) collectRateMetricNames(expr *parser.PromQLExpr, entries []*di
 			vs, _ := source.MostOuterOperation[*promParser.VectorSelector](s)
 			add(vs.Name)
 			for _, e := range entries {
+				if e.State == discovery.Removed {
+					continue
+				}
 				if e.PathError != nil {
 					continue
 				}
@@ -247,6 +250,9 @@ func (c RateCheck) checkSources(
 			}
 
 			for _, e := range entries {
+				if e.State == discovery.Removed {
+					continue
+				}
 				if e.PathError != nil {
 					continue
 				}
