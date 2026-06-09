@@ -195,6 +195,16 @@ func TestImpossibleCheck(t *testing.T) {
 			problems:   true,
 		},
 		{
+			description: "impossible / ignoring group_right side message",
+			content: `
+- record: foo
+  expr: sum(bar) / ignoring(instance) group_right(cluster) foo{job="bar"}
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
+		{
 			description: "impossible sum * on sum",
 			content: `
 - record: foo

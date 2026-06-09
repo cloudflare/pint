@@ -1609,9 +1609,13 @@ func canJoin(ls, rs *Source, vm *promParser.VectorMatching) (bool, string, posra
 				continue
 			}
 			if ls.CanHaveLabel(name) && !rs.CanHaveLabel(name) {
+				otherSide := "left"
+				if side == "left" {
+					otherSide = "right"
+				}
 				reason, fragment := rs.LabelExcludeReason(name)
-				return false, fmt.Sprintf("The %s hand side will never be matched because it doesn't have the `%s` label while the left hand side will. %s",
-					side, name, reason), fragment
+				return false, fmt.Sprintf("The %s hand side will never be matched because it doesn't have the `%s` label while the %s hand side will. %s",
+					side, name, otherSide, reason), fragment
 			}
 		}
 	}
