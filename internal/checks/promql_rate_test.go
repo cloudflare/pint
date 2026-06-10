@@ -514,6 +514,28 @@ func TestRateCheck(t *testing.T) {
 			},
 		},
 		{
+			description: "removed recording rule is ignored for rate over sum",
+			content:     "- alert: my alert\n  expr: rate(my:sum[5m])\n",
+			entries:     parseWithState("- record: my:sum\n  expr: sum(foo)\n", discovery.Removed),
+			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
+				},
+				{
+					conds: []requestCondition{
+						requireMetadataPath,
+						formCond{"metric", "my:sum"},
+					},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{
+						"my:sum": {{Type: "counter"}},
+					}},
+				},
+			},
+		},
+		{
 			description: "rate_over_sum",
 			content:     "- alert: my alert\n  expr: rate(my:sum[5m])\n",
 			entries:     mustParseContent("- record: my:sum\n  expr: sum(foo)\n"),

@@ -19,7 +19,7 @@ Warning: required label is being removed via aggregation (promql/aggregate)
 Warning: label must be removed in aggregations (promql/aggregate)
   ---> rules/0001.yml:6 -> `colo_job:foo:irate3m` [+3 duplicates]
 6 |   expr: sum(irate(foo[3m])) WITHOUT (colo_id)
-                                ^^^^^^^^
+                                ^^^^^^^
                                 `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$`
                                 rules.
 

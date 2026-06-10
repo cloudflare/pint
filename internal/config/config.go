@@ -235,6 +235,7 @@ func Load(path string, failOnMissing bool) (cfg Config, fromFile bool, err error
 		staticRule{name: checks.RegexpCheckName, checker: checks.NewRegexpCheck()},
 		staticRule{name: checks.RuleDependencyCheckName, checker: checks.NewRuleDependencyCheck()},
 		staticRule{name: checks.ImpossibleCheckName, checker: checks.NewImpossibleCheck()},
+		staticRule{name: checks.NaNCheckName, checker: checks.NewNaNCheck()},
 		staticRule{name: checks.GroupIntervalCheckName, checker: checks.NewGroupIntervalCheck()},
 	)
 

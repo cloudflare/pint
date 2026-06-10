@@ -95,7 +95,7 @@ body: |
 
     ```yaml
     5 |     expr: count by (a, b, c) (bar)
-                        ^^^
+                        ^^
     ```
 
     Query is using aggregation with `by(a, b, c)`, only labels included inside `by(...)` will be present on the results.

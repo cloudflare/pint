@@ -885,7 +885,7 @@
         help: '{{ $labels.ixtance }}'
   output: |
     3 |   expr: count(...) by (instance, version) != ignoring(package) group_left(foo) ...
-                           ^^^
+                           ^^
                            Query is using aggregation with `by(instance, version)`, only labels included
                            inside `by(...)` will be present on the results.
       |   [...]
@@ -904,7 +904,7 @@
           kind: 0
         - message: Query is using aggregation with `by(instance, version)`, only labels included inside `by(...)` will be present on the results.
           firstcolumn: 19
-          lastcolumn: 21
+          lastcolumn: 20
           kind: 1
     lines:
         first: 2

@@ -330,3 +330,28 @@ expr: |
 10 |   line10
 
 ---
+
+[TestInjectDiagnostics/multi-line_folded_expression_keeps_caret_on_leading_sum_after_trimming - 1]
+
+expr: |2-
+  
+                                (
+                                  sum(rate(prometheus_rule_evaluation_failures_total{kubernetes_namespace="thanos", pod_app="ruler-core", pod_component="ruler"}[2m]))
+                                  by (job,kubernetes_name,pod, pod_app, pod_component)
+                                /
+                                  sum(rate(prometheus_rule_evaluations_total{kubernetes_namespace="thanos", pod_app="ruler-core", pod_component="ruler"}[2m]))
+                                  by (job,kubernetes_name,pod, pod_app, pod_component)
+                                * 100 > 5
+                                )
+
+ 2 | expr: |2-
+ 3 |   
+ 4 |                                 (
+ 5 |                                   sum(...)
+                                       ^^^ unsafe division in aggregation
+ 6 |                                   by (job,kubernetes_name,pod, pod_app, pod_component)
+ 7 |                                 /
+   | [...]
+11 |                                 )
+
+---

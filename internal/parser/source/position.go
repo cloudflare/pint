@@ -21,9 +21,19 @@ func isOutside(pos posrange.PositionRange, outside []posrange.PositionRange) boo
 	return true
 }
 
-// FindFuncNamePosition returns the position of fn inside the within fragment,
-// matching fn case-insensitively only when it is followed by '(' (ignoring
-// whitespace), so "by" matches "by (...)" but not "bytes".
+// FindFuncNamePosition returns the source position of a function name within
+// the provided fragment.
+//
+// It matches fn case-insensitively, but only when the matched text is
+// followed by optional whitespace and then `(`. This allows `by (...)` to
+// match `by` while skipping the same text inside longer words such as
+// `bytes`.
+//
+// The returned range covers only the function name. When converting it to a
+// diagnostic, use:
+//
+// - FirstColumn = pos.Start + 1
+// - LastColumn = pos.End.
 func FindFuncNamePosition(expr string, within posrange.PositionRange, fn string) posrange.PositionRange {
 	fragment := GetQueryFragment(expr, within)
 	lower := strings.ToLower(fragment)
@@ -44,7 +54,7 @@ func FindFuncNamePosition(expr string, within posrange.PositionRange, fn string)
 			if c == '(' {
 				return posrange.PositionRange{
 					Start: within.Start + posrange.Pos(idx),
-					End:   within.Start + posrange.Pos(i),
+					End:   within.Start + posrange.Pos(end),
 				}
 			}
 			if c != ' ' && c != '\n' && c != '\t' {

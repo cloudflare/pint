@@ -7105,6 +7105,431 @@ groups:
 				},
 			},
 		},
+		{
+			input: []byte(`---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: thanos
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ruler-core
+      component: ruler
+  serviceName: thanos-ruler
+  template:
+    metadata:
+      labels:
+        app: ruler-core
+        component: ruler
+    spec:
+      containers:
+        - args:
+            - --log.format=json
+            - --http-address=0.0.0.0:10902
+            - --grpc-address=0.0.0.0:10901
+            - --eval-interval=1m
+            - |
+              --tracing.config=
+              type: JAEGER
+              config:
+                sampler_param: 0.01
+                sampler_type: probabilistic
+          command:
+            - /bin/thanos
+            - rule
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              path: /-/healthy
+              port: 10902
+            initialDelaySeconds: 30
+            terminationGracePeriodSeconds: 300
+            timeoutSeconds: 5
+          name: ruler
+          ports:
+            - containerPort: 10902
+              name: http-metrics
+          readinessProbe:
+            httpGet:
+              path: /-/ready
+              port: 10902
+            initialDelaySeconds: 30
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: "4"
+              memory: 4G
+            requests:
+              cpu: "4"
+              memory: 4G
+        - args:
+            - --config=/rules/current/.pint.hcl
+            - watch
+            - --listen=:10904
+            - --max-problems=50
+            - glob
+            - /rules/current/rules/*
+          command:
+            - /usr/local/bin/pint
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 10904
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
+          name: pint
+          ports:
+            - containerPort: 10904
+              name: pint
+          resources:
+            limits:
+              cpu: "1"
+              memory: 256Mi
+            requests:
+              cpu: "1"
+              memory: 256Mi
+          volumeMounts:
+            - mountPath: /rules
+              name: rules
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    prometheus.cfplat.com/rules: "true"
+  name: ruler-core-ruler
+  namespace: thanos
+data:
+  rules: |
+    groups:
+      - name: ruler-health-alerts
+        rules:
+          - alert: Thanos_Rule_Queue_Is_Dropping_Alerts
+            expr: rate(thanos_alert_queue_alerts_dropped_total{kubernetes_namespace="thanos", pod_app="ruler-core", pod_component="ruler"}[2m]) > 0
+            for: 5m
+            labels:
+              priority: "3"
+              notify: chat-obs-metrics
+            annotations:
+              summary: Thanos Ruler is failing to queue alerts.
+          - alert: Thanos_Rule_Sender_Is_Dropping_Alerts
+            expr: rate(thanos_alert_sender_alerts_dropped_total{kubernetes_namespace="thanos", pod_app="ruler-core", pod_component="ruler"}[2m]) > 0
+            for: 5m
+            labels:
+              priority: "3"
+              notify: chat-obs-metrics
+            annotations:
+              summary: Thanos Ruler is failing to send alerts.
+          - alert: Thanos_Rule_High_Rule_Evaluation_Failures
+            expr: |2-
+              
+                                  (
+                                    sum(rate(prometheus_rule_evaluation_failures_total{kubernetes_namespace="thanos", pod_app="ruler-core", pod_component="ruler"}[2m]) / rate(prometheus_rule_group_last_duration_seconds{kubernetes_namespace="thanos", pod_app="ruler-core", pod_component="ruler"}[2m]))
+                                    by (job,kubernetes_name,pod, pod_app, pod_component)
+                                  /
+                                    sum(rate(prometheus_rule_evaluations_total{kubernetes_namespace="thanos", pod_app="ruler-core", pod_component="ruler"}[2m]) / rate(prometheus_rule_group_last_duration_seconds{kubernetes_namespace="thanos", pod_app="ruler-core", pod_component="ruler"}[2m]))
+                                    by (job,kubernetes_name,pod, pod_app, pod_component)
+                                  * 100 > 5
+                                  )
+            for: 5m
+            labels:
+              priority: "3"
+              notify: chat-obs-metrics
+            annotations:
+              summary: Thanos Ruler is failing to evaluate {{ $value | humanize }}% of rules.
+`),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Name: parser.YamlNode{
+							Value: "ruler-health-alerts",
+							Pos: diags.PositionRanges{
+								{Line: 2, FirstColumn: 11, LastColumn: 29},
+							},
+						},
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 102, Last: 109},
+								AlertingRule: &parser.AlertingRule{
+									Alert: parser.YamlNode{
+										Value: "Thanos_Rule_Queue_Is_Dropping_Alerts",
+										Pos: diags.PositionRanges{
+											{Line: 102, FirstColumn: 20, LastColumn: 55},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: `rate(thanos_alert_queue_alerts_dropped_total{kubernetes_namespace="thanos", pod_app="ruler-core", pod_component="ruler"}[2m]) > 0`,
+											Pos: diags.PositionRanges{
+												{Line: 103, FirstColumn: 19, LastColumn: 147},
+											},
+										},
+									},
+									For: &parser.YamlDuration{
+										Value: 5 * time.Minute,
+										Raw:   "5m",
+										Pos: diags.PositionRanges{
+											{Line: 104, FirstColumn: 18, LastColumn: 19},
+										},
+									},
+									Labels: &parser.YamlMap{
+										Key: &parser.YamlNode{
+											Value: "labels",
+											Pos: diags.PositionRanges{
+												{Line: 105, FirstColumn: 13, LastColumn: 18},
+											},
+										},
+										Items: []*parser.YamlKeyValue{
+											{
+												Key: &parser.YamlNode{
+													Value: "priority",
+													Pos: diags.PositionRanges{
+														{Line: 106, FirstColumn: 15, LastColumn: 22},
+													},
+												},
+												Value: &parser.YamlNode{
+													Value: "3",
+													Pos: diags.PositionRanges{
+														{Line: 106, FirstColumn: 26, LastColumn: 26},
+													},
+												},
+											},
+											{
+												Key: &parser.YamlNode{
+													Value: "notify",
+													Pos: diags.PositionRanges{
+														{Line: 107, FirstColumn: 15, LastColumn: 20},
+													},
+												},
+												Value: &parser.YamlNode{
+													Value: "chat-obs-metrics",
+													Pos: diags.PositionRanges{
+														{Line: 107, FirstColumn: 23, LastColumn: 38},
+													},
+												},
+											},
+										},
+									},
+									Annotations: &parser.YamlMap{
+										Key: &parser.YamlNode{
+											Value: "annotations",
+											Pos: diags.PositionRanges{
+												{Line: 108, FirstColumn: 13, LastColumn: 23},
+											},
+										},
+										Items: []*parser.YamlKeyValue{
+											{
+												Key: &parser.YamlNode{
+													Value: "summary",
+													Pos: diags.PositionRanges{
+														{Line: 109, FirstColumn: 15, LastColumn: 21},
+													},
+												},
+												Value: &parser.YamlNode{
+													Value: "Thanos Ruler is failing to queue alerts.",
+													Pos: diags.PositionRanges{
+														{Line: 109, FirstColumn: 24, LastColumn: 63},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+							{
+								Lines: diags.LineRange{First: 110, Last: 117},
+								AlertingRule: &parser.AlertingRule{
+									Alert: parser.YamlNode{
+										Value: "Thanos_Rule_Sender_Is_Dropping_Alerts",
+										Pos: diags.PositionRanges{
+											{Line: 110, FirstColumn: 20, LastColumn: 56},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: `rate(thanos_alert_sender_alerts_dropped_total{kubernetes_namespace="thanos", pod_app="ruler-core", pod_component="ruler"}[2m]) > 0`,
+											Pos: diags.PositionRanges{
+												{Line: 111, FirstColumn: 19, LastColumn: 148},
+											},
+										},
+									},
+									For: &parser.YamlDuration{
+										Value: 5 * time.Minute,
+										Raw:   "5m",
+										Pos: diags.PositionRanges{
+											{Line: 112, FirstColumn: 18, LastColumn: 19},
+										},
+									},
+									Labels: &parser.YamlMap{
+										Key: &parser.YamlNode{
+											Value: "labels",
+											Pos: diags.PositionRanges{
+												{Line: 113, FirstColumn: 13, LastColumn: 18},
+											},
+										},
+										Items: []*parser.YamlKeyValue{
+											{
+												Key: &parser.YamlNode{
+													Value: "priority",
+													Pos: diags.PositionRanges{
+														{Line: 114, FirstColumn: 15, LastColumn: 22},
+													},
+												},
+												Value: &parser.YamlNode{
+													Value: "3",
+													Pos: diags.PositionRanges{
+														{Line: 114, FirstColumn: 26, LastColumn: 26},
+													},
+												},
+											},
+											{
+												Key: &parser.YamlNode{
+													Value: "notify",
+													Pos: diags.PositionRanges{
+														{Line: 115, FirstColumn: 15, LastColumn: 20},
+													},
+												},
+												Value: &parser.YamlNode{
+													Value: "chat-obs-metrics",
+													Pos: diags.PositionRanges{
+														{Line: 115, FirstColumn: 23, LastColumn: 38},
+													},
+												},
+											},
+										},
+									},
+									Annotations: &parser.YamlMap{
+										Key: &parser.YamlNode{
+											Value: "annotations",
+											Pos: diags.PositionRanges{
+												{Line: 116, FirstColumn: 13, LastColumn: 23},
+											},
+										},
+										Items: []*parser.YamlKeyValue{
+											{
+												Key: &parser.YamlNode{
+													Value: "summary",
+													Pos: diags.PositionRanges{
+														{Line: 117, FirstColumn: 15, LastColumn: 21},
+													},
+												},
+												Value: &parser.YamlNode{
+													Value: "Thanos Ruler is failing to send alerts.",
+													Pos: diags.PositionRanges{
+														{Line: 117, FirstColumn: 24, LastColumn: 62},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+							{
+								Lines: diags.LineRange{First: 118, Last: 134},
+								AlertingRule: &parser.AlertingRule{
+									Alert: parser.YamlNode{
+										Value: "Thanos_Rule_High_Rule_Evaluation_Failures",
+										Pos: diags.PositionRanges{
+											{Line: 118, FirstColumn: 20, LastColumn: 60},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "\n                    (\n                      sum(rate(prometheus_rule_evaluation_failures_total{kubernetes_namespace=\"thanos\", pod_app=\"ruler-core\", pod_component=\"ruler\"}[2m]) / rate(prometheus_rule_group_last_duration_seconds{kubernetes_namespace=\"thanos\", pod_app=\"ruler-core\", pod_component=\"ruler\"}[2m]))\n                      by (job,kubernetes_name,pod, pod_app, pod_component)\n                    /\n                      sum(rate(prometheus_rule_evaluations_total{kubernetes_namespace=\"thanos\", pod_app=\"ruler-core\", pod_component=\"ruler\"}[2m]) / rate(prometheus_rule_group_last_duration_seconds{kubernetes_namespace=\"thanos\", pod_app=\"ruler-core\", pod_component=\"ruler\"}[2m]))\n                      by (job,kubernetes_name,pod, pod_app, pod_component)\n                    * 100 > 5\n                    )",
+											Pos: diags.PositionRanges{
+												{Line: 119, FirstColumn: 22, LastColumn: 22},
+												{Line: 120, FirstColumn: 14, LastColumn: 15},
+												{Line: 121, FirstColumn: 17, LastColumn: 36},
+												{Line: 122, FirstColumn: 15, LastColumn: 301},
+												{Line: 123, FirstColumn: 15, LastColumn: 89},
+												{Line: 124, FirstColumn: 15, LastColumn: 36},
+												{Line: 125, FirstColumn: 15, LastColumn: 293},
+												{Line: 126, FirstColumn: 15, LastColumn: 89},
+												{Line: 127, FirstColumn: 15, LastColumn: 44},
+												{Line: 128, FirstColumn: 15, LastColumn: 35},
+											},
+										},
+									},
+									For: &parser.YamlDuration{
+										Value: 5 * time.Minute,
+										Raw:   "5m",
+										Pos: diags.PositionRanges{
+											{Line: 129, FirstColumn: 18, LastColumn: 19},
+										},
+									},
+									Labels: &parser.YamlMap{
+										Key: &parser.YamlNode{
+											Value: "labels",
+											Pos: diags.PositionRanges{
+												{Line: 130, FirstColumn: 13, LastColumn: 18},
+											},
+										},
+										Items: []*parser.YamlKeyValue{
+											{
+												Key: &parser.YamlNode{
+													Value: "priority",
+													Pos: diags.PositionRanges{
+														{Line: 131, FirstColumn: 15, LastColumn: 22},
+													},
+												},
+												Value: &parser.YamlNode{
+													Value: "3",
+													Pos: diags.PositionRanges{
+														{Line: 131, FirstColumn: 26, LastColumn: 26},
+													},
+												},
+											},
+											{
+												Key: &parser.YamlNode{
+													Value: "notify",
+													Pos: diags.PositionRanges{
+														{Line: 132, FirstColumn: 15, LastColumn: 20},
+													},
+												},
+												Value: &parser.YamlNode{
+													Value: "chat-obs-metrics",
+													Pos: diags.PositionRanges{
+														{Line: 132, FirstColumn: 23, LastColumn: 38},
+													},
+												},
+											},
+										},
+									},
+									Annotations: &parser.YamlMap{
+										Key: &parser.YamlNode{
+											Value: "annotations",
+											Pos: diags.PositionRanges{
+												{Line: 133, FirstColumn: 13, LastColumn: 23},
+											},
+										},
+										Items: []*parser.YamlKeyValue{
+											{
+												Key: &parser.YamlNode{
+													Value: "summary",
+													Pos: diags.PositionRanges{
+														{Line: 134, FirstColumn: 15, LastColumn: 21},
+													},
+												},
+												Value: &parser.YamlNode{
+													Value: "Thanos Ruler is failing to evaluate {{ $value | humanize }}% of rules.",
+													Pos: diags.PositionRanges{
+														{Line: 134, FirstColumn: 24, LastColumn: 93},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	alwaysEqual := cmp.Comparer(func(_, _ any) bool { return true })

@@ -50,6 +50,7 @@ checks:
     - promql/regexp
     - rule/dependency
     - promql/impossible
+    - promql/nan
     - group/interval
     - promql/rate(prom1)
     - promql/series(prom1)

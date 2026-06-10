@@ -1597,7 +1597,7 @@
         )
   output: |
     4 |     group (
-            ^^^^^^ Previously joined label `tier` is being removed from the results.
+            ^^^^^ Previously joined label `tier` is being removed from the results.
     5 |       up{node_status="v", job="node_exporter"}
     6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
                                           ^^^^
@@ -1613,7 +1613,7 @@
     diagnostics:
         - message: Previously joined label `tier` is being removed from the results.
           firstcolumn: 1
-          lastcolumn: 6
+          lastcolumn: 5
           kind: 0
         - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
           firstcolumn: 82
@@ -1636,7 +1636,7 @@
         )
   output: |
     4 |     group (
-            ^^^^^^ Previously joined label `animal` is being removed from the results.
+            ^^^^^ Previously joined label `animal` is being removed from the results.
     5 |       up{node_status="v", job="node_exporter"}
     6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
                                                 ^^^^^^
@@ -1652,7 +1652,7 @@
     diagnostics:
         - message: Previously joined label `animal` is being removed from the results.
           firstcolumn: 1
-          lastcolumn: 6
+          lastcolumn: 5
           kind: 0
         - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
           firstcolumn: 88
@@ -1675,7 +1675,7 @@
         )
   output: |
     4 |     group (
-            ^^^^^^ Previously joined label `brand` is being removed from the results.
+            ^^^^^ Previously joined label `brand` is being removed from the results.
     5 |       up{node_status="v", job="node_exporter"}
     6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
                                                         ^^^^^
@@ -1692,7 +1692,7 @@
     diagnostics:
         - message: Previously joined label `brand` is being removed from the results.
           firstcolumn: 1
-          lastcolumn: 6
+          lastcolumn: 5
           kind: 0
         - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
           firstcolumn: 96
@@ -1715,7 +1715,7 @@
         )
   output: |
     4 |     group (
-            ^^^^^^ Previously joined label `pop_name` is being removed from the results.
+            ^^^^^ Previously joined label `pop_name` is being removed from the results.
     5 |       up{node_status="v", job="node_exporter"}
     6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
                                                                ^^^^^^^^
@@ -1731,7 +1731,7 @@
     diagnostics:
         - message: Previously joined label `pop_name` is being removed from the results.
           firstcolumn: 1
-          lastcolumn: 6
+          lastcolumn: 5
           kind: 0
         - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
           firstcolumn: 103
@@ -1754,7 +1754,7 @@
         )
   output: |
     4 |     group (
-            ^^^^^^ Previously joined label `sliver` is being removed from the results.
+            ^^^^^ Previously joined label `sliver` is being removed from the results.
     5 |       up{node_status="v", job="node_exporter"}
     6 |       * on (colo_name) group_left(tier, animal, brand, pop_name) colo_metadata{colo_status="v"}
     7 |       * on (instance) group_left (sliver) sliver_metadata{node_status="v"}
@@ -1770,7 +1770,7 @@
     diagnostics:
         - message: Previously joined label `sliver` is being removed from the results.
           firstcolumn: 1
-          lastcolumn: 6
+          lastcolumn: 5
           kind: 0
         - message: Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
           firstcolumn: 174
@@ -2701,7 +2701,7 @@
     4 |     sum by (cluster, err, gen, scope, is_dev, job, slice)
                     ^^^^^^^ You can't use `cluster` because this label is not possible here.
     5 |       ( sum by (instance, job) (rate(cycles_total[2m])) * on (instance)
-                    ^^^
+                    ^^
                     Query is using aggregation with `by(instance, job)`, only labels included inside
                     `by(...)` will be present on the results.
     6 |       group_left (err, gen, scope, is_dev, slice) (instance_job:node_metadata)
@@ -2717,7 +2717,7 @@
           kind: 0
         - message: Query is using aggregation with `by(instance, job)`, only labels included inside `by(...)` will be present on the results.
           firstcolumn: 63
-          lastcolumn: 65
+          lastcolumn: 64
           kind: 1
     lines:
         first: 4
@@ -3857,7 +3857,7 @@
     4 |     colo_metadata * on (colo_name) group_right(tier, animal, brand, pop_name)
                                 ^^^^^^^^^ You can't use `colo_name` because this label is not possible here.
     5 |     group by (animal) (
-                  ^^^
+                  ^^
                   Query is using aggregation with `by(animal)`, only labels included inside `by(...)` will
                   be present on the results.
     6 |         sliver_metadata * on (instance) group_right (sliver)
@@ -3874,7 +3874,7 @@
           kind: 0
         - message: Query is using aggregation with `by(animal)`, only labels included inside `by(...)` will be present on the results.
           firstcolumn: 81
-          lastcolumn: 83
+          lastcolumn: 82
           kind: 1
     lines:
         first: 4

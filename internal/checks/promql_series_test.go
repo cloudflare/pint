@@ -10,6 +10,7 @@ import (
 	"github.com/prometheus/common/model"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -18,6 +19,8 @@ func newSeriesCheck(prom *promapi.FailoverGroup) checks.RuleChecker {
 }
 
 func TestSeriesCheck(t *testing.T) {
+	now := time.Now()
+
 	testCases := []checkTest{
 		{
 			description: "ignores rules with syntax errors",
@@ -382,6 +385,45 @@ func TestSeriesCheck(t *testing.T) {
 			problems:    true,
 		},
 		{
+			description: "removed recording rule is ignored for series lookup",
+			content:     "- record: foo\n  expr: sum(foo:bar{job=\"xxx\"})\n",
+			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
+			entries:     parseWithState("- record: foo:bar\n  expr: sum(foo:bar)\n", discovery.Removed),
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(\nfoo:bar{job=\"xxx\"}\n)"},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(\nfoo:bar\n)"},
+					},
+					resp: respondWithEmptyMatrix(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(\nup\n)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
+			},
+		},
+		{
+			description: "removed alerting rule is ignored for ALERTS lookup",
+			content:     "- record: foo\n  expr: count(ALERTS{alertname=\"myalert\"})\n",
+			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
+			entries:     parseWithState("- alert: myalert\n  expr: sum(foo) == 0\n", discovery.Removed),
+			problems:    true,
+		},
+		{
 			description: "#2 series never present but recording rule provides it, query error",
 			content:     "- record: foo\n  expr: sum(foo:bar{job=\"xxx\"})\n",
 			checker:     newSeriesCheck,
@@ -560,8 +602,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Hour*24*-7).Add(time.Minute*5),
+								now.Add(time.Hour*24*-7),
+								now.Add(time.Hour*24*-7).Add(time.Minute*5),
 								time.Minute*5,
 							),
 						},
@@ -606,8 +648,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-5),
-								time.Now().Add(time.Hour*24*-5),
+								now.Add(time.Hour*24*-5),
+								now.Add(time.Hour*24*-5),
 								time.Minute*5,
 							),
 						},
@@ -622,8 +664,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-5),
-								time.Now().Add(time.Hour*24*-5),
+								now.Add(time.Hour*24*-5),
+								now.Add(time.Hour*24*-5),
 								time.Minute*5,
 							),
 						},
@@ -638,8 +680,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-5),
-								time.Now().Add(time.Hour*24*-5),
+								now.Add(time.Hour*24*-5),
+								now.Add(time.Hour*24*-5),
 								time.Minute*5,
 							),
 						},
@@ -654,14 +696,14 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Hour*24*-5).Add(time.Minute*-5),
+								now.Add(time.Hour*24*-7),
+								now.Add(time.Hour*24*-5).Add(time.Minute*-5),
 								time.Minute*5,
 							),
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-5).Add(time.Minute*5),
-								time.Now(),
+								now.Add(time.Hour*24*-5).Add(time.Minute*5),
+								now,
 								time.Minute*5,
 							),
 						},
@@ -676,14 +718,14 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Hour*24*-5).Add(time.Minute*-5),
+								now.Add(time.Hour*24*-7),
+								now.Add(time.Hour*24*-5).Add(time.Minute*-5),
 								time.Minute*5,
 							),
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-5).Add(time.Minute*5),
-								time.Now(),
+								now.Add(time.Hour*24*-5).Add(time.Minute*5),
+								now,
 								time.Minute*5,
 							),
 						},
@@ -721,8 +763,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-5),
-								time.Now().Add(time.Hour*24*-4),
+								now.Add(time.Hour*24*-5),
+								now.Add(time.Hour*24*-4),
 								time.Minute*5,
 							),
 						},
@@ -737,8 +779,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-5),
-								time.Now().Add(time.Hour*24*-5),
+								now.Add(time.Hour*24*-5),
+								now.Add(time.Hour*24*-5),
 								time.Minute*5,
 							),
 						},
@@ -753,8 +795,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-5),
-								time.Now().Add(time.Hour*24*-5).Add(time.Minute*10),
+								now.Add(time.Hour*24*-5),
+								now.Add(time.Hour*24*-5).Add(time.Minute*10),
 								time.Minute*5,
 							),
 						},
@@ -769,14 +811,14 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Hour*24*-5).Add(time.Minute*-10),
+								now.Add(time.Hour*24*-7),
+								now.Add(time.Hour*24*-5).Add(time.Minute*-10),
 								time.Minute*5,
 							),
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-5).Add(time.Minute*5),
-								time.Now(),
+								now.Add(time.Hour*24*-5).Add(time.Minute*5),
+								now,
 								time.Minute*5,
 							),
 						},
@@ -791,14 +833,14 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Hour*24*-5).Add(time.Minute*-10),
+								now.Add(time.Hour*24*-7),
+								now.Add(time.Hour*24*-5).Add(time.Minute*-10),
 								time.Minute*5,
 							),
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-5).Add(time.Minute*10),
-								time.Now(),
+								now.Add(time.Hour*24*-5).Add(time.Minute*10),
+								now,
 								time.Minute*5,
 							),
 						},
@@ -836,8 +878,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-5),
-								time.Now().Add(time.Hour*24*-4),
+								now.Add(time.Hour*24*-5),
+								now.Add(time.Hour*24*-4),
 								time.Minute*5,
 							),
 						},
@@ -852,8 +894,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-5),
-								time.Now().Add(time.Hour*24*-5),
+								now.Add(time.Hour*24*-5),
+								now.Add(time.Hour*24*-5),
 								time.Minute*5,
 							),
 						},
@@ -868,8 +910,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-5),
-								time.Now().Add(time.Hour*24*-5).Add(time.Minute*10),
+								now.Add(time.Hour*24*-5),
+								now.Add(time.Hour*24*-5).Add(time.Minute*10),
 								time.Minute*5,
 							),
 						},
@@ -884,14 +926,14 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Hour*24*-5).Add(time.Minute*-10),
+								now.Add(time.Hour*24*-7),
+								now.Add(time.Hour*24*-5).Add(time.Minute*-10),
 								time.Minute*5,
 							),
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-5).Add(time.Minute*5),
-								time.Now(),
+								now.Add(time.Hour*24*-5).Add(time.Minute*5),
+								now,
 								time.Minute*5,
 							),
 						},
@@ -906,14 +948,14 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Hour*24*-5).Add(time.Minute*-10),
+								now.Add(time.Hour*24*-7),
+								now.Add(time.Hour*24*-5).Add(time.Minute*-10),
 								time.Minute*5,
 							),
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-5).Add(time.Minute*10),
-								time.Now(),
+								now.Add(time.Hour*24*-5).Add(time.Minute*10),
+								now,
 								time.Minute*5,
 							),
 						},
@@ -950,8 +992,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Minute*-50),
+								now.Add(time.Hour*24*-7),
+								now.Add(time.Minute*-50),
 								time.Minute*5,
 							),
 						},
@@ -966,8 +1008,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{"job": "foo"},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Minute*-50),
+								now.Add(time.Hour*24*-7),
+								now.Add(time.Minute*-50),
 								time.Minute*5,
 							),
 						},
@@ -982,8 +1024,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{"instance": "bar"},
-								time.Now().Add(time.Minute*-50),
-								time.Now(),
+								now.Add(time.Minute*-50),
+								now,
 								time.Minute*5,
 							),
 						},
@@ -1021,8 +1063,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								now.Add(time.Hour*24*-7),
+								now.Add(time.Hour*24*-4).Add(time.Minute*-5),
 								time.Minute*5,
 							),
 						},
@@ -1037,8 +1079,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-4),
-								time.Now(),
+								now.Add(time.Hour*24*-4),
+								now,
 								time.Minute*5,
 							),
 						},
@@ -1053,8 +1095,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
-								time.Now(),
+								now.Add(time.Hour*24*-4).Add(time.Minute*-5),
+								now,
 								time.Minute*5,
 							),
 						},
@@ -1102,8 +1144,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								now.Add(time.Hour*24*-7),
+								now.Add(time.Hour*24*-4).Add(time.Minute*-5),
 								time.Minute*5,
 							),
 						},
@@ -1118,8 +1160,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
-								time.Now(),
+								now.Add(time.Hour*24*-4).Add(time.Minute*-5),
+								now,
 								time.Minute*5,
 							),
 						},
@@ -1168,8 +1210,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								now.Add(time.Hour*24*-7),
+								now.Add(time.Hour*24*-4).Add(time.Minute*-5),
 								time.Minute*5,
 							),
 						},
@@ -1224,8 +1266,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								now.Add(time.Hour*24*-7),
+								now.Add(time.Hour*24*-4).Add(time.Minute*-5),
 								time.Minute*5,
 							),
 						},
@@ -1240,8 +1282,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
-								time.Now(),
+								now.Add(time.Hour*24*-4).Add(time.Minute*-5),
+								now,
 								time.Minute*5,
 							),
 						},
@@ -1256,8 +1298,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
-								time.Now(),
+								now.Add(time.Hour*24*-4).Add(time.Minute*-5),
+								now,
 								time.Minute*5,
 							),
 						},
@@ -1298,8 +1340,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								now.Add(time.Hour*24*-7),
+								now.Add(time.Hour*24*-4).Add(time.Minute*-5),
 								time.Minute*5,
 							),
 						},
@@ -1314,8 +1356,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
-								time.Now(),
+								now.Add(time.Hour*24*-4).Add(time.Minute*-5),
+								now,
 								time.Minute*5,
 							),
 						},
@@ -1330,8 +1372,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
-								time.Now(),
+								now.Add(time.Hour*24*-4).Add(time.Minute*-5),
+								now,
 								time.Minute*5,
 							),
 						},
@@ -1373,8 +1415,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								now.Add(time.Hour*24*-7),
+								now.Add(time.Hour*24*-4).Add(time.Minute*-5),
 								time.Minute*5,
 							),
 						},
@@ -1389,8 +1431,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
-								time.Now(),
+								now.Add(time.Hour*24*-4).Add(time.Minute*-5),
+								now,
 								time.Minute*5,
 							),
 						},
@@ -1405,8 +1447,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
-								time.Now(),
+								now.Add(time.Hour*24*-4).Add(time.Minute*-5),
+								now,
 								time.Minute*5,
 							),
 						},
@@ -1448,8 +1490,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								now.Add(time.Hour*24*-7),
+								now.Add(time.Hour*24*-4).Add(time.Minute*-5),
 								time.Minute*5,
 							),
 						},
@@ -1464,8 +1506,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
-								time.Now(),
+								now.Add(time.Hour*24*-4).Add(time.Minute*-5),
+								now,
 								time.Minute*5,
 							),
 						},
@@ -1480,8 +1522,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
-								time.Now(),
+								now.Add(time.Hour*24*-4).Add(time.Minute*-5),
+								now,
 								time.Minute*5,
 							),
 						},
@@ -1523,8 +1565,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								now.Add(time.Hour*24*-7),
+								now.Add(time.Hour*24*-4).Add(time.Minute*-5),
 								time.Minute*5,
 							),
 						},
@@ -1539,8 +1581,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
-								time.Now(),
+								now.Add(time.Hour*24*-4).Add(time.Minute*-5),
+								now,
 								time.Minute*5,
 							),
 						},
@@ -1555,8 +1597,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
-								time.Now(),
+								now.Add(time.Hour*24*-4).Add(time.Minute*-5),
+								now,
 								time.Minute*5,
 							),
 						},
@@ -1764,20 +1806,20 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Hour*24*-7).Add(time.Hour),
+								now.Add(time.Hour*24*-7),
+								now.Add(time.Hour*24*-7).Add(time.Hour),
 								time.Minute*5,
 							),
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-5),
-								time.Now().Add(time.Hour*24*-5).Add(time.Minute*10),
+								now.Add(time.Hour*24*-5),
+								now.Add(time.Hour*24*-5).Add(time.Minute*10),
 								time.Minute*5,
 							),
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-2),
-								time.Now().Add(time.Hour*24*-2).Add(time.Minute*20),
+								now.Add(time.Hour*24*-2),
+								now.Add(time.Hour*24*-2).Add(time.Minute*20),
 								time.Minute*5,
 							),
 						},
@@ -1792,20 +1834,20 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Hour*24*-7).Add(time.Hour),
+								now.Add(time.Hour*24*-7),
+								now.Add(time.Hour*24*-7).Add(time.Hour),
 								time.Minute*5,
 							),
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-5),
-								time.Now().Add(time.Hour*24*-5).Add(time.Minute*10),
+								now.Add(time.Hour*24*-5),
+								now.Add(time.Hour*24*-5).Add(time.Minute*10),
 								time.Minute*5,
 							),
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-2),
-								time.Now().Add(time.Hour*24*-2).Add(time.Minute*20),
+								now.Add(time.Hour*24*-2),
+								now.Add(time.Hour*24*-2).Add(time.Minute*20),
 								time.Minute*5,
 							),
 						},
@@ -2146,8 +2188,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-6).Add(time.Hour*8),
-								time.Now(),
+								now.Add(time.Hour*24*-6).Add(time.Hour*8),
+								now,
 								time.Minute*5,
 							),
 						},
@@ -2162,8 +2204,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Hour*24*-6).Add(time.Hour*8),
+								now.Add(time.Hour*24*-7),
+								now.Add(time.Hour*24*-6).Add(time.Hour*8),
 								time.Minute*5,
 							),
 						},
@@ -2212,8 +2254,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-6).Add(time.Hour*8),
-								time.Now(),
+								now.Add(time.Hour*24*-6).Add(time.Hour*8),
+								now,
 								time.Minute*5,
 							),
 						},
@@ -2228,8 +2270,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Hour*24*-6).Add(time.Hour*8),
+								now.Add(time.Hour*24*-7),
+								now.Add(time.Hour*24*-6).Add(time.Hour*8),
 								time.Minute*5,
 							),
 						},
@@ -2277,8 +2319,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Minute*-150),
-								time.Now(),
+								now.Add(time.Minute*-150),
+								now,
 								time.Minute*5,
 							),
 						},
@@ -2293,8 +2335,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Minute*-150),
+								now.Add(time.Hour*24*-7),
+								now.Add(time.Minute*-150),
 								time.Minute*5,
 							),
 						},
@@ -2339,26 +2381,26 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Hour*24*-6),
+								now.Add(time.Hour*24*-7),
+								now.Add(time.Hour*24*-6),
 								time.Minute*5,
 							),
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-5),
-								time.Now().Add(time.Hour*24*-5).Add(time.Hour*8),
+								now.Add(time.Hour*24*-5),
+								now.Add(time.Hour*24*-5).Add(time.Hour*8),
 								time.Minute*5,
 							),
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-4),
-								time.Now().Add(time.Hour*24*-3),
+								now.Add(time.Hour*24*-4),
+								now.Add(time.Hour*24*-3),
 								time.Minute*5,
 							),
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-2),
-								time.Now().Add(time.Hour*24*-1),
+								now.Add(time.Hour*24*-2),
+								now.Add(time.Hour*24*-1),
 								time.Minute*5,
 							),
 						},
@@ -2373,20 +2415,20 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Hour*24*-6).Add(time.Hour*8),
+								now.Add(time.Hour*24*-7),
+								now.Add(time.Hour*24*-6).Add(time.Hour*8),
 								time.Minute*5,
 							),
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-4),
-								time.Now().Add(time.Hour*24*-3),
+								now.Add(time.Hour*24*-4),
+								now.Add(time.Hour*24*-3),
 								time.Minute*5,
 							),
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-1),
-								time.Now().Add(time.Hour*24*-1),
+								now.Add(time.Hour*24*-1),
+								now.Add(time.Hour*24*-1),
 								time.Minute*5,
 							),
 						},
@@ -2424,20 +2466,20 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Hour*24*-7).Add(time.Hour),
+								now.Add(time.Hour*24*-7),
+								now.Add(time.Hour*24*-7).Add(time.Hour),
 								time.Minute*5,
 							),
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-5),
-								time.Now().Add(time.Hour*24*-5).Add(time.Minute*10),
+								now.Add(time.Hour*24*-5),
+								now.Add(time.Hour*24*-5).Add(time.Minute*10),
 								time.Minute*5,
 							),
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-2),
-								time.Now().Add(time.Hour*24*-2).Add(time.Minute*20),
+								now.Add(time.Hour*24*-2),
+								now.Add(time.Hour*24*-2).Add(time.Minute*20),
 								time.Minute*5,
 							),
 						},
@@ -2474,14 +2516,14 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Hour*24*-3).Add(time.Minute*-5),
+								now.Add(time.Hour*24*-7),
+								now.Add(time.Hour*24*-3).Add(time.Minute*-5),
 								time.Minute*5,
 							),
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-3).Add(time.Hour),
-								time.Now(),
+								now.Add(time.Hour*24*-3).Add(time.Hour),
+								now,
 								time.Minute*5,
 							),
 						},
@@ -2496,14 +2538,14 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Hour*24*-3).Add(time.Minute*-5),
+								now.Add(time.Hour*24*-7),
+								now.Add(time.Hour*24*-3).Add(time.Minute*-5),
 								time.Minute*5,
 							),
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-3).Add(time.Hour),
-								time.Now(),
+								now.Add(time.Hour*24*-3).Add(time.Hour),
+								now,
 								time.Minute*5,
 							),
 						},
@@ -3062,8 +3104,8 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Minute*-50),
-								time.Now(),
+								now.Add(time.Minute*-50),
+								now,
 								time.Minute*5,
 							),
 						},

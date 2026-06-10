@@ -2,6 +2,10 @@
 
 ## v0.86.0
 
+### Added
+
+- Added [promql/nan](checks/promql/nan.md) check.
+
 ### Changed
 
 - [promql/vector_matching](checks/promql/vector_matching.md) was refactored heavily

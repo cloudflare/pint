@@ -1,0 +1,1825 @@
+
+[TestNaNCheck/addition_inside_aggregation_is_allowed - 1]
+[]
+
+---
+
+[TestNaNCheck/alerting_rule_with_division_inside_sum_is_reported - 1]
+- description: alerting rule with division inside sum is reported
+  content: |
+    - alert: foo
+      expr: sum(foo / bar) > 0
+  output: |
+    2 |   expr: sum(foo / bar) > 0
+                          ^^^
+                          This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+          firstcolumn: 11
+          lastcolumn: 13
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/cyclic_recording_rule_chain_with_transitive_unsafe_dependency_inside_aggregation_is_reported - 1]
+- description: cyclic recording rule chain with transitive unsafe dependency inside aggregation is reported
+  content: |
+    - record: output
+      expr: sum(rec_rule1)
+  output: |
+    2 |   expr: sum(rec_rule1)
+                    ^^^^^^^^^
+                    This aggregation can return NaN or Inf because recording rule `rec_rule1` can produce
+                    it.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf because recording rule `rec_rule1` can produce it.
+          firstcolumn: 5
+          lastcolumn: 13
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/cyclic_safe_recording_rule_chain_inside_aggregation_is_allowed - 1]
+[]
+
+---
+
+[TestNaNCheck/deeply_nested_parens_around_division_with_scalar_is_allowed - 1]
+[]
+
+---
+
+[TestNaNCheck/division_between_aggregation_results_is_allowed - 1]
+[]
+
+---
+
+[TestNaNCheck/division_by_clamp_max_with_negative_ceiling_inside_sum_is_allowed - 1]
+[]
+
+---
+
+[TestNaNCheck/division_by_clamp_max_with_non-constant_scalar_ceiling_inside_sum_is_reported - 1]
+- description: division by clamp_max with non-constant scalar ceiling inside sum is reported
+  content: |
+    - record: foo
+      expr: sum(foo / clamp_max(bar, scalar(baz)))
+  output: |
+    2 |   expr: sum(foo / clamp_max(bar, scalar(baz)))
+                                    ^^^
+                                    This aggregation can return NaN or Inf if any series for `bar` evaluates
+                                    to zero.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+          firstcolumn: 21
+          lastcolumn: 23
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/division_by_clamp_max_with_positive_ceiling_inside_sum_is_reported - 1]
+- description: division by clamp_max with positive ceiling inside sum is reported
+  content: |
+    - record: foo
+      expr: sum(foo / clamp_max(bar, 1))
+  output: |
+    2 |   expr: sum(foo / clamp_max(bar, 1))
+                                    ^^^
+                                    This aggregation can return NaN or Inf if any series for `bar` evaluates
+                                    to zero.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+          firstcolumn: 21
+          lastcolumn: 23
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/division_by_clamp_max_with_zero_ceiling_inside_sum_is_reported - 1]
+- description: division by clamp_max with zero ceiling inside sum is reported
+  content: |
+    - record: foo
+      expr: sum(foo / clamp_max(bar, 0))
+  output: |
+    2 |   expr: sum(foo / clamp_max(bar, 0))
+                                    ^^^
+                                    This aggregation can return NaN or Inf if any series for `bar` evaluates
+                                    to zero.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+          firstcolumn: 21
+          lastcolumn: 23
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/division_by_clamp_min_with_negative_floor_inside_sum_is_reported - 1]
+- description: division by clamp_min with negative floor inside sum is reported
+  content: |
+    - record: foo
+      expr: sum(foo / clamp_min(bar, -1))
+  output: |
+    2 |   expr: sum(foo / clamp_min(bar, -1))
+                                    ^^^
+                                    This aggregation can return NaN or Inf if any series for `bar` evaluates
+                                    to zero.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+          firstcolumn: 21
+          lastcolumn: 23
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/division_by_clamp_min_with_non-constant_scalar_floor_inside_sum_is_reported - 1]
+- description: division by clamp_min with non-constant scalar floor inside sum is reported
+  content: |
+    - record: foo
+      expr: sum(foo / clamp_min(bar, scalar(baz)))
+  output: |
+    2 |   expr: sum(foo / clamp_min(bar, scalar(baz)))
+                                    ^^^
+                                    This aggregation can return NaN or Inf if any series for `bar` evaluates
+                                    to zero.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+          firstcolumn: 21
+          lastcolumn: 23
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/division_by_clamp_min_with_positive_floor_inside_sum_is_allowed - 1]
+[]
+
+---
+
+[TestNaNCheck/division_by_clamp_min_with_zero_floor_inside_sum_is_reported - 1]
+- description: division by clamp_min with zero floor inside sum is reported
+  content: |
+    - record: foo
+      expr: sum(foo / clamp_min(bar, 0))
+  output: |
+    2 |   expr: sum(foo / clamp_min(bar, 0))
+                                    ^^^
+                                    This aggregation can return NaN or Inf if any series for `bar` evaluates
+                                    to zero.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+          firstcolumn: 21
+          lastcolumn: 23
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/division_by_clamp_with_negative_range_inside_sum_is_allowed - 1]
+[]
+
+---
+
+[TestNaNCheck/division_by_clamp_with_non-constant_scalar_bounds_inside_sum_is_reported - 1]
+- description: division by clamp with non-constant scalar bounds inside sum is reported
+  content: |
+    - record: foo
+      expr: sum(foo / clamp(bar, scalar(lo), scalar(hi)))
+  output: |
+    2 |   expr: sum(foo / clamp(bar, scalar(lo), scalar(hi)))
+                                ^^^
+                                This aggregation can return NaN or Inf if any series for `bar` evaluates to
+                                zero.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+          firstcolumn: 17
+          lastcolumn: 19
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/division_by_clamp_with_positive_range_inside_sum_is_allowed - 1]
+[]
+
+---
+
+[TestNaNCheck/division_by_clamp_with_range_crossing_zero_inside_sum_is_reported - 1]
+- description: division by clamp with range crossing zero inside sum is reported
+  content: |
+    - record: foo
+      expr: sum(foo / clamp(bar, -1, 1))
+  output: |
+    2 |   expr: sum(foo / clamp(bar, -1, 1))
+                                ^^^
+                                This aggregation can return NaN or Inf if any series for `bar` evaluates to
+                                zero.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+          firstcolumn: 17
+          lastcolumn: 19
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/division_by_clamp_with_zero_lower_bound_inside_sum_is_reported - 1]
+- description: division by clamp with zero lower bound inside sum is reported
+  content: |
+    - record: foo
+      expr: sum(foo / clamp(bar, 0, 1))
+  output: |
+    2 |   expr: sum(foo / clamp(bar, 0, 1))
+                                ^^^
+                                This aggregation can return NaN or Inf if any series for `bar` evaluates to
+                                zero.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+          firstcolumn: 17
+          lastcolumn: 19
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/division_by_clamp_with_zero_upper_bound_inside_sum_is_reported - 1]
+- description: division by clamp with zero upper bound inside sum is reported
+  content: |
+    - record: foo
+      expr: sum(foo / clamp(bar, -1, 0))
+  output: |
+    2 |   expr: sum(foo / clamp(bar, -1, 0))
+                                ^^^
+                                This aggregation can return NaN or Inf if any series for `bar` evaluates to
+                                zero.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+          firstcolumn: 17
+          lastcolumn: 19
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/division_by_equality_guard_keeping_only_zeros_is_reported - 1]
+- description: division by equality guard keeping only zeros is reported
+  content: |
+    - record: foo
+      expr: sum(foo / (bar == 0))
+  output: |
+    2 |   expr: sum(foo / (bar == 0))
+                           ^^^
+                           This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+          firstcolumn: 12
+          lastcolumn: 14
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/division_by_greater-than-or-equal_guard_keeping_zeros_is_reported - 1]
+- description: division by greater-than-or-equal guard keeping zeros is reported
+  content: |
+    - record: foo
+      expr: sum(foo / (bar >= 0))
+  output: |
+    2 |   expr: sum(foo / (bar >= 0))
+                           ^^^
+                           This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+          firstcolumn: 12
+          lastcolumn: 14
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/division_by_greater-than_guard_with_negative_threshold_keeping_zeros_is_reported - 1]
+- description: division by greater-than guard with negative threshold keeping zeros is reported
+  content: |
+    - record: foo
+      expr: sum(foo / (bar > -1))
+  output: |
+    2 |   expr: sum(foo / (bar > -1))
+                           ^^^
+                           This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+          firstcolumn: 12
+          lastcolumn: 14
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/division_by_guard_with_unknown_value_is_reported - 1]
+- description: division by guard with unknown value is reported
+  content: |
+    - record: foo
+      expr: sum(foo / (bar > baz))
+  output: |
+    2 |   expr: sum(foo / (bar > baz))
+                           ^^^
+                           This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+          firstcolumn: 12
+          lastcolumn: 14
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/division_by_less-than-or-equal_guard_excluding_zeros_is_allowed - 1]
+[]
+
+---
+
+[TestNaNCheck/division_by_less-than-or-equal_guard_keeping_zeros_is_reported - 1]
+- description: division by less-than-or-equal guard keeping zeros is reported
+  content: |
+    - record: foo
+      expr: sum(foo / (bar <= 0))
+  output: |
+    2 |   expr: sum(foo / (bar <= 0))
+                           ^^^
+                           This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+          firstcolumn: 12
+          lastcolumn: 14
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/division_by_less-than_guard_excluding_zeros_is_allowed - 1]
+[]
+
+---
+
+[TestNaNCheck/division_by_less-than_guard_keeping_zeros_is_reported - 1]
+- description: division by less-than guard keeping zeros is reported
+  content: |
+    - record: foo
+      expr: sum(foo / (bar < 1))
+  output: |
+    2 |   expr: sum(foo / (bar < 1))
+                           ^^^
+                           This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+          firstcolumn: 12
+          lastcolumn: 14
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/division_by_negative_scalar_inside_sum_is_allowed - 1]
+[]
+
+---
+
+[TestNaNCheck/division_by_non-zero_scalar_inside_sum_is_allowed - 1]
+[]
+
+---
+
+[TestNaNCheck/division_by_not-equal_guard_with_non-zero_threshold_keeping_zeros_is_reported - 1]
+- description: division by not-equal guard with non-zero threshold keeping zeros is reported
+  content: |
+    - record: foo
+      expr: sum(foo / (bar != 1))
+  output: |
+    2 |   expr: sum(foo / (bar != 1))
+                           ^^^
+                           This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+          firstcolumn: 12
+          lastcolumn: 14
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/division_by_parenthesized_scalar_inside_sum_is_allowed - 1]
+[]
+
+---
+
+[TestNaNCheck/division_by_vector_call_with_non-zero_arg_inside_sum_is_allowed - 1]
+[]
+
+---
+
+[TestNaNCheck/division_by_vector_call_with_zero_arg_inside_sum_is_reported - 1]
+- description: division by vector call with zero arg inside sum is reported
+  content: |
+    - record: foo
+      expr: sum(foo / vector(0))
+  output: |
+    2 |   expr: sum(foo / vector(0))
+                          ^^^^^^^^^
+                          This aggregation can return NaN or Inf if any series for `vector(0)` evaluates to
+                          zero.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf if any series for `vector(0)` evaluates to zero.
+          firstcolumn: 11
+          lastcolumn: 19
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/division_by_zero_scalar_inside_sum_is_reported - 1]
+- description: division by zero scalar inside sum is reported
+  content: |
+    - record: foo
+      expr: sum(foo / 0)
+  output: |
+    2 |   expr: sum(foo / 0)
+                          ^ This aggregation can return NaN or Inf if any series for `0` evaluates to zero.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf if any series for `0` evaluates to zero.
+          firstcolumn: 11
+          lastcolumn: 11
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/division_inside_bottomk_is_safe - 1]
+[]
+
+---
+
+[TestNaNCheck/division_inside_count_is_safe - 1]
+[]
+
+---
+
+[TestNaNCheck/division_inside_count_values_is_safe - 1]
+[]
+
+---
+
+[TestNaNCheck/division_inside_group_is_safe - 1]
+[]
+
+---
+
+[TestNaNCheck/division_inside_limit_ratio_is_safe - 1]
+[]
+
+---
+
+[TestNaNCheck/division_inside_limitk_is_safe - 1]
+[]
+
+---
+
+[TestNaNCheck/division_inside_max_is_safe - 1]
+[]
+
+---
+
+[TestNaNCheck/division_inside_min_is_safe - 1]
+[]
+
+---
+
+[TestNaNCheck/division_inside_quantile_is_safe - 1]
+[]
+
+---
+
+[TestNaNCheck/division_inside_stddev_is_reported - 1]
+- description: division inside stddev is reported
+  content: |
+    - record: foo
+      expr: stddev(foo / bar)
+  output: |
+    2 |   expr: stddev(foo / bar)
+                             ^^^
+                             This aggregation can return NaN or Inf if any series for `bar` evaluates to
+                             zero.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+          firstcolumn: 14
+          lastcolumn: 16
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/division_inside_stdvar_is_reported - 1]
+- description: division inside stdvar is reported
+  content: |
+    - record: foo
+      expr: stdvar(foo / bar)
+  output: |
+    2 |   expr: stdvar(foo / bar)
+                             ^^^
+                             This aggregation can return NaN or Inf if any series for `bar` evaluates to
+                             zero.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+          firstcolumn: 14
+          lastcolumn: 16
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/division_inside_sum_is_reported - 1]
+- description: division inside sum is reported
+  content: |
+    - record: foo
+      expr: sum(foo / bar)
+  output: |
+    2 |   expr: sum(foo / bar)
+                          ^^^
+                          This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+          firstcolumn: 11
+          lastcolumn: 13
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/division_inside_topk_is_safe - 1]
+[]
+
+---
+
+[TestNaNCheck/division_with_bool_modifier_on_divisor_is_still_reported - 1]
+- description: division with bool modifier on divisor is still reported
+  content: |
+    - record: foo
+      expr: sum(foo / (bar > bool 0))
+  output: |
+    2 |   expr: sum(foo / (bar > bool 0))
+                           ^^^
+                           This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+          firstcolumn: 12
+          lastcolumn: 14
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/division_with_greater_or_equal_guard_on_divisor_is_allowed - 1]
+[]
+
+---
+
+[TestNaNCheck/division_with_guarded_divisor_using_greater_than_is_allowed - 1]
+[]
+
+---
+
+[TestNaNCheck/division_with_guarded_divisor_using_not_equal_is_allowed - 1]
+[]
+
+---
+
+[TestNaNCheck/division_without_aggregation_is_allowed - 1]
+[]
+
+---
+
+[TestNaNCheck/guard_on_numerator_does_not_protect_divisor - 1]
+- description: guard on numerator does not protect divisor
+  content: |
+    - record: foo
+      expr: sum((foo > 0) / bar)
+  output: |
+    2 |   expr: sum((foo > 0) / bar)
+                                ^^^
+                                This aggregation can return NaN or Inf if any series for `bar` evaluates to
+                                zero.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+          firstcolumn: 17
+          lastcolumn: 19
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/guarded_division_followed_by_unguarded_division_in_same_aggregation_reports_unguarded - 1]
+- description: guarded division followed by unguarded division in same aggregation reports unguarded
+  content: |
+    - record: foo
+      expr: sum(foo / (bar > 0) * baz / qux)
+  output: |
+    2 |   expr: sum(foo / (bar > 0) * baz / qux)
+                                            ^^^
+                                            This aggregation can return NaN or Inf if any series for `qux`
+                                            evaluates to zero.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf if any series for `qux` evaluates to zero.
+          firstcolumn: 29
+          lastcolumn: 31
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/guarded_recording_rule_inside_aggregation_is_allowed - 1]
+[]
+
+---
+
+[TestNaNCheck/mixed_safe_and_unsafe_aggregations_only_reports_unsafe - 1]
+- description: mixed safe and unsafe aggregations only reports unsafe
+  content: |
+    - record: foo
+      expr: sum(foo / bar) + count(foo / bar)
+  output: |
+    2 |   expr: sum(foo / bar) + count(foo / bar)
+                          ^^^
+                          This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+          firstcolumn: 11
+          lastcolumn: 13
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/modulo_by_clamp_max_with_negative_ceiling_inside_sum_is_allowed - 1]
+[]
+
+---
+
+[TestNaNCheck/modulo_by_clamp_min_with_positive_floor_inside_sum_is_allowed - 1]
+[]
+
+---
+
+[TestNaNCheck/modulo_by_non-zero_scalar_inside_sum_is_allowed - 1]
+[]
+
+---
+
+[TestNaNCheck/modulo_by_zero_scalar_inside_sum_is_reported - 1]
+- description: modulo by zero scalar inside sum is reported
+  content: |
+    - record: foo
+      expr: sum(foo % 0)
+  output: |
+    2 |   expr: sum(foo % 0)
+                          ^ This aggregation can return NaN or Inf if any series for `0` evaluates to zero.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf if any series for `0` evaluates to zero.
+          firstcolumn: 11
+          lastcolumn: 11
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/modulo_inside_avg_is_reported - 1]
+- description: modulo inside avg is reported
+  content: |
+    - record: foo
+      expr: avg(foo % bar)
+  output: |
+    2 |   expr: avg(foo % bar)
+                          ^^^
+                          This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+          firstcolumn: 11
+          lastcolumn: 13
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/modulo_with_guarded_divisor_is_allowed - 1]
+[]
+
+---
+
+[TestNaNCheck/modulo_without_aggregation_is_allowed - 1]
+[]
+
+---
+
+[TestNaNCheck/multiplication_and_division_in_same_aggregation_reports_division - 1]
+- description: multiplication and division in same aggregation reports division
+  content: |
+    - record: foo
+      expr: sum(foo * bar / baz)
+  output: |
+    2 |   expr: sum(foo * bar / baz)
+                                ^^^
+                                This aggregation can return NaN or Inf if any series for `baz` evaluates to
+                                zero.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf if any series for `baz` evaluates to zero.
+          firstcolumn: 17
+          lastcolumn: 19
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/multiplication_inside_aggregation_is_allowed - 1]
+[]
+
+---
+
+[TestNaNCheck/nested_sum_wrapping_division_is_reported - 1]
+- description: nested sum wrapping division is reported
+  content: |
+    - record: foo
+      expr: sum(foo / bar) / sum(baz)
+  output: |
+    2 |   expr: sum(foo / bar) / sum(baz)
+                          ^^^
+                          This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+          firstcolumn: 11
+          lastcolumn: 13
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/rate_divided_by_rate_inside_sum_is_reported - 1]
+- description: rate divided by rate inside sum is reported
+  content: |
+    - record: foo
+      expr: sum(rate(foo[5m]) / rate(bar[5m]))
+  output: |
+    2 |   expr: sum(rate(foo[5m]) / rate(bar[5m]))
+                                         ^^^
+                                         This aggregation can return NaN or Inf if any series for `bar`
+                                         evaluates to zero.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+          firstcolumn: 26
+          lastcolumn: 28
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/recording_rule_producing_NaN_inside_aggregation_is_reported - 1]
+- description: recording rule producing NaN inside aggregation is reported
+  content: |
+    - record: output
+      expr: sum(rec_rule)
+  output: |
+    2 |   expr: sum(rec_rule)
+                    ^^^^^^^^
+                    This aggregation can return NaN or Inf because recording rule `rec_rule` can produce it.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf because recording rule `rec_rule` can produce it.
+          firstcolumn: 5
+          lastcolumn: 12
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/recording_rule_with_division_used_in_addition_inside_aggregation_is_reported - 1]
+- description: recording rule with division used in addition inside aggregation is reported
+  content: |
+    - record: foo
+      expr: sum(rec_rule + bar)
+  output: |
+    2 |   expr: sum(rec_rule + bar)
+                    ^^^^^^^^
+                    This aggregation can return NaN or Inf because recording rule `rec_rule` can produce it.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf because recording rule `rec_rule` can produce it.
+          firstcolumn: 5
+          lastcolumn: 12
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/recording_rule_without_NaN_inside_aggregation_is_allowed - 1]
+[]
+
+---
+
+[TestNaNCheck/removed_recording_rule_with_NaN_is_ignored - 1]
+[]
+
+---
+
+[TestNaNCheck/safe_LHS_recording_rule_added_to_unsafe_RHS_recording_rule_inside_aggregation_is_reported - 1]
+- description: safe LHS recording rule added to unsafe RHS recording rule inside aggregation is reported
+  content: |
+    - record: foo
+      expr: sum(rec_rule1 + rec_rule2)
+  output: |
+    2 |   expr: sum(rec_rule1 + rec_rule2)
+                    ^^^^^^^^^
+                    This aggregation can return NaN or Inf because recording rule `rec_rule2` can produce
+                    it.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf because recording rule `rec_rule2` can produce it.
+          firstcolumn: 5
+          lastcolumn: 13
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/scalar_division_by_clamp_max_with_negative_ceiling_inside_sum_is_allowed - 1]
+[]
+
+---
+
+[TestNaNCheck/scalar_division_by_clamp_min_with_positive_floor_inside_sum_is_allowed - 1]
+[]
+
+---
+
+[TestNaNCheck/scalar_division_by_clamp_with_positive_range_inside_sum_is_allowed - 1]
+[]
+
+---
+
+[TestNaNCheck/scalar_division_by_constant_inside_sum_is_reported - 1]
+- description: scalar division by constant inside sum is reported
+  content: |
+    - record: foo
+      expr: sum(1 / bar)
+  output: |
+    2 |   expr: sum(1 / bar)
+                        ^^^
+                        This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf if any series for `bar` evaluates to zero.
+          firstcolumn: 9
+          lastcolumn: 11
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/syntax_error_is_ignored - 1]
+[]
+
+---
+
+[TestNaNCheck/transitive_recording_rule_producing_NaN_inside_aggregation_is_reported - 1]
+- description: transitive recording rule producing NaN inside aggregation is reported
+  content: |
+    - record: output
+      expr: sum(rec_rule2)
+  output: |
+    2 |   expr: sum(rec_rule2)
+                    ^^^^^^^^^
+                    This aggregation can return NaN or Inf because recording rule `rec_rule2` can produce
+                    it.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf because recording rule `rec_rule2` can produce it.
+          firstcolumn: 5
+          lastcolumn: 13
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/transitive_safe_recording_rule_chain_inside_aggregation_is_allowed - 1]
+[]
+
+---
+
+[TestNaNCheck/transitive_unsafe_branch_among_safe_recording_rules_inside_aggregation_is_reported - 1]
+- description: transitive unsafe branch among safe recording rules inside aggregation is reported
+  content: |
+    - record: output
+      expr: sum(rec_rule3)
+  output: |
+    2 |   expr: sum(rec_rule3)
+                    ^^^^^^^^^
+                    This aggregation can return NaN or Inf because recording rule `rec_rule3` can produce
+                    it.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf because recording rule `rec_rule3` can produce it.
+          firstcolumn: 5
+          lastcolumn: 13
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/two_safe_recording_rules_added_inside_aggregation_are_allowed - 1]
+[]
+
+---
+
+[TestNaNCheck/two_safe_recording_rules_divided_inside_aggregation_is_reported - 1]
+- description: two safe recording rules divided inside aggregation is reported
+  content: |
+    - record: foo
+      expr: sum(rec_rule1 / rec_rule2)
+  output: |
+    2 |   expr: sum(rec_rule1 / rec_rule2)
+                                ^^^^^^^^^
+                                This aggregation can return NaN or Inf if any series for `rec_rule2`
+                                evaluates to zero.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf if any series for `rec_rule2` evaluates to zero.
+          firstcolumn: 17
+          lastcolumn: 25
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/two_unsafe_recording_rules_added_inside_aggregation_is_reported - 1]
+- description: two unsafe recording rules added inside aggregation is reported
+  content: |
+    - record: foo
+      expr: sum(rec_rule1 + rec_rule2)
+  output: |
+    2 |   expr: sum(rec_rule1 + rec_rule2)
+                    ^^^^^^^^^
+                    This aggregation can return NaN or Inf because recording rule `rec_rule1` can produce
+                    it.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf because recording rule `rec_rule1` can produce it.
+          firstcolumn: 5
+          lastcolumn: 13
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+- description: two unsafe recording rules added inside aggregation is reported
+  content: |
+    - record: foo
+      expr: sum(rec_rule1 + rec_rule2)
+  output: |
+    2 |   expr: sum(rec_rule1 + rec_rule2)
+                    ^^^^^^^^^
+                    This aggregation can return NaN or Inf because recording rule `rec_rule2` can produce
+                    it.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf because recording rule `rec_rule2` can produce it.
+          firstcolumn: 5
+          lastcolumn: 13
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestNaNCheck/unsafe_LHS_recording_rule_added_to_safe_RHS_recording_rule_inside_aggregation_is_reported - 1]
+- description: unsafe LHS recording rule added to safe RHS recording rule inside aggregation is reported
+  content: |
+    - record: foo
+      expr: sum(rec_rule1 + rec_rule2)
+  output: |
+    2 |   expr: sum(rec_rule1 + rec_rule2)
+                    ^^^^^^^^^
+                    This aggregation can return NaN or Inf because recording rule `rec_rule1` can produce
+                    it.
+  problem:
+    reporter: promql/nan
+    summary: unsafe division in aggregation
+    details: |-
+        Division by zero produces non-finite values in PromQL:
+
+        - `0 / 0` returns `NaN`
+        - `1 / 0` returns `+Inf`
+        - `x % 0` returns `NaN`
+
+        Even if only one out of many input series is `NaN` or `Inf`, the entire aggregation result
+        becomes `NaN` or `Inf`, making all other valid series irrelevant.
+        To avoid this, filter out zero-valued divisor series before division, for example:
+        `sum(foo / (bar > 0))`
+        See [promql/nan](https://cloudflare.github.io/pint/checks/promql/nan.html) for more details.
+    diagnostics:
+        - message: This aggregation can return NaN or Inf because recording rule `rec_rule1` can produce it.
+          firstcolumn: 5
+          lastcolumn: 13
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
