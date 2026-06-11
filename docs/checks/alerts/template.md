@@ -26,6 +26,11 @@ the value of any annotation can change between alert evaluations.
 See [this blog post](https://www.robustperception.io/dont-put-the-value-in-alert-labels)
 for more details.
 
+This check will also warn if an annotation template uses `.Value` to display
+the result of a query that uses `rate()`, `irate()`, or `deriv()` without
+applying one of the `humanize` template functions. These functions produce
+very small floating point numbers that are hard to read without formatting.
+
 ## Configuration
 
 This check doesn't have any configuration options.

@@ -1,0 +1,32 @@
+mkdir rules/real
+exec ln -s real/bob.yml rules/link.yml
+
+exec bash -x ./test.sh &
+
+exec pint watch --listen=127.0.0.1:6275 --pidfile=pint.pid glob rules
+cmp curl.txt metrics.txt
+
+-- test.sh --
+sleep 3
+curl -s http://127.0.0.1:6275/metrics | grep -E 'pint_problem\b|pint_rule_file_owner' | perl -pe "s/^([a-zA-Z].+)[ ]([0-9\.\-\+eE]+)$/\1/g" > curl.txt
+cat pint.pid | xargs kill
+
+-- rules/real/bob.yml --
+# pint file/owner bob
+
+groups:
+- name: bob
+  rules:
+  - alert: broken
+    expr: foo / count())
+
+-- .pint.hcl --
+
+-- metrics.txt --
+# HELP pint_problem Prometheus rule problem reported by pint.
+# TYPE pint_problem gauge
+pint_problem{filename="rules/link.yml",kind="alerting",name="broken",owner="bob",problem="PromQL syntax error: unexpected right parenthesis ')'",reporter="promql/syntax",severity="fatal"}
+# HELP pint_rule_file_owner This is a boolean metric that describes who is the configured owner for given rule file.
+# TYPE pint_rule_file_owner gauge
+pint_rule_file_owner{filename="rules/link.yml",owner="bob"}
+pint_rule_file_owner{filename="rules/real/bob.yml",owner="bob"}

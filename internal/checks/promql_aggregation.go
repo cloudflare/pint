@@ -83,9 +83,12 @@ func (c AggregationCheck) Check(_ context.Context, entry *discovery.Entry, _ []*
 		}
 	}
 
-	nameDesc := "`" + c.nameRegex.anchored + "`"
-	if nameDesc == "`^.+$`" || nameDesc == "`^.*$`" {
-		nameDesc = "all"
+	nameDesc := "all"
+	if c.nameRegex != nil {
+		nameDesc = "`" + c.nameRegex.anchored + "`"
+		if nameDesc == "`^.+$`" || nameDesc == "`^.*$`" {
+			nameDesc = "all"
+		}
 	}
 
 	for _, src := range expr.Source() {

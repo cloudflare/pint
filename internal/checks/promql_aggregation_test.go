@@ -416,6 +416,15 @@ func TestAggregationCheck(t *testing.T) {
 			},
 			prometheus: noProm,
 		},
+		{
+			description: "nil nameRegex with missing label",
+			content:     "- record: foo\n  expr: sum(foo) without(job)\n",
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewAggregationCheck(nil, "job", true, "", checks.Warning)
+			},
+			prometheus: noProm,
+			problems:   true,
+		},
 	}
 	runTests(t, testCases)
 }

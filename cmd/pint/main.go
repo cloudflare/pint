@@ -70,7 +70,7 @@ func newApp() *cli.Command {
 				Name:    offlineFlag,
 				Aliases: []string{"o"},
 				Value:   false,
-				Usage:   "Disable all check that send live queries to Prometheus servers.",
+				Usage:   "Disable all checks that send live queries to Prometheus servers.",
 			},
 			&cli.BoolFlag{
 				Name:    showDupsFlag,

@@ -118,7 +118,7 @@ will produce results that are consistent between them and there will be no confu
 ## Configuration
 
 This check can be configured to ignore specific metrics when checking for
- cross-group dependencies.
+cross-group dependencies.
 
 ### `ignoreGroupMismatch`
 

@@ -210,7 +210,10 @@ func (c RuleDependencyCheck) checkCrossGroupDependency(entry *discovery.Entry, e
 				if isStaticRecordingRule(other) {
 					continue
 				}
-				if entry.Group != nil && other.Group != nil && entry.Group.Name.Value == other.Group.Name.Value {
+				if other.Group == nil {
+					continue
+				}
+				if entry.Group != nil && entry.Group.Name.Value == other.Group.Name.Value {
 					continue
 				}
 				vsPos := vs.PositionRange()
