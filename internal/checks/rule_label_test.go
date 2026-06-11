@@ -433,6 +433,22 @@ groups:
 			prometheus: noProm,
 			problems:   true,
 		},
+		{
+			description: "recording rule with regex key pattern matching existing label",
+			content:     "- record: foo\n  expr: rate(foo[1m])\n  labels:\n    team_a: myteam\n",
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewLabelCheck(
+					checks.MustTemplatedRegexp("team_.*"),
+					nil,
+					nil,
+					nil,
+					true,
+					"",
+					checks.Warning,
+				)
+			},
+			prometheus: noProm,
+		},
 	}
 	runTests(t, testCases)
 }

@@ -1202,6 +1202,11 @@
 
 ---
 
+[TestSeriesCheck/bare_promql/series_disable_comment_suppresses_missing_series - 1]
+[]
+
+---
+
 [TestSeriesCheck/complex_query - 1]
 - description: complex query
   content: |
@@ -1226,6 +1231,11 @@
         last: 2
     severity: 2
     anchor: 0
+
+---
+
+[TestSeriesCheck/disable_comment_for_a_mismatched_bare_series_name - 1]
+[]
 
 ---
 

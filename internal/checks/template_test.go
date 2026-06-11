@@ -81,6 +81,16 @@ func TestTemplatedRegexpExpand(t *testing.T) {
 		},
 		{
 			input:  "annotation foo is {{ $labels.foo }}!",
+			rule:   newMustRule("- alert: foo\n  expr: foo\n  labels:\n    foo: bar\n  annotations:\n    summary: test\n"),
+			output: "^annotation foo is bar!$",
+		},
+		{
+			input:  "annotation foo is {{ $labels.foo }}!",
+			rule:   newMustRule("- alert: foo\n  expr: foo\n  annotations:\n    foo: bar\n"),
+			output: "^annotation foo is !$",
+		},
+		{
+			input:  "annotation foo is {{ $annotations.foo }}!",
 			rule:   newMustRule("- alert: foo\n  expr: foo\n  annotations:\n    foo: bar\n"),
 			output: "^annotation foo is bar!$",
 		},

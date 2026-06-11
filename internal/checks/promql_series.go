@@ -1113,6 +1113,9 @@ func stripLabels(selector *promParser.VectorSelector) promParser.VectorSelector 
 
 func isDisabled(rule parser.Rule, selector *promParser.VectorSelector) bool {
 	for _, disable := range comments.Only[comments.Disable](rule.Comments, comments.DisableType) {
+		if disable.Match == SeriesCheckName {
+			return true
+		}
 		if strings.HasPrefix(disable.Match, SeriesCheckName+"(") && strings.HasSuffix(disable.Match, ")") {
 			cs := strings.TrimSuffix(strings.TrimPrefix(disable.Match, SeriesCheckName+"("), ")")
 			isMatch, ok := matchSelectorToMetric(selector, cs)

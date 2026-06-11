@@ -109,7 +109,7 @@ func newTemplateContext(rule parser.Rule) (c TemplateContext) {
 		}
 		if rule.AlertingRule.Annotations != nil {
 			for _, ann := range rule.AlertingRule.Annotations.Items {
-				c.Labels[ann.Key.Value] = ann.Value.Value
+				c.Annotations[ann.Key.Value] = ann.Value.Value
 			}
 		}
 	}

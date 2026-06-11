@@ -99,8 +99,14 @@ func (c LabelCheck) checkRecordingRule(entry *discovery.Entry) (problems []Probl
 		return problems
 	}
 
-	val := entryLabels.GetValue(c.keyRe.original)
-	if val == nil || val.Value == "" {
+	labels := make([]*parser.YamlKeyValue, 0, len(entryLabels.Items))
+	for _, lab := range entryLabels.Items {
+		if c.keyRe.MustExpand(entry.Rule).MatchString(lab.Key.Value) {
+			labels = append(labels, lab)
+		}
+	}
+
+	if len(labels) == 0 {
 		if c.isRequired {
 			problems = append(problems, Problem{
 				Anchor:   AnchorAfter,
@@ -124,14 +130,36 @@ func (c LabelCheck) checkRecordingRule(entry *discovery.Entry) (problems []Probl
 		return problems
 	}
 
-	if c.tokenRe != nil {
-		for _, match := range c.tokenRe.MustExpand(entry.Rule).FindAllString(val.Value, -1) {
-			problems = append(problems, c.checkValue(entry.Rule, match, val)...)
+	for _, lab := range labels {
+		if lab.Value.Value == "" && c.isRequired {
+			problems = append(problems, Problem{
+				Anchor:   AnchorAfter,
+				Lines:    entryLabels.Lines(),
+				Reporter: c.Reporter(),
+				Summary:  "required label not set",
+				Details:  maybeComment(c.comment),
+				Severity: c.severity,
+				Diagnostics: []diags.Diagnostic{
+					{
+						Message:     fmt.Sprintf("`%s` label is required.", c.keyRe.original),
+						Pos:         entryLabels.Key.Pos,
+						Expr:        nil,
+						FirstColumn: 1,
+						LastColumn:  len(entryLabels.Key.Value),
+						Kind:        diags.Issue,
+					},
+				},
+			})
+			return problems
 		}
-		return problems
+		if c.tokenRe != nil {
+			for _, match := range c.tokenRe.MustExpand(entry.Rule).FindAllString(lab.Value.Value, -1) {
+				problems = append(problems, c.checkValue(entry.Rule, match, lab.Value)...)
+			}
+		} else {
+			problems = append(problems, c.checkValue(entry.Rule, lab.Value.Value, lab.Value)...)
+		}
 	}
-
-	problems = append(problems, c.checkValue(entry.Rule, val.Value, val)...)
 	return problems
 }
 

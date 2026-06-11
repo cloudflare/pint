@@ -168,6 +168,11 @@ func runTests(t *testing.T, testCases []checkTest) {
 	for _, tc := range testCases {
 		// original test
 		t.Run(tc.description, func(t *testing.T) {
+			defer func() {
+				if r := recover(); r != nil {
+					t.Fatalf("unexpected panic: %v", r)
+				}
+			}()
 			if tc.setup != nil {
 				tc.setup(t)
 			}

@@ -739,6 +739,38 @@
 
 ---
 
+[TestAggregationCheck/nil_nameRegex_with_missing_label - 1]
+- description: nil nameRegex with missing label
+  content: |
+    - record: foo
+      expr: sum(foo) without(job)
+  output: |
+    2 |   expr: sum(foo) without(job)
+                                 ^^^
+                                 `job` label is required and should be preserved when aggregating all rules.
+                                 Query is using aggregation with `without(job)`, all labels included inside
+                                 `without(...)` will be removed from the results.
+  problem:
+    reporter: promql/aggregate
+    summary: required label is being removed via aggregation
+    details: ""
+    diagnostics:
+        - message: '`job` label is required and should be preserved when aggregating all rules.'
+          firstcolumn: 18
+          lastcolumn: 20
+          kind: 0
+        - message: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
+          firstcolumn: 18
+          lastcolumn: 20
+          kind: 1
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
 [TestAggregationCheck/passing_most_outer_aggregation_should_continue_further_keep_checks - 1]
 - description: passing most outer aggregation should continue further keep checks
   content: |

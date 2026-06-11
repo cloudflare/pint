@@ -3902,6 +3902,27 @@ func TestSeriesCheck(t *testing.T) {
 			checker:     newSeriesCheck,
 			prometheus:  newSimpleProm,
 		},
+		{
+			description: "disable comment for a mismatched bare series name",
+			content: `
+# pint disable promql/series(bar)
+# pint disable promql/series
+- record: my_series
+  expr: count(bar)
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+		},
+		{
+			description: "bare promql/series disable comment suppresses missing series",
+			content: `
+# pint disable promql/series
+- record: my_series
+  expr: sum(notfound)
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+		},
 	}
 	runTests(t, testCases)
 }

@@ -591,6 +591,11 @@
 
 ---
 
+[TestLabelCheck/recording_rule_with_regex_key_pattern_matching_existing_label - 1]
+[]
+
+---
+
 [TestLabelCheck/templated_label_value_/_not_passing - 1]
 - description: templated label value / not passing
   content: |
