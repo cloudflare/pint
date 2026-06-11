@@ -1,0 +1,8 @@
+groups:
+- name: nan risks
+  rules:
+  - record: error:ratio
+    expr: sum(errors_total / requests_total) by (job)
+
+  - alert: High Error Rate
+    expr: sum(errors_total / requests_total) by (job) > 0.5

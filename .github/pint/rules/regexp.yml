@@ -1,12 +1,15 @@
 groups:
-- name: test
+- name: regexp
   rules:
-  - record: up:sum
-    expr: sum(up)
-
   - record: up:sum
     expr: sum(up{instance!="none", job=~"bob", job=~"^abc", cluster="dev"})
 
   - record: up:sum
     expr: |
       sum(up{instance!="none", job=~"bob", job=~"^abc", cluster="dev"})
+
+  - record: up:anchored
+    expr: sum(up{job=~"^myservice$"})
+
+  - record: up:smelly
+    expr: sum(up{instance=~".*prod-region1.*"})

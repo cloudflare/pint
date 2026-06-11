@@ -1,0 +1,8 @@
+groups:
+- name: fragile alerts
+  rules:
+  - alert: Top Errors
+    expr: topk(5, rate(errors_total[5m]))
+
+  - alert: Partial Data Risk
+    expr: sum(requests_total) / sum(capacity_total) > 0.9

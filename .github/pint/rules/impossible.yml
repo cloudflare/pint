@@ -1,0 +1,6 @@
+groups:
+- name: impossible
+  rules:
+  - alert: Dead Code
+    expr: |
+      sum(foo or vector(0)) by(name) > 0

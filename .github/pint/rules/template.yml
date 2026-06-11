@@ -1,0 +1,7 @@
+groups:
+- name: template
+  rules:
+  - alert: Rate Without Humanize
+    expr: rate(http_requests_total[5m]) > 100
+    annotations:
+      summary: "Request rate is {{ $value }} req/s"
