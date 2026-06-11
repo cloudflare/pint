@@ -449,9 +449,8 @@
                       ^^^^^^^^^^^^
                       Using `on(notfound)` won't produce any results on `prom` Prometheus server at
                       https://simple.example.com because [series returned from both sides of the
-                      query](notfound) don't have the
-                      `https://simple.example.com/query?g0.expr=foo+%2F+on+%28notfound%29+bar&&g0.tab=table`
-                      label.
+                      query](https://simple.example.com/query?g0.expr=foo+%2F+on+%28notfound%29+bar&&g0.tab=table)
+                      don't have the `notfound` label.
   problem:
     reporter: promql/vector_matching
     summary: impossible binary operation
@@ -460,7 +459,7 @@
         You can match time series with different labels by using special keywords and follow the rules set by PromQL.
         [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
-        - message: Using `on(notfound)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned from both sides of the query](notfound) don't have the `https://simple.example.com/query?g0.expr=foo+%2F+on+%28notfound%29+bar&&g0.tab=table` label.
+        - message: Using `on(notfound)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned from both sides of the query](https://simple.example.com/query?g0.expr=foo+%2F+on+%28notfound%29+bar&&g0.tab=table) don't have the `notfound` label.
           firstcolumn: 7
           lastcolumn: 18
           kind: 0

@@ -30,6 +30,9 @@
   on [promql/series](checks/promql/series.md) checks.
 - Fixed `pint_rule_file_owner` metric using symlink target path instead
   of symlink name, making it inconsistent with `pint_problem` metric.
+- Fixed swapped label name and URL in
+  [promql/vector_matching](checks/promql/vector_matching.md) error message
+  when both sides of a binary operation are missing a label.
 
 ## v0.85.0
 
