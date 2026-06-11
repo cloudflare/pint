@@ -89,7 +89,8 @@ func actionCI(ctx context.Context, c *cli.Command) error {
 	}
 	currentBranch := detectCurrentBranch(gitInfo.CurrentBranch)
 	slog.LogAttrs(ctx, slog.LevelDebug, "Got branch information", slog.String("base", baseBranch), slog.String("current", currentBranch))
-	if currentBranch == strings.Split(baseBranch, "/")[len(strings.Split(baseBranch, "/"))-1] {
+	baseParts := strings.Split(baseBranch, "/")
+	if currentBranch == baseParts[len(baseParts)-1] {
 		slog.LogAttrs(ctx, slog.LevelInfo, "Running from base branch, skipping checks", slog.String("branch", currentBranch))
 		return nil
 	}
