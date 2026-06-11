@@ -273,8 +273,8 @@ check "promql/series" {
 }
 ```
 
-When pint checks validates the rule using this query it will runs `promql/series`
-three time - once for `promA`, once for `promB` and once for `promC`.
+When pint checks the rule using this query it will run `promql/series`
+three times - once for `promA`, once for `promB` and once for `promC`.
 When it runs on `promB` it doesn't find `my_service_errors_total{env="prod"}` present, so it checks
 `promA` and `promB` to tell you if it's present there. Since `promA` has `my_service_errors_total{env="prod"}`
 time series present pint will next check if these time series match any of the selectors from `ignoreMatchingElsewhere`.
@@ -299,7 +299,7 @@ Duration must follow syntax documented in [prometheus docs](https://prometheus.i
 To set `min-age` for specific metric:
 
 ```yaml
-# pint rule/set promql/series($selector)) min-age $duration
+# pint rule/set promql/series($selector) min-age $duration
 ```
 
 Example:
