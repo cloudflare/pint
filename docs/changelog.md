@@ -28,6 +28,8 @@
   patterns on recording rules.
 - Fixed bare `# pint disable promql/series` comments having no effect
   on [promql/series](checks/promql/series.md) checks.
+- Fixed `pint_rule_file_owner` metric using symlink target path instead
+  of symlink name, making it inconsistent with `pint_problem` metric.
 
 ## v0.85.0
 

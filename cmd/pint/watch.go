@@ -343,7 +343,7 @@ func (c *problemCollector) scan(ctx context.Context, workers int, isOffline bool
 	fileOwners := map[string]string{}
 	for _, entry := range entries {
 		if entry.Owner != "" {
-			fileOwners[entry.Path.SymlinkTarget] = entry.Owner
+			fileOwners[entry.Path.Name] = entry.Owner
 		}
 	}
 	c.fileOwners = fileOwners
