@@ -8,36 +8,36 @@ level=INFO msg="Finding all rules to check" paths=["rules"]
 level=INFO msg="Checking Prometheus rules" entries=9 workers=10 online=true
 Warning: unsafe division in aggregation (promql/nan)
   ---> rules/1.yaml:119-128 -> `Thanos_Rule_High_Rule_Evaluation_Failures`
-119 |             expr: |2-
+119 | expr: |2-
     |             [...]
-123 |                                     by (job,kubernetes_name,pod, pod_app, pod_component)
-124 |                                   /
-125 |                                     sum(... / rate(prometheus_rule_group_last_duration_seconds{kubernetes_namespace="thanos", pod_app="ruler-core", pod_component="ruler"}[2m]))
-                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                      This aggregation can return NaN or Inf if any series for `prometheus_rule_group_last_duration_seconds{kubernetes_namespace="thanos", pod_app="ruler-core",
-                      pod_component="ruler"}` evaluates to zero.
-126 |                                     by (job,kubernetes_name,pod, pod_app, pod_component)
-127 |                                   * 100 > 5
-128 |                                   )
+123 |                         by (job,kubernetes_name,pod, pod_app, pod_component)
+124 |                       /
+125 |                         sum(... / rate(prometheus_rule_group_last_duration_seconds{kubernetes_namespace="thanos", pod_app="ruler-core", pod_component="ruler"}[2m]))
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          This aggregation can return NaN or Inf if any series for `prometheus_rule_group_last_duration_seconds{kubernetes_namespace="thanos", pod_app="ruler-core",
+          pod_component="ruler"}` evaluates to zero.
+126 |                         by (job,kubernetes_name,pod, pod_app, pod_component)
+127 |                       * 100 > 5
+128 |                       )
 
 Warning: unsafe division in aggregation (promql/nan)
   ---> rules/1.yaml:119-128 -> `Thanos_Rule_High_Rule_Evaluation_Failures`
-119 |             expr: |2-
-120 |               
-121 |                                   (
-122 |                                     sum(... / rate(prometheus_rule_group_last_duration_seconds{kubernetes_namespace="thanos", pod_app="ruler-core", pod_component="ruler"}[2m]))
-                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                      This aggregation can return NaN or Inf if any series for `prometheus_rule_group_last_duration_seconds{kubernetes_namespace="thanos", pod_app="ruler-core",
-                      pod_component="ruler"}` evaluates to zero.
-123 |                                     by (job,kubernetes_name,pod, pod_app, pod_component)
-124 |                                   /
+119 | expr: |2-
+120 |   
+121 |                       (
+122 |                         sum(... / rate(prometheus_rule_group_last_duration_seconds{kubernetes_namespace="thanos", pod_app="ruler-core", pod_component="ruler"}[2m]))
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          This aggregation can return NaN or Inf if any series for `prometheus_rule_group_last_duration_seconds{kubernetes_namespace="thanos", pod_app="ruler-core",
+          pod_component="ruler"}` evaluates to zero.
+123 |                         by (job,kubernetes_name,pod, pod_app, pod_component)
+124 |                       /
     |             [...]
-128 |                                   )
+128 |                       )
 
 Warning: required annotation not set (alerts/annotation)
   ---> rules/1.yaml:143-150 -> `Thanos_Rule_Config_Reload_Failed`
-150 |               description: Thanos Ruler has not been able to reload its configuration.
-                    ^^^ `summary` annotation is required.
+150 | description: Thanos Ruler has not been able to reload its configuration.
+      ^^^ `summary` annotation is required.
 
 level=INFO msg="Problems found" Warning=3
 -- .pint.hcl --
