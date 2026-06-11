@@ -1,0 +1,9 @@
+groups:
+- name: slow evaluation
+  interval: 10m
+  rules:
+  - record: job:up:sum
+    expr: sum(up) by (job)
+
+  - alert: Slow Alert
+    expr: up == 0

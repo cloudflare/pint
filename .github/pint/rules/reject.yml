@@ -1,0 +1,32 @@
+groups:
+- name: config checks
+  rules:
+  - alert: Bad Label Key
+    expr: up == 0
+    labels:
+      severity: warning
+      bad key: "value with spaces in key"
+    annotations:
+      summary: "Service is down"
+
+  - alert: URL In Label
+    expr: up == 0
+    labels:
+      severity: critical
+      dashboard: "https://grafana.example.com/d/123"
+    annotations:
+      summary: "Service is down"
+
+  - alert: Long Range Query
+    expr: max_over_time(up[7d]) == 0
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Service has been down for a week"
+
+  - record: bad_name
+    expr: sum(up) by (job)
+
+  - record: job:up:count
+    expr: count(up)

@@ -73,7 +73,7 @@ benchmark-diff:
 	echo "Benchmark diff:" | tee benchstat.txt
 	echo "" | tee -a benchstat.txt
 	echo '```' | tee -a benchstat.txt
-	go tool -modfile=tools/benchstat/go.mod benchstat old.txt new.txt | tee -a benchstat.txt
+	go tool -modfile=tools/benchstat/go.mod benchstat -confidence=0.99 old.txt new.txt | tee -a benchstat.txt
 	echo '```' | tee -a benchstat.txt
 
 .PHONY: update-major-imports
