@@ -213,8 +213,28 @@ func InjectDiagnostics(content string, d []Diagnostic, color output.Color) strin
 
 	contentLines := strings.Split(content, "\n")
 
+	// Minimum leading-space indent across all visible lines.
+	// gapIndent aligns gap markers, minIndent controls stripping
+	// (only when the indent is large enough to be worth it).
+	gapIndent := -1
+	for _, lineNum := range lines {
+		if lineNum < 1 || lineNum > len(contentLines) {
+			continue
+		}
+		if trimmed := strings.TrimLeft(contentLines[lineNum-1], " "); len(trimmed) > 0 {
+			indent := len(contentLines[lineNum-1]) - len(trimmed)
+			if gapIndent < 0 || indent < gapIndent {
+				gapIndent = indent
+			}
+		}
+	}
+	gapIndent = max(0, gapIndent)
+	minIndent := 0
+	if gapIndent > 10 {
+		minIndent = gapIndent
+	}
+
 	var lastWriteLine int
-	minIndent := -1
 	for lineIndex, line := range contentLines {
 
 		if lineIndex+1 > lastLine {
@@ -234,6 +254,13 @@ func InjectDiagnostics(content string, d []Diagnostic, color output.Color) strin
 		trim := trimLine(line, diags, diagPositions, lineIndex+1)
 		line = trim.line
 
+		// Strip common leading whitespace so deeply indented YAML
+		// expressions don't push content off-screen.
+		lineStrip := minIndent
+		if lineStrip > 0 && len(line) >= lineStrip {
+			line = line[lineStrip:]
+		}
+
 		prefix := fmt.Sprintf(nrFmt+" | ", lineIndex+1)
 
 		// Print a gap marker when lines were skipped between the previous
@@ -243,6 +270,9 @@ func InjectDiagnostics(content string, d []Diagnostic, color output.Color) strin
 		if lastWriteLine > 0 && lineIndex+1-lastWriteLine > 1 {
 			skipped := lineIndex + 1 - lastWriteLine - 1
 			skippedLine := contentLines[lastWriteLine]
+			if lineStrip > 0 && len(skippedLine) >= lineStrip {
+				skippedLine = skippedLine[lineStrip:]
+			}
 			if skipped == 1 && len(strings.TrimSpace(skippedLine)) < 10 {
 				buf.WriteString(output.MaybeColor(
 					output.White, color == output.None,
@@ -253,20 +283,13 @@ func InjectDiagnostics(content string, d []Diagnostic, color output.Color) strin
 			} else {
 				buf.WriteString(output.MaybeColor(output.White, color == output.None, strings.Repeat(" ", digits)))
 				buf.WriteString(" | ")
-				if minIndent > 0 {
-					buf.WriteString(strings.Repeat(" ", minIndent))
+				if gapIndent > 0 {
+					buf.WriteString(strings.Repeat(" ", gapIndent))
 				}
 				buf.WriteString("[...]\n")
 			}
 		}
 		lastWriteLine = lineIndex + 1
-
-		if trimmed := strings.TrimLeft(line, " "); len(trimmed) > 0 {
-			indent := len(line) - len(trimmed)
-			if minIndent < 0 || indent < minIndent {
-				minIndent = indent
-			}
-		}
 
 		buf.WriteString(output.MaybeColor(output.White, color == output.None, prefix))
 		for i, ok := range needsNextLine {
@@ -275,9 +298,13 @@ func InjectDiagnostics(content string, d []Diagnostic, color output.Color) strin
 			}
 		}
 
+		// Translate displayed column indices back to original columns
+		// so caret positions still line up after stripping.
+		colShift := lineStrip
 		for columnIndex, r := range line {
 			buf.WriteRune(r)
 
+			origCol := columnIndex + 1 + colShift
 			for i, ok := range needsNextLine {
 				if !ok {
 					continue
@@ -286,8 +313,8 @@ func InjectDiagnostics(content string, d []Diagnostic, color output.Color) strin
 					if pos.Line != lineIndex+1 {
 						continue
 					}
-					before := pos.FirstColumn > columnIndex+1
-					inside := pos.FirstColumn <= columnIndex+1 && pos.LastColumn >= columnIndex+1
+					before := pos.FirstColumn > origCol
+					inside := pos.FirstColumn <= origCol && pos.LastColumn >= origCol
 					switch {
 					case before:
 						nextLine[i].WriteRune(' ')
@@ -314,7 +341,7 @@ func InjectDiagnostics(content string, d []Diagnostic, color output.Color) strin
 					indent = 0
 					for _, pos := range diagPositions[i] {
 						if pos.Line == lineIndex+1 && pos.FirstColumn > 0 {
-							indent = digits + 3 + pos.FirstColumn - 1
+							indent = digits + 3 + pos.FirstColumn - 1 - colShift
 							break
 						}
 					}
