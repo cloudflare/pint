@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/prometheus/common/model"
+
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/config"
 	"github.com/cloudflare/pint/internal/discovery"
@@ -163,10 +165,10 @@ func actionCI(ctx context.Context, c *cli.Command) error {
 			return errors.New("BITBUCKET_AUTH_TOKEN env variable is required when reporting to BitBucket")
 		}
 
-		timeout, _ := time.ParseDuration(meta.cfg.Repository.BitBucket.Timeout)
+		bbTimeout, _ := model.ParseDuration(meta.cfg.Repository.BitBucket.Timeout)
 		br := reporter.NewBitBucketReporter(
 			meta.cfg.Repository.BitBucket.URI,
-			timeout,
+			time.Duration(bbTimeout),
 			token,
 			meta.cfg.Repository.BitBucket.Project,
 			meta.cfg.Repository.BitBucket.Repository,
@@ -183,13 +185,13 @@ func actionCI(ctx context.Context, c *cli.Command) error {
 			return errors.New("GITLAB_AUTH_TOKEN env variable is required when reporting to GitLab")
 		}
 
-		timeout, _ := time.ParseDuration(meta.cfg.Repository.GitLab.Timeout)
+		timeout, _ := model.ParseDuration(meta.cfg.Repository.GitLab.Timeout)
 		var gl reporter.GitLabReporter
 		if gl, err = reporter.NewGitLabReporter(
 			version,
 			currentBranch,
 			meta.cfg.Repository.GitLab.URI,
-			timeout,
+			time.Duration(timeout),
 			token,
 			meta.cfg.Repository.GitLab.Project,
 			meta.cfg.Repository.GitLab.MaxComments,
@@ -216,14 +218,14 @@ func actionCI(ctx context.Context, c *cli.Command) error {
 			return fmt.Errorf("got not a valid number via GITHUB_PULL_REQUEST_NUMBER: %w", err)
 		}
 
-		timeout, _ := time.ParseDuration(meta.cfg.Repository.GitHub.Timeout)
+		timeout, _ := model.ParseDuration(meta.cfg.Repository.GitHub.Timeout)
 		var gr reporter.GithubReporter
 		if gr, err = reporter.NewGithubReporter(
 			ctx,
 			version,
 			meta.cfg.Repository.GitHub.BaseURI,
 			meta.cfg.Repository.GitHub.UploadURI,
-			timeout,
+			time.Duration(timeout),
 			token,
 			meta.cfg.Repository.GitHub.Owner,
 			meta.cfg.Repository.GitHub.Repo,
