@@ -56,30 +56,6 @@
         last: 2
     severity: 1
     anchor: 0
-- description: flag parse error
-  content: |
-    - record: foo
-      expr: rate(foo[30d])
-  output: |
-    2 |   expr: rate(foo[30d])
-                     ^^^^^^^^
-                     `foo[30d]` selector is trying to query Prometheus for 30d worth of metrics, but `prom`
-                     Prometheus server at https://simple.example.com is configured to only keep 0s of
-                     metrics history.
-  problem:
-    reporter: promql/range_query
-    summary: query beyond configured retention
-    details: ""
-    diagnostics:
-        - message: '`foo[30d]` selector is trying to query Prometheus for 30d worth of metrics, but `prom` Prometheus server at https://simple.example.com is configured to only keep 0s of metrics history.'
-          firstcolumn: 6
-          lastcolumn: 13
-          kind: 0
-    lines:
-        first: 2
-        last: 2
-    severity: 1
-    anchor: 0
 
 ---
 

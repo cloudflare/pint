@@ -101,6 +101,7 @@ func (c RangeQueryCheck) Check(ctx context.Context, entry *discovery.Entry, _ []
 	retention, p := retentionFromFlags(flags.Flags, c.Reporter(), expr)
 	if p != nil {
 		problems = append(problems, *p)
+		return problems
 	}
 
 	problems = append(

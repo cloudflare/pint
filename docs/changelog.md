@@ -33,6 +33,8 @@
 - Fixed swapped label name and URL in
   [promql/vector_matching](checks/promql/vector_matching.md) error message
   when both sides of a binary operation are missing a label.
+- Fixed false positive [promql/range_query](checks/promql/range_query.md)
+  reports when Prometheus retention flag cannot be parsed.
 
 ## v0.85.0
 
