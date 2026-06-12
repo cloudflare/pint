@@ -178,6 +178,34 @@
 
 ---
 
+[TestRejectCheck/rejected_key_/_alerting_/_multiline - 1]
+- description: rejected key / alerting / multiline
+  content: |
+    - alert: foo
+      expr: sum(foo)
+      labels:
+        bad: |
+          bar
+  output: |
+    4 |     bad: |
+            ^^^ key is not allowed to match `^bad$`.
+  problem:
+    reporter: rule/reject
+    summary: key not allowed
+    details: ""
+    diagnostics:
+        - message: key is not allowed to match `^bad$`.
+          firstcolumn: 1
+          lastcolumn: 3
+          kind: 0
+    lines:
+        first: 4
+        last: 4
+    severity: 2
+    anchor: 0
+
+---
+
 [TestRejectCheck/rejected_key_/_don't_check_annotations - 1]
 []
 
