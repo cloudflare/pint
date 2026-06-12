@@ -51,11 +51,6 @@
 
 ---
 
-[TestCounterCheck/counter - 1]
-[]
-
----
-
 [TestCounterCheck/counter_==_1_and_counter_>_2_or_counter_<_3 - 1]
 - description: counter == 1 and counter > 2 or counter < 3
   content: |4-
@@ -158,6 +153,42 @@
         last: 3
     severity: 1
     anchor: 0
+
+---
+
+[TestCounterCheck/counter_with_metadata - 1]
+- description: counter with metadata
+  content: |
+    - alert: my alert
+      expr: http_requests_total
+  output: |
+    2 |   expr: http_requests_total
+                ^^^^^^^^^^^^^^^^^^^
+                `http_requests_total` is a counter according to metrics metadata from `prom` Prometheus
+                server at https://simple.example.com, it can be dangerous to use its value directly.
+  problem:
+    reporter: promql/counter
+    summary: direct counter read
+    details: |-
+        [Counters](https://prometheus.io/docs/concepts/metric_types/#counter) track the number of events over time and so the value of a counter can only grow and never decrease.
+        This means that the absolute value of a counter doesn't matter, it will be a random number that depends on the number of events that happened since your application was started.
+        To use the value of a counter in PromQL you most likely want to calculate the rate of events using the [rate()](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) function, or any other function that is safe to use with counters.
+        Once you calculate the rate you can use that result in other functions or aggregations that are not counter safe, like [sum()](https://prometheus.io/docs/prometheus/latest/querying/operators/#aggregation-operators).
+    diagnostics:
+        - message: '`http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangerous to use its value directly.'
+          firstcolumn: 1
+          lastcolumn: 19
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestCounterCheck/counter_without_metadata - 1]
+[]
 
 ---
 

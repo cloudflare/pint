@@ -33,6 +33,8 @@
   when both sides of a binary operation are missing a label.
 - Fixed false positive [promql/range_query](checks/promql/range_query.md)
   reports when Prometheus retention flag cannot be parsed.
+- Fixed [promql/counter](checks/promql/counter.md) not checking bare
+  counter metrics used without any wrapping function.
 
 ## v0.85.0
 
