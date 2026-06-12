@@ -1,6 +1,7 @@
 package discovery_test
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -25,14 +26,14 @@ func gitCommit(t *testing.T, message string) {
 	t.Setenv("GIT_AUTHOR_EMAIL", "pint@example.com")
 	t.Setenv("GIT_COMMITTER_NAME", "pint")
 	t.Setenv("GIT_COMMITTER_EMAIL", "pint")
-	_, err := git.RunGit("commit", "-am", "commit "+message)
+	_, err := git.RunGit(t.Context(), "commit", "-am", "commit "+message)
 	require.NoError(t, err, "git commit %s", message)
 }
 
 func commitFile(t *testing.T, path, content, message string) {
 	err := os.WriteFile(path, []byte(content), 0o644)
 	require.NoError(t, err, "write %s", path)
-	_, err = git.RunGit("add", path)
+	_, err = git.RunGit(t.Context(), "add", path)
 	require.NoError(t, err, "git add")
 	gitCommit(t, message)
 }
@@ -71,7 +72,7 @@ func TestGitBranchFinder(t *testing.T) {
 			title: "git list PR commits error - main",
 			setup: func(_ *testing.T) {},
 			finder: discovery.NewGitBranchFinder(
-				func(args ...string) ([]byte, error) {
+				func(_ context.Context, args ...string) ([]byte, error) {
 					return nil, fmt.Errorf("mock git error: %v", args)
 				},
 				git.NewPathFilter(includeAll, nil, nil),
@@ -87,7 +88,7 @@ func TestGitBranchFinder(t *testing.T) {
 			title: "git list PR commits error - master",
 			setup: func(_ *testing.T) {},
 			finder: discovery.NewGitBranchFinder(
-				func(args ...string) ([]byte, error) {
+				func(_ context.Context, args ...string) ([]byte, error) {
 					return nil, fmt.Errorf("mock git error: %v", args)
 				},
 				git.NewPathFilter(includeAll, nil, nil),
@@ -104,7 +105,7 @@ func TestGitBranchFinder(t *testing.T) {
 			setup: func(t *testing.T) {
 				commitFile(t, "rules.yml", "# v1\n", "v1")
 
-				_, err := git.RunGit("checkout", "-b", "v2")
+				_, err := git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
 				commitFile(t, "rules.yml", "# v2-1\n", "v2-1")
@@ -120,7 +121,7 @@ func TestGitBranchFinder(t *testing.T) {
 			title: "git list modified files error",
 			setup: func(_ *testing.T) {},
 			finder: discovery.NewGitBranchFinder(
-				func(args ...string) ([]byte, error) {
+				func(_ context.Context, args ...string) ([]byte, error) {
 					switch strings.Join(args, " ") {
 					case "log --format=%H --no-abbrev-commit --reverse main..HEAD":
 						return []byte("c1\nc2\nc3\nc4\n"), nil
@@ -141,7 +142,7 @@ func TestGitBranchFinder(t *testing.T) {
 			title: "git get commit message error",
 			setup: func(_ *testing.T) {},
 			finder: discovery.NewGitBranchFinder(
-				func(args ...string) ([]byte, error) {
+				func(_ context.Context, args ...string) ([]byte, error) {
 					switch strings.Join(args, " ") {
 					case "log --reverse --no-merges --first-parent --format=%H --name-status main..HEAD":
 						return []byte("c1\nA\trules.yml\n"), nil
@@ -162,7 +163,7 @@ func TestGitBranchFinder(t *testing.T) {
 			title: "git diff error",
 			setup: func(_ *testing.T) {},
 			finder: discovery.NewGitBranchFinder(
-				func(args ...string) ([]byte, error) {
+				func(_ context.Context, args ...string) ([]byte, error) {
 					switch strings.Join(args, " ") {
 					case "log --reverse --no-merges --first-parent --format=%H --name-status main..HEAD":
 						return []byte("c1\nA\trules.yml\n"), nil
@@ -194,7 +195,7 @@ func TestGitBranchFinder(t *testing.T) {
 			setup: func(t *testing.T) {
 				commitFile(t, "rules.yml", "# v1\n", "v1")
 
-				_, err := git.RunGit("checkout", "-b", "v2")
+				_, err := git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
 				commitFile(t, "rules.yml", "# v2\n", "v2")
@@ -213,7 +214,7 @@ groups:
     expr: count(up == 1)
 `, "v1")
 
-				_, err := git.RunGit("checkout", "-b", "v2")
+				_, err := git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
 				commitFile(t, "rules.yml", `
@@ -252,7 +253,7 @@ groups:
     expr: count(up)
 `, "v1")
 
-				_, err := git.RunGit("checkout", "-b", "v2")
+				_, err := git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
 				commitFile(t, "rules.yml", `
@@ -289,7 +290,7 @@ groups:
   expr: count(up)
 `, "v1")
 
-				_, err := git.RunGit("checkout", "-b", "v2")
+				_, err := git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
 				commitFile(t, "rules.yml", `
@@ -322,7 +323,7 @@ groups:
   expr: count(up)
 `, "v1")
 
-				_, err := git.RunGit("checkout", "-b", "v2")
+				_, err := git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
 				commitFile(t, "rules.yml", `
@@ -358,7 +359,7 @@ groups:
     expr: count(up)
 `, "v1")
 
-				_, err := git.RunGit("checkout", "-b", "v2")
+				_, err := git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
 				commitFile(t, "rules.yml", `
@@ -390,7 +391,7 @@ groups:
     expr: count(up)
 `, "v1")
 
-				_, err := git.RunGit("checkout", "-b", "v2")
+				_, err := git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
 				commitFile(t, "rules.yml", `
@@ -415,7 +416,7 @@ groups:
     expr: count(up)
 `, "v1")
 
-				_, err := git.RunGit("checkout", "-b", "v2")
+				_, err := git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
 				commitFile(t, "rules.yml", `
@@ -437,12 +438,12 @@ groups:
   expr: count(up)
 `, "v1")
 
-				_, err := git.RunGit("checkout", "-b", "v2")
+				_, err := git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
 				err = os.Symlink("rules.yml", "symlink.yml")
 				require.NoError(t, err, "symlink")
-				_, err = git.RunGit("add", "symlink.yml")
+				_, err = git.RunGit(t.Context(), "add", "symlink.yml")
 				require.NoError(t, err, "git add")
 				gitCommit(t, "v2")
 			},
@@ -476,7 +477,7 @@ groups:
     expr: count(up)
 `, "v1")
 
-				_, err := git.RunGit("checkout", "-b", "v2")
+				_, err := git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
 				commitFile(t, "rules.yml", `
@@ -593,7 +594,7 @@ groups:
   for: 0s
 `, "v1")
 
-				_, err := git.RunGit("checkout", "-b", "v2")
+				_, err := git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
 				commitFile(t, "rules.yml", `
@@ -651,7 +652,7 @@ groups:
   expr: sum(foo) by(job)
 `, "v1")
 
-				_, err := git.RunGit("checkout", "-b", "v2")
+				_, err := git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
 				commitFile(t, "rules.yml", `
@@ -705,7 +706,7 @@ groups:
   expr: sum(foo) by(job)
 `, "v1")
 
-				_, err := git.RunGit("checkout", "-b", "v2")
+				_, err := git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
 				commitFile(t, "rules.yml", `
@@ -751,7 +752,7 @@ groups:
   expr: sum(foo) by(job)
 `, "v1")
 
-				_, err := git.RunGit("checkout", "-b", "v2")
+				_, err := git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
 				commitFile(t, "rules.yml", `
@@ -825,7 +826,7 @@ groups:
     expr: sum(up)
 `, "v1")
 
-				_, err := git.RunGit("checkout", "-b", "v2")
+				_, err := git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
 				commitFile(t, "rules.yml", `
@@ -885,7 +886,7 @@ groups:
   expr: sum(foo) by(job)
 `, "v1")
 
-				_, err := git.RunGit("checkout", "-b", "v2")
+				_, err := git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
 				commitFile(t, "rules.yml", `
@@ -975,7 +976,7 @@ groups:
   expr: sum(foo) by(job)
 `, "v1")
 
-				_, err := git.RunGit("checkout", "-b", "v2")
+				_, err := git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
 				commitFile(t, "rules.yml", `
@@ -1081,7 +1082,7 @@ groups:
   for: 1s
 `, "v1")
 
-				_, err := git.RunGit("checkout", "-b", "v2")
+				_, err := git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
 				commitFile(t, "rules.yml", `
@@ -1146,10 +1147,10 @@ groups:
   expr: up == 0
 `, "v1")
 
-				_, err := git.RunGit("checkout", "-b", "v2")
+				_, err := git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
-				_, err = git.RunGit("mv", "a.yml", "b.yml")
+				_, err = git.RunGit(t.Context(), "mv", "a.yml", "b.yml")
 				require.NoError(t, err, "git mv")
 
 				gitCommit(t, "v2")
@@ -1180,7 +1181,7 @@ groups:
   expr: up == 0
 `, "v1")
 
-				_, err := git.RunGit("checkout", "-b", "v2")
+				_, err := git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
 				commitFile(t, "a.yml", `
@@ -1188,7 +1189,7 @@ groups:
   expr: up == 0
 `, "v2")
 
-				_, err = git.RunGit("mv", "a.yml", "b.yml")
+				_, err = git.RunGit(t.Context(), "mv", "a.yml", "b.yml")
 				require.NoError(t, err, "git mv")
 
 				gitCommit(t, "v3")
@@ -1222,17 +1223,17 @@ groups:
 
 				err := os.Symlink("rules.yml", "symlink.yml")
 				require.NoError(t, err, "symlink")
-				_, err = git.RunGit("add", "symlink.yml")
+				_, err = git.RunGit(t.Context(), "add", "symlink.yml")
 				require.NoError(t, err, "git add")
 				gitCommit(t, "v1")
 
-				_, err = git.RunGit("checkout", "-b", "v2")
+				_, err = git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
-				_, err = git.RunGit("mv", "rules.yml", "new.yml")
+				_, err = git.RunGit(t.Context(), "mv", "rules.yml", "new.yml")
 				require.NoError(t, err, "git mv")
 
-				_, err = git.RunGit("rm", "-f", "symlink.yml")
+				_, err = git.RunGit(t.Context(), "rm", "-f", "symlink.yml")
 				require.NoError(t, err, "git rm symlink")
 
 				gitCommit(t, "v2")
@@ -1282,7 +1283,7 @@ groups:
     expr: sum(up)
 `, "v1")
 
-				_, err := git.RunGit("checkout", "-b", "v2")
+				_, err := git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
 				commitFile(t, "rules.yml", `
@@ -1343,7 +1344,7 @@ groups:
   expr: sum(foo) by(job)
 `, "v1")
 
-				_, err := git.RunGit("checkout", "-b", "v2")
+				_, err := git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
 				commitFile(t, "rules.yml", `
@@ -1412,7 +1413,7 @@ groups:
   expr: sum(foo) by(job)
 `, "v1")
 
-				_, err := git.RunGit("checkout", "-b", "v2")
+				_, err := git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
 				commitFile(t, "rules.yml", `
@@ -1524,7 +1525,7 @@ groups:
     expr: sum(up)
 `, "v1")
 
-				_, err := git.RunGit("checkout", "-b", "v2")
+				_, err := git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
 				commitFile(t, "rules.yml", `
@@ -1585,7 +1586,7 @@ groups:
       )
 `, "v1")
 
-				_, err := git.RunGit("checkout", "-b", "v2")
+				_, err := git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
 				commitFile(t, "rules.yml", `
@@ -1642,7 +1643,7 @@ groups:
     expr: bar
 `, "v1")
 
-				_, err := git.RunGit("checkout", "-b", "v2")
+				_, err := git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
 				commitFile(t, "rules.yml", `
@@ -1697,7 +1698,7 @@ groups:
   expr: up == 1
 `, "v1")
 
-				_, err := git.RunGit("checkout", "-b", "v2")
+				_, err := git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
 				commitFile(t, "rules.yml", `
@@ -1762,7 +1763,7 @@ groups:
   expr: bar
 `, "v1")
 
-				_, err := git.RunGit("checkout", "-b", "v2")
+				_, err := git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
 				commitFile(t, "rules.yml", `
@@ -1805,7 +1806,7 @@ groups:
   expr: bar
 `, "v1")
 
-				_, err := git.RunGit("checkout", "-b", "v2")
+				_, err := git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
 				commitFile(t, "rules.yml", `
@@ -1853,7 +1854,7 @@ groups:
   expr: bar
 `, "v1")
 
-				_, err := git.RunGit("checkout", "-b", "v2")
+				_, err := git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
 				commitFile(t, "rules.yml", `
@@ -1893,7 +1894,7 @@ groups:
 			setup: func(t *testing.T) {
 				commitFile(t, "base.yml", "groups:\n- name: base\n  rules: []\n", "v1")
 
-				_, err := git.RunGit("checkout", "-b", "v2")
+				_, err := git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
 				require.NoError(t, os.MkdirAll("relaxed", 0o755))
@@ -1939,11 +1940,11 @@ groups:
 			setup: func(t *testing.T) {
 				commitFile(t, "strict.yml", "groups:\n- name: base\n  rules:\n  - record: up:count\n    expr: count(up)\n", "v1")
 
-				_, err := git.RunGit("checkout", "-b", "v2")
+				_, err := git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
 				require.NoError(t, os.MkdirAll("relaxed", 0o755))
-				_, err = git.RunGit("mv", "strict.yml", "relaxed/rules.yml")
+				_, err = git.RunGit(t.Context(), "mv", "strict.yml", "relaxed/rules.yml")
 				require.NoError(t, err, "git mv")
 
 				commitFile(t, "relaxed/rules.yml", "- record: up:count\n  expr: count(up == 1)\n", "v2")
@@ -2002,10 +2003,10 @@ groups:
 				require.NoError(t, os.MkdirAll("relaxed", 0o755))
 				commitFile(t, "relaxed/rules.yml", "- record: up:count\n  expr: count(up)\n", "v1")
 
-				_, err := git.RunGit("checkout", "-b", "v2")
+				_, err := git.RunGit(t.Context(), "checkout", "-b", "v2")
 				require.NoError(t, err, "git checkout v2")
 
-				_, err = git.RunGit("mv", "relaxed/rules.yml", "strict.yml")
+				_, err = git.RunGit(t.Context(), "mv", "relaxed/rules.yml", "strict.yml")
 				require.NoError(t, err, "git mv")
 
 				commitFile(t, "strict.yml", "groups:\n- name: base\n  rules:\n  - record: up:count\n    expr: count(up == 1)\n", "v2")
@@ -2065,11 +2066,11 @@ groups:
 			dir := t.TempDir()
 			t.Chdir(dir)
 
-			_, err := git.RunGit("init", "--initial-branch=main", ".")
+			_, err := git.RunGit(t.Context(), "init", "--initial-branch=main", ".")
 			require.NoError(t, err, "git init")
 
 			tc.setup(t)
-			entries, err := tc.finder.Find(tc.allEntries)
+			entries, err := tc.finder.Find(t.Context(), tc.allEntries)
 			if tc.err != "" {
 				require.EqualError(t, err, tc.err)
 			} else {

@@ -83,7 +83,7 @@ func actionCI(ctx context.Context, c *cli.Command) error {
 	if c.String(baseBranchFlag) != "" {
 		baseBranch = c.String(baseBranchFlag)
 	}
-	gitInfo, err := git.Describe(git.RunGit)
+	gitInfo, err := git.Describe(ctx, git.RunGit)
 	if err != nil {
 		return fmt.Errorf("failed to get git info: %w", err)
 	}
@@ -110,7 +110,7 @@ func actionCI(ctx context.Context, c *cli.Command) error {
 		return err
 	}
 
-	entries, err = discovery.NewGitBranchFinder(git.RunGit, filter, baseBranch, meta.cfg.CI.MaxCommits, meta.cfg.Parser.Options(), allowedOwners).Find(entries)
+	entries, err = discovery.NewGitBranchFinder(git.RunGit, filter, baseBranch, meta.cfg.CI.MaxCommits, meta.cfg.Parser.Options(), allowedOwners).Find(ctx, entries)
 	if err != nil {
 		return err
 	}

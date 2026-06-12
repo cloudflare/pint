@@ -9,11 +9,11 @@ import (
 	"strings"
 )
 
-type CommandRunner func(args ...string) ([]byte, error)
+type CommandRunner func(ctx context.Context, args ...string) ([]byte, error)
 
-func RunGit(args ...string) (content []byte, err error) {
-	slog.LogAttrs(context.Background(), slog.LevelDebug, "Running git command", slog.Any("args", args))
-	cmd := exec.Command("git", args...)
+func RunGit(ctx context.Context, args ...string) (content []byte, err error) {
+	slog.LogAttrs(ctx, slog.LevelDebug, "Running git command", slog.Any("args", args))
+	cmd := exec.CommandContext(ctx, "git", args...)
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
@@ -31,13 +31,13 @@ type Info struct {
 	CurrentBranch string
 }
 
-func Describe(cmd CommandRunner) (Info, error) {
-	commit, err := cmd("rev-parse", "--verify", "HEAD")
+func Describe(ctx context.Context, cmd CommandRunner) (Info, error) {
+	commit, err := cmd(ctx, "rev-parse", "--verify", "HEAD")
 	if err != nil {
 		return Info{}, err
 	}
 
-	branch, err := cmd("rev-parse", "--abbrev-ref", "HEAD")
+	branch, err := cmd(ctx, "rev-parse", "--abbrev-ref", "HEAD")
 	if err != nil {
 		return Info{}, err
 	}
@@ -48,8 +48,8 @@ func Describe(cmd CommandRunner) (Info, error) {
 	}, nil
 }
 
-func CommitMessage(cmd CommandRunner, sha string) (string, error) {
-	msg, err := cmd("show", "-s", "--format=%B", sha)
+func CommitMessage(ctx context.Context, cmd CommandRunner, sha string) (string, error) {
+	msg, err := cmd(ctx, "show", "-s", "--format=%B", sha)
 	if err != nil {
 		return "", err
 	}

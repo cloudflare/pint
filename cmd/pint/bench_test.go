@@ -48,21 +48,23 @@ func BenchmarkGitFinder(b *testing.B) {
 	b.Setenv("GIT_COMMITTER_NAME", "pint")
 	b.Setenv("GIT_COMMITTER_EMAIL", "pint")
 
-	_, err := git.RunGit("init", "--initial-branch=main", ".")
+	ctx := b.Context()
+
+	_, err := git.RunGit(ctx, "init", "--initial-branch=main", ".")
 	require.NoError(b, err, "git init")
 
-	_, err = git.RunGit("add", "Makefile", "README.md")
+	_, err = git.RunGit(ctx, "add", "Makefile", "README.md")
 	require.NoError(b, err, "git add")
-	_, err = git.RunGit("commit", "-am", "commit")
+	_, err = git.RunGit(ctx, "commit", "-am", "commit")
 	require.NoError(b, err, "git commit")
 
-	_, err = git.RunGit("checkout", "-b", "v2")
+	_, err = git.RunGit(ctx, "checkout", "-b", "v2")
 	require.NoError(b, err, "git checkout v2")
 
-	_, err = git.RunGit("add", ".")
+	_, err = git.RunGit(ctx, "add", ".")
 	require.NoError(b, err, "git add")
 
-	_, err = git.RunGit("commit", "-am", "commit")
+	_, err = git.RunGit(ctx, "commit", "-am", "commit")
 	require.NoError(b, err, "git commit")
 
 	finder := discovery.NewGitBranchFinder(
@@ -76,7 +78,7 @@ func BenchmarkGitFinder(b *testing.B) {
 
 	b.ResetTimer()
 	for b.Loop() {
-		_, _ = finder.Find(nil)
+		_, _ = finder.Find(ctx, nil)
 	}
 }
 
