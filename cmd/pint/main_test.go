@@ -192,7 +192,7 @@ func httpServer(ts *testscript.TestScript, _ bool, args []string) {
 			}
 		}))
 
-		listener, err := net.Listen("tcp", listen)
+		listener, err := (&net.ListenConfig{}).Listen(context.Background(), "tcp", listen)
 		ts.Check(err)
 		server := &http.Server{Addr: listen, Handler: mux}
 		go func() {

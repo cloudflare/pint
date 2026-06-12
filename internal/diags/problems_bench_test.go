@@ -24,7 +24,7 @@ func BenchmarkInjectDiagnosticsLongExpr(b *testing.B) {
 
 	b.ReportAllocs()
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_ = InjectDiagnostics(input, diags, output.None)
 	}
 }
@@ -41,7 +41,7 @@ func BenchmarkInjectDiagnosticsShortExpr(b *testing.B) {
 
 	b.ReportAllocs()
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_ = InjectDiagnostics(input, diags, output.None)
 	}
 }

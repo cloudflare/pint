@@ -41,8 +41,8 @@ type GitBranchFinder struct {
 	opts          parser.Options
 }
 
-func (f GitBranchFinder) Find(allEntries []*Entry) (entries []*Entry, err error) {
-	changes, err := git.Changes(f.gitCmd, f.baseBranch, f.filter)
+func (f GitBranchFinder) Find(ctx context.Context, allEntries []*Entry) (entries []*Entry, err error) {
+	changes, err := git.Changes(ctx, f.gitCmd, f.baseBranch, f.filter)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (f GitBranchFinder) Find(allEntries []*Entry) (entries []*Entry, err error)
 		return nil, fmt.Errorf("number of commits to check (%d) is higher than maxCommits (%d), exiting", totalCommits, f.maxCommits)
 	}
 
-	shouldSkip, err := f.shouldSkipAllChecks(changes)
+	shouldSkip, err := f.shouldSkipAllChecks(ctx, changes)
 	if err != nil {
 		return nil, err
 	}
@@ -207,7 +207,7 @@ func (f GitBranchFinder) Find(allEntries []*Entry) (entries []*Entry, err error)
 	return allEntries, nil
 }
 
-func (f GitBranchFinder) shouldSkipAllChecks(changes []*git.FileChange) (bool, error) {
+func (f GitBranchFinder) shouldSkipAllChecks(ctx context.Context, changes []*git.FileChange) (bool, error) {
 	commits := map[string]struct{}{}
 	for _, change := range changes {
 		for _, commit := range change.Commits {
@@ -216,7 +216,7 @@ func (f GitBranchFinder) shouldSkipAllChecks(changes []*git.FileChange) (bool, e
 	}
 
 	for commit := range commits {
-		msg, err := git.CommitMessage(f.gitCmd, commit)
+		msg, err := git.CommitMessage(ctx, f.gitCmd, commit)
 		if err != nil {
 			return false, fmt.Errorf("failed to get commit message for %s: %w", commit, err)
 		}

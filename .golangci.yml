@@ -3,7 +3,9 @@ run:
   tests: true
 linters:
   enable:
+    - bodyclose
     - copyloopvar
+    - errcheck
     - errname
     - errorlint
     - exhaustive
@@ -12,18 +14,24 @@ linters:
     - gocritic
     - godot
     - importas
+    - ineffassign
+    - intrange
     - iotamixing
+    - mirror
     - misspell
     - modernize
     - nakedret
     - nilnesserr
+    - noctx
     - perfsprint
     - prealloc
     - predeclared
     - promlinter
     - revive
+    - sloglint
     - testifylint
     - unconvert
+    - unused
     - usetesting
   settings:
     exhaustruct:

@@ -66,8 +66,11 @@ func TestDoRequestErrors(t *testing.T) {
 				}
 				ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 				defer cancel()
-				_, err := prom.doRequest(ctx, tc.method, tc.path, nil)
+				resp, err := prom.doRequest(ctx, tc.method, tc.path, nil)
 				require.Error(t, err)
+				if resp != nil {
+					resp.Body.Close()
+				}
 			}
 		})
 	}

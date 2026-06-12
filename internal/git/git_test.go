@@ -1,6 +1,7 @@
 package git_test
 
 import (
+	"context"
 	"errors"
 	"regexp"
 	"strconv"
@@ -24,7 +25,7 @@ func TestDescribe(t *testing.T) {
 		{
 			// First git command (rev-parse --verify HEAD) fails.
 			name: "head commit command fails",
-			mock: func(_ ...string) ([]byte, error) {
+			mock: func(_ context.Context, _ ...string) ([]byte, error) {
 				return nil, errors.New("mock error")
 			},
 			err: "mock error",
@@ -34,7 +35,7 @@ func TestDescribe(t *testing.T) {
 			name: "current branch command fails",
 			mock: func() git.CommandRunner {
 				var calls int
-				return func(_ ...string) ([]byte, error) {
+				return func(_ context.Context, _ ...string) ([]byte, error) {
 					calls++
 					if calls == 1 {
 						return []byte("abc123\n"), nil
@@ -49,7 +50,7 @@ func TestDescribe(t *testing.T) {
 			name: "both commands succeed",
 			mock: func() git.CommandRunner {
 				var calls int
-				return func(_ ...string) ([]byte, error) {
+				return func(_ context.Context, _ ...string) ([]byte, error) {
 					calls++
 					if calls == 1 {
 						return []byte("abc123\n"), nil
@@ -65,7 +66,7 @@ func TestDescribe(t *testing.T) {
 		{
 			// Both commands succeed with empty output.
 			name: "both commands succeed with empty output",
-			mock: func(_ ...string) ([]byte, error) {
+			mock: func(_ context.Context, _ ...string) ([]byte, error) {
 				return []byte(""), nil
 			},
 			expected: git.Info{
@@ -77,7 +78,7 @@ func TestDescribe(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			info, err := git.Describe(tc.mock)
+			info, err := git.Describe(t.Context(), tc.mock)
 			if tc.err != "" {
 				require.EqualError(t, err, tc.err)
 			} else {
@@ -113,7 +114,7 @@ func TestRunGit(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(strings.Join(tc.args, " "), func(t *testing.T) {
-			output, err := git.RunGit(tc.args...)
+			output, err := git.RunGit(t.Context(), tc.args...)
 			if tc.err != "" {
 				require.EqualError(t, err, tc.err)
 			} else {
@@ -133,27 +134,27 @@ func TestCommitMessage(t *testing.T) {
 
 	testCases := []testCaseT{
 		{
-			mock: func(_ ...string) ([]byte, error) {
+			mock: func(_ context.Context, _ ...string) ([]byte, error) {
 				return nil, errors.New("mock error")
 			},
 			output:      "",
 			shouldError: true,
 		},
 		{
-			mock: func(_ ...string) ([]byte, error) {
+			mock: func(_ context.Context, _ ...string) ([]byte, error) {
 				return []byte(""), nil
 			},
 			output:      "",
 			shouldError: false,
 		},
 		{
-			mock: func(_ ...string) ([]byte, error) {
+			mock: func(_ context.Context, _ ...string) ([]byte, error) {
 				return []byte("foo"), nil
 			},
 			output: "foo",
 		},
 		{
-			mock: func(_ ...string) ([]byte, error) {
+			mock: func(_ context.Context, _ ...string) ([]byte, error) {
 				return []byte("foo bar\n"), nil
 			},
 			output: "foo bar\n",
@@ -162,7 +163,7 @@ func TestCommitMessage(t *testing.T) {
 
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			output, err := git.CommitMessage(tc.mock, "abc1234567890")
+			output, err := git.CommitMessage(t.Context(), tc.mock, "abc1234567890")
 
 			hadError := (err != nil)
 			if hadError != tc.shouldError {

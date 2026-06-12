@@ -210,8 +210,8 @@ type FileChange struct {
 	Status  FileStatus
 }
 
-func Changes(cmd CommandRunner, baseBranch string, filter PathFilter) ([]*FileChange, error) {
-	out, err := cmd("log", "--reverse", "--no-merges", "--first-parent", "--format=%H", "--name-status", baseBranch+"..HEAD")
+func Changes(ctx context.Context, cmd CommandRunner, baseBranch string, filter PathFilter) ([]*FileChange, error) {
+	out, err := cmd(ctx, "log", "--reverse", "--no-merges", "--first-parent", "--format=%H", "--name-status", baseBranch+"..HEAD")
 	if err != nil {
 		return nil, fmt.Errorf("failed to get the list of modified files from git: %w", err)
 	}
@@ -284,16 +284,16 @@ func Changes(cmd CommandRunner, baseBranch string, filter PathFilter) ([]*FileCh
 				change.Path.Before.Name = ""
 				change.Path.Before.SymlinkTarget = ""
 				// If a path changed type we'll see A but we can still query for old type.
-				change.Path.Before.Type = getTypeForPath(cmd, commit+"^", srcPath)
+				change.Path.Before.Type = getTypeForPath(ctx, cmd, commit+"^", srcPath)
 				if change.Path.Before.Type != Missing {
 					// If it was a type change then
 					change.Path.Before.Name = srcPath
-					change.Path.Before.Type = getTypeForPath(cmd, commit+"^", srcPath)
+					change.Path.Before.Type = getTypeForPath(ctx, cmd, commit+"^", srcPath)
 				}
 			case FileDeleted, FileRenamed, FileModified, FileTypeChanged:
 				change.Path.Before.Name = srcPath
-				change.Path.Before.Type = getTypeForPath(cmd, commit+"^", srcPath)
-				change.Path.Before.SymlinkTarget = resolveSymlinkTarget(cmd, commit+"^", srcPath, change.Path.Before.Type)
+				change.Path.Before.Type = getTypeForPath(ctx, cmd, commit+"^", srcPath)
+				change.Path.Before.SymlinkTarget = resolveSymlinkTarget(ctx, cmd, commit+"^", srcPath, change.Path.Before.Type)
 			}
 		}
 
@@ -315,16 +315,16 @@ func Changes(cmd CommandRunner, baseBranch string, filter PathFilter) ([]*FileCh
 		)
 
 		if change.Path.Before.Name != "" {
-			change.Path.Before.Type = getTypeForPath(cmd, change.Commits[0]+"^", change.Path.Before.Name)
-			change.Path.Before.SymlinkTarget = resolveSymlinkTarget(cmd, change.Commits[0]+"^", change.Path.Before.Name, change.Path.Before.Type)
-			change.Body.Before = getContentAtCommit(cmd, change.Commits[0]+"^", change.Path.Before.EffectivePath())
+			change.Path.Before.Type = getTypeForPath(ctx, cmd, change.Commits[0]+"^", change.Path.Before.Name)
+			change.Path.Before.SymlinkTarget = resolveSymlinkTarget(ctx, cmd, change.Commits[0]+"^", change.Path.Before.Name, change.Path.Before.Type)
+			change.Body.Before = getContentAtCommit(ctx, cmd, change.Commits[0]+"^", change.Path.Before.EffectivePath())
 		}
 
 		lastCommit := change.Commits[len(change.Commits)-1]
 		if change.Path.After.Name != "" && change.Status != FileDeleted {
-			change.Path.After.Type = getTypeForPath(cmd, lastCommit, change.Path.After.Name)
-			change.Path.After.SymlinkTarget = resolveSymlinkTarget(cmd, lastCommit, change.Path.After.Name, change.Path.After.Type)
-			change.Body.After = getContentAtCommit(cmd, lastCommit, change.Path.After.EffectivePath())
+			change.Path.After.Type = getTypeForPath(ctx, cmd, lastCommit, change.Path.After.Name)
+			change.Path.After.SymlinkTarget = resolveSymlinkTarget(ctx, cmd, lastCommit, change.Path.After.Name, change.Path.After.Type)
+			change.Body.After = getContentAtCommit(ctx, cmd, lastCommit, change.Path.After.EffectivePath())
 		}
 
 		slog.LogAttrs(
@@ -347,7 +347,7 @@ func Changes(cmd CommandRunner, baseBranch string, filter PathFilter) ([]*FileCh
 			slog.LogAttrs(context.Background(), slog.LevelDebug, "Path was turned into a symlink", slog.String("path", change.Path.After.Name))
 			change.Body.Lines = MakeLineRangeFromTo(1, CountLines(change.Body.After), LinesAfter)
 		case change.Path.Before.Type != Missing && change.Path.After.Type != Missing && change.Path.After.Type != Symlink:
-			change.Body.Lines, err = getModifiedLines(cmd, change.Commits, change.Path.Before.EffectivePath(), change.Path.After.EffectivePath())
+			change.Body.Lines, err = getModifiedLines(ctx, cmd, change.Commits, change.Path.Before.EffectivePath(), change.Path.After.EffectivePath())
 			if err != nil {
 				return nil, fmt.Errorf("failed to run git diff for %s: %w", change.Path.After.EffectivePath(), err)
 			}
@@ -396,7 +396,7 @@ func getChangeByPath(changes []*FileChange, fpath string) *FileChange {
 	return nil
 }
 
-func getModifiedLines(cmd CommandRunner, commits []string, beforePath, afterPath string) (LineNumbers, error) {
+func getModifiedLines(ctx context.Context, cmd CommandRunner, commits []string, beforePath, afterPath string) (LineNumbers, error) {
 	slog.LogAttrs(
 		context.Background(), slog.LevelDebug, "Getting list of modified lines",
 		slog.Any("commits", commits),
@@ -404,7 +404,7 @@ func getModifiedLines(cmd CommandRunner, commits []string, beforePath, afterPath
 		slog.String("afterPath", afterPath),
 	)
 
-	output, err := cmd("diff", "-M", commits[0]+"^.."+commits[len(commits)-1], "--", beforePath, afterPath)
+	output, err := cmd(ctx, "diff", "-M", commits[0]+"^.."+commits[len(commits)-1], "--", beforePath, afterPath)
 	if err != nil {
 		return nil, fmt.Errorf("git diff for %s: %w", afterPath, err)
 	}
@@ -542,9 +542,9 @@ func parseDiff(diff []byte, targetPath string) LineNumbers {
 	return lineNumbers
 }
 
-func getTypeForPath(cmd CommandRunner, commit, fpath string) PathType {
+func getTypeForPath(ctx context.Context, cmd CommandRunner, commit, fpath string) PathType {
 	args := []string{"ls-tree", commit, fpath}
-	out, err := cmd(args...)
+	out, err := cmd(ctx, args...)
 	if err != nil {
 		slog.LogAttrs(context.Background(), slog.LevelDebug, "git command returned an error", slog.Any("err", err), slog.String("args", fmt.Sprint(args)))
 		return Missing
@@ -594,19 +594,19 @@ func getTypeForPath(cmd CommandRunner, commit, fpath string) PathType {
 }
 
 // recursively find the final target of a symlink.
-func resolveSymlinkTarget(cmd CommandRunner, commit, fpath string, pathType PathType) string {
+func resolveSymlinkTarget(ctx context.Context, cmd CommandRunner, commit, fpath string, pathType PathType) string {
 	if pathType != Symlink {
 		return fpath
 	}
-	raw := string(getContentAtCommit(cmd, commit, fpath))
+	raw := string(getContentAtCommit(ctx, cmd, commit, fpath))
 	spath := path.Clean(path.Join(path.Dir(fpath), raw))
-	stype := getTypeForPath(cmd, commit, spath)
-	return resolveSymlinkTarget(cmd, commit, spath, stype)
+	stype := getTypeForPath(ctx, cmd, commit, spath)
+	return resolveSymlinkTarget(ctx, cmd, commit, spath, stype)
 }
 
-func getContentAtCommit(cmd CommandRunner, commit, fpath string) []byte {
+func getContentAtCommit(ctx context.Context, cmd CommandRunner, commit, fpath string) []byte {
 	args := []string{"cat-file", "blob", fmt.Sprintf("%s:%s", commit, fpath)}
-	body, err := cmd(args...)
+	body, err := cmd(ctx, args...)
 	if err != nil {
 		slog.LogAttrs(context.Background(), slog.LevelDebug, "git command returned an error", slog.Any("err", err), slog.String("args", fmt.Sprint(args)))
 		return nil

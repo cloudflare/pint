@@ -68,7 +68,7 @@ func TestReadRules(t *testing.T) {
 			reportedPath: "rules.yml",
 			sourcePath:   "rules.yml",
 			sourceFunc: func(_ *testing.T) io.Reader {
-				return bytes.NewBuffer([]byte("     "))
+				return bytes.NewBufferString("     ")
 			},
 			isStrict: false,
 		},
@@ -77,7 +77,7 @@ func TestReadRules(t *testing.T) {
 			reportedPath: "rules.yml",
 			sourcePath:   "rules.yml",
 			sourceFunc: func(_ *testing.T) io.Reader {
-				return bytes.NewBuffer([]byte("     "))
+				return bytes.NewBufferString("     ")
 			},
 			isStrict: true,
 		},
@@ -86,7 +86,7 @@ func TestReadRules(t *testing.T) {
 			reportedPath: "rules.yml",
 			sourcePath:   "rules.yml",
 			sourceFunc: func(_ *testing.T) io.Reader {
-				return bytes.NewBuffer([]byte("\n\n   # pint file/disable xxx  \n\n"))
+				return bytes.NewBufferString("\n\n   # pint file/disable xxx  \n\n")
 			},
 			isStrict: false,
 		},
@@ -95,12 +95,12 @@ func TestReadRules(t *testing.T) {
 			reportedPath: "rules.yml",
 			sourcePath:   "rules.yml",
 			sourceFunc: func(_ *testing.T) io.Reader {
-				return bytes.NewBuffer([]byte(`
+				return bytes.NewBufferString(`
 # pint file/disable promql/series
 
 - record: foo
   expr: bar
-`))
+`)
 			},
 			isStrict: false,
 			entries: []Entry{
@@ -120,7 +120,7 @@ func TestReadRules(t *testing.T) {
 			reportedPath: "rules.yml",
 			sourcePath:   "rules.yml",
 			sourceFunc: func(_ *testing.T) io.Reader {
-				return bytes.NewBuffer([]byte(`
+				return bytes.NewBufferString(`
 # pint file/disable promql/series
 
 groups:
@@ -128,7 +128,7 @@ groups:
   rules:
   - record: foo
     expr: bar
-`))
+`)
 			},
 			isStrict: true,
 			entries: []Entry{
@@ -148,12 +148,12 @@ groups:
 			reportedPath: "rules.yml",
 			sourcePath:   "rules.yml",
 			sourceFunc: func(_ *testing.T) io.Reader {
-				return bytes.NewBuffer([]byte(`
+				return bytes.NewBufferString(`
 # pint file/snooze 2000-01-01T00:00:00Z promql/series
 
 - record: foo
   expr: bar
-`))
+`)
 			},
 			isStrict: false,
 			entries: []Entry{
@@ -172,7 +172,7 @@ groups:
 			reportedPath: "rules.yml",
 			sourcePath:   "rules.yml",
 			sourceFunc: func(_ *testing.T) io.Reader {
-				return bytes.NewBuffer([]byte(`
+				return bytes.NewBufferString(`
 # pint file/snooze 2000-01-01T00:00:00Z promql/series
 
 groups:
@@ -180,7 +180,7 @@ groups:
   rules:
   - record: foo
     expr: bar
-`))
+`)
 			},
 			isStrict: true,
 			entries: []Entry{
@@ -199,12 +199,12 @@ groups:
 			reportedPath: "rules.yml",
 			sourcePath:   "rules.yml",
 			sourceFunc: func(_ *testing.T) io.Reader {
-				return bytes.NewBuffer([]byte(`
+				return bytes.NewBufferString(`
 # pint file/snooze 2099-01-01T00:00:00Z promql/series
 
 - record: foo
   expr: bar
-`))
+`)
 			},
 			isStrict: false,
 			entries: []Entry{
@@ -224,7 +224,7 @@ groups:
 			reportedPath: "rules.yml",
 			sourcePath:   "rules.yml",
 			sourceFunc: func(_ *testing.T) io.Reader {
-				return bytes.NewBuffer([]byte(`
+				return bytes.NewBufferString(`
 # pint file/snooze 2099-01-01T00:00:00Z promql/series
 
 groups:
@@ -232,7 +232,7 @@ groups:
   rules:
   - record: foo
     expr: bar
-`))
+`)
 			},
 			isStrict: true,
 			entries: []Entry{
@@ -252,12 +252,12 @@ groups:
 			reportedPath: "rules.yml",
 			sourcePath:   "rules.yml",
 			sourceFunc: func(_ *testing.T) io.Reader {
-				return bytes.NewBuffer([]byte(`
+				return bytes.NewBufferString(`
 # pint ignore/file
 
 - record: foo
   expr: bar
-`))
+`)
 			},
 			isStrict: false,
 			entries: []Entry{
@@ -286,7 +286,7 @@ groups:
 			reportedPath: "rules.yml",
 			sourcePath:   "rules.yml",
 			sourceFunc: func(_ *testing.T) io.Reader {
-				return bytes.NewBuffer([]byte(`
+				return bytes.NewBufferString(`
 # pint ignore/file
 
 groups:
@@ -294,7 +294,7 @@ groups:
   rules:
   - record: foo
     expr: bar
-`))
+`)
 			},
 			isStrict: true,
 			entries: []Entry{

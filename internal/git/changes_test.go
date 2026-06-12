@@ -1,6 +1,7 @@
 package git_test
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -16,8 +17,8 @@ import (
 )
 
 func debugGitRun(t *testing.T) git.CommandRunner {
-	return func(args ...string) ([]byte, error) {
-		out, err := git.RunGit(args...)
+	return func(ctx context.Context, args ...string) ([]byte, error) {
+		out, err := git.RunGit(ctx, args...)
 		if err == nil {
 			if len(out) == 0 {
 				t.Logf("%s ~> no stdout", strings.Join(args, " "))
@@ -30,7 +31,7 @@ func debugGitRun(t *testing.T) git.CommandRunner {
 }
 
 func mustRun(t *testing.T, args ...string) {
-	_, err := debugGitRun(t)(args...)
+	_, err := debugGitRun(t)(t.Context(), args...)
 	require.NoError(t, err, strings.Join(args, " "))
 }
 
@@ -54,7 +55,7 @@ func TestChanges(t *testing.T) {
 		{
 			title: "git log error",
 			setup: func(_ *testing.T) git.CommandRunner {
-				cmd := func(args ...string) ([]byte, error) {
+				cmd := func(_ context.Context, args ...string) ([]byte, error) {
 					return nil, fmt.Errorf("mock git error: %v", args)
 				}
 				return cmd
@@ -735,7 +736,7 @@ func TestChanges(t *testing.T) {
 			t.Chdir(dir)
 
 			cmd := tc.setup(t)
-			changes, err := git.Changes(cmd, "main", git.NewPathFilter(nil, nil, nil))
+			changes, err := git.Changes(t.Context(), cmd, "main", git.NewPathFilter(nil, nil, nil))
 			if tc.err != "" {
 				require.EqualError(t, err, tc.err)
 				require.Nil(t, changes)
@@ -764,7 +765,7 @@ func TestChangesParseDiff(t *testing.T) {
 	testCases := []testCaseT{
 		{
 			title: "empty line in git log output",
-			mock: func(args ...string) ([]byte, error) {
+			mock: func(_ context.Context, args ...string) ([]byte, error) {
 				if args[0] == "log" {
 					// Empty line should trigger len(parts) == 0
 					return []byte("abc123\n\nM\tfile.txt\n"), nil
@@ -803,7 +804,7 @@ func TestChangesParseDiff(t *testing.T) {
 		},
 		{
 			title: "ls-tree malformed line - less than 3 space-separated parts",
-			mock: func(args ...string) ([]byte, error) {
+			mock: func(_ context.Context, args ...string) ([]byte, error) {
 				if args[0] == "log" {
 					return []byte("abc123\nA\tnewfile.txt\n"), nil
 				}
@@ -839,7 +840,7 @@ func TestChangesParseDiff(t *testing.T) {
 		},
 		{
 			title: "ls-tree line missing tab separator",
-			mock: func(args ...string) ([]byte, error) {
+			mock: func(_ context.Context, args ...string) ([]byte, error) {
 				if args[0] == "log" {
 					return []byte("abc123\nA\tnewfile.txt\n"), nil
 				}
@@ -875,7 +876,7 @@ func TestChangesParseDiff(t *testing.T) {
 		},
 		{
 			title: "ls-tree returns different path",
-			mock: func(args ...string) ([]byte, error) {
+			mock: func(_ context.Context, args ...string) ([]byte, error) {
 				if args[0] == "log" {
 					return []byte("abc123\nA\tnewfile.txt\n"), nil
 				}
@@ -911,7 +912,7 @@ func TestChangesParseDiff(t *testing.T) {
 		},
 		{
 			title: "ls-tree returns tag object type",
-			mock: func(args ...string) ([]byte, error) {
+			mock: func(_ context.Context, args ...string) ([]byte, error) {
 				if args[0] == "log" {
 					return []byte("abc123\nA\tnewfile.txt\n"), nil
 				}
@@ -949,7 +950,7 @@ func TestChangesParseDiff(t *testing.T) {
 			// git diff command returns an error for a modified file.
 			title: "git diff error",
 			err:   "failed to run git diff for file.txt: git diff for file.txt: mock diff error",
-			mock: func(args ...string) ([]byte, error) {
+			mock: func(_ context.Context, args ...string) ([]byte, error) {
 				if args[0] == "log" {
 					return []byte("abc123\nM\tfile.txt\n"), nil
 				}
@@ -967,7 +968,7 @@ func TestChangesParseDiff(t *testing.T) {
 		},
 		{
 			title: "ls-tree error on before commit",
-			mock: func(args ...string) ([]byte, error) {
+			mock: func(_ context.Context, args ...string) ([]byte, error) {
 				if args[0] == "log" {
 					return []byte("abc123\nM\tfile.txt\n"), nil
 				}
@@ -1017,7 +1018,7 @@ func TestChangesParseDiff(t *testing.T) {
 			// must be treated as deletions/additions, not as diff headers.
 			// The inHunk flag ensures headers are only matched outside hunks.
 			title: "hunk content with triple-dash and triple-plus lines",
-			mock: func(args ...string) ([]byte, error) {
+			mock: func(_ context.Context, args ...string) ([]byte, error) {
 				if args[0] == "log" {
 					return []byte("abc123\nM\tfile.txt\n"), nil
 				}
@@ -1074,7 +1075,7 @@ func TestChangesParseDiff(t *testing.T) {
 		t.Run(tc.title, func(t *testing.T) {
 			slog.SetDefault(slogt.New(t))
 
-			changes, err := git.Changes(tc.mock, "main", git.NewPathFilter(nil, nil, nil))
+			changes, err := git.Changes(t.Context(), tc.mock, "main", git.NewPathFilter(nil, nil, nil))
 			if tc.err != "" {
 				require.EqualError(t, err, tc.err)
 				require.Nil(t, changes)
@@ -1095,7 +1096,7 @@ func TestChangesParseDiff(t *testing.T) {
 func TestChangesPathFilterExclusion(t *testing.T) {
 	slog.SetDefault(slogt.New(t))
 
-	mock := func(args ...string) ([]byte, error) {
+	mock := func(_ context.Context, args ...string) ([]byte, error) {
 		if args[0] == "log" {
 			return []byte("abc123\nM\tfile.txt\nM\texcluded.txt\n"), nil
 		}
@@ -1113,7 +1114,7 @@ func TestChangesPathFilterExclusion(t *testing.T) {
 
 	exclude := []*regexp.Regexp{regexp.MustCompile(`^excluded\.txt$`)}
 	filter := git.NewPathFilter(nil, exclude, nil)
-	changes, err := git.Changes(mock, "main", filter)
+	changes, err := git.Changes(t.Context(), mock, "main", filter)
 	require.NoError(t, err)
 	require.Len(t, changes, 1)
 	require.Equal(t, "file.txt", changes[0].Path.After.Name)
@@ -1125,14 +1126,14 @@ func TestChangesSkipsDirectoryPath(t *testing.T) {
 
 	dir := t.TempDir()
 
-	mock := func(args ...string) ([]byte, error) {
+	mock := func(_ context.Context, args ...string) ([]byte, error) {
 		if args[0] == "log" {
 			return []byte("abc123\nM\t" + dir + "\n"), nil
 		}
 		return nil, nil
 	}
 
-	changes, err := git.Changes(mock, "main", git.NewPathFilter(nil, nil, nil))
+	changes, err := git.Changes(t.Context(), mock, "main", git.NewPathFilter(nil, nil, nil))
 	require.NoError(t, err)
 	require.Empty(t, changes)
 }
