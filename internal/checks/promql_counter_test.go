@@ -48,10 +48,31 @@ func TestCounterCheck(t *testing.T) {
 			},
 		},
 		{
-			description: "counter",
+			description: "counter without metadata",
 			content:     "- alert: my alert\n  expr: http_requests_total\n",
 			checker:     newCounterCheck,
 			prometheus:  newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireMetadataPath},
+					resp:  metadataResponse{metadata: map[string][]v1.Metadata{}},
+				},
+			},
+		},
+		{
+			description: "counter with metadata",
+			content:     "- alert: my alert\n  expr: http_requests_total\n",
+			checker:     newCounterCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireMetadataPath},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{
+						"http_requests_total": {{Type: "counter"}},
+					}},
+				},
+			},
 		},
 		{
 			description: "rate(counter) > 1",

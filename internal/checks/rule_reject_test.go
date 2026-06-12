@@ -76,6 +76,15 @@ func TestRejectCheck(t *testing.T) {
 			problems:   true,
 		},
 		{
+			description: "rejected key / alerting / multiline",
+			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    bad: |\n      bar\n",
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewRejectCheck(true, true, badRe, badRe, checks.Bug)
+			},
+			prometheus: noProm,
+			problems:   true,
+		},
+		{
 			description: "rejected value / alerting",
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bad\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {

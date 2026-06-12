@@ -83,7 +83,7 @@ func (c Reject) reject(rule parser.Rule, label *parser.YamlKeyValue) (problems [
 	if c.keyRe != nil && c.keyRe.MustExpand(rule).MatchString(label.Key.Value) {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
-			Lines:    label.Value.Pos.Lines(),
+			Lines:    label.Key.Pos.Lines(),
 			Reporter: c.Reporter(),
 			Summary:  "key not allowed",
 			Details:  "",

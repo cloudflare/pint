@@ -133,7 +133,7 @@ LOOP:
 
 func (c CounterCheck) needsMetadataCheck(vs *parser.PromQLNode) bool {
 	if vs.Parent == nil {
-		return false
+		return true
 	}
 
 	for _, call := range parser.WalkUpExpr[*promParser.Call](vs.Parent) {

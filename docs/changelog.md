@@ -19,8 +19,6 @@
   labels.
 - Fixed a crash in [promql/aggregate](checks/promql/aggregate.md) when
   `name` regexp is not set.
-- Fixed a crash in [rule/dependency](checks/rule/dependency.md) when
-  another entry has no rule group set.
 - Fixed [alerts/template](checks/alerts/template.md) not populating
   `$annotations` map, causing template expansion to always return
   empty values for annotation references.
@@ -35,6 +33,8 @@
   when both sides of a binary operation are missing a label.
 - Fixed false positive [promql/range_query](checks/promql/range_query.md)
   reports when Prometheus retention flag cannot be parsed.
+- Fixed [promql/counter](checks/promql/counter.md) not checking bare
+  counter metrics used without any wrapping function.
 
 ## v0.85.0
 
