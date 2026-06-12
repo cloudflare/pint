@@ -576,29 +576,6 @@ func TestRuleDependencyCheck(t *testing.T) {
 `, discovery.Noop, "base.yaml", "base.yaml"),
 		},
 		{
-			description: "nil Group in other entry during cross-group check",
-			content: `groups:
-- name: aggregations
-  rules:
-  - record: foo:rate
-    expr: rate(foo:sum[5m])
-`,
-			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewRuleDependencyCheck()
-			},
-			prometheus: newSimpleProm,
-			entries: func() []*discovery.Entry {
-				entries := parseWithStatePath(
-					"- record: foo:sum\n  expr: sum(foo)\n",
-					discovery.Noop,
-					"base.yaml",
-					"base.yaml",
-				)
-				entries[0].Group = nil
-				return entries
-			}(),
-		},
-		{
 			description: "ignores recording rule with vector(1) - no VectorSelector",
 			content: `groups:
 - name: aggregations

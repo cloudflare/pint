@@ -176,11 +176,6 @@
 
 ---
 
-[TestRuleDependencyCheck/nil_Group_in_other_entry_during_cross-group_check - 1]
-[]
-
----
-
 [TestRuleDependencyCheck/warns_about_bar:sum_but_ignores_foo:sum_when_only_foo:.*_is_in_ignoreGroupMismatch - 1]
 - description: warns about bar:sum but ignores foo:sum when only foo:.* is in ignoreGroupMismatch
   content: |

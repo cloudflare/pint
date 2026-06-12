@@ -19,8 +19,6 @@
   labels.
 - Fixed a crash in [promql/aggregate](checks/promql/aggregate.md) when
   `name` regexp is not set.
-- Fixed a crash in [rule/dependency](checks/rule/dependency.md) when
-  another entry has no rule group set.
 - Fixed [alerts/template](checks/alerts/template.md) not populating
   `$annotations` map, causing template expansion to always return
   empty values for annotation references.
