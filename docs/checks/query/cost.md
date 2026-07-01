@@ -30,7 +30,7 @@ Similar to evaluation duration this information comes from Prometheus query stat
 There are two different stats that give us information about the number of samples
 used by given query:
 
-- `totalQueryableSamples` - the total number of samples read during the query execution.
+- `totalQueryableSamples` - the total number of samples loaded/processed by the query engine.
 - `peakSamples` - the max samples kept in memory during the query execution and shows
 how close the query was to reach the `--query.max-samples` limit.
 

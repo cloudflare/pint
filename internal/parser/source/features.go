@@ -190,6 +190,17 @@ func newDefaultFeatures() *Features {
 		StableVersion: ver(0, 0, 0),
 	})
 
+	f.Register("min_of", FeatureVersion{
+		Flag:          FeatureExperimentalFunctions,
+		MinVersion:    ver(3, 13, 0),
+		StableVersion: ver(0, 0, 0),
+	})
+	f.Register("max_of", FeatureVersion{
+		Flag:          FeatureExperimentalFunctions,
+		MinVersion:    ver(3, 13, 0),
+		StableVersion: ver(0, 0, 0),
+	})
+
 	// Experimental aggregation operators behind promql-experimental-functions.
 	f.Register(promParser.ItemTypeStr[promParser.LIMITK], FeatureVersion{
 		Flag:          FeatureExperimentalFunctions,

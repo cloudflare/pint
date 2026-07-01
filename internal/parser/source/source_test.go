@@ -857,6 +857,21 @@ func TestLabelsSourceWithFeatures(t *testing.T) {
 			description: "smoothed with @ modifier in binop",
 			expr:        `rate(foo[5m] smoothed @ 1609459200) + bar`,
 		},
+		// Experimental function: min_of.
+		{
+			description: "min_of function",
+			expr:        `min_of(1, 2)`,
+		},
+		// Experimental function: max_of.
+		{
+			description: "max_of function",
+			expr:        `max_of(1, 2)`,
+		},
+		// Parenthesised negative offset.
+		{
+			description: "parenthesised negative offset",
+			expr:        `foo offset -(5)`,
+		},
 	}
 
 	for _, tc := range testCases {
