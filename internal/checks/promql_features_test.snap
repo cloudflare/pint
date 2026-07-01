@@ -398,6 +398,132 @@
 
 ---
 
+[TestFeaturesCheck/max_of()_missing_feature_flag - 1]
+- description: max_of() missing feature flag
+  content: |
+    - record: foo
+      expr: max_of(1, 2)
+  output: |
+    2 |   expr: max_of(1, 2)
+                ^^^^^^
+                `max_of` requires `--enable-feature=promql-experimental-functions` to be set on `prom`
+                Prometheus server at https://simple.example.com.
+  problem:
+    reporter: promql/features
+    summary: required feature flag not enabled
+    details: |-
+        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+    diagnostics:
+        - message: '`max_of` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
+          firstcolumn: 1
+          lastcolumn: 6
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestFeaturesCheck/max_of()_version_too_old - 1]
+- description: max_of() version too old
+  content: |
+    - record: foo
+      expr: max_of(1, 2)
+  output: |
+    2 |   expr: max_of(1, 2)
+                ^^^^^^
+                `max_of` requires Prometheus 3.13.0 or later but `prom` Prometheus server at
+                https://simple.example.com is running 3.12.0.
+  problem:
+    reporter: promql/features
+    summary: required feature flag not enabled
+    details: |-
+        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+    diagnostics:
+        - message: '`max_of` requires Prometheus 3.13.0 or later but `prom` Prometheus server at https://simple.example.com is running 3.12.0.'
+          firstcolumn: 1
+          lastcolumn: 6
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestFeaturesCheck/max_of()_with_feature_flag_enabled - 1]
+[]
+
+---
+
+[TestFeaturesCheck/min_of()_missing_feature_flag - 1]
+- description: min_of() missing feature flag
+  content: |
+    - record: foo
+      expr: min_of(1, 2)
+  output: |
+    2 |   expr: min_of(1, 2)
+                ^^^^^^
+                `min_of` requires `--enable-feature=promql-experimental-functions` to be set on `prom`
+                Prometheus server at https://simple.example.com.
+  problem:
+    reporter: promql/features
+    summary: required feature flag not enabled
+    details: |-
+        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+    diagnostics:
+        - message: '`min_of` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
+          firstcolumn: 1
+          lastcolumn: 6
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestFeaturesCheck/min_of()_version_too_old - 1]
+- description: min_of() version too old
+  content: |
+    - record: foo
+      expr: min_of(1, 2)
+  output: |
+    2 |   expr: min_of(1, 2)
+                ^^^^^^
+                `min_of` requires Prometheus 3.13.0 or later but `prom` Prometheus server at
+                https://simple.example.com is running 3.12.0.
+  problem:
+    reporter: promql/features
+    summary: required feature flag not enabled
+    details: |-
+        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+    diagnostics:
+        - message: '`min_of` requires Prometheus 3.13.0 or later but `prom` Prometheus server at https://simple.example.com is running 3.12.0.'
+          firstcolumn: 1
+          lastcolumn: 6
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestFeaturesCheck/min_of()_with_feature_flag_enabled - 1]
+[]
+
+---
+
 [TestFeaturesCheck/multiple_features_missing - 1]
 - description: multiple features missing
   content: |

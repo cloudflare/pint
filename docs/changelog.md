@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.87.0
+
+### Added
+
+- Added support for Prometheus v3.13.0 experimental PromQL functions:
+  `min_of()`, `max_of()`.
+
 ## v0.86.0
 
 ### Added

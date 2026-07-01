@@ -785,6 +785,120 @@ func TestFeaturesCheck(t *testing.T) {
 				},
 			},
 		},
+		// Verifies that min_of() produces a problem when the flag is missing.
+		{
+			description: "min_of() missing feature flag",
+			content:     "- record: foo\n  expr: min_of(1, 2)\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp:  flagsResponse{flags: map[string]string{}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.13.0"},
+				},
+			},
+		},
+		// Verifies that min_of() produces no problem when the flag is enabled.
+		{
+			description: "min_of() with feature flag enabled",
+			content:     "- record: foo\n  expr: min_of(1, 2)\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp: flagsResponse{flags: map[string]string{
+						"enable-feature": "promql-experimental-functions",
+					}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.13.0"},
+				},
+			},
+		},
+		// Verifies that min_of() on a version too old produces a problem.
+		{
+			description: "min_of() version too old",
+			content:     "- record: foo\n  expr: min_of(1, 2)\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp: flagsResponse{flags: map[string]string{
+						"enable-feature": "promql-experimental-functions",
+					}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.12.0"},
+				},
+			},
+		},
+		// Verifies that max_of() produces a problem when the flag is missing.
+		{
+			description: "max_of() missing feature flag",
+			content:     "- record: foo\n  expr: max_of(1, 2)\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp:  flagsResponse{flags: map[string]string{}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.13.0"},
+				},
+			},
+		},
+		// Verifies that max_of() produces no problem when the flag is enabled.
+		{
+			description: "max_of() with feature flag enabled",
+			content:     "- record: foo\n  expr: max_of(1, 2)\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp: flagsResponse{flags: map[string]string{
+						"enable-feature": "promql-experimental-functions",
+					}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.13.0"},
+				},
+			},
+		},
+		// Verifies that max_of() on a version too old produces a problem.
+		{
+			description: "max_of() version too old",
+			content:     "- record: foo\n  expr: max_of(1, 2)\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp: flagsResponse{flags: map[string]string{
+						"enable-feature": "promql-experimental-functions",
+					}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.12.0"},
+				},
+			},
+		},
 	}
 	runTests(t, testCases)
 }

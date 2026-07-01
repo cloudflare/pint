@@ -26,7 +26,7 @@ Currently detected features:
 
 - `promql-experimental-functions` - required when using experimental PromQL functions
   such as `mad_over_time`, `sort_by_label`, `sort_by_label_desc`, `info`,
-  `double_exponential_smoothing`, `start`, `end`, `range`, `step`,
+  `double_exponential_smoothing`, `min_of`, `max_of`, `start`, `end`, `range`, `step`,
   `limitk`, `limit_ratio`, and others.
 - `promql-duration-expr` - required when using arithmetic expressions in time durations.
 - `promql-extended-range-selectors` - required when using `anchored` or `smoothed` range selector modifiers.

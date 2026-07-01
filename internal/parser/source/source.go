@@ -1033,7 +1033,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 			nil,
 		)
 
-	case "scalar":
+	case "min_of", "max_of", "scalar":
 		s.Returns = promParser.ValueTypeScalar
 		s.ReturnInfo.AlwaysReturns = true
 		funcPos := FindFuncPosition(expr, n.PositionRange(), n.Func.Name, nil)

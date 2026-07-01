@@ -21731,6 +21731,202 @@ output:
 
 ---
 
+[TestLabelsSourceWithFeatures/max_of_function - 1]
+expr: max_of(1, 2)
+output:
+    - labels:
+        "":
+            reason: Calling `max_of()` will return a scalar value with no labels.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 12
+      returns: scalar
+      operations:
+        - args:
+            - "1"
+            - "2"
+          node: '[*parser.Call] max_of(1, 2)'
+          op: max_of
+      indirect:
+        - src:
+            labels:
+                "":
+                    reason: This query returns a number value with no labels.
+                    kind: excluded
+                    fragment:
+                        start: 7
+                        end: 8
+            returns: scalar
+            returnInfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 7
+                    end: 8
+                returnednumber: 1
+                alwaysreturns: true
+                knownreturn: true
+                isreturnbool: false
+            position:
+                start: 7
+                end: 8
+            type: number
+            fixedLabels: true
+          op: 0
+          side: 0
+        - src:
+            labels:
+                "":
+                    reason: This query returns a number value with no labels.
+                    kind: excluded
+                    fragment:
+                        start: 10
+                        end: 11
+            returns: scalar
+            returnInfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 10
+                    end: 11
+                returnednumber: 2
+                alwaysreturns: true
+                knownreturn: true
+                isreturnbool: false
+            position:
+                start: 10
+                end: 11
+            type: number
+            fixedLabels: true
+          op: 0
+          side: 0
+      needsFeatures:
+        - feature: promql-experimental-functions
+          name: max_of
+          fragments:
+            - start: 0
+              end: 6
+      returnInfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: true
+        knownreturn: false
+        isreturnbool: false
+      position:
+        start: 0
+        end: 12
+      type: function
+      fixedLabels: true
+
+---
+
+[TestLabelsSourceWithFeatures/min_of_function - 1]
+expr: min_of(1, 2)
+output:
+    - labels:
+        "":
+            reason: Calling `min_of()` will return a scalar value with no labels.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 12
+      returns: scalar
+      operations:
+        - args:
+            - "1"
+            - "2"
+          node: '[*parser.Call] min_of(1, 2)'
+          op: min_of
+      indirect:
+        - src:
+            labels:
+                "":
+                    reason: This query returns a number value with no labels.
+                    kind: excluded
+                    fragment:
+                        start: 7
+                        end: 8
+            returns: scalar
+            returnInfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 7
+                    end: 8
+                returnednumber: 1
+                alwaysreturns: true
+                knownreturn: true
+                isreturnbool: false
+            position:
+                start: 7
+                end: 8
+            type: number
+            fixedLabels: true
+          op: 0
+          side: 0
+        - src:
+            labels:
+                "":
+                    reason: This query returns a number value with no labels.
+                    kind: excluded
+                    fragment:
+                        start: 10
+                        end: 11
+            returns: scalar
+            returnInfo:
+                logicalexpr: ""
+                valueposition:
+                    start: 10
+                    end: 11
+                returnednumber: 2
+                alwaysreturns: true
+                knownreturn: true
+                isreturnbool: false
+            position:
+                start: 10
+                end: 11
+            type: number
+            fixedLabels: true
+          op: 0
+          side: 0
+      needsFeatures:
+        - feature: promql-experimental-functions
+          name: min_of
+          fragments:
+            - start: 0
+              end: 6
+      returnInfo:
+        logicalexpr: ""
+        valueposition:
+            start: 0
+            end: 0
+        returnednumber: 0
+        alwaysreturns: true
+        knownreturn: false
+        isreturnbool: false
+      position:
+        start: 0
+        end: 12
+      type: function
+      fixedLabels: true
+
+---
+
+[TestLabelsSourceWithFeatures/parenthesised_negative_offset - 1]
+expr: foo offset -(5)
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo offset -5s'
+          op: ""
+      position:
+        start: 0
+        end: 15
+      type: selector
+
+---
+
 [TestLabelsSourceWithFeatures/range()_inside_duration_expression - 1]
 expr: foo[5m+range()]
 output:
