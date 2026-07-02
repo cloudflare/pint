@@ -72,6 +72,7 @@ var (
 		"externalURL":        dummyFuncMap,
 		"parseDuration":      dummyFuncMap,
 		"urlQueryEscape":     dummyFuncMap,
+		"tmpl":               dummyFuncMap,
 	}
 
 	templatePool = sync.Pool{

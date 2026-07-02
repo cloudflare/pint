@@ -10,6 +10,11 @@
   passed to the `query` template function, reporting syntax errors and result
   labels that the query cannot produce.
 
+### Fixed
+
+- Fixed [alerts/template](checks/alerts/template.md) was missing support for
+  `tmpl` template function.
+
 ## v0.86.0
 
 ### Added
