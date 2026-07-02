@@ -1,4 +1,259 @@
 
+[TestRuleDuplicateCheck/__name___matcher_equivalent_to_metric_name_overlaps - 1]
+- description: __name__ matcher equivalent to metric name overlaps
+  content: |
+    - alert: foo
+      expr: node_load1 > 5
+  output: |
+    1 | - alert: foo
+                 ^^^
+                 This rule uses a different query but it can select the same time series as the `foo` alert
+                 at `fake.yml:2`, which means both rules will create identical alerts that might be
+                 deduplicated, with no way to distinguish between them.
+  problem:
+    reporter: rule/duplicate
+    summary: duplicated alerting rule
+    details: ""
+    diagnostics:
+        - message: This rule uses a different query but it can select the same time series as the `foo` alert at `fake.yml:2`, which means both rules will create identical alerts that might be deduplicated, with no way to distinguish between them.
+          firstcolumn: 1
+          lastcolumn: 3
+          kind: 0
+    lines:
+        first: 1
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRuleDuplicateCheck/aggregations_collapsing_to_a_single_series_collide - 1]
+- description: aggregations collapsing to a single series collide
+  content: |
+    - alert: foo
+      expr: sum(rate(errors[5m])) > 5
+  output: |
+    1 | - alert: foo
+                 ^^^
+                 This rule uses a different query but it can select the same time series as the `foo` alert
+                 at `fake.yml:2`, which means both rules will create identical alerts that might be
+                 deduplicated, with no way to distinguish between them.
+  problem:
+    reporter: rule/duplicate
+    summary: duplicated alerting rule
+    details: ""
+    diagnostics:
+        - message: This rule uses a different query but it can select the same time series as the `foo` alert at `fake.yml:2`, which means both rules will create identical alerts that might be deduplicated, with no way to distinguish between them.
+          firstcolumn: 1
+          lastcolumn: 3
+          kind: 0
+    lines:
+        first: 1
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRuleDuplicateCheck/alerting_rules_with_different_alert_names - 1]
+[]
+
+---
+
+[TestRuleDuplicateCheck/alerting_rules_with_different_labels - 1]
+[]
+
+---
+
+[TestRuleDuplicateCheck/alerting_rules_with_different_metrics - 1]
+[]
+
+---
+
+[TestRuleDuplicateCheck/alerting_rules_with_mismatched_selectors - 1]
+[]
+
+---
+
+[TestRuleDuplicateCheck/alerting_rules_with_overlapping_selectors - 1]
+- description: alerting rules with overlapping selectors
+  content: |
+    - alert: foo
+      expr: salt_function_running_start_time_unix > 5400
+  output: |
+    1 | - alert: foo
+                 ^^^
+                 This rule uses a different query but it can select the same time series as the `foo` alert
+                 at `fake.yml:2`, which means both rules will create identical alerts that might be
+                 deduplicated, with no way to distinguish between them.
+  problem:
+    reporter: rule/duplicate
+    summary: duplicated alerting rule
+    details: ""
+    diagnostics:
+        - message: This rule uses a different query but it can select the same time series as the `foo` alert at `fake.yml:2`, which means both rules will create identical alerts that might be deduplicated, with no way to distinguish between them.
+          firstcolumn: 1
+          lastcolumn: 3
+          kind: 0
+    lines:
+        first: 1
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRuleDuplicateCheck/alerting_rules_with_same_expr_and_labels_but_different_for - 1]
+- description: alerting rules with same expr and labels but different for
+  content: |
+    - alert: foo
+      expr: up == 0
+      for: 5m
+  output: |
+    1 | - alert: foo
+                 ^^^ Duplicated rule, identical rule found in the `foo` alert at `fake.yml:2`.
+  problem:
+    reporter: rule/duplicate
+    summary: duplicated alerting rule
+    details: ""
+    diagnostics:
+        - message: Duplicated rule, identical rule found in the `foo` alert at `fake.yml:2`.
+          firstcolumn: 1
+          lastcolumn: 3
+          kind: 0
+    lines:
+        first: 1
+        last: 3
+    severity: 2
+    anchor: 0
+
+---
+
+[TestRuleDuplicateCheck/alerting_rules_with_same_expr_formatted_differently - 1]
+- description: alerting rules with same expr formatted differently
+  content: |
+    - alert: foo
+      expr: sum(up) by(job) == 0
+  output: |
+    1 | - alert: foo
+                 ^^^ Duplicated rule, identical rule found in the `foo` alert at `fake.yml:2`.
+  problem:
+    reporter: rule/duplicate
+    summary: duplicated alerting rule
+    details: ""
+    diagnostics:
+        - message: Duplicated rule, identical rule found in the `foo` alert at `fake.yml:2`.
+          firstcolumn: 1
+          lastcolumn: 3
+          kind: 0
+    lines:
+        first: 1
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestRuleDuplicateCheck/binary_op_between_two_metrics_with_same_output_labels_collides - 1]
+- description: binary op between two metrics with same output labels collides
+  content: |
+    - alert: foo
+      expr: errors / total > 0.1
+  output: |
+    1 | - alert: foo
+                 ^^^
+                 This rule uses a different query but it can select the same time series as the `foo` alert
+                 at `fake.yml:2`, which means both rules will create identical alerts that might be
+                 deduplicated, with no way to distinguish between them.
+  problem:
+    reporter: rule/duplicate
+    summary: duplicated alerting rule
+    details: ""
+    diagnostics:
+        - message: This rule uses a different query but it can select the same time series as the `foo` alert at `fake.yml:2`, which means both rules will create identical alerts that might be deduplicated, with no way to distinguish between them.
+          firstcolumn: 1
+          lastcolumn: 3
+          kind: 0
+    lines:
+        first: 1
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRuleDuplicateCheck/different_metric_names_never_overlap - 1]
+[]
+
+---
+
+[TestRuleDuplicateCheck/equal_matchers_with_different_values_mismatch - 1]
+[]
+
+---
+
+[TestRuleDuplicateCheck/identical_alerting_rule_for_a_different_Prometheus_is_ignored - 1]
+[]
+
+---
+
+[TestRuleDuplicateCheck/identical_alerting_rule_on_a_different_Prometheus_is_ignored - 1]
+[]
+
+---
+
+[TestRuleDuplicateCheck/identical_alerting_rules - 1]
+- description: identical alerting rules
+  content: |
+    - alert: foo
+      expr: up == 0
+  output: |
+    1 | - alert: foo
+                 ^^^ Duplicated rule, identical rule found in the `foo` alert at `fake.yml:2`.
+  problem:
+    reporter: rule/duplicate
+    summary: duplicated alerting rule
+    details: ""
+    diagnostics:
+        - message: Duplicated rule, identical rule found in the `foo` alert at `fake.yml:2`.
+          firstcolumn: 1
+          lastcolumn: 3
+          kind: 0
+    lines:
+        first: 1
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestRuleDuplicateCheck/identical_alerting_rules_with_same_labels - 1]
+- description: identical alerting rules with same labels
+  content: |
+    - alert: foo
+      expr: up == 0
+      labels:
+        cluster: prod
+  output: |
+    1 | - alert: foo
+                 ^^^ Duplicated rule, identical rule found in the `foo` alert at `fake.yml:2`.
+  problem:
+    reporter: rule/duplicate
+    summary: duplicated alerting rule
+    details: ""
+    diagnostics:
+        - message: Duplicated rule, identical rule found in the `foo` alert at `fake.yml:2`.
+          firstcolumn: 1
+          lastcolumn: 3
+          kind: 0
+    lines:
+        first: 1
+        last: 4
+    severity: 2
+    anchor: 0
+
+---
+
 [TestRuleDuplicateCheck/ignores_different_Prometheus_servers - 1]
 []
 
@@ -25,6 +280,16 @@
 ---
 
 [TestRuleDuplicateCheck/ignores_self - 1]
+[]
+
+---
+
+[TestRuleDuplicateCheck/mismatch_on_one_label_but_overlapping_on_another_is_still_a_mismatch - 1]
+[]
+
+---
+
+[TestRuleDuplicateCheck/multi_selector_expression_is_not_compared - 1]
 []
 
 ---
@@ -64,6 +329,138 @@
 
 ---
 
+[TestRuleDuplicateCheck/negative_matcher_mismatches_equal_matcher - 1]
+[]
+
+---
+
+[TestRuleDuplicateCheck/one_selector_is_a_subset_of_the_other_via_added_matcher - 1]
+- description: one selector is a subset of the other via added matcher
+  content: |
+    - alert: foo
+      expr: node_load1{job="node"} > 5
+  output: |
+    1 | - alert: foo
+                 ^^^
+                 This rule uses a different query but it can select the same time series as the `foo` alert
+                 at `fake.yml:2`, which means both rules will create identical alerts that might be
+                 deduplicated, with no way to distinguish between them.
+  problem:
+    reporter: rule/duplicate
+    summary: duplicated alerting rule
+    details: ""
+    diagnostics:
+        - message: This rule uses a different query but it can select the same time series as the `foo` alert at `fake.yml:2`, which means both rules will create identical alerts that might be deduplicated, with no way to distinguish between them.
+          firstcolumn: 1
+          lastcolumn: 3
+          kind: 0
+    lines:
+        first: 1
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRuleDuplicateCheck/overlapping_selectors_but_different_labels_do_not_match - 1]
+[]
+
+---
+
+[TestRuleDuplicateCheck/overlapping_selectors_with_different_thresholds - 1]
+- description: overlapping selectors with different thresholds
+  content: |
+    - alert: foo
+      expr: node_load1 > 5
+  output: |
+    1 | - alert: foo
+                 ^^^
+                 This rule uses a different query but it can select the same time series as the `foo` alert
+                 at `fake.yml:2`, which means both rules will create identical alerts that might be
+                 deduplicated, with no way to distinguish between them.
+  problem:
+    reporter: rule/duplicate
+    summary: duplicated alerting rule
+    details: ""
+    diagnostics:
+        - message: This rule uses a different query but it can select the same time series as the `foo` alert at `fake.yml:2`, which means both rules will create identical alerts that might be deduplicated, with no way to distinguish between them.
+          firstcolumn: 1
+          lastcolumn: 3
+          kind: 0
+    lines:
+        first: 1
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRuleDuplicateCheck/rate_on_same_metric_but_different_window - 1]
+- description: rate on same metric but different window
+  content: |
+    - alert: foo
+      expr: rate(http_requests[5m]) > 5
+  output: |
+    1 | - alert: foo
+                 ^^^
+                 This rule uses a different query but it can select the same time series as the `foo` alert
+                 at `fake.yml:2`, which means both rules will create identical alerts that might be
+                 deduplicated, with no way to distinguish between them.
+  problem:
+    reporter: rule/duplicate
+    summary: duplicated alerting rule
+    details: ""
+    diagnostics:
+        - message: This rule uses a different query but it can select the same time series as the `foo` alert at `fake.yml:2`, which means both rules will create identical alerts that might be deduplicated, with no way to distinguish between them.
+          firstcolumn: 1
+          lastcolumn: 3
+          kind: 0
+    lines:
+        first: 1
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRuleDuplicateCheck/regexp_matcher_mismatches_equal_matcher - 1]
+[]
+
+---
+
+[TestRuleDuplicateCheck/regexp_matcher_overlaps_equal_matcher - 1]
+- description: regexp matcher overlaps equal matcher
+  content: |
+    - alert: foo
+      expr: up{job=~"api.*"} == 0
+  output: |
+    1 | - alert: foo
+                 ^^^
+                 This rule uses a different query but it can select the same time series as the `foo` alert
+                 at `fake.yml:2`, which means both rules will create identical alerts that might be
+                 deduplicated, with no way to distinguish between them.
+  problem:
+    reporter: rule/duplicate
+    summary: duplicated alerting rule
+    details: ""
+    diagnostics:
+        - message: This rule uses a different query but it can select the same time series as the `foo` alert at `fake.yml:2`, which means both rules will create identical alerts that might be deduplicated, with no way to distinguish between them.
+          firstcolumn: 1
+          lastcolumn: 3
+          kind: 0
+    lines:
+        first: 1
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRuleDuplicateCheck/regexp_only_selectors_are_not_compared - 1]
+[]
+
+---
+
 [TestRuleDuplicateCheck/same_expr_but_formatted_differently - 1]
 - description: same expr but formatted differently
   content: |
@@ -89,6 +486,31 @@
 
 ---
 
+[TestRuleDuplicateCheck/same_rule_deployed_via_symlink_to_same_Prometheus_is_a_duplicate - 1]
+- description: same rule deployed via symlink to same Prometheus is a duplicate
+  content: |
+    - alert: foo
+      expr: up == 0
+  output: |
+    1 | - alert: foo
+                 ^^^ Duplicated rule, identical rule found in the `foo` alert at `fake.yml:1`.
+  problem:
+    reporter: rule/duplicate
+    summary: duplicated alerting rule
+    details: ""
+    diagnostics:
+        - message: Duplicated rule, identical rule found in the `foo` alert at `fake.yml:1`.
+          firstcolumn: 1
+          lastcolumn: 3
+          kind: 0
+    lines:
+        first: 1
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
 [TestRuleDuplicateCheck/skip_alerting_entries - 1]
 []
 
@@ -96,5 +518,33 @@
 
 [TestRuleDuplicateCheck/skip_broken_entries - 1]
 []
+
+---
+
+[TestRuleDuplicateCheck/two_negative_matchers_can_overlap - 1]
+- description: two negative matchers can overlap
+  content: |
+    - alert: foo
+      expr: up{env!="prod"} == 0
+  output: |
+    1 | - alert: foo
+                 ^^^
+                 This rule uses a different query but it can select the same time series as the `foo` alert
+                 at `fake.yml:2`, which means both rules will create identical alerts that might be
+                 deduplicated, with no way to distinguish between them.
+  problem:
+    reporter: rule/duplicate
+    summary: duplicated alerting rule
+    details: ""
+    diagnostics:
+        - message: This rule uses a different query but it can select the same time series as the `foo` alert at `fake.yml:2`, which means both rules will create identical alerts that might be deduplicated, with no way to distinguish between them.
+          firstcolumn: 1
+          lastcolumn: 3
+          kind: 0
+    lines:
+        first: 1
+        last: 2
+    severity: 1
+    anchor: 0
 
 ---
