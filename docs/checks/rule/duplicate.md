@@ -6,7 +6,7 @@ grand_parent: Documentation
 
 # rule/duplicate
 
-This check will find and report any duplicated recording rules.
+This check will find and report duplicated recording and alerting rules.
 
 When Prometheus is configured with two identical recording rules that
 are producing the exact time series it will discard results from one
@@ -20,6 +20,32 @@ msg="Error on ingesting results from rule evaluation with different value but sa
 Duplicated rule itself is not catastrophic but it will cause constant unnecessary
 logs that might hide other issues and can lead to other problems if the
 duplicated rule is later updated, but only in one place, not in both.
+
+The same problem applies to alerting rules. Two alerting rules with the
+same name and labels produce the same `ALERTS` time series, so when both
+fire Prometheus will discard results from one of them and log the warning
+above. This check reports two kinds of duplicated alerting rules:
+
+- rules with an identical query, which always produce the same alerts,
+- rules with different queries that use the same time series and can return
+  the same results. For example when one query is a less specific version of the other:
+
+  ```yaml
+  - alert: Job_Running_For_Too_Long
+    expr: job_duration > 5400
+  - alert: Job_Running_For_Too_Long
+    expr: job_duration{type!="foo"} > 3600
+  ```
+
+  Both rules can match the same series and, when they do, produce two
+  identical alerts, which can be confusing.
+
+This check only compares rules that are loaded by the same Prometheus server,
+based on its `include` and `exclude` configuration. If the same rule is deployed
+to two different Prometheus servers it may or may not produce duplicates based on
+`external_labels` and `alert_relabel_configs` configured for each instance.
+This check only warns about cases where it's clear from the rule itself that
+it overlaps with another rule.
 
 ## Configuration
 
