@@ -9,7 +9,7 @@
         summary: "{{ $value | first }} errors"
   output: |
     5 |     summary: "{{ $value | first }} errors"
-                                  ^^^^^^
+                                  ^^^^^
                                   Template failed to parse with this error: `124: executing "summary" at
                                   <first>: wrong type for value; expected template.queryResult; got
                                   float64`.
@@ -20,7 +20,7 @@
     diagnostics:
         - message: 'Template failed to parse with this error: `124: executing "summary" at <first>: wrong type for value; expected template.queryResult; got float64`.'
           firstcolumn: 13
-          lastcolumn: 18
+          lastcolumn: 17
           kind: 0
     lines:
         first: 5
@@ -39,8 +39,7 @@
                 ^^^^^^^^^^^^^^^^ `rate()` will produce results that are hard for humans to read.
       |   [...]
     5 |     summary: "{{ $value | first }} errors"
-                         ^^^^^^^
-                         Use one of the humanize template functions to make the result more readable.
+                         ^^^^^^ Use one of the humanize template functions to make the result more readable.
   problem:
     reporter: alerts/template
     summary: use humanize filters for the results
@@ -52,7 +51,7 @@
           kind: 1
         - message: Use one of the humanize template functions to make the result more readable.
           firstcolumn: 4
-          lastcolumn: 10
+          lastcolumn: 9
           kind: 0
     lines:
         first: 3
@@ -1296,7 +1295,7 @@
     6 |       line one
     7 |       line two
     8 |       {{ nil }}
-                 ^^^^
+                 ^^^
                  Template failed to parse with this error: `3: executing "summary" at <nil>: nil is not a
                  command`.
   problem:
@@ -1306,7 +1305,7 @@
     diagnostics:
         - message: 'Template failed to parse with this error: `3: executing "summary" at <nil>: nil is not a command`.'
           firstcolumn: 22
-          lastcolumn: 25
+          lastcolumn: 24
           kind: 0
     lines:
         first: 5
@@ -1557,7 +1556,7 @@
                 ^^^^^^^^^^^^^^^^^^^^^^ `rate()` will produce results that are hard for humans to read.
       |   [...]
     5 |     summary: Seeing {{ printf "%f" 2 }}{{ $value }} instances with errors
-                                                  ^^^^^^^
+                                                  ^^^^^^
                                                   Use one of the humanize template functions to make the
                                                   result more readable.
   problem:
@@ -1571,7 +1570,7 @@
           kind: 1
         - message: Use one of the humanize template functions to make the result more readable.
           firstcolumn: 30
-          lastcolumn: 36
+          lastcolumn: 35
           kind: 0
     lines:
         first: 3
@@ -1948,7 +1947,7 @@
                 ^^^^^^^^^^^^^^^^^ `irate()` will produce results that are hard for humans to read.
       |   [...]
     5 |     summary: "Seeing {{ .Value }} errors"
-                                ^^^^^^^
+                                ^^^^^^
                                 Use one of the humanize template functions to make the result more readable.
   problem:
     reporter: alerts/template
@@ -1961,7 +1960,7 @@
           kind: 1
         - message: Use one of the humanize template functions to make the result more readable.
           firstcolumn: 11
-          lastcolumn: 17
+          lastcolumn: 16
           kind: 0
     lines:
         first: 3
@@ -1984,7 +1983,7 @@
                 ^^^^^^^^^^^^^^^^^ `deriv()` will produce results that are hard for humans to read.
       |   [...]
     5 |     summary: "Seeing {{ .Value }} errors"
-                                ^^^^^^^
+                                ^^^^^^
                                 Use one of the humanize template functions to make the result more readable.
   problem:
     reporter: alerts/template
@@ -1997,7 +1996,7 @@
           kind: 1
         - message: Use one of the humanize template functions to make the result more readable.
           firstcolumn: 11
-          lastcolumn: 17
+          lastcolumn: 16
           kind: 0
     lines:
         first: 3
@@ -2020,7 +2019,7 @@
                 ^^^^^^^^^^^^^^^^ `rate()` will produce results that are hard for humans to read.
       |   [...]
     5 |     summary: "Seeing {{ $value }} errors"
-                                ^^^^^^^
+                                ^^^^^^
                                 Use one of the humanize template functions to make the result more readable.
   problem:
     reporter: alerts/template
@@ -2033,7 +2032,7 @@
           kind: 1
         - message: Use one of the humanize template functions to make the result more readable.
           firstcolumn: 11
-          lastcolumn: 17
+          lastcolumn: 16
           kind: 0
     lines:
         first: 3
@@ -2056,9 +2055,9 @@
                 ^^^^^^^^^^^^^^^^ `rate()` will produce results that are hard for humans to read.
       |   [...]
     5 |     summary: "{{ $foo := $value }}{{ $bar := $foo }} Seeing {{ $bar }} errors"
-                                                                       ^^^^^
-          Use one of the humanize template functions to make the result more
-          readable.
+                                                                       ^^^^
+         Use one of the humanize template functions to make the result more
+         readable.
   problem:
     reporter: alerts/template
     summary: use humanize filters for the results
@@ -2070,7 +2069,7 @@
           kind: 1
         - message: Use one of the humanize template functions to make the result more readable.
           firstcolumn: 50
-          lastcolumn: 54
+          lastcolumn: 53
           kind: 0
     lines:
         first: 3
@@ -2148,6 +2147,257 @@
 
 ---
 
+[TestTemplateCheck/template_chain_on_non-query_field - 1]
+[]
+
+---
+
+[TestTemplateCheck/template_piped_query_with_syntax_error - 1]
+- description: template piped query with syntax error
+  content: |4
+
+    - alert: Foo
+      expr: up == 0
+      annotations:
+        summary: |
+          {{ "up xxx" | query | first | value }}
+  output: |
+    6 |       {{ "up xxx" | query | first | value }}
+                            ^^^^^
+                            Template failed to parse with this error: `126: executing "summary" at <query>:
+                            error calling query: 1:4: parse error: unexpected identifier "xxx"`.
+  problem:
+    reporter: alerts/template
+    summary: template syntax error
+    details: Supported template syntax is documented [here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#templating).
+    diagnostics:
+        - message: 'Template failed to parse with this error: `126: executing "summary" at <query>: error calling query: 1:4: parse error: unexpected identifier "xxx"`.'
+          firstcolumn: 15
+          lastcolumn: 19
+          kind: 0
+    lines:
+        first: 5
+        last: 6
+    severity: 3
+    anchor: 0
+
+---
+
+[TestTemplateCheck/template_query_chain_reads_value_not_label - 1]
+[]
+
+---
+
+[TestTemplateCheck/template_query_in_else_branch - 1]
+[]
+
+---
+
+[TestTemplateCheck/template_query_keeps_instance - 1]
+[]
+
+---
+
+[TestTemplateCheck/template_query_label_function_keeps_present_label - 1]
+[]
+
+---
+
+[TestTemplateCheck/template_query_reads_missing_label_twice - 1]
+- description: template query reads missing label twice
+  content: |4
+
+    - alert: Foo
+      expr: up == 0
+      annotations:
+        summary: |
+          {{ range query "sum(up)" }}
+          {{ printf "%s%s" .Labels.instance .Labels.instance }}
+          {{ end }}
+  output: |
+    6 |       {{ range query "sum(up)" }}
+                             ^^^^^^^^^ Query is using aggregation that removes all labels.
+    7 |       {{ printf "%s%s" .Labels.instance .Labels.instance }}
+                               ^^^^^^^^^^^^^^^^
+                               The template query is using `instance` label but the query results won't have
+                               this label.
+    8 |       {{ end }}
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: The template query is using `instance` label but the query results won't have this label.
+          firstcolumn: 46
+          lastcolumn: 61
+          kind: 0
+        - message: Query is using aggregation that removes all labels.
+          firstcolumn: 16
+          lastcolumn: 24
+          kind: 1
+    lines:
+        first: 2
+        last: 8
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/template_query_reads_missing_label_via_first_in_pipe - 1]
+- description: template query reads missing label via first in pipe
+  content: |4
+
+    - alert: Foo
+      expr: up == 0
+      annotations:
+        summary: '{{ (query "sum(up)" | first).Labels.instance }}'
+  output: |
+    5 |     summary: '{{ (query "sum(up)" | first).Labels.instance }}'
+                                                  ^^^^^^^^^^^^^^^^
+                                                  The template query is using `instance` label but the query
+                                                  results won't have this label.
+                                ^^^^^^^^^ Query is using aggregation that removes all labels.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: The template query is using `instance` label but the query results won't have this label.
+          firstcolumn: 29
+          lastcolumn: 44
+          kind: 0
+        - message: Query is using aggregation that removes all labels.
+          firstcolumn: 11
+          lastcolumn: 19
+          kind: 1
+    lines:
+        first: 2
+        last: 5
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/template_query_reads_two_missing_labels - 1]
+- description: template query reads two missing labels
+  content: |4
+
+    - alert: Foo
+      expr: up == 0
+      annotations:
+        summary: |
+          {{ range query "sum(up)" }}
+          {{ .Labels.instance }} {{ .Labels.job }}
+          {{ end }}
+  output: |
+    6 |       {{ range query "sum(up)" }}
+                             ^^^^^^^^^ Query is using aggregation that removes all labels.
+    7 |       {{ .Labels.instance }} {{ .Labels.job }}
+                 ^^^^^^^^^^^^^^^^
+                 The template query is using `instance` label but the query results won't have this label.
+    8 |       {{ end }}
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: The template query is using `instance` label but the query results won't have this label.
+          firstcolumn: 32
+          lastcolumn: 47
+          kind: 0
+        - message: Query is using aggregation that removes all labels.
+          firstcolumn: 16
+          lastcolumn: 24
+          kind: 1
+    lines:
+        first: 2
+        last: 8
+    severity: 2
+    anchor: 0
+- description: template query reads two missing labels
+  content: |4
+
+    - alert: Foo
+      expr: up == 0
+      annotations:
+        summary: |
+          {{ range query "sum(up)" }}
+          {{ .Labels.instance }} {{ .Labels.job }}
+          {{ end }}
+  output: |
+    6 |       {{ range query "sum(up)" }}
+                             ^^^^^^^^^ Query is using aggregation that removes all labels.
+    7 |       {{ .Labels.instance }} {{ .Labels.job }}
+                                        ^^^^^^^^^^^
+                                        The template query is using `job` label but the query results won't
+                                        have this label.
+    8 |       {{ end }}
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: The template query is using `job` label but the query results won't have this label.
+          firstcolumn: 55
+          lastcolumn: 65
+          kind: 0
+        - message: Query is using aggregation that removes all labels.
+          firstcolumn: 16
+          lastcolumn: 24
+          kind: 1
+    lines:
+        first: 2
+        last: 8
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/template_query_removes_instance - 1]
+- description: template query removes instance
+  content: |4
+
+    - alert: Foo
+      expr: up == 0
+      annotations:
+        summary: |
+          {{ with printf "sum(up{job='%s'})" .Labels.job | query }}
+          {{ . | first | label "instance" }}
+          {{ end }}
+  output: |
+    6 |       {{ with printf "sum(up{job='%s'})" .Labels.job | query }}
+                             ^^^^^^^^^^^^^^^^^^^ Query is using aggregation that removes all labels.
+    7 |       {{ . | first | label "instance" }}
+                                   ^^^^^^^^^^
+                                   The template query is using `instance` label but the query results won't
+                                   have this label.
+    8 |       {{ end }}
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: The template query is using `instance` label but the query results won't have this label.
+          firstcolumn: 80
+          lastcolumn: 89
+          kind: 0
+        - message: Query is using aggregation that removes all labels.
+          firstcolumn: 16
+          lastcolumn: 34
+          kind: 1
+    lines:
+        first: 2
+        last: 8
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/template_query_with_absent_keeps_passed_labels - 1]
+[]
+
+---
+
 [TestTemplateCheck/template_query_with_bogus_function - 1]
 - description: template query with bogus function
   content: |4
@@ -2161,10 +2411,10 @@
           {{ end }}
   output: |
     6 |       {{ with printf "suz({job='%s'})" .Labels.job | query }}
-                                                             ^^^^^^
-          Template failed to parse with this error: `159: executing
-          "summary" at <query>: error calling query: 1:1: parse
-          error: unknown function with name "suz"`.
+                                                             ^^^^^
+         Template failed to parse with this error: `159: executing
+         "summary" at <query>: error calling query: 1:1: parse
+         error: unknown function with name "suz"`.
     7 |       {{ . | first | label "instance" }}
     8 |       {{ end }}
   problem:
@@ -2174,7 +2424,42 @@
     diagnostics:
         - message: 'Template failed to parse with this error: `159: executing "summary" at <query>: error calling query: 1:1: parse error: unknown function with name "suz"`.'
           firstcolumn: 48
-          lastcolumn: 53
+          lastcolumn: 52
+          kind: 0
+    lines:
+        first: 5
+        last: 8
+    severity: 3
+    anchor: 0
+
+---
+
+[TestTemplateCheck/template_query_with_bogus_query_in_if - 1]
+- description: template query with bogus query in if
+  content: |4
+
+    - alert: Foo
+      expr: up == 0
+      annotations:
+        summary: |
+          {{ if false }}
+          {{ query "up xxx" }}
+          {{ end }}
+  output: |
+    6 |       {{ if false }}
+    7 |       {{ query "up xxx" }}
+                       ^^^^^^^^
+                       Template query failed to parse with this error: `1:4: parse error: unexpected
+                       identifier "xxx"`.
+    8 |       {{ end }}
+  problem:
+    reporter: alerts/template
+    summary: template query syntax error
+    details: Supported template syntax is documented [here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#templating).
+    diagnostics:
+        - message: 'Template query failed to parse with this error: `1:4: parse error: unexpected identifier "xxx"`.'
+          firstcolumn: 25
+          lastcolumn: 32
           kind: 0
     lines:
         first: 5
@@ -2197,7 +2482,7 @@
           {{ end }}
   output: |
     6 |       {{ range query "up xxx" }}
-                       ^^^^^^^^^^^^^^^
+                       ^^^^^^^^^^^^^^
                        Template failed to parse with this error: `121: executing "summary" at <query "up
                        xxx">: error calling query: 1:4: parse error: unexpected identifier "xxx"`.
     7 |       {{ .Labels.instance }} {{ .Value }}
@@ -2209,13 +2494,64 @@
     diagnostics:
         - message: 'Template failed to parse with this error: `121: executing "summary" at <query "up xxx">: error calling query: 1:4: parse error: unexpected identifier "xxx"`.'
           firstcolumn: 10
-          lastcolumn: 24
+          lastcolumn: 23
           kind: 0
     lines:
         first: 5
         last: 8
     severity: 3
     anchor: 0
+
+---
+
+[TestTemplateCheck/template_query_with_non-printf_var_declaration - 1]
+[]
+
+---
+
+[TestTemplateCheck/template_query_with_on()_removes_unlisted_labels - 1]
+- description: template query with on() removes unlisted labels
+  content: |4
+
+    - alert: Foo
+      expr: up == 0
+      annotations:
+        summary: |
+          {{ range query "foo * on(job) bar" }}
+          {{ .Labels.instance }}
+          {{ end }}
+  output: |
+    6 |       {{ range query "foo * on(job) bar" }}
+                             ^^^^^^^^^^^^^^^^^^^
+                             Query is using one-to-one vector matching with `on(job)`, only labels included
+                             inside `on(...)` will be present on the results.
+    7 |       {{ .Labels.instance }}
+                 ^^^^^^^^^^^^^^^^
+                 The template query is using `instance` label but the query results won't have this label.
+    8 |       {{ end }}
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: The template query is using `instance` label but the query results won't have this label.
+          firstcolumn: 42
+          lastcolumn: 57
+          kind: 0
+        - message: Query is using one-to-one vector matching with `on(job)`, only labels included inside `on(...)` will be present on the results.
+          firstcolumn: 16
+          lastcolumn: 34
+          kind: 1
+    lines:
+        first: 2
+        last: 8
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/template_query_with_piped_var_declaration - 1]
+[]
 
 ---
 
@@ -2232,10 +2568,10 @@
           {{ end }}
   output: |
     6 |       {{ with printf "sum({job='%s'}) by(" .Labels.job | query }}
-                                                                 ^^^^^^
-              Template failed to parse with this error: `163: executing
-              "summary" at <query>: error calling query: 1:18: parse error:
-              unclosed left parenthesis`.
+                                                                 ^^^^^
+             Template failed to parse with this error: `163: executing
+             "summary" at <query>: error calling query: 1:18: parse error:
+             unclosed left parenthesis`.
     7 |       {{ . | first | label "instance" }}
     8 |       {{ end }}
   problem:
@@ -2245,7 +2581,7 @@
     diagnostics:
         - message: 'Template failed to parse with this error: `163: executing "summary" at <query>: error calling query: 1:18: parse error: unclosed left parenthesis`.'
           firstcolumn: 52
-          lastcolumn: 57
+          lastcolumn: 56
           kind: 0
     lines:
         first: 5
@@ -2257,6 +2593,104 @@
 
 [TestTemplateCheck/template_query_with_valid_expr - 1]
 []
+
+---
+
+[TestTemplateCheck/template_query_with_valid_piped_string - 1]
+[]
+
+---
+
+[TestTemplateCheck/template_query_with_valid_printf - 1]
+[]
+
+---
+
+[TestTemplateCheck/template_query_with_valid_string - 1]
+[]
+
+---
+
+[TestTemplateCheck/template_query_with_var - 1]
+[]
+
+---
+
+[TestTemplateCheck/template_query_with_vector(0)_removes_labels - 1]
+- description: template query with vector(0) removes labels
+  content: |4
+
+    - alert: Foo
+      expr: up == 0
+      annotations:
+        summary: |
+          {{ range query "vector(0)" }}
+          {{ .Labels.instance }}
+          {{ end }}
+  output: |
+    6 |       {{ range query "vector(0)" }}
+                             ^^^^^^^^^^^ Calling `vector()` will return a vector value with no labels.
+    7 |       {{ .Labels.instance }}
+                 ^^^^^^^^^^^^^^^^
+                 The template query is using `instance` label but the query results won't have this label.
+    8 |       {{ end }}
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: The template query is using `instance` label but the query results won't have this label.
+          firstcolumn: 34
+          lastcolumn: 49
+          kind: 0
+        - message: Calling `vector()` will return a vector value with no labels.
+          firstcolumn: 16
+          lastcolumn: 26
+          kind: 1
+    lines:
+        first: 2
+        last: 8
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/template_range_query_removes_instance - 1]
+- description: template range query removes instance
+  content: |4
+
+    - alert: Foo
+      expr: up == 0
+      annotations:
+        summary: |
+          {{ range query "sum(up)" }}
+          {{ .Labels.instance }} {{ .Value }}
+          {{ end }}
+  output: |
+    6 |       {{ range query "sum(up)" }}
+                             ^^^^^^^^^ Query is using aggregation that removes all labels.
+    7 |       {{ .Labels.instance }} {{ .Value }}
+                 ^^^^^^^^^^^^^^^^
+                 The template query is using `instance` label but the query results won't have this label.
+    8 |       {{ end }}
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: The template query is using `instance` label but the query results won't have this label.
+          firstcolumn: 32
+          lastcolumn: 47
+          kind: 0
+        - message: Query is using aggregation that removes all labels.
+          firstcolumn: 16
+          lastcolumn: 24
+          kind: 1
+    lines:
+        first: 2
+        last: 8
+    severity: 2
+    anchor: 0
 
 ---
 

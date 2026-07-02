@@ -77,7 +77,7 @@ Information: use humanize filters for the results (alerts/template)
                  ^^^^^^^^^^^^^^^^ `rate()` will produce results that are hard for humans to read.
    |   [...]
 61 |     summary: 'error rate: {{ $value }}'
-                                  ^^^^^^^
+                                  ^^^^^^
                                   Use one of the humanize template functions to make the result more
                                   readable.
 

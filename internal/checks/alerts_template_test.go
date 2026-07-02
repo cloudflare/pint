@@ -594,34 +594,288 @@ func TestTemplateCheck(t *testing.T) {
 			checker:    newTemplateCheck,
 			prometheus: noProm,
 		},
-		/*
-					TODO
-					{
-						description: "template query removes instance",
-						content: `
-			- alert: Foo
-			  expr: up == 0
-			  annotations:
-			    summary: |
-			      {{ with printf "sum({job='%s'})" .Labels.job | query }}
-			      {{ . | first | label "instance" }}
-			      {{ end }}
-			`,
-						checker:    newTemplateCheck,
-						prometheus: noProm,
-						problems: func(_ string) []checks.Problem {
-							return []checks.Problem{
-								{
-												    {{ with printf "sum({job='%s'})" .Labels.job | query }}
-			    {{ . | first | label "instance" }}`,
-									Reporter: checks.TemplateCheckName,
-									Text:     `"summary" annotation template sends a query that is using "instance" label but that query removes it`,
-									Severity: checks.Bug,
-								},
-							}
-						},
-					},
-		*/
+		{
+			description: "template query with bogus query in if",
+			content: `
+- alert: Foo
+  expr: up == 0
+  annotations:
+    summary: |
+      {{ if false }}
+      {{ query "up xxx" }}
+      {{ end }}
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   true,
+		},
+		{
+			description: "template query with valid string",
+			content: `
+- alert: Foo
+  expr: up == 0
+  annotations:
+    summary: Instance {{ query "up" | first | value }} is down
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+		},
+		{
+			description: "template query with valid piped string",
+			content: `
+- alert: Foo
+  expr: up == 0
+  annotations:
+    summary: Instance {{ "up" | query | first | value }} is down
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+		},
+		{
+			description: "template query with valid printf",
+			content: `
+- alert: Foo
+  expr: up{job="bar"} == 0
+  annotations:
+    summary: Instance {{ printf "up{job='%s'}" $labels.job | query | first | value }} is down
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+		},
+		{
+			description: "template query removes instance",
+			content: `
+- alert: Foo
+  expr: up == 0
+  annotations:
+    summary: |
+      {{ with printf "sum(up{job='%s'})" .Labels.job | query }}
+      {{ . | first | label "instance" }}
+      {{ end }}
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   true,
+		},
+		{
+			description: "template query keeps instance",
+			content: `
+- alert: Foo
+  expr: up == 0
+  annotations:
+    summary: |
+      {{ with query "sum(up) by(instance)" }}
+      {{ . | first | label "instance" }}
+      {{ end }}
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+		},
+		{
+			description: "template range query removes instance",
+			content: `
+- alert: Foo
+  expr: up == 0
+  annotations:
+    summary: |
+      {{ range query "sum(up)" }}
+      {{ .Labels.instance }} {{ .Value }}
+      {{ end }}
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   true,
+		},
+		{
+			description: "template query with var",
+			content: `
+- alert: Foo
+  expr: up == 0
+  annotations:
+    summary: |
+      {{ $q := "up" }}
+      {{ query $q | first | value }}
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+		},
+		{
+			description: "template query reads missing label twice",
+			content: `
+- alert: Foo
+  expr: up == 0
+  annotations:
+    summary: |
+      {{ range query "sum(up)" }}
+      {{ printf "%s%s" .Labels.instance .Labels.instance }}
+      {{ end }}
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   true,
+		},
+		{
+			description: "template query in else branch",
+			content: `
+- alert: Foo
+  expr: up == 0
+  annotations:
+    summary: |
+      {{ if false }}
+      nothing
+      {{ else }}
+      {{ query "up" | first | value }}
+      {{ end }}
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+		},
+		{
+			description: "template query with piped var declaration",
+			content: `
+- alert: Foo
+  expr: up == 0
+  annotations:
+    summary: |
+      {{ $q := "up" | toUpper }}
+      {{ query "up" | first | value }}
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+		},
+		{
+			description: "template query with non-printf var declaration",
+			content: `
+- alert: Foo
+  expr: up == 0
+  annotations:
+    summary: |
+      {{ $q := and "up" "up" }}
+      {{ query "up" | first | value }}
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+		},
+		{
+			description: "template piped query with syntax error",
+			content: `
+- alert: Foo
+  expr: up == 0
+  annotations:
+    summary: |
+      {{ "up xxx" | query | first | value }}
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   true,
+		},
+		{
+			description: "template query reads missing label via first in pipe",
+			content: `
+- alert: Foo
+  expr: up == 0
+  annotations:
+    summary: '{{ (query "sum(up)" | first).Labels.instance }}'
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   true,
+		},
+		{
+			description: "template chain on non-query field",
+			content: `
+- alert: Foo
+  expr: up == 0
+  annotations:
+    summary: '{{ (.Labels).instance }}'
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+		},
+		{
+			description: "template query chain reads value not label",
+			content: `
+- alert: Foo
+  expr: up == 0
+  annotations:
+    summary: '{{ (query "up" | first).Value }}'
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+		},
+		{
+			description: "template query reads two missing labels",
+			content: `
+- alert: Foo
+  expr: up == 0
+  annotations:
+    summary: |
+      {{ range query "sum(up)" }}
+      {{ .Labels.instance }} {{ .Labels.job }}
+      {{ end }}
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   true,
+		},
+		{
+			description: "template query with vector(0) removes labels",
+			content: `
+- alert: Foo
+  expr: up == 0
+  annotations:
+    summary: |
+      {{ range query "vector(0)" }}
+      {{ .Labels.instance }}
+      {{ end }}
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   true,
+		},
+		{
+			description: "template query with absent keeps passed labels",
+			content: `
+- alert: Foo
+  expr: up == 0
+  annotations:
+    summary: |
+      {{ range query "absent(up{job=\"foo\"})" }}
+      {{ .Labels.job }}
+      {{ end }}
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+		},
+		{
+			description: "template query with on() removes unlisted labels",
+			content: `
+- alert: Foo
+  expr: up == 0
+  annotations:
+    summary: |
+      {{ range query "foo * on(job) bar" }}
+      {{ .Labels.instance }}
+      {{ end }}
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   true,
+		},
+		{
+			description: "template query label function keeps present label",
+			content: `
+- alert: Foo
+  expr: up == 0
+  annotations:
+    summary: |
+      {{ with query "sum(up) by(instance)" }}
+      {{ . | first | label "instance" }}
+      {{ end }}
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+		},
 		{
 			description: "sub aggregation",
 			content: `

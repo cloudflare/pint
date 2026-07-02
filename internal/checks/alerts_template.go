@@ -17,6 +17,7 @@ import (
 	"github.com/prometheus/prometheus/model/timestamp"
 	"github.com/prometheus/prometheus/promql"
 	promParser "github.com/prometheus/prometheus/promql/parser"
+	"github.com/prometheus/prometheus/promql/parser/posrange"
 	promTemplate "github.com/prometheus/prometheus/template"
 
 	"github.com/cloudflare/pint/internal/diags"
@@ -128,100 +129,94 @@ func (c TemplateCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*d
 	data := promTemplate.AlertTemplateData(map[string]string{}, map[string]string{}, "", promql.Sample{})
 
 	for _, label := range entry.Labels().Items {
-		if err := checkTemplateSyntax(ctx, label.Key.Value, label.Value.Value, data); err != nil {
-			firstCol := 1
-			lastCol := len(label.Value.Value)
-			if terr, ok := errors.AsType[templateError](err); ok {
-				firstCol = terr.firstCol
-				lastCol = terr.lastCol
-			}
-			problems = append(problems, Problem{
-				Anchor: AnchorAfter,
-				Lines: diags.LineRange{
-					First: label.Key.Pos.Lines().First,
-					Last:  label.Value.Pos.Lines().Last,
-				},
-				Reporter: c.Reporter(),
-				Summary:  "template syntax error",
-				Details:  TemplateCheckSyntaxDetails,
-				Severity: Fatal,
-				Diagnostics: []diags.Diagnostic{
-					{
-						Message:     fmt.Sprintf("Template failed to parse with this error: `%s`.", err),
-						Pos:         label.Value.Pos,
-						Expr:        nil,
-						FirstColumn: firstCol,
-						LastColumn:  lastCol,
-						Kind:        diags.Issue,
-					},
-				},
-			})
+		meta := analyzeTemplate(label.Value.Value)
+		if syntaxErr, ok := c.checkSyntax(ctx, label, data); ok {
+			problems = append(problems, syntaxErr)
+		} else {
+			problems = append(problems, c.checkTemplateQueries(entry.Rule, label, meta)...)
 		}
-		la := analyzeTemplate(label.Value.Value)
-		for _, msg := range checkForValueInLabels(la) {
-			problems = append(problems, Problem{
-				Anchor: AnchorAfter,
-				Lines: diags.LineRange{
-					First: label.Key.Pos.Lines().First,
-					Last:  label.Value.Pos.Lines().Last,
-				},
-				Reporter: c.Reporter(),
-				Summary:  "value used in labels",
-				Details:  "",
-				Severity: Bug,
-				Diagnostics: []diags.Diagnostic{
-					{
-						Message:     msg,
-						Pos:         label.Value.Pos,
-						Expr:        nil,
-						FirstColumn: 1,
-						LastColumn:  len(label.Value.Value),
-						Kind:        diags.Issue,
-					},
-				},
-			})
-		}
-
-		problems = append(problems, c.checkQueryLabels(entry.Group, entry.Rule, label, src, la)...)
+		problems = append(problems, c.checkValueInLabels(label, meta)...)
+		problems = append(problems, c.checkQueryLabels(entry.Group, entry.Rule, label, src, meta)...)
 	}
 
 	if entry.Rule.AlertingRule.Annotations != nil {
 		for _, annotation := range entry.Rule.AlertingRule.Annotations.Items {
-			if err := checkTemplateSyntax(ctx, annotation.Key.Value, annotation.Value.Value, data); err != nil {
-				firstCol := 1
-				lastCol := len(annotation.Value.Value)
-				if terr, ok := errors.AsType[templateError](err); ok {
-					firstCol = terr.firstCol
-					lastCol = terr.lastCol
-				}
-				problems = append(problems, Problem{
-					Anchor: AnchorAfter,
-					Lines: diags.LineRange{
-						First: annotation.Key.Pos.Lines().First,
-						Last:  annotation.Value.Pos.Lines().Last,
-					},
-					Reporter: c.Reporter(),
-					Summary:  "template syntax error",
-					Details:  TemplateCheckSyntaxDetails,
-					Severity: Fatal,
-					Diagnostics: []diags.Diagnostic{
-						{
-							Message:     fmt.Sprintf("Template failed to parse with this error: `%s`.", err),
-							Pos:         annotation.Value.Pos,
-							Expr:        nil,
-							FirstColumn: firstCol,
-							LastColumn:  lastCol,
-							Kind:        diags.Issue,
-						},
-					},
-				})
+			meta := analyzeTemplate(annotation.Value.Value)
+			if syntaxErr, ok := c.checkSyntax(ctx, annotation, data); ok {
+				problems = append(problems, syntaxErr)
+			} else {
+				problems = append(problems, c.checkTemplateQueries(entry.Rule, annotation, meta)...)
 			}
-			aa := analyzeTemplate(annotation.Value.Value)
-			problems = append(problems, c.checkQueryLabels(entry.Group, entry.Rule, annotation, src, aa)...)
-			problems = append(problems, c.checkHumanizeIsNeeded(entry.Rule.AlertingRule.Expr, annotation, aa)...)
+			problems = append(problems, c.checkQueryLabels(entry.Group, entry.Rule, annotation, src, meta)...)
+			problems = append(problems, c.checkHumanizeIsNeeded(entry.Rule.AlertingRule.Expr, annotation, meta)...)
 		}
 	}
 
+	return problems
+}
+
+// checkSyntax validates that a label/annotation template parses and expands.
+// It returns a Fatal problem and true when parsing fails, or false when the
+// template is valid.
+func (c TemplateCheck) checkSyntax(ctx context.Context, kv *parser.YamlKeyValue, data any) (problem Problem, found bool) {
+	err := checkTemplateSyntax(ctx, kv.Key.Value, kv.Value.Value, data)
+	if err == nil {
+		return problem, false
+	}
+
+	firstCol, lastCol := 1, len(kv.Value.Value)
+	if terr, ok := errors.AsType[templateError](err); ok {
+		firstCol, lastCol = terr.firstCol, terr.lastCol
+	}
+	return Problem{
+		Anchor: AnchorAfter,
+		Lines: diags.LineRange{
+			First: kv.Key.Pos.Lines().First,
+			Last:  kv.Value.Pos.Lines().Last,
+		},
+		Reporter: c.Reporter(),
+		Summary:  "template syntax error",
+		Details:  TemplateCheckSyntaxDetails,
+		Severity: Fatal,
+		Diagnostics: []diags.Diagnostic{
+			{
+				Message:     fmt.Sprintf("Template failed to parse with this error: `%s`.", err),
+				Pos:         kv.Value.Pos,
+				Expr:        nil,
+				FirstColumn: firstCol,
+				LastColumn:  lastCol,
+				Kind:        diags.Issue,
+			},
+		},
+	}, true
+}
+
+// checkValueInLabels reports labels whose value depends on the query result,
+// which would create a new alert identity on every value change.
+func (c TemplateCheck) checkValueInLabels(label *parser.YamlKeyValue, meta templateMeta) (problems []Problem) {
+	for _, msg := range checkForValueInLabels(meta) {
+		problems = append(problems, Problem{
+			Anchor: AnchorAfter,
+			Lines: diags.LineRange{
+				First: label.Key.Pos.Lines().First,
+				Last:  label.Value.Pos.Lines().Last,
+			},
+			Reporter: c.Reporter(),
+			Summary:  "value used in labels",
+			Details:  "",
+			Severity: Bug,
+			Diagnostics: []diags.Diagnostic{
+				{
+					Message:     msg,
+					Pos:         label.Value.Pos,
+					Expr:        nil,
+					FirstColumn: 1,
+					LastColumn:  len(label.Value.Value),
+					Kind:        diags.Issue,
+				},
+			},
+		})
+	}
 	return problems
 }
 
@@ -258,7 +253,7 @@ func (c TemplateCheck) checkHumanizeIsNeeded(expr parser.PromQLExpr, ann *parser
 							Pos:         ann.Value.Pos,
 							Expr:        nil,
 							FirstColumn: v.column,
-							LastColumn:  v.column + len(v.value[0]),
+							LastColumn:  v.column + len(v.value[0]) - 1,
 							Kind:        diags.Issue,
 						})
 					}
@@ -380,7 +375,7 @@ func newTemplateError(rawErr error, name, text string) templateError {
 	if tokenM := templateErrorTokenRe.FindStringSubmatch(msg); tokenM != nil {
 		if idx := strings.Index(text[pos:], tokenM[1]); idx >= 0 {
 			te.firstCol = pos + idx + 1
-			te.lastCol = pos + idx + len(tokenM[1]) + 1
+			te.lastCol = pos + idx + len(tokenM[1])
 		}
 	}
 
@@ -416,39 +411,57 @@ func checkTemplateSyntax(ctx context.Context, name, text string, data any) error
 type templateMeta struct {
 	aliases     aliasMap
 	vars        []tmplVar
+	uses        []templateQueryUse
 	hasValue    bool
 	hasHumanize bool
 	isValid     bool
 }
 
-func analyzeTemplate(text string) templateMeta {
+// parseTemplate parses a label or annotation value and calls fn with the
+// result. ok is false if it can't be parsed.
+func parseTemplate(text string, fn func(*textTemplate.Template)) (ok bool) {
 	t := templatePool.Get().(*textTemplate.Template)
 	defer templatePool.Put(t)
 
 	tt, err := t.Parse(templateDefsString + text)
 	if err != nil {
+		return false
+	}
+	fn(tt)
+	return true
+}
+
+func analyzeTemplate(text string) templateMeta {
+	var meta templateMeta
+	ok := parseTemplate(text, func(tt *textTemplate.Template) {
+		aliases := aliasesForTemplate(tt)
+		vars := make([]tmplVar, 0, len(tt.Root.Nodes))
+		for _, node := range tt.Root.Nodes {
+			vars = append(vars, getVariables(node)...)
+		}
+		meta = templateMeta{
+			aliases: aliases,
+			vars:    vars,
+			uses: walkTemplateNode(tt.Root, queryScope{
+				aliases: map[string]templateQuery{},
+				dot:     nil,
+			}),
+			hasValue:    hasValue(tt, aliases),
+			hasHumanize: hasHumanize(tt, aliases),
+			isValid:     true,
+		}
+	})
+	if !ok {
 		return templateMeta{
 			aliases:     aliasMap{aliases: nil},
 			vars:        nil,
+			uses:        nil,
 			hasValue:    false,
 			hasHumanize: false,
 			isValid:     false,
 		}
 	}
-
-	aliases := aliasesForTemplate(tt)
-	var vars []tmplVar
-	for _, node := range tt.Root.Nodes {
-		vars = append(vars, getVariables(node)...)
-	}
-
-	return templateMeta{
-		aliases:     aliases,
-		vars:        vars,
-		hasValue:    hasValue(tt, aliases),
-		hasHumanize: hasHumanize(tt, aliases),
-		isValid:     true,
-	}
+	return meta
 }
 
 func checkForValueInLabels(a templateMeta) (msgs []string) {
@@ -587,22 +600,41 @@ func getVariables(node parse.Node) (vars []tmplVar) {
 }
 
 func findTemplateVariables(_, text string) (vars []tmplVar, aliases aliasMap, ok bool) {
-	t := templatePool.Get().(*textTemplate.Template)
-	defer templatePool.Put(t)
-
-	tt, err := t.Parse(templateDefsString + text)
-	if err != nil {
-		// no need to double report errors
-		return vars, aliases, false
-	}
-
 	aliases.aliases = map[string]map[string]struct{}{}
-	for _, node := range tt.Root.Nodes {
-		getAliases(node, &aliases)
-		vars = append(vars, getVariables(node)...)
-	}
+	ok = parseTemplate(text, func(tt *textTemplate.Template) {
+		for _, node := range tt.Root.Nodes {
+			getAliases(node, &aliases)
+			vars = append(vars, getVariables(node)...)
+		}
+	})
+	return vars, aliases, ok
+}
 
-	return vars, aliases, true
+// missingLabel checks if none of the sources can return the given label. If so
+// it returns why and where in the query. ok is false if any source can have it.
+func missingLabel(src []*source.Source, name string) (reason string, fragment posrange.PositionRange, ok bool) {
+	for _, s := range src {
+		if s.DeadInfo != nil || s.CanHaveLabel(name) {
+			continue
+		}
+		reason, fragment = s.LabelExcludeReason(name)
+		return reason, fragment, true
+	}
+	return "", posrange.PositionRange{}, false
+}
+
+// nonExistentLabelProblem builds the "template uses non-existent label" problem
+// shared by both label checks.
+func (c TemplateCheck) nonExistentLabelProblem(rule parser.Rule, issue, context diags.Diagnostic) Problem {
+	return Problem{
+		Anchor:      AnchorAfter,
+		Lines:       rule.Lines,
+		Reporter:    c.Reporter(),
+		Summary:     "template uses non-existent label",
+		Details:     "",
+		Severity:    Bug,
+		Diagnostics: []diags.Diagnostic{issue, context},
+	}
 }
 
 func (c TemplateCheck) checkQueryLabels(group *parser.Group, rule parser.Rule, label *parser.YamlKeyValue, src []*source.Source, a templateMeta) (problems []Problem) {
@@ -613,53 +645,42 @@ func (c TemplateCheck) checkQueryLabels(group *parser.Group, rule parser.Rule, l
 	done := map[string]struct{}{}
 	labelsAliases := a.aliases.varAliases(".Labels")
 	for _, v := range a.vars {
-		for _, la := range labelsAliases {
-			if len(v.value) > 1 && v.value[0] == la {
-				if _, ok := done[v.value[1]]; ok {
-					continue
-				}
-				if group != nil && group.Labels != nil && group.Labels.GetValue(v.value[1]) != nil {
-					goto NEXT
-				}
-				for _, s := range src {
-					if s.DeadInfo != nil {
-						continue
-					}
-					if !s.CanHaveLabel(v.value[1]) {
-						reason, fragment := s.LabelExcludeReason(v.value[1])
-						problems = append(problems, Problem{
-							Anchor:   AnchorAfter,
-							Lines:    rule.Lines,
-							Reporter: c.Reporter(),
-							Summary:  "template uses non-existent label",
-							Details:  "",
-							Severity: Bug,
-							Diagnostics: []diags.Diagnostic{
-								{
-									Message:     fmt.Sprintf("The template is using `%s` label but the query results won't have this label.", v.value[1]),
-									Pos:         label.Value.Pos,
-									Expr:        nil,
-									FirstColumn: v.column,
-									LastColumn:  v.column + len(v.value[1]),
-									Kind:        diags.Issue,
-								},
-								{
-									Message:     reason,
-									Pos:         rule.AlertingRule.Expr.Value.Pos,
-									Expr:        rule.Expr().Query().Expr,
-									FirstColumn: int(fragment.Start) + 1,
-									LastColumn:  int(fragment.End),
-									Kind:        diags.Context,
-								},
-							},
-						})
-						goto NEXT
-					}
-				}
-			NEXT:
-				done[v.value[1]] = struct{}{}
-			}
+		// We need both the .Labels alias and the label name after it: .Labels.instance.
+		if len(v.value) < 2 || !slices.Contains(labelsAliases, v.value[0]) {
+			continue
 		}
+		name := v.value[1]
+		if _, ok := done[name]; ok {
+			continue
+		}
+		done[name] = struct{}{}
+
+		if group != nil && group.Labels != nil && group.Labels.GetValue(name) != nil {
+			continue
+		}
+		reason, fragment, ok := missingLabel(src, name)
+		if !ok {
+			continue
+		}
+		problems = append(problems, c.nonExistentLabelProblem(
+			rule,
+			diags.Diagnostic{
+				Message:     fmt.Sprintf("The template is using `%s` label but the query results won't have this label.", name),
+				Pos:         label.Value.Pos,
+				Expr:        nil,
+				FirstColumn: v.column,
+				LastColumn:  v.column + len(name),
+				Kind:        diags.Issue,
+			},
+			diags.Diagnostic{
+				Message:     reason,
+				Pos:         rule.AlertingRule.Expr.Value.Pos,
+				Expr:        rule.Expr().Query().Expr,
+				FirstColumn: int(fragment.Start) + 1,
+				LastColumn:  int(fragment.End),
+				Kind:        diags.Context,
+			},
+		))
 	}
 
 	return problems

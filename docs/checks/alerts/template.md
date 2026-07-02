@@ -31,6 +31,24 @@ the result of a query that uses `rate()`, `irate()`, or `deriv()` without
 applying one of the `humanize` template functions. These functions produce
 very small floating point numbers that are hard to read without formatting.
 
+This check will also validate any PromQL query passed to the `query` template
+function. It will report a problem if the query has a syntax error, or if the
+template reads a label from the query result that the query cannot produce.
+For example this template reads the `instance` label from the query result:
+
+```yaml
+annotations:
+  summary: '{{ with query "up" }}{{ . | first | label "instance" }}{{ end }}'
+```
+
+If the query is changed to one that aggregates away the `instance` label then
+the label read will never return a value, and pint will report it:
+
+```yaml
+annotations:
+  summary: '{{ with query "sum(up)" }}{{ . | first | label "instance" }}{{ end }}'
+```
+
 ## Configuration
 
 This check doesn't have any configuration options.

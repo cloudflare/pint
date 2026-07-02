@@ -6,6 +6,9 @@
 
 - Added support for Prometheus v3.13.0 experimental PromQL functions:
   `min_of()`, `max_of()`.
+- [alerts/template](checks/alerts/template.md) now validates PromQL queries
+  passed to the `query` template function, reporting syntax errors and result
+  labels that the query cannot produce.
 
 ## v0.86.0
 
