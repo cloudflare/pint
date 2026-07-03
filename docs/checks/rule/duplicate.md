@@ -22,9 +22,17 @@ logs that might hide other issues and can lead to other problems if the
 duplicated rule is later updated, but only in one place, not in both.
 
 The same problem applies to alerting rules. Two alerting rules with the
-same name and labels produce the same `ALERTS` time series, so when both
-fire Prometheus will discard results from one of them and log the warning
-above. This check reports two kinds of duplicated alerting rules:
+same name and labels produce the same alert that will be sent to alertmanager.
+Annotations don't count towards alert identity, so even if both alerts
+have different annotations they will still be de-duplicated into a single
+alert by alertmanager. This can make it seem like there's only one alert
+firing when in fact two distinct rules are alerting.
+To make things worse Prometheus uses `ALERTS` and `ALERTS_FOR_STATE` time series
+to keep track of firing alerts and `for` state of each alert (if the rule uses
+`for`). With multiple rules producing alerts with identical name and labels
+these time series can conflict with each other, so their values become unreliable
+and only one rule's state is tracked at a time.
+This check reports two kinds of duplicated alerting rules:
 
 - rules with an identical query, which always produce the same alerts,
 - rules with different queries that use the same time series and can return
