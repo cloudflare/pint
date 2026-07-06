@@ -333,7 +333,7 @@ func TestMakePrometheusDetailsComment(t *testing.T) {
 
 	expected := `Some checks were disabled because one or more configured Prometheus server doesn't seem to support all required Prometheus APIs.
 This usually means that you're running pint against a service like Thanos or Mimir that allows to query metrics but doesn't implement all APIs documented [here](https://prometheus.io/docs/prometheus/latest/querying/api/).
-Since pint uses many of these API endpoint for querying information needed to run online checks only a real Prometheus server will allow it to run all of these checks.
+Since pint uses many of these API endpoints for querying information needed to run checks only a real Prometheus server will allow it to run all of these checks.
 Below is the list of checks that were disabled for each Prometheus server defined in pint config file.
 
 - ` + "`prom-a`" + `

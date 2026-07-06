@@ -61,7 +61,6 @@ func (c RateCheck) Meta() CheckMeta {
 			discovery.Modified,
 			discovery.Moved,
 		},
-		Online:        true,
 		AlwaysEnabled: false,
 	}
 }
@@ -75,6 +74,10 @@ func (c RateCheck) Reporter() string {
 }
 
 func (c RateCheck) Check(ctx context.Context, entry *discovery.Entry, entries []*discovery.Entry) (problems []Problem) {
+	if promapi.IsOffline(ctx) {
+		return problems
+	}
+
 	expr := entry.Rule.Expr()
 
 	if expr.SyntaxError() != nil {

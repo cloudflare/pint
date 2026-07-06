@@ -369,12 +369,8 @@ func formatGHReviewBody(ctx context.Context, version string, summary Summary, sh
 	b.WriteString(strconv.Itoa(len(summary.Reports())))
 	b.WriteString(" |\n")
 
-	b.WriteString("| Number of offline checks | ")
-	b.WriteString(strconv.FormatInt(summary.OfflineChecks, 10))
-	b.WriteString(" |\n")
-
-	b.WriteString("| Number of online checks | ")
-	b.WriteString(strconv.FormatInt(summary.OnlineChecks, 10))
+	b.WriteString("| Number of checks | ")
+	b.WriteString(strconv.FormatInt(summary.TotalChecks, 10))
 	b.WriteString(" |\n")
 
 	b.WriteString("| Checks duration | ")

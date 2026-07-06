@@ -42,7 +42,6 @@ func (c CounterCheck) Meta() CheckMeta {
 			discovery.Modified,
 			discovery.Moved,
 		},
-		Online:        true,
 		AlwaysEnabled: false,
 	}
 }
@@ -56,6 +55,10 @@ func (c CounterCheck) Reporter() string {
 }
 
 func (c CounterCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*discovery.Entry) (problems []Problem) {
+	if promapi.IsOffline(ctx) {
+		return problems
+	}
+
 	expr := entry.Rule.Expr()
 
 	if expr.SyntaxError() != nil {
