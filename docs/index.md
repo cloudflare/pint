@@ -13,13 +13,13 @@ pint is a Prometheus rule linter/validator.
 
 pint will run checks on Prometheus alerting & recording rules to detect potential problems
 with those rules.
-Some checks rely only on the rule itself and can be run "offline" - without talking to any
-Prometheus server.
-You can run pint in "offline" mode if you:
-
-- Don't pass any configuration file to pint.
-- You pass configuration file to pint that **doesn't** contain any `prometheus` definition.
-- You pass `--offline` flag to `pint` command.
+You can run pint in "offline" mode by passing the `--offline` flag.
+In this mode no network requests will be sent. Some checks might be skipped
+entirely while others will run with reduced functionality — only the parts
+of their logic that don't require network access will be executed.
+This means that passing `--offline` will disable Prometheus API queries and so
+any check, or part of a check, that needs to talk to a live Prometheus server
+will be skipped.
 
 Most checks included in pint will require sending queries to a running Prometheus server where
 those rules are, or would be, deployed.

@@ -630,9 +630,6 @@ func TestRuleDependencyCheck_Interface(t *testing.T) {
 		t.Errorf("Reporter() = %q, want %q", c.Reporter(), checks.RuleDependencyCheckName)
 	}
 	meta := c.Meta()
-	if meta.Online {
-		t.Error("Meta().Online = true, want false")
-	}
 	if meta.AlwaysEnabled {
 		t.Error("Meta().AlwaysEnabled = true, want false")
 	}

@@ -428,8 +428,6 @@ func updateDestination(ctx context.Context, s Summary, c Commenter, dst any, sho
 		ctx, slog.LevelInfo, "Creating report summary",
 		slog.String("reporter", c.Describe()),
 		slog.Int("reports", len(s.reports)),
-		slog.Int("online", int(s.OnlineChecks)),
-		slog.Int("offline", int(s.OfflineChecks)),
 		slog.String("duration", output.HumanizeDuration(s.Duration)),
 		slog.Int("entries", s.TotalEntries),
 		slog.Int("checked", int(s.CheckedEntries)),
@@ -502,7 +500,7 @@ func makePrometheusDetailsComment(s Summary) string {
 	var buf strings.Builder
 	buf.WriteString(`Some checks were disabled because one or more configured Prometheus server doesn't seem to support all required Prometheus APIs.
 This usually means that you're running pint against a service like Thanos or Mimir that allows to query metrics but doesn't implement all APIs documented [here](https://prometheus.io/docs/prometheus/latest/querying/api/).
-Since pint uses many of these API endpoint for querying information needed to run online checks only a real Prometheus server will allow it to run all of these checks.
+Since pint uses many of these API endpoints for querying information needed to run checks only a real Prometheus server will allow it to run all of these checks.
 Below is the list of checks that were disabled for each Prometheus server defined in pint config file.
 
 `)

@@ -206,8 +206,7 @@ body: |+
     | Number of rules parsed | 2 |
     | Number of rules checked | 2 |
     | Number of problems found | 4 |
-    | Number of offline checks | 20 |
-    | Number of online checks | 0 |
+    | Number of checks | 20 |
     | Checks duration | 0 |
 
     </p>

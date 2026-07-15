@@ -1,6 +1,7 @@
 package checks_test
 
 import (
+	"context"
 	"net/http"
 	"testing"
 	"time"
@@ -27,6 +28,15 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 `
 
 	testCases := []checkTest{
+		{
+			description: "offline",
+			content:     "- alert: foo\n  expr: up == 0\n",
+			checker:     newAlertsExternalLabelsCheck,
+			prometheus:  newSimpleProm,
+			ctx: func(ctx context.Context, _ string) context.Context {
+				return promapi.WithOffline(ctx, true)
+			},
+		},
 		{
 			description: "ignores recording rules",
 			content:     "- record: foo\n  expr: up == 0\n",
