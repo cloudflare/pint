@@ -24,7 +24,17 @@ type PrometheusContextKey string
 
 const (
 	AllPrometheusServers = PrometheusContextKey("allServers")
+	isOfflineKey         = PrometheusContextKey("isOffline")
 )
+
+func WithOffline(ctx context.Context, offline bool) context.Context {
+	return context.WithValue(ctx, isOfflineKey, offline)
+}
+
+func IsOffline(ctx context.Context) bool {
+	v, ok := ctx.Value(isOfflineKey).(bool)
+	return ok && v
+}
 
 type QueryError struct {
 	err error

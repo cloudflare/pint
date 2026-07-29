@@ -68,7 +68,6 @@ func (c CostCheck) Meta() CheckMeta {
 			discovery.Modified,
 			discovery.Moved,
 		},
-		Online:        true,
 		AlwaysEnabled: false,
 	}
 }
@@ -82,6 +81,10 @@ func (c CostCheck) Reporter() string {
 }
 
 func (c CostCheck) Check(ctx context.Context, entry *discovery.Entry, entries []*discovery.Entry) (problems []Problem) {
+	if promapi.IsOffline(ctx) {
+		return problems
+	}
+
 	expr := entry.Rule.Expr()
 
 	if expr.SyntaxError() != nil {

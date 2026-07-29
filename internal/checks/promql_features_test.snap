@@ -80,14 +80,14 @@
   output: |
     1 | - record: foo
                   ^^^
-                  Couldn't run some online checks due to "prom" error: `failed to parse Prometheus version
+                  Couldn't run some checks due to "prom" error: `failed to parse Prometheus version
                   "not-a-version": expected major.minor.patch format`.
   problem:
     reporter: promql/features
     summary: unable to run checks
     details: ""
     diagnostics:
-        - message: 'Couldn''t run some online checks due to "prom" error: `failed to parse Prometheus version "not-a-version": expected major.minor.patch format`.'
+        - message: 'Couldn''t run some checks due to "prom" error: `failed to parse Prometheus version "not-a-version": expected major.minor.patch format`.'
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -364,14 +364,14 @@
   output: |
     1 | - record: foo
                   ^^^
-                  Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX
-                  error: `server_error: internal error`.
+                  Couldn't run some checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error:
+                  `server_error: internal error`.
   problem:
     reporter: promql/features
     summary: unable to run checks
     details: ""
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.'
+        - message: 'Couldn''t run some checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.'
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -660,6 +660,11 @@
         last: 2
     severity: 2
     anchor: 0
+
+---
+
+[TestFeaturesCheck/offline - 1]
+[]
 
 ---
 

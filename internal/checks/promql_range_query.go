@@ -54,7 +54,6 @@ func (c RangeQueryCheck) Meta() CheckMeta {
 			discovery.Modified,
 			discovery.Moved,
 		},
-		Online:        true,
 		AlwaysEnabled: false,
 	}
 }
@@ -68,6 +67,10 @@ func (c RangeQueryCheck) Reporter() string {
 }
 
 func (c RangeQueryCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*discovery.Entry) (problems []Problem) {
+	if promapi.IsOffline(ctx) {
+		return problems
+	}
+
 	expr := entry.Rule.Expr()
 	if expr.SyntaxError() != nil {
 		return problems

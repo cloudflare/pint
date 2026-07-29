@@ -18,7 +18,7 @@ type testCheck struct {
 }
 
 func (tc testCheck) Meta() checks.CheckMeta {
-	return checks.CheckMeta{Online: false}
+	return checks.CheckMeta{}
 }
 
 func (tc testCheck) String() string {

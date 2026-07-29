@@ -46,7 +46,6 @@ func (c NaNCheck) Meta() CheckMeta {
 			discovery.Modified,
 			discovery.Moved,
 		},
-		Online:        false,
 		AlwaysEnabled: false,
 	}
 }

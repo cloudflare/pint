@@ -34,7 +34,6 @@ func (c AlertsExternalLabelsCheck) Meta() CheckMeta {
 			discovery.Modified,
 			discovery.Moved,
 		},
-		Online:        true,
 		AlwaysEnabled: false,
 	}
 }
@@ -48,6 +47,10 @@ func (c AlertsExternalLabelsCheck) Reporter() string {
 }
 
 func (c AlertsExternalLabelsCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*discovery.Entry) (problems []Problem) {
+	if promapi.IsOffline(ctx) {
+		return problems
+	}
+
 	if entry.Rule.AlertingRule == nil {
 		return problems
 	}
