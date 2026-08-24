@@ -996,6 +996,15 @@ foo details
 	}
 }
 
+func TestIsPintGeneralComment(t *testing.T) {
+	quoted := "> " + tooManyCommentsMsg(3, 1)
+	require.False(t, isPintGeneralComment(tooManyCommentsMsg(3, 1)))
+	require.False(t, isPintGeneralComment(quoted))
+	require.True(t, isPintGeneralComment(signGeneralComment(tooManyCommentsMsg(3, 1))))
+	require.False(t, isPintGeneralComment(signGeneralComment("")))
+	require.Equal(t, tooManyCommentsMsg(3, 1), unsignedGeneralComment(signGeneralComment(tooManyCommentsMsg(3, 1))))
+}
+
 func TestCommentsCommonPaths(t *testing.T) {
 	type errorCheck func(err error) error
 

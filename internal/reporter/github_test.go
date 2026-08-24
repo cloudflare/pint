@@ -248,7 +248,7 @@ func TestGitHubReporter(t *testing.T) {
 					return
 				}
 				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/issues/123/comments" {
-					_, _ = w.Write([]byte(`[{"id":999,"body":"This pint run would create 3 comment(s), which is more than the limit configured for pint (1).\n2 comment(s) were skipped and won't be visible on this PR."}]`))
+					_, _ = w.Write([]byte(`[{"id":999,"body":"This pint run would create 3 comment(s), which is more than the limit configured for pint (1).\n2 comment(s) were skipped and won't be visible on this PR.\n<!-- pint -->"}]`))
 					return
 				}
 				if r.Method == http.MethodDelete && r.URL.Path == "/api/v3/repos/foo/bar/issues/comments/999" {
@@ -308,7 +308,7 @@ func TestGitHubReporter(t *testing.T) {
 					return
 				}
 				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/issues/123/comments" {
-					_, _ = w.Write([]byte(`[{"id":999,"body":"This pint run would create 2 comment(s), which is more than the limit configured for pint (1).\n1 comment(s) were skipped and won't be visible on this PR."}]`))
+					_, _ = w.Write([]byte(`[{"id":999,"body":"This pint run would create 2 comment(s), which is more than the limit configured for pint (1).\n1 comment(s) were skipped and won't be visible on this PR.\n<!-- pint -->"}]`))
 					return
 				}
 				if r.Method == http.MethodDelete && r.URL.Path == "/api/v3/repos/foo/bar/issues/comments/999" {
@@ -365,6 +365,86 @@ func TestGitHubReporter(t *testing.T) {
 					},
 				},
 			}),
+		},
+		{
+			description: "foreign general comments are not deleted",
+			owner:       "foo",
+			repo:        "bar",
+			token:       "something",
+			prNum:       123,
+			maxComments: 50,
+			timeout:     time.Second,
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/user" {
+					w.Header().Set("Content-Type", "application/json")
+					_, _ = w.Write([]byte(`{"id":42,"login":"ci-user"}`))
+					return
+				}
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/reviews" {
+					_, _ = w.Write([]byte(`[{"id":1,"body":"### This pull request was validated by [pint](https://github.com/cloudflare/pint).\nxxxx"}]`))
+					return
+				}
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
+					_, _ = w.Write([]byte(`[]`))
+					return
+				}
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/issues/123/comments" {
+					_, _ = w.Write([]byte(`[
+						{"id":100,"body":"LGTM","user":{"id":7,"login":"reviewer"}},
+						{"id":101,"body":"automated review comment","user":{"id":8,"login":"review-bot"}},
+						{"id":102,"body":"workflow status comment","user":{"id":9,"login":"workflow-bot"}},
+						{"id":103,"body":"> This pint run would create 3 comment(s), which is more than the limit configured for pint (1).","user":{"id":42,"login":"ci-user"}}
+					]`))
+					return
+				}
+				if r.Method == http.MethodDelete && strings.HasPrefix(r.URL.Path, "/api/v3/repos/foo/bar/issues/comments/") {
+					t.Errorf("Unexpected delete of foreign general comment: %s", r.URL.Path)
+					return
+				}
+				_, _ = w.Write([]byte(""))
+			}),
+			summary: reporter.NewSummary([]reporter.Report{}),
+		},
+		{
+			description: "same-author non-pint comment is not deleted",
+			owner:       "foo",
+			repo:        "bar",
+			token:       "something",
+			prNum:       123,
+			maxComments: 50,
+			timeout:     time.Second,
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/user" {
+					w.Header().Set("Content-Type", "application/json")
+					_, _ = w.Write([]byte(`{"id":42,"login":"ci-user"}`))
+					return
+				}
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/reviews" {
+					_, _ = w.Write([]byte(`[{"id":1,"body":"### This pull request was validated by [pint](https://github.com/cloudflare/pint).\nxxxx"}]`))
+					return
+				}
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
+					_, _ = w.Write([]byte(`[]`))
+					return
+				}
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/issues/123/comments" {
+					_, _ = w.Write([]byte(`[
+						{"id":200,"body":"workflow status comment","user":{"id":42,"login":"ci-user"}},
+						{"id":201,"body":"This pint run would create 3 comment(s), which is more than the limit configured for pint (1).\n2 comment(s) were skipped and won't be visible on this PR.\n<!-- pint -->","user":{"id":42,"login":"ci-user"}}
+					]`))
+					return
+				}
+				if r.Method == http.MethodDelete && r.URL.Path == "/api/v3/repos/foo/bar/issues/comments/200" {
+					t.Errorf("Unexpected delete of non-pint workflow comment")
+					return
+				}
+				if r.Method == http.MethodDelete && r.URL.Path == "/api/v3/repos/foo/bar/issues/comments/201" {
+					_, _ = w.Write([]byte(`{}`))
+					return
+				}
+				_, _ = w.Write([]byte(""))
+			}),
+			summary: reporter.NewSummary([]reporter.Report{}),
 		},
 		{
 			description: "error crating review",
@@ -643,7 +723,7 @@ func TestGitHubReporter(t *testing.T) {
 				if r.Method == http.MethodPost && r.URL.Path == "/api/v3/repos/foo/bar/issues/123/comments" {
 					body, _ := io.ReadAll(r.Body)
 					b := strings.TrimSpace(strings.TrimRight(string(body), "\n\t\r"))
-					if b == `{"body":"This pint run would create 4 comment(s), which is more than the limit configured for pint (2).\n2 comment(s) were skipped and won't be visible on this PR."}` {
+					if b == `{"body":"This pint run would create 4 comment(s), which is more than the limit configured for pint (2).\n2 comment(s) were skipped and won't be visible on this PR.\n<!-- pint -->"}` {
 						w.WriteHeader(http.StatusInternalServerError)
 						_, _ = w.Write([]byte("Cannot create issue comment"))
 						return
@@ -1596,17 +1676,26 @@ func TestNewGithubReporterEnterpriseURLError(t *testing.T) {
 
 func TestGithubReporterListSkipsGeneralComments(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == "/api/v3/repos/owner/repo/pulls/123/comments" {
+		w.Header().Set("Content-Type", "application/json")
+		switch r.URL.Path {
+		case "/api/v3/user":
+			_, _ = w.Write([]byte(`{"id":42,"login":"ci-user"}`))
+		case "/api/v3/repos/owner/repo/pulls/123/comments":
 			// Return a mix of file comments and general comments (empty path)
-			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`[
 				{"id": 1, "path": "file.yml", "body": "file comment", "line": 10},
 				{"id": 2, "path": "", "body": "general comment", "line": 0},
 				{"id": 3, "path": "other.yml", "body": "another file comment", "line": 5}
 			]`))
-			return
+		case "/api/v3/repos/owner/repo/issues/123/comments":
+			_, _ = w.Write([]byte(`[
+				{"id": 10, "body": "LGTM", "user": {"id": 7, "login": "reviewer"}},
+				{"id": 11, "body": "> This pint run would create 3 comment(s), which is more than the limit configured for pint (1).", "user": {"id": 42, "login": "ci-user"}},
+				{"id": 12, "body": "This pint run would create 3 comment(s), which is more than the limit configured for pint (1).\n2 comment(s) were skipped and won't be visible on this PR.\n<!-- pint -->", "user": {"id": 42, "login": "ci-user"}}
+			]`))
+		default:
+			w.WriteHeader(http.StatusOK)
 		}
-		w.WriteHeader(http.StatusOK)
 	}))
 	defer srv.Close()
 
@@ -1629,6 +1718,7 @@ func TestGithubReporterListSkipsGeneralComments(t *testing.T) {
 
 	comments, err := r.List(t.Context(), nil)
 	require.NoError(t, err)
-	// Should only have 2 comments (general comment with empty path skipped)
-	require.Len(t, comments, 2)
+	// Two file comments plus pint's own signed general comment. Empty-path
+	// review comments, reviewer comments, and unsigned quotes are skipped.
+	require.Len(t, comments, 3)
 }
