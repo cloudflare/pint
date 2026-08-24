@@ -18,6 +18,9 @@
 
 - GitHub, GitLab, and BitBucket reporters were trying to create comments on
   incorrect lines for symlinked files.
+- GitHub reporter no longer deletes pull request comments it did not post
+  when removing outdated general comments. Cleanup is limited to comments
+  authored by the authenticated user that include pint's comment marker.
 
 ## v0.87.0
 
