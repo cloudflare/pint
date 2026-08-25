@@ -19,7 +19,7 @@ require (
 	github.com/stretchr/testify v1.12.0
 	github.com/urfave/cli/v3 v3.11.0
 	github.com/zclconf/go-cty v1.19.0
-	gitlab.com/gitlab-org/api/client-go/v2 v2.58.0
+	gitlab.com/gitlab-org/api/client-go/v2 v2.58.2
 	go.nhat.io/httpmock v0.11.0
 	go.uber.org/ratelimit v0.3.1
 	go.yaml.in/yaml/v3 v3.0.5
@@ -82,7 +82,7 @@ require (
 	golang.org/x/text v0.40.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
 	golang.org/x/tools v0.47.0 // indirect
-	google.golang.org/protobuf v1.36.11 // indirect
+	google.golang.org/protobuf v1.36.12 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/apimachinery v0.35.3 // indirect
