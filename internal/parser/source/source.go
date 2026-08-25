@@ -1062,6 +1062,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 		)
 
 	case "timestamp",
+		"start_timestamp",
 		"ts_of_first_over_time",
 		"ts_of_last_over_time",
 		"ts_of_max_over_time",

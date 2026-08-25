@@ -27,10 +27,15 @@ Currently detected features:
 - `promql-experimental-functions` - required when using experimental PromQL functions
   such as `mad_over_time`, `sort_by_label`, `sort_by_label_desc`, `info`,
   `double_exponential_smoothing`, `min_of`, `max_of`, `start`, `end`, `range`, `step`,
-  `limitk`, `limit_ratio`, and others.
+  `start_timestamp`, `limitk`, `limit_ratio`, and others.
 - `promql-duration-expr` - required when using arithmetic expressions in time durations.
 - `promql-extended-range-selectors` - required when using `anchored` or `smoothed` range selector modifiers.
 - `promql-binop-fill-modifiers` - required when using `fill()` binary operator modifier.
+
+Features that became stable and no longer require a feature flag:
+
+- `first_over_time()` - stable since Prometheus v3.14.0.
+- Arithmetic expressions in range selectors (e.g. `[5m+1m]`, `[step() * 4]`) - stable since Prometheus v3.14.0.
 
 See [Prometheus feature flags documentation](https://prometheus.io/docs/prometheus/latest/feature_flags/)
 for details on each feature.

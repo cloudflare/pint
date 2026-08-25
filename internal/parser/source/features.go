@@ -157,11 +157,16 @@ func newDefaultFeatures() *Features {
 	f.Register("first_over_time", FeatureVersion{
 		Flag:          FeatureExperimentalFunctions,
 		MinVersion:    ver(3, 7, 0),
-		StableVersion: ver(0, 0, 0),
+		StableVersion: ver(3, 14, 0),
 	})
 	f.Register("ts_of_first_over_time", FeatureVersion{
 		Flag:          FeatureExperimentalFunctions,
 		MinVersion:    ver(3, 7, 0),
+		StableVersion: ver(0, 0, 0),
+	})
+	f.Register("start_timestamp", FeatureVersion{
+		Flag:          FeatureExperimentalFunctions,
+		MinVersion:    ver(3, 14, 0),
 		StableVersion: ver(0, 0, 0),
 	})
 	f.Register("histogram_quantiles", FeatureVersion{
@@ -217,7 +222,7 @@ func newDefaultFeatures() *Features {
 	f.Register("duration_expr", FeatureVersion{
 		Flag:          FeatureDurationExpr,
 		MinVersion:    ver(3, 4, 0),
-		StableVersion: ver(0, 0, 0),
+		StableVersion: ver(3, 14, 0),
 	})
 
 	// Extended range selectors behind promql-extended-range-selectors.
