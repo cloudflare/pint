@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.88.0
+
+### Added
+
+- Added support for Prometheus v3.14.0 experimental PromQL function:
+  `start_timestamp()`.
+
+### Changed
+
+- `first_over_time()` is now stable as of Prometheus v3.14.0 and no longer
+  requires `--enable-feature=promql-experimental-functions`.
+- Duration expressions are now enabled by default as of Prometheus v3.14.0
+  and no longer require `--enable-feature=promql-duration-expr`.
+
 ## v0.87.0
 
 ### Added

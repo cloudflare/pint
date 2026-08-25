@@ -899,6 +899,152 @@ func TestFeaturesCheck(t *testing.T) {
 				},
 			},
 		},
+		// Verifies that first_over_time() produces no problem on 3.14.0 without the flag.
+		{
+			description: "first_over_time() stable on 3.14.0",
+			content:     "- record: foo\n  expr: first_over_time(bar[5m])\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp:  flagsResponse{flags: map[string]string{}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.14.0"},
+				},
+			},
+		},
+		// Verifies that first_over_time() produces a problem when the flag is missing.
+		{
+			description: "first_over_time() missing feature flag",
+			content:     "- record: foo\n  expr: first_over_time(bar[5m])\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp:  flagsResponse{flags: map[string]string{}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.13.0"},
+				},
+			},
+		},
+		// Verifies that first_over_time() produces no problem when the flag is enabled.
+		{
+			description: "first_over_time() with feature flag enabled",
+			content:     "- record: foo\n  expr: first_over_time(bar[5m])\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp: flagsResponse{flags: map[string]string{
+						"enable-feature": "promql-experimental-functions",
+					}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.13.0"},
+				},
+			},
+		},
+		// Verifies that duration expression produces no problem on 3.14.0 without the flag.
+		{
+			description: "duration expression stable on 3.14.0",
+			content:     "- record: foo\n  expr: rate(bar[5m+1m])\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp:  flagsResponse{flags: map[string]string{}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.14.0"},
+				},
+			},
+		},
+		// Verifies that duration expression produces a problem when the flag is missing.
+		{
+			description: "duration expression missing feature flag",
+			content:     "- record: foo\n  expr: rate(bar[5m+1m])\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp:  flagsResponse{flags: map[string]string{}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.13.0"},
+				},
+			},
+		},
+		// Verifies that start_timestamp() produces a problem when the flag is missing.
+		{
+			description: "start_timestamp() missing feature flag",
+			content:     "- record: foo\n  expr: start_timestamp(bar)\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp:  flagsResponse{flags: map[string]string{}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.14.0"},
+				},
+			},
+		},
+		// Verifies that start_timestamp() produces no problem when the flag is enabled.
+		{
+			description: "start_timestamp() with feature flag enabled",
+			content:     "- record: foo\n  expr: start_timestamp(bar)\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp: flagsResponse{flags: map[string]string{
+						"enable-feature": "promql-experimental-functions",
+					}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.14.0"},
+				},
+			},
+		},
+		// Verifies that start_timestamp() on a version too old produces a problem.
+		{
+			description: "start_timestamp() version too old",
+			content:     "- record: foo\n  expr: start_timestamp(bar)\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp: flagsResponse{flags: map[string]string{
+						"enable-feature": "promql-experimental-functions",
+					}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.13.0"},
+				},
+			},
+		},
 	}
 	runTests(t, testCases)
 }

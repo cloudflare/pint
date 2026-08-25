@@ -1417,3 +1417,212 @@
 []
 
 ---
+
+[TestFeaturesCheck/first_over_time()_graduated_on_3.14.0_without_flag - 1]
+[]
+
+---
+
+[TestFeaturesCheck/first_over_time()_missing_feature_flag_on_3.13.0 - 1]
+- description: first_over_time() missing feature flag on 3.13.0
+  content: |
+    - record: foo
+      expr: first_over_time(bar[5m])
+  output: |
+    2 |   expr: first_over_time(bar[5m])
+                ^^^^^^^^^^^^^^^
+                `first_over_time` requires `--enable-feature=promql-experimental-functions` to be set on
+                `prom` Prometheus server at https://simple.example.com.
+  problem:
+    reporter: promql/features
+    summary: required feature flag not enabled
+    details: |-
+        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+    diagnostics:
+        - message: '`first_over_time` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
+          firstcolumn: 1
+          lastcolumn: 15
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestFeaturesCheck/first_over_time()_with_feature_flag_on_3.13.0 - 1]
+[]
+
+---
+
+[TestFeaturesCheck/duration_expression_graduated_on_3.14.0_without_flag - 1]
+[]
+
+---
+
+[TestFeaturesCheck/duration_expression_missing_flag_on_3.13.0 - 1]
+- description: duration expression missing flag on 3.13.0
+  content: |
+    - record: foo
+      expr: rate(bar[5m+1m])
+  output: |
+    2 |   expr: rate(bar[5m+1m])
+                         ^^^^^
+                         `duration_expr` requires `--enable-feature=promql-duration-expr` to be set on
+                         `prom` Prometheus server at https://simple.example.com.
+  problem:
+    reporter: promql/features
+    summary: required feature flag not enabled
+    details: |-
+        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+    diagnostics:
+        - message: '`duration_expr` requires `--enable-feature=promql-duration-expr` to be set on `prom` Prometheus server at https://simple.example.com.'
+          firstcolumn: 10
+          lastcolumn: 14
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestFeaturesCheck/start_timestamp()_missing_feature_flag - 1]
+- description: start_timestamp() missing feature flag
+  content: |
+    - record: foo
+      expr: start_timestamp(bar)
+  output: |
+    2 |   expr: start_timestamp(bar)
+                ^^^^^^^^^^^^^^^
+                `start_timestamp` requires `--enable-feature=promql-experimental-functions` to be set on
+                `prom` Prometheus server at https://simple.example.com.
+  problem:
+    reporter: promql/features
+    summary: required feature flag not enabled
+    details: |-
+        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+    diagnostics:
+        - message: '`start_timestamp` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
+          firstcolumn: 1
+          lastcolumn: 15
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestFeaturesCheck/start_timestamp()_with_feature_flag_enabled - 1]
+[]
+
+---
+
+[TestFeaturesCheck/start_timestamp()_version_too_old - 1]
+- description: start_timestamp() version too old
+  content: |
+    - record: foo
+      expr: start_timestamp(bar)
+  output: |
+    2 |   expr: start_timestamp(bar)
+                ^^^^^^^^^^^^^^^
+                `start_timestamp` requires Prometheus 3.14.0 or later but `prom` Prometheus server at
+                https://simple.example.com is running 3.13.0.
+  problem:
+    reporter: promql/features
+    summary: required feature flag not enabled
+    details: |-
+        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+    diagnostics:
+        - message: '`start_timestamp` requires Prometheus 3.14.0 or later but `prom` Prometheus server at https://simple.example.com is running 3.13.0.'
+          firstcolumn: 1
+          lastcolumn: 15
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestFeaturesCheck/first_over_time()_stable_on_3.14.0 - 1]
+[]
+
+---
+
+[TestFeaturesCheck/first_over_time()_missing_feature_flag - 1]
+- description: first_over_time() missing feature flag
+  content: |
+    - record: foo
+      expr: first_over_time(bar[5m])
+  output: |
+    2 |   expr: first_over_time(bar[5m])
+                ^^^^^^^^^^^^^^^
+                `first_over_time` requires `--enable-feature=promql-experimental-functions` to be set on
+                `prom` Prometheus server at https://simple.example.com.
+  problem:
+    reporter: promql/features
+    summary: required feature flag not enabled
+    details: |-
+        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+    diagnostics:
+        - message: '`first_over_time` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
+          firstcolumn: 1
+          lastcolumn: 15
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestFeaturesCheck/first_over_time()_with_feature_flag_enabled - 1]
+[]
+
+---
+
+[TestFeaturesCheck/duration_expression_stable_on_3.14.0 - 1]
+[]
+
+---
+
+[TestFeaturesCheck/duration_expression_missing_feature_flag#01 - 1]
+- description: duration expression missing feature flag
+  content: |
+    - record: foo
+      expr: rate(bar[5m+1m])
+  output: |
+    2 |   expr: rate(bar[5m+1m])
+                         ^^^^^
+                         `duration_expr` requires `--enable-feature=promql-duration-expr` to be set on
+                         `prom` Prometheus server at https://simple.example.com.
+  problem:
+    reporter: promql/features
+    summary: required feature flag not enabled
+    details: |-
+        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+    diagnostics:
+        - message: '`duration_expr` requires `--enable-feature=promql-duration-expr` to be set on `prom` Prometheus server at https://simple.example.com.'
+          firstcolumn: 10
+          lastcolumn: 14
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
