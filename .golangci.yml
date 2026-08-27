@@ -9,7 +9,6 @@ linters:
     - errname
     - errorlint
     - exhaustive
-    - exhaustruct
     - exptostd
     - gocritic
     - godot
@@ -34,24 +33,6 @@ linters:
     - unused
     - usetesting
   settings:
-    exhaustruct:
-      exclude:
-        - net/http\..+
-        - crypto/tls\..+
-        - encoding/xml\..+
-        - .+/checks\.badMatcher
-        - .+/checks\..+Settings
-        - .+/config\.Match
-        - .+/discovery\.Entry
-        - .+/parser\.Rule
-        - .+/parser\.ParseError
-        - .+/parser\.VectorSelector
-        - .+/promapi\.MetricTimeRange
-        - github.com/prometheus/.+\..+
-        - github.com/urfave/cli/.+
-        - gitlab.com/gitlab-org/api/.+
-        - github.com/google/go-github/.+
-        - github.com/hashicorp/hcl/.+
     govet:
       enable-all: true
   exclusions:
@@ -83,7 +64,8 @@ formatters:
     - goimports
   settings:
     gofumpt:
-      extra-rules: true
+      extra:
+        group-params: true
     goimports:
       local-prefixes:
         - github.com/cloudflare/pint

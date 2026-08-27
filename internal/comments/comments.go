@@ -183,32 +183,36 @@ func parseValue(commentType Type, s string, pos diags.PositionRanges, offset int
 			return nil, fmt.Errorf("missing %s value", FileOwnerComment)
 		}
 		return Owner{
-			Name:     s,
-			Position: Position{Pos: pos, Offset: offset},
+			Name:   s,
+			Pos:    pos,
+			Offset: offset,
 		}, nil
 	case RuleOwnerType:
 		if s == "" {
 			return nil, fmt.Errorf("missing %s value", RuleOwnerComment)
 		}
 		return Owner{
-			Name:     s,
-			Position: Position{Pos: pos, Offset: offset},
+			Name:   s,
+			Pos:    pos,
+			Offset: offset,
 		}, nil
 	case FileDisableType:
 		if s == "" {
 			return nil, fmt.Errorf("missing %s value", FileDisableComment)
 		}
 		return Disable{
-			Match:    s,
-			Position: Position{Pos: pos, Offset: offset},
+			Match:  s,
+			Pos:    pos,
+			Offset: offset,
 		}, nil
 	case DisableType:
 		if s == "" {
 			return nil, fmt.Errorf("missing %s value", DisableComment)
 		}
 		return Disable{
-			Match:    s,
-			Position: Position{Pos: pos, Offset: offset},
+			Match:  s,
+			Pos:    pos,
+			Offset: offset,
 		}, nil
 	case FileSnoozeType:
 		if s == "" {
@@ -225,8 +229,9 @@ func parseValue(commentType Type, s string, pos diags.PositionRanges, offset int
 			return nil, fmt.Errorf("missing %s value", RuleSetComment)
 		}
 		return RuleSet{
-			Value:    s,
-			Position: Position{Pos: pos, Offset: offset},
+			Value:  s,
+			Pos:    pos,
+			Offset: offset,
 		}, nil
 	case UnknownType, InvalidComment:
 		// these are never passed here
