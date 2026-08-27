@@ -14,6 +14,12 @@
 - Duration expressions are now enabled by default as of Prometheus v3.14.0
   and no longer require `--enable-feature=promql-duration-expr`.
 
+### Fixed
+
+- GitHub reporter no longer deletes pull request comments it did not post
+  when removing outdated general comments. Cleanup is limited to comments
+  authored by the authenticated user that include pint's comment marker.
+
 ## v0.87.0
 
 ### Added

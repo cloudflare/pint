@@ -2,10 +2,9 @@ http method github GET /api/v3/user 200 {"id":42,"login":"ci-user"}
 http method github GET /api/v3/repos/cloudflare/pint/pulls/1/reviews 200 []
 http method github POST /api/v3/repos/cloudflare/pint/pulls/1/reviews 200 {}
 http method github GET /api/v3/repos/cloudflare/pint/pulls/1/comments 200 []
-http method github GET /api/v3/repos/cloudflare/pint/issues/1/comments 200 [{"id":999,"body":"This pint run would create 3 comment(s), which is more than the limit configured for pint (1). <!-- pint -->","user":{"id":42,"login":"ci-user"}}]
+http method github GET /api/v3/repos/cloudflare/pint/issues/1/comments 200 [{"id":100,"body":"LGTM","user":{"id":7,"login":"reviewer"}},{"id":101,"body":"automated review comment","user":{"id":8,"login":"review-bot"}},{"id":102,"body":"workflow status comment","user":{"id":9,"login":"workflow-bot"}}]
 http method github POST /api/v3/repos/cloudflare/pint/pulls/1/comments 200 {}
-http method github DELETE /api/v3/repos/cloudflare/pint/issues/comments/999 200 {}
-http start github 127.0.0.1:6271
+http start github 127.0.0.1:6276
 
 mkdir testrepo
 cd testrepo
@@ -28,7 +27,7 @@ env GITHUB_AUTH_TOKEN=12345
 env GITHUB_PULL_REQUEST_NUMBER=1
 exec pint -l debug --offline --no-color ci
 ! stdout .
-stderr 'level=INFO msg="Deleting stale general comment" reporter=GitHub id=999'
+! stderr 'Deleting stale general comment'
 stderr 'level=INFO msg="Pull request review created" status="200 OK"'
 cmp github.got ../github.expected
 
@@ -53,8 +52,8 @@ parser {
 }
 repository {
   github {
-    baseuri   = "http://127.0.0.1:6271"
-    uploaduri = "http://127.0.0.1:6271"
+    baseuri   = "http://127.0.0.1:6276"
+    uploaduri = "http://127.0.0.1:6276"
     owner     = "cloudflare"
     repo      = "pint"
   }
@@ -75,12 +74,6 @@ GET /api/v3/repos/cloudflare/pint/pulls/1/comments
 
 GET /api/v3/repos/cloudflare/pint/issues/1/comments
   Accept: application/vnd.github.squirrel-girl-preview
-  Accept-Encoding: gzip
-  Authorization: Bearer 12345
-  X-Github-Api-Version: 2022-11-28
-
-DELETE /api/v3/repos/cloudflare/pint/issues/comments/999
-  Accept: application/vnd.github.v3+json
   Accept-Encoding: gzip
   Authorization: Bearer 12345
   X-Github-Api-Version: 2022-11-28

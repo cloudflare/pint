@@ -525,3 +525,22 @@ Below is the list of checks that were disabled for each Prometheus server define
 	}
 	return buf.String()
 }
+
+// pintCommentMarker is appended to general comments pint posts so later runs
+// can recognize them without matching on human-readable text.
+const pintCommentMarker = "<!-- pint -->"
+
+func signGeneralComment(body string) string {
+	if body == "" || strings.Contains(body, pintCommentMarker) {
+		return body
+	}
+	return strings.TrimRight(body, "\n") + "\n" + pintCommentMarker
+}
+
+func unsignedGeneralComment(body string) string {
+	return strings.TrimSpace(strings.ReplaceAll(body, pintCommentMarker, ""))
+}
+
+func isPintGeneralComment(body string) bool {
+	return strings.Contains(body, pintCommentMarker)
+}
