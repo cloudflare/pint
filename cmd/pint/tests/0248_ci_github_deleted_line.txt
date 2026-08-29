@@ -169,8 +169,7 @@ body: |+
     | Number of rules parsed | 5 |
     | Number of rules checked | 5 |
     | Number of problems found | 1 |
-    | Number of offline checks | 2 |
-    | Number of online checks | 0 |
+    | Number of checks | 2 |
     | Checks duration | 0 |
 
     </p>

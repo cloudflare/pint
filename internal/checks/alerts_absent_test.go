@@ -1,6 +1,7 @@
 package checks_test
 
 import (
+	"context"
 	"net/http"
 	"testing"
 	"time"
@@ -15,6 +16,15 @@ func newAlertsAbsentCheck(prom *promapi.FailoverGroup) checks.RuleChecker {
 
 func TestAlertsAbsentCheck(t *testing.T) {
 	testCases := []checkTest{
+		{
+			description: "offline",
+			content:     "- alert: foo\n  expr: absent(foo)\n",
+			checker:     newAlertsAbsentCheck,
+			prometheus:  newSimpleProm,
+			ctx: func(ctx context.Context, _ string) context.Context {
+				return promapi.WithOffline(ctx, true)
+			},
+		},
 		{
 			description: "ignores recording rules",
 			content:     "- record: foo\n  expr: sum(foo)\n",

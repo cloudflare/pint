@@ -39,18 +39,6 @@ type Config struct {
 	staticRules []staticRule
 }
 
-func (cfg *Config) DisableOnlineChecks() {
-	for _, name := range checks.OnlineChecks {
-		var found bool
-		if slices.Contains(cfg.Checks.Disabled, name) {
-			found = true
-		}
-		if !found {
-			cfg.Checks.Disabled = append(cfg.Checks.Disabled, name)
-		}
-	}
-}
-
 func (cfg *Config) SetDisabledChecks(l []string) {
 	disabled := map[string]struct{}{}
 	for _, s := range l {

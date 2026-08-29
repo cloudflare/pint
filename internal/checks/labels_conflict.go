@@ -35,7 +35,6 @@ func (c LabelsConflictCheck) Meta() CheckMeta {
 			discovery.Modified,
 			discovery.Moved,
 		},
-		Online:        true,
 		AlwaysEnabled: false,
 	}
 }
@@ -49,6 +48,10 @@ func (c LabelsConflictCheck) Reporter() string {
 }
 
 func (c LabelsConflictCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*discovery.Entry) (problems []Problem) {
+	if promapi.IsOffline(ctx) {
+		return problems
+	}
+
 	var labels *parser.YamlMap
 	if entry.Rule.AlertingRule != nil && entry.Rule.AlertingRule.Expr.SyntaxError() == nil && entry.Rule.AlertingRule.Labels != nil {
 		labels = entry.Rule.AlertingRule.Labels

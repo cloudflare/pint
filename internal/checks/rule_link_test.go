@@ -1,6 +1,7 @@
 package checks_test
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -47,6 +48,21 @@ func TestRuleLinkCheck(t *testing.T) {
 	t.Cleanup(srv.Close)
 
 	testCases := []checkTest{
+		{
+			description: "offline",
+			content:     "- alert: foo\n  expr: up == 0\n  annotations:\n    link: http://example.com\n",
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewRuleLinkCheck(
+					checks.MustTemplatedRegexp(".*"),
+					"", time.Second, nil, "",
+					checks.Bug,
+				)
+			},
+			prometheus: noProm,
+			ctx: func(ctx context.Context, _ string) context.Context {
+				return promapi.WithOffline(ctx, true)
+			},
+		},
 		{
 			description: "ignores recording rules",
 			content:     "- record: foo\n  expr: sum(foo)\n",

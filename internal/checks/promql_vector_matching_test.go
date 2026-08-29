@@ -1,6 +1,7 @@
 package checks_test
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -16,6 +17,15 @@ func newVectorMatchingCheck(prom *promapi.FailoverGroup) checks.RuleChecker {
 
 func TestVectorMatchingCheck(t *testing.T) {
 	testCases := []checkTest{
+		{
+			description: "offline",
+			content:     "- record: foo\n  expr: bar / baz\n",
+			checker:     newVectorMatchingCheck,
+			prometheus:  newSimpleProm,
+			ctx: func(ctx context.Context, _ string) context.Context {
+				return promapi.WithOffline(ctx, true)
+			},
+		},
 		{
 			description: "ignores rules with syntax errors",
 			content:     "- record: foo\n  expr: sum(foo) without(\n",
