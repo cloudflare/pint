@@ -2,7 +2,7 @@ package discovery
 
 import (
 	"bytes"
-	"encoding/json"
+	"encoding/json/v2"
 	"errors"
 	"fmt"
 	"io"
@@ -11,11 +11,29 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/parser"
 )
+
+// Errors are compared by message. Entry.File and Group.Rules are not
+// compared, Entry.Rule carries the same parse results.
+// Diagnostic.Expr and PromQLExpr internals hold the PromQL AST.
+var entryCmpOptions = []cmp.Option{
+	cmp.Comparer(func(x, y error) bool {
+		if x == nil || y == nil {
+			return x == nil && y == nil
+		}
+		return x.Error() == y.Error()
+	}),
+	cmpopts.IgnoreFields(Entry{}, "File"),
+	cmpopts.IgnoreFields(parser.Group{}, "Rules"),
+	cmpopts.IgnoreFields(diags.Diagnostic{}, "Expr"),
+	cmpopts.IgnoreUnexported(parser.PromQLExpr{}),
+}
 
 func TestReadRules(t *testing.T) {
 	mustParse := func(offset int, s string) parser.Rule {
@@ -33,13 +51,25 @@ func TestReadRules(t *testing.T) {
 		return file.Groups[0].Rules[0]
 	}
 
+	mustParseGroup := func(offset int, s string) *parser.Group {
+		p := parser.NewParser(parser.DefaultOptions)
+		file := p.Parse(strings.NewReader(strings.Repeat("\n", offset) + s))
+		if file.Error.Err != nil {
+			panic(fmt.Sprintf("failed to parse rule:\n---\n%s\n---\nerror: %s", s, file.Error))
+		}
+		if len(file.Groups) != 1 {
+			panic(fmt.Sprintf("wrong number of groups returned: %d\n---\n%s\n---", len(file.Groups), s))
+		}
+		return &file.Groups[0]
+	}
+
 	type testCaseT struct {
 		sourceFunc    func(t *testing.T) io.Reader
 		check         func(t *testing.T, entries []*Entry)
 		title         string
 		reportedPath  string
 		sourcePath    string
-		entries       []Entry
+		entries       []*Entry
 		allowedOwners []*regexp.Regexp
 		isStrict      bool
 	}
@@ -103,13 +133,14 @@ func TestReadRules(t *testing.T) {
 `)
 			},
 			isStrict: false,
-			entries: []Entry{
+			entries: []*Entry{
 				{
 					State: Noop,
 					Path: Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
+					Group:          mustParseGroup(0, "- record: foo\n  expr: bar\n"),
 					Rule:           mustParse(3, "- record: foo\n  expr: bar\n"),
 					DisabledChecks: []string{"promql/series"},
 				},
@@ -131,13 +162,14 @@ groups:
 `)
 			},
 			isStrict: true,
-			entries: []Entry{
+			entries: []*Entry{
 				{
 					State: Noop,
 					Path: Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
+					Group:          mustParseGroup(3, "groups:\n- name: foo\n  rules:\n  - record: foo\n    expr: bar\n"),
 					Rule:           mustParse(6, "  - record: foo\n    expr: bar\n"),
 					DisabledChecks: []string{"promql/series"},
 				},
@@ -156,14 +188,15 @@ groups:
 `)
 			},
 			isStrict: false,
-			entries: []Entry{
+			entries: []*Entry{
 				{
 					State: Noop,
 					Path: Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					Rule: mustParse(3, "- record: foo\n  expr: bar\n"),
+					Group: mustParseGroup(0, "- record: foo\n  expr: bar\n"),
+					Rule:  mustParse(3, "- record: foo\n  expr: bar\n"),
 				},
 			},
 		},
@@ -183,14 +216,15 @@ groups:
 `)
 			},
 			isStrict: true,
-			entries: []Entry{
+			entries: []*Entry{
 				{
 					State: Noop,
 					Path: Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					Rule: mustParse(6, "  - record: foo\n    expr: bar\n"),
+					Group: mustParseGroup(3, "groups:\n- name: foo\n  rules:\n  - record: foo\n    expr: bar\n"),
+					Rule:  mustParse(6, "  - record: foo\n    expr: bar\n"),
 				},
 			},
 		},
@@ -207,13 +241,14 @@ groups:
 `)
 			},
 			isStrict: false,
-			entries: []Entry{
+			entries: []*Entry{
 				{
 					State: Noop,
 					Path: Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
+					Group:          mustParseGroup(0, "- record: foo\n  expr: bar\n"),
 					Rule:           mustParse(3, "- record: foo\n  expr: bar\n"),
 					DisabledChecks: []string{"promql/series"},
 				},
@@ -235,13 +270,14 @@ groups:
 `)
 			},
 			isStrict: true,
-			entries: []Entry{
+			entries: []*Entry{
 				{
 					State: Noop,
 					Path: Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
+					Group:          mustParseGroup(3, "groups:\n- name: foo\n  rules:\n  - record: foo\n    expr: bar\n"),
 					Rule:           mustParse(6, "  - record: foo\n    expr: bar\n"),
 					DisabledChecks: []string{"promql/series"},
 				},
@@ -260,7 +296,7 @@ groups:
 `)
 			},
 			isStrict: false,
-			entries: []Entry{
+			entries: []*Entry{
 				{
 					State: Noop,
 					Path: Path{
@@ -297,7 +333,7 @@ groups:
 `)
 			},
 			isStrict: true,
-			entries: []Entry{
+			entries: []*Entry{
 				{
 					State: Noop,
 					Path: Path{
@@ -396,11 +432,10 @@ groups:
 				if tc.check != nil {
 					tc.check(t, entries)
 				} else {
-					expected, err := json.MarshalIndent(tc.entries, "", "  ")
-					require.NoError(t, err, "json(expected)")
-					got, err := json.MarshalIndent(entries, "", "  ")
-					require.NoError(t, err, "json(got)")
-					require.Equal(t, string(expected), string(got))
+					if diff := cmp.Diff(tc.entries, entries, entryCmpOptions...); diff != "" {
+						t.Errorf("readRules() returned wrong output (-want +got):\n%s", diff)
+						return
+					}
 				}
 			},
 		)
@@ -429,7 +464,7 @@ func TestChangeTypeMarshalJSON(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			b, err := tc.ct.MarshalJSON()
+			b, err := json.Marshal(tc.ct)
 			require.NoError(t, err)
 			require.Equal(t, tc.expected, string(b))
 		})

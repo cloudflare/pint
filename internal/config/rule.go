@@ -22,18 +22,18 @@ type Rule struct {
 	Aggregate     []AggregateSettings        `hcl:"aggregate,block" json:"aggregate,omitempty"`
 	Annotation    []AnnotationSettings       `hcl:"annotation,block" json:"annotation,omitempty"`
 	Label         []AnnotationSettings       `hcl:"label,block" json:"label,omitempty"`
-	Cost          *CostSettings              `hcl:"cost,block" json:"cost,omitempty"`
-	Alerts        *AlertsSettings            `hcl:"alerts,block" json:"alerts,omitempty"`
-	For           *ForSettings               `hcl:"for,block" json:"for,omitempty"`
-	KeepFiringFor *ForSettings               `hcl:"keep_firing_for,block" json:"keep_firing_for,omitempty"`
-	RangeQuery    *RangeQuerySettings        `hcl:"range_query,block" json:"range_query,omitempty"`
-	Report        *ReportSettings            `hcl:"report,block" json:"report,omitempty"`
+	Cost          *CostSettings              `hcl:"cost,block" json:"cost,omitzero"`
+	Alerts        *AlertsSettings            `hcl:"alerts,block" json:"alerts,omitzero"`
+	For           *ForSettings               `hcl:"for,block" json:"for,omitzero"`
+	KeepFiringFor *ForSettings               `hcl:"keep_firing_for,block" json:"keep_firing_for,omitzero"`
+	RangeQuery    *RangeQuerySettings        `hcl:"range_query,block" json:"range_query,omitzero"`
+	Report        *ReportSettings            `hcl:"report,block" json:"report,omitzero"`
 	Reject        []RejectSettings           `hcl:"reject,block" json:"reject,omitempty"`
 	RuleLink      []RuleLinkSettings         `hcl:"link,block" json:"link,omitempty"`
 	RuleName      []RuleNameSettings         `hcl:"name,block" json:"name,omitempty"`
 	Selector      []options.SelectorSettings `hcl:"selector,block" json:"selector,omitempty"`
 	Call          []options.CallSettings     `hcl:"call,block" json:"call,omitempty"`
-	Locked        bool                       `hcl:"locked,optional" json:"locked,omitempty"`
+	Locked        bool                       `hcl:"locked,optional" json:"locked,omitzero"`
 }
 
 func (rule *Rule) validate() (err error) {

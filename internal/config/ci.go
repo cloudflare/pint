@@ -6,7 +6,7 @@ import (
 
 type CI struct {
 	BaseBranch string `hcl:"baseBranch,optional" json:"baseBranch,omitempty"`
-	MaxCommits int    `hcl:"maxCommits,optional" json:"maxCommits,omitempty"`
+	MaxCommits int    `hcl:"maxCommits,optional" json:"maxCommits,omitzero"`
 }
 
 func (ci CI) validate() error {

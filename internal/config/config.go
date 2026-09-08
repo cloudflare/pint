@@ -2,7 +2,8 @@ package config
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"fmt"
 	"log/slog"
 	"os"
@@ -26,12 +27,12 @@ type staticRule struct {
 }
 
 type Config struct {
-	CI         *CI                `hcl:"ci,block" json:"ci,omitempty"`
-	Parser     *Parser            `hcl:"parser,block" json:"parser,omitempty"`
-	Repository *Repository        `hcl:"repository,block" json:"repository,omitempty"`
-	Discovery  *Discovery         `hcl:"discovery,block" json:"discovery,omitempty"`
-	Checks     *Checks            `hcl:"checks,block" json:"checks,omitempty"`
-	Owners     *Owners            `hcl:"owners,block" json:"owners,omitempty"`
+	CI         *CI                `hcl:"ci,block" json:"ci,omitzero"`
+	Parser     *Parser            `hcl:"parser,block" json:"parser,omitzero"`
+	Repository *Repository        `hcl:"repository,block" json:"repository,omitzero"`
+	Discovery  *Discovery         `hcl:"discovery,block" json:"discovery,omitzero"`
+	Checks     *Checks            `hcl:"checks,block" json:"checks,omitzero"`
+	Owners     *Owners            `hcl:"owners,block" json:"owners,omitzero"`
 	Prometheus []PrometheusConfig `hcl:"prometheus,block" json:"prometheus,omitempty"`
 	Check      []Check            `hcl:"check,block" json:"check,omitempty"`
 	Rules      []Rule             `hcl:"rule,block" json:"rules,omitempty"`
@@ -76,7 +77,12 @@ func (cfg *Config) SetDisabledChecks(l []string) {
 }
 
 func (cfg Config) String() string {
-	content, _ := json.MarshalIndent(cfg, "", "  ")
+	content, _ := json.Marshal(
+		cfg,
+		jsontext.WithIndent("  "),
+		jsontext.EscapeForHTML(true),
+		json.Deterministic(true),
+	)
 	return string(content)
 }
 

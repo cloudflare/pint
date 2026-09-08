@@ -1,7 +1,8 @@
 package config
 
 import (
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"errors"
 	"fmt"
 	"testing"
@@ -54,5 +55,13 @@ func TestChecksSettings(t *testing.T) {
 func TestCheckMarshalJSONError(t *testing.T) {
 	c := Check{Name: "invalid"}
 	_, err := json.Marshal(c)
-	require.EqualError(t, err, `json: error calling MarshalJSON for type *config.Check: unknown check "invalid"`)
+
+	// SemanticError randomizes its modal verb, so compare all exported fields.
+	semanticErr, ok := errors.AsType[*json.SemanticError](err)
+	require.True(t, ok)
+	require.Equal(t, int64(0), semanticErr.ByteOffset)
+	require.Equal(t, jsontext.Pointer(""), semanticErr.JSONPointer)
+	require.Equal(t, jsontext.Kind(0), semanticErr.JSONKind)
+	require.Equal(t, jsontext.Value(nil), semanticErr.JSONValue)
+	require.EqualError(t, semanticErr.Err, `unknown check "invalid"`)
 }

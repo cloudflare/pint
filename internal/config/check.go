@@ -1,7 +1,8 @@
 package config
 
 import (
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"fmt"
 
 	"github.com/hashicorp/hcl/v2"
@@ -11,16 +12,16 @@ import (
 )
 
 type Check struct {
-	Body hcl.Body `hcl:",remain" json:"-"`
-	Name string   `hcl:",label" json:"name"`
+	Body hcl.Body `hcl:",remain"`
+	Name string   `hcl:",label"`
 }
 
-func (c Check) MarshalJSON() ([]byte, error) {
+func (c Check) MarshalJSONTo(enc *jsontext.Encoder) error {
 	s, err := c.Decode()
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return json.MarshalIndent(s, "", "  ")
+	return json.MarshalEncode(enc, s)
 }
 
 func (c Check) Decode() (s CheckSettings, err error) {

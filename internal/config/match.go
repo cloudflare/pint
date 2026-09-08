@@ -41,9 +41,9 @@ type (
 )
 
 type Match struct {
-	Label      *MatchLabel        `hcl:"label,block" json:"label,omitempty"`
-	Annotation *MatchAnnotation   `hcl:"annotation,block" json:"annotation,omitempty"`
-	Command    *ContextCommandVal `hcl:"command,optional" json:"command,omitempty"`
+	Label      *MatchLabel        `hcl:"label,block" json:"label,omitzero"`
+	Annotation *MatchAnnotation   `hcl:"annotation,block" json:"annotation,omitzero"`
+	Command    *ContextCommandVal `hcl:"command,optional" json:"command,omitzero"`
 
 	pathRe                     *regexp.Regexp
 	nameRe                     *regexp.Regexp

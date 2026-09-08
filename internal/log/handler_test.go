@@ -3,9 +3,9 @@ package log
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
 	"log/slog"
+	"math"
 	"strconv"
 	"testing"
 	"time"
@@ -74,13 +74,9 @@ func TestHandler(t *testing.T) {
 		{
 			noColor: true,
 			run: func(l *slog.Logger) {
-				type Foo struct {
-					N json.Number
-				}
-				x := Foo{json.Number(`invalid`)}
-				l.Error("bar", slog.Any("err", x))
+				l.Error("bar", slog.Any("err", math.Inf(1)))
 			},
-			expected: "level=ERROR msg=bar err={invalid}\n",
+			expected: "level=ERROR msg=bar err=+Inf\n",
 		},
 		{
 			noColor: true,
@@ -94,7 +90,7 @@ func TestHandler(t *testing.T) {
 			run: func(l *slog.Logger) {
 				l.Info("bar", slog.Group("group", slog.String("with", "true")))
 			},
-			expected: "level=INFO msg=bar group=[{\"Key\":\"with\",\"Value\":{}}]\n",
+			expected: "level=INFO msg=bar group=[with=true]\n",
 		},
 		{
 			noColor: true,

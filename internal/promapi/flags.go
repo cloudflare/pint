@@ -2,7 +2,7 @@ package promapi
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/v2"
 	"errors"
 	"fmt"
 	"io"
@@ -103,7 +103,7 @@ func parseFlags(r io.Reader) (_ v1.FlagsResult, err error) {
 	defer dummyReadAll(r)
 
 	var data PrometheusFlagsResponse
-	if err = json.NewDecoder(r).Decode(&data); err != nil {
+	if err = json.UnmarshalRead(r, &data); err != nil {
 		return data.Data, APIError{
 			Status:    data.Status,
 			ErrorType: v1.ErrBadResponse,

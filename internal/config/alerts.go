@@ -12,7 +12,7 @@ type AlertsSettings struct {
 	Resolve  string `hcl:"resolve" json:"resolve"`
 	Comment  string `hcl:"comment,optional" json:"comment,omitempty"`
 	Severity string `hcl:"severity,optional" json:"severity,omitempty"`
-	MinCount int    `hcl:"minCount,optional" json:"minCount,omitempty"`
+	MinCount int    `hcl:"minCount,optional" json:"minCount,omitzero"`
 }
 
 func (as AlertsSettings) validate() error {

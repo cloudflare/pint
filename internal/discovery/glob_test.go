@@ -1,7 +1,6 @@
 package discovery_test
 
 import (
-	"encoding/json"
 	"errors"
 	"io/fs"
 	"os"
@@ -12,6 +11,7 @@ import (
 	"syscall"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/discovery"
@@ -57,6 +57,7 @@ func TestGlobPathFinder(t *testing.T) {
 						Name:          "bar.yml",
 						SymlinkTarget: "bar.yml",
 					},
+					Group: &testFile.Groups[0],
 					Rule:  testFile.Groups[0].Rules[0],
 					Owner: "bob",
 				},
@@ -86,7 +87,7 @@ func TestGlobPathFinder(t *testing.T) {
 						SymlinkTarget: "bar.yml",
 					},
 					PathError: parser.ParseError{
-						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
+						Err:  errors.New("top level field must be a groups key, got list"),
 						Line: 3,
 					},
 					Owner: "bob",
@@ -118,6 +119,7 @@ func TestGlobPathFinder(t *testing.T) {
 						Name:          "bar.yml",
 						SymlinkTarget: "bar.yml",
 					},
+					Group: &testFile.Groups[0],
 					Rule:  testFile.Groups[0].Rules[0],
 					Owner: "bob",
 				},
@@ -133,6 +135,7 @@ func TestGlobPathFinder(t *testing.T) {
 						Name:          "foo/bar.yml",
 						SymlinkTarget: "foo/bar.yml",
 					},
+					Group: &testFile.Groups[0],
 					Rule:  testFile.Groups[0].Rules[0],
 					Owner: "alice",
 				},
@@ -149,7 +152,7 @@ func TestGlobPathFinder(t *testing.T) {
 						SymlinkTarget: "bar.yml",
 					},
 					PathError: parser.ParseError{
-						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
+						Err:  errors.New("top level field must be a groups key, got list"),
 						Line: 3,
 					},
 					Owner: "bob",
@@ -186,7 +189,7 @@ func TestGlobPathFinder(t *testing.T) {
 						SymlinkTarget: "bar.yml",
 					},
 					PathError: parser.ParseError{
-						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
+						Err:  errors.New("top level field must be a groups key, got list"),
 						Line: 3,
 					},
 					Owner: "bob",
@@ -198,7 +201,7 @@ func TestGlobPathFinder(t *testing.T) {
 						SymlinkTarget: "bar.yml",
 					},
 					PathError: parser.ParseError{
-						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
+						Err:  errors.New("top level field must be a groups key, got list"),
 						Line: 3,
 					},
 					Owner: "bob",
@@ -220,7 +223,7 @@ func TestGlobPathFinder(t *testing.T) {
 						SymlinkTarget: "a/bar.yml",
 					},
 					PathError: parser.ParseError{
-						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
+						Err:  errors.New("top level field must be a groups key, got list"),
 						Line: 3,
 					},
 					Owner: "bob",
@@ -232,7 +235,7 @@ func TestGlobPathFinder(t *testing.T) {
 						SymlinkTarget: "a/bar.yml",
 					},
 					PathError: parser.ParseError{
-						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
+						Err:  errors.New("top level field must be a groups key, got list"),
 						Line: 3,
 					},
 					Owner: "bob",
@@ -244,7 +247,7 @@ func TestGlobPathFinder(t *testing.T) {
 						SymlinkTarget: "a/bar.yml",
 					},
 					PathError: parser.ParseError{
-						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
+						Err:  errors.New("top level field must be a groups key, got list"),
 						Line: 3,
 					},
 					Owner: "bob",
@@ -266,7 +269,7 @@ func TestGlobPathFinder(t *testing.T) {
 						SymlinkTarget: "a/bar.yml",
 					},
 					PathError: parser.ParseError{
-						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
+						Err:  errors.New("top level field must be a groups key, got list"),
 						Line: 3,
 					},
 					Owner: "bob",
@@ -286,7 +289,7 @@ func TestGlobPathFinder(t *testing.T) {
 						SymlinkTarget: "a/bar.yml",
 					},
 					PathError: parser.ParseError{
-						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
+						Err:  errors.New("top level field must be a groups key, got list"),
 						Line: 3,
 					},
 					Owner: "bob",
@@ -314,7 +317,7 @@ func TestGlobPathFinder(t *testing.T) {
 						SymlinkTarget: "a/bar.yml",
 					},
 					PathError: parser.ParseError{
-						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
+						Err:  errors.New("unexpected key xxx"),
 						Line: 1,
 					},
 					Owner: "",
@@ -326,7 +329,7 @@ func TestGlobPathFinder(t *testing.T) {
 						SymlinkTarget: "a/bar.yml",
 					},
 					PathError: parser.ParseError{
-						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
+						Err:  errors.New("unexpected key xxx"),
 						Line: 1,
 					},
 					Owner: "",
@@ -361,7 +364,7 @@ func TestGlobPathFinder(t *testing.T) {
 						SymlinkTarget: "a/bar.yml",
 					},
 					PathError: parser.ParseError{
-						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
+						Err:  errors.New("top level field must be a groups key, got list"),
 						Line: 3,
 					},
 					Owner: "bob",
@@ -373,7 +376,7 @@ func TestGlobPathFinder(t *testing.T) {
 						SymlinkTarget: "a/bar.yml",
 					},
 					PathError: parser.ParseError{
-						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
+						Err:  errors.New("top level field must be a groups key, got list"),
 						Line: 3,
 					},
 					Owner: "bob",
@@ -431,7 +434,7 @@ func TestGlobPathFinder(t *testing.T) {
 						SymlinkTarget: "subdir/bar.yml",
 					},
 					PathError: parser.ParseError{
-						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
+						Err:  errors.New("top level field must be a groups key, got list"),
 						Line: 3,
 					},
 					Owner: "bob",
@@ -521,11 +524,10 @@ func TestGlobPathFinder(t *testing.T) {
 			} else {
 				require.NoError(t, err)
 
-				expected, err := json.MarshalIndent(tc.entries, "", "  ")
-				require.NoError(t, err, "json(expected)")
-				got, err := json.MarshalIndent(entries, "", "  ")
-				require.NoError(t, err, "json(got)")
-				require.Equal(t, string(expected), string(got))
+				if diff := cmp.Diff(tc.entries, entries, entryCmpOptions...); diff != "" {
+					t.Errorf("tc.finder.Find() returned wrong output (-want +got):\n%s", diff)
+					return
+				}
 			}
 		})
 	}

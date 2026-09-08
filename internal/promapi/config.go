@@ -2,6 +2,7 @@ package promapi
 
 import (
 	"context"
+	"encoding/json/v2"
 	"errors"
 	"fmt"
 	"io"
@@ -10,7 +11,6 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/go-json-experiment/json"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"go.yaml.in/yaml/v3"
 )

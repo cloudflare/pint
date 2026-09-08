@@ -13,7 +13,7 @@ type AnnotationSettings struct {
 	Comment  string   `hcl:"comment,optional" json:"comment,omitempty"`
 	Severity string   `hcl:"severity,optional" json:"severity,omitempty"`
 	Values   []string `hcl:"values,optional" json:"values,omitempty"`
-	Required bool     `hcl:"required,optional" json:"required,omitempty"`
+	Required bool     `hcl:"required,optional" json:"required,omitzero"`
 }
 
 func (as AnnotationSettings) validate() error {

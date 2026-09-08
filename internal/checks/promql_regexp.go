@@ -28,7 +28,7 @@ const (
 )
 
 type PromqlRegexpSettings struct {
-	Smelly        *bool `hcl:"smelly,optional" json:"smelly,omitempty"`
+	Smelly        *bool `hcl:"smelly,optional" json:"smelly,omitzero"`
 	smellyEnabled bool
 }
 

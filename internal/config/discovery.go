@@ -122,7 +122,7 @@ func (d *Discovery) merge(dst, src []*promapi.FailoverGroup) ([]*promapi.Failove
 
 type PrometheusTemplate struct {
 	Headers     map[string]string `hcl:"headers,optional" json:"headers,omitempty"`
-	TLS         *TLSConfig        `hcl:"tls,block" json:"tls,omitempty"`
+	TLS         *TLSConfig        `hcl:"tls,block" json:"tls,omitzero"`
 	Name        string            `hcl:"name" json:"name"`
 	URI         string            `hcl:"uri" json:"uri"`
 	PublicURI   string            `hcl:"publicURI,optional" json:"publicURI,omitempty"`
@@ -370,7 +370,7 @@ type PrometheusQuery struct {
 	URI      string               `hcl:"uri" json:"uri"`
 	Headers  map[string]string    `hcl:"headers,optional" json:"headers,omitempty"`
 	Timeout  string               `hcl:"timeout,optional"  json:"timeout"`
-	TLS      *TLSConfig           `hcl:"tls,block" json:"tls,omitempty"`
+	TLS      *TLSConfig           `hcl:"tls,block" json:"tls,omitzero"`
 	Query    string               `hcl:"query" json:"query"`
 	Template []PrometheusTemplate `hcl:"template,block" json:"template"`
 }

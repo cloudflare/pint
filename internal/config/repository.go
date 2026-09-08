@@ -104,9 +104,9 @@ func (gl GitLab) validate() error {
 }
 
 type Repository struct {
-	BitBucket *BitBucket `hcl:"bitbucket,block" json:"bitbucket,omitempty"`
-	GitHub    *GitHub    `hcl:"github,block" json:"github,omitempty"`
-	GitLab    *GitLab    `hcl:"gitlab,block" json:"gitlab,omitempty"`
+	BitBucket *BitBucket `hcl:"bitbucket,block" json:"bitbucket,omitzero"`
+	GitHub    *GitHub    `hcl:"github,block" json:"github,omitzero"`
+	GitLab    *GitLab    `hcl:"gitlab,block" json:"gitlab,omitzero"`
 }
 
 func (r *Repository) validate() (err error) {
