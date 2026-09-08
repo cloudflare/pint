@@ -175,6 +175,7 @@ func makeComments(summary Summary, showDuplicates bool) (comments []PendingComme
 		buf.WriteString(reports[0].Problem.Reporter)
 		buf.WriteString(".html).\n")
 
+		path := reports[0].Path.SymlinkTarget
 		line := reports[0].Problem.Lines.Last
 		oldPath := ""
 		changedLines := git.LineNumbers{}
@@ -187,10 +188,14 @@ func makeComments(summary Summary, showDuplicates bool) (comments []PendingComme
 					break
 				}
 			}
+			if reports[0].Changes.IsSymlink {
+				path = reports[0].Path.Name
+				line = 1
+			}
 		}
 
 		pc := PendingComment{
-			path:       reports[0].Path.SymlinkTarget,
+			path:       path,
 			oldPath:    oldPath,
 			text:       buf.String(),
 			line:       line,

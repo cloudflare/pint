@@ -14,6 +14,11 @@
 - Duration expressions are now enabled by default as of Prometheus v3.14.0
   and no longer require `--enable-feature=promql-duration-expr`.
 
+### Fixed
+
+- GitHub, GitLab, and BitBucket reporters were trying to create comments on
+  incorrect lines for symlinked files.
+
 ## v0.87.0
 
 ### Added

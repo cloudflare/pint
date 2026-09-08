@@ -456,7 +456,8 @@ groups:
 						SymlinkTarget: "rules.yml",
 					},
 					Changes: &discovery.Changes{
-						Lines: git.MakeLineRangeFromTo(1, 3, git.LinesAfter),
+						Lines:     git.MakeLineRangeFromTo(1, 3, git.LinesAfter),
+						IsSymlink: true,
 					},
 					Rule: mustParse(1, "- record: up:count\n  expr: count(up)\n"),
 				},

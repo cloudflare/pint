@@ -84,6 +84,9 @@ type Changes struct {
 
 	// Modified lines.
 	Lines git.LineNumbers
+
+	// IsSymlink is true when the path after the change is a symlink.
+	IsSymlink bool
 }
 
 type Entry struct {
