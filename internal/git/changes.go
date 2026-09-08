@@ -248,10 +248,10 @@ func Changes(ctx context.Context, cmd CommandRunner, baseBranch string, filter P
 		}
 
 		// Rest is populated inside the next loop.
-		change := &FileChange{ // nolint: exhaustruct
+		change := &FileChange{ // nolint: exhaustruct_v5
 			Status: status,
-			Path: PathDiff{ // nolint: exhaustruct
-				After: Path{ // nolint: exhaustruct
+			Path: PathDiff{ // nolint: exhaustruct_v5
+				After: Path{ // nolint: exhaustruct_v5
 					Name: dstPath,
 				},
 			},

@@ -23,7 +23,7 @@ func (e *endpointStats) hit()  { e.hits++ }
 func (e *endpointStats) miss() { e.misses++ }
 
 func newQueryCache(maxStale time.Duration, now nowFunc) *queryCache {
-	// nolint: exhaustruct
+	// nolint: exhaustruct_v5
 	return &queryCache{
 		now:      now,
 		entries:  map[uint64]*cacheEntry{},

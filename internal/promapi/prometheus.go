@@ -151,7 +151,7 @@ func NewPrometheus(name, uri, publicURI string, headers map[string]string, timeo
 		publicURI = safeURI
 	}
 
-	prom := Prometheus{ // nolint: exhaustruct
+	prom := Prometheus{ // nolint: exhaustruct_v5
 		name:        name,
 		unsafeURI:   uri,
 		safeURI:     safeURI,
@@ -162,7 +162,7 @@ func NewPrometheus(name, uri, publicURI string, headers map[string]string, timeo
 		locker:      newPartitionLocker((&sync.Mutex{})),
 		rateLimiter: ratelimit.New(rl),
 		concurrency: concurrency,
-		apis:        &unsupporedAPIs{}, // nolint: exhaustruct
+		apis:        &unsupporedAPIs{}, // nolint: exhaustruct_v5
 	}
 
 	return &prom
@@ -240,7 +240,7 @@ func processJob(prom *Prometheus, query querier) queryResult {
 	}
 
 	if !prom.apis.isSupported(query.Endpoint()) {
-		return queryResult{err: ErrUnsupported} // nolint: exhaustruct
+		return queryResult{err: ErrUnsupported} // nolint: exhaustruct_v5
 	}
 
 	prometheusQueriesTotal.WithLabelValues(prom.name, query.Endpoint()).Inc()
@@ -264,7 +264,7 @@ func processJob(prom *Prometheus, query querier) queryResult {
 				slog.String("uri", prom.safeURI),
 				slog.String("api", query.Endpoint()),
 			)
-			return queryResult{err: ErrUnsupported} // nolint: exhaustruct
+			return queryResult{err: ErrUnsupported} // nolint: exhaustruct_v5
 		}
 		slog.LogAttrs(
 			context.Background(), slog.LevelError,

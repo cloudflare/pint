@@ -54,5 +54,5 @@ func TestChecksSettings(t *testing.T) {
 func TestCheckMarshalJSONError(t *testing.T) {
 	c := Check{Name: "invalid"}
 	_, err := json.Marshal(c)
-	require.EqualError(t, err, `json: error calling MarshalJSON for type config.Check: unknown check "invalid"`)
+	require.EqualError(t, err, `json: error calling MarshalJSON for type *config.Check: unknown check "invalid"`)
 }

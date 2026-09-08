@@ -133,13 +133,13 @@ func getContext() *hcl.EvalContext {
 }
 
 func Load(path string, failOnMissing bool) (cfg Config, fromFile bool, err error) {
-	cfg = Config{ // nolint: exhaustruct
+	cfg = Config{ // nolint: exhaustruct_v5
 		CI: &CI{
 			MaxCommits: 20,
 			BaseBranch: "master",
 		},
-		Parser:     &Parser{},     // nolint: exhaustruct
-		Repository: &Repository{}, // nolint: exhaustruct
+		Parser:     &Parser{},     // nolint: exhaustruct_v5
+		Repository: &Repository{}, // nolint: exhaustruct_v5
 		Checks: &Checks{
 			Enabled:  checks.CheckNames,
 			Disabled: []string{},

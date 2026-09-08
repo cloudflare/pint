@@ -143,7 +143,7 @@ func baseRules(staticRules []staticRule, proms []*promapi.FailoverGroup, match [
 
 func defaultRuleMatch(match []Match, defaultStates []string) []Match {
 	if len(match) == 0 {
-		return []Match{{State: defaultStates}} // nolint: exhaustruct
+		return []Match{{State: defaultStates}} // nolint: exhaustruct_v5
 	}
 	dst := make([]Match, 0, len(match))
 	for _, m := range match {
