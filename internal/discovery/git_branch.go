@@ -73,7 +73,11 @@ func (f GitBranchFinder) Find(ctx context.Context, allEntries []*Entry) (entries
 
 		var fileChanges *Changes
 		if len(change.Body.Lines) > 0 || oldPath != "" {
-			fileChanges = &Changes{Lines: change.Body.Lines, OldPath: oldPath}
+			fileChanges = &Changes{
+				Lines:     change.Body.Lines,
+				OldPath:   oldPath,
+				IsSymlink: change.Path.After.Type == git.Symlink,
+			}
 		}
 
 		var entriesBefore, entriesAfter []*Entry

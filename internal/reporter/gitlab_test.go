@@ -56,6 +56,8 @@ func TestGitLabReporter(t *testing.T) {
 	tmpDir := t.TempDir()
 	mockPath := filepath.Join(tmpDir, "foo.txt")
 	require.NoError(t, os.WriteFile(mockPath, []byte(mockRules), 0o644))
+	mockLink := filepath.Join(tmpDir, "link.txt")
+	require.NoError(t, os.Symlink(mockPath, mockLink))
 	mockFile := p.Parse(strings.NewReader(mockRules))
 
 	fooReport := reporter.Report{
@@ -171,6 +173,25 @@ func TestGitLabReporter(t *testing.T) {
 
 :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/%s.html).
 `, reporter, summary, details, reporter))
+	}
+	symlinkedDiscBody := func(reporter, summary, details, link string) *string {
+		return new(fmt.Sprintf(`:warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **%s** check.
+
+------
+
+%s
+
+<details>
+<summary>More information</summary>
+%s
+</details>
+
+:leftwards_arrow_with_hook: This problem was detected on a symlinked file `+"`%s`"+`.
+
+------
+
+:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/%s.html).
+`, reporter, summary, details, link, reporter))
 	}
 	discBodyWithDiag := func(reporter, summary, details, yml, diag string) *string {
 		return new(fmt.Sprintf(
@@ -1168,6 +1189,59 @@ Below is the list of checks that were disabled for each Prometheus server define
 				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{})
 				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
 					Body: discBody("a", "foo error1", "foo details"),
+				}).ReturnJSON(gitlab.Response{})
+			}),
+			errorHandler: func(err error) error {
+				return err
+			},
+		},
+		{
+			description: "symlink target outside diff",
+			timeout:     time.Minute,
+			maxComments: 1,
+			// The merge request adds mockLink, while the problem belongs to
+			// mockPath, which is not in the merge request diff.
+			summary: reporter.NewSummary([]reporter.Report{
+				{
+					Path: discovery.Path{
+						Name:          mockLink,
+						SymlinkTarget: mockPath,
+					},
+					Changes: &discovery.Changes{
+						OldPath:   "",
+						Lines:     git.MakeLineRangeFromTo(1, 4, git.LinesAfter),
+						IsSymlink: true,
+					},
+					Rule: mockFile.Groups[0].Rules[1],
+					Problem: checks.Problem{
+						Reporter:    "foo",
+						Summary:     "foo error",
+						Details:     "foo details",
+						Diagnostics: []diags.Diagnostic{},
+						Lines:       diags.LineRange{First: 4, Last: 4},
+						Severity:    checks.Warning,
+						Anchor:      checks.AnchorAfter,
+					},
+				},
+			}),
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(apiUser).ReturnJSON(gitlab.User{ID: 123})
+				s.ExpectGet(apiOpenMergeRequests).ReturnJSON([]gitlab.BasicMergeRequest{
+					{IID: 1},
+				})
+				s.ExpectGet(apiVersions(1)).ReturnJSON([]gitlab.MergeRequestDiffVersion{
+					{ID: 2, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
+					{ID: 1, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
+				})
+				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{})
+				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
+					Body: symlinkedDiscBody(
+						"foo",
+						"foo error",
+						"foo details",
+						mockLink,
+					),
+					Position: discPosition(mockLink, 1),
 				}).ReturnJSON(gitlab.Response{})
 			}),
 			errorHandler: func(err error) error {
