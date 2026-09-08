@@ -394,19 +394,20 @@ func TestFilePathDiscover(t *testing.T) {
 			setup: func(t *testing.T) (FilePath, string) {
 				t.Helper()
 				dir := filepath.Join(t.TempDir(), "missing")
+				expectedErr := fmt.Sprintf(
+					"filepath discovery error: lstat %s: no such file or directory",
+					dir,
+				)
 				return FilePath{
-						Directory: dir,
-						Match:     ".+",
-						Template: []PrometheusTemplate{
-							{
-								Name: "test",
-								URI:  "http://localhost",
-							},
+					Directory: dir,
+					Match:     ".+",
+					Template: []PrometheusTemplate{
+						{
+							Name: "test",
+							URI:  "http://localhost",
 						},
-					}, fmt.Sprintf(
-						"filepath discovery error: lstat %s: no such file or directory",
-						dir,
-					)
+					},
+				}, expectedErr
 			},
 		},
 		{

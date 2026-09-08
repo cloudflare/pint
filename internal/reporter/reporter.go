@@ -93,7 +93,7 @@ type Summary struct {
 }
 
 func NewSummary(reports []Report) Summary {
-	return Summary{reports: reports} // nolint: exhaustruct
+	return Summary{reports: reports} // nolint: exhaustruct_v5
 }
 
 func (s *Summary) MarkCheckDisabled(prom, api string, checks []string) {
@@ -101,7 +101,7 @@ func (s *Summary) MarkCheckDisabled(prom, api string, checks []string) {
 		s.promDetails = map[string]PrometheusDetails{}
 	}
 	if _, ok := s.promDetails[prom]; !ok {
-		s.promDetails[prom] = PrometheusDetails{} // nolint: exhaustruct
+		s.promDetails[prom] = PrometheusDetails{} // nolint: exhaustruct_v5
 	}
 	s.promDetails[prom] = PrometheusDetails{
 		Name:           prom,

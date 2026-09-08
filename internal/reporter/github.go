@@ -76,7 +76,7 @@ func NewGithubReporter(
 	)
 
 	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: token}, // nolint: exhaustruct
+		&oauth2.Token{AccessToken: token}, // nolint: exhaustruct_v5
 	)
 	tc := oauth2.NewClient(ctx, ts)
 

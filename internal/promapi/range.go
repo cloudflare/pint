@@ -161,7 +161,7 @@ func (prom *Prometheus) RangeQuery(ctx context.Context, expr string, params Rang
 		wg.Go(func() {
 			result, err := prom.runQuery(ctx, q)
 			if err != nil {
-				results <- queryResult{err: err} // nolint: exhaustruct
+				results <- queryResult{err: err} // nolint: exhaustruct_v5
 				cancel()
 				return
 			}
@@ -174,9 +174,9 @@ func (prom *Prometheus) RangeQuery(ctx context.Context, expr string, params Rang
 		close(results)
 	}()
 
-	merged := RangeQueryResult{ // nolint: exhaustruct
+	merged := RangeQueryResult{ // nolint: exhaustruct_v5
 		URI: prom.publicURI,
-		Series: SeriesTimeRanges{ // nolint: exhaustruct
+		Series: SeriesTimeRanges{ // nolint: exhaustruct_v5
 			From:  start,
 			Until: end,
 			Step:  step,

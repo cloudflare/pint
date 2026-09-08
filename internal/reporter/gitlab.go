@@ -293,7 +293,7 @@ func (gl *GitLabReporter) getMRs(ctx context.Context) (ids []int64, err error) {
 		return gl.client.MergeRequests.ListProjectMergeRequests(gl.project, &gitlab.ListProjectMergeRequestsOptions{
 			State:        new("opened"),
 			SourceBranch: new(gl.branch),
-			ListOptions:  gitlab.ListOptions{Page: pageNum},
+			Page:         pageNum,
 		}, gitlab.WithContext(reqCtx))
 	})
 	if err != nil {
@@ -311,9 +311,7 @@ func (gl *GitLabReporter) getVersions(ctx context.Context, mrNum int64) (*gitlab
 		reqCtx, cancel := context.WithTimeout(ctx, gl.timeout)
 		defer cancel()
 		return gl.client.MergeRequests.GetMergeRequestDiffVersions(gl.project, mrNum, &gitlab.GetMergeRequestDiffVersionsOptions{
-			ListOptions: gitlab.ListOptions{
-				Page: pageNum,
-			},
+			Page: pageNum,
 		}, gitlab.WithContext(reqCtx))
 	})
 	if err != nil {
@@ -331,9 +329,7 @@ func (gl *GitLabReporter) getDiscussions(ctx context.Context, mrNum int64) ([]*g
 		reqCtx, cancel := context.WithTimeout(ctx, gl.timeout)
 		defer cancel()
 		return gl.client.Discussions.ListMergeRequestDiscussions(gl.project, mrNum, &gitlab.ListMergeRequestDiscussionsOptions{
-			ListOptions: gitlab.ListOptions{
-				Page: pageNum,
-			},
+			Page: pageNum,
 		}, gitlab.WithContext(reqCtx))
 	})
 	return discs, err

@@ -37,7 +37,7 @@ func (s *SampleLabels) UnmarshalJSONFrom(dec *jsontext.Decoder) (err error) {
 		return err
 	}
 	if tok.Kind() != '{' {
-		return &json.SemanticError{JSONKind: tok.Kind()} // nolint: exhaustruct
+		return &json.SemanticError{JSONKind: tok.Kind()} // nolint: exhaustruct_v5
 	}
 
 	var parts []string
@@ -69,7 +69,7 @@ func (s *SampleTimestampValue) UnmarshalJSONFrom(dec *jsontext.Decoder) (err err
 		return err
 	}
 	if tok.Kind() != '[' {
-		return &json.SemanticError{JSONKind: tok.Kind()} // nolint: exhaustruct
+		return &json.SemanticError{JSONKind: tok.Kind()} // nolint: exhaustruct_v5
 	}
 
 	tok, err = dec.ReadToken()
@@ -95,7 +95,7 @@ func (s *SampleTimestampValue) UnmarshalJSONFrom(dec *jsontext.Decoder) (err err
 		return err
 	}
 	if tok.Kind() != ']' {
-		return &json.SemanticError{JSONKind: tok.Kind()} // nolint: exhaustruct
+		return &json.SemanticError{JSONKind: tok.Kind()} // nolint: exhaustruct_v5
 	}
 	return nil
 }

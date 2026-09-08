@@ -87,7 +87,7 @@ type FailoverGroup struct {
 }
 
 func NewFailoverGroup(name, uri string, servers []*Prometheus, strictErrors bool, uptimeMetric string, include, exclude []*regexp.Regexp, tags []string) *FailoverGroup {
-	return &FailoverGroup{ // nolint: exhaustruct
+	return &FailoverGroup{ // nolint: exhaustruct_v5
 		name:           name,
 		uri:            uri,
 		servers:        servers,
@@ -96,7 +96,7 @@ func NewFailoverGroup(name, uri string, servers []*Prometheus, strictErrors bool
 		pathsInclude:   include,
 		pathsExclude:   exclude,
 		tags:           tags,
-		disabledChecks: disabledChecks{apis: map[string][]string{}}, // nolint: exhaustruct
+		disabledChecks: disabledChecks{apis: map[string][]string{}}, // nolint: exhaustruct_v5
 	}
 }
 

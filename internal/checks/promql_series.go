@@ -290,7 +290,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries 
 					slog.String("name", c.prom.Name()),
 					slog.String("metric", c.prom.UptimeMetric()),
 				)
-				promUptime = &promapi.RangeQueryResult{ // nolint: exhaustruct
+				promUptime = &promapi.RangeQueryResult{ // nolint: exhaustruct_v5
 					URI: c.prom.URI(),
 					Series: promapi.SeriesTimeRanges{
 						From:  params.Start(),

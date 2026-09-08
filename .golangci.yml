@@ -9,7 +9,7 @@ linters:
     - errname
     - errorlint
     - exhaustive
-    - exhaustruct
+    - exhaustruct_v5
     - exptostd
     - gocritic
     - godot
@@ -34,8 +34,8 @@ linters:
     - unused
     - usetesting
   settings:
-    exhaustruct:
-      exclude:
+    exhaustruct_v5:
+      ignore-patterns:
         - net/http\..+
         - crypto/tls\..+
         - encoding/xml\..+
@@ -61,7 +61,7 @@ linters:
       - std-error-handling
     rules:
       - linters:
-          - exhaustruct
+          - exhaustruct_v5
         path: ^.*_test\.go$
       - linters:
           - revive
@@ -83,7 +83,10 @@ formatters:
     - goimports
   settings:
     gofumpt:
-      extra-rules: true
+      extra:
+        balance-calls: true
+        clothe-returns: true
+        group-params: true
     goimports:
       local-prefixes:
         - github.com/cloudflare/pint

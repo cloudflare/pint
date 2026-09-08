@@ -126,7 +126,7 @@ func (p *Parser) parseNode(node, parent *yaml.Node, group *Group, offsetLine, of
 		}
 
 		if group == nil {
-			group = &Group{} // nolint: exhaustruct
+			group = &Group{} // nolint: exhaustruct_v5
 		}
 		// Try parsing rules.
 		for _, n := range unpackNodes(node) {
