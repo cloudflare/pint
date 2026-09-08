@@ -3,7 +3,7 @@ package reporter
 import (
 	"bytes"
 	"context"
-	"encoding/json"
+	"encoding/json/v2"
 	"fmt"
 	"io"
 	"log/slog"
@@ -316,7 +316,7 @@ type BitBucketPendingCommentAnchor struct {
 	LineType string `json:"lineType,omitempty"`
 	FileType string `json:"fileType,omitempty"`
 	DiffType string `json:"diffType"`
-	Line     int    `json:"line,omitempty"`
+	Line     int    `json:"line,omitzero"`
 }
 
 type BitBucketPendingComment struct {

@@ -2,7 +2,7 @@ package promapi
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/v2"
 	"errors"
 	"log/slog"
 	"net"
@@ -146,7 +146,7 @@ func tryDecodingAPIError(resp *http.Response) error {
 	}
 
 	var data PrometheusResponse
-	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+	if err := json.UnmarshalRead(resp.Body, &data); err != nil {
 		switch resp.StatusCode / 100 {
 		case 4:
 			return APIError{

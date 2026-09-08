@@ -2,7 +2,7 @@ package promapi
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/v2"
 	"errors"
 	"fmt"
 	"io"
@@ -104,7 +104,7 @@ func parseBuildInfo(r io.Reader) (_ v1.BuildinfoResult, err error) {
 	defer dummyReadAll(r)
 
 	var data PrometheusBuildInfoResponse
-	if err = json.NewDecoder(r).Decode(&data); err != nil {
+	if err = json.UnmarshalRead(r, &data); err != nil {
 		return data.Data, APIError{
 			Status:    data.Status,
 			ErrorType: v1.ErrBadResponse,

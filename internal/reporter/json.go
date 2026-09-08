@@ -2,7 +2,8 @@ package reporter
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"io"
 )
 
@@ -40,7 +41,10 @@ func (jr JSONReporter) Submit(_ context.Context, summary Summary) (err error) {
 		})
 	}
 
-	enc := json.NewEncoder(jr.output)
-	enc.SetIndent("", "  ")
-	return enc.Encode(out)
+	enc := jsontext.NewEncoder(
+		jr.output,
+		jsontext.WithIndent("  "),
+		jsontext.EscapeForHTML(true),
+	)
+	return json.MarshalEncode(enc, out)
 }

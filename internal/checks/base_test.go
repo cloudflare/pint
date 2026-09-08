@@ -3,7 +3,8 @@ package checks_test
 import (
 	"bytes"
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"fmt"
 	"io"
 	"log/slog"
@@ -446,7 +447,7 @@ func (pe promError) respond(w http.ResponseWriter, _ *http.Request) {
 		ErrorType: pe.errorType,
 		Error:     pe.err,
 	}
-	d, err := json.MarshalIndent(perr, "", "  ")
+	d, err := json.Marshal(perr, jsontext.WithIndent("  "))
 	if err != nil {
 		panic(err)
 	}
@@ -480,7 +481,7 @@ func (vr vectorResponse) respond(w http.ResponseWriter, _ *http.Request) {
 			Stats:      vr.stats,
 		},
 	}
-	d, err := json.MarshalIndent(result, "", "  ")
+	d, err := json.Marshal(result, jsontext.WithIndent("  "))
 	if err != nil {
 		panic(err)
 	}
@@ -533,7 +534,7 @@ func (mr matrixResponse) respond(w http.ResponseWriter, r *http.Request) {
 			Stats:      mr.stats,
 		},
 	}
-	d, err := json.MarshalIndent(result, "", "  ")
+	d, err := json.Marshal(result, jsontext.WithIndent("  "))
 	if err != nil {
 		panic(err)
 	}
@@ -554,7 +555,7 @@ func (cr configResponse) respond(w http.ResponseWriter, _ *http.Request) {
 		Status: "success",
 		Data:   v1.ConfigResult{YAML: cr.yaml},
 	}
-	d, err := json.MarshalIndent(result, "", "  ")
+	d, err := json.Marshal(result, jsontext.WithIndent("  "))
 	if err != nil {
 		panic(err)
 	}
@@ -575,7 +576,7 @@ func (fg flagsResponse) respond(w http.ResponseWriter, _ *http.Request) {
 		Status: "success",
 		Data:   fg.flags,
 	}
-	d, err := json.MarshalIndent(result, "", "  ")
+	d, err := json.Marshal(result, jsontext.WithIndent("  "))
 	if err != nil {
 		panic(err)
 	}
@@ -596,7 +597,7 @@ func (bi buildInfoResponse) respond(w http.ResponseWriter, _ *http.Request) {
 		Status: "success",
 		Data:   v1.BuildinfoResult{Version: bi.version},
 	}
-	d, err := json.MarshalIndent(result, "", "  ")
+	d, err := json.Marshal(result, jsontext.WithIndent("  "))
 	if err != nil {
 		panic(err)
 	}
@@ -618,7 +619,7 @@ func (mr metadataResponse) respond(w http.ResponseWriter, _ *http.Request) {
 		Status: "success",
 		Data:   mr.metadata,
 	}
-	d, err := json.MarshalIndent(result, "", "  ")
+	d, err := json.Marshal(result, jsontext.WithIndent("  "))
 	if err != nil {
 		panic(err)
 	}

@@ -1,7 +1,7 @@
 package reporter_test
 
 import (
-	"encoding/json"
+	"encoding/json/v2"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -1116,7 +1116,7 @@ func TestBitBucketReporter(t *testing.T) {
 				s.ExpectGet(bbPRPath + "?start=0").Return("not json")
 			}),
 			errorHandler: func(err error) error {
-				if err != nil && err.Error() == "failed to get open pull requests from BitBucket: invalid character 'o' in literal null (expecting 'u')" {
+				if err != nil && err.Error() == "failed to get open pull requests from BitBucket: jsontext: invalid character 'o' in literal null (expecting 'u') after offset 1" {
 					return nil
 				}
 				return fmt.Errorf("unexpected error: %w", err)
@@ -1131,7 +1131,7 @@ func TestBitBucketReporter(t *testing.T) {
 				s.ExpectGet(bbActivities + "?start=0").Return("bad json")
 			}),
 			errorHandler: func(err error) error {
-				if err != nil && err.Error() == "invalid character 'b' looking for beginning of value" {
+				if err != nil && err.Error() == "jsontext: invalid character 'b' at start of value" {
 					return nil
 				}
 				return fmt.Errorf("unexpected error: %w", err)

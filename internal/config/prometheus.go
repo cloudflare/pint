@@ -24,7 +24,7 @@ type TLSConfig struct {
 	CaCert             string `hcl:"caCert,optional" json:"caCert,omitempty"`
 	ClientCert         string `hcl:"clientCert,optional" json:"clientCert,omitempty"`
 	ClientKey          string `hcl:"clientKey,optional" json:"clientKey,omitempty"`
-	InsecureSkipVerify bool   `hcl:"skipVerify,optional" json:"skipVerify,omitempty"`
+	InsecureSkipVerify bool   `hcl:"skipVerify,optional" json:"skipVerify,omitzero"`
 }
 
 func (t TLSConfig) validate() error {
@@ -80,7 +80,7 @@ func (t *TLSConfig) toHTTPConfig() (*tls.Config, error) {
 
 type PrometheusConfig struct {
 	Headers     map[string]string `hcl:"headers,optional" json:"headers,omitempty"`
-	TLS         *TLSConfig        `hcl:"tls,block" json:"tls,omitempty"`
+	TLS         *TLSConfig        `hcl:"tls,block" json:"tls,omitzero"`
 	Name        string            `hcl:",label" json:"name"`
 	URI         string            `hcl:"uri" json:"uri"`
 	PublicURI   string            `hcl:"publicURI,optional" json:"publicURI,omitempty"`

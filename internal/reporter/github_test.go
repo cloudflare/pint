@@ -1,7 +1,7 @@
 package reporter_test
 
 import (
-	"encoding/json"
+	"encoding/json/v2"
 	"fmt"
 	"io"
 	"log/slog"
@@ -1174,7 +1174,7 @@ Fatal: syntax error (mock)
 `
 					body, _ := io.ReadAll(r.Body)
 					type jr struct {
-						Body string
+						Body string `json:"body"`
 					}
 					var j jr
 					_ = json.Unmarshal(body, &j)
@@ -1261,7 +1261,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 `
 					body, _ := io.ReadAll(r.Body)
 					type jr struct {
-						Body string
+						Body string `json:"body"`
 					}
 					var r jr
 					_ = json.Unmarshal(body, &r)

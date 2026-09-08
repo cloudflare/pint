@@ -145,7 +145,7 @@ func TestMetadata(t *testing.T) {
 			assertErr: func(t *testing.T, err error) {
 				require.EqualError(
 					t, err,
-					`bad_response: JSON parse error: invalid character '}' after object key`,
+					`bad_response: JSON parse error: jsontext: invalid character '}' after object name (expecting ':') within "/data/gauge" after offset 35`,
 				)
 			},
 			mock: httpmock.New(func(s *httpmock.Server) {

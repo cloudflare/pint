@@ -3,7 +3,8 @@ package log
 import (
 	"bytes"
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"fmt"
 	"io"
 	"log/slog"
@@ -115,7 +116,11 @@ func (h *handler) appendAttr(buf *bytes.Buffer, attr slog.Attr) {
 }
 
 func formatAny(attr slog.Attr) string {
-	data, err := json.Marshal(attr.Value.Any())
+	data, err := json.Marshal(
+		attr.Value.Any(),
+		json.Deterministic(true),
+		jsontext.EscapeForHTML(true),
+	)
 	if err != nil {
 		return attr.Value.String()
 	}

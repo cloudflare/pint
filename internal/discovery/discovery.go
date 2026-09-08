@@ -2,7 +2,7 @@ package discovery
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
 	"fmt"
 	"io"
 	"log/slog"
@@ -52,8 +52,8 @@ func (c ChangeType) String() string {
 	}
 }
 
-func (c *ChangeType) MarshalJSON() ([]byte, error) {
-	return json.Marshal(c.String())
+func (c *ChangeType) MarshalJSONTo(enc *jsontext.Encoder) error {
+	return enc.WriteToken(jsontext.String(c.String()))
 }
 
 const (
@@ -91,8 +91,8 @@ type Changes struct {
 
 type Entry struct {
 	PathError      error
-	File           *parser.File  `json:"-"`
-	Group          *parser.Group `json:"-"`
+	File           *parser.File
+	Group          *parser.Group
 	Path           Path
 	Owner          string
 	Changes        *Changes

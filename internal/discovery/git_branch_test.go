@@ -2,7 +2,6 @@ package discovery_test
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -13,6 +12,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/diags"
@@ -20,6 +20,22 @@ import (
 	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
 )
+
+// Errors are compared by message. Entry.File and Group.Rules are not
+// compared, Entry.Rule carries the same parse results.
+// Diagnostic.Expr and PromQLExpr internals hold the PromQL AST.
+var entryCmpOptions = []cmp.Option{
+	cmp.Comparer(func(x, y error) bool {
+		if x == nil || y == nil {
+			return x == nil && y == nil
+		}
+		return x.Error() == y.Error()
+	}),
+	cmpopts.IgnoreFields(discovery.Entry{}, "File"),
+	cmpopts.IgnoreFields(parser.Group{}, "Rules"),
+	cmpopts.IgnoreFields(diags.Diagnostic{}, "Expr"),
+	cmpopts.IgnoreUnexported(parser.PromQLExpr{}),
+}
 
 func gitCommit(t *testing.T, message string) {
 	t.Setenv("GIT_AUTHOR_NAME", "pint")
@@ -54,6 +70,18 @@ func TestGitBranchFinder(t *testing.T) {
 			panic(fmt.Sprintf("wrong number of rules returned: %d\n---\n%s\n---", len(file.Groups[0].Rules), s))
 		}
 		return file.Groups[0].Rules[0]
+	}
+
+	mustParseGroup := func(offset int, s string) *parser.Group {
+		p := parser.NewParser(parser.DefaultOptions)
+		file := p.Parse(strings.NewReader(strings.Repeat("\n", offset) + s))
+		if file.Error.Err != nil {
+			panic(fmt.Sprintf("failed to parse rule:\n---\n%s\n---\nerror: %s", s, file.Error))
+		}
+		if len(file.Groups) != 1 {
+			panic(fmt.Sprintf("wrong number of groups returned: %d\n---\n%s\n---", len(file.Groups), s))
+		}
+		return &file.Groups[0]
 	}
 
 	type setupFn func(t *testing.T)
@@ -238,7 +266,8 @@ groups:
 							{Before: 3, After: 3, Modified: true},
 						},
 					},
-					Rule: mustParse(4, "  - record: up:count\n    expr: count(up == 1)\n"),
+					Group: mustParseGroup(1, "groups:\n- name: v2\n  rules:\n  - record: up:count\n    expr: count(up == 1)\n"),
+					Rule:  mustParse(4, "  - record: up:count\n    expr: count(up == 1)\n"),
 				},
 			},
 		},
@@ -278,7 +307,8 @@ groups:
 							{Before: 6, After: 6, Modified: true},
 						},
 					},
-					Rule: mustParse(4, "  - record: up:count\n    expr: count(up == 1)\n"),
+					Group: mustParseGroup(1, "groups:\n- name: v2\n  rules:\n  - record: up:count\n    expr: count(up == 1)\n"),
+					Rule:  mustParse(4, "  - record: up:count\n    expr: count(up == 1)\n"),
 				},
 			},
 		},
@@ -311,7 +341,8 @@ groups:
 							{Before: 3, After: 3, Modified: true},
 						},
 					},
-					Rule: mustParse(1, "- record: up:count\n  expr: count(up == 1)\n"),
+					Group: mustParseGroup(0, "- record: up:count\n  expr: count(up == 1)\n"),
+					Rule:  mustParse(1, "- record: up:count\n  expr: count(up == 1)\n"),
 				},
 			},
 		},
@@ -344,7 +375,8 @@ groups:
 							{Before: 3, After: 3, Modified: true},
 						},
 					},
-					Rule: mustParse(1, "- record: up:count\n  expr: count(up == 1)\n"),
+					Group: mustParseGroup(0, "- record: up:count\n  expr: count(up == 1)\n"),
+					Rule:  mustParse(1, "- record: up:count\n  expr: count(up == 1)\n"),
 				},
 			},
 		},
@@ -459,7 +491,8 @@ groups:
 						Lines:     git.MakeLineRangeFromTo(1, 3, git.LinesAfter),
 						IsSymlink: true,
 					},
-					Rule: mustParse(1, "- record: up:count\n  expr: count(up)\n"),
+					Group: mustParseGroup(0, "- record: up:count\n  expr: count(up)\n"),
+					Rule:  mustParse(1, "- record: up:count\n  expr: count(up)\n"),
 				},
 			},
 		},
@@ -512,7 +545,8 @@ groups:
 							{Before: 0, After: 12, Modified: true},
 						},
 					},
-					Rule: mustParse(4, "  - record: up:count:1\n    expr: count(up == 1)\n"),
+					Group: mustParseGroup(1, "groups:\n- name: v2\n  rules:\n  - record: up:count:1\n    expr: count(up == 1)\n"),
+					Rule:  mustParse(4, "  - record: up:count:1\n    expr: count(up == 1)\n"),
 				},
 				{
 					State: discovery.Added,
@@ -529,7 +563,8 @@ groups:
 							{Before: 0, After: 12, Modified: true},
 						},
 					},
-					Rule: mustParse(6, "  - record: up:count:2a\n    expr: count(up)\n"),
+					Group: mustParseGroup(1, "groups:\n- name: v2\n  rules:\n  - record: up:count:2a\n    expr: count(up)\n"),
+					Rule:  mustParse(6, "  - record: up:count:2a\n    expr: count(up)\n"),
 				},
 				{
 					State: discovery.Noop,
@@ -546,7 +581,8 @@ groups:
 							{Before: 0, After: 12, Modified: true},
 						},
 					},
-					Rule: mustParse(8, "  - record: up:count:3\n    expr: count(up)\n"),
+					Group: mustParseGroup(1, "groups:\n- name: v2\n  rules:\n  - record: up:count:3\n    expr: count(up)\n"),
+					Rule:  mustParse(8, "  - record: up:count:3\n    expr: count(up)\n"),
 				},
 				{
 					State: discovery.Added,
@@ -563,7 +599,8 @@ groups:
 							{Before: 0, After: 12, Modified: true},
 						},
 					},
-					Rule: mustParse(10, "  - record: up:count:4\n    expr: count(up)\n"),
+					Group: mustParseGroup(1, "groups:\n- name: v2\n  rules:\n  - record: up:count:4\n    expr: count(up)\n"),
+					Rule:  mustParse(10, "  - record: up:count:4\n    expr: count(up)\n"),
 				},
 				{
 					State: discovery.Removed,
@@ -580,7 +617,8 @@ groups:
 							{Before: 0, After: 12, Modified: true},
 						},
 					},
-					Rule: mustParse(6, "  - record: up:count:2\n    expr: count(up)\n"),
+					Group: mustParseGroup(1, "groups:\n- name: v1\n  rules:\n  - record: up:count:2\n    expr: count(up)\n"),
+					Rule:  mustParse(6, "  - record: up:count:2\n    expr: count(up)\n"),
 				},
 			},
 		},
@@ -623,7 +661,8 @@ groups:
 							{Before: 6, After: 7, Modified: false},
 						},
 					},
-					Rule: mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n  for: 0s\n"),
+					Group: mustParseGroup(0, "- alert: rule1\n  expr: sum(foo) by(job)\n  for: 0s\n"),
+					Rule:  mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n  for: 0s\n"),
 				},
 				{
 					State: discovery.Noop,
@@ -639,7 +678,8 @@ groups:
 							{Before: 6, After: 7, Modified: false},
 						},
 					},
-					Rule: mustParse(4, "- alert: rule2\n  expr: sum(foo) by(job)\n  for: 0s\n"),
+					Group: mustParseGroup(0, "- alert: rule2\n  expr: sum(foo) by(job)\n  for: 0s\n"),
+					Rule:  mustParse(4, "- alert: rule2\n  expr: sum(foo) by(job)\n  for: 0s\n"),
 				},
 			},
 		},
@@ -677,7 +717,8 @@ groups:
 							{Before: 5, After: 3},
 						},
 					},
-					Rule: mustParse(1, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
+					Group: mustParseGroup(0, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
+					Rule:  mustParse(1, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
 				},
 				{
 					State: discovery.Removed,
@@ -693,7 +734,8 @@ groups:
 							{Before: 5, After: 3},
 						},
 					},
-					Rule: mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
+					Group: mustParseGroup(0, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
+					Rule:  mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
 				},
 			},
 		},
@@ -726,7 +768,8 @@ groups:
 					Changes: &discovery.Changes{
 						Lines: git.MakeLineRangeFromTo(4, 5, git.LinesBefore),
 					},
-					Rule: mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
+					Group: mustParseGroup(0, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
+					Rule:  mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
 				},
 				{
 					State: discovery.Removed,
@@ -737,7 +780,8 @@ groups:
 					Changes: &discovery.Changes{
 						Lines: git.MakeLineRangeFromTo(4, 5, git.LinesBefore),
 					},
-					Rule: mustParse(3, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
+					Group: mustParseGroup(0, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
+					Rule:  mustParse(3, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
 				},
 			},
 		},
@@ -779,7 +823,8 @@ groups:
 							{Before: 7, After: 5},
 						},
 					},
-					Rule: mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
+					Group: mustParseGroup(0, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
+					Rule:  mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
 				},
 				{
 					State: discovery.Noop,
@@ -795,7 +840,8 @@ groups:
 							{Before: 7, After: 5},
 						},
 					},
-					Rule: mustParse(3, "- alert: rule3\n  expr: sum(foo) by(job)\n"),
+					Group: mustParseGroup(0, "- alert: rule3\n  expr: sum(foo) by(job)\n"),
+					Rule:  mustParse(3, "- alert: rule3\n  expr: sum(foo) by(job)\n"),
 				},
 				{
 					State: discovery.Removed,
@@ -811,7 +857,8 @@ groups:
 							{Before: 7, After: 5},
 						},
 					},
-					Rule: mustParse(3, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
+					Group: mustParseGroup(0, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
+					Rule:  mustParse(3, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
 				},
 			},
 		},
@@ -853,7 +900,8 @@ groups:
 							{Before: 7, After: 0},
 						},
 					},
-					Rule: mustParse(4, "  - record: up:count\n    expr: count(up)\n"),
+					Group: mustParseGroup(1, "groups:\n- name: v2\n  rules:\n  - record: up:count\n    expr: count(up)\n"),
+					Rule:  mustParse(4, "  - record: up:count\n    expr: count(up)\n"),
 				},
 				{
 					State: discovery.Removed,
@@ -867,6 +915,7 @@ groups:
 							{Before: 7, After: 0},
 						},
 					},
+					Group: mustParseGroup(1, "groups:\n- name: v1\n  rules:\n  - record: up:count\n    expr: count(up)\n    expr: sum(up)\n"),
 					Rule: parser.Rule{
 						Lines: diags.LineRange{First: 5, Last: 7},
 						Error: parser.ParseError{
@@ -917,7 +966,8 @@ groups:
 							{Before: 0, After: 9, Modified: true},
 						},
 					},
-					Rule: mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
+					Group: mustParseGroup(0, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
+					Rule:  mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
 				},
 				{
 					State: discovery.Noop,
@@ -933,7 +983,8 @@ groups:
 							{Before: 0, After: 9, Modified: true},
 						},
 					},
-					Rule: mustParse(3, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
+					Group: mustParseGroup(0, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
+					Rule:  mustParse(3, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
 				},
 				{
 					State: discovery.Added,
@@ -949,7 +1000,8 @@ groups:
 							{Before: 0, After: 9, Modified: true},
 						},
 					},
-					Rule: mustParse(5, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
+					Group: mustParseGroup(0, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
+					Rule:  mustParse(5, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
 				},
 				{
 					State: discovery.Added,
@@ -965,7 +1017,8 @@ groups:
 							{Before: 0, After: 9, Modified: true},
 						},
 					},
-					Rule: mustParse(7, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
+					Group: mustParseGroup(0, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
+					Rule:  mustParse(7, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
 				},
 			},
 		},
@@ -1010,7 +1063,8 @@ groups:
 							{Before: 3, After: 9},
 						},
 					},
-					Rule: mustParse(1, "- alert: rule1\n  expr: up == 0\n"),
+					Group: mustParseGroup(0, "- alert: rule1\n  expr: up == 0\n"),
+					Rule:  mustParse(1, "- alert: rule1\n  expr: up == 0\n"),
 				},
 				{
 					State: discovery.Added,
@@ -1029,7 +1083,8 @@ groups:
 							{Before: 3, After: 9},
 						},
 					},
-					Rule: mustParse(3, "- alert: rule1\n  expr: up == 1\n"),
+					Group: mustParseGroup(0, "- alert: rule1\n  expr: up == 1\n"),
+					Rule:  mustParse(3, "- alert: rule1\n  expr: up == 1\n"),
 				},
 				{
 					State: discovery.Added,
@@ -1048,7 +1103,8 @@ groups:
 							{Before: 3, After: 9},
 						},
 					},
-					Rule: mustParse(5, "- alert: rule1\n  expr: up != 0\n"),
+					Group: mustParseGroup(0, "- alert: rule1\n  expr: up != 0\n"),
+					Rule:  mustParse(5, "- alert: rule1\n  expr: up != 0\n"),
 				},
 				{
 					State: discovery.Added,
@@ -1067,7 +1123,8 @@ groups:
 							{Before: 3, After: 9},
 						},
 					},
-					Rule: mustParse(7, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
+					Group: mustParseGroup(0, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
+					Rule:  mustParse(7, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
 				},
 			},
 		},
@@ -1118,7 +1175,8 @@ groups:
 							{Before: 0, After: 12, Modified: true},
 						},
 					},
-					Rule: mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n  for: 1s\n"),
+					Group: mustParseGroup(0, "- alert: rule1\n  expr: sum(foo) by(job)\n  for: 1s\n"),
+					Rule:  mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n  for: 1s\n"),
 				},
 				{
 					State: discovery.Modified,
@@ -1136,7 +1194,8 @@ groups:
 							{Before: 0, After: 12, Modified: true},
 						},
 					},
-					Rule: mustParse(4, "- alert: rule2\n  expr: sum(foo) by(job)\n  keep_firing_for: 5m\n  for: 0s\n  annotations:\n    foo: bar\n  labels:\n    foo: bar\n"),
+					Group: mustParseGroup(0, "- alert: rule2\n  expr: sum(foo) by(job)\n  keep_firing_for: 5m\n  for: 0s\n  annotations:\n    foo: bar\n  labels:\n    foo: bar\n"),
+					Rule:  mustParse(4, "- alert: rule2\n  expr: sum(foo) by(job)\n  keep_firing_for: 5m\n  for: 0s\n  annotations:\n    foo: bar\n  labels:\n    foo: bar\n"),
 				},
 			},
 		},
@@ -1169,7 +1228,8 @@ groups:
 						// Renamed without content changes.
 						Lines: git.LineNumbers{},
 					},
-					Rule: mustParse(1, "- alert: rule\n  expr: up == 0\n"),
+					Group: mustParseGroup(0, "- alert: rule\n  expr: up == 0\n"),
+					Rule:  mustParse(1, "- alert: rule\n  expr: up == 0\n"),
 				},
 			},
 		},
@@ -1210,7 +1270,8 @@ groups:
 							{Before: 4, After: 3},
 						},
 					},
-					Rule: mustParse(1, "- alert: rule\n  expr: up == 0\n"),
+					Group: mustParseGroup(0, "- alert: rule\n  expr: up == 0\n"),
+					Rule:  mustParse(1, "- alert: rule\n  expr: up == 0\n"),
 				},
 			},
 		},
@@ -1252,7 +1313,8 @@ groups:
 						// Renamed without content changes.
 						Lines: git.LineNumbers{},
 					},
-					Rule: mustParse(1, "- alert: rule\n  expr: up == 0\n"),
+					Group: mustParseGroup(0, "- alert: rule\n  expr: up == 0\n"),
+					Rule:  mustParse(1, "- alert: rule\n  expr: up == 0\n"),
 				},
 				{
 					State: discovery.Removed,
@@ -1263,7 +1325,8 @@ groups:
 					Changes: &discovery.Changes{
 						Lines: git.MakeLineRangeFromTo(1, 3, git.LinesBefore),
 					},
-					Rule: mustParse(1, "- alert: rule\n  expr: up == 0\n"),
+					Group: mustParseGroup(0, "- alert: rule\n  expr: up == 0\n"),
+					Rule:  mustParse(1, "- alert: rule\n  expr: up == 0\n"),
 				},
 			},
 		},
@@ -1372,7 +1435,8 @@ groups:
 							{Before: 2, After: 2, Modified: true},
 						},
 					},
-					Rule: mustParse(3, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
+					Group: mustParseGroup(0, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
+					Rule:  mustParse(3, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
 				},
 				{
 					State: discovery.Modified,
@@ -1385,7 +1449,8 @@ groups:
 							{Before: 2, After: 2, Modified: true},
 						},
 					},
-					Rule: mustParse(5, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
+					Group: mustParseGroup(0, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
+					Rule:  mustParse(5, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
 				},
 				{
 					State: discovery.Modified,
@@ -1398,7 +1463,8 @@ groups:
 							{Before: 2, After: 2, Modified: true},
 						},
 					},
-					Rule: mustParse(7, "- alert: rule3\n  expr: sum(foo) by(job)\n"),
+					Group: mustParseGroup(0, "- alert: rule3\n  expr: sum(foo) by(job)\n"),
+					Rule:  mustParse(7, "- alert: rule3\n  expr: sum(foo) by(job)\n"),
 				},
 			},
 		},
@@ -1446,7 +1512,8 @@ groups:
 							{Before: 0, After: 11, Modified: true},
 						},
 					},
-					Rule: mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
+					Group: mustParseGroup(0, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
+					Rule:  mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
 				},
 				{
 					State: discovery.Noop,
@@ -1462,7 +1529,8 @@ groups:
 							{Before: 0, After: 11, Modified: true},
 						},
 					},
-					Rule: mustParse(3, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
+					Group: mustParseGroup(0, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
+					Rule:  mustParse(3, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
 				},
 				{
 					State: discovery.Noop,
@@ -1478,7 +1546,8 @@ groups:
 							{Before: 0, After: 11, Modified: true},
 						},
 					},
-					Rule: mustParse(5, "- alert: rule3\n  expr: sum(foo) by(job)\n"),
+					Group: mustParseGroup(0, "- alert: rule3\n  expr: sum(foo) by(job)\n"),
+					Rule:  mustParse(5, "- alert: rule3\n  expr: sum(foo) by(job)\n"),
 				},
 				{
 					State: discovery.Added,
@@ -1494,7 +1563,8 @@ groups:
 							{Before: 0, After: 11, Modified: true},
 						},
 					},
-					Rule: mustParse(7, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
+					Group: mustParseGroup(0, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
+					Rule:  mustParse(7, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
 				},
 				{
 					State: discovery.Added,
@@ -1510,7 +1580,8 @@ groups:
 							{Before: 0, After: 11, Modified: true},
 						},
 					},
-					Rule: mustParse(9, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
+					Group: mustParseGroup(0, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
+					Rule:  mustParse(9, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
 				},
 			},
 		},
@@ -1552,7 +1623,8 @@ groups:
 							{Before: 6, After: 6, Modified: true},
 						},
 					},
-					Rule: mustParse(4, "  - record: up:count\n    # pint disable promql/series(up)\n    expr: sum(up)\n"),
+					Group: mustParseGroup(1, "groups:\n- name: v2\n  rules:\n  - record: up:count\n    # pint disable promql/series(up)\n    expr: sum(up)\n"),
+					Rule:  mustParse(4, "  - record: up:count\n    # pint disable promql/series(up)\n    expr: sum(up)\n"),
 				},
 				{
 					State: discovery.Removed,
@@ -1567,7 +1639,7 @@ groups:
 						},
 					},
 					PathError: parser.ParseError{
-						Err:  errors.New("xxx"),
+						Err:  errors.New("could not find expected ':'"),
 						Line: 6,
 					},
 				},
@@ -1615,7 +1687,8 @@ groups:
 							{Before: 7, After: 7, Modified: true},
 						},
 					},
-					Rule: mustParse(4, "  - record: up:count\n    expr: |\n      count(\n        up\n      )\n"),
+					Group: mustParseGroup(1, "groups:\n- name: v1\n  rules:\n  - record: up:count\n    expr: |\n      count(\n        up\n      )\n"),
+					Rule:  mustParse(4, "  - record: up:count\n    expr: |\n      count(\n        up\n      )\n"),
 				},
 				{
 					State: discovery.Removed,
@@ -1629,7 +1702,8 @@ groups:
 							{Before: 7, After: 7, Modified: true},
 						},
 					},
-					Rule: mustParse(4, "  - record: up:sum\n    expr: |\n      sum(\n        up\n      )\n"),
+					Group: mustParseGroup(1, "groups:\n- name: v1\n  rules:\n  - record: up:sum\n    expr: |\n      sum(\n        up\n      )\n"),
+					Rule:  mustParse(4, "  - record: up:sum\n    expr: |\n      sum(\n        up\n      )\n"),
 				},
 			},
 		},
@@ -1670,7 +1744,8 @@ groups:
 							{Before: 6, After: 6, Modified: true},
 						},
 					},
-					Rule: mustParse(4, "  - record: foo\n    expr: sum(bar)\n"),
+					Group: mustParseGroup(1, "groups:\n- name: v1\n  rules:\n  - record: foo\n    expr: sum(bar)\n"),
+					Rule:  mustParse(4, "  - record: foo\n    expr: sum(bar)\n"),
 				},
 				{
 					State: discovery.Modified,
@@ -1722,7 +1797,8 @@ groups:
 							{Before: 5, After: 0},
 						},
 					},
-					Rule: mustParse(1, "- alert: rule1\n  expr: up != 0\n"),
+					Group: mustParseGroup(0, "- alert: rule1\n  expr: up != 0\n"),
+					Rule:  mustParse(1, "- alert: rule1\n  expr: up != 0\n"),
 				},
 				{
 					State: discovery.Removed,
@@ -1737,7 +1813,8 @@ groups:
 							{Before: 5, After: 0},
 						},
 					},
-					Rule: mustParse(1, "- alert: rule1\n  expr: up == 0\n"),
+					Group: mustParseGroup(0, "- alert: rule1\n  expr: up == 0\n"),
+					Rule:  mustParse(1, "- alert: rule1\n  expr: up == 0\n"),
 				},
 				{
 					State: discovery.Removed,
@@ -1752,7 +1829,8 @@ groups:
 							{Before: 5, After: 0},
 						},
 					},
-					Rule: mustParse(3, "- alert: rule1\n  expr: up == 1\n"),
+					Group: mustParseGroup(0, "- alert: rule1\n  expr: up == 1\n"),
+					Rule:  mustParse(3, "- alert: rule1\n  expr: up == 1\n"),
 				},
 			},
 		},
@@ -1780,7 +1858,8 @@ groups:
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					Rule: mustParse(1, "- record: foo\n  expr: sum(bar)\n"),
+					Group: mustParseGroup(0, "- record: foo\n  expr: sum(bar)\n"),
+					Rule:  mustParse(1, "- record: foo\n  expr: sum(bar)\n"),
 				},
 			},
 			entries: []*discovery.Entry{
@@ -1795,7 +1874,8 @@ groups:
 							{Before: 3, After: 3, Modified: true},
 						},
 					},
-					Rule: mustParse(1, "- record: foo\n  expr: sum(bar)\n"),
+					Group: mustParseGroup(0, "- record: foo\n  expr: sum(bar)\n"),
+					Rule:  mustParse(1, "- record: foo\n  expr: sum(bar)\n"),
 				},
 			},
 		},
@@ -1830,7 +1910,8 @@ groups:
 							{Before: 3, After: 3, Modified: true},
 						},
 					},
-					Rule: mustParse(1, "- record: foo\n  expr: sum(bar)\n"),
+					Group: mustParseGroup(0, "- record: foo\n  expr: sum(bar)\n"),
+					Rule:  mustParse(1, "- record: foo\n  expr: sum(bar)\n"),
 				},
 				{
 					State: discovery.Modified,
@@ -1886,7 +1967,8 @@ groups:
 							{Before: 3, After: 3, Modified: true},
 						},
 					},
-					Rule: mustParse(1, "- record: foo\n  expr: sum(bar)\n"),
+					Group: mustParseGroup(0, "- record: foo\n  expr: sum(bar)\n"),
+					Rule:  mustParse(1, "- record: foo\n  expr: sum(bar)\n"),
 				},
 			},
 		},
@@ -1932,7 +2014,8 @@ groups:
 							{Before: 0, After: 3, Modified: true},
 						},
 					},
-					Rule: mustParse(1, "- record: up:count\n  expr: count(up == 1)\n"),
+					Group: mustParseGroup(0, "- record: up:count\n  expr: count(up == 1)\n"),
+					Rule:  mustParse(1, "- record: up:count\n  expr: count(up == 1)\n"),
 				},
 			},
 		},
@@ -1977,7 +2060,8 @@ groups:
 							{Before: 0, After: 2, Modified: true},
 						},
 					},
-					Rule: mustParse(0, "- record: up:count\n  expr: count(up == 1)\n"),
+					Group: mustParseGroup(0, "- record: up:count\n  expr: count(up == 1)\n"),
+					Rule:  mustParse(0, "- record: up:count\n  expr: count(up == 1)\n"),
 				},
 				{
 					State: discovery.Removed,
@@ -1994,7 +2078,8 @@ groups:
 							{Before: 5, After: 0, Modified: false},
 						},
 					},
-					Rule: mustParse(3, "  - record: up:count\n    expr: count(up)\n"),
+					Group: mustParseGroup(0, "groups:\n- name: base\n  rules:\n  - record: up:count\n    expr: count(up)\n"),
+					Rule:  mustParse(3, "  - record: up:count\n    expr: count(up)\n"),
 				},
 			},
 		},
@@ -2039,7 +2124,8 @@ groups:
 							{Before: 2, After: 0, Modified: false},
 						},
 					},
-					Rule: mustParse(0, "- record: up:count\n  expr: count(up)\n"),
+					Group: mustParseGroup(0, "- record: up:count\n  expr: count(up)\n"),
+					Rule:  mustParse(0, "- record: up:count\n  expr: count(up)\n"),
 				},
 				{
 					State: discovery.Added,
@@ -2056,7 +2142,8 @@ groups:
 							{Before: 0, After: 5, Modified: true},
 						},
 					},
-					Rule: mustParse(3, "  - record: up:count\n    expr: count(up == 1)\n"),
+					Group: mustParseGroup(0, "groups:\n- name: base\n  rules:\n  - record: up:count\n    expr: count(up == 1)\n"),
+					Rule:  mustParse(3, "  - record: up:count\n    expr: count(up == 1)\n"),
 				},
 			},
 		},
@@ -2077,11 +2164,7 @@ groups:
 			} else {
 				require.NoError(t, err, "tc.finder.Find()")
 
-				expected, err := json.MarshalIndent(tc.entries, "", "  ")
-				require.NoError(t, err, "json(expected)")
-				got, err := json.MarshalIndent(entries, "", "  ")
-				require.NoError(t, err, "json(got)")
-				if diff := cmp.Diff(string(expected), string(got)); diff != "" {
+				if diff := cmp.Diff(tc.entries, entries, entryCmpOptions...); diff != "" {
 					t.Errorf("tc.finder.Find() returned wrong output (-want +got):\n%s", diff)
 					return
 				}
