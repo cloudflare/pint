@@ -197,13 +197,13 @@ func TestGitBranchFinder(t *testing.T) {
 						return []byte("c1\nA\trules.yml\n"), nil
 					case "ls-tree c1^ rules.yml":
 						return []byte("100644 blob c0\trules.yml"), nil
-					case "ls-tree c1 rules.yml":
+					case "ls-tree HEAD rules.yml":
 						return []byte("100644 blob c1\trules.yml"), nil
 					case "show -s --format=%B c1":
 						return []byte(""), nil
-					case "cat-file blob c0":
+					case "cat-file blob c1^:rules.yml":
 						return []byte("# old\n"), nil
-					case "cat-file blob c1":
+					case "cat-file blob HEAD:rules.yml":
 						return []byte("# new\n"), nil
 					default:
 						return nil, fmt.Errorf("mock git error: %v", args)
@@ -216,7 +216,7 @@ func TestGitBranchFinder(t *testing.T) {
 				nil,
 			),
 			entries: nil,
-			err:     "failed to run git diff for rules.yml: git diff for rules.yml: mock git error: [diff -M c1^..c1 -- rules.yml rules.yml]",
+			err:     "failed to run git diff for rules.yml: git diff for rules.yml: mock git error: [diff -M c1^..HEAD -- rules.yml rules.yml]",
 		},
 		{
 			title: "no rules in file",

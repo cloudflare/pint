@@ -14,6 +14,8 @@ import (
 	"strings"
 )
 
+const HeadRef = "HEAD"
+
 type FileStatus rune
 
 const (
@@ -211,7 +213,7 @@ type FileChange struct {
 }
 
 func Changes(ctx context.Context, cmd CommandRunner, baseBranch string, filter PathFilter) ([]*FileChange, error) {
-	out, err := cmd(ctx, "log", "--reverse", "--no-merges", "--first-parent", "--format=%H", "--name-status", baseBranch+"..HEAD")
+	out, err := cmd(ctx, "log", "--reverse", "--no-merges", "--first-parent", "--format=%H", "--name-status", baseBranch+".."+HeadRef)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get the list of modified files from git: %w", err)
 	}
@@ -320,11 +322,13 @@ func Changes(ctx context.Context, cmd CommandRunner, baseBranch string, filter P
 			change.Body.Before = getContentAtCommit(ctx, cmd, change.Commits[0]+"^", change.Path.Before.EffectivePath())
 		}
 
-		lastCommit := change.Commits[len(change.Commits)-1]
-		if change.Path.After.Name != "" && change.Status != FileDeleted {
-			change.Path.After.Type = getTypeForPath(ctx, cmd, lastCommit, change.Path.After.Name)
-			change.Path.After.SymlinkTarget = resolveSymlinkTarget(ctx, cmd, lastCommit, change.Path.After.Name, change.Path.After.Type)
-			change.Body.After = getContentAtCommit(ctx, cmd, lastCommit, change.Path.After.EffectivePath())
+		// The after state must be read from HEAD, not from the last commit that
+		// touched the file, because a merge commit can restore the file after
+		// the last commit visible to git log.
+		if change.Path.After.Name != "" {
+			change.Path.After.Type = getTypeForPath(ctx, cmd, HeadRef, change.Path.After.Name)
+			change.Path.After.SymlinkTarget = resolveSymlinkTarget(ctx, cmd, HeadRef, change.Path.After.Name, change.Path.After.Type)
+			change.Body.After = getContentAtCommit(ctx, cmd, HeadRef, change.Path.After.EffectivePath())
 		}
 
 		slog.LogAttrs(
@@ -404,7 +408,7 @@ func getModifiedLines(ctx context.Context, cmd CommandRunner, commits []string, 
 		slog.String("afterPath", afterPath),
 	)
 
-	output, err := cmd(ctx, "diff", "-M", commits[0]+"^.."+commits[len(commits)-1], "--", beforePath, afterPath)
+	output, err := cmd(ctx, "diff", "-M", commits[0]+"^.."+HeadRef, "--", beforePath, afterPath)
 	if err != nil {
 		return nil, fmt.Errorf("git diff for %s: %w", afterPath, err)
 	}
