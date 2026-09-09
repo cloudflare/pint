@@ -32,12 +32,12 @@ type Info struct {
 }
 
 func Describe(ctx context.Context, cmd CommandRunner) (Info, error) {
-	commit, err := cmd(ctx, "rev-parse", "--verify", "HEAD")
+	commit, err := cmd(ctx, "rev-parse", "--verify", HeadRef)
 	if err != nil {
 		return Info{}, err
 	}
 
-	branch, err := cmd(ctx, "rev-parse", "--abbrev-ref", "HEAD")
+	branch, err := cmd(ctx, "rev-parse", "--abbrev-ref", HeadRef)
 	if err != nil {
 		return Info{}, err
 	}

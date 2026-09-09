@@ -286,7 +286,7 @@ func logSeverityCounters(src map[checks.Severity]int) (attrs []slog.Attr) {
 // we might have a git checkout that lacks branch information, so we need
 // to get that name from ENV variables.
 func detectCurrentBranch(branch string) string {
-	if branch != "HEAD" {
+	if branch != git.HeadRef {
 		return branch
 	}
 	for _, key := range []string{

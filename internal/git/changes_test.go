@@ -202,6 +202,59 @@ func TestChanges(t *testing.T) {
 			err: "",
 		},
 		{
+			// A merge commit restores the file to the base version, so the file
+			// has no net change between main and HEAD. Changes() must report the
+			// content from HEAD and no modified lines. Reporting the stale
+			// content from the edit commit makes pint comment on a file that is
+			// missing from the PR diff.
+			title: "file modified then restored in a merge commit",
+			setup: func(t *testing.T) git.CommandRunner {
+				mustRun(t, "init", "--initial-branch=main", ".")
+				require.NoError(t, os.WriteFile("index.txt", []byte("1\n2\n3\n4\n5\n"), 0o644))
+				mustRun(t, "add", "index.txt")
+				gitCommit(t, "init")
+
+				mustRun(t, "checkout", "-b", "v2")
+				require.NoError(t, os.WriteFile("index.txt", []byte("1\n2\nX\n4\n5\n"), 0o644))
+				mustRun(t, "add", "index.txt")
+				gitCommit(t, "edit")
+
+				mustRun(t, "checkout", "main")
+				require.NoError(t, os.WriteFile("other.txt", []byte("other\n"), 0o644))
+				mustRun(t, "add", "other.txt")
+				gitCommit(t, "main moves on")
+
+				mustRun(t, "checkout", "v2")
+				mustRun(t, "merge", "--no-commit", "main")
+				require.NoError(t, os.WriteFile("index.txt", []byte("1\n2\n3\n4\n5\n"), 0o644))
+				mustRun(t, "add", "index.txt")
+				gitCommit(t, "merge main")
+
+				return debugGitRun(t)
+			},
+			changes: []*git.FileChange{
+				{
+					Commits: []string{"1"},
+					Path: git.PathDiff{
+						Before: git.Path{
+							Name: "index.txt",
+							Type: git.File,
+						},
+						After: git.Path{
+							Name: "index.txt",
+							Type: git.File,
+						},
+					},
+					Body: git.BodyDiff{
+						Before: []byte("1\n2\n3\n4\n5\n"),
+						After:  []byte("1\n2\n3\n4\n5\n"),
+						Lines:  []git.LineNumber{},
+					},
+				},
+			},
+			err: "",
+		},
+		{
 			title: "file -> symlink",
 			setup: func(t *testing.T) git.CommandRunner {
 				mustRun(t, "init", "--initial-branch=main", ".")

@@ -22,6 +22,8 @@
   comments it did not post when removing outdated general comments.
   Cleanup is limited to comments authored by the authenticated user that
   include hidden comment marker.
+- Fixed change detection logic that could result in pint treating some
+  file with no final PR diff as modified - [#1943](https://github.com/cloudflare/pint/issues/1943).
 
 ## v0.87.0
 
