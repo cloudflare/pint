@@ -6,6 +6,7 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"unicode"
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/diags"
@@ -531,21 +532,33 @@ Below is the list of checks that were disabled for each Prometheus server define
 	return buf.String()
 }
 
-// pintCommentMarker is appended to general comments pint posts so later runs
-// can recognize them without matching on human-readable text.
+// pintCommentMarker is a hidden HTML comment.
+// We add it to the general comments pint creates so we can tell which comment
+// was created by pint and which by other tools using same API token.
+//
+// We don't add it to review comments because these are matched using
+// 'This pull request was validated by pint' first line.
 const pintCommentMarker = "<!-- pint -->"
 
-func signGeneralComment(body string) string {
-	if body == "" || strings.Contains(body, pintCommentMarker) {
+// addPintMarker adds the marker to the end of the body if needed.
+func addPintMarker(body string) string {
+	if body == "" || hasPintMarker(body) {
 		return body
 	}
-	return strings.TrimRight(body, "\n") + "\n" + pintCommentMarker
+	return body + "\n" + pintCommentMarker
 }
 
-func unsignedGeneralComment(body string) string {
-	return strings.TrimSpace(strings.ReplaceAll(body, pintCommentMarker, ""))
+// removePintMarker removes the marker, and whitespace at the end of the body.
+// It cuts exactly what addPintMarker appends, so the original body is restored.
+func removePintMarker(body string) string {
+	// First trim trailing whitespace so we can match the suffix.
+	body = strings.TrimRightFunc(body, unicode.IsSpace)
+	// Then undo, in reverse order, what addPintMarker appended.
+	return strings.TrimSuffix(strings.TrimSuffix(body, pintCommentMarker), "\n")
 }
 
-func isPintGeneralComment(body string) bool {
+func hasPintMarker(body string) bool {
+	// Marker should be at the end, but the user might edit the message
+	// so we scan the whole comment body just in case.
 	return strings.Contains(body, pintCommentMarker)
 }

@@ -13,7 +13,7 @@ import (
 )
 
 func TestOwnGitHubIssueComment(t *testing.T) {
-	pintBody := signGeneralComment(tooManyCommentsMsg(3, 1))
+	pintBody := addPintMarker(tooManyCommentsMsg(3, 1))
 	quoted := "> " + tooManyCommentsMsg(3, 1)
 	author := github.User{ID: new(int64(42)), Login: new("ci-user")}
 	other := github.User{ID: new(int64(99)), Login: new("reviewer")}

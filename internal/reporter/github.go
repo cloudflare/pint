@@ -158,7 +158,7 @@ func (gr GithubReporter) getUserID(ctx context.Context) (int64, error) {
 }
 
 func ownGitHubIssueComment(userID int64, ic *github.IssueComment) bool {
-	if !isPintGeneralComment(ic.GetBody()) {
+	if !hasPintMarker(ic.GetBody()) {
 		return false
 	}
 	if userID == 0 {
@@ -168,15 +168,15 @@ func ownGitHubIssueComment(userID int64, ic *github.IssueComment) bool {
 }
 
 func (gr GithubReporter) List(ctx context.Context, _ any) ([]ExistingComment, error) {
-	reqCtx, cancel := gr.reqContext(ctx)
-	defer cancel()
-
 	userID, err := gr.getUserID(ctx)
 	if err != nil {
 		// Fall back to the comment marker so we never treat other issue
 		// comments as ours when the token cannot identify the current user.
 		slog.LogAttrs(ctx, slog.LevelWarn, "Failed to get authenticated GitHub user, will only delete general comments posted by pint", slog.Any("err", err))
 	}
+
+	reqCtx, cancel := gr.reqContext(ctx)
+	defer cancel()
 
 	slog.LogAttrs(ctx, slog.LevelDebug, "Getting the list of pull request comments", slog.Int("pr", gr.prNum))
 	existing, _, err := gr.client.PullRequests.ListComments(reqCtx, gr.owner, gr.repo, gr.prNum, nil)
@@ -216,7 +216,7 @@ func (gr GithubReporter) List(ctx context.Context, _ any) ([]ExistingComment, er
 		comments = append(comments, ExistingComment{
 			id:        strconv.FormatInt(ic.GetID(), 10),
 			path:      "",
-			text:      unsignedGeneralComment(ic.GetBody()),
+			text:      removePintMarker(ic.GetBody()),
 			line:      0,
 			meta:      ghIssueCommentMeta{id: ic.GetID()},
 			isGeneral: true,
@@ -440,7 +440,7 @@ func formatGHReviewBody(ctx context.Context, version string, summary Summary, sh
 }
 
 func (gr GithubReporter) generalComment(ctx context.Context, body string) error {
-	body = signGeneralComment(body)
+	body = addPintMarker(body)
 	comment := github.IssueComment{
 		Body: new(body),
 	}

@@ -996,13 +996,128 @@ foo details
 	}
 }
 
-func TestIsPintGeneralComment(t *testing.T) {
-	quoted := "> " + tooManyCommentsMsg(3, 1)
-	require.False(t, isPintGeneralComment(tooManyCommentsMsg(3, 1)))
-	require.False(t, isPintGeneralComment(quoted))
-	require.True(t, isPintGeneralComment(signGeneralComment(tooManyCommentsMsg(3, 1))))
-	require.False(t, isPintGeneralComment(signGeneralComment("")))
-	require.Equal(t, tooManyCommentsMsg(3, 1), unsignedGeneralComment(signGeneralComment(tooManyCommentsMsg(3, 1))))
+func TestPintMarker(t *testing.T) {
+	msg := tooManyCommentsMsg(3, 1)
+
+	t.Run("has marker", func(t *testing.T) {
+		testCases := []struct {
+			name     string
+			body     string
+			expected bool
+		}{
+			{
+				name:     "message without the marker",
+				body:     msg,
+				expected: false,
+			},
+			{
+				name:     "quoted message without the marker",
+				body:     "> " + msg,
+				expected: false,
+			},
+			{
+				name:     "message with the marker",
+				body:     msg + "\n" + pintCommentMarker,
+				expected: true,
+			},
+			{
+				name:     "empty body",
+				body:     "",
+				expected: false,
+			},
+		}
+
+		for _, tc := range testCases {
+			t.Run(tc.name, func(t *testing.T) {
+				require.Equal(t, tc.expected, hasPintMarker(tc.body))
+			})
+		}
+	})
+
+	t.Run("add marker", func(t *testing.T) {
+		testCases := []struct {
+			name     string
+			body     string
+			expected string
+		}{
+			{
+				name:     "empty body stays empty",
+				body:     "",
+				expected: "",
+			},
+			{
+				name:     "body with the marker is unchanged",
+				body:     msg + "\n" + pintCommentMarker,
+				expected: msg + "\n" + pintCommentMarker,
+			},
+			{
+				name:     "body gets the marker at the end",
+				body:     msg,
+				expected: msg + "\n" + pintCommentMarker,
+			},
+			{
+				name:     "trailing newlines are kept",
+				body:     msg + "\n\n",
+				expected: msg + "\n\n\n" + pintCommentMarker,
+			},
+		}
+
+		for _, tc := range testCases {
+			t.Run(tc.name, func(t *testing.T) {
+				require.Equal(t, tc.expected, addPintMarker(tc.body))
+			})
+		}
+	})
+
+	t.Run("remove marker", func(t *testing.T) {
+		testCases := []struct {
+			name     string
+			body     string
+			expected string
+		}{
+			{
+				name:     "signed body returns the original message",
+				body:     msg + "\n" + pintCommentMarker,
+				expected: msg,
+			},
+			{
+				name:     "signed body with trailing newline returns the original message",
+				body:     msg + "\n\n" + pintCommentMarker,
+				expected: msg + "\n",
+			},
+			{
+				name:     "whitespace after the marker is removed",
+				body:     msg + "\n" + pintCommentMarker + "  \n",
+				expected: msg,
+			},
+			{
+				name:     "trailing whitespace without the marker is removed",
+				body:     msg + "  ",
+				expected: msg,
+			},
+			{
+				name:     "leading whitespace is kept",
+				body:     "  " + msg,
+				expected: "  " + msg,
+			},
+			{
+				name:     "body with only the marker is removed",
+				body:     pintCommentMarker,
+				expected: "",
+			},
+			{
+				name:     "empty body stays empty",
+				body:     "",
+				expected: "",
+			},
+		}
+
+		for _, tc := range testCases {
+			t.Run(tc.name, func(t *testing.T) {
+				require.Equal(t, tc.expected, removePintMarker(tc.body))
+			})
+		}
+	})
 }
 
 func TestCommentsCommonPaths(t *testing.T) {
