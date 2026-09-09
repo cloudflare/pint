@@ -74,7 +74,8 @@ rule {
 
 rule {
   match {
-    path = ".*/reject\\.yml"
+    path  = ".*/reject\\.yml"
+    state = ["any"]
   }
 
   report {
