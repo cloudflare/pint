@@ -104,7 +104,7 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Authorization: Bearer "12345"
   Content-Type: application/json
 --- BODY ---
-text: |
+text: |-
     :information_source: **Information** reported by [pint](https://cloudflare.github.io/pint/) **alerts/count** check.
 
     <details>
@@ -135,6 +135,8 @@ text: |
     ------
 
     :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/count.html).
+
+    <!-- pint -->
 severity: NORMAL
 anchor:
     path: rules.yml

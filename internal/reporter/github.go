@@ -146,35 +146,18 @@ func (gr GithubReporter) Summary(ctx context.Context, _ any, s Summary, pendingC
 	return nil
 }
 
-func (gr GithubReporter) getUserID(ctx context.Context) (int64, error) {
+func (gr GithubReporter) UserID(ctx context.Context, _ any) (string, error) {
 	slog.LogAttrs(ctx, slog.LevelDebug, "Getting current GitHub user details")
 	reqCtx, cancel := gr.reqContext(ctx)
 	defer cancel()
 	user, _, err := gr.client.Users.Get(reqCtx, "")
 	if err != nil {
-		return 0, err
+		return "", err
 	}
-	return user.GetID(), nil
-}
-
-func ownGitHubIssueComment(userID int64, ic *github.IssueComment) bool {
-	if !hasPintMarker(ic.GetBody()) {
-		return false
-	}
-	if userID == 0 {
-		return true
-	}
-	return ic.GetUser().GetID() == userID
+	return strconv.FormatInt(user.GetID(), 10), nil
 }
 
 func (gr GithubReporter) List(ctx context.Context, _ any) ([]ExistingComment, error) {
-	userID, err := gr.getUserID(ctx)
-	if err != nil {
-		// Fall back to the comment marker so we never treat other issue
-		// comments as ours when the token cannot identify the current user.
-		slog.LogAttrs(ctx, slog.LevelWarn, "Failed to get authenticated GitHub user, will only delete general comments posted by pint", slog.Any("err", err))
-	}
-
 	reqCtx, cancel := gr.reqContext(ctx)
 	defer cancel()
 
@@ -194,6 +177,7 @@ func (gr GithubReporter) List(ctx context.Context, _ any) ([]ExistingComment, er
 			id:        strconv.FormatInt(ec.GetID(), 10),
 			path:      ec.GetPath(),
 			text:      ec.GetBody(),
+			author:    strconv.FormatInt(ec.GetUser().GetID(), 10),
 			line:      ec.GetLine(),
 			meta:      ghCommentMeta{id: ec.GetID()},
 			isGeneral: false,
@@ -205,18 +189,11 @@ func (gr GithubReporter) List(ctx context.Context, _ any) ([]ExistingComment, er
 		return nil, fmt.Errorf("failed to list issue comments: %w", err)
 	}
 	for _, ic := range issueComments {
-		if !ownGitHubIssueComment(userID, ic) {
-			slog.LogAttrs(
-				ctx, slog.LevelDebug, "Skipping issue comment from another user",
-				slog.Int64("id", ic.GetID()),
-				slog.String("user", ic.GetUser().GetLogin()),
-			)
-			continue
-		}
 		comments = append(comments, ExistingComment{
 			id:        strconv.FormatInt(ic.GetID(), 10),
 			path:      "",
-			text:      removePintMarker(ic.GetBody()),
+			text:      ic.GetBody(),
+			author:    strconv.FormatInt(ic.GetUser().GetID(), 10),
 			line:      0,
 			meta:      ghIssueCommentMeta{id: ic.GetID()},
 			isGeneral: true,
@@ -440,7 +417,7 @@ func formatGHReviewBody(ctx context.Context, version string, summary Summary, sh
 }
 
 func (gr GithubReporter) generalComment(ctx context.Context, body string) error {
-	body = addPintMarker(body)
+	body = AddPintMarker(body)
 	comment := github.IssueComment{
 		Body: new(body),
 	}

@@ -125,7 +125,7 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Authorization: Bearer "12345"
   Content-Type: application/json
 --- BODY ---
-text: |
+text: |-
     :stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **promql/rate** check.
 
     <details>
@@ -154,6 +154,8 @@ text: |
     ------
 
     :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/rate.html).
+
+    <!-- pint -->
 severity: NORMAL
 anchor:
     path: rules.yml
@@ -168,7 +170,7 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Authorization: Bearer "12345"
   Content-Type: application/json
 --- BODY ---
-text: |
+text: |-
     :stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **promql/rate** check.
 
     <details>
@@ -197,6 +199,8 @@ text: |
     ------
 
     :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/rate.html).
+
+    <!-- pint -->
 severity: NORMAL
 anchor:
     path: rules.yml

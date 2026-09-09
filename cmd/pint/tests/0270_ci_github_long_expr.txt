@@ -1,3 +1,4 @@
+http method github GET /api/v3/user 200 {"id":42,"login":"ci-user"}
 http method github GET /api/v3/repos/cloudflare/pint/pulls/1/reviews 200 []
 http method github POST /api/v3/repos/cloudflare/pint/pulls/1/reviews 200 {}
 http method github GET /api/v3/repos/cloudflare/pint/pulls/1/comments 200 []
@@ -83,6 +84,12 @@ repository {
 }
 
 -- github.expected --
+GET /api/v3/user
+  Accept: application/vnd.github.v3+json
+  Accept-Encoding: gzip
+  Authorization: Bearer 12345
+  X-Github-Api-Version: 2022-11-28
+
 GET /api/v3/repos/cloudflare/pint/pulls/1/comments
   Accept: application/vnd.github.squirrel-girl-preview, application/vnd.github.comfort-fade-preview+json
   Accept-Encoding: gzip
@@ -102,7 +109,7 @@ POST /api/v3/repos/cloudflare/pint/pulls/1/comments
   Content-Type: application/json
   X-Github-Api-Version: 2022-11-28
 --- BODY ---
-body: |
+body: |-
     :stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **alerts/template** check.
 
     <details>
@@ -127,6 +134,8 @@ body: |
     ------
 
     :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/template.html).
+
+    <!-- pint -->
 path: rules.yml
 line: 8
 side: RIGHT
@@ -140,7 +149,7 @@ POST /api/v3/repos/cloudflare/pint/pulls/1/comments
   Content-Type: application/json
   X-Github-Api-Version: 2022-11-28
 --- BODY ---
-body: |
+body: |-
     :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **promql/impossible** check.
 
     <details>
@@ -165,6 +174,8 @@ body: |
     ------
 
     :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/impossible.html).
+
+    <!-- pint -->
 path: rules.yml
 line: 8
 side: RIGHT
@@ -178,7 +189,7 @@ POST /api/v3/repos/cloudflare/pint/pulls/1/comments
   Content-Type: application/json
   X-Github-Api-Version: 2022-11-28
 --- BODY ---
-body: |
+body: |-
     :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **promql/regexp** check.
 
     <details>
@@ -202,6 +213,8 @@ body: |
     ------
 
     :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/regexp.html).
+
+    <!-- pint -->
 path: rules.yml
 line: 20
 side: RIGHT

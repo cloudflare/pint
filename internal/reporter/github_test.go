@@ -55,7 +55,7 @@ func TestGitHubReporter(t *testing.T) {
 
 	for _, tc := range []testCaseT{
 		{
-			description: "list pull reviews timeout",
+			description: "get user details timeout",
 			owner:       "foo",
 			repo:        "bar",
 			token:       "something",
@@ -67,7 +67,7 @@ func TestGitHubReporter(t *testing.T) {
 			}),
 			timeout: 100 * time.Millisecond,
 			error: func(_ string) string {
-				return "failed to list pull request reviews: context deadline exceeded"
+				return "failed to get user details: context deadline exceeded"
 			},
 			summary: reporter.NewSummary([]reporter.Report{
 				{
@@ -603,8 +603,8 @@ func TestGitHubReporter(t *testing.T) {
 					body, _ := io.ReadAll(r.Body)
 					b := strings.TrimSpace(strings.TrimRight(string(body), "\n\t\r"))
 					switch b {
-					case `{"body":":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock1** check.\n\n------\n\nsyntax error1\n\n<details>\n<summary>More information</summary>\nsyntax details1\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock1.html).\n","path":"foo.txt","line":2,"side":"RIGHT","commit_id":"HEAD"}`:
-					case `{"body":":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock2** check.\n\n------\n\nsyntax error2\n\n<details>\n<summary>More information</summary>\nsyntax details2\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock2.html).\n","path":"foo.txt","line":2,"side":"RIGHT","commit_id":"HEAD"}`:
+					case `{"body":":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock1** check.\n\n------\n\nsyntax error1\n\n<details>\n<summary>More information</summary>\nsyntax details1\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock1.html).\n\n<!-- pint -->","path":"foo.txt","line":2,"side":"RIGHT","commit_id":"HEAD"}`:
+					case `{"body":":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock2** check.\n\n------\n\nsyntax error2\n\n<details>\n<summary>More information</summary>\nsyntax details2\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock2.html).\n\n<!-- pint -->","path":"foo.txt","line":2,"side":"RIGHT","commit_id":"HEAD"}`:
 					case `{"body":"This pint run would create 4 comment(s), which is more than 2 limit configured for pint.\n2 comments were skipped and won't be visible on this PR."}`:
 					default:
 						t.Errorf("Unexpected comment: %s", b)
@@ -960,7 +960,63 @@ func TestGitHubReporter(t *testing.T) {
 				if r.Method == http.MethodPost && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
 					body, _ := io.ReadAll(r.Body)
 					b := strings.TrimSpace(strings.TrimRight(string(body), "\n\t\r"))
-					if b != `{"body":":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n","path":"foo.txt","line":1,"side":"RIGHT","commit_id":"HEAD"}` {
+					if b != `{"body":":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n\n<!-- pint -->","path":"foo.txt","line":1,"side":"RIGHT","commit_id":"HEAD"}` {
+						t.Errorf("Unexpected comment: %s", b)
+						t.FailNow()
+					}
+				}
+				_, _ = w.Write([]byte(""))
+			}),
+			summary: reporter.NewSummary([]reporter.Report{
+				{
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
+					Changes: &discovery.Changes{
+						OldPath: "",
+						Lines:   git.LineNumbers{{Before: 0, After: 1, Modified: true}},
+					},
+					Rule: mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Lines: diags.LineRange{
+							First: 1,
+							Last:  1,
+						},
+						Reporter: "mock",
+						Summary:  "syntax error",
+						Details:  "syntax details",
+						Severity: checks.Fatal,
+					},
+				},
+			}),
+		},
+		{
+			description: "stale inline comment is kept",
+			owner:       "foo",
+			repo:        "bar",
+			token:       "something",
+			prNum:       123,
+			maxComments: 50,
+			timeout:     time.Second,
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/user" {
+					_, _ = w.Write([]byte(`{"id":42,"login":"ci-user"}`))
+					return
+				}
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/reviews" {
+					_, _ = w.Write([]byte(`[]`))
+					return
+				}
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
+					_, _ = w.Write([]byte(`[{"id":1,"commit_id":"fake-commit-id","path":"foo.txt","line":2,"body":"stale comment\n<!-- pint -->","user":{"id":42,"login":"ci-user"}}]`))
+					return
+				}
+				if r.Method == http.MethodPost && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
+					body, _ := io.ReadAll(r.Body)
+					b := strings.TrimSpace(strings.TrimRight(string(body), "\n\t\r"))
+					if b != `{"body":":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n\n<!-- pint -->","path":"foo.txt","line":1,"side":"RIGHT","commit_id":"HEAD"}` {
 						t.Errorf("Unexpected comment: %s", b)
 						t.FailNow()
 					}
@@ -1012,7 +1068,7 @@ func TestGitHubReporter(t *testing.T) {
 				if r.Method == http.MethodPost && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
 					body, _ := io.ReadAll(r.Body)
 					b := strings.TrimSpace(strings.TrimRight(string(body), "\n\t\r"))
-					if b != `{"body":":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n","path":"foo.txt","line":2,"side":"RIGHT","commit_id":"HEAD"}` {
+					if b != `{"body":":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n\n<!-- pint -->","path":"foo.txt","line":2,"side":"RIGHT","commit_id":"HEAD"}` {
 						t.Errorf("Unexpected comment: %s", b)
 						t.FailNow()
 					}
@@ -1064,7 +1120,7 @@ func TestGitHubReporter(t *testing.T) {
 				if r.Method == http.MethodPost && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
 					body, _ := io.ReadAll(r.Body)
 					b := strings.TrimSpace(strings.TrimRight(string(body), "\n\t\r"))
-					if b != `{"body":":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n","path":"foo.txt","line":3,"side":"LEFT","commit_id":"HEAD"}` {
+					if b != `{"body":":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n\n<!-- pint -->","path":"foo.txt","line":3,"side":"LEFT","commit_id":"HEAD"}` {
 						t.Errorf("Unexpected comment: %s", b)
 						t.FailNow()
 					}
@@ -1119,7 +1175,7 @@ func TestGitHubReporter(t *testing.T) {
 					b := strings.TrimSpace(strings.TrimRight(string(body), "\n\t\r"))
 					// Problem on old line 3, but only old line 5 is in the diff.
 					// Moved to nearest deleted line: 5.
-					if b != `{"body":":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n","path":"foo.txt","line":5,"side":"LEFT","commit_id":"HEAD"}` {
+					if b != `{"body":":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n\n<!-- pint -->","path":"foo.txt","line":5,"side":"LEFT","commit_id":"HEAD"}` {
 						t.Errorf("Unexpected comment: %s", b)
 						t.FailNow()
 					}
@@ -1174,7 +1230,7 @@ func TestGitHubReporter(t *testing.T) {
 					b := strings.TrimSpace(strings.TrimRight(string(body), "\n\t\r"))
 					// Diff only has added lines, no deleted lines to attach to.
 					// Falls through to RIGHT side, moved to nearest added line: 5.
-					if b != `{"body":":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n","path":"foo.txt","line":5,"side":"RIGHT","commit_id":"HEAD"}` {
+					if b != `{"body":":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n\n<!-- pint -->","path":"foo.txt","line":5,"side":"RIGHT","commit_id":"HEAD"}` {
 						t.Errorf("Unexpected comment: %s", b)
 						t.FailNow()
 					}
@@ -1377,10 +1433,10 @@ Below is the list of checks that were disabled for each Prometheus server define
 					body, _ := io.ReadAll(r.Body)
 					b := strings.TrimSpace(strings.TrimRight(string(body), "\n\t\r"))
 					switch b {
-					case `{"body":":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n","path":"foo.txt","line":2,"side":"RIGHT","commit_id":"HEAD"}`:
-					case `{"body":":warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **different** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/different.html).\n","path":"foo.txt","line":2,"side":"RIGHT","commit_id":"HEAD"}`:
-					case `{"body":":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n","path":"foo.txt","line":4,"side":"RIGHT","commit_id":"HEAD"}`:
-					case `{"body":":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n","path":"foo.txt","line":5,"side":"RIGHT","commit_id":"HEAD"}`:
+					case `{"body":":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n\n<!-- pint -->","path":"foo.txt","line":2,"side":"RIGHT","commit_id":"HEAD"}`:
+					case `{"body":":warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **different** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/different.html).\n\n<!-- pint -->","path":"foo.txt","line":2,"side":"RIGHT","commit_id":"HEAD"}`:
+					case `{"body":":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n\n<!-- pint -->","path":"foo.txt","line":4,"side":"RIGHT","commit_id":"HEAD"}`:
+					case `{"body":":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n\n<!-- pint -->","path":"foo.txt","line":5,"side":"RIGHT","commit_id":"HEAD"}`:
 					default:
 						t.Errorf("Unexpected comment: %s", b)
 					}
@@ -1499,8 +1555,8 @@ Below is the list of checks that were disabled for each Prometheus server define
 					body, _ := io.ReadAll(r.Body)
 					b := strings.TrimSpace(strings.TrimRight(string(body), "\n\t\r"))
 					switch b {
-					case `{"body":":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\nThe same issue was reported 2 more time(s), duplicates were suppressed.\n\n<details>\n<summary>Show affected rules</summary>\n\n- ` + "`sum errors` at `foo.txt:4`" + `\n` + "- `sum errors` at `foo.txt:5`" + `\n\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n","path":"foo.txt","line":2,"side":"RIGHT","commit_id":"HEAD"}`:
-					case `{"body":":warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **different** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/different.html).\n","path":"foo.txt","line":2,"side":"RIGHT","commit_id":"HEAD"}`:
+					case `{"body":":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\nThe same issue was reported 2 more time(s), duplicates were suppressed.\n\n<details>\n<summary>Show affected rules</summary>\n\n- ` + "`sum errors` at `foo.txt:4`" + `\n` + "- `sum errors` at `foo.txt:5`" + `\n\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n\n<!-- pint -->","path":"foo.txt","line":2,"side":"RIGHT","commit_id":"HEAD"}`:
+					case `{"body":":warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **different** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/different.html).\n\n<!-- pint -->","path":"foo.txt","line":2,"side":"RIGHT","commit_id":"HEAD"}`:
 					default:
 						t.Errorf("Unexpected comment: %s", b)
 					}
@@ -1718,7 +1774,7 @@ func TestGithubReporterListSkipsGeneralComments(t *testing.T) {
 
 	comments, err := r.List(t.Context(), nil)
 	require.NoError(t, err)
-	// Two file comments plus pint's own signed general comment. Empty-path
-	// review comments, reviewer comments, and unsigned quotes are skipped.
-	require.Len(t, comments, 3)
+	// List returns all comments as is, only the empty path PR comment is
+	// skipped. Ownership filtering happens in the shared submit flow.
+	require.Len(t, comments, 5)
 }

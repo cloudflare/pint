@@ -1,3 +1,4 @@
+http method github GET /api/v3/user 200 {"id":42,"login":"ci-user"}
 http method github GET /api/v3/repos/foo/bar/pulls/123/reviews 200 []
 http method github POST /api/v3/repos/foo/bar/pulls/123/reviews 200 {}
 http method github GET /api/v3/repos/foo/bar/pulls/123/comments 200 []
@@ -55,6 +56,12 @@ groups:
 repository {}
 
 -- github.expected --
+GET /api/v3/user
+  Accept: application/vnd.github.v3+json
+  Accept-Encoding: gzip
+  Authorization: Bearer 12345
+  X-Github-Api-Version: 2022-11-28
+
 GET /api/v3/repos/foo/bar/pulls/123/comments
   Accept: application/vnd.github.squirrel-girl-preview, application/vnd.github.comfort-fade-preview+json
   Accept-Encoding: gzip
@@ -74,7 +81,7 @@ POST /api/v3/repos/foo/bar/pulls/123/comments
   Content-Type: application/json
   X-Github-Api-Version: 2022-11-28
 --- BODY ---
-body: |
+body: |-
     :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **alerts/comparison** check.
 
     <details>
@@ -98,6 +105,8 @@ body: |
     ------
 
     :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/comparison.html).
+
+    <!-- pint -->
 path: rules.yml
 line: 8
 side: RIGHT
@@ -111,7 +120,7 @@ POST /api/v3/repos/foo/bar/pulls/123/comments
   Content-Type: application/json
   X-Github-Api-Version: 2022-11-28
 --- BODY ---
-body: |
+body: |-
     :information_source: **Information** reported by [pint](https://cloudflare.github.io/pint/) **alerts/for** check.
 
     <details>
@@ -129,6 +138,8 @@ body: |
     ------
 
     :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/for.html).
+
+    <!-- pint -->
 path: rules.yml
 line: 8
 side: RIGHT

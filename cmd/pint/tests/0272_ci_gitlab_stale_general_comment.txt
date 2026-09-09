@@ -1,6 +1,6 @@
 http method gitlab GET /api/v4/user 200 {"id": 555}
 http method gitlab GET /api/v4/projects/1234/merge_requests/1/versions 200 [{"id": 2, "head_commit_sha": "head", "base_commit_sha": "base", "start_commit_sha": "start"},{"id": 1, "head_commit_sha": "head", "base_commit_sha": "base", "start_commit_sha": "start"}]
-http method gitlab GET /api/v4/projects/1234/merge_requests/1/discussions 200 [{"id": "500", "notes": [{"id": 501, "author": {"id": 555}, "system": false, "body": "stale general comment from previous pint run"}]}]
+http method gitlab GET /api/v4/projects/1234/merge_requests/1/discussions 200 [{"id": "500", "notes": [{"id": 501, "author": {"id": 555}, "system": false, "body": "This pint run would create 3 comment(s), which is more than the limit configured for pint (1). <!-- pint -->"}]}]
 http method gitlab GET /api/v4/projects/1234/merge_requests 200 [{"iid": 1}]
 http method gitlab PUT /api/v4/projects/1234/merge_requests/1/discussions/500 200 {}
 http start gitlab 127.0.0.1:6272

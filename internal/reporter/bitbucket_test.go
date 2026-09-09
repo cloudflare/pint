@@ -22,7 +22,7 @@ import (
 	"github.com/cloudflare/pint/internal/reporter"
 )
 
-func bbCommentText(severity, reporter, summary string) string {
+func bbCommentText(severity, check, summary string) string {
 	icon := ":stop_sign:"
 	switch severity {
 	case "Warning":
@@ -30,7 +30,7 @@ func bbCommentText(severity, reporter, summary string) string {
 	case "Information":
 		icon = ":information_source:"
 	}
-	return icon + " **" + severity + "** reported by [pint](https://cloudflare.github.io/pint/) **" + reporter + "** check.\n\n------\n\n" + summary + "\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/" + reporter + ".html).\n"
+	return reporter.AddPintMarker(icon + " **" + severity + "** reported by [pint](https://cloudflare.github.io/pint/) **" + check + "** check.\n\n------\n\n" + summary + "\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/" + check + ".html).\n")
 }
 
 const (
@@ -223,7 +223,7 @@ func TestBitBucketReporter(t *testing.T) {
 									Version:  1,
 									State:    "OPEN",
 									Severity: "NORMAL",
-									Text:     "stale comment text",
+									Text:     reporter.AddPintMarker("stale comment text"),
 									Author:   reporter.BitBucketCommentAuthor{Name: "user"},
 								},
 								CommentAnchor: reporter.BitBucketCommentAnchor{
@@ -287,7 +287,7 @@ func TestBitBucketReporter(t *testing.T) {
 									Version:  3,
 									State:    "OPEN",
 									Severity: "NORMAL",
-									Text:     "stale comment with reply",
+									Text:     reporter.AddPintMarker("stale comment with reply"),
 									Author:   reporter.BitBucketCommentAuthor{Name: "user"},
 									Comments: []reporter.BitBucketPullRequestComment{
 										{ID: 201, Text: "reply"},
@@ -322,7 +322,7 @@ func TestBitBucketReporter(t *testing.T) {
 				s.ExpectGet(bbWhoami).ReturnCode(http.StatusInternalServerError)
 			}),
 			errorHandler: func(err error) error {
-				if err != nil && err.Error() == "GET request failed" {
+				if err != nil && err.Error() == "failed to get user details: GET request failed" {
 					return nil
 				}
 				return fmt.Errorf("unexpected error: %w", err)
@@ -606,7 +606,7 @@ func TestBitBucketReporter(t *testing.T) {
 									Version:  1,
 									State:    "OPEN",
 									Severity: "NORMAL",
-									Text:     "stale page 1",
+									Text:     reporter.AddPintMarker("stale page 1"),
 									Author:   reporter.BitBucketCommentAuthor{Name: "user"},
 								},
 								CommentAnchor: reporter.BitBucketCommentAnchor{
@@ -629,7 +629,7 @@ func TestBitBucketReporter(t *testing.T) {
 									Version:  1,
 									State:    "OPEN",
 									Severity: "NORMAL",
-									Text:     "stale page 2",
+									Text:     reporter.AddPintMarker("stale page 2"),
 									Author:   reporter.BitBucketCommentAuthor{Name: "user"},
 								},
 								CommentAnchor: reporter.BitBucketCommentAnchor{
@@ -693,7 +693,7 @@ func TestBitBucketReporter(t *testing.T) {
 									Version:  1,
 									State:    "OPEN",
 									Severity: "BLOCKER",
-									Text:     "stale blocker with reply",
+									Text:     reporter.AddPintMarker("stale blocker with reply"),
 									Author:   reporter.BitBucketCommentAuthor{Name: "user"},
 									Comments: []reporter.BitBucketPullRequestComment{
 										{ID: 651, Text: "a reply"},
@@ -764,7 +764,7 @@ func TestBitBucketReporter(t *testing.T) {
 									Version:  2,
 									State:    "OPEN",
 									Severity: "NORMAL",
-									Text:     "stale non-blocker with reply",
+									Text:     reporter.AddPintMarker("stale non-blocker with reply"),
 									Author:   reporter.BitBucketCommentAuthor{Name: "user"},
 									Comments: []reporter.BitBucketPullRequestComment{
 										{ID: 601, Text: "a reply"},
@@ -845,7 +845,7 @@ func TestBitBucketReporter(t *testing.T) {
 					ReturnCode(http.StatusCreated)
 				s.ExpectPost(bbComments).
 					WithBodyJSON(reporter.BitBucketPendingComment{
-						Text:     "This pint run would create 2 comment(s), which is more than the limit configured for pint (1).\n1 comment(s) were skipped and won't be visible on this PR.",
+						Text:     reporter.AddPintMarker("This pint run would create 2 comment(s), which is more than the limit configured for pint (1).\n1 comment(s) were skipped and won't be visible on this PR."),
 						Severity: "NORMAL",
 						Anchor: reporter.BitBucketPendingCommentAnchor{
 							DiffType: "EFFECTIVE",
@@ -993,7 +993,7 @@ func TestBitBucketReporter(t *testing.T) {
 									Version:  1,
 									State:    "OPEN",
 									Severity: "NORMAL",
-									Text:     "old text that no longer matches",
+									Text:     reporter.AddPintMarker("old text that no longer matches"),
 									Author:   reporter.BitBucketCommentAuthor{Name: "user"},
 								},
 								CommentAnchor: reporter.BitBucketCommentAnchor{
@@ -1009,7 +1009,7 @@ func TestBitBucketReporter(t *testing.T) {
 									Version:  1,
 									State:    "OPEN",
 									Severity: "NORMAL",
-									Text:     "comment on same path different line",
+									Text:     reporter.AddPintMarker("comment on same path different line"),
 									Author:   reporter.BitBucketCommentAuthor{Name: "user"},
 								},
 								CommentAnchor: reporter.BitBucketCommentAnchor{
@@ -1226,7 +1226,7 @@ func TestBitBucketReporter(t *testing.T) {
 									Version:  1,
 									State:    "OPEN",
 									Severity: "NORMAL",
-									Text:     "stale non-blocker with reply",
+									Text:     reporter.AddPintMarker("stale non-blocker with reply"),
 									Author:   reporter.BitBucketCommentAuthor{Name: "user"},
 									Comments: []reporter.BitBucketPullRequestComment{
 										{ID: 701, Text: "reply"},
