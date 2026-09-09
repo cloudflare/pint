@@ -2,7 +2,7 @@ http response bitbucket /plugins/servlet/applinks/whoami 200 pint
 http response bitbucket /rest/api/1.0/projects/prometheus/repos/rules/commits/.*/pull-requests 200 {"size":1,"isLastPage":true,"values":[{"id":123,"open":true,"fromRef":{"id":"refs/heads/modify","latestCommit":"fake-commit-id"},"toRef":{"id":"refs/heads/main","latestCommit":"fake-commit-id"}}]}
 http response bitbucket /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/123/changes 200 {"values":[{"path":{"toString":"rules.yml"}}],"size":1,"isLastPage":true}
 http response bitbucket /rest/api/latest/projects/prometheus/repos/rules/commits/fake-commit-id/diff/rules.yml 200 {"diffs":[{"hunks":[{"segments":[{"type":"ADDED", "lines":[{"source":5,"destination":5}]}]}]}]}
-http response bitbucket /rest/api/latest/projects/prometheus/repos/rules/pull-requests/123/activities 200 {"size":1,"isLastPage":true,"values":[{"action":"COMMENTED","commentAction":"ADDED","commentAnchor":{"diffType":"EFFECTIVE","lineType":"ADDED","path":"rules.yml","line":5},"comment":{"id":1,"state":"OPEN","severity":"NORMAL","author":{"name":"pint"},"comments":[{"id":2}]}}]}
+http response bitbucket /rest/api/latest/projects/prometheus/repos/rules/pull-requests/123/activities 200 {"size":1,"isLastPage":true,"values":[{"action":"COMMENTED","commentAction":"ADDED","commentAnchor":{"diffType":"EFFECTIVE","lineType":"ADDED","path":"rules.yml","line":5},"comment":{"id":1,"state":"OPEN","severity":"NORMAL","text":"stale pint comment\n<!-- pint -->","author":{"name":"pint"},"comments":[{"id":2}]}}]}
 http response bitbucket /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/123/comments 200 {}
 http start bitbucket 127.0.0.1:7164
 
@@ -92,7 +92,7 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/123/comments
   Authorization: Bearer "12345"
   Content-Type: application/json
 --- BODY ---
-text: |
+text: |-
     :stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **promql/syntax** check.
 
     <details>
@@ -112,6 +112,8 @@ text: |
     ------
 
     :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/syntax.html).
+
+    <!-- pint -->
 severity: NORMAL
 anchor:
     path: rules.yml
@@ -160,7 +162,7 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/123/comments
   Authorization: Bearer "12345"
   Content-Type: application/json
 --- BODY ---
-text: |
+text: |-
     :stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **promql/syntax** check.
 
     <details>
@@ -180,6 +182,8 @@ text: |
     ------
 
     :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/syntax.html).
+
+    <!-- pint -->
 severity: NORMAL
 anchor:
     path: rules.yml

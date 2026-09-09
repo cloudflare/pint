@@ -83,7 +83,7 @@ POST /api/v4/projects/1234/merge_requests/1/discussions
   Content-Type: application/json
   Private-Token: secret
 --- BODY ---
-body: |
+body: |-
     :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **alerts/comparison** check.
 
     <details>
@@ -107,6 +107,8 @@ body: |
     ------
 
     :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/comparison.html).
+
+    <!-- pint -->
 position:
     base_sha: base
     head_sha: head
@@ -123,7 +125,7 @@ POST /api/v4/projects/1234/merge_requests/1/discussions
   Content-Type: application/json
   Private-Token: secret
 --- BODY ---
-body: |
+body: |-
     :information_source: **Information** reported by [pint](https://cloudflare.github.io/pint/) **alerts/for** check.
 
     <details>
@@ -141,6 +143,8 @@ body: |
     ------
 
     :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/for.html).
+
+    <!-- pint -->
 position:
     base_sha: base
     head_sha: head

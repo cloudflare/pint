@@ -2,10 +2,12 @@ package reporter
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"slices"
 	"strconv"
 	"strings"
+	"unicode"
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/diags"
@@ -36,6 +38,7 @@ type ExistingComment struct {
 	id        string
 	path      string
 	text      string
+	author    string
 	line      int
 	isGeneral bool
 }
@@ -45,6 +48,7 @@ type Commenter interface {
 	Destinations(context.Context) ([]any, error)
 	Summary(context.Context, any, Summary, []PendingComment, []error) error
 	List(context.Context, any) ([]ExistingComment, error)
+	UserID(context.Context, any) (string, error)
 	Create(context.Context, any, PendingComment) error
 	Delete(context.Context, any, ExistingComment) error
 	CanCreate(int) bool
@@ -332,11 +336,43 @@ func Submit(ctx context.Context, s Summary, c Commenter, showDuplicates bool) er
 }
 
 func updateDestination(ctx context.Context, s Summary, c Commenter, dst any, showDuplicates bool) (err error) {
+	slog.LogAttrs(ctx, slog.LevelInfo, "Getting user details", slog.String("reporter", c.Describe()))
+	userID, err := c.UserID(ctx, dst)
+	if err != nil {
+		return fmt.Errorf("failed to get user details: %w", err)
+	}
+
 	slog.LogAttrs(ctx, slog.LevelInfo, "Listing existing comments", slog.String("reporter", c.Describe()))
 	existingComments, err := c.List(ctx, dst)
 	if err != nil {
 		return err
 	}
+
+	// Keep only comments created by pint and remove the marker,
+	// so the text can be compared with pending comments.
+	ownedComments := make([]ExistingComment, 0, len(existingComments))
+	for _, ec := range existingComments {
+		if !hasPintMarker(ec.text) {
+			slog.LogAttrs(
+				ctx, slog.LevelDebug, "Skipping comment not created by pint",
+				slog.String("reporter", c.Describe()),
+				slog.String("id", ec.id),
+			)
+			continue
+		}
+		if userID != "" && ec.author != userID {
+			slog.LogAttrs(
+				ctx, slog.LevelDebug, "Skipping comment from another user",
+				slog.String("reporter", c.Describe()),
+				slog.String("id", ec.id),
+				slog.String("author", ec.author),
+			)
+			continue
+		}
+		ec.text = removePintMarker(ec.text)
+		ownedComments = append(ownedComments, ec)
+	}
+	existingComments = ownedComments
 
 	var created int
 	var errs []error
@@ -383,6 +419,8 @@ func updateDestination(ctx context.Context, s Summary, c Commenter, dst any, sho
 			slog.String("path", pending.path),
 			slog.Int("line", pending.line),
 		)
+		// Add the comment marker, existing comments are stored without the marker.
+		pending.text = AddPintMarker(pending.text)
 		if err := c.Create(ctx, dst, pending); err != nil {
 			slog.LogAttrs(
 				ctx, slog.LevelError, "Failed to create a new comment",
@@ -529,4 +567,35 @@ Below is the list of checks that were disabled for each Prometheus server define
 		}
 	}
 	return buf.String()
+}
+
+// pintCommentMarker is a hidden HTML comment.
+// We add it to the general comments pint creates so we can tell which comment
+// was created by pint and which by other tools using same API token.
+//
+// We don't add it to review comments because these are matched using
+// 'This pull request was validated by pint' first line.
+const pintCommentMarker = "<!-- pint -->"
+
+// AddPintMarker adds the marker to the end of the body if needed.
+func AddPintMarker(body string) string {
+	if body == "" || hasPintMarker(body) {
+		return body
+	}
+	return body + "\n" + pintCommentMarker
+}
+
+// removePintMarker removes the marker, and whitespace at the end of the body.
+// It cuts exactly what AddPintMarker appends, so the original body is restored.
+func removePintMarker(body string) string {
+	// First trim trailing whitespace so we can match the suffix.
+	body = strings.TrimRightFunc(body, unicode.IsSpace)
+	// Then undo, in reverse order, what AddPintMarker appended.
+	return strings.TrimSuffix(strings.TrimSuffix(body, pintCommentMarker), "\n")
+}
+
+func hasPintMarker(body string) bool {
+	// Marker should be at the end, but the user might edit the message
+	// so we scan the whole comment body just in case.
+	return strings.Contains(body, pintCommentMarker)
 }

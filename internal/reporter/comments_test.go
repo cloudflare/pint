@@ -33,6 +33,7 @@ type testCommenter struct {
 	destinations func(context.Context) ([]any, error)
 	summary      func(context.Context, any, Summary, []PendingComment, []error) error
 	list         func(context.Context, any) ([]ExistingComment, error)
+	userID       func(context.Context, any) (string, error)
 	create       func(context.Context, any, PendingComment) error
 	delete       func(context.Context, any, ExistingComment) error
 	canCreate    func(int) bool
@@ -53,6 +54,13 @@ func (tc testCommenter) Summary(ctx context.Context, dst any, s Summary, comment
 
 func (tc testCommenter) List(ctx context.Context, dst any) ([]ExistingComment, error) {
 	return tc.list(ctx, dst)
+}
+
+func (tc testCommenter) UserID(ctx context.Context, dst any) (string, error) {
+	if tc.userID != nil {
+		return tc.userID(ctx, dst)
+	}
+	return "", nil
 }
 
 func (tc testCommenter) Create(ctx context.Context, dst any, comment PendingComment) error {
@@ -108,9 +116,10 @@ func TestCommenter(t *testing.T) {
 		},
 	}
 	fooComment := ExistingComment{
-		path: "foo.txt",
-		line: 2,
-		text: `:stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **foo** check.
+		path:   "foo.txt",
+		line:   2,
+		author: "pint",
+		text: AddPintMarker(`:stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **foo** check.
 
 ------
 
@@ -124,7 +133,7 @@ foo details
 ------
 
 :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/foo.html).
-`,
+`),
 		meta: nil,
 	}
 
@@ -148,9 +157,10 @@ foo details
 		},
 	}
 	barComment := ExistingComment{
-		path: "bar.txt",
-		line: 1,
-		text: `:warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **bar** check.
+		path:   "bar.txt",
+		line:   1,
+		author: "pint",
+		text: AddPintMarker(`:warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **bar** check.
 
 ------
 
@@ -159,7 +169,7 @@ bar warning
 ------
 
 :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/bar.html).
-`,
+`),
 		meta: nil,
 	}
 
@@ -218,10 +228,54 @@ bar warning
 					}
 					return nil
 				},
+				userID: func(_ context.Context, _ any) (string, error) {
+					return "pint", nil
+				},
 				list: func(_ context.Context, _ any) ([]ExistingComment, error) {
 					return []ExistingComment{fooComment, barComment}, nil
 				},
 				create: func(_ context.Context, _ any, p PendingComment) error {
+					return fmt.Errorf("shouldn't try to create %s:%d", p.path, p.line)
+				},
+				delete: func(_ context.Context, _ any, e ExistingComment) error {
+					return fmt.Errorf("shouldn't try to delete %s:%d", e.path, e.line)
+				},
+				isEqual: func(e ExistingComment, p PendingComment) bool {
+					return e.path == p.path && e.line == p.line && e.text == p.text
+				},
+				canCreate: func(_ int) bool {
+					return true
+				},
+			},
+			checkErr: func(t *testing.T, err error) {
+				require.NoError(t, err)
+			},
+		},
+		{
+			description: "recreates a comment that belongs to another user",
+			reports:     []Report{fooReport},
+			commenter: testCommenter{
+				destinations: func(_ context.Context) ([]any, error) {
+					return []any{1}, nil
+				},
+				summary: func(_ context.Context, _ any, _ Summary, _ []PendingComment, errs []error) error {
+					if len(errs) != 0 {
+						return fmt.Errorf("Expected empty errs, got %v", errs)
+					}
+					return nil
+				},
+				userID: func(_ context.Context, _ any) (string, error) {
+					return "pint", nil
+				},
+				list: func(_ context.Context, _ any) ([]ExistingComment, error) {
+					comment := fooComment
+					comment.author = "someone-else"
+					return []ExistingComment{comment}, nil
+				},
+				create: func(_ context.Context, _ any, p PendingComment) error {
+					if p.path == fooComment.path && p.line == fooComment.line && p.text == fooComment.text {
+						return nil
+					}
 					return fmt.Errorf("shouldn't try to create %s:%d", p.path, p.line)
 				},
 				delete: func(_ context.Context, _ any, e ExistingComment) error {
@@ -485,7 +539,7 @@ foo details
 
 :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/foo.html).
 `
-					if p.text != expected {
+					if p.text != AddPintMarker(expected) {
 						return fmt.Errorf("wrong text: %s", cmp.Diff(expected, p.text))
 					}
 					return nil
@@ -569,7 +623,7 @@ foo details
 
 :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/foo.html).
 `
-					if p.text != expected {
+					if p.text != AddPintMarker(expected) {
 						return fmt.Errorf("wrong text: %s", cmp.Diff(expected, p.text))
 					}
 					return nil
@@ -725,7 +779,7 @@ foo details
 
 :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/foo.html).
 `
-					if p.line == 3 && p.text != expected {
+					if p.line == 3 && p.text != AddPintMarker(expected) {
 						return fmt.Errorf("wrong text on first report: %s", cmp.Diff(expected, p.text))
 					}
 					expected2 := `:stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **foo** check.
@@ -743,7 +797,7 @@ foo details
 
 :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/foo.html).
 `
-					if p.line == 2 && p.text != expected2 {
+					if p.line == 2 && p.text != AddPintMarker(expected2) {
 						return fmt.Errorf("wrong text on second report: %s", cmp.Diff(expected2, p.text))
 					}
 					return nil
@@ -940,7 +994,7 @@ foo details
 						fooComment,
 						{
 							path:      "",
-							text:      "stale general comment",
+							text:      AddPintMarker("stale general comment"),
 							line:      0,
 							meta:      nil,
 							isGeneral: true,
@@ -994,6 +1048,130 @@ foo details
 			tc.checkErr(t, Submit(t.Context(), summary, tc.commenter, tc.showDuplicates))
 		})
 	}
+}
+
+func TestPintMarker(t *testing.T) {
+	msg := tooManyCommentsMsg(3, 1)
+
+	t.Run("has marker", func(t *testing.T) {
+		testCases := []struct {
+			name     string
+			body     string
+			expected bool
+		}{
+			{
+				name:     "message without the marker",
+				body:     msg,
+				expected: false,
+			},
+			{
+				name:     "quoted message without the marker",
+				body:     "> " + msg,
+				expected: false,
+			},
+			{
+				name:     "message with the marker",
+				body:     msg + "\n" + pintCommentMarker,
+				expected: true,
+			},
+			{
+				name:     "empty body",
+				body:     "",
+				expected: false,
+			},
+		}
+
+		for _, tc := range testCases {
+			t.Run(tc.name, func(t *testing.T) {
+				require.Equal(t, tc.expected, hasPintMarker(tc.body))
+			})
+		}
+	})
+
+	t.Run("add marker", func(t *testing.T) {
+		testCases := []struct {
+			name     string
+			body     string
+			expected string
+		}{
+			{
+				name:     "empty body stays empty",
+				body:     "",
+				expected: "",
+			},
+			{
+				name:     "body with the marker is unchanged",
+				body:     msg + "\n" + pintCommentMarker,
+				expected: msg + "\n" + pintCommentMarker,
+			},
+			{
+				name:     "body gets the marker at the end",
+				body:     msg,
+				expected: msg + "\n" + pintCommentMarker,
+			},
+			{
+				name:     "trailing newlines are kept",
+				body:     msg + "\n\n",
+				expected: msg + "\n\n\n" + pintCommentMarker,
+			},
+		}
+
+		for _, tc := range testCases {
+			t.Run(tc.name, func(t *testing.T) {
+				require.Equal(t, tc.expected, AddPintMarker(tc.body))
+			})
+		}
+	})
+
+	t.Run("remove marker", func(t *testing.T) {
+		testCases := []struct {
+			name     string
+			body     string
+			expected string
+		}{
+			{
+				name:     "signed body returns the original message",
+				body:     msg + "\n" + pintCommentMarker,
+				expected: msg,
+			},
+			{
+				name:     "signed body with trailing newline returns the original message",
+				body:     msg + "\n\n" + pintCommentMarker,
+				expected: msg + "\n",
+			},
+			{
+				name:     "whitespace after the marker is removed",
+				body:     msg + "\n" + pintCommentMarker + "  \n",
+				expected: msg,
+			},
+			{
+				name:     "trailing whitespace without the marker is removed",
+				body:     msg + "  ",
+				expected: msg,
+			},
+			{
+				name:     "leading whitespace is kept",
+				body:     "  " + msg,
+				expected: "  " + msg,
+			},
+			{
+				name:     "body with only the marker is removed",
+				body:     pintCommentMarker,
+				expected: "",
+			},
+			{
+				name:     "empty body stays empty",
+				body:     "",
+				expected: "",
+			},
+		}
+
+		for _, tc := range testCases {
+			t.Run(tc.name, func(t *testing.T) {
+				require.Equal(t, tc.expected, removePintMarker(tc.body))
+			})
+		}
+	})
 }
 
 func TestCommentsCommonPaths(t *testing.T) {

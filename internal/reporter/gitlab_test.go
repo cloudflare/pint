@@ -157,8 +157,8 @@ func TestGitLabReporter(t *testing.T) {
 		}
 		return path
 	}
-	discBody := func(reporter, summary, details string) *string {
-		return new(fmt.Sprintf(`:stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **%s** check.
+	discBody := func(check, summary, details string) *string {
+		return new(reporter.AddPintMarker(fmt.Sprintf(`:stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **%s** check.
 
 ------
 
@@ -172,10 +172,10 @@ func TestGitLabReporter(t *testing.T) {
 ------
 
 :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/%s.html).
-`, reporter, summary, details, reporter))
+`, check, summary, details, check)))
 	}
-	symlinkedDiscBody := func(reporter, summary, details, link string) *string {
-		return new(fmt.Sprintf(`:warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **%s** check.
+	symlinkedDiscBody := func(check, summary, details, link string) *string {
+		return new(reporter.AddPintMarker(fmt.Sprintf(`:warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **%s** check.
 
 ------
 
@@ -191,10 +191,10 @@ func TestGitLabReporter(t *testing.T) {
 ------
 
 :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/%s.html).
-`, reporter, summary, details, link, reporter))
+`, check, summary, details, link, check)))
 	}
-	discBodyWithDiag := func(reporter, summary, details, yml, diag string) *string {
-		return new(fmt.Sprintf(
+	discBodyWithDiag := func(check, summary, details, yml, diag string) *string {
+		return new(reporter.AddPintMarker(fmt.Sprintf(
 			`:stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **%s** check.
 
 <details>
@@ -211,8 +211,8 @@ func TestGitLabReporter(t *testing.T) {
 ------
 
 :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/a.html).
-`, reporter, summary, yml, diag, details,
-		))
+`, check, summary, yml, diag, details,
+		)))
 	}
 	discPosition := func(path string, line int64) *gitlab.PositionOptions {
 		return new(gitlab.PositionOptions{
@@ -382,9 +382,9 @@ func TestGitLabReporter(t *testing.T) {
 						s.ExpectGet(apiDiscussions(i, true)).ReturnJSON([]gitlab.Discussion{
 							{ID: "100", Notes: []*gitlab.Note{systemNote(discNote(101, 123, "system message", nil))}},
 							{ID: "200", Notes: []*gitlab.Note{discNote(201, 321, "different user", notePos("foo.txt", "foo.txt", 2, 0))}},
-							{ID: "300", Notes: []*gitlab.Note{discNote(301, 123, "stale comment", notePos("foo.txt", "foo.txt", 2, 0))}},
-							{ID: "400", Notes: []*gitlab.Note{discNote(401, 123, "stale comment on unmodified line", notePos("foo.txt", "foo.txt", 1, 0))}},
-							{ID: "500", Notes: []*gitlab.Note{discNote(101, 123, "no position", nil)}},
+							{ID: "300", Notes: []*gitlab.Note{discNote(301, 123, reporter.AddPintMarker("stale comment"), notePos("foo.txt", "foo.txt", 2, 0))}},
+							{ID: "400", Notes: []*gitlab.Note{discNote(401, 123, reporter.AddPintMarker("stale comment on unmodified line"), notePos("foo.txt", "foo.txt", 1, 0))}},
+							{ID: "500", Notes: []*gitlab.Note{discNote(101, 123, reporter.AddPintMarker("no position"), nil)}},
 						})
 					}
 
@@ -408,7 +408,7 @@ func TestGitLabReporter(t *testing.T) {
 				}
 
 				s.ExpectPost(apiDiscussions(5, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
-					Body:     new(":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **foo** check.\n\n------\n\nfoo error\n\n\u003cdetails\u003e\n\u003csummary\u003eMore information\u003c/summary\u003e\nfoo details\n\u003c/details\u003e\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/foo.html).\n"),
+					Body:     new(reporter.AddPintMarker(":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **foo** check.\n\n------\n\nfoo error\n\n\u003cdetails\u003e\n\u003csummary\u003eMore information\u003c/summary\u003e\nfoo details\n\u003c/details\u003e\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/foo.html).\n")),
 					Position: discPosition("foo.txt", 2),
 				}).ReturnJSON(gitlab.Response{})
 			}),
@@ -476,7 +476,11 @@ func TestGitLabReporter(t *testing.T) {
 					},
 					{
 						ID:    "300",
-						Notes: []*gitlab.Note{resolvedNote(discNote(301, 123, "different line", notePos("foo.txt", "foo.txt", 1, 0)))},
+						Notes: []*gitlab.Note{resolvedNote(discNote(301, 123, reporter.AddPintMarker("different line"), notePos("foo.txt", "foo.txt", 1, 0)))},
+					},
+					{
+						ID:    "400",
+						Notes: []*gitlab.Note{discNote(401, 123, "comment without marker", notePos("foo.txt", "foo.txt", 2, 0))},
 					},
 				})
 				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
@@ -484,7 +488,7 @@ func TestGitLabReporter(t *testing.T) {
 					Position: discPosition("foo.txt", 1),
 				}).ReturnJSON(gitlab.Response{})
 				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
-					Body: new("This pint run would create 3 comment(s), which is more than the limit configured for pint (1).\n2 comment(s) were skipped and won't be visible on this PR."),
+					Body: new(reporter.AddPintMarker("This pint run would create 3 comment(s), which is more than the limit configured for pint (1).\n2 comment(s) were skipped and won't be visible on this PR.")),
 				}).ReturnJSON(gitlab.Response{})
 			}),
 			errorHandler: func(err error) error {
@@ -512,7 +516,7 @@ func TestGitLabReporter(t *testing.T) {
 					},
 					{
 						ID:    "200",
-						Notes: []*gitlab.Note{discNote(201, 123, "This pint run would create 3 comment(s), which is more than the limit configured for pint (1).\n2 comment(s) were skipped and won't be visible on this PR.", nil)},
+						Notes: []*gitlab.Note{discNote(201, 123, reporter.AddPintMarker("This pint run would create 3 comment(s), which is more than the limit configured for pint (1).\n2 comment(s) were skipped and won't be visible on this PR."), nil)},
 					},
 				})
 				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
@@ -584,7 +588,7 @@ func TestGitLabReporter(t *testing.T) {
 				})
 				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{})
 				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
-					Body: new(`Some checks were disabled because one or more configured Prometheus server doesn't seem to support all required Prometheus APIs.
+					Body: new(reporter.AddPintMarker(`Some checks were disabled because one or more configured Prometheus server doesn't seem to support all required Prometheus APIs.
 This usually means that you're running pint against a service like Thanos or Mimir that allows to query metrics but doesn't implement all APIs documented [here](https://prometheus.io/docs/prometheus/latest/querying/api/).
 Since pint uses many of these API endpoint for querying information needed to run online checks only a real Prometheus server will allow it to run all of these checks.
 Below is the list of checks that were disabled for each Prometheus server defined in pint config file.
@@ -597,7 +601,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 - ` + "`prom2`" + `
   - ` + "`/api/v1/metadata` " + `is unsupported, disabled checks:
     - [check1](https://cloudflare.github.io/pint/checks/check1.html)
-`),
+`)),
 				}).ReturnJSON(gitlab.Response{})
 			}),
 			errorHandler: func(err error) error {
@@ -655,7 +659,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 					},
 					{
 						ID:    "300",
-						Notes: []*gitlab.Note{discNote(301, 123, "This pint run would create 3 comment(s), which is more than the limit configured for pint (1).\n2 comment(s) were skipped and won't be visible on this PR.", nil)},
+						Notes: []*gitlab.Note{discNote(301, 123, reporter.AddPintMarker("This pint run would create 3 comment(s), which is more than the limit configured for pint (1).\n2 comment(s) were skipped and won't be visible on this PR."), nil)},
 					},
 				})
 				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
@@ -747,19 +751,19 @@ Below is the list of checks that were disabled for each Prometheus server define
 					{
 						ID: "200",
 						Notes: []*gitlab.Note{
-							discNote(201, 123, "different path", notePos("bar.txt", "bar.txt", 5, 0)),
+							discNote(201, 123, reporter.AddPintMarker("different path"), notePos("bar.txt", "bar.txt", 5, 0)),
 						},
 					},
 					{
 						ID: "300",
 						Notes: []*gitlab.Note{
-							discNote(301, 123, "different path", notePos("bar.txt", "", 1, 0)),
+							discNote(301, 123, reporter.AddPintMarker("different path"), notePos("bar.txt", "", 1, 0)),
 						},
 					},
 					{
 						ID: "400",
 						Notes: []*gitlab.Note{
-							discNote(401, 123, "different line", notePos("foo.txt", "", 0, 1)),
+							discNote(401, 123, reporter.AddPintMarker("different line"), notePos("foo.txt", "", 0, 1)),
 						},
 					},
 					{
@@ -1490,7 +1494,7 @@ func getHTTPHandlerForCommentingLines(expectedNewLine, expectedOldLine int, t *t
 				}
 
 				expected := `{
-		"body":":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n\u003cdetails\u003e\n\u003csummary\u003eMore information\u003c/summary\u003e\nsyntax details\n\u003c/details\u003e\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n",
+		"body":":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n\u003cdetails\u003e\n\u003csummary\u003eMore information\u003c/summary\u003e\nsyntax details\n\u003c/details\u003e\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n\n\u003c!-- pint --\u003e",
 		"position":{
 			"base_sha":"base",
 			"head_sha":"head",

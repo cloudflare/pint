@@ -115,6 +115,10 @@ func (bb BitBucketReporter) Summary(
 	return nil
 }
 
+func (bb BitBucketReporter) UserID(ctx context.Context, _ any) (string, error) {
+	return bb.whoami(ctx)
+}
+
 func (bb BitBucketReporter) List(ctx context.Context, dst any) ([]ExistingComment, error) {
 	pr := dst.(*bitBucketPR)
 	bbComments, err := bb.getPullRequestComments(ctx, pr)
@@ -125,10 +129,11 @@ func (bb BitBucketReporter) List(ctx context.Context, dst any) ([]ExistingCommen
 	comments := make([]ExistingComment, 0, len(bbComments))
 	for _, c := range bbComments {
 		comments = append(comments, ExistingComment{
-			id:   strconv.Itoa(c.id),
-			path: c.anchor.Path,
-			text: c.text,
-			line: c.anchor.Line,
+			id:     strconv.Itoa(c.id),
+			path:   c.anchor.Path,
+			text:   c.text,
+			author: c.author,
+			line:   c.anchor.Line,
 			meta: bitBucketCommentMeta{
 				id:       c.id,
 				version:  c.version,
@@ -152,6 +157,7 @@ func (bb BitBucketReporter) Delete(ctx context.Context, dst any, c ExistingComme
 	meta := c.meta.(bitBucketCommentMeta)
 	bc := bitBucketComment{
 		text:     "",
+		author:   c.author,
 		severity: meta.severity,
 		anchor: BitBucketCommentAnchor{
 			Path:     "",
@@ -252,6 +258,7 @@ type bitBucketPR struct {
 
 type bitBucketComment struct {
 	text     string
+	author   string
 	severity string
 	anchor   BitBucketCommentAnchor
 	id       int
@@ -454,11 +461,6 @@ func (bb BitBucketReporter) findPullRequestForBranch(ctx context.Context, branch
 }
 
 func (bb BitBucketReporter) getPullRequestComments(ctx context.Context, pr *bitBucketPR) ([]bitBucketComment, error) {
-	username, err := bb.whoami(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	comments := []bitBucketComment{}
 
 	var start int
@@ -493,9 +495,6 @@ func (bb BitBucketReporter) getPullRequestComments(ctx context.Context, pr *bitB
 			if act.Comment.State != "OPEN" {
 				continue
 			}
-			if act.Comment.Author.Name != username {
-				continue
-			}
 			if act.Comment.Severity == "BLOCKER" && act.Comment.Resolved {
 				continue
 			}
@@ -506,6 +505,7 @@ func (bb BitBucketReporter) getPullRequestComments(ctx context.Context, pr *bitB
 				id:       act.Comment.ID,
 				version:  act.Comment.Version,
 				text:     act.Comment.Text,
+				author:   act.Comment.Author.Name,
 				anchor:   act.CommentAnchor,
 				severity: act.Comment.Severity,
 				replies:  len(act.Comment.Comments),
@@ -608,7 +608,7 @@ func (bb BitBucketReporter) postComment(ctx context.Context, pr *bitBucketPR, co
 
 func (bb BitBucketReporter) postGeneralComment(ctx context.Context, pr *bitBucketPR, text string) error {
 	comment := BitBucketPendingComment{
-		Text:     text,
+		Text:     AddPintMarker(text),
 		Severity: "NORMAL",
 		Anchor: BitBucketPendingCommentAnchor{
 			Path:     "",

@@ -106,7 +106,7 @@ POST /api/v4/projects/1234/merge_requests/1/discussions
   Content-Type: application/json
   Private-Token: secret
 --- BODY ---
-body: |
+body: |-
     :stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **alerts/template** check.
 
     <details>
@@ -131,6 +131,8 @@ body: |
     ------
 
     :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/template.html).
+
+    <!-- pint -->
 position:
     base_sha: base
     head_sha: head
@@ -147,7 +149,7 @@ POST /api/v4/projects/1234/merge_requests/1/discussions
   Content-Type: application/json
   Private-Token: secret
 --- BODY ---
-body: |
+body: |-
     :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **promql/impossible** check.
 
     <details>
@@ -172,6 +174,8 @@ body: |
     ------
 
     :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/impossible.html).
+
+    <!-- pint -->
 position:
     base_sha: base
     head_sha: head
@@ -188,7 +192,7 @@ POST /api/v4/projects/1234/merge_requests/1/discussions
   Content-Type: application/json
   Private-Token: secret
 --- BODY ---
-body: |
+body: |-
     :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **promql/regexp** check.
 
     <details>
@@ -212,6 +216,8 @@ body: |
     ------
 
     :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/regexp.html).
+
+    <!-- pint -->
 position:
     base_sha: base
     head_sha: head

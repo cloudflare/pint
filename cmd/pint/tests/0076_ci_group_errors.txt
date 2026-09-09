@@ -246,7 +246,7 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Authorization: Bearer "12345"
   Content-Type: application/json
 --- BODY ---
-text: |
+text: |-
     :stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **alerts/annotation** check.
 
     <details>
@@ -280,6 +280,8 @@ text: |
     ------
 
     :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/annotation.html).
+
+    <!-- pint -->
 severity: NORMAL
 anchor:
     path: rules.yml
@@ -294,7 +296,7 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Authorization: Bearer "12345"
   Content-Type: application/json
 --- BODY ---
-text: |
+text: |-
     :stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **rule/label** check.
 
     <details>
@@ -326,6 +328,8 @@ text: |
     ------
 
     :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/rule/label.html).
+
+    <!-- pint -->
 severity: NORMAL
 anchor:
     path: rules.yml
@@ -340,7 +344,7 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Authorization: Bearer "12345"
   Content-Type: application/json
 --- BODY ---
-text: |
+text: |-
     :stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **rule/owner** check.
 
     <details>
@@ -376,6 +380,8 @@ text: |
     ------
 
     :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/rule/owner.html).
+
+    <!-- pint -->
 severity: NORMAL
 anchor:
     path: rules.yml
@@ -390,7 +396,7 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Authorization: Bearer "12345"
   Content-Type: application/json
 --- BODY ---
-text: |
+text: |-
     :stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **promql/syntax** check.
 
     <details>
@@ -410,6 +416,8 @@ text: |
     ------
 
     :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/syntax.html).
+
+    <!-- pint -->
 severity: NORMAL
 anchor:
     path: rules.yml
@@ -424,7 +432,7 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Authorization: Bearer "12345"
   Content-Type: application/json
 --- BODY ---
-text: |
+text: |-
     :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **alerts/comparison** check.
 
     <details>
@@ -461,6 +469,8 @@ text: |
     ------
 
     :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/comparison.html).
+
+    <!-- pint -->
 severity: NORMAL
 anchor:
     path: rules.yml
@@ -475,7 +485,7 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Authorization: Bearer "12345"
   Content-Type: application/json
 --- BODY ---
-text: |
+text: |-
     :information_source: **Information** reported by [pint](https://cloudflare.github.io/pint/) **alerts/for** check.
 
     <details>
@@ -493,6 +503,8 @@ text: |
     ------
 
     :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/for.html).
+
+    <!-- pint -->
 severity: NORMAL
 anchor:
     path: rules.yml
@@ -507,7 +519,7 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Authorization: Bearer "12345"
   Content-Type: application/json
 --- BODY ---
-text: |
+text: |-
     :stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **alerts/template** check.
 
     <details>
@@ -532,6 +544,8 @@ text: |
     ------
 
     :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/template.html).
+
+    <!-- pint -->
 severity: NORMAL
 anchor:
     path: rules.yml
@@ -546,7 +560,7 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Authorization: Bearer "12345"
   Content-Type: application/json
 --- BODY ---
-text: |
+text: |-
     :stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **alerts/template** check.
 
     <details>
@@ -564,6 +578,8 @@ text: |
     ------
 
     :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/template.html).
+
+    <!-- pint -->
 severity: NORMAL
 anchor:
     path: rules.yml
@@ -578,7 +594,7 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Authorization: Bearer "12345"
   Content-Type: application/json
 --- BODY ---
-text: |
+text: |-
     :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **promql/regexp** check.
 
     <details>
@@ -598,6 +614,8 @@ text: |
     ------
 
     :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/regexp.html).
+
+    <!-- pint -->
 severity: NORMAL
 anchor:
     path: rules.yml
@@ -612,7 +630,7 @@ POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/1/comments
   Authorization: Bearer "12345"
   Content-Type: application/json
 --- BODY ---
-text: |
+text: |-
     :stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **promql/aggregate** check.
 
     <details>
@@ -632,6 +650,8 @@ text: |
     ------
 
     :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/aggregate.html).
+
+    <!-- pint -->
 severity: NORMAL
 anchor:
     path: rules.yml

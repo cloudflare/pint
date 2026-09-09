@@ -146,6 +146,17 @@ func (gr GithubReporter) Summary(ctx context.Context, _ any, s Summary, pendingC
 	return nil
 }
 
+func (gr GithubReporter) UserID(ctx context.Context, _ any) (string, error) {
+	slog.LogAttrs(ctx, slog.LevelDebug, "Getting current GitHub user details")
+	reqCtx, cancel := gr.reqContext(ctx)
+	defer cancel()
+	user, _, err := gr.client.Users.Get(reqCtx, "")
+	if err != nil {
+		return "", err
+	}
+	return strconv.FormatInt(user.GetID(), 10), nil
+}
+
 func (gr GithubReporter) List(ctx context.Context, _ any) ([]ExistingComment, error) {
 	reqCtx, cancel := gr.reqContext(ctx)
 	defer cancel()
@@ -166,6 +177,7 @@ func (gr GithubReporter) List(ctx context.Context, _ any) ([]ExistingComment, er
 			id:        strconv.FormatInt(ec.GetID(), 10),
 			path:      ec.GetPath(),
 			text:      ec.GetBody(),
+			author:    strconv.FormatInt(ec.GetUser().GetID(), 10),
 			line:      ec.GetLine(),
 			meta:      ghCommentMeta{id: ec.GetID()},
 			isGeneral: false,
@@ -181,6 +193,7 @@ func (gr GithubReporter) List(ctx context.Context, _ any) ([]ExistingComment, er
 			id:        strconv.FormatInt(ic.GetID(), 10),
 			path:      "",
 			text:      ic.GetBody(),
+			author:    strconv.FormatInt(ic.GetUser().GetID(), 10),
 			line:      0,
 			meta:      ghIssueCommentMeta{id: ic.GetID()},
 			isGeneral: true,
@@ -404,6 +417,7 @@ func formatGHReviewBody(ctx context.Context, version string, summary Summary, sh
 }
 
 func (gr GithubReporter) generalComment(ctx context.Context, body string) error {
+	body = AddPintMarker(body)
 	comment := github.IssueComment{
 		Body: new(body),
 	}

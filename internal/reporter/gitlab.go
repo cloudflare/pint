@@ -163,6 +163,10 @@ func (gl GitLabReporter) Summary(ctx context.Context, dst any, s Summary, pendin
 	return nil
 }
 
+func (gl GitLabReporter) UserID(_ context.Context, dst any) (string, error) {
+	return strconv.FormatInt(dst.(gitlabMR).userID, 10), nil
+}
+
 func (gl GitLabReporter) List(_ context.Context, dst any) ([]ExistingComment, error) {
 	mr := dst.(gitlabMR)
 	comments := make([]ExistingComment, 0, len(mr.discussions))
@@ -178,10 +182,11 @@ func (gl GitLabReporter) List(_ context.Context, dst any) ([]ExistingComment, er
 			if note.Position == nil {
 				// General comment, no path, line or commit information available.
 				comments = append(comments, ExistingComment{
-					id:   strconv.FormatInt(note.ID, 10),
-					path: "",
-					text: note.Body,
-					line: 0,
+					id:     strconv.FormatInt(note.ID, 10),
+					path:   "",
+					text:   note.Body,
+					author: strconv.FormatInt(note.Author.ID, 10),
+					line:   0,
 					meta: gitlabComment{
 						discussionID: disc.ID,
 						noteID:       note.ID,
@@ -346,10 +351,13 @@ func (gl GitLabReporter) generalComment(ctx context.Context, mr gitlabMR, msg st
 			if note.Author.ID != mr.userID {
 				continue
 			}
+			if !hasPintMarker(note.Body) {
+				continue
+			}
 			if note.Position != nil {
 				continue
 			}
-			if note.Body == msg {
+			if removePintMarker(note.Body) == msg {
 				slog.LogAttrs(ctx, slog.LevelDebug, "Comment already exits", slog.String("body", msg))
 				return nil
 			}
@@ -358,7 +366,7 @@ func (gl GitLabReporter) generalComment(ctx context.Context, mr gitlabMR, msg st
 
 	reqCtx, cancel := context.WithTimeout(ctx, gl.timeout)
 	defer cancel()
-	opt := gitlab.CreateMergeRequestDiscussionOptions{Body: new(msg)}
+	opt := gitlab.CreateMergeRequestDiscussionOptions{Body: new(AddPintMarker(msg))}
 	_, _, err = gl.client.Discussions.CreateMergeRequestDiscussion(gl.project, mr.mrID, &opt, gitlab.WithContext(reqCtx))
 	return err
 }
@@ -376,6 +384,7 @@ func (gl GitLabReporter) noteToExisting(discID string, note *gitlab.Note) (c Exi
 	}
 	c.id = strconv.FormatInt(note.ID, 10)
 	c.text = note.Body
+	c.author = strconv.FormatInt(note.Author.ID, 10)
 	c.meta = gitlabComment{
 		discussionID: discID,
 		noteID:       note.ID,
