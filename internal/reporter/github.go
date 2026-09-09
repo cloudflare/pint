@@ -152,7 +152,11 @@ func (gr GithubReporter) UserID(ctx context.Context, _ any) (string, error) {
 	defer cancel()
 	user, _, err := gr.client.Users.Get(reqCtx, "")
 	if err != nil {
-		return "", err
+		// The default GITHUB_TOKEN is a GitHub App installation token.
+		// Such tokens cannot access GET /user, they get a 403 error.
+		// Fall back to the comment marker only.
+		slog.LogAttrs(ctx, slog.LevelWarn, "Failed to get authenticated GitHub user, will only manage comments with pint's marker", slog.Any("err", err))
+		return "", nil
 	}
 	return strconv.FormatInt(user.GetID(), 10), nil
 }

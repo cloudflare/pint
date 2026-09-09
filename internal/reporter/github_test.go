@@ -55,7 +55,7 @@ func TestGitHubReporter(t *testing.T) {
 
 	for _, tc := range []testCaseT{
 		{
-			description: "get user details timeout",
+			description: "list pull reviews timeout",
 			owner:       "foo",
 			repo:        "bar",
 			token:       "something",
@@ -67,7 +67,7 @@ func TestGitHubReporter(t *testing.T) {
 			}),
 			timeout: 100 * time.Millisecond,
 			error: func(_ string) string {
-				return "failed to get user details: context deadline exceeded"
+				return "failed to list pull request reviews: context deadline exceeded"
 			},
 			summary: reporter.NewSummary([]reporter.Report{
 				{
