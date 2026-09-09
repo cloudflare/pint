@@ -1,6 +1,7 @@
 package checks_test
 
 import (
+	"context"
 	"net/http"
 	"testing"
 
@@ -14,6 +15,15 @@ func newOffsetCheck(prom *promapi.FailoverGroup) checks.RuleChecker {
 
 func TestOffsetCheck(t *testing.T) {
 	testCases := []checkTest{
+		{
+			description: "offline",
+			content:     "- record: foo\n  expr: bar\n",
+			checker:     newOffsetCheck,
+			prometheus:  newSimpleProm,
+			ctx: func(ctx context.Context, _ string) context.Context {
+				return promapi.WithOffline(ctx, true)
+			},
+		},
 		{
 			description: "ignores rules with syntax errors",
 			content:     "- record: foo\n  expr: sum(foo) without(\n",

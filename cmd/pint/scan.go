@@ -43,13 +43,14 @@ func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 	var reports []reporter.Report
 
 	ctx = context.WithValue(ctx, promapi.AllPrometheusServers, gen.Servers())
+	ctx = promapi.WithOffline(ctx, isOffline)
 	for _, s := range cfg.Check {
 		settings, _ := s.Decode()
 		key := checks.SettingsKey(s.Name)
 		ctx = context.WithValue(ctx, key, settings)
 	}
 
-	var onlineChecksCount, offlineChecksCount, checkedEntriesCount atomic.Int64
+	var checkedEntriesCount, totalChecksCount atomic.Int64
 	for _, entry := range entries {
 		switch {
 		case entry.PathError != nil && entry.State == discovery.Removed:
@@ -91,11 +92,7 @@ func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 			checkList := cfg.GetChecksForEntry(ctx, gen, entry)
 			for _, check := range checkList {
 				checkIterationChecks.Inc()
-				if check.Meta().Online {
-					onlineChecksCount.Add(1)
-				} else {
-					offlineChecksCount.Add(1)
-				}
+				totalChecksCount.Add(1)
 				concurrencyLimit <- struct{}{}
 				wg.Go(func() {
 					defer func() { <-concurrencyLimit }()
@@ -117,8 +114,7 @@ func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 	summary.Duration = time.Since(start)
 	summary.TotalEntries = len(entries)
 	summary.CheckedEntries = checkedEntriesCount.Load()
-	summary.OnlineChecks = onlineChecksCount.Load()
-	summary.OfflineChecks = offlineChecksCount.Load()
+	summary.TotalChecks = totalChecksCount.Load()
 
 	for _, prom := range gen.Servers() {
 		for api, names := range prom.GetDisabledChecks() {

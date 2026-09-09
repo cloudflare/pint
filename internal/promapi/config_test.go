@@ -38,6 +38,19 @@ func TestConfig(t *testing.T) {
 
 	testCases := []testCaseT{
 		{
+			name:        "offline",
+			timeout:     time.Second,
+			useFailover: true,
+			ctx: func(t *testing.T) context.Context {
+				return promapi.WithOffline(t.Context(), true)
+			},
+			errCheck: func(t *testing.T, err error) {
+				t.Helper()
+				require.EqualError(t, err, "disabled by --offline flag")
+			},
+			mock: httpmock.New(func(_ *httpmock.Server) {}),
+		},
+		{
 			name:    "default config",
 			timeout: time.Second,
 			cfg:     defaults,

@@ -51,7 +51,6 @@ func (c RuleDependencyCheck) Meta() CheckMeta {
 			discovery.Modified,
 			discovery.Removed,
 		},
-		Online:        false,
 		AlwaysEnabled: false,
 	}
 }

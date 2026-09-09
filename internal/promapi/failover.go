@@ -240,6 +240,9 @@ func (fg *FailoverGroup) Config(
 	ctx context.Context,
 	cacheTTL time.Duration,
 ) *Request[*ConfigResult] {
+	if IsOffline(ctx) {
+		return newRequest(func() (*ConfigResult, error) { return nil, ErrOffline })
+	}
 	return newRequest(func() (*ConfigResult, error) {
 		var cfg *ConfigResult
 		var uri string
@@ -262,6 +265,9 @@ func (fg *FailoverGroup) Query(
 	ctx context.Context,
 	expr string,
 ) *Request[*QueryResult] {
+	if IsOffline(ctx) {
+		return newRequest(func() (*QueryResult, error) { return nil, ErrOffline })
+	}
 	return newRequest(func() (*QueryResult, error) {
 		var qr *QueryResult
 		var uri string
@@ -294,6 +300,9 @@ func (fg *FailoverGroup) RangeQuery(
 	expr string,
 	params RangeQueryTimes,
 ) *Request[*RangeQueryResult] {
+	if IsOffline(ctx) {
+		return newRequest(func() (*RangeQueryResult, error) { return nil, ErrOffline })
+	}
 	return newRequest(func() (*RangeQueryResult, error) {
 		var rqr *RangeQueryResult
 		var uri string
@@ -316,6 +325,9 @@ func (fg *FailoverGroup) Metadata(
 	ctx context.Context,
 	metric string,
 ) *Request[*MetadataResult] {
+	if IsOffline(ctx) {
+		return newRequest(func() (*MetadataResult, error) { return nil, ErrOffline })
+	}
 	return newRequest(func() (*MetadataResult, error) {
 		var metadata *MetadataResult
 		var uri string
@@ -337,6 +349,9 @@ func (fg *FailoverGroup) Metadata(
 func (fg *FailoverGroup) Flags(
 	ctx context.Context,
 ) *Request[*FlagsResult] {
+	if IsOffline(ctx) {
+		return newRequest(func() (*FlagsResult, error) { return nil, ErrOffline })
+	}
 	return newRequest(func() (*FlagsResult, error) {
 		var flags *FlagsResult
 		var uri string
@@ -358,6 +373,9 @@ func (fg *FailoverGroup) Flags(
 func (fg *FailoverGroup) BuildInfo(
 	ctx context.Context,
 ) *Request[*BuildInfoResult] {
+	if IsOffline(ctx) {
+		return newRequest(func() (*BuildInfoResult, error) { return nil, ErrOffline })
+	}
 	return newRequest(func() (*BuildInfoResult, error) {
 		var bi *BuildInfoResult
 		var uri string

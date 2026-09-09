@@ -54,7 +54,6 @@ func (c AnnotationCheck) Meta() CheckMeta {
 			discovery.Modified,
 			discovery.Moved,
 		},
-		Online:        false,
 		AlwaysEnabled: false,
 	}
 }

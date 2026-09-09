@@ -52,7 +52,6 @@ func (c Reject) Meta() CheckMeta {
 			discovery.Modified,
 			discovery.Moved,
 		},
-		Online:        false,
 		AlwaysEnabled: false,
 	}
 }

@@ -41,7 +41,6 @@ func (c FeaturesCheck) Meta() CheckMeta {
 			discovery.Modified,
 			discovery.Moved,
 		},
-		Online:        true,
 		AlwaysEnabled: false,
 	}
 }
@@ -55,6 +54,10 @@ func (c FeaturesCheck) Reporter() string {
 }
 
 func (c FeaturesCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*discovery.Entry) (problems []Problem) {
+	if promapi.IsOffline(ctx) {
+		return problems
+	}
+
 	expr := entry.Rule.Expr()
 	if expr.SyntaxError() != nil {
 		return problems

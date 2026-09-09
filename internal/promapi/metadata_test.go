@@ -27,6 +27,17 @@ func TestMetadata(t *testing.T) {
 
 	testCases := []testCaseT{
 		{
+			name:    "offline",
+			timeout: time.Second,
+			ctx: func(t *testing.T) context.Context {
+				return promapi.WithOffline(t.Context(), true)
+			},
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(t, err, "disabled by --offline flag")
+			},
+			mock: httpmock.New(func(_ *httpmock.Server) {}),
+		},
+		{
 			name:     "gauge",
 			timeout:  time.Second,
 			metadata: []v1.Metadata{{Type: "gauge", Help: "Text", Unit: ""}},
