@@ -6,7 +6,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.3.0
 	github.com/gkampitakis/go-snaps v0.5.23
 	github.com/google/go-cmp v0.7.0
-	github.com/google/go-github/v88 v88.0.0
+	github.com/google/go-github/v91 v91.0.0
 	github.com/hashicorp/hcl/v2 v2.24.0
 	github.com/klauspost/compress v1.20.0
 	github.com/neilotoole/slogt/v2 v2.0.0
@@ -18,7 +18,7 @@ require (
 	github.com/stretchr/testify v1.12.1
 	github.com/urfave/cli/v3 v3.11.0
 	github.com/zclconf/go-cty v1.19.0
-	gitlab.com/gitlab-org/api/client-go/v2 v2.63.0
+	gitlab.com/gitlab-org/api/client-go/v3 v3.0.0
 	go.nhat.io/httpmock v0.12.1
 	go.uber.org/ratelimit v0.3.1
 	go.yaml.in/yaml/v3 v3.0.5

@@ -125,10 +125,10 @@ body: |-
     :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/comparison.html).
 
     <!-- pint -->
+commit_id: <COMMIT ID>
 path: rules.yml
 line: 7
 side: RIGHT
-commit_id: <COMMIT ID>
 --- END ---
 
 GET /api/v3/repos/cloudflare/pint/pulls/1/reviews

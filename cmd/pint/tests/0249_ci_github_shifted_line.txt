@@ -107,10 +107,10 @@ body: |-
     :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/comparison.html).
 
     <!-- pint -->
+commit_id: <COMMIT ID>
 path: rules.yml
 line: 8
 side: RIGHT
-commit_id: <COMMIT ID>
 --- END ---
 
 POST /api/v3/repos/foo/bar/pulls/123/comments
@@ -140,10 +140,10 @@ body: |-
     :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/for.html).
 
     <!-- pint -->
+commit_id: <COMMIT ID>
 path: rules.yml
 line: 8
 side: RIGHT
-commit_id: <COMMIT ID>
 --- END ---
 
 GET /api/v3/repos/foo/bar/pulls/123/reviews

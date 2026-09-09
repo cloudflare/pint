@@ -131,8 +131,8 @@ github.com/google/gnostic-models v0.7.0/go.mod h1:whL5G0m6dmc5cPxKc5bdKdEN3UjI7O
 github.com/google/go-cmp v0.6.0/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
 github.com/google/go-cmp v0.7.0 h1:wk8382ETsv4JYUZwIsn6YpYiWiBsYLSJiTsyBybVuN8=
 github.com/google/go-cmp v0.7.0/go.mod h1:pXiqmnSA92OHEEa9HXL2W4E7lf9JzCmGVUdgjX3N/iU=
-github.com/google/go-github/v88 v88.0.0 h1:dZA9IKkPK1eXZj4ypngnpRj5FwdpTv4whix2PrQMP7M=
-github.com/google/go-github/v88 v88.0.0/go.mod h1:rufTDgn2N45wjhukLTyxmvc9nilSp3mr3Rgtt6b1MPw=
+github.com/google/go-github/v91 v91.0.0 h1:fpulREh37uBvOj4kF0vLuzjwJ1HHmFcAfquNjJfmpYs=
+github.com/google/go-github/v91 v91.0.0/go.mod h1:rHtn7haKvmkTLhUK/aCQypiIj/suWSB3rnS+a1FdH6M=
 github.com/google/go-querystring v1.2.0 h1:yhqkPbu2/OH+V9BfpCVPZkNmUXhb2gBxJArfhIxNtP0=
 github.com/google/go-querystring v1.2.0/go.mod h1:8IFJqpSRITyJ8QhQ13bmbeMBDfmeEJZD5A0egEOmkqU=
 github.com/google/gofuzz v1.0.0/go.mod h1:dBl0BpW6vV/+mYPU4Po3pmUjxk6FQPldtuIdl/M65Eg=
@@ -251,8 +251,8 @@ github.com/zclconf/go-cty v1.19.0 h1:IV8WdqYZc2c5rLX9bEoLNXKojBAp0MZPBHMIrCoa/s4
 github.com/zclconf/go-cty v1.19.0/go.mod h1:12W89jGn3JCOIQi7infWr9m80rOkb5RNYJqXMZcN4c8=
 github.com/zclconf/go-cty-debug v0.0.0-20240509010212-0d6042c53940 h1:4r45xpDWB6ZMSMNJFMOjqrGHynW3DIBuR2H9j0ug+Mo=
 github.com/zclconf/go-cty-debug v0.0.0-20240509010212-0d6042c53940/go.mod h1:CmBdvvj3nqzfzJ6nTCIwDTPZ56aVGvDrmztiO5g3qrM=
-gitlab.com/gitlab-org/api/client-go/v2 v2.63.0 h1:lPZsGn8oISRd/ReeTI4OuHXWO1UXg9fPkLz5/JxK4lA=
-gitlab.com/gitlab-org/api/client-go/v2 v2.63.0/go.mod h1:a8PSqY/h53boJ6FvWTJZH888tdpcj+n2hVUo2NsOi/E=
+gitlab.com/gitlab-org/api/client-go/v3 v3.0.0 h1:H2uUG4YE8g7Db73pyUQVYJ4w/7NjxuGAa3lEl/9kC44=
+gitlab.com/gitlab-org/api/client-go/v3 v3.0.0/go.mod h1:k7uYxRoIeuSqyWZSJfAPZlf0L32OH0lUBImAl4gWUFc=
 go.nhat.io/httpmock v0.12.1 h1:TQlfppf0zM0FHH1N/wswJLZQ0ceaa/gatOxSgBQnfpQ=
 go.nhat.io/httpmock v0.12.1/go.mod h1:IiaeSIPDqGNawUjQkAhbnPIUFsZVm8DRX0NGbAHwa9I=
 go.nhat.io/matcher/v2 v2.0.0 h1:W+rbHi0hKuZHtOQH4U5g+KwyKyfVioIxrxjoGRcUETE=

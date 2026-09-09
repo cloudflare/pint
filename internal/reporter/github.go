@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/go-github/v88/github"
+	"github.com/google/go-github/v91/github"
 	"golang.org/x/oauth2"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -216,10 +216,10 @@ func (gr GithubReporter) Create(ctx context.Context, _ any, p PendingComment) er
 	//       "LEFT"  -- deletions (red lines in the diff).
 	//       "RIGHT" -- additions (green) or unchanged context lines (white).
 	side, line := gr.commentPosition(p)
-	comment := &github.PullRequestComment{
-		CommitID: new(gr.headCommit),
-		Path:     new(p.path),
-		Body:     new(p.text),
+	comment := github.CreatePullRequestCommentRequest{
+		CommitID: gr.headCommit,
+		Path:     p.path,
+		Body:     p.text,
 		Line:     new(line),
 		Side:     new(side),
 	}
@@ -418,8 +418,8 @@ func formatGHReviewBody(ctx context.Context, version string, summary Summary, sh
 
 func (gr GithubReporter) generalComment(ctx context.Context, body string) error {
 	body = AddPintMarker(body)
-	comment := github.IssueComment{
-		Body: new(body),
+	comment := github.IssueCommentRequest{
+		Body: body,
 	}
 
 	slog.LogAttrs(ctx, slog.LevelDebug, "Creating PR comment", slog.String("body", comment.GetBody()))
@@ -427,7 +427,7 @@ func (gr GithubReporter) generalComment(ctx context.Context, body string) error 
 	reqCtx, cancel := gr.reqContext(ctx)
 	defer cancel()
 
-	_, _, err := gr.client.Issues.CreateComment(reqCtx, gr.owner, gr.repo, gr.prNum, &comment)
+	_, _, err := gr.client.Issues.CreateComment(reqCtx, gr.owner, gr.repo, gr.prNum, comment)
 	return err
 }
 
