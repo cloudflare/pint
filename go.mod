@@ -16,7 +16,7 @@ require (
 	github.com/prometheus/prometheus v0.314.0
 	github.com/rogpeppe/go-internal v1.16.0
 	github.com/stretchr/testify v1.12.1
-	github.com/urfave/cli/v3 v3.11.0
+	github.com/urfave/cli/v3 v3.12.0
 	github.com/zclconf/go-cty v1.19.0
 	gitlab.com/gitlab-org/api/client-go/v3 v3.12.0
 	go.nhat.io/httpmock v0.12.1
