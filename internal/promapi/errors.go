@@ -30,6 +30,8 @@ func IsUnavailableError(err error) bool {
 	return false
 }
 
+var ErrOffline = errors.New("disabled by --offline flag")
+
 func IsQueryTooExpensive(err error) bool {
 	if e1, ok := errors.AsType[APIError](err); ok {
 		if e1.ErrorType != v1.ErrExec {

@@ -70,7 +70,7 @@ func newApp() *cli.Command {
 				Name:    offlineFlag,
 				Aliases: []string{"o"},
 				Value:   false,
-				Usage:   "Disable all checks that send live queries to Prometheus servers.",
+				Usage:   "Offline mode, no network requests will be sent, some parts of check logic might be disabled or checks might be skipped entirely.",
 			},
 			&cli.BoolFlag{
 				Name:    showDupsFlag,
@@ -123,10 +123,7 @@ func actionSetup(c *cli.Command) (meta actionMeta, err error) {
 		meta.cfg.Checks.Enabled = enabled
 	}
 
-	if c.Bool(offlineFlag) {
-		meta.isOffline = true
-		meta.cfg.DisableOnlineChecks()
-	}
+	meta.isOffline = c.Bool(offlineFlag)
 
 	return meta, nil
 }

@@ -40,7 +40,6 @@ func (c AlertsAbsentCheck) Meta() CheckMeta {
 			discovery.Modified,
 			discovery.Moved,
 		},
-		Online:        true,
 		AlwaysEnabled: false,
 	}
 }
@@ -54,6 +53,10 @@ func (c AlertsAbsentCheck) Reporter() string {
 }
 
 func (c AlertsAbsentCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*discovery.Entry) (problems []Problem) {
+	if promapi.IsOffline(ctx) {
+		return problems
+	}
+
 	if entry.Rule.AlertingRule == nil {
 		return problems
 	}

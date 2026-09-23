@@ -86,6 +86,20 @@ func TestRange(t *testing.T) {
 
 	testCases := []testCaseT{
 		{
+			query:   "offline",
+			start:   timeParse("2022-06-14T00:00:00Z"),
+			end:     timeParse("2022-06-14T00:01:00Z"),
+			step:    time.Minute,
+			timeout: time.Second,
+			ctx: func(t *testing.T) context.Context {
+				return promapi.WithOffline(t.Context(), true)
+			},
+			assertErr: func(t *testing.T, err error) {
+				require.EqualError(t, err, "disabled by --offline flag")
+			},
+			mock: httpmock.New(func(_ *httpmock.Server) {}),
+		},
+		{
 			query:   "1m",
 			start:   timeParse("2022-06-14T00:00:00Z"),
 			end:     timeParse("2022-06-14T00:01:00Z"),

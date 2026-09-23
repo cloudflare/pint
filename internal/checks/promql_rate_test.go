@@ -1,6 +1,7 @@
 package checks_test
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"testing"
@@ -20,6 +21,15 @@ func newRateCheck(prom *promapi.FailoverGroup) checks.RuleChecker {
 
 func TestRateCheck(t *testing.T) {
 	testCases := []checkTest{
+		{
+			description: "offline",
+			content:     "- record: foo\n  expr: rate(bar[5m])\n",
+			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
+			ctx: func(ctx context.Context, _ string) context.Context {
+				return promapi.WithOffline(ctx, true)
+			},
+		},
 		{
 			description: "ignores rules with syntax errors",
 			content:     "- record: foo\n  expr: sum(foo) without(\n",
