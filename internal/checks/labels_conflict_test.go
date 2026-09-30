@@ -1,6 +1,7 @@
 package checks_test
 
 import (
+	"context"
 	"net/http"
 	"testing"
 	"time"
@@ -15,6 +16,15 @@ func newLabelsConflict(prom *promapi.FailoverGroup) checks.RuleChecker {
 
 func TestLabelsConflictCheck(t *testing.T) {
 	testCases := []checkTest{
+		{
+			description: "offline",
+			content:     "- alert: foo\n  expr: up == 0\n  labels:\n    job: bar\n",
+			checker:     newLabelsConflict,
+			prometheus:  newSimpleProm,
+			ctx: func(ctx context.Context, _ string) context.Context {
+				return promapi.WithOffline(ctx, true)
+			},
+		},
 		{
 			description: "ignores rules with syntax errors",
 			content:     "- record: foo\n  expr: sum(foo) without(\n",

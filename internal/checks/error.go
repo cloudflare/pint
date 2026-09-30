@@ -40,7 +40,6 @@ func (c ErrorCheck) Meta() CheckMeta {
 			discovery.Moved,
 			discovery.Removed,
 		},
-		Online:        false,
 		AlwaysEnabled: true,
 	}
 }

@@ -1,6 +1,7 @@
 package checks_test
 
 import (
+	"context"
 	"testing"
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
@@ -15,6 +16,15 @@ func newCounterCheck(prom *promapi.FailoverGroup) checks.RuleChecker {
 
 func TestCounterCheck(t *testing.T) {
 	testCases := []checkTest{
+		{
+			description: "offline",
+			content:     "- record: foo\n  expr: rate(bar[5m])\n",
+			checker:     newCounterCheck,
+			prometheus:  newSimpleProm,
+			ctx: func(ctx context.Context, _ string) context.Context {
+				return promapi.WithOffline(ctx, true)
+			},
+		},
 		{
 			description: "ignores rules with syntax errors",
 			content:     "- record: foo\n  expr: sum(foo) without(\n",

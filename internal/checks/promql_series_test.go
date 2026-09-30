@@ -23,6 +23,15 @@ func TestSeriesCheck(t *testing.T) {
 
 	testCases := []checkTest{
 		{
+			description: "offline",
+			content:     "- record: foo\n  expr: bar\n",
+			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
+			ctx: func(ctx context.Context, _ string) context.Context {
+				return promapi.WithOffline(ctx, true)
+			},
+		},
+		{
 			description: "ignores rules with syntax errors",
 			content:     "- record: foo\n  expr: sum(foo) without(\n",
 			checker:     newSeriesCheck,
