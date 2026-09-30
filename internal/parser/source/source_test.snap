@@ -21918,8 +21918,14 @@ expr: foo offset -(5)
 output:
     - returns: vector
       operations:
-        - node: '[*parser.VectorSelector] foo offset -5s'
+        - node: '[*parser.VectorSelector] foo offset -(5)'
           op: ""
+      needsFeatures:
+        - feature: promql-duration-expr
+          name: duration_expr
+          fragments:
+            - start: 11
+              end: 14
       position:
         start: 0
         end: 15
