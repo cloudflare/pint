@@ -1,6 +1,7 @@
 package checks_test
 
 import (
+	"context"
 	"net/http"
 	"testing"
 	"time"
@@ -19,6 +20,15 @@ func newRangeQueryCheckWithLimit(prom *promapi.FailoverGroup) checks.RuleChecker
 
 func TestRangeQueryCheck(t *testing.T) {
 	testCases := []checkTest{
+		{
+			description: "offline",
+			content:     "- record: foo\n  expr: rate(bar[5m])\n",
+			checker:     newRangeQueryCheck,
+			prometheus:  newSimpleProm,
+			ctx: func(ctx context.Context, _ string) context.Context {
+				return promapi.WithOffline(ctx, true)
+			},
+		},
 		{
 			description: "ignores rules with syntax errors",
 			content:     "- record: foo\n  expr: sum(foo) without(\n",

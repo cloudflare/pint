@@ -1,6 +1,7 @@
 package checks_test
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -18,6 +19,15 @@ func TestAlertsCountCheck(t *testing.T) {
 	content := "- alert: Foo Is Down\n  expr: up{job=\"foo\"} == 0\n"
 
 	testCases := []checkTest{
+		{
+			description: "offline",
+			content:     "- alert: foo\n  expr: up == 0\n",
+			checker:     newAlertsCheck,
+			prometheus:  newSimpleProm,
+			ctx: func(ctx context.Context, _ string) context.Context {
+				return promapi.WithOffline(ctx, true)
+			},
+		},
 		{
 			description: "ignores recording rules",
 			content:     "- record: foo\n  expr: up == 0\n",

@@ -50,14 +50,14 @@
   output: |
     1 | - record: foo
                   ^^^
-                  Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111
-                  error: `connection refused`.
+                  Couldn't run some checks due to `prom` Prometheus server at http://127.0.0.1:1111 error:
+                  `connection refused`.
   problem:
     reporter: promql/vector_matching
     summary: unable to run checks
     details: ""
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 error: `connection refused`.'
+        - message: 'Couldn''t run some checks due to `prom` Prometheus server at http://127.0.0.1:1111 error: `connection refused`.'
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -77,14 +77,14 @@
   output: |
     1 | - record: foo
                   ^^^
-                  Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111
-                  error: `connection refused`.
+                  Couldn't run some checks due to `prom` Prometheus server at http://127.0.0.1:1111 error:
+                  `connection refused`.
   problem:
     reporter: promql/vector_matching
     summary: unable to run checks
     details: ""
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 error: `connection refused`.'
+        - message: 'Couldn''t run some checks due to `prom` Prometheus server at http://127.0.0.1:1111 error: `connection refused`.'
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -104,14 +104,14 @@
   output: |
     1 | - record: foo
                   ^^^
-                  Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX
-                  error: `server_error: internal error`.
+                  Couldn't run some checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error:
+                  `server_error: internal error`.
   problem:
     reporter: promql/vector_matching
     summary: unable to run checks
     details: ""
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.'
+        - message: 'Couldn''t run some checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.'
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -131,14 +131,14 @@
   output: |
     1 | - record: foo
                   ^^^
-                  Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX
-                  error: `server_error: internal error`.
+                  Couldn't run some checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error:
+                  `server_error: internal error`.
   problem:
     reporter: promql/vector_matching
     summary: unable to run checks
     details: ""
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.'
+        - message: 'Couldn''t run some checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.'
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -363,6 +363,11 @@
         last: 2
     severity: 2
     anchor: 0
+
+---
+
+[TestVectorMatchingCheck/offline - 1]
+[]
 
 ---
 

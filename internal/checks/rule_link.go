@@ -14,6 +14,7 @@ import (
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
+	"github.com/cloudflare/pint/internal/promapi"
 )
 
 const (
@@ -52,7 +53,6 @@ func (c RuleLinkCheck) Meta() CheckMeta {
 			discovery.Modified,
 			discovery.Moved,
 		},
-		Online:        true,
 		AlwaysEnabled: false,
 	}
 }
@@ -66,6 +66,11 @@ func (c RuleLinkCheck) Reporter() string {
 }
 
 func (c RuleLinkCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*discovery.Entry) (problems []Problem) {
+	// This check makes HTTP requests to verify annotation links, skip when running in offline mode.
+	if promapi.IsOffline(ctx) {
+		return problems
+	}
+
 	if entry.Rule.AlertingRule == nil || entry.Rule.AlertingRule.Annotations == nil {
 		return nil
 	}
