@@ -37,6 +37,7 @@ cmp stderr ../stderrV2.txt
 -- stderrV1.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check on current git branch" base=main
+level=INFO msg="Git file changes parsed" files=1 entries=2 commits=1 maxCommits=20
 level=INFO msg="Configured new Prometheus server" name=prom1 uris=1 uptime=up tags=[] include=["^prom1.yml$"] exclude=[]
 level=INFO msg="Configured new Prometheus server" name=prom2 uris=1 uptime=up tags=[] include=["^prom2.yml$"] exclude=[]
 level=INFO msg="Checking Prometheus rules" entries=2 workers=10 online=true

@@ -36,6 +36,13 @@ func TestPrometheusConfig(t *testing.T) {
 			conf: PrometheusConfig{URI: "http://localhost"},
 		},
 		{
+			conf: PrometheusConfig{
+				URI:             "http://localhost",
+				SampleRateLimit: -1,
+			},
+			err: errors.New("sampleRateLimit cannot be negative"),
+		},
+		{
 			conf: PrometheusConfig{},
 			err:  errors.New("prometheus URI cannot be empty"),
 		},

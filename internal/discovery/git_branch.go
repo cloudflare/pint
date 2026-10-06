@@ -47,7 +47,8 @@ func (f GitBranchFinder) Find(ctx context.Context, allEntries []*Entry) (entries
 		return nil, err
 	}
 
-	if totalCommits := countCommits(changes); totalCommits > f.maxCommits {
+	totalCommits := countCommits(changes)
+	if totalCommits > f.maxCommits {
 		return nil, fmt.Errorf("number of commits to check (%d) is higher than maxCommits (%d), exiting", totalCommits, f.maxCommits)
 	}
 
@@ -101,7 +102,7 @@ func (f GitBranchFinder) Find(ctx context.Context, allEntries []*Entry) (entries
 		failedEntries := entriesWithPathErrors(entriesAfter)
 
 		slog.LogAttrs(
-			context.Background(), slog.LevelDebug,
+			ctx, slog.LevelDebug,
 			"Parsing git file change",
 			slog.Any("commits", change.Commits),
 			slog.String("before.path", change.Path.Before.Name),
@@ -119,7 +120,7 @@ func (f GitBranchFinder) Find(ctx context.Context, allEntries []*Entry) (entries
 			case !me.hasBefore && me.hasAfter:
 				me.after.State = Added
 				slog.LogAttrs(
-					context.Background(), slog.LevelDebug,
+					ctx, slog.LevelDebug,
 					"Rule added on HEAD branch",
 					slog.String("name", me.after.Rule.Name()),
 					slog.String("state", me.after.State.String()),
@@ -132,7 +133,7 @@ func (f GitBranchFinder) Find(ctx context.Context, allEntries []*Entry) (entries
 				case me.isIdentical && !me.wasMoved:
 					me.after.State = Noop
 					slog.LogAttrs(
-						context.Background(), slog.LevelDebug,
+						ctx, slog.LevelDebug,
 						"Rule content was not modified on HEAD, identical rule present before",
 						slog.String("name", me.after.Rule.Name()),
 						slog.Any("lines", me.after.Rule.Lines),
@@ -140,7 +141,7 @@ func (f GitBranchFinder) Find(ctx context.Context, allEntries []*Entry) (entries
 				case me.wasMoved:
 					me.after.State = Moved
 					slog.LogAttrs(
-						context.Background(), slog.LevelDebug,
+						ctx, slog.LevelDebug,
 						"Rule content was not modified on HEAD but the file was moved or renamed",
 						slog.String("name", me.after.Rule.Name()),
 						slog.Any("lines", me.after.Rule.Lines),
@@ -148,7 +149,7 @@ func (f GitBranchFinder) Find(ctx context.Context, allEntries []*Entry) (entries
 				default:
 					me.after.State = Modified
 					slog.LogAttrs(
-						context.Background(), slog.LevelDebug,
+						ctx, slog.LevelDebug,
 						"Rule modified on HEAD branch",
 						slog.String("name", me.after.Rule.Name()),
 						slog.String("state", me.after.State.String()),
@@ -160,7 +161,7 @@ func (f GitBranchFinder) Find(ctx context.Context, allEntries []*Entry) (entries
 			case me.hasBefore && !me.hasAfter && len(failedEntries) == 0:
 				me.before.State = Removed
 				slog.LogAttrs(
-					context.Background(), slog.LevelDebug,
+					ctx, slog.LevelDebug,
 					"Rule removed on HEAD branch",
 					slog.String("name", me.before.Rule.Name()),
 					slog.String("state", me.before.State.String()),
@@ -188,7 +189,11 @@ func (f GitBranchFinder) Find(ctx context.Context, allEntries []*Entry) (entries
 	}
 
 	var found bool
+	var changedEntries int
 	for _, entry := range entries {
+		if entry.State == Added || entry.State == Modified || entry.State == Moved || entry.State == Removed {
+			changedEntries++
+		}
 		found = false
 		if entry.State == Removed {
 			goto NEXT
@@ -207,7 +212,12 @@ func (f GitBranchFinder) Find(ctx context.Context, allEntries []*Entry) (entries
 		}
 	}
 
-	slog.LogAttrs(context.Background(), slog.LevelDebug, "Git branch finder completed", slog.Int("count", len(allEntries)))
+	slog.LogAttrs(ctx, slog.LevelInfo, "Git file changes parsed",
+		slog.Int("files", len(changes)),
+		slog.Int("entries", changedEntries),
+		slog.Int("commits", totalCommits),
+		slog.Int("maxCommits", f.maxCommits),
+	)
 	return allEntries, nil
 }
 

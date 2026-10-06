@@ -121,20 +121,21 @@ func (d *Discovery) merge(dst, src []*promapi.FailoverGroup) ([]*promapi.Failove
 }
 
 type PrometheusTemplate struct {
-	Headers     map[string]string `hcl:"headers,optional" json:"headers,omitempty"`
-	TLS         *TLSConfig        `hcl:"tls,block" json:"tls,omitzero"`
-	Name        string            `hcl:"name" json:"name"`
-	URI         string            `hcl:"uri" json:"uri"`
-	PublicURI   string            `hcl:"publicURI,optional" json:"publicURI,omitempty"`
-	Timeout     string            `hcl:"timeout,optional"  json:"timeout"`
-	Uptime      string            `hcl:"uptime,optional" json:"uptime"`
-	Failover    []string          `hcl:"failover,optional" json:"failover,omitempty"`
-	Include     []string          `hcl:"include,optional" json:"include,omitempty"`
-	Exclude     []string          `hcl:"exclude,optional" json:"exclude,omitempty"`
-	Tags        []string          `hcl:"tags,optional" json:"tags,omitempty"`
-	Concurrency int               `hcl:"concurrency,optional" json:"concurrency"`
-	RateLimit   int               `hcl:"rateLimit,optional" json:"rateLimit"`
-	Required    bool              `hcl:"required,optional" json:"required"`
+	Headers         map[string]string `hcl:"headers,optional" json:"headers,omitempty"`
+	TLS             *TLSConfig        `hcl:"tls,block" json:"tls,omitzero"`
+	Name            string            `hcl:"name" json:"name"`
+	URI             string            `hcl:"uri" json:"uri"`
+	PublicURI       string            `hcl:"publicURI,optional" json:"publicURI,omitempty"`
+	Timeout         string            `hcl:"timeout,optional"  json:"timeout"`
+	Uptime          string            `hcl:"uptime,optional" json:"uptime"`
+	Failover        []string          `hcl:"failover,optional" json:"failover,omitempty"`
+	Include         []string          `hcl:"include,optional" json:"include,omitempty"`
+	Exclude         []string          `hcl:"exclude,optional" json:"exclude,omitempty"`
+	Tags            []string          `hcl:"tags,optional" json:"tags,omitempty"`
+	Concurrency     int               `hcl:"concurrency,optional" json:"concurrency"`
+	RateLimit       int               `hcl:"rateLimit,optional" json:"rateLimit"`
+	SampleRateLimit int               `hcl:"sampleRateLimit,optional" json:"sampleRateLimit,omitzero"`
+	Required        bool              `hcl:"required,optional" json:"required"`
 }
 
 func (pt PrometheusTemplate) validate() (err error) {
@@ -235,20 +236,21 @@ func (pt PrometheusTemplate) Render(data map[string]string) (*promapi.FailoverGr
 	}
 
 	prom := PrometheusConfig{
-		Name:        name,
-		URI:         strings.TrimSuffix(uri, "/"),
-		PublicURI:   strings.TrimSuffix(publicURI, "/"),
-		Headers:     headers,
-		Failover:    failover,
-		Timeout:     pt.Timeout,
-		Concurrency: pt.Concurrency,
-		RateLimit:   pt.RateLimit,
-		Uptime:      pt.Uptime,
-		Include:     include,
-		Exclude:     exclude,
-		Tags:        tags,
-		Required:    pt.Required,
-		TLS:         pt.TLS,
+		Name:            name,
+		URI:             strings.TrimSuffix(uri, "/"),
+		PublicURI:       strings.TrimSuffix(publicURI, "/"),
+		Headers:         headers,
+		Failover:        failover,
+		Timeout:         pt.Timeout,
+		Concurrency:     pt.Concurrency,
+		RateLimit:       pt.RateLimit,
+		SampleRateLimit: pt.SampleRateLimit,
+		Uptime:          pt.Uptime,
+		Include:         include,
+		Exclude:         exclude,
+		Tags:            tags,
+		Required:        pt.Required,
+		TLS:             pt.TLS,
 	}
 	prom.applyDefaults()
 	if err = prom.validate(); err != nil {
@@ -408,7 +410,7 @@ func (pq PrometheusQuery) Discover(ctx context.Context) ([]*promapi.FailoverGrou
 	timeout, _ := parseDuration(pq.Timeout)
 	tls, _ := pq.TLS.toHTTPConfig()
 
-	prom := promapi.NewPrometheus("discovery", pq.URI, "", pq.Headers, timeout, 1, 100, tls)
+	prom := promapi.NewPrometheus("discovery", pq.URI, "", pq.Headers, timeout, 1, 100, 0, tls)
 	prom.StartWorkers()
 
 	slog.LogAttrs(

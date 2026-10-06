@@ -24,6 +24,7 @@ cmp stderr ../stderr.txt
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check on current git branch" base=main
 level=WARN msg="Failed to parse file content" err="top level field must be a groups key, got list" path=rules.yml line=1
+level=INFO msg="Git file changes parsed" files=0 entries=0 commits=0 maxCommits=20
 level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
 -- src/rules.yml --
 - record: rule1

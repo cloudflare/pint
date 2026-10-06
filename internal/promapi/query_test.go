@@ -5,10 +5,13 @@ import (
 	"encoding/json/jsontext"
 	"encoding/json/v2"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
+	"net/http/httptest"
 	"reflect"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -350,7 +353,7 @@ func TestQuery(t *testing.T) {
 			srv := tc.mock(t)
 
 			fg := promapi.NewFailoverGroup("test", srv.URL(), []*promapi.Prometheus{
-				promapi.NewPrometheus("test", srv.URL(), srv.URL(), nil, tc.timeout, 1, 100, nil),
+				promapi.NewPrometheus("test", srv.URL(), srv.URL(), nil, tc.timeout, 1, 100, 0, nil),
 			}, true, "up", nil, nil, nil)
 			reg := prometheus.NewRegistry()
 			fg.StartWorkers(reg)
@@ -367,6 +370,110 @@ func TestQuery(t *testing.T) {
 				require.Equal(t, tc.series, qr.Series)
 				require.Equal(t, tc.stats, qr.Stats)
 			}
+		})
+	}
+}
+
+func TestSampleRateLimit(t *testing.T) {
+	testCases := []struct {
+		name          string
+		waitErr       string
+		firstSamples  int
+		secondSamples int
+		rate          int
+		minWait       time.Duration
+		deadline      time.Duration
+	}{
+		{
+			// The first query uses more samples than the rate limit allows,
+			// the second one waits one second for the budget refill.
+			name:          "query above the rate limit delays the next query",
+			firstSamples:  20000,
+			secondSamples: 1000,
+			rate:          10000,
+			minWait:       50 * time.Millisecond,
+		},
+		{
+			// A query below the rate limit doesn't delay the next one,
+			// the short deadline proves that no wait happened.
+			name:          "query below the rate limit doesn't delay the next query",
+			firstSamples:  100,
+			secondSamples: 100,
+			rate:          10000,
+			deadline:      100 * time.Millisecond,
+		},
+		{
+			name:          "response without stats is not rate limited",
+			firstSamples:  0,
+			secondSamples: 0,
+			rate:          10000,
+		},
+		{
+			// The budget wait is longer than the query deadline,
+			// so the query fails with the rate limiter error
+			// and no request is sent.
+			name:          "budget wait error fails the query",
+			firstSamples:  20000,
+			secondSamples: 10000,
+			rate:          10000,
+			deadline:      500 * time.Millisecond,
+			waitErr:       "rate: Wait(n=0) would exceed context deadline",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			var requests atomic.Int32
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+				samples := tc.firstSamples
+				if requests.Add(1) > 1 {
+					samples = tc.secondSamples
+				}
+				stats := ""
+				if samples > 0 {
+					stats = fmt.Sprintf(`,"stats":{"samples":{"totalQueryableSamples":%d}}`, samples)
+				}
+				fmt.Fprintf(w, `{"status":"success","data":{"resultType":"vector","result":[]%s}}`, stats)
+			}))
+			defer srv.Close()
+
+			prom := promapi.NewPrometheus("test", srv.URL, "", nil, time.Second, 1, 1000, tc.rate, nil)
+			prom.StartWorkers()
+
+			first, err := prom.Query(t.Context(), "first")
+			require.NoError(t, err)
+			require.Equal(t, &promapi.QueryResult{
+				URI:    srv.URL,
+				Series: []promapi.Sample{},
+				Stats: promapi.QueryStats{
+					Samples: promapi.QuerySamples{TotalQueryableSamples: tc.firstSamples},
+				},
+			}, first)
+			// Give the background spend time to register the debt.
+			time.Sleep(100 * time.Millisecond)
+
+			start := time.Now()
+			ctx := t.Context()
+			if tc.deadline > 0 {
+				var cancel context.CancelFunc
+				ctx, cancel = context.WithTimeout(ctx, tc.deadline)
+				defer cancel()
+			}
+			second, err := prom.Query(ctx, "second")
+			if tc.waitErr != "" {
+				require.EqualError(t, err, tc.waitErr)
+				require.Nil(t, second)
+				return
+			}
+			require.NoError(t, err)
+			require.Equal(t, &promapi.QueryResult{
+				URI:    srv.URL,
+				Series: []promapi.Sample{},
+				Stats: promapi.QueryStats{
+					Samples: promapi.QuerySamples{TotalQueryableSamples: tc.secondSamples},
+				},
+			}, second)
+			require.GreaterOrEqual(t, time.Since(start), tc.minWait)
 		})
 	}
 }

@@ -199,7 +199,7 @@ func TestConfig(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			srv := tc.mock(t)
 
-			prom := promapi.NewPrometheus("test", srv.URL(), "", nil, tc.timeout, 1, 100, nil)
+			prom := promapi.NewPrometheus("test", srv.URL(), "", nil, tc.timeout, 1, 100, 0, nil)
 
 			var cfg *promapi.ConfigResult
 			var err error
@@ -270,7 +270,7 @@ func TestConfigHeaders(t *testing.T) {
 			t.Cleanup(srv.Close)
 
 			fg := promapi.NewFailoverGroup("test", srv.URL, []*promapi.Prometheus{
-				promapi.NewPrometheus("test", srv.URL, "", tc.config, time.Second, 1, 100, nil),
+				promapi.NewPrometheus("test", srv.URL, "", tc.config, time.Second, 1, 100, 0, nil),
 			}, true, "up", nil, nil, nil)
 
 			reg := prometheus.NewRegistry()
