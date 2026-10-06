@@ -138,10 +138,10 @@ text: |-
 
     Duration for `rate()` must be at least 2 x scrape_interval, `5m` Prometheus server at http://127.0.0.1:2094 is using `5m` scrape_interval.
 
-    Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) and [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) function comes with a few requirements:
+    Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate), [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) and [increase](https://prometheus.io/docs/prometheus/latest/querying/functions/#increase) functions comes with a few requirements:
 
-    - The metric you calculate (i)rate from must be a counter or a native histogram.
-    - The time window of the (i)rate function must have at least 2 samples.
+    - The metric you calculate (i)rate or increase from must be a counter or a native histogram.
+    - The time window of the (i)rate or increase function must have at least 2 samples.
 
     The type of your metric is defined by the application that exports that metric.
     The number of samples depends on how often your application is being scraped by Prometheus.
@@ -183,10 +183,10 @@ text: |-
 
     Duration for `rate()` must be at least 2 x scrape_interval, `5m` Prometheus server at http://127.0.0.1:2094 is using `5m` scrape_interval.
 
-    Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) and [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) function comes with a few requirements:
+    Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate), [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) and [increase](https://prometheus.io/docs/prometheus/latest/querying/functions/#increase) functions comes with a few requirements:
 
-    - The metric you calculate (i)rate from must be a counter or a native histogram.
-    - The time window of the (i)rate function must have at least 2 samples.
+    - The metric you calculate (i)rate or increase from must be a counter or a native histogram.
+    - The time window of the (i)rate or increase function must have at least 2 samples.
 
     The type of your metric is defined by the application that exports that metric.
     The number of samples depends on how often your application is being scraped by Prometheus.
