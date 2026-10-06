@@ -64,6 +64,30 @@ func TestConfigLoadMergeDefaultsWhenMissing(t *testing.T) {
 	require.NotNil(t, cfg.Repository)
 }
 
+func TestConfigLoadSampleRateLimit(t *testing.T) {
+	path := path.Join(t.TempDir(), "config.hcl")
+	err := os.WriteFile(path, []byte(`prometheus "prom" {
+  uri             = "http://localhost"
+  sampleRateLimit = 1000
+}`), 0o644)
+	require.NoError(t, err)
+
+	cfg, fromFile, err := config.Load(path, true)
+	require.NoError(t, err)
+	require.True(t, fromFile)
+	require.Equal(t, []config.PrometheusConfig{
+		{
+			Name:            "prom",
+			URI:             "http://localhost",
+			Timeout:         "2m0s",
+			Uptime:          "up",
+			Concurrency:     16,
+			RateLimit:       100,
+			SampleRateLimit: 1000,
+		},
+	}, cfg.Prometheus)
+}
+
 func TestConfigLoadIgnoreKeepFiringForOnly(t *testing.T) {
 	dir := t.TempDir()
 	path := path.Join(dir, "config.hcl")
@@ -1908,6 +1932,13 @@ func TestConfigErrors(t *testing.T) {
   timeout = "abc"
 }`,
 			err: `not a valid duration string: "abc"`,
+		},
+		{
+			config: `prometheus "prom" {
+  uri             = "http://localhost"
+  sampleRateLimit = -1
+}`,
+			err: "sampleRateLimit cannot be negative",
 		},
 		{
 			config: `rule {

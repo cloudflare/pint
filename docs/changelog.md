@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.89.0
+
+### Added
+
+- Added `sampleRateLimit` option to Prometheus server configuration.
+  It limits the number of samples Prometheus reads per second to process
+  queries sent by pint. It requires [query statistics](https://prometheus.io/docs/prometheus/latest/querying/api/#query-statistics)
+  to be enabled.
+- Added `pint_prometheus_sample_rate_limit` and `pint_prometheus_query_samples_total`
+  metrics for the `sampleRateLimit` option.
+
 ## v0.88.0
 
 ### Added

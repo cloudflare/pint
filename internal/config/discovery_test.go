@@ -285,6 +285,15 @@ func TestPrometheusTemplateRender(t *testing.T) {
 		},
 		{
 			template: PrometheusTemplate{
+				Name:            "foo",
+				URI:             "http://localhost",
+				SampleRateLimit: -1,
+			},
+			data: map[string]string{},
+			err:  "sampleRateLimit cannot be negative",
+		},
+		{
+			template: PrometheusTemplate{
 				Name:    "foo",
 				URI:     "http://{{ $name }}",
 				Headers: map[string]string{"X-Cluster": "{{ $cluster }}"},

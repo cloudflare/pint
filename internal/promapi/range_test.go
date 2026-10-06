@@ -565,7 +565,7 @@ func TestRange(t *testing.T) {
 			srv := tc.mock(t)
 
 			fg := promapi.NewFailoverGroup("test", srv.URL(), []*promapi.Prometheus{
-				promapi.NewPrometheus("test", srv.URL(), "", nil, tc.timeout, 1, 100, nil),
+				promapi.NewPrometheus("test", srv.URL(), "", nil, tc.timeout, 1, 100, 0, nil),
 			}, true, "up", nil, nil, nil)
 			reg := prometheus.NewRegistry()
 			fg.StartWorkers(reg)

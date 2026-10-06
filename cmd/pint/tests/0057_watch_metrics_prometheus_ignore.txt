@@ -167,6 +167,10 @@ pint_prometheus_query_errors_total{endpoint="/api/v1/status/config",name="prom1"
 pint_prometheus_query_errors_total{endpoint="/api/v1/status/config",name="prom2",reason="connection/error"}
 pint_prometheus_query_errors_total{endpoint="/api/v1/status/flags",name="prom1",reason="api/unsupported"}
 pint_prometheus_query_errors_total{endpoint="/api/v1/status/flags",name="prom2",reason="connection/error"}
+# HELP pint_prometheus_sample_rate_limit Configured sampleRateLimit for this Prometheus server.
+# TYPE pint_prometheus_sample_rate_limit gauge
+pint_prometheus_sample_rate_limit{name="prom1"}
+pint_prometheus_sample_rate_limit{name="prom2"}
 # HELP pint_rules_parsed_total Total number of rules parsed since startup.
 # TYPE pint_rules_parsed_total counter
 pint_rules_parsed_total{kind="alerting"}

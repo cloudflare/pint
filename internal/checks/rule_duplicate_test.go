@@ -161,7 +161,10 @@ func TestRuleDuplicateCheck(t *testing.T) {
 					"prom",
 					uri,
 					[]*promapi.Prometheus{
-						promapi.NewPrometheus("prom", uri, simplePromPublicURI, map[string]string{}, time.Second, 4, 100, nil),
+						promapi.NewPrometheus(
+							"prom", uri, simplePromPublicURI,
+							map[string]string{}, time.Second, 4, 100, 0, nil,
+						),
 					},
 					true,
 					"up",
@@ -200,7 +203,10 @@ func TestRuleDuplicateCheck(t *testing.T) {
 					"prom",
 					uri,
 					[]*promapi.Prometheus{
-						promapi.NewPrometheus("prom", uri, simplePromPublicURI, map[string]string{}, time.Second, 4, 100, nil),
+						promapi.NewPrometheus(
+							"prom", uri, simplePromPublicURI,
+							map[string]string{}, time.Second, 4, 100, 0, nil,
+						),
 					},
 					true,
 					"up",
@@ -558,7 +564,10 @@ func TestRuleDuplicateCheck(t *testing.T) {
 					"prom",
 					uri,
 					[]*promapi.Prometheus{
-						promapi.NewPrometheus("prom", uri, simplePromPublicURI, map[string]string{}, time.Second, 4, 100, nil),
+						promapi.NewPrometheus(
+							"prom", uri, simplePromPublicURI,
+							map[string]string{}, time.Second, 4, 100, 0, nil,
+						),
 					},
 					true,
 					"up",
@@ -580,7 +589,10 @@ func TestRuleDuplicateCheck(t *testing.T) {
 					"prom",
 					uri,
 					[]*promapi.Prometheus{
-						promapi.NewPrometheus("prom", uri, simplePromPublicURI, map[string]string{}, time.Second, 4, 100, nil),
+						promapi.NewPrometheus(
+							"prom", uri, simplePromPublicURI,
+							map[string]string{}, time.Second, 4, 100, 0, nil,
+						),
 					},
 					true,
 					"up",

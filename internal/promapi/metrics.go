@@ -29,12 +29,28 @@ var (
 		},
 		[]string{"name", "endpoint", "reason"},
 	)
+	prometheusQuerySamplesTotal = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "pint_prometheus_query_samples_total",
+			Help: "Total number of samples Prometheus had to read to process queries.",
+		},
+		[]string{"name"},
+	)
+	prometheusSampleRateLimit = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "pint_prometheus_sample_rate_limit",
+			Help: "Configured sampleRateLimit for this Prometheus server.",
+		},
+		[]string{"name"},
+	)
 )
 
 func RegisterMetrics(reg *prometheus.Registry) {
 	reg.MustRegister(prometheusQueriesRunning)
 	reg.MustRegister(prometheusQueriesTotal)
 	reg.MustRegister(prometheusQueryErrorsTotal)
+	reg.MustRegister(prometheusQuerySamplesTotal)
+	reg.MustRegister(prometheusSampleRateLimit)
 }
 
 func errReason(err error) string {

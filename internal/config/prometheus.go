@@ -79,23 +79,28 @@ func (t *TLSConfig) toHTTPConfig() (*tls.Config, error) {
 }
 
 type PrometheusConfig struct {
-	Headers     map[string]string `hcl:"headers,optional" json:"headers,omitempty"`
-	TLS         *TLSConfig        `hcl:"tls,block" json:"tls,omitzero"`
-	Name        string            `hcl:",label" json:"name"`
-	URI         string            `hcl:"uri" json:"uri"`
-	PublicURI   string            `hcl:"publicURI,optional" json:"publicURI,omitempty"`
-	Timeout     string            `hcl:"timeout,optional"  json:"timeout"`
-	Uptime      string            `hcl:"uptime,optional" json:"uptime"`
-	Failover    []string          `hcl:"failover,optional" json:"failover,omitempty"`
-	Include     []string          `hcl:"include,optional" json:"include,omitempty"`
-	Exclude     []string          `hcl:"exclude,optional" json:"exclude,omitempty"`
-	Tags        []string          `hcl:"tags,optional" json:"tags,omitempty"`
-	Concurrency int               `hcl:"concurrency,optional" json:"concurrency"`
-	RateLimit   int               `hcl:"rateLimit,optional" json:"rateLimit"`
-	Required    bool              `hcl:"required,optional" json:"required"`
+	Headers         map[string]string `hcl:"headers,optional" json:"headers,omitempty"`
+	TLS             *TLSConfig        `hcl:"tls,block" json:"tls,omitzero"`
+	Name            string            `hcl:",label" json:"name"`
+	URI             string            `hcl:"uri" json:"uri"`
+	PublicURI       string            `hcl:"publicURI,optional" json:"publicURI,omitempty"`
+	Timeout         string            `hcl:"timeout,optional"  json:"timeout"`
+	Uptime          string            `hcl:"uptime,optional" json:"uptime"`
+	Failover        []string          `hcl:"failover,optional" json:"failover,omitempty"`
+	Include         []string          `hcl:"include,optional" json:"include,omitempty"`
+	Exclude         []string          `hcl:"exclude,optional" json:"exclude,omitempty"`
+	Tags            []string          `hcl:"tags,optional" json:"tags,omitempty"`
+	Concurrency     int               `hcl:"concurrency,optional" json:"concurrency"`
+	RateLimit       int               `hcl:"rateLimit,optional" json:"rateLimit"`
+	SampleRateLimit int               `hcl:"sampleRateLimit,optional" json:"sampleRateLimit,omitzero"`
+	Required        bool              `hcl:"required,optional" json:"required"`
 }
 
 func (pc PrometheusConfig) validate() error {
+	if pc.SampleRateLimit < 0 {
+		return errors.New("sampleRateLimit cannot be negative")
+	}
+
 	if pc.URI == "" {
 		return errors.New("prometheus URI cannot be empty")
 	}
@@ -168,9 +173,15 @@ func newFailoverGroup(prom PrometheusConfig) *promapi.FailoverGroup {
 	var tlsConf *tls.Config
 	tlsConf, _ = prom.TLS.toHTTPConfig()
 	upstreams := make([]*promapi.Prometheus, 0, len(prom.Failover)+1)
-	upstreams = append(upstreams, promapi.NewPrometheus(prom.Name, prom.URI, prom.PublicURI, prom.Headers, timeout, prom.Concurrency, prom.RateLimit, tlsConf))
+	upstreams = append(upstreams, promapi.NewPrometheus(
+		prom.Name, prom.URI, prom.PublicURI, prom.Headers, timeout,
+		prom.Concurrency, prom.RateLimit, prom.SampleRateLimit, tlsConf,
+	))
 	for _, uri := range prom.Failover {
-		upstreams = append(upstreams, promapi.NewPrometheus(prom.Name, uri, prom.PublicURI, prom.Headers, timeout, prom.Concurrency, prom.RateLimit, tlsConf))
+		upstreams = append(upstreams, promapi.NewPrometheus(
+			prom.Name, uri, prom.PublicURI, prom.Headers, timeout,
+			prom.Concurrency, prom.RateLimit, prom.SampleRateLimit, tlsConf,
+		))
 	}
 	include := make([]*regexp.Regexp, 0, len(prom.Include))
 	for _, path := range prom.Include {
