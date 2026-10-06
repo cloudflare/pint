@@ -22,6 +22,7 @@ cmp stderr ../stderr.txt
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check on current git branch" base=main
+level=INFO msg="Git file changes parsed" files=0 entries=0 commits=0 maxCommits=20
 level=INFO msg="Checking Prometheus rules" entries=0 workers=10 online=true
 level=INFO msg="No rules found, skipping Prometheus discovery"
 level=ERROR msg="Execution completed with error(s)" err="got not a valid number via GITHUB_PULL_REQUEST_NUMBER: strconv.Atoi: parsing \"abc\": invalid syntax"
