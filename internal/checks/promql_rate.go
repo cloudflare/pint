@@ -22,10 +22,10 @@ import (
 
 const (
 	RateCheckName    = "promql/rate"
-	RateCheckDetails = `Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) and [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) function comes with a few requirements:
+	RateCheckDetails = `Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate), [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) and [increase](https://prometheus.io/docs/prometheus/latest/querying/functions/#increase) functions comes with a few requirements:
 
-- The metric you calculate (i)rate from must be a counter or a native histogram.
-- The time window of the (i)rate function must have at least 2 samples.
+- The metric you calculate (i)rate or increase from must be a counter or a native histogram.
+- The time window of the (i)rate or increase function must have at least 2 samples.
 
 The type of your metric is defined by the application that exports that metric.
 The number of samples depends on how often your application is being scraped by Prometheus.
@@ -293,17 +293,18 @@ func (c RateCheck) checkSources(
 								Reporter: c.Reporter(),
 								Summary:  "chained rate call",
 								Details: fmt.Sprintf(
-									"You can only calculate `rate()` directly from a counter metric. "+
-										"Calling `rate()` on `%s()` results will return bogus results because `%s()` will hide information on when each counter resets. "+
-										"You must first calculate `rate()` before calling any aggregation function. Always `sum(rate(counter))`, never `rate(sum(counter))`",
-									rsrc.Operation(), rsrc.Operation(),
+									"You can only calculate `%s()` directly from a counter metric. "+
+										"Calling `%s()` on `%s()` results will return bogus results because `%s()` will hide information on when each counter resets. "+
+										"You must first calculate `%s()` before calling any aggregation function. Always `sum(%s(counter))`, never `%s(sum(counter))`",
+									call.Func.Name, call.Func.Name, rsrc.Operation(), rsrc.Operation(),
+									call.Func.Name, call.Func.Name, call.Func.Name,
 								),
 								Severity: severity,
 								Diagnostics: []diags.Diagnostic{
 									{
 										Message: fmt.Sprintf(
-											"`rate(%s(counter))` chain detected, `%s` is called here on results of `%s(%s)`.",
-											rsrc.Operation(), call, rsrc.Operation(), rvs,
+											"`%s(%s(counter))` chain detected, `%s` is called here on results of `%s(%s)`.",
+											call.Func.Name, rsrc.Operation(), call, rsrc.Operation(), rvs,
 										),
 										Pos:         expr.Value.Pos,
 										Expr:        expr.Query().Expr,
@@ -330,7 +331,7 @@ func findRateCall(s *source.Source) (*promParser.Call, bool) {
 			continue
 		}
 		switch call.Func.Name {
-		case "rate", "irate", "deriv":
+		case "rate", "irate", "increase", "deriv":
 			return call, true
 		}
 	}

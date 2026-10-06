@@ -443,6 +443,66 @@ func TestRateCheck(t *testing.T) {
 			},
 		},
 		{
+			// increase() adjusts for counter resets like rate() does,
+			// so calling it on a gauge must be reported.
+			description: "increase(gauge)",
+			content:     "- record: foo\n  expr: increase(foo[5m])\n",
+			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
+				},
+				{
+					conds: []requestCondition{requireMetadataPath},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{
+						"foo": {{Type: "gauge"}},
+					}},
+				},
+			},
+		},
+		{
+			// increase() on a counter with a valid range is correct usage.
+			description: "increase(counter)",
+			content:     "- record: foo\n  expr: increase(foo[5m])\n",
+			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
+				},
+				{
+					conds: []requestCondition{requireMetadataPath},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{
+						"foo": {{Type: "counter"}},
+					}},
+				},
+			},
+		},
+		{
+			// increase() needs at least two samples, same as rate().
+			description: "increase < 2x scrape_interval",
+			content:     "- record: foo\n  expr: increase(foo[1m])\n",
+			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
+				},
+				{
+					conds: []requestCondition{requireMetadataPath},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{
+						"foo": {{Type: "counter"}},
+					}},
+				},
+			},
+		},
+		{
 			description: "rate(counter)  / rate(gauge)",
 			content:     "- record: foo\n  expr: rate(foo_c[2m]) / rate(bar_g[2m])\n",
 			checker:     newRateCheck,

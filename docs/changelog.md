@@ -11,6 +11,12 @@
 - Added `pint_prometheus_sample_rate_limit` and `pint_prometheus_query_samples_total`
   metrics for the `sampleRateLimit` option.
 
+### Fixed
+
+- `promql/rate` check now reports `increase()` calls on non-counter metrics
+  and validates the time window passed to `increase()`, same as for `rate()`
+  and `irate()` - [#1989](https://github.com/cloudflare/pint/issues/1989).
+
 ## v0.88.0
 
 ### Added
