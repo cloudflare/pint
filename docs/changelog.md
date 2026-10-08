@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.89.2
+
+### Fixed
+
+- Improved Prometheus query cache efficiency.
+
 ## v0.89.1
 
 ### Fixed

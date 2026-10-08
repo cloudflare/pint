@@ -65,6 +65,7 @@ func TestRange(t *testing.T) {
 		out       promapi.SeriesTimeRanges
 		stats     promapi.QueryStats
 		step      time.Duration
+		endOffset time.Duration
 		timeout   time.Duration
 	}
 
@@ -558,6 +559,49 @@ func TestRange(t *testing.T) {
 			},
 			mock: httpmock.New(func(_ *httpmock.Server) {}),
 		},
+		{
+			// Relative range queries are sent with a fixed start and the end
+			// moving with the clock, by less than the step between two checks.
+			// All slices share cache entries and only the first iteration
+			// queries Prometheus.
+			query:     "range end inside the same step bucket is cached",
+			start:     timeParse("2022-06-14T08:00:00Z"),
+			end:       timeParse("2022-06-14T12:00:00.2Z"),
+			step:      time.Minute,
+			endOffset: 200 * time.Millisecond,
+			timeout:   time.Second,
+			out:       promapi.SeriesTimeRanges{},
+			assertErr: func(t *testing.T, err error) {
+				require.NoError(t, err)
+			},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPost(promapi.APIPathQueryRange).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"resultType":"matrix","result":[]}}`).
+					Times(3)
+			}),
+		},
+		{
+			// When the range end moves past a slice boundary the last slice
+			// becomes a full slice, cache keys rounded to the step let pint
+			// reuse it and query only the new last slice.
+			query:     "range end crossing a slice boundary queries only the last slice",
+			start:     timeParse("2022-06-14T08:00:00Z"),
+			end:       timeParse("2022-06-14T11:59:59.7Z"),
+			step:      time.Minute,
+			endOffset: 200 * time.Millisecond,
+			timeout:   time.Second,
+			out:       promapi.SeriesTimeRanges{},
+			assertErr: func(t *testing.T, err error) {
+				require.NoError(t, err)
+			},
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectPost(promapi.APIPathQueryRange).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"resultType":"matrix","result":[]}}`).
+					Times(3)
+			}),
+		},
 	}
 
 	for _, tc := range testCases {
@@ -578,7 +622,8 @@ func TestRange(t *testing.T) {
 
 			for i := 1; i < 5; i++ {
 				t.Run(tc.query, func(t *testing.T) {
-					qr, err := fg.RangeQuery(ctx, tc.query, newAbsoluteRange(tc.start, tc.end, tc.step)).Wait()
+					end := tc.end.Add(tc.endOffset * time.Duration(i))
+					qr, err := fg.RangeQuery(ctx, tc.query, newAbsoluteRange(tc.start, end, tc.step)).Wait()
 					tc.assertErr(t, err)
 					if qr != nil {
 						require.Equal(t, printRange(tc.out.Ranges), printRange(qr.Series.Ranges), tc)

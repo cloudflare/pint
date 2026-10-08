@@ -363,6 +363,9 @@ prometheus "$name" {
 - `sampleRateLimit` - per second rate limit for the number of samples Prometheus had to read
   to process all queries sent from pint. If you set it to 10000 and pint sends a query that
   loads 20000 samples then pint will wait one second before sending another query.
+  This limit is best effort and individual queries can load more samples than the limit
+  allows for. The goal of the limit is to avoid overloading Prometheus with too many
+  heavy queries one after another.
   This requires Prometheus API responses to include [query statistics](https://prometheus.io/docs/prometheus/latest/querying/api/#query-statistics), if statistics are not present
   then this limit is no-op.
   Optional, default is 0 (disabled).

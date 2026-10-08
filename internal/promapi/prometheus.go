@@ -196,7 +196,7 @@ func (prom *Prometheus) runQuery(ctx context.Context, query querier) (queryResul
 	}
 	defer func() { <-prom.concurrencyLimit }()
 
-	result := processJob(ctx, prom, query)
+	result := processJob(prom, query)
 	if result.err != nil {
 		return result, result.err
 	}
@@ -247,7 +247,7 @@ func (prom *Prometheus) requestContext(ctx context.Context) (context.Context, co
 	return context.WithTimeout(ctx, prom.timeout+time.Second)
 }
 
-func processJob(ctx context.Context, prom *Prometheus, query querier) queryResult {
+func processJob(prom *Prometheus, query querier) queryResult {
 	cacheKey := query.CacheKey()
 	if prom.cache != nil {
 		if cached, ok := prom.cache.get(cacheKey, query.Endpoint()); ok {
@@ -263,16 +263,6 @@ func processJob(ctx context.Context, prom *Prometheus, query querier) queryResul
 	prometheusQueriesRunning.WithLabelValues(prom.name, query.Endpoint()).Inc()
 
 	prom.rateLimiter.Take()
-	if prom.sampleLimiter != nil {
-		switch query.Endpoint() {
-		case APIPathQuery, APIPathQueryRange:
-			// Wait for the sample budget spent by earlier queries before sending this request.
-			if err := prom.sampleLimiter.WaitN(ctx, 0); err != nil {
-				prometheusQueriesRunning.WithLabelValues(prom.name, query.Endpoint()).Dec()
-				return queryResult{err: err} // nolint: exhaustruct_v5
-			}
-		}
-	}
 	result := query.Run()
 	prometheusQueriesRunning.WithLabelValues(prom.name, query.Endpoint()).Dec()
 
@@ -280,20 +270,16 @@ func processJob(ctx context.Context, prom *Prometheus, query querier) queryResul
 		prometheusQuerySamplesTotal.WithLabelValues(prom.name).
 			Add(float64(result.stats.Samples.TotalQueryableSamples))
 		if prom.sampleLimiter != nil {
-			// Spend the samples in the background so the result is not delayed,
-			// new queries wait for the budget to refill.
-			go func(used int) {
-				// A single call cannot spend more than the budget size,
-				// so we need to batch usage until we account for all samples
-				// used in the last query.
-				// We pass a dummy context so that WaitN never errors.
-				// All we need to do here is wait.
-				for used > 0 {
-					chunk := min(used, prom.sampleLimiter.Burst())
-					_ = prom.sampleLimiter.WaitN(context.Background(), chunk)
-					used -= chunk
-				}
-			}(result.stats.Samples.TotalQueryableSamples)
+			// A single query can eat up to the limit itself, never more.
+			// This is so that one huge query cannot stall all later queries
+			// by making the budget a huge negative number that needs to be refilled
+			// slowly over many seconds.
+			// We pass a dummy context so that WaitN never errors.
+			// All we need to do here is wait.
+			_ = prom.sampleLimiter.WaitN(
+				context.Background(),
+				min(result.stats.Samples.TotalQueryableSamples, prom.sampleLimiter.Burst()),
+			)
 		}
 	}
 

@@ -19,7 +19,11 @@ func newSeriesCheck(prom *promapi.FailoverGroup) checks.RuleChecker {
 }
 
 func TestSeriesCheck(t *testing.T) {
-	now := time.Now()
+	// Truncate to the query step so all sample timestamps are aligned to it.
+	// The range query window moves with the clock, with samples aligned to the
+	// step the window edge always falls between two samples and every run
+	// produces identical query results.
+	now := time.Now().Truncate(time.Minute * 5)
 
 	testCases := []checkTest{
 		{

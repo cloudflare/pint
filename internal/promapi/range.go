@@ -94,7 +94,12 @@ func (q rangeQuery) String() string {
 }
 
 func (q rangeQuery) CacheKey() uint64 {
-	return hash(q.prom.unsafeURI, q.Endpoint(), q.expr, q.r.Start.Format(time.RFC3339), q.r.End.Round(q.r.Step).Format(time.RFC3339), output.HumanizeDuration(q.r.Step))
+	// Round both range ends to the step so queries with ends inside the same
+	// step share one cache entry. This lets repeated relative range queries
+	// reuse slices from the previous query as their end moves with the clock.
+	start := q.r.Start.Round(q.r.Step).Format(time.RFC3339)
+	end := q.r.End.Round(q.r.Step).Format(time.RFC3339)
+	return hash(q.prom.unsafeURI, q.Endpoint(), q.expr, start, end, output.HumanizeDuration(q.r.Step))
 }
 
 func (q rangeQuery) CacheTTL() time.Duration {
@@ -155,7 +160,11 @@ func (prom *Prometheus) RangeQuery(ctx context.Context, expr string, params Rang
 				End:   s.End,
 				Step:  step,
 			},
-			ttl: s.End.Sub(start) + time.Minute*10,
+			// Checks send the same relative range query over and over, with the
+			// end moving forward with the clock. It takes at most queryStep for
+			// the range to move past any single slice, so a slice result is
+			// cached for one queryStep plus one step of margin.
+			ttl: queryStep + step,
 		}
 
 		wg.Go(func() {
