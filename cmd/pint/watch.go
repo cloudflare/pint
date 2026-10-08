@@ -327,26 +327,26 @@ func (c *problemCollector) scan(ctx context.Context, workers int, isOffline bool
 		return err
 	}
 
-	s, err := checkRules(ctx, workers, isOffline, gen, c.cfg, entries)
-	if err != nil {
-		return err
-	}
-
-	c.lock.Lock()
-	defer c.lock.Unlock()
-
-	s.SortReports()
-	s.Dedup()
-
-	c.summary = &s
-
 	fileOwners := map[string]string{}
 	for _, entry := range entries {
 		if entry.Owner != "" {
 			fileOwners[entry.Path.Name] = entry.Owner
 		}
 	}
+	c.lock.Lock()
 	c.fileOwners = fileOwners
+	c.lock.Unlock()
+
+	s, err := checkRules(ctx, workers, isOffline, gen, c.cfg, entries)
+	if err != nil {
+		return err
+	}
+	s.SortReports()
+	s.Dedup()
+
+	c.lock.Lock()
+	c.summary = &s
+	c.lock.Unlock()
 
 	return nil
 }
@@ -359,12 +359,12 @@ func (c *problemCollector) Collect(ch chan<- prometheus.Metric) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 
-	if c.summary == nil {
-		return
-	}
-
 	for filename, owner := range c.fileOwners {
 		ch <- prometheus.MustNewConstMetric(c.fileOwnersMetric, prometheus.GaugeValue, 1, filename, owner)
+	}
+
+	if c.summary == nil {
+		return
 	}
 
 	done := map[string][]prometheus.Metric{}

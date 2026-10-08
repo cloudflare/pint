@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.89.1
+
+### Fixed
+
+- `pint_rule_file_owner` metric is now exported immediately after all rules are
+  parsed, instead of waiting for all checks to complete.
+
 ## v0.89.0
 
 ### Added
