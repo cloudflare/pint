@@ -34,18 +34,6 @@ func (e *FailoverGroupError) IsStrict() bool {
 	return e.isStrict
 }
 
-func cacheCleaner(cache *queryCache, interval time.Duration, quit chan bool) {
-	ticker := time.NewTicker(interval)
-	for {
-		select {
-		case <-quit:
-			return
-		case <-ticker.C:
-			cache.gc()
-		}
-	}
-}
-
 type disabledChecks struct {
 	// Key is the name of the unsupported API, value is the list of checks disabled because of it.
 	apis map[string][]string
@@ -77,13 +65,11 @@ type FailoverGroup struct {
 	servers        []*Prometheus
 	uptimeMetric   string
 	cacheCollector *cacheCollector
-	quitChan       chan bool
-
-	pathsInclude []*regexp.Regexp
-	pathsExclude []*regexp.Regexp
-	tags         []string
-	started      bool
-	strictErrors bool
+	pathsInclude   []*regexp.Regexp
+	pathsExclude   []*regexp.Regexp
+	tags           []string
+	started        bool
+	strictErrors   bool
 }
 
 func NewFailoverGroup(name, uri string, servers []*Prometheus, strictErrors bool, uptimeMetric string, include, exclude []*regexp.Regexp, tags []string) *FailoverGroup {
@@ -188,8 +174,6 @@ func (fg *FailoverGroup) StartWorkers(reg *prometheus.Registry) {
 	}
 
 	queryCache := newQueryCache(time.Hour, time.Now)
-	fg.quitChan = make(chan bool)
-	go cacheCleaner(queryCache, time.Minute*2, fg.quitChan)
 
 	fg.cacheCollector = newCacheCollector(queryCache, fg.name)
 	reg.MustRegister(fg.cacheCollector)
@@ -205,10 +189,9 @@ func (fg *FailoverGroup) Close(reg *prometheus.Registry) {
 		return
 	}
 	reg.Unregister(fg.cacheCollector)
-	fg.quitChan <- true
 }
 
-func (fg *FailoverGroup) CleanCache() {
+func (fg *FailoverGroup) GC() {
 	for _, prom := range fg.servers {
 		if prom.cache != nil {
 			prom.cache.gc()
