@@ -6,6 +6,8 @@
 
 - `pint_rule_file_owner` metric is now exported immediately after all rules are
   parsed, instead of waiting for all checks to complete.
+- The `sampleRateLimit` option was being applied to all requests, instead of only
+  requests that can load samples. Now it only applies to instant and range queries.
 
 ## v0.89.0
 

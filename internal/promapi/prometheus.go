@@ -264,10 +264,13 @@ func processJob(ctx context.Context, prom *Prometheus, query querier) queryResul
 
 	prom.rateLimiter.Take()
 	if prom.sampleLimiter != nil {
-		// Wait for the sample budget spent by earlier queries before sending this request.
-		if err := prom.sampleLimiter.WaitN(ctx, 0); err != nil {
-			prometheusQueriesRunning.WithLabelValues(prom.name, query.Endpoint()).Dec()
-			return queryResult{err: err} // nolint: exhaustruct_v5
+		switch query.Endpoint() {
+		case APIPathQuery, APIPathQueryRange:
+			// Wait for the sample budget spent by earlier queries before sending this request.
+			if err := prom.sampleLimiter.WaitN(ctx, 0); err != nil {
+				prometheusQueriesRunning.WithLabelValues(prom.name, query.Endpoint()).Dec()
+				return queryResult{err: err} // nolint: exhaustruct_v5
+			}
 		}
 	}
 	result := query.Run()
