@@ -8,6 +8,9 @@
   parsed, instead of waiting for all checks to complete.
 - The `sampleRateLimit` option was being applied to all requests, instead of only
   requests that can load samples. Now it only applies to instant and range queries.
+- When running `pint watch` Prometheus query cache was being cleaned prematurely
+  while cached responses might have been still needed, resulting in unnecessary queries.
+  Cache evictions now happen only after each `pint watch` iteration.
 
 ## v0.89.0
 

@@ -8,25 +8,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestCacheCleaner(t *testing.T) {
-	cache := newQueryCache(time.Minute, time.Now)
-	quit := make(chan bool)
-
-	// Add some entries to cache
-	cache.set(1, nil, 0)
-	cache.set(2, nil, 0)
-	require.Len(t, cache.entries, 2)
-
-	// Start cache cleaner with very short interval
-	go cacheCleaner(cache, time.Millisecond*10, quit)
-
-	// Wait for at least one gc cycle
-	time.Sleep(time.Millisecond * 50)
-
-	// Stop the cleaner
-	quit <- true
-}
-
 func TestFailoverGroupStartWorkers(t *testing.T) {
 	type testCaseT struct {
 		name          string
@@ -160,11 +141,11 @@ func TestFailoverGroupCleanCache(t *testing.T) {
 
 			if tc.expectPanics {
 				require.Panics(t, func() {
-					fg.CleanCache()
+					fg.GC()
 				})
 			} else {
 				require.NotPanics(t, func() {
-					fg.CleanCache()
+					fg.GC()
 				})
 			}
 

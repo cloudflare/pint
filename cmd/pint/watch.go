@@ -250,6 +250,9 @@ func startTimer(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 					slog.LogAttrs(ctx, slog.LevelError, "Got an error when running checks", slog.Any("err", err))
 				}
 				checkIterationsTotal.Inc()
+				for _, server := range gen.Servers() {
+					server.GC()
+				}
 			case <-stop:
 				ticker.Stop()
 				slog.LogAttrs(ctx, slog.LevelInfo, "Background worker finished")
