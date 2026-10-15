@@ -10,7 +10,7 @@ require (
 	github.com/hashicorp/hcl/v2 v2.25.0
 	github.com/klauspost/compress v1.20.1
 	github.com/neilotoole/slogt/v2 v2.0.0
-	github.com/prometheus/client_golang v1.24.1
+	github.com/prometheus/client_golang v1.25.0
 	github.com/prometheus/client_model v0.6.3
 	github.com/prometheus/common v0.72.0
 	github.com/prometheus/prometheus v0.315.0
@@ -56,7 +56,7 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.3-0.20250322232337-35a7c28c31ee // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
-	github.com/prometheus/procfs v0.21.1 // indirect
+	github.com/prometheus/procfs v0.22.0 // indirect
 	github.com/sergi/go-diff v1.4.0 // indirect
 	github.com/swaggest/assertjson v1.10.0 // indirect
 	github.com/tidwall/gjson v1.19.0 // indirect
