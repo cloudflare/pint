@@ -97,14 +97,14 @@
   output: |
     1 | - record: foo
                   ^^^
-                  Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111
-                  error: `connection refused`.
+                  Couldn't run some checks due to `prom` Prometheus server at http://127.0.0.1:1111 error:
+                  `connection refused`.
   problem:
     reporter: labels/conflict
     summary: unable to run checks
     details: ""
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 error: `connection refused`.'
+        - message: 'Couldn''t run some checks due to `prom` Prometheus server at http://127.0.0.1:1111 error: `connection refused`.'
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -147,6 +147,11 @@
 ---
 
 [TestLabelsConflictCheck/no_labels_/_recording - 1]
+[]
+
+---
+
+[TestLabelsConflictCheck/offline - 1]
 []
 
 ---

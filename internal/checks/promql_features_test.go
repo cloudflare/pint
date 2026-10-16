@@ -1,6 +1,7 @@
 package checks_test
 
 import (
+	"context"
 	"net/http"
 	"testing"
 
@@ -15,6 +16,15 @@ func newFeaturesCheck(prom *promapi.FailoverGroup) checks.RuleChecker {
 
 func TestFeaturesCheck(t *testing.T) {
 	testCases := []checkTest{
+		{
+			description: "offline",
+			content:     "- record: foo\n  expr: bar @ start()\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			ctx: func(ctx context.Context, _ string) context.Context {
+				return promapi.WithOffline(ctx, true)
+			},
+		},
 		// Verifies that rules with syntax errors are skipped.
 		{
 			description: "ignores rules with syntax errors",

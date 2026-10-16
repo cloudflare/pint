@@ -14,57 +14,40 @@ import (
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
-var (
-	CheckNames = []string{
-		AlertsAbsentCheckName,
-		AnnotationCheckName,
-		ComparisonCheckName,
-		AlertsCheckName,
-		AlertsExternalLabelsCheckName,
-		AlertForCheckName,
-		TemplateCheckName,
-		LabelsConflictCheckName,
-		AggregationCheckName,
-		CounterCheckName,
-		FeaturesCheckName,
-		FragileCheckName,
-		GroupIntervalCheckName,
-		ImpossibleCheckName,
-		NaNCheckName,
-		OffsetCheckName,
-		RangeQueryCheckName,
-		RateCheckName,
-		RegexpCheckName,
-		SelectorCheckName,
-		SeriesCheckName,
-		SyntaxCheckName,
-		VectorMatchingCheckName,
-		CostCheckName,
-		RuleDependencyCheckName,
-		RuleDuplicateCheckName,
-		RuleForCheckName,
-		LabelCheckName,
-		RuleLinkCheckName,
-		RuleNameCheckName,
-		RejectCheckName,
-		ReportCheckName,
-	}
-	OnlineChecks = []string{
-		AlertsAbsentCheckName,
-		AlertsCheckName,
-		AlertsExternalLabelsCheckName,
-		LabelsConflictCheckName,
-		CounterCheckName,
-		FeaturesCheckName,
-		OffsetCheckName,
-		RangeQueryCheckName,
-		RateCheckName,
-		SeriesCheckName,
-		VectorMatchingCheckName,
-		CostCheckName,
-		RuleLinkCheckName,
-	}
-)
+var CheckNames = []string{
+	AlertsAbsentCheckName,
+	AnnotationCheckName,
+	ComparisonCheckName,
+	AlertsCheckName,
+	AlertsExternalLabelsCheckName,
+	AlertForCheckName,
+	TemplateCheckName,
+	LabelsConflictCheckName,
+	AggregationCheckName,
+	CounterCheckName,
+	FeaturesCheckName,
+	FragileCheckName,
+	GroupIntervalCheckName,
+	ImpossibleCheckName,
+	NaNCheckName,
+	OffsetCheckName,
+	RangeQueryCheckName,
+	RateCheckName,
+	RegexpCheckName,
+	SelectorCheckName,
+	SeriesCheckName,
+	SyntaxCheckName,
+	VectorMatchingCheckName,
+	CostCheckName,
+	RuleDependencyCheckName,
+	RuleDuplicateCheckName,
+	RuleForCheckName,
+	LabelCheckName,
+	RuleLinkCheckName,
+	RuleNameCheckName,
+	RejectCheckName,
+	ReportCheckName,
+}
 
 // Severity of the problem reported.
 type Severity uint8
@@ -133,7 +116,6 @@ type Problem struct {
 
 type CheckMeta struct {
 	States        []discovery.ChangeType
-	Online        bool
 	AlwaysEnabled bool
 }
 
@@ -157,16 +139,16 @@ func problemFromError(err error, rule parser.Rule, reporter, prom string, s Seve
 	var severity Severity
 	switch {
 	case promapi.IsQueryTooExpensive(err):
-		text = fmt.Sprintf("Couldn't run some online checks on %s because some queries are too expensive: `%s`.", promDesc, err)
+		text = fmt.Sprintf("Couldn't run some checks on %s because some queries are too expensive: `%s`.", promDesc, err)
 		severity = Warning
 	case promapi.IsUnavailableError(err):
-		text = fmt.Sprintf("Couldn't run some online checks due to %s error: `%s`.", promDesc, err)
+		text = fmt.Sprintf("Couldn't run some checks due to %s error: `%s`.", promDesc, err)
 		severity = Warning
 		if perrOk && perr.IsStrict() {
 			severity = Bug
 		}
 	default:
-		text = fmt.Sprintf("Couldn't run some online checks due to %s error: `%s`.", promDesc, err)
+		text = fmt.Sprintf("Couldn't run some checks due to %s error: `%s`.", promDesc, err)
 		severity = s
 	}
 

@@ -27,7 +27,6 @@ func (c ImpossibleCheck) Meta() CheckMeta {
 			discovery.Modified,
 			discovery.Moved,
 		},
-		Online:        false,
 		AlwaysEnabled: false,
 	}
 }

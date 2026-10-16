@@ -104,7 +104,6 @@ func (c TemplateCheck) Meta() CheckMeta {
 			discovery.Modified,
 			discovery.Moved,
 		},
-		Online:        false,
 		AlwaysEnabled: false,
 	}
 }

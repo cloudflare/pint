@@ -1,6 +1,7 @@
 package checks_test
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -14,6 +15,17 @@ func TestCostCheck(t *testing.T) {
 	content := "- record: foo\n  expr: sum(foo)\n"
 
 	testCases := []checkTest{
+		{
+			description: "offline",
+			content:     "- record: foo\n  expr: sum(bar)\n",
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 0, 0, 0, 0, "", checks.Bug)
+			},
+			prometheus: newSimpleProm,
+			ctx: func(ctx context.Context, _ string) context.Context {
+				return promapi.WithOffline(ctx, true)
+			},
+		},
 		{
 			description: "ignores rules with syntax errors",
 			content:     "- record: foo\n  expr: sum(foo) without(\n",
