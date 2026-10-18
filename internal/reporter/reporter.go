@@ -85,11 +85,10 @@ type PrometheusDetails struct {
 type Summary struct {
 	promDetails    map[string]PrometheusDetails
 	reports        []Report
-	OfflineChecks  int64
-	OnlineChecks   int64
 	Duration       time.Duration
 	TotalEntries   int
 	CheckedEntries int64
+	TotalChecks    int64
 }
 
 func NewSummary(reports []Report) Summary {

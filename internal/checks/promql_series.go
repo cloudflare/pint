@@ -118,7 +118,6 @@ func (c SeriesCheck) Meta() CheckMeta {
 			discovery.Modified,
 			discovery.Moved,
 		},
-		Online:        true,
 		AlwaysEnabled: false,
 	}
 }
@@ -137,6 +136,10 @@ func (c SeriesCheck) Reporter() string {
 }
 
 func (c SeriesCheck) Check(ctx context.Context, entry *discovery.Entry, entries []*discovery.Entry) (problems []Problem) {
+	if promapi.IsOffline(ctx) {
+		return problems
+	}
+
 	var settings *PromqlSeriesSettings
 	if s := ctx.Value(SettingsKey(c.Reporter())); s != nil {
 		settings = s.(*PromqlSeriesSettings)

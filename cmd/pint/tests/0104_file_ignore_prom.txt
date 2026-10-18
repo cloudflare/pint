@@ -9,7 +9,7 @@ stderr 'level=ERROR msg="Query returned an error" err="502 Bad Gateway" uri=http
 stderr 'level=ERROR msg="Query returned an error" err="502 Bad Gateway" uri=http://127.0.0.1:7104 query=count\(\\nfoo\\n\)'
 stderr 'level=INFO msg="Problems found" Bug=4'
 -- rules/0001.yml --
-# This should skip all online checks
+# This should skip all checks that require Prometheus API
 # pint file/disable promql/series
 #  pint  file/disable  promql/rate
 #

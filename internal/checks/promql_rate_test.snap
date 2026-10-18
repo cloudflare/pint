@@ -7,14 +7,14 @@
   output: |
     1 | - record: foo
                   ^^^
-                  Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX
-                  error: `server_error: internal error`.
+                  Couldn't run some checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error:
+                  `server_error: internal error`.
   problem:
     reporter: promql/rate
     summary: unable to run checks
     details: ""
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.'
+        - message: 'Couldn''t run some checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.'
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -39,14 +39,14 @@
   output: |
     1 | - record: foo
                   ^^^
-                  Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111
-                  error: `connection refused`.
+                  Couldn't run some checks due to `prom` Prometheus server at http://127.0.0.1:1111 error:
+                  `connection refused`.
   problem:
     reporter: promql/rate
     summary: unable to run checks
     details: ""
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 error: `connection refused`.'
+        - message: 'Couldn''t run some checks due to `prom` Prometheus server at http://127.0.0.1:1111 error: `connection refused`.'
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -191,15 +191,15 @@
   output: |
     1 | - record: foo
                   ^^^
-                  Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX
-                  error: `failed to decode config data in http://127.0.0.1:XXXXX response: yaml: line 2:
-                  could not find expected ':'`.
+                  Couldn't run some checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error:
+                  `failed to decode config data in http://127.0.0.1:XXXXX response: yaml: line 2: could not
+                  find expected ':'`.
   problem:
     reporter: promql/rate
     summary: unable to run checks
     details: ""
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `failed to decode config data in http://127.0.0.1:XXXXX response: yaml: line 2: could not find expected '':''`.'
+        - message: 'Couldn''t run some checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `failed to decode config data in http://127.0.0.1:XXXXX response: yaml: line 2: could not find expected '':''`.'
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -219,14 +219,14 @@
   output: |
     1 | - record: foo
                   ^^^
-                  Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX
-                  error: `bad_data: bad input data`.
+                  Couldn't run some checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error:
+                  `bad_data: bad input data`.
   problem:
     reporter: promql/rate
     summary: unable to run checks
     details: ""
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `bad_data: bad input data`.'
+        - message: 'Couldn''t run some checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `bad_data: bad input data`.'
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -352,14 +352,14 @@
   output: |
     1 | - record: foo
                   ^^^
-                  Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX
-                  error: `server_error: internal error`.
+                  Couldn't run some checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error:
+                  `server_error: internal error`.
   problem:
     reporter: promql/rate
     summary: unable to run checks
     details: ""
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.'
+        - message: 'Couldn''t run some checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.'
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -439,6 +439,11 @@
         last: 2
     severity: 2
     anchor: 0
+
+---
+
+[TestRateCheck/offline - 1]
+[]
 
 ---
 
@@ -689,14 +694,14 @@
   output: |
     1 | - alert: my alert
                  ^^^^^^^^
-                 Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX
-                 error: `server_error: internal error`.
+                 Couldn't run some checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error:
+                 `server_error: internal error`.
   problem:
     reporter: promql/rate
     summary: unable to run checks
     details: ""
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.'
+        - message: 'Couldn''t run some checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.'
           firstcolumn: 1
           lastcolumn: 8
           kind: 0
