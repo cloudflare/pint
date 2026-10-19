@@ -160,11 +160,7 @@ func (prom *Prometheus) RangeQuery(ctx context.Context, expr string, params Rang
 				End:   s.End,
 				Step:  step,
 			},
-			// Checks send the same relative range query over and over, with the
-			// end moving forward with the clock. It takes at most queryStep for
-			// the range to move past any single slice, so a slice result is
-			// cached for one queryStep plus one step of margin.
-			ttl: queryStep + step,
+			ttl: s.End.Sub(start) + time.Minute*10,
 		}
 
 		wg.Go(func() {

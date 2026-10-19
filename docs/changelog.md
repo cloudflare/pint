@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.89.3
+
+### Fixed
+
+- Fixed premature cache expiry for range queries.
+
 ## v0.89.2
 
 ### Fixed
