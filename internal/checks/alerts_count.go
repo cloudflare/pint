@@ -98,12 +98,27 @@ func (c AlertsCheck) Check(ctx context.Context, entry *discovery.Entry, _ []*dis
 		keepFiringForDur = entry.Rule.AlertingRule.KeepFiringFor.Value
 	}
 
-	var alerts int
+	// An alert fires once a range is longer than `for`.
+	// If `keep_firing_for` is set it will delay when the alert resolves.
+	var (
+		alerts      int
+		firingFP    uint64
+		firingUntil time.Time
+	)
 	for _, r := range qr.Series.Ranges {
-		// If `keepFiringFor` is not defined its Duration will be 0
-		if r.End.Sub(r.Start) > (forDur + keepFiringForDur) {
-			alerts++
+		if r.Fingerprint == firingFP && !r.Start.After(firingUntil) {
+			firingUntil = r.End.Add(time.Second + keepFiringForDur)
+			// Separate range of an already firing alert and within keep_firing_for value.
+			// This does not count as a new alert.
+			continue
 		}
+		if r.End.Sub(r.Start) <= forDur {
+			// Too short to fire due to `for` value, wouldn't fire at all.
+			continue
+		}
+		alerts++
+		firingFP = r.Fingerprint
+		firingUntil = r.End.Add(time.Second + keepFiringForDur)
 	}
 
 	if alerts < c.minCount {

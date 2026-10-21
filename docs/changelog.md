@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.89.4
+
+### Fixed
+
+- Fixed `alerts/count` check undercounting alerts for rules with
+  `keep_firing_for` - [#2004](https://github.com/cloudflare/pint/issues/2004).
+
 ## v0.89.3
 
 ### Fixed
