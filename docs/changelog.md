@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.90.0
+
+### Added
+
+- Added support for Prometheus v3.16.0, which adds the new experimental PromQL
+  function `integral()` and makes the `anchored` and `smoothed` range selector
+  modifiers stable, so they no longer require
+  `--enable-feature=promql-extended-range-selectors`.
+
 ## v0.89.4
 
 ### Fixed

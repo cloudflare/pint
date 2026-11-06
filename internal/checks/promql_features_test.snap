@@ -72,6 +72,11 @@
 
 ---
 
+[TestFeaturesCheck/anchored_selector_stable_on_3.16.0 - 1]
+[]
+
+---
+
 [TestFeaturesCheck/buildinfo_bad_version - 1]
 - description: buildinfo bad version
   content: |
@@ -467,6 +472,69 @@
 ---
 
 [TestFeaturesCheck/ignores_rules_with_syntax_errors - 1]
+[]
+
+---
+
+[TestFeaturesCheck/integral()_missing_feature_flag - 1]
+- description: integral() missing feature flag
+  content: |
+    - record: foo
+      expr: integral(bar[5m])
+  output: |
+    2 |   expr: integral(bar[5m])
+                ^^^^^^^^
+                `integral` requires `--enable-feature=promql-experimental-functions` to be set on `prom`
+                Prometheus server at https://simple.example.com.
+  problem:
+    reporter: promql/features
+    summary: required feature flag not enabled
+    details: |-
+        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+    diagnostics:
+        - message: '`integral` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
+          firstcolumn: 1
+          lastcolumn: 8
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestFeaturesCheck/integral()_version_too_old - 1]
+- description: integral() version too old
+  content: |
+    - record: foo
+      expr: integral(bar[5m])
+  output: |
+    2 |   expr: integral(bar[5m])
+                ^^^^^^^^
+                `integral` requires Prometheus 3.16.0 or later but `prom` Prometheus server at
+                https://simple.example.com is running 3.15.0.
+  problem:
+    reporter: promql/features
+    summary: required feature flag not enabled
+    details: |-
+        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+    diagnostics:
+        - message: '`integral` requires Prometheus 3.16.0 or later but `prom` Prometheus server at https://simple.example.com is running 3.15.0.'
+          firstcolumn: 1
+          lastcolumn: 8
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestFeaturesCheck/integral()_with_feature_flag_enabled - 1]
 []
 
 ---
@@ -879,6 +947,11 @@
         last: 2
     severity: 2
     anchor: 0
+
+---
+
+[TestFeaturesCheck/smoothed_selector_stable_on_3.16.0 - 1]
+[]
 
 ---
 

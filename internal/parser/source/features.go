@@ -205,6 +205,11 @@ func newDefaultFeatures() *Features {
 		MinVersion:    ver(3, 13, 0),
 		StableVersion: ver(0, 0, 0),
 	})
+	f.Register("integral", FeatureVersion{
+		Flag:          FeatureExperimentalFunctions,
+		MinVersion:    ver(3, 16, 0),
+		StableVersion: ver(0, 0, 0),
+	})
 
 	// Experimental aggregation operators behind promql-experimental-functions.
 	f.Register(promParser.ItemTypeStr[promParser.LIMITK], FeatureVersion{
@@ -226,15 +231,16 @@ func newDefaultFeatures() *Features {
 	})
 
 	// Extended range selectors behind promql-extended-range-selectors.
+	// Stable and always-on since Prometheus 3.16.0.
 	f.Register(promParser.ItemTypeStr[promParser.ANCHORED], FeatureVersion{
 		Flag:          FeatureExtendedRangeSelectors,
 		MinVersion:    ver(3, 7, 0),
-		StableVersion: ver(0, 0, 0),
+		StableVersion: ver(3, 16, 0),
 	})
 	f.Register(promParser.ItemTypeStr[promParser.SMOOTHED], FeatureVersion{
 		Flag:          FeatureExtendedRangeSelectors,
 		MinVersion:    ver(3, 7, 0),
-		StableVersion: ver(0, 0, 0),
+		StableVersion: ver(3, 16, 0),
 	})
 
 	// Fill modifiers behind promql-binop-fill-modifiers.

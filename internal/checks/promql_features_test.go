@@ -1045,6 +1045,97 @@ func TestFeaturesCheck(t *testing.T) {
 				},
 			},
 		},
+		// Verifies that integral() produces a problem when the flag is missing.
+		{
+			description: "integral() missing feature flag",
+			content:     "- record: foo\n  expr: integral(bar[5m])\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp:  flagsResponse{flags: map[string]string{}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.16.0"},
+				},
+			},
+		},
+		// Verifies that integral() produces no problem when the flag is enabled.
+		{
+			description: "integral() with feature flag enabled",
+			content:     "- record: foo\n  expr: integral(bar[5m])\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp: flagsResponse{flags: map[string]string{
+						"enable-feature": "promql-experimental-functions",
+					}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.16.0"},
+				},
+			},
+		},
+		// Verifies that integral() on a version too old produces a problem.
+		{
+			description: "integral() version too old",
+			content:     "- record: foo\n  expr: integral(bar[5m])\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp: flagsResponse{flags: map[string]string{
+						"enable-feature": "promql-experimental-functions",
+					}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.15.0"},
+				},
+			},
+		},
+		// Verifies that smoothed produces no problem on 3.16.0 without the flag.
+		{
+			description: "smoothed selector stable on 3.16.0",
+			content:     "- record: foo\n  expr: rate(bar[5m] smoothed)\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp:  flagsResponse{flags: map[string]string{}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.16.0"},
+				},
+			},
+		},
+		// Verifies that anchored produces no problem on 3.16.0 without the flag.
+		{
+			description: "anchored selector stable on 3.16.0",
+			content:     "- record: foo\n  expr: bar anchored\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp:  flagsResponse{flags: map[string]string{}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.16.0"},
+				},
+			},
+		},
 	}
 	runTests(t, testCases)
 }

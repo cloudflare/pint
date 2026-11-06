@@ -991,7 +991,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
 
-	case "double_exponential_smoothing", "holt_winters", "predict_linear":
+	case "double_exponential_smoothing", "holt_winters", "integral", "predict_linear":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
 
