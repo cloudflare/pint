@@ -21913,6 +21913,94 @@ output:
 
 ---
 
+[TestLabelsSourceWithFeatures/multiple_unquoted_utf8_names - 1]
+expr: http.server.request.duration{service.name="api"} / on(job.name) bar.baz
+output:
+    - labels:
+        "":
+            reason: Query is using one-to-one vector matching with `on(job.name)`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 51
+                end: 63
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 71
+        job.name:
+            reason: Query is using one-to-one vector matching with `on(job.name)`, only labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 54
+                end: 62
+        service.name:
+            reason: Query is using one-to-one vector matching with `on(job.name)`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 51
+                end: 63
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] http.server.request.duration{service.name="api"}'
+          op: ""
+      joins:
+        - addedlabels: []
+          depth: 0
+          ison: true
+          matchinglabels:
+            - job.name
+          op: /
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar.baz'
+                  op: ""
+            needsFeatures:
+                - feature: promql-unquoted-utf8-names
+                  name: unquoted_utf8_names
+                  fragments:
+                    - start: 64
+                      end: 71
+            position:
+                start: 64
+                end: 71
+            type: selector
+      needsFeatures:
+        - feature: promql-unquoted-utf8-names
+          name: unquoted_utf8_names
+          fragments:
+            - start: 0
+              end: 28
+            - start: 29
+              end: 41
+            - start: 54
+              end: 62
+      usedLabels:
+        - job.name
+      position:
+        start: 0
+        end: 48
+      type: selector
+      fixedLabels: true
+
+---
+
+[TestLabelsSourceWithFeatures/name_matcher_with_dots - 1]
+expr: '{__name__="http.server.request.duration"}'
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] {__name__="http.server.request.duration"}'
+          op: ""
+      position:
+        start: 0
+        end: 41
+      type: selector
+
+---
+
 [TestLabelsSourceWithFeatures/parenthesised_negative_offset - 1]
 expr: foo offset -(5)
 output:
@@ -21930,6 +22018,307 @@ output:
         start: 0
         end: 15
       type: selector
+
+---
+
+[TestLabelsSourceWithFeatures/quoted_utf8_by_grouping_label - 1]
+expr: sum by ("service.name") (foo)
+output:
+    - labels:
+        "":
+            reason: Query is using aggregation with `by(service.name)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 4
+                end: 6
+        __name__:
+            reason: Aggregation removes metric name.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 29
+        service.name:
+            reason: Query is using aggregation with `by(service.name)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 4
+                end: 23
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum by (service.name) (foo)'
+          op: sum
+      usedLabels:
+        - service.name
+      position:
+        start: 25
+        end: 28
+      type: aggregation
+      fixedLabels: true
+
+---
+
+[TestLabelsSourceWithFeatures/quoted_utf8_group_left_label - 1]
+expr: foo + on(job) group_left ("service.name") bar
+output:
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 45
+        job:
+            reason: Query is using many-to-one vector matching with `on(job)`, labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 9
+                end: 12
+        service.name:
+            reason: Query is using `group_left(service.name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+            kind: included
+            fragment:
+                start: 14
+                end: 41
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+      joins:
+        - addedlabels:
+            - service.name
+          depth: 0
+          ison: true
+          matchinglabels:
+            - job
+          op: +
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+            position:
+                start: 42
+                end: 45
+            type: selector
+      usedLabels:
+        - job
+      position:
+        start: 0
+        end: 3
+      type: selector
+
+---
+
+[TestLabelsSourceWithFeatures/quoted_utf8_group_right_label - 1]
+expr: foo + on(job) group_right ("service.name") bar
+output:
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 46
+        job:
+            reason: Query is using one-to-many vector matching with `on(job)`, labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 9
+                end: 12
+        service.name:
+            reason: Query is using `group_right(service.name)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
+            kind: included
+            fragment:
+                start: 14
+                end: 42
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] bar'
+          op: ""
+      joins:
+        - addedlabels:
+            - service.name
+          depth: 0
+          ison: true
+          matchinglabels:
+            - job
+          op: +
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] foo'
+                  op: ""
+            position:
+                start: 0
+                end: 3
+            type: selector
+      usedLabels:
+        - job
+      position:
+        start: 43
+        end: 46
+      type: selector
+
+---
+
+[TestLabelsSourceWithFeatures/quoted_utf8_ignoring_matching_label - 1]
+expr: foo * ignoring ("service.name") bar
+output:
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 35
+        service.name:
+            reason: Query is using one-to-one vector matching with `ignoring(service.name)`, all labels included inside `ignoring(...)` will be removed on the results.
+            kind: excluded
+            fragment:
+                start: 6
+                end: 31
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+      joins:
+        - addedlabels: []
+          depth: 0
+          ison: false
+          matchinglabels:
+            - service.name
+          op: '*'
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+            position:
+                start: 32
+                end: 35
+            type: selector
+      position:
+        start: 0
+        end: 3
+      type: selector
+
+---
+
+[TestLabelsSourceWithFeatures/quoted_utf8_label_name - 1]
+expr: foo{"service.name"="api"}
+output:
+    - labels:
+        service.name:
+            reason: Query will only return series where these labels are present.
+            kind: guaranteed
+            fragment:
+                start: 0
+                end: 25
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo{service.name="api"}'
+          op: ""
+      position:
+        start: 0
+        end: 25
+      type: selector
+
+---
+
+[TestLabelsSourceWithFeatures/quoted_utf8_metric_name - 1]
+expr: '{"http.server.request.duration"}'
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] {__name__="http.server.request.duration"}'
+          op: ""
+      position:
+        start: 0
+        end: 32
+      type: selector
+
+---
+
+[TestLabelsSourceWithFeatures/quoted_utf8_on_matching_label - 1]
+expr: foo + on ("service.name") bar
+output:
+    - labels:
+        "":
+            reason: Query is using one-to-one vector matching with `on(service.name)`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 6
+                end: 25
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 29
+        service.name:
+            reason: Query is using one-to-one vector matching with `on(service.name)`, only labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 6
+                end: 25
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+      joins:
+        - addedlabels: []
+          depth: 0
+          ison: true
+          matchinglabels:
+            - service.name
+          op: +
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+            position:
+                start: 26
+                end: 29
+            type: selector
+      usedLabels:
+        - service.name
+      position:
+        start: 0
+        end: 3
+      type: selector
+      fixedLabels: true
+
+---
+
+[TestLabelsSourceWithFeatures/quoted_utf8_without_grouping_label - 1]
+expr: sum(foo) without ("service.name")
+output:
+    - labels:
+        __name__:
+            reason: Aggregation removes metric name.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 33
+        service.name:
+            reason: Query is using aggregation with `without(service.name)`, all labels included inside `without(...)` will be removed from the results.
+            kind: excluded
+            fragment:
+                start: 9
+                end: 33
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum without (service.name) (foo)'
+          op: sum
+      position:
+        start: 4
+        end: 7
+      type: aggregation
 
 ---
 
@@ -22245,6 +22634,711 @@ output:
         start: 5
         end: 26
       type: function
+
+---
+
+[TestLabelsSourceWithFeatures/unicode_label_name - 1]
+expr: foo{имя="test"}
+output:
+    - labels:
+        имя:
+            reason: Query will only return series where these labels are present.
+            kind: guaranteed
+            fragment:
+                start: 0
+                end: 18
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo{имя="test"}'
+          op: ""
+      needsFeatures:
+        - feature: promql-unquoted-utf8-names
+          name: unquoted_utf8_names
+          fragments:
+            - start: 4
+              end: 10
+      position:
+        start: 0
+        end: 18
+      type: selector
+
+---
+
+[TestLabelsSourceWithFeatures/unicode_metric_name - 1]
+expr: métrique
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] métrique'
+          op: ""
+      needsFeatures:
+        - feature: promql-unquoted-utf8-names
+          name: unquoted_utf8_names
+          fragments:
+            - start: 0
+              end: 9
+      position:
+        start: 0
+        end: 9
+      type: selector
+
+---
+
+[TestLabelsSourceWithFeatures/unquoted_utf8_by_grouping_label - 1]
+expr: sum(foo) by (service.name)
+output:
+    - labels:
+        "":
+            reason: Query is using aggregation with `by(service.name)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 9
+                end: 11
+        __name__:
+            reason: Aggregation removes metric name.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 26
+        service.name:
+            reason: Query is using aggregation with `by(service.name)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 13
+                end: 25
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum by (service.name) (foo)'
+          op: sum
+      needsFeatures:
+        - feature: promql-unquoted-utf8-names
+          name: unquoted_utf8_names
+          fragments:
+            - start: 13
+              end: 25
+      usedLabels:
+        - service.name
+      position:
+        start: 4
+        end: 7
+      type: aggregation
+      fixedLabels: true
+
+---
+
+[TestLabelsSourceWithFeatures/unquoted_utf8_by_grouping_label_with_in-string_occurrences - 1]
+expr: sum(foo) by ("x service.name", "y service.name z", "w, service.name v", service.name)
+output:
+    - labels:
+        "":
+            reason: Query is using aggregation with `by(x service.name, y service.name z, w, service.name v, service.name)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 9
+                end: 11
+        __name__:
+            reason: Aggregation removes metric name.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 85
+        service.name:
+            reason: Query is using aggregation with `by(x service.name, y service.name z, w, service.name v, service.name)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 72
+                end: 84
+        w, service.name v:
+            reason: Query is using aggregation with `by(x service.name, y service.name z, w, service.name v, service.name)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 9
+                end: 85
+        x service.name:
+            reason: Query is using aggregation with `by(x service.name, y service.name z, w, service.name v, service.name)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 9
+                end: 85
+        y service.name z:
+            reason: Query is using aggregation with `by(x service.name, y service.name z, w, service.name v, service.name)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 9
+                end: 85
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum by ("x service.name", "y service.name z", "w, service.name v", service.name) (foo)'
+          op: sum
+      needsFeatures:
+        - feature: promql-unquoted-utf8-names
+          name: unquoted_utf8_names
+          fragments:
+            - start: 72
+              end: 84
+      usedLabels:
+        - x service.name
+        - y service.name z
+        - w, service.name v
+        - service.name
+      position:
+        start: 4
+        end: 7
+      type: aggregation
+      fixedLabels: true
+
+---
+
+[TestLabelsSourceWithFeatures/unquoted_utf8_by_grouping_label_with_spaces - 1]
+expr: sum(foo) by ( service.name )
+output:
+    - labels:
+        "":
+            reason: Query is using aggregation with `by(service.name)`, only labels included inside `by(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 9
+                end: 11
+        __name__:
+            reason: Aggregation removes metric name.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 28
+        service.name:
+            reason: Query is using aggregation with `by(service.name)`, only labels included inside `by(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 14
+                end: 26
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum by (service.name) (foo)'
+          op: sum
+      needsFeatures:
+        - feature: promql-unquoted-utf8-names
+          name: unquoted_utf8_names
+          fragments:
+            - start: 14
+              end: 26
+      usedLabels:
+        - service.name
+      position:
+        start: 4
+        end: 7
+      type: aggregation
+      fixedLabels: true
+
+---
+
+[TestLabelsSourceWithFeatures/unquoted_utf8_group_left_label - 1]
+expr: foo * on(job) group_left(service.name) bar
+output:
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 42
+        job:
+            reason: Query is using many-to-one vector matching with `on(job)`, labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 9
+                end: 12
+        service.name:
+            reason: Query is using `group_left(service.name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
+            kind: included
+            fragment:
+                start: 25
+                end: 37
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+      joins:
+        - addedlabels:
+            - service.name
+          depth: 0
+          ison: true
+          matchinglabels:
+            - job
+          op: '*'
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+            position:
+                start: 39
+                end: 42
+            type: selector
+      needsFeatures:
+        - feature: promql-unquoted-utf8-names
+          name: unquoted_utf8_names
+          fragments:
+            - start: 25
+              end: 37
+      usedLabels:
+        - job
+      position:
+        start: 0
+        end: 3
+      type: selector
+
+---
+
+[TestLabelsSourceWithFeatures/unquoted_utf8_group_right_label - 1]
+expr: foo * on(job) group_right(service.name) bar
+output:
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 43
+        job:
+            reason: Query is using one-to-many vector matching with `on(job)`, labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 9
+                end: 12
+        service.name:
+            reason: Query is using `group_right(service.name)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
+            kind: included
+            fragment:
+                start: 26
+                end: 38
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] bar'
+          op: ""
+      joins:
+        - addedlabels:
+            - service.name
+          depth: 0
+          ison: true
+          matchinglabels:
+            - job
+          op: '*'
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] foo'
+                  op: ""
+            position:
+                start: 0
+                end: 3
+            type: selector
+      needsFeatures:
+        - feature: promql-unquoted-utf8-names
+          name: unquoted_utf8_names
+          fragments:
+            - start: 26
+              end: 38
+      usedLabels:
+        - job
+      position:
+        start: 40
+        end: 43
+      type: selector
+
+---
+
+[TestLabelsSourceWithFeatures/unquoted_utf8_ignoring_matching_label - 1]
+expr: foo * ignoring(service.name) bar
+output:
+    - labels:
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 32
+        service.name:
+            reason: Query is using one-to-one vector matching with `ignoring(service.name)`, all labels included inside `ignoring(...)` will be removed on the results.
+            kind: excluded
+            fragment:
+                start: 15
+                end: 27
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+      joins:
+        - addedlabels: []
+          depth: 0
+          ison: false
+          matchinglabels:
+            - service.name
+          op: '*'
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+            position:
+                start: 29
+                end: 32
+            type: selector
+      needsFeatures:
+        - feature: promql-unquoted-utf8-names
+          name: unquoted_utf8_names
+          fragments:
+            - start: 15
+              end: 27
+      position:
+        start: 0
+        end: 3
+      type: selector
+
+---
+
+[TestLabelsSourceWithFeatures/unquoted_utf8_label_name - 1]
+expr: foo{service.name="api"}
+output:
+    - labels:
+        service.name:
+            reason: Query will only return series where these labels are present.
+            kind: guaranteed
+            fragment:
+                start: 0
+                end: 23
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo{service.name="api"}'
+          op: ""
+      needsFeatures:
+        - feature: promql-unquoted-utf8-names
+          name: unquoted_utf8_names
+          fragments:
+            - start: 4
+              end: 16
+      position:
+        start: 0
+        end: 23
+      type: selector
+
+---
+
+[TestLabelsSourceWithFeatures/unquoted_utf8_label_name_with_in-value_occurrence - 1]
+expr: foo{c="a.b=", a.b ="v"}
+output:
+    - labels:
+        a.b:
+            reason: Query will only return series where these labels are present.
+            kind: guaranteed
+            fragment:
+                start: 0
+                end: 23
+        c:
+            reason: Query will only return series where these labels are present.
+            kind: guaranteed
+            fragment:
+                start: 0
+                end: 23
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo{a.b="v",c="a.b="}'
+          op: ""
+      needsFeatures:
+        - feature: promql-unquoted-utf8-names
+          name: unquoted_utf8_names
+          fragments:
+            - start: 14
+              end: 17
+      position:
+        start: 0
+        end: 23
+      type: selector
+
+---
+
+[TestLabelsSourceWithFeatures/unquoted_utf8_label_name_with_operator-like_in-value_occurrence - 1]
+expr: foo{c="a.b=1", a.b="v"}
+output:
+    - labels:
+        a.b:
+            reason: Query will only return series where these labels are present.
+            kind: guaranteed
+            fragment:
+                start: 0
+                end: 23
+        c:
+            reason: Query will only return series where these labels are present.
+            kind: guaranteed
+            fragment:
+                start: 0
+                end: 23
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo{a.b="v",c="a.b=1"}'
+          op: ""
+      needsFeatures:
+        - feature: promql-unquoted-utf8-names
+          name: unquoted_utf8_names
+          fragments:
+            - start: 15
+              end: 18
+      position:
+        start: 0
+        end: 23
+      type: selector
+
+---
+
+[TestLabelsSourceWithFeatures/unquoted_utf8_label_name_with_space_before_regex_value - 1]
+expr: foo{service.name =~ "api"}
+output:
+    - labels:
+        service.name:
+            reason: Query will only return series where these labels are present.
+            kind: guaranteed
+            fragment:
+                start: 0
+                end: 26
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo{service.name=~"api"}'
+          op: ""
+      needsFeatures:
+        - feature: promql-unquoted-utf8-names
+          name: unquoted_utf8_names
+          fragments:
+            - start: 4
+              end: 16
+      position:
+        start: 0
+        end: 26
+      type: selector
+
+---
+
+[TestLabelsSourceWithFeatures/unquoted_utf8_label_name_with_space_before_value - 1]
+expr: foo{service.name = "api"}
+output:
+    - labels:
+        service.name:
+            reason: Query will only return series where these labels are present.
+            kind: guaranteed
+            fragment:
+                start: 0
+                end: 25
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo{service.name="api"}'
+          op: ""
+      needsFeatures:
+        - feature: promql-unquoted-utf8-names
+          name: unquoted_utf8_names
+          fragments:
+            - start: 4
+              end: 16
+      position:
+        start: 0
+        end: 25
+      type: selector
+
+---
+
+[TestLabelsSourceWithFeatures/unquoted_utf8_metric_and_label_name_with_same_text - 1]
+expr: service.name{service.name="api"}
+output:
+    - labels:
+        service.name:
+            reason: Query will only return series where these labels are present.
+            kind: guaranteed
+            fragment:
+                start: 0
+                end: 32
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] service.name{service.name="api"}'
+          op: ""
+      needsFeatures:
+        - feature: promql-unquoted-utf8-names
+          name: unquoted_utf8_names
+          fragments:
+            - start: 0
+              end: 12
+            - start: 13
+              end: 25
+      position:
+        start: 0
+        end: 32
+      type: selector
+
+---
+
+[TestLabelsSourceWithFeatures/unquoted_utf8_metric_name - 1]
+expr: http.server.request.duration
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] http.server.request.duration'
+          op: ""
+      needsFeatures:
+        - feature: promql-unquoted-utf8-names
+          name: unquoted_utf8_names
+          fragments:
+            - start: 0
+              end: 28
+      position:
+        start: 0
+        end: 28
+      type: selector
+
+---
+
+[TestLabelsSourceWithFeatures/unquoted_utf8_metric_name_in_rate - 1]
+expr: rate(http.server.request.duration[5m])
+output:
+    - returns: vector
+      operations:
+        - node: '[*parser.MatrixSelector] http.server.request.duration[5m]'
+          op: ""
+        - node: '[*parser.VectorSelector] http.server.request.duration'
+          op: ""
+        - node: '[*parser.Call] rate(http.server.request.duration[5m])'
+          op: rate
+      needsFeatures:
+        - feature: promql-unquoted-utf8-names
+          name: unquoted_utf8_names
+          fragments:
+            - start: 5
+              end: 33
+      position:
+        start: 5
+        end: 37
+      type: function
+
+---
+
+[TestLabelsSourceWithFeatures/unquoted_utf8_metric_name_with_matchers - 1]
+expr: http.server.request.duration{job="foo"}
+output:
+    - labels:
+        job:
+            reason: Query will only return series where these labels are present.
+            kind: guaranteed
+            fragment:
+                start: 0
+                end: 39
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] http.server.request.duration{job="foo"}'
+          op: ""
+      needsFeatures:
+        - feature: promql-unquoted-utf8-names
+          name: unquoted_utf8_names
+          fragments:
+            - start: 0
+              end: 28
+      position:
+        start: 0
+        end: 39
+      type: selector
+
+---
+
+[TestLabelsSourceWithFeatures/unquoted_utf8_on_matching_label - 1]
+expr: foo * on(service.name) bar
+output:
+    - labels:
+        "":
+            reason: Query is using one-to-one vector matching with `on(service.name)`, only labels included inside `on(...)` will be present on the results.
+            kind: excluded
+            fragment:
+                start: 6
+                end: 22
+        __name__:
+            reason: Binary operation between two vectors removes metric names.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 26
+        service.name:
+            reason: Query is using one-to-one vector matching with `on(service.name)`, only labels included inside `on(...)` will be present on the results.
+            kind: included
+            fragment:
+                start: 9
+                end: 21
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+      joins:
+        - addedlabels: []
+          depth: 0
+          ison: true
+          matchinglabels:
+            - service.name
+          op: '*'
+          src:
+            returns: vector
+            operations:
+                - node: '[*parser.VectorSelector] bar'
+                  op: ""
+            position:
+                start: 23
+                end: 26
+            type: selector
+      needsFeatures:
+        - feature: promql-unquoted-utf8-names
+          name: unquoted_utf8_names
+          fragments:
+            - start: 9
+              end: 21
+      usedLabels:
+        - service.name
+      position:
+        start: 0
+        end: 3
+      type: selector
+      fixedLabels: true
+
+---
+
+[TestLabelsSourceWithFeatures/unquoted_utf8_without_grouping_label - 1]
+expr: sum(foo) without(service.name)
+output:
+    - labels:
+        __name__:
+            reason: Aggregation removes metric name.
+            kind: excluded
+            fragment:
+                start: 0
+                end: 30
+        service.name:
+            reason: Query is using aggregation with `without(service.name)`, all labels included inside `without(...)` will be removed from the results.
+            kind: excluded
+            fragment:
+                start: 17
+                end: 29
+      returns: vector
+      operations:
+        - node: '[*parser.VectorSelector] foo'
+          op: ""
+        - node: '[*parser.AggregateExpr] sum without (service.name) (foo)'
+          op: sum
+      needsFeatures:
+        - feature: promql-unquoted-utf8-names
+          name: unquoted_utf8_names
+          fragments:
+            - start: 17
+              end: 29
+      position:
+        start: 4
+        end: 7
+      type: aggregation
 
 ---
 

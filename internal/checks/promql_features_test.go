@@ -1136,6 +1136,107 @@ func TestFeaturesCheck(t *testing.T) {
 				},
 			},
 		},
+		// Verifies that unquoted UTF-8 names produce a problem when the flag is missing.
+		{
+			description: "unquoted utf8 names missing feature flag",
+			content:     "- record: foo\n  expr: http.server.request.duration{service.name=\"api\"}\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp:  flagsResponse{flags: map[string]string{}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.16.0"},
+				},
+			},
+		},
+		// Verifies that unquoted UTF-8 names produce no problem when the flag is enabled.
+		{
+			description: "unquoted utf8 names with feature flag enabled",
+			content:     "- record: foo\n  expr: http.server.request.duration{service.name=\"api\"}\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp: flagsResponse{flags: map[string]string{
+						"enable-feature": "promql-unquoted-utf8-names",
+					}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.16.0"},
+				},
+			},
+		},
+		// Verifies that unquoted UTF-8 names on a version too old produce a problem.
+		{
+			description: "unquoted utf8 names version too old",
+			content:     "- record: foo\n  expr: http.server.request.duration{service.name=\"api\"}\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp: flagsResponse{flags: map[string]string{
+						"enable-feature": "promql-unquoted-utf8-names",
+					}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.15.0"},
+				},
+			},
+		},
+		// Verifies that unquoted UTF-8 names in on() and group_left() clauses
+		// are detected.
+		{
+			description: "unquoted utf8 names in vector matching",
+			content:     "- record: foo\n  expr: foo * on(job.name) group_left(service.name) bar\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp:  flagsResponse{flags: map[string]string{}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.16.0"},
+				},
+			},
+		},
+		// Verifies that unquoted UTF-8 names in by() clause are detected.
+		{
+			description: "unquoted utf8 names in by grouping",
+			content:     "- record: foo\n  expr: sum(foo) by (service.name)\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+			problems:    true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp:  flagsResponse{flags: map[string]string{}},
+				},
+				{
+					conds: []requestCondition{requireBuildInfoPath},
+					resp:  buildInfoResponse{version: "3.16.0"},
+				},
+			},
+		},
+		// Verifies that quoted UTF-8 names produce no problem without the flag.
+		{
+			description: "quoted utf8 names need no feature flag",
+			content:     "- record: foo\n  expr: bar{\"service.name\"=\"api\"}\n",
+			checker:     newFeaturesCheck,
+			prometheus:  newSimpleProm,
+		},
 	}
 	runTests(t, testCases)
 }

@@ -39,6 +39,7 @@ const (
 	FeatureDurationExpr           = "promql-duration-expr"
 	FeatureExtendedRangeSelectors = "promql-extended-range-selectors"
 	FeatureBinopFillModifiers     = "promql-binop-fill-modifiers"
+	FeatureUnquotedUTF8Names      = "promql-unquoted-utf8-names"
 )
 
 // Used for test snapshots.
@@ -307,6 +308,20 @@ func (s *Source) requireFeature(name string, pos posrange.PositionRange) {
 		Name:      name,
 		Fragments: []posrange.PositionRange{pos},
 	})
+}
+
+// requireUnquotedNames records the promql-unquoted-utf8-names feature for
+// each name in names that needs that flag. It locates each name inside the
+// clause that within selects.
+func (s *Source) requireUnquotedNames(expr string, within posrange.PositionRange, names ...string) {
+	for _, name := range names {
+		if model.LegacyValidation.IsValidLabelName(name) {
+			continue
+		}
+		if pos, ok := findUnquotedArgumentPosition(expr, within, name); ok {
+			s.requireFeature(unquotedUTF8Names, pos)
+		}
+	}
 }
 
 func (s *Source) clone() *Source {
@@ -712,6 +727,20 @@ func walkNode(expr string, node promParser.Node) (src []*Source) {
 			s.RangeSelectorMode = RangeSelectorSmoothed
 			s.requireFeature(promParser.ItemTypeStr[promParser.SMOOTHED], n.PosRange)
 		}
+		if n.Name != "" && !model.LegacyValidation.IsValidMetricName(n.Name) {
+			s.requireFeature(unquotedUTF8Names, posrange.PositionRange{
+				Start: n.PosRange.Start,
+				End:   n.PosRange.Start + posrange.Pos(len(n.Name)),
+			})
+		}
+		for _, lm := range n.LabelMatchers {
+			if model.LegacyValidation.IsValidLabelName(lm.Name) {
+				continue
+			}
+			if p, ok := findUnquotedMatcherName(expr, n.PosRange, lm); ok {
+				s.requireFeature(unquotedUTF8Names, p)
+			}
+		}
 		s.requireDurationExprFeatures(n.OriginalOffsetExpr)
 		s.requireStartOrEndFeature(expr, n.StartOrEnd, n.PosRange)
 		s.Operations = append(s.Operations, Operation{
@@ -850,6 +879,11 @@ func parseAggregation(expr string, n *promParser.AggregateExpr) (src []*Source) 
 		}
 
 		s.checkAggregationLabels(expr, n)
+		grouping := promParser.ItemTypeStr[promParser.BY]
+		if n.Without {
+			grouping = promParser.ItemTypeStr[promParser.WITHOUT]
+		}
+		s.requireUnquotedNames(expr, FindFuncPosition(expr, n.PosRange, grouping, nil), n.Grouping...)
 		if n.Without {
 			for _, name := range n.Grouping {
 				s.excludeLabel(
@@ -1210,6 +1244,22 @@ func walkDurationExprFeatures(s *Source, de *promParser.DurationExpr) {
 	}
 }
 
+func (s *Source) requireVectorMatchingFeatures(expr string, n *promParser.BinaryExpr) {
+	sides := []posrange.PositionRange{n.LHS.PositionRange(), n.RHS.PositionRange()}
+	matching := promParser.ItemTypeStr[promParser.IGNORING]
+	if n.VectorMatching.On {
+		matching = promParser.ItemTypeStr[promParser.ON]
+	}
+	s.requireUnquotedNames(expr, FindFuncPosition(expr, n.PositionRange(), matching, sides), n.VectorMatching.MatchingLabels...)
+	if len(n.VectorMatching.Include) > 0 {
+		included := promParser.ItemTypeStr[promParser.GROUP_LEFT]
+		if n.VectorMatching.Card == promParser.CardOneToMany {
+			included = promParser.ItemTypeStr[promParser.GROUP_RIGHT]
+		}
+		s.requireUnquotedNames(expr, FindFuncPosition(expr, n.PositionRange(), included, sides), n.VectorMatching.Include...)
+	}
+}
+
 func parseBinOps(expr string, n *promParser.BinaryExpr) (src []*Source) {
 	pos := n.PositionRange()
 	src = make([]*Source, 0, 2)
@@ -1271,6 +1321,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []*Source) {
 	case n.VectorMatching.Card == promParser.CardOneToOne:
 		rhs := walkNode(expr, n.RHS)
 		for _, ls := range walkNode(expr, n.LHS) {
+			ls.requireVectorMatchingFeatures(expr, n)
 			if n.VectorMatching.On {
 				ls.UsedLabels = appendToSlice(ls.UsedLabels, n.VectorMatching.MatchingLabels...)
 				ls.checkIncludedLabels(expr, pos, n.VectorMatching.MatchingLabels)
@@ -1349,6 +1400,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []*Source) {
 	case n.VectorMatching.Card == promParser.CardOneToMany:
 		lhs := walkNode(expr, n.LHS)
 		for _, rs := range walkNode(expr, n.RHS) {
+			rs.requireVectorMatchingFeatures(expr, n)
 			rs.joinLabels(expr, pos, promParser.GROUP_RIGHT, n.VectorMatching.Include, []posrange.PositionRange{
 				n.LHS.PositionRange(), n.RHS.PositionRange(),
 			})
@@ -1423,6 +1475,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []*Source) {
 	case n.VectorMatching.Card == promParser.CardManyToOne:
 		rhs := walkNode(expr, n.RHS)
 		for _, ls := range walkNode(expr, n.LHS) {
+			ls.requireVectorMatchingFeatures(expr, n)
 			ls.joinLabels(expr, pos, promParser.GROUP_LEFT, n.VectorMatching.Include, []posrange.PositionRange{
 				n.LHS.PositionRange(), n.RHS.PositionRange(),
 			})
@@ -1512,6 +1565,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []*Source) {
 		var lhsCanBeEmpty bool // true if any of the LHS query can produce empty results.
 		rhs := walkNode(expr, n.RHS)
 		for _, ls := range walkNode(expr, n.LHS) {
+			ls.requireVectorMatchingFeatures(expr, n)
 			var rhsConditional bool
 			// With many-to-many on/ignore is only used for matching series, it doesn't impact
 			// returned labels.

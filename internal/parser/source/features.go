@@ -8,6 +8,8 @@ import (
 	promParser "github.com/prometheus/prometheus/promql/parser"
 )
 
+const unquotedUTF8Names = "unquoted_utf8_names"
+
 type PrometheusVersion struct {
 	Major int
 	Minor int
@@ -247,6 +249,13 @@ func newDefaultFeatures() *Features {
 	f.Register(promParser.ItemTypeStr[promParser.FILL], FeatureVersion{
 		Flag:          FeatureBinopFillModifiers,
 		MinVersion:    ver(3, 10, 0),
+		StableVersion: ver(0, 0, 0),
+	})
+
+	// Unquoted UTF-8 names behind promql-unquoted-utf8-names.
+	f.Register(unquotedUTF8Names, FeatureVersion{
+		Flag:          FeatureUnquotedUTF8Names,
+		MinVersion:    ver(3, 16, 0),
 		StableVersion: ver(0, 0, 0),
 	})
 

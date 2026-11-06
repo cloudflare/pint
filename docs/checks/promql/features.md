@@ -31,6 +31,8 @@ Currently detected features:
 - `promql-duration-expr` - required when using arithmetic expressions in time durations.
 - `promql-extended-range-selectors` - required when using `anchored` or `smoothed` range selector modifiers.
 - `promql-binop-fill-modifiers` - required when using `fill()` binary operator modifier.
+- `promql-unquoted-utf8-names` - required when using unquoted metric or label names
+  with Unicode letters or dots, like `http.server.request.duration{service.name="api"}`.
 
 Features that became stable and no longer require a feature flag:
 

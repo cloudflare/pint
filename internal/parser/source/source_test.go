@@ -872,6 +872,155 @@ func TestLabelsSourceWithFeatures(t *testing.T) {
 			description: "parenthesised negative offset",
 			expr:        `foo offset -(5)`,
 		},
+		// Unquoted UTF-8 metric name.
+		{
+			description: "unquoted utf8 metric name",
+			expr:        `http.server.request.duration`,
+		},
+		// Unquoted UTF-8 metric name with label matchers.
+		{
+			description: "unquoted utf8 metric name with matchers",
+			expr:        `http.server.request.duration{job="foo"}`,
+		},
+		// Unquoted UTF-8 metric name inside rate().
+		{
+			description: "unquoted utf8 metric name in rate",
+			expr:        `rate(http.server.request.duration[5m])`,
+		},
+		// Quoted UTF-8 metric name doesn't require the flag.
+		{
+			description: "quoted utf8 metric name",
+			expr:        `{"http.server.request.duration"}`,
+		},
+		// __name__ matcher doesn't require the flag.
+		{
+			description: "name matcher with dots",
+			expr:        `{__name__="http.server.request.duration"}`,
+		},
+		// Unquoted UTF-8 label name inside braces.
+		{
+			description: "unquoted utf8 label name",
+			expr:        `foo{service.name="api"}`,
+		},
+		// Unquoted UTF-8 metric name whose text also appears as a label
+		// matcher name, the matcher scan must skip the metric name
+		// occurrence before matching the real one.
+		{
+			description: "unquoted utf8 metric and label name with same text",
+			expr:        `service.name{service.name="api"}`,
+		},
+		// Unquoted UTF-8 label name with the same text embedded in another
+		// matcher's value, plus whitespace around the matcher, to exercise
+		// the matcher scan skipping quoted and in-value occurrences.
+		{
+			description: "unquoted utf8 label name with in-value occurrence",
+			expr:        `foo{c="a.b=", a.b ="v"}`,
+		},
+		// Unquoted UTF-8 label name with the same text in another matcher's
+		// value followed by a non-quote character, the matcher scan must skip
+		// the operator-like occurrence inside the value.
+		{
+			description: "unquoted utf8 label name with operator-like in-value occurrence",
+			expr:        `foo{c="a.b=1", a.b="v"}`,
+		},
+		// Quoted UTF-8 label name inside braces doesn't require the flag.
+		{
+			description: "quoted utf8 label name",
+			expr:        `foo{"service.name"="api"}`,
+		},
+		// Unicode letters in metric name.
+		{
+			description: "unicode metric name",
+			expr:        `métrique`,
+		},
+		// Unicode letters in label name.
+		{
+			description: "unicode label name",
+			expr:        `foo{имя="test"}`,
+		},
+		// Unquoted UTF-8 label name in by() clause.
+		{
+			description: "unquoted utf8 by grouping label",
+			expr:        `sum(foo) by (service.name)`,
+		},
+		// Unquoted UTF-8 label name in without() clause.
+		{
+			description: "unquoted utf8 without grouping label",
+			expr:        `sum(foo) without(service.name)`,
+		},
+		// Unquoted UTF-8 label name in on() clause.
+		{
+			description: "unquoted utf8 on matching label",
+			expr:        `foo * on(service.name) bar`,
+		},
+		// Unquoted UTF-8 label name in ignoring() clause.
+		{
+			description: "unquoted utf8 ignoring matching label",
+			expr:        `foo * ignoring(service.name) bar`,
+		},
+		// Unquoted UTF-8 label name in group_left() clause.
+		{
+			description: "unquoted utf8 group_left label",
+			expr:        `foo * on(job) group_left(service.name) bar`,
+		},
+		// Unquoted UTF-8 label name in group_right() clause.
+		{
+			description: "unquoted utf8 group_right label",
+			expr:        `foo * on(job) group_right(service.name) bar`,
+		},
+		// Multiple unquoted UTF-8 names merged into a single requirement.
+		{
+			description: "multiple unquoted utf8 names",
+			expr:        `http.server.request.duration{service.name="api"} / on(job.name) bar.baz`,
+		},
+		// Whitespace between the match operator and the opening quote is
+		// valid PromQL and must still record the feature requirement.
+		{
+			description: "unquoted utf8 label name with space before value",
+			expr:        `foo{service.name = "api"}`,
+		},
+		{
+			description: "unquoted utf8 label name with space before regex value",
+			expr:        `foo{service.name =~ "api"}`,
+		},
+		// Quoted grouping names are valid without the feature flag.
+		{
+			description: "quoted utf8 by grouping label",
+			expr:        `sum by ("service.name") (foo)`,
+		},
+		{
+			description: "quoted utf8 without grouping label",
+			expr:        `sum(foo) without ("service.name")`,
+		},
+		{
+			description: "quoted utf8 on matching label",
+			expr:        `foo + on ("service.name") bar`,
+		},
+		{
+			description: "quoted utf8 ignoring matching label",
+			expr:        `foo * ignoring ("service.name") bar`,
+		},
+		{
+			description: "quoted utf8 group_left label",
+			expr:        `foo + on(job) group_left ("service.name") bar`,
+		},
+		{
+			description: "quoted utf8 group_right label",
+			expr:        `foo + on(job) group_right ("service.name") bar`,
+		},
+		// Unquoted UTF-8 grouping label surrounded by whitespace inside the
+		// by() clause.
+		{
+			description: "unquoted utf8 by grouping label with spaces",
+			expr:        `sum(foo) by ( service.name )`,
+		},
+		// Unquoted UTF-8 grouping label next to quoted labels that contain the
+		// same text inside their values, the argument scan must skip the
+		// in-string occurrences before matching the real one.
+		{
+			description: "unquoted utf8 by grouping label with in-string occurrences",
+			expr:        `sum(foo) by ("x service.name", "y service.name z", "w, service.name v", service.name)`,
+		},
 	}
 
 	for _, tc := range testCases {

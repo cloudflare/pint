@@ -8,6 +8,8 @@ import (
 	"github.com/prometheus/prometheus/promql/parser/posrange"
 )
 
+const exprSpace = " \n\t"
+
 func GetQueryFragment(expr string, pos posrange.PositionRange) string {
 	return expr[pos.Start:pos.End]
 }
@@ -128,49 +130,11 @@ func FindFuncPosition(expr string, within posrange.PositionRange, fn string, out
 // If expr is `sum(foo) without(notify)` and within selects `without(notify)`,
 // then name="notify" returns the position of `notify` in the full expr.
 func findArgumentPosition(expr string, within posrange.PositionRange, name string) posrange.PositionRange {
-	fragment := GetQueryFragment(expr, within)
-
-	isSpace := func(b byte) bool {
-		return b == ' ' || b == '\n' || b == '\t'
-	}
-	// Match the right-most name that sits as a complete argument, i.e. one
-	// bordered by '(' or ',' on the left and ',' or ')' on the right.
-	best := -1
-	for off := 0; ; {
-		i := strings.Index(fragment[off:], name)
-		if i < 0 {
-			break
-		}
-		i += off
-		off = i + 1
-
-		// The byte opening the argument must be '(' or a ',' separator.
-		p := i - 1
-		for p >= 0 && isSpace(fragment[p]) {
-			p--
-		}
-		if p < 0 || (fragment[p] != '(' && fragment[p] != ',') {
-			continue
-		}
-
-		// The byte closing the argument must be ')' or a ',' separator.
-		q := i + len(name)
-		for q < len(fragment) && isSpace(fragment[q]) {
-			q++
-		}
-		if q >= len(fragment) || (fragment[q] != ')' && fragment[q] != ',') {
-			continue
-		}
-
-		best = i
-	}
-	if best < 0 {
+	pos, ok := findUnquotedArgumentPosition(expr, within, name)
+	if !ok {
 		return within
 	}
-	return posrange.PositionRange{
-		Start: within.Start + posrange.Pos(best),
-		End:   within.Start + posrange.Pos(best+len(name)),
-	}
+	return pos
 }
 
 // findBinOpsOperatorPosition returns the position of the op operator between the
@@ -189,6 +153,80 @@ func findBinOpsOperatorPosition(expr string, n *promParser.BinaryExpr, op string
 		Start: within.Start + posrange.Pos(idx),
 		End:   within.Start + posrange.Pos(idx+len(op)),
 	}
+}
+
+// findUnquotedMatcherName returns the position of the label name for the
+// passed matcher. It returns a position only when the query writes the name
+// without quotes. You can also write `foo.bar` as `{"foo.bar"="v"}`.
+// That form does not need a feature flag, so this function skips quoted
+// names and returns false.
+func findUnquotedMatcherName(expr string, within posrange.PositionRange, m *labels.Matcher) (posrange.PositionRange, bool) {
+	fragment := GetQueryFragment(expr, within)
+	for off := 0; ; {
+		idx := strings.Index(fragment[off:], m.Name)
+		if idx < 0 {
+			return posrange.PositionRange{}, false
+		}
+		idx += off
+		off = idx + 1
+
+		// The name must come before the match operator and an opening quote.
+		// This test skips the same text inside label values.
+		after, ok := strings.CutPrefix(strings.TrimLeft(fragment[idx+len(m.Name):], exprSpace), m.Type.String())
+		if !ok || !strings.HasPrefix(strings.TrimLeft(after, exprSpace), `"`) {
+			continue
+		}
+		if strings.HasSuffix(strings.TrimRight(fragment[:idx], exprSpace), `"`) {
+			continue
+		}
+		return posrange.PositionRange{
+			Start: within.Start + posrange.Pos(idx),
+			End:   within.Start + posrange.Pos(idx+len(m.Name)),
+		}, true
+	}
+}
+
+// findUnquotedArgumentPosition looks for the last unquoted occurrence of
+// name in the substring that within selects. The name must be surrounded by
+// argument separators. A quoted name like `by ("service.name")` never
+// matches, because a quote is not a separator. Such names do not need the
+// promql-unquoted-utf8-names feature, so this function does not report them.
+func findUnquotedArgumentPosition(expr string, within posrange.PositionRange, name string) (posrange.PositionRange, bool) {
+	fragment := GetQueryFragment(expr, within)
+
+	best := -1
+	for off := 0; ; {
+		i := strings.Index(fragment[off:], name)
+		if i < 0 {
+			break
+		}
+		i += off
+		off = i + 1
+		if isUnquotedArgument(fragment, i, len(name)) {
+			best = i
+		}
+	}
+	if best < 0 {
+		return posrange.PositionRange{}, false
+	}
+	return posrange.PositionRange{
+		Start: within.Start + posrange.Pos(best),
+		End:   within.Start + posrange.Pos(best+len(name)),
+	}, true
+}
+
+// isUnquotedArgument reports if the name that starts at the given position
+// is written without quotes. A '(' or a ',' must come before the name, and
+// a ')' or a ',' must come after the name. Whitespace around the name is
+// permitted, any other character is not.
+// For example `job` in `by ( job )` and in `by(job)` has no quotes. The
+// same text inside `by ("job")` or `by (myjob)` does not match: a quote or
+// a letter touches the name.
+func isUnquotedArgument(fragment string, i, n int) bool {
+	before := strings.TrimRight(fragment[:i], exprSpace)
+	after := strings.TrimLeft(fragment[i+n:], exprSpace)
+	return (strings.HasSuffix(before, "(") || strings.HasSuffix(before, ",")) &&
+		(strings.HasPrefix(after, ")") || strings.HasPrefix(after, ","))
 }
 
 // FindMatcherPos locates 'name op "value"' (e.g. job=~"foo") in the expression

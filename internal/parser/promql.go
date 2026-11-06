@@ -15,7 +15,7 @@ import (
 var PromQLParser = promParser.NewParser(promParser.Options{
 	EnableExperimentalFunctions: true,
 	EnableBinopFillModifiers:    true,
-	EnableUnquotedUTF8Names:     false,
+	EnableUnquotedUTF8Names:     true,
 })
 
 type PromQLExpr struct {
