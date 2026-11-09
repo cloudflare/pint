@@ -1,3 +1,9 @@
+# We run git inside a dir that's not a git repo, so git tries to walk
+# up looking for .git folder. As it walks up it might end up on a different
+# filesystem (if /tmp is on tmpfs) and then it throws a different error
+# to what we expect. Setting GIT_DISCOVERY_ACROSS_FILESYSTEM=1 makes it
+# cross filesystems and always error the same way.
+env GIT_DISCOVERY_ACROSS_FILESYSTEM=1
 ! exec pint -l debug --no-color ci
 ! stdout .
 cmp stderr stderr.txt

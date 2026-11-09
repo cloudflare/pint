@@ -13,10 +13,9 @@ import (
 // PromQLParser is a shared, goroutine-safe PromQL parser with all feature flags enabled.
 // Each method creates its own internal parser state, so it is safe to call concurrently.
 var PromQLParser = promParser.NewParser(promParser.Options{
-	EnableExperimentalFunctions:  true,
-	ExperimentalDurationExpr:     true,
-	EnableExtendedRangeSelectors: true,
-	EnableBinopFillModifiers:     true,
+	EnableExperimentalFunctions: true,
+	EnableBinopFillModifiers:    true,
+	EnableUnquotedUTF8Names:     true,
 })
 
 type PromQLExpr struct {

@@ -72,6 +72,11 @@
 
 ---
 
+[TestFeaturesCheck/anchored_selector_stable_on_3.16.0 - 1]
+[]
+
+---
+
 [TestFeaturesCheck/buildinfo_bad_version - 1]
 - description: buildinfo bad version
   content: |
@@ -471,6 +476,69 @@
 
 ---
 
+[TestFeaturesCheck/integral()_missing_feature_flag - 1]
+- description: integral() missing feature flag
+  content: |
+    - record: foo
+      expr: integral(bar[5m])
+  output: |
+    2 |   expr: integral(bar[5m])
+                ^^^^^^^^
+                `integral` requires `--enable-feature=promql-experimental-functions` to be set on `prom`
+                Prometheus server at https://simple.example.com.
+  problem:
+    reporter: promql/features
+    summary: required feature flag not enabled
+    details: |-
+        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+    diagnostics:
+        - message: '`integral` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
+          firstcolumn: 1
+          lastcolumn: 8
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestFeaturesCheck/integral()_version_too_old - 1]
+- description: integral() version too old
+  content: |
+    - record: foo
+      expr: integral(bar[5m])
+  output: |
+    2 |   expr: integral(bar[5m])
+                ^^^^^^^^
+                `integral` requires Prometheus 3.16.0 or later but `prom` Prometheus server at
+                https://simple.example.com is running 3.15.0.
+  problem:
+    reporter: promql/features
+    summary: required feature flag not enabled
+    details: |-
+        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+    diagnostics:
+        - message: '`integral` requires Prometheus 3.16.0 or later but `prom` Prometheus server at https://simple.example.com is running 3.15.0.'
+          firstcolumn: 1
+          lastcolumn: 8
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestFeaturesCheck/integral()_with_feature_flag_enabled - 1]
+[]
+
+---
+
 [TestFeaturesCheck/max_of()_missing_feature_flag - 1]
 - description: max_of() missing feature flag
   content: |
@@ -736,6 +804,11 @@
 
 ---
 
+[TestFeaturesCheck/quoted_utf8_names_need_no_feature_flag - 1]
+[]
+
+---
+
 [TestFeaturesCheck/range()_missing_feature_flag - 1]
 - description: range() missing feature flag
   content: |
@@ -879,6 +952,11 @@
         last: 2
     severity: 2
     anchor: 0
+
+---
+
+[TestFeaturesCheck/smoothed_selector_stable_on_3.16.0 - 1]
+[]
 
 ---
 
@@ -1550,6 +1628,151 @@
 ---
 
 [TestFeaturesCheck/step()_with_feature_flag_enabled - 1]
+[]
+
+---
+
+[TestFeaturesCheck/unquoted_utf8_names_in_by_grouping - 1]
+- description: unquoted utf8 names in by grouping
+  content: |
+    - record: foo
+      expr: sum(foo) by (service.name)
+  output: |
+    2 |   expr: sum(foo) by (service.name)
+                             ^^^^^^^^^^^^
+                             `unquoted_utf8_names` requires `--enable-feature=promql-unquoted-utf8-names` to
+                             be set on `prom` Prometheus server at https://simple.example.com.
+  problem:
+    reporter: promql/features
+    summary: required feature flag not enabled
+    details: |-
+        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+    diagnostics:
+        - message: '`unquoted_utf8_names` requires `--enable-feature=promql-unquoted-utf8-names` to be set on `prom` Prometheus server at https://simple.example.com.'
+          firstcolumn: 14
+          lastcolumn: 25
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestFeaturesCheck/unquoted_utf8_names_in_vector_matching - 1]
+- description: unquoted utf8 names in vector matching
+  content: |
+    - record: foo
+      expr: foo * on(job.name) group_left(service.name) bar
+  output: |
+    2 |   expr: foo * on(job.name) group_left(service.name) bar
+                                              ^^^^^^^^^^^^
+                                              `unquoted_utf8_names` requires
+                                              `--enable-feature=promql-unquoted-utf8-names` to be set on
+                                              `prom` Prometheus server at https://simple.example.com.
+                         ^^^^^^^^
+                         `unquoted_utf8_names` requires `--enable-feature=promql-unquoted-utf8-names` to be
+                         set on `prom` Prometheus server at https://simple.example.com.
+  problem:
+    reporter: promql/features
+    summary: required feature flag not enabled
+    details: |-
+        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+    diagnostics:
+        - message: '`unquoted_utf8_names` requires `--enable-feature=promql-unquoted-utf8-names` to be set on `prom` Prometheus server at https://simple.example.com.'
+          firstcolumn: 10
+          lastcolumn: 17
+          kind: 0
+        - message: '`unquoted_utf8_names` requires `--enable-feature=promql-unquoted-utf8-names` to be set on `prom` Prometheus server at https://simple.example.com.'
+          firstcolumn: 31
+          lastcolumn: 42
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestFeaturesCheck/unquoted_utf8_names_missing_feature_flag - 1]
+- description: unquoted utf8 names missing feature flag
+  content: |
+    - record: foo
+      expr: http.server.request.duration{service.name="api"}
+  output: |
+    2 |   expr: http.server.request.duration{service.name="api"}
+                                             ^^^^^^^^^^^^
+                                             `unquoted_utf8_names` requires
+                                             `--enable-feature=promql-unquoted-utf8-names` to be set on
+                                             `prom` Prometheus server at https://simple.example.com.
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                `unquoted_utf8_names` requires `--enable-feature=promql-unquoted-utf8-names` to be set on
+                `prom` Prometheus server at https://simple.example.com.
+  problem:
+    reporter: promql/features
+    summary: required feature flag not enabled
+    details: |-
+        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+    diagnostics:
+        - message: '`unquoted_utf8_names` requires `--enable-feature=promql-unquoted-utf8-names` to be set on `prom` Prometheus server at https://simple.example.com.'
+          firstcolumn: 1
+          lastcolumn: 28
+          kind: 0
+        - message: '`unquoted_utf8_names` requires `--enable-feature=promql-unquoted-utf8-names` to be set on `prom` Prometheus server at https://simple.example.com.'
+          firstcolumn: 30
+          lastcolumn: 41
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestFeaturesCheck/unquoted_utf8_names_version_too_old - 1]
+- description: unquoted utf8 names version too old
+  content: |
+    - record: foo
+      expr: http.server.request.duration{service.name="api"}
+  output: |
+    2 |   expr: http.server.request.duration{service.name="api"}
+                                             ^^^^^^^^^^^^
+                                             `unquoted_utf8_names` requires Prometheus 3.16.0 or later but
+                                             `prom` Prometheus server at https://simple.example.com is
+                                             running 3.15.0.
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                `unquoted_utf8_names` requires Prometheus 3.16.0 or later but `prom` Prometheus server at
+                https://simple.example.com is running 3.15.0.
+  problem:
+    reporter: promql/features
+    summary: required feature flag not enabled
+    details: |-
+        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+    diagnostics:
+        - message: '`unquoted_utf8_names` requires Prometheus 3.16.0 or later but `prom` Prometheus server at https://simple.example.com is running 3.15.0.'
+          firstcolumn: 1
+          lastcolumn: 28
+          kind: 0
+        - message: '`unquoted_utf8_names` requires Prometheus 3.16.0 or later but `prom` Prometheus server at https://simple.example.com is running 3.15.0.'
+          firstcolumn: 30
+          lastcolumn: 41
+          kind: 0
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestFeaturesCheck/unquoted_utf8_names_with_feature_flag_enabled - 1]
 []
 
 ---
