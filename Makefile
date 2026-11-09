@@ -38,6 +38,7 @@ test:
 		-count=3 \
 		-timeout=15m \
 		./...
+	@go tool cover -func=$(COVER_PROFILE) | (grep -v 100.0 || exit 0)
 
 .PHONY: debug-testscript
 debug-testscript:
