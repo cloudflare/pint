@@ -17,7 +17,8 @@ import (
 func NewGitBranchFinder(
 	gitCmd git.CommandRunner,
 	filter git.PathFilter,
-	baseBranch string,
+	head string,
+	targetBranch string,
 	maxCommits int,
 	opts parser.Options,
 	allowedOwners []*regexp.Regexp,
@@ -25,7 +26,8 @@ func NewGitBranchFinder(
 	return GitBranchFinder{
 		gitCmd:        gitCmd,
 		filter:        filter,
-		baseBranch:    baseBranch,
+		head:          head,
+		targetBranch:  targetBranch,
 		maxCommits:    maxCommits,
 		opts:          opts,
 		allowedOwners: allowedOwners,
@@ -34,7 +36,8 @@ func NewGitBranchFinder(
 
 type GitBranchFinder struct {
 	gitCmd        git.CommandRunner
-	baseBranch    string
+	head          string
+	targetBranch  string
 	filter        git.PathFilter
 	allowedOwners []*regexp.Regexp
 	maxCommits    int
@@ -42,22 +45,30 @@ type GitBranchFinder struct {
 }
 
 func (f GitBranchFinder) Find(ctx context.Context, allEntries []*Entry) (entries []*Entry, err error) {
-	changes, err := git.Changes(ctx, f.gitCmd, f.baseBranch, f.filter)
+	base, err := git.MergeBase(ctx, f.gitCmd, f.targetBranch, f.head)
 	if err != nil {
 		return nil, err
 	}
 
-	totalCommits := countCommits(changes)
-	if totalCommits > f.maxCommits {
-		return nil, fmt.Errorf("number of commits to check (%d) is higher than maxCommits (%d), exiting", totalCommits, f.maxCommits)
+	commits, err := git.Commits(ctx, f.gitCmd, base, f.head)
+	if err != nil {
+		return nil, err
+	}
+	if len(commits) > f.maxCommits {
+		return nil, fmt.Errorf("number of commits to check (%d) is higher than maxCommits (%d), exiting", len(commits), f.maxCommits)
 	}
 
-	shouldSkip, err := f.shouldSkipAllChecks(ctx, changes)
+	shouldSkip, err := f.shouldSkipAllChecks(ctx, commits)
 	if err != nil {
 		return nil, err
 	}
 	if shouldSkip {
 		return nil, nil
+	}
+
+	changes, err := git.Changes(ctx, f.gitCmd, base, f.head, f.filter)
+	if err != nil {
+		return nil, err
 	}
 
 	for _, change := range changes {
@@ -104,7 +115,6 @@ func (f GitBranchFinder) Find(ctx context.Context, allEntries []*Entry) (entries
 		slog.LogAttrs(
 			ctx, slog.LevelDebug,
 			"Parsing git file change",
-			slog.Any("commits", change.Commits),
 			slog.String("before.path", change.Path.Before.Name),
 			slog.String("before.target", change.Path.Before.SymlinkTarget),
 			slog.Any("before.type", change.Path.Before.Type),
@@ -215,21 +225,14 @@ func (f GitBranchFinder) Find(ctx context.Context, allEntries []*Entry) (entries
 	slog.LogAttrs(ctx, slog.LevelInfo, "Git file changes parsed",
 		slog.Int("files", len(changes)),
 		slog.Int("entries", changedEntries),
-		slog.Int("commits", totalCommits),
+		slog.Int("commits", len(commits)),
 		slog.Int("maxCommits", f.maxCommits),
 	)
 	return allEntries, nil
 }
 
-func (f GitBranchFinder) shouldSkipAllChecks(ctx context.Context, changes []*git.FileChange) (bool, error) {
-	commits := map[string]struct{}{}
-	for _, change := range changes {
-		for _, commit := range change.Commits {
-			commits[commit] = struct{}{}
-		}
-	}
-
-	for commit := range commits {
+func (f GitBranchFinder) shouldSkipAllChecks(ctx context.Context, commits []string) (bool, error) {
+	for _, commit := range commits {
 		msg, err := git.CommitMessage(ctx, f.gitCmd, commit)
 		if err != nil {
 			return false, fmt.Errorf("failed to get commit message for %s: %w", commit, err)
@@ -338,16 +341,6 @@ func findRulesByName(entries []*Entry, name string, ruleType parser.RuleType) (n
 		}
 	}
 	return nomatch, match
-}
-
-func countCommits(changes []*git.FileChange) int {
-	commits := map[string]struct{}{}
-	for _, change := range changes {
-		for _, commit := range change.Commits {
-			commits[commit] = struct{}{}
-		}
-	}
-	return len(commits)
 }
 
 func entriesWithPathErrors(entries []*Entry) (match []*Entry) {

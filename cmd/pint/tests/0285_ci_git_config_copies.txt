@@ -1,0 +1,55 @@
+# Setup:
+# 1. main has a.yml.
+# 2. The MR branch breaks rule1 in a.yml and adds b.yml with the same
+#    content.
+# 3. pint runs two times: first with the default git config, then with
+#    diff.renames=copies.
+#
+# Expected: both runs report rule1 in a.yml and in b.yml. The git config
+# must not change what pint reports.
+
+mkdir testrepo
+cd testrepo
+exec git init --initial-branch=main .
+
+cp ../src/.pint.hcl .
+cp ../src/good.yml a.yml
+env GIT_AUTHOR_NAME=pint
+env GIT_AUTHOR_EMAIL=pint@example.com
+env GIT_COMMITTER_NAME=pint
+env GIT_COMMITTER_EMAIL=pint@example.com
+exec git add .
+exec git commit -am 'init'
+
+exec git checkout -b v2
+cp ../src/broken.yml a.yml
+cp ../src/broken.yml b.yml
+exec git add .
+exec git commit -am 'break a.yml and copy it'
+
+! exec pint --no-color ci --show-duplicates
+stderr 'msg="Problems found" Fatal=2$'
+stderr '---> a\.yml:5 -> `rule1`'
+stderr '---> b\.yml:5 -> `rule1`'
+cp stderr ../default.txt
+
+exec git config diff.renames copies
+! exec pint --no-color ci --show-duplicates
+cmp stderr ../default.txt
+
+-- src/.pint.hcl --
+ci {
+  baseBranch = "main"
+}
+-- src/good.yml --
+groups:
+- name: rules
+  rules:
+  - record: rule1
+    expr: sum(foo) by(job)
+-- src/broken.yml --
+groups:
+- name: rules
+  rules:
+  - record: rule1
+    expr: sum(foo) bi()

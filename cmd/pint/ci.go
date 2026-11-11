@@ -110,7 +110,7 @@ func actionCI(ctx context.Context, c *cli.Command) error {
 		return err
 	}
 
-	entries, err = discovery.NewGitBranchFinder(git.RunGit, filter, targetBranch, meta.cfg.CI.MaxCommits, meta.cfg.Parser.Options(), allowedOwners).Find(ctx, entries)
+	entries, err = discovery.NewGitBranchFinder(git.RunGit, filter, gitInfo.HeadCommit, targetBranch, meta.cfg.CI.MaxCommits, meta.cfg.Parser.Options(), allowedOwners).Find(ctx, entries)
 	if err != nil {
 		return err
 	}

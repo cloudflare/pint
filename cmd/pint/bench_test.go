@@ -70,6 +70,7 @@ func BenchmarkGitFinder(b *testing.B) {
 	finder := discovery.NewGitBranchFinder(
 		git.RunGit,
 		git.NewPathFilter(nil, nil, nil),
+		"HEAD",
 		"main",
 		50,
 		parser.DefaultOptions,
