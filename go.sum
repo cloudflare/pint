@@ -237,8 +237,8 @@ github.com/zclconf/go-cty v1.20.0 h1:V2Mh9pu2xWPATCY7US3LnGBNSq/AAZDsqQZmmOAV7DI
 github.com/zclconf/go-cty v1.20.0/go.mod h1:12W89jGn3JCOIQi7infWr9m80rOkb5RNYJqXMZcN4c8=
 github.com/zclconf/go-cty-debug v0.0.0-20240509010212-0d6042c53940 h1:4r45xpDWB6ZMSMNJFMOjqrGHynW3DIBuR2H9j0ug+Mo=
 github.com/zclconf/go-cty-debug v0.0.0-20240509010212-0d6042c53940/go.mod h1:CmBdvvj3nqzfzJ6nTCIwDTPZ56aVGvDrmztiO5g3qrM=
-gitlab.com/gitlab-org/api/client-go/v3 v3.43.0 h1:X7qHPPt6If/5f0bgBpeT8GYWx2zDnuUzRsfnzJa9/cc=
-gitlab.com/gitlab-org/api/client-go/v3 v3.43.0/go.mod h1:8cuzgeUJzkVvaRvw57iZ8foGmL5q8GZXi4lHTiF5edY=
+gitlab.com/gitlab-org/api/client-go/v3 v3.44.0 h1:lIkjQ4Beo54oT2Puf9FwZJyVrS6CVzyDhy5+S8ZjMiw=
+gitlab.com/gitlab-org/api/client-go/v3 v3.44.0/go.mod h1:8cuzgeUJzkVvaRvw57iZ8foGmL5q8GZXi4lHTiF5edY=
 go.nhat.io/httpmock v0.12.1 h1:TQlfppf0zM0FHH1N/wswJLZQ0ceaa/gatOxSgBQnfpQ=
 go.nhat.io/httpmock v0.12.1/go.mod h1:IiaeSIPDqGNawUjQkAhbnPIUFsZVm8DRX0NGbAHwa9I=
 go.nhat.io/matcher/v2 v2.0.0 h1:W+rbHi0hKuZHtOQH4U5g+KwyKyfVioIxrxjoGRcUETE=

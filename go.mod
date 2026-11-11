@@ -18,7 +18,7 @@ require (
 	github.com/stretchr/testify v1.12.1
 	github.com/urfave/cli/v3 v3.14.0
 	github.com/zclconf/go-cty v1.20.0
-	gitlab.com/gitlab-org/api/client-go/v3 v3.43.0
+	gitlab.com/gitlab-org/api/client-go/v3 v3.44.0
 	go.nhat.io/httpmock v0.12.1
 	go.uber.org/ratelimit v0.3.1
 	go.yaml.in/yaml/v3 v3.0.6
