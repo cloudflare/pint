@@ -244,8 +244,8 @@ func Changes(ctx context.Context, cmd CommandRunner, base, head string, filter P
 		}
 
 		status := FileStatus(parts[0][0])
-		srcPath := parts[1]
-		dstPath := parts[len(parts)-1]
+		srcPath := unquotePath(parts[1])
+		dstPath := unquotePath(parts[len(parts)-1])
 		slog.LogAttrs(context.Background(), slog.LevelDebug, "Git file change", slog.String("change", parts[0]), slog.String("path", dstPath))
 
 		if !filter.IsPathAllowed(dstPath) {
@@ -434,8 +434,8 @@ func parseDiff(diff []byte, targetPath string) LineNumbers {
 			inHunk = false
 		case !inHunk && strings.HasPrefix(line, "+++ "):
 			// +++ b/path or +++ /dev/null
-			p := strings.TrimPrefix(line, "+++ b/")
-			inTargetBlock = p == targetPath
+			p := unquotePath(strings.TrimPrefix(line, "+++ "))
+			inTargetBlock = strings.TrimPrefix(p, "b/") == targetPath
 		case !inTargetBlock:
 			continue
 		case strings.HasPrefix(line, "@@"):
@@ -495,6 +495,14 @@ func parseDiff(diff []byte, targetPath string) LineNumbers {
 	return lineNumbers
 }
 
+// unquotePath decodes a path that git printed as a C-style quoted string.
+func unquotePath(p string) string {
+	if strings.HasPrefix(p, `"`) {
+		p, _ = strconv.Unquote(p)
+	}
+	return p
+}
+
 func getTypeForPath(ctx context.Context, cmd CommandRunner, commit, fpath string) PathType {
 	args := []string{"ls-tree", commit, fpath}
 	out, err := cmd(ctx, args...)
@@ -516,7 +524,7 @@ func getTypeForPath(ctx context.Context, cmd CommandRunner, commit, fpath string
 		if len(parts) != 2 {
 			continue
 		}
-		objpath := parts[1]
+		objpath := unquotePath(parts[1])
 		slog.LogAttrs(
 			context.Background(), slog.LevelDebug, "ls-tree line",
 			slog.String("mode", objmode),
