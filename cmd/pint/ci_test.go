@@ -110,7 +110,7 @@ func TestDetectCurrentBranch(t *testing.T) {
 	}
 }
 
-func TestDetectBaseBranch(t *testing.T) {
+func TestDetectTargetBranch(t *testing.T) {
 	type testCaseT struct {
 		envVars  map[string]string
 		input    string
@@ -169,7 +169,7 @@ func TestDetectBaseBranch(t *testing.T) {
 				t.Setenv(k, v)
 			}
 
-			result := detectBaseBranch(tc.input)
+			result := detectTargetBranch(tc.input)
 			require.Equal(t, tc.expected, result)
 		})
 	}

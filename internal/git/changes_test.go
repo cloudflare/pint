@@ -53,7 +53,7 @@ func TestChanges(t *testing.T) {
 
 	testCases := []testCaseT{
 		{
-			title: "git log error",
+			title: "git diff-tree error",
 			setup: func(_ *testing.T) git.CommandRunner {
 				cmd := func(_ context.Context, args ...string) ([]byte, error) {
 					return nil, fmt.Errorf("mock git error: %v", args)
@@ -61,7 +61,7 @@ func TestChanges(t *testing.T) {
 				return cmd
 			},
 			changes: nil,
-			err:     "failed to get the list of modified files from git: mock git error: [log --reverse --no-merges --first-parent --format=%H --name-status main..HEAD]",
+			err:     "failed to get the list of modified files from git: mock git error: [diff-tree --name-status -r -M main HEAD]",
 		},
 		{
 			title: "chmod",
@@ -80,7 +80,6 @@ func TestChanges(t *testing.T) {
 			},
 			changes: []*git.FileChange{
 				{
-					Commits: []string{"1"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name: "index.txt",
@@ -119,7 +118,6 @@ func TestChanges(t *testing.T) {
 			},
 			changes: []*git.FileChange{
 				{
-					Commits: []string{"1"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name: "index.txt",
@@ -139,7 +137,6 @@ func TestChanges(t *testing.T) {
 					},
 				},
 				{
-					Commits: []string{"1"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name: "index.txt/.keep",
@@ -179,34 +176,12 @@ func TestChanges(t *testing.T) {
 
 				return debugGitRun(t)
 			},
-			changes: []*git.FileChange{
-				{
-					Commits: []string{"1", "2"},
-					Path: git.PathDiff{
-						Before: git.Path{
-							Name: "index.txt",
-							Type: git.File,
-						},
-						After: git.Path{
-							Name: "index.txt",
-							Type: git.File,
-						},
-					},
-					Body: git.BodyDiff{
-						Before: []byte("foo"),
-						After:  []byte("foo"),
-						Lines:  []git.LineNumber{},
-					},
-				},
-			},
-			err: "",
+			changes: nil,
+			err:     "",
 		},
 		{
 			// A merge commit restores the file to the base version, so the file
-			// has no net change between main and HEAD. Changes() must report the
-			// content from HEAD and no modified lines. Reporting the stale
-			// content from the edit commit makes pint comment on a file that is
-			// missing from the PR diff.
+			// has no net change between main and HEAD and must not be reported.
 			title: "file modified then restored in a merge commit",
 			setup: func(t *testing.T) git.CommandRunner {
 				mustRun(t, "init", "--initial-branch=main", ".")
@@ -232,27 +207,8 @@ func TestChanges(t *testing.T) {
 
 				return debugGitRun(t)
 			},
-			changes: []*git.FileChange{
-				{
-					Commits: []string{"1"},
-					Path: git.PathDiff{
-						Before: git.Path{
-							Name: "index.txt",
-							Type: git.File,
-						},
-						After: git.Path{
-							Name: "index.txt",
-							Type: git.File,
-						},
-					},
-					Body: git.BodyDiff{
-						Before: []byte("1\n2\n3\n4\n5\n"),
-						After:  []byte("1\n2\n3\n4\n5\n"),
-						Lines:  []git.LineNumber{},
-					},
-				},
-			},
-			err: "",
+			changes: nil,
+			err:     "",
 		},
 		{
 			title: "file -> symlink",
@@ -274,7 +230,6 @@ func TestChanges(t *testing.T) {
 			},
 			changes: []*git.FileChange{
 				{
-					Commits: []string{"1"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name: "second file.txt",
@@ -316,7 +271,6 @@ func TestChanges(t *testing.T) {
 			},
 			changes: []*git.FileChange{
 				{
-					Commits: []string{"1"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name: "index.txt",
@@ -360,7 +314,6 @@ func TestChanges(t *testing.T) {
 			},
 			changes: []*git.FileChange{
 				{
-					Commits: []string{"1", "2"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name: "index.txt",
@@ -401,7 +354,6 @@ func TestChanges(t *testing.T) {
 			},
 			changes: []*git.FileChange{
 				{
-					Commits: []string{"1"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name: "",
@@ -420,7 +372,6 @@ func TestChanges(t *testing.T) {
 					},
 				},
 				{
-					Commits: []string{"1"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name: "",
@@ -460,7 +411,6 @@ func TestChanges(t *testing.T) {
 			},
 			changes: []*git.FileChange{
 				{
-					Commits: []string{"1"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name: "second.txt",
@@ -500,7 +450,6 @@ func TestChanges(t *testing.T) {
 			},
 			changes: []*git.FileChange{
 				{
-					Commits: []string{"1"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name:          "second.txt",
@@ -543,7 +492,6 @@ func TestChanges(t *testing.T) {
 			},
 			changes: []*git.FileChange{
 				{
-					Commits: []string{"1"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name:          "dir/first.txt",
@@ -563,7 +511,6 @@ func TestChanges(t *testing.T) {
 					},
 				},
 				{
-					Commits: []string{"1"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name:          "dir/second.txt",
@@ -609,7 +556,6 @@ func TestChanges(t *testing.T) {
 			},
 			changes: []*git.FileChange{
 				{
-					Commits: []string{"1"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name:          "dir/second.txt",
@@ -654,7 +600,6 @@ func TestChanges(t *testing.T) {
 			},
 			changes: []*git.FileChange{
 				{
-					Commits: []string{"1", "2"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name: "main.txt",
@@ -696,7 +641,6 @@ func TestChanges(t *testing.T) {
 			},
 			changes: []*git.FileChange{
 				{
-					Commits: []string{"1"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name: "dir1/rules/file1.txt",
@@ -715,7 +659,6 @@ func TestChanges(t *testing.T) {
 					},
 				},
 				{
-					Commits: []string{"1"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name: "dir1/rules/file2.txt",
@@ -756,7 +699,6 @@ func TestChanges(t *testing.T) {
 			},
 			changes: []*git.FileChange{
 				{
-					Commits: []string{"1", "2"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name: "main.txt",
@@ -789,7 +731,7 @@ func TestChanges(t *testing.T) {
 			t.Chdir(dir)
 
 			cmd := tc.setup(t)
-			changes, err := git.Changes(t.Context(), cmd, "main", git.NewPathFilter(nil, nil, nil))
+			changes, err := git.Changes(t.Context(), cmd, "main", "HEAD", git.NewPathFilter(nil, nil, nil))
 			if tc.err != "" {
 				require.EqualError(t, err, tc.err)
 				require.Nil(t, changes)
@@ -797,7 +739,6 @@ func TestChanges(t *testing.T) {
 				require.NoError(t, err)
 				require.Len(t, changes, len(tc.changes))
 				for i := range tc.changes {
-					require.Len(t, changes[i].Commits, len(tc.changes[i].Commits), "changes[%d].Commits", i)
 					require.Equal(t, tc.changes[i].Path, changes[i].Path, "changes[%d].Path", i)
 					require.Equal(t, tc.changes[i].Body, changes[i].Body, "changes[%d].Body", i)
 				}
@@ -817,11 +758,10 @@ func TestChangesParseDiff(t *testing.T) {
 
 	testCases := []testCaseT{
 		{
-			title: "empty line in git log output",
+			title: "empty line in git diff-tree output",
 			mock: func(_ context.Context, args ...string) ([]byte, error) {
-				if args[0] == "log" {
-					// Empty line should trigger len(parts) == 0
-					return []byte("abc123\n\nM\tfile.txt\n"), nil
+				if args[1] == "--name-status" {
+					return []byte("\nM\tfile.txt\n"), nil
 				}
 				if args[0] == "ls-tree" {
 					return []byte("100644 blob abc123def456\tfile.txt\n"), nil
@@ -829,14 +769,10 @@ func TestChangesParseDiff(t *testing.T) {
 				if args[0] == "cat-file" {
 					return []byte("content"), nil
 				}
-				if args[0] == "diff" {
-					return nil, nil
-				}
 				return nil, nil
 			},
 			changes: []*git.FileChange{
 				{
-					Commits: []string{"1"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name: "file.txt",
@@ -858,8 +794,8 @@ func TestChangesParseDiff(t *testing.T) {
 		{
 			title: "ls-tree malformed line - less than 3 space-separated parts",
 			mock: func(_ context.Context, args ...string) ([]byte, error) {
-				if args[0] == "log" {
-					return []byte("abc123\nA\tnewfile.txt\n"), nil
+				if args[1] == "--name-status" {
+					return []byte("A\tnewfile.txt\n"), nil
 				}
 				if args[0] == "ls-tree" {
 					// Only 2 parts instead of 3
@@ -872,7 +808,6 @@ func TestChangesParseDiff(t *testing.T) {
 			},
 			changes: []*git.FileChange{
 				{
-					Commits: []string{"1"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name: "",
@@ -894,8 +829,8 @@ func TestChangesParseDiff(t *testing.T) {
 		{
 			title: "ls-tree line missing tab separator",
 			mock: func(_ context.Context, args ...string) ([]byte, error) {
-				if args[0] == "log" {
-					return []byte("abc123\nA\tnewfile.txt\n"), nil
+				if args[1] == "--name-status" {
+					return []byte("A\tnewfile.txt\n"), nil
 				}
 				if args[0] == "ls-tree" {
 					// Has 3 space parts but no tab in third part
@@ -908,7 +843,6 @@ func TestChangesParseDiff(t *testing.T) {
 			},
 			changes: []*git.FileChange{
 				{
-					Commits: []string{"1"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name: "",
@@ -930,8 +864,8 @@ func TestChangesParseDiff(t *testing.T) {
 		{
 			title: "ls-tree returns different path",
 			mock: func(_ context.Context, args ...string) ([]byte, error) {
-				if args[0] == "log" {
-					return []byte("abc123\nA\tnewfile.txt\n"), nil
+				if args[1] == "--name-status" {
+					return []byte("A\tnewfile.txt\n"), nil
 				}
 				if args[0] == "ls-tree" {
 					// Returns a different file path
@@ -944,7 +878,6 @@ func TestChangesParseDiff(t *testing.T) {
 			},
 			changes: []*git.FileChange{
 				{
-					Commits: []string{"1"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name: "",
@@ -966,8 +899,8 @@ func TestChangesParseDiff(t *testing.T) {
 		{
 			title: "ls-tree returns tag object type",
 			mock: func(_ context.Context, args ...string) ([]byte, error) {
-				if args[0] == "log" {
-					return []byte("abc123\nA\tnewfile.txt\n"), nil
+				if args[1] == "--name-status" {
+					return []byte("A\tnewfile.txt\n"), nil
 				}
 				if args[0] == "ls-tree" {
 					// Object type is "tag" not "blob" or "tree"
@@ -980,7 +913,6 @@ func TestChangesParseDiff(t *testing.T) {
 			},
 			changes: []*git.FileChange{
 				{
-					Commits: []string{"1"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name: "",
@@ -1004,8 +936,8 @@ func TestChangesParseDiff(t *testing.T) {
 			title: "git diff error",
 			err:   "failed to run git diff for file.txt: git diff for file.txt: mock diff error",
 			mock: func(_ context.Context, args ...string) ([]byte, error) {
-				if args[0] == "log" {
-					return []byte("abc123\nM\tfile.txt\n"), nil
+				if args[1] == "--name-status" {
+					return []byte("M\tfile.txt\n"), nil
 				}
 				if args[0] == "ls-tree" {
 					return []byte("100644 blob abc123def456\tfile.txt\n"), nil
@@ -1013,7 +945,7 @@ func TestChangesParseDiff(t *testing.T) {
 				if args[0] == "cat-file" {
 					return []byte("content"), nil
 				}
-				if args[0] == "diff" {
+				if args[1] == "-p" {
 					return nil, errors.New("mock diff error")
 				}
 				return nil, nil
@@ -1022,30 +954,26 @@ func TestChangesParseDiff(t *testing.T) {
 		{
 			title: "ls-tree error on before commit",
 			mock: func(_ context.Context, args ...string) ([]byte, error) {
-				if args[0] == "log" {
-					return []byte("abc123\nM\tfile.txt\n"), nil
+				if args[1] == "--name-status" {
+					return []byte("M\tfile.txt\n"), nil
 				}
 				if args[0] == "ls-tree" {
-					if strings.Contains(strings.Join(args, " "), "abc123^") {
+					if args[1] == "main" {
 						return nil, errors.New("mock ls-tree error")
 					}
 					return []byte("100644 blob abc123def456\tfile.txt\n"), nil
 				}
 				if args[0] == "cat-file" {
 					// Fail for the before commit blob ref.
-					if strings.Contains(args[2], "abc123^") {
+					if strings.HasPrefix(args[2], "main:") {
 						return nil, errors.New("mock cat-file error")
 					}
 					return []byte("new content"), nil
-				}
-				if args[0] == "diff" {
-					return nil, nil
 				}
 				return nil, nil
 			},
 			changes: []*git.FileChange{
 				{
-					Commits: []string{"1"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name: "file.txt",
@@ -1072,19 +1000,19 @@ func TestChangesParseDiff(t *testing.T) {
 			// The inHunk flag ensures headers are only matched outside hunks.
 			title: "hunk content with triple-dash and triple-plus lines",
 			mock: func(_ context.Context, args ...string) ([]byte, error) {
-				if args[0] == "log" {
-					return []byte("abc123\nM\tfile.txt\n"), nil
+				if args[1] == "--name-status" {
+					return []byte("M\tfile.txt\n"), nil
 				}
 				if args[0] == "ls-tree" {
 					return []byte("100644 blob abc123def456\tfile.txt\n"), nil
 				}
 				if args[0] == "cat-file" {
-					if strings.Contains(args[2], "abc123^") {
+					if strings.HasPrefix(args[2], "main:") {
 						return []byte("-- old\nkeep\n"), nil
 					}
 					return []byte("++ new\nkeep\n"), nil
 				}
-				if args[0] == "diff" {
+				if args[1] == "-p" {
 					return []byte(
 						"diff --git a/file.txt b/file.txt\n" +
 							"--- a/file.txt\n" +
@@ -1099,7 +1027,6 @@ func TestChangesParseDiff(t *testing.T) {
 			},
 			changes: []*git.FileChange{
 				{
-					Commits: []string{"1"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name:          "file.txt",
@@ -1128,7 +1055,7 @@ func TestChangesParseDiff(t *testing.T) {
 		t.Run(tc.title, func(t *testing.T) {
 			slog.SetDefault(slogt.New(t))
 
-			changes, err := git.Changes(t.Context(), tc.mock, "main", git.NewPathFilter(nil, nil, nil))
+			changes, err := git.Changes(t.Context(), tc.mock, "main", "HEAD", git.NewPathFilter(nil, nil, nil))
 			if tc.err != "" {
 				require.EqualError(t, err, tc.err)
 				require.Nil(t, changes)
@@ -1136,7 +1063,6 @@ func TestChangesParseDiff(t *testing.T) {
 				require.NoError(t, err)
 				require.Len(t, changes, len(tc.changes))
 				for i := range tc.changes {
-					require.Len(t, changes[i].Commits, len(tc.changes[i].Commits), "changes[%d].Commits", i)
 					require.Equal(t, tc.changes[i].Path, changes[i].Path, "changes[%d].Path", i)
 					require.Equal(t, tc.changes[i].Body, changes[i].Body, "changes[%d].Body", i)
 				}
@@ -1150,8 +1076,8 @@ func TestChangesPathFilterExclusion(t *testing.T) {
 	slog.SetDefault(slogt.New(t))
 
 	mock := func(_ context.Context, args ...string) ([]byte, error) {
-		if args[0] == "log" {
-			return []byte("abc123\nM\tfile.txt\nM\texcluded.txt\n"), nil
+		if args[1] == "--name-status" {
+			return []byte("M\tfile.txt\nM\texcluded.txt\n"), nil
 		}
 		if args[0] == "ls-tree" {
 			return []byte("100644 blob abc123def456\t" + args[2] + "\n"), nil
@@ -1159,34 +1085,31 @@ func TestChangesPathFilterExclusion(t *testing.T) {
 		if args[0] == "cat-file" {
 			return []byte("content"), nil
 		}
-		if args[0] == "diff" {
-			return nil, nil
-		}
 		return nil, nil
 	}
 
 	exclude := []*regexp.Regexp{regexp.MustCompile(`^excluded\.txt$`)}
 	filter := git.NewPathFilter(nil, exclude, nil)
-	changes, err := git.Changes(t.Context(), mock, "main", filter)
+	changes, err := git.Changes(t.Context(), mock, "main", "HEAD", filter)
 	require.NoError(t, err)
 	require.Len(t, changes, 1)
 	require.Equal(t, "file.txt", changes[0].Path.After.Name)
 }
 
-// Directory path in git log output is skipped.
+// Directory path in git diff-tree output is skipped.
 func TestChangesSkipsDirectoryPath(t *testing.T) {
 	slog.SetDefault(slogt.New(t))
 
 	dir := t.TempDir()
 
 	mock := func(_ context.Context, args ...string) ([]byte, error) {
-		if args[0] == "log" {
-			return []byte("abc123\nM\t" + dir + "\n"), nil
+		if args[1] == "--name-status" {
+			return []byte("M\t" + dir + "\n"), nil
 		}
 		return nil, nil
 	}
 
-	changes, err := git.Changes(t.Context(), mock, "main", git.NewPathFilter(nil, nil, nil))
+	changes, err := git.Changes(t.Context(), mock, "main", "HEAD", git.NewPathFilter(nil, nil, nil))
 	require.NoError(t, err)
 	require.Empty(t, changes)
 }

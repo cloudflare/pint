@@ -1,0 +1,45 @@
+# Setup:
+# 1. main has a.yml.
+# 2. The MR branch renames a.yml to b.yml and changes nothing else.
+# 3. pint runs two times: first with the default git config, then with
+#    diff.renames=false.
+#
+# Expected: both runs see one renamed file, not a removed and an added
+# file. The git config must not change what pint reports.
+
+mkdir testrepo
+cd testrepo
+exec git init --initial-branch=main .
+
+cp ../src/.pint.hcl .
+cp ../src/rules.yml a.yml
+env GIT_AUTHOR_NAME=pint
+env GIT_AUTHOR_EMAIL=pint@example.com
+env GIT_COMMITTER_NAME=pint
+env GIT_COMMITTER_EMAIL=pint@example.com
+exec git add .
+exec git commit -am 'init'
+
+exec git checkout -b v2
+exec git mv a.yml b.yml
+exec git commit -am 'rename'
+
+exec pint --no-color -l debug ci
+stderr 'msg="Git file change" change=R100 path=b\.yml$'
+stderr 'msg="Git file changes parsed" files=1 entries=1 '
+cp stderr ../default.txt
+
+exec git config diff.renames false
+exec pint --no-color -l debug ci
+cmp stderr ../default.txt
+
+-- src/.pint.hcl --
+ci {
+  baseBranch = "main"
+}
+-- src/rules.yml --
+groups:
+- name: rules
+  rules:
+  - record: rule1
+    expr: sum(foo) by(job)

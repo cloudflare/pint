@@ -8,6 +8,8 @@ env GIT_AUTHOR_NAME=pint
 env GIT_AUTHOR_EMAIL=pint@example.com
 env GIT_COMMITTER_NAME=pint
 env GIT_COMMITTER_EMAIL=pint@example.com
+env GIT_AUTHOR_DATE=2020-01-01T00:00:00Z
+env GIT_COMMITTER_DATE=2020-01-01T00:00:00Z
 exec git add .
 exec git commit -am 'import rules and config'
 
@@ -22,7 +24,7 @@ cmp stderr ../stderr.txt
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=DEBUG msg="Adding pint config to the parser exclude list" path=.pint.hcl
-level=DEBUG msg="Running git command" args=["rev-parse","--verify","HEAD"]
+level=DEBUG msg="Running git command" args=["rev-list","--parents","-n","1","HEAD"]
 level=DEBUG msg="Running git command" args=["rev-parse","--abbrev-ref","HEAD"]
 level=DEBUG msg="Got branch information" base=origin/main current=v2
 level=INFO msg="Finding all rules to check on current git branch" base=origin/main
@@ -30,8 +32,8 @@ level=DEBUG msg="Excluding git directory from glob results" path=.git glob=*
 level=DEBUG msg="File path is in the exclude list" path=.pint.hcl exclude=["^.pint.hcl$"]
 level=DEBUG msg="File parsed" path=rules.yml rules=1
 level=DEBUG msg="Glob finder completed" count=1
-level=DEBUG msg="Running git command" args=["log","--reverse","--no-merges","--first-parent","--format=%H","--name-status","origin/main..HEAD"]
-level=ERROR msg="Execution completed with error(s)" err="failed to get the list of modified files from git: fatal: ambiguous argument 'origin/main..HEAD': unknown revision or path not in the working tree.\nUse '--' to separate paths from revisions, like this:\n'git <command> [<revision>...] -- [<file>...]'\n"
+level=DEBUG msg="Running git command" args=["merge-base","origin/main","ee3148da2d375f4809a554e798db415adc7f4733"]
+level=ERROR msg="Execution completed with error(s)" err="failed to find the common ancestor of origin/main and ee3148da2d375f4809a554e798db415adc7f4733, make sure both are fetched with enough git history: fatal: Not a valid object name origin/main\n"
 -- src/v1.yml --
 - record: rule1
   expr: sum(foo) by(job)

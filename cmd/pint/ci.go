@@ -79,23 +79,23 @@ func actionCI(ctx context.Context, c *cli.Command) error {
 		return err
 	}
 
-	baseBranch := detectBaseBranch(meta.cfg.CI.BaseBranch)
+	targetBranch := detectTargetBranch(meta.cfg.CI.BaseBranch)
 	if c.String(baseBranchFlag) != "" {
-		baseBranch = c.String(baseBranchFlag)
+		targetBranch = c.String(baseBranchFlag)
 	}
-	gitInfo, err := git.Describe(ctx, git.RunGit)
+	gitInfo, err := git.Describe(ctx, git.RunGit, targetBranch)
 	if err != nil {
 		return fmt.Errorf("failed to get git info: %w", err)
 	}
 	currentBranch := detectCurrentBranch(gitInfo.CurrentBranch)
-	slog.LogAttrs(ctx, slog.LevelDebug, "Got branch information", slog.String("base", baseBranch), slog.String("current", currentBranch))
-	baseParts := strings.Split(baseBranch, "/")
-	if currentBranch == baseParts[len(baseParts)-1] {
+	slog.LogAttrs(ctx, slog.LevelDebug, "Got branch information", slog.String("base", targetBranch), slog.String("current", currentBranch))
+	targetParts := strings.Split(targetBranch, "/")
+	if currentBranch == targetParts[len(targetParts)-1] {
 		slog.LogAttrs(ctx, slog.LevelInfo, "Running from base branch, skipping checks", slog.String("branch", currentBranch))
 		return nil
 	}
 
-	slog.LogAttrs(ctx, slog.LevelInfo, "Finding all rules to check on current git branch", slog.String("base", baseBranch))
+	slog.LogAttrs(ctx, slog.LevelInfo, "Finding all rules to check on current git branch", slog.String("base", targetBranch))
 
 	filter := git.NewPathFilter(
 		config.MustCompileRegexes(meta.cfg.Parser.Include...),
@@ -110,7 +110,7 @@ func actionCI(ctx context.Context, c *cli.Command) error {
 		return err
 	}
 
-	entries, err = discovery.NewGitBranchFinder(git.RunGit, filter, baseBranch, meta.cfg.CI.MaxCommits, meta.cfg.Parser.Options(), allowedOwners).Find(ctx, entries)
+	entries, err = discovery.NewGitBranchFinder(git.RunGit, filter, gitInfo.HeadCommit, targetBranch, meta.cfg.CI.MaxCommits, meta.cfg.Parser.Options(), allowedOwners).Find(ctx, entries)
 	if err != nil {
 		return err
 	}
@@ -311,7 +311,7 @@ func detectCurrentBranch(branch string) string {
 // but we might have a pull request that is between two feature branches where the target
 // is not the repos base branch (main), we can detect that from the ENV and set the
 // base (target) branch accordingly.
-func detectBaseBranch(branch string) string {
+func detectTargetBranch(branch string) string {
 	for _, key := range []string{
 		"GITHUB_BASE_REF",                     // GitHub
 		"CI_MERGE_REQUEST_TARGET_BRANCH_NAME", // GitLab

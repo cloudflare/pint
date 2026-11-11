@@ -9,7 +9,6 @@ import (
 	"os"
 	"path"
 	"regexp"
-	"slices"
 	"strconv"
 	"strings"
 )
@@ -206,37 +205,48 @@ type PathDiff struct {
 }
 
 type FileChange struct {
-	Path    PathDiff
-	Body    BodyDiff
-	Commits []string
-	Status  FileStatus
+	Path   PathDiff
+	Body   BodyDiff
+	Status FileStatus
 }
 
-func Changes(ctx context.Context, cmd CommandRunner, baseBranch string, filter PathFilter) ([]*FileChange, error) {
-	out, err := cmd(ctx, "log", "--reverse", "--no-merges", "--first-parent", "--format=%H", "--name-status", baseBranch+".."+HeadRef)
+// MergeBase returns the commit where head started from targetBranch.
+func MergeBase(ctx context.Context, cmd CommandRunner, targetBranch, head string) (string, error) {
+	out, err := cmd(ctx, "merge-base", targetBranch, head)
+	if err != nil {
+		return "", fmt.Errorf("failed to find the common ancestor of %s and %s, make sure both are fetched with enough git history: %w", targetBranch, head, err)
+	}
+	return strings.TrimSpace(string(out)), nil
+}
+
+// Commits returns all non-merge commits reachable from head but not from base.
+func Commits(ctx context.Context, cmd CommandRunner, base, head string) ([]string, error) {
+	out, err := cmd(ctx, "rev-list", "--no-merges", base+".."+head)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get the list of commits from git: %w", err)
+	}
+	return strings.Fields(string(out)), nil
+}
+
+// Changes returns all file changes between base and head.
+func Changes(ctx context.Context, cmd CommandRunner, base, head string, filter PathFilter) ([]*FileChange, error) {
+	out, err := cmd(ctx, "diff-tree", "--name-status", "-r", "-M", base, head)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get the list of modified files from git: %w", err)
 	}
 
 	var changes []*FileChange
-	var commit string
 	s := bufio.NewScanner(bytes.NewReader(out))
 	for s.Scan() {
-		line := s.Text()
-
-		parts := strings.Split(line, "\t")
-		// Split always returns at least 1 element slice.
-		if len(parts) == 1 {
-			if parts[0] != "" {
-				commit = parts[0]
-			}
+		parts := strings.Split(s.Text(), "\t")
+		if len(parts) < 2 {
 			continue
 		}
 
 		status := FileStatus(parts[0][0])
-		srcPath := parts[1]
-		dstPath := parts[len(parts)-1]
-		slog.LogAttrs(context.Background(), slog.LevelDebug, "Git file change", slog.String("change", parts[0]), slog.String("path", dstPath), slog.String("commit", commit))
+		srcPath := unquotePath(parts[1])
+		dstPath := unquotePath(parts[len(parts)-1])
+		slog.LogAttrs(context.Background(), slog.LevelDebug, "Git file change", slog.String("change", parts[0]), slog.String("path", dstPath))
 
 		if !filter.IsPathAllowed(dstPath) {
 			slog.LogAttrs(context.Background(), slog.LevelDebug, "Skipping file due to include/exclude rules", slog.String("path", dstPath))
@@ -258,83 +268,39 @@ func Changes(ctx context.Context, cmd CommandRunner, baseBranch string, filter P
 				},
 			},
 		}
-
-		prev := getChangeByPath(changes, srcPath)
-		slog.LogAttrs(
-			context.Background(), slog.LevelDebug, "Looking for previous changes",
-			slog.String("src", srcPath),
-			slog.String("dst", dstPath),
-			slog.String("commit", commit),
-		)
-		if prev != nil {
-			slog.LogAttrs(
-				context.Background(), slog.LevelDebug, "Found a previous change",
-				slog.Any("commits", prev.Commits),
-				slog.String("status", string(prev.Status)),
-				slog.String("path", prev.Path.Before.Name),
-				slog.String("target", prev.Path.Before.SymlinkTarget),
-				slog.Any("type", prev.Path.Before.Type),
-			)
-			change.Commits = append(change.Commits, prev.Commits...)
-			change.Path.Before = prev.Path.Before
-			// Remove any changes for "BEFORE" path we might already have
-			changes = changesWithout(changes, srcPath)
-		} else {
-			slog.LogAttrs(context.Background(), slog.LevelDebug, "No previous change found")
-			switch change.Status {
-			case FileAdded, FileCopied:
-				change.Path.Before.Name = ""
-				change.Path.Before.SymlinkTarget = ""
-				// If a path changed type we'll see A but we can still query for old type.
-				change.Path.Before.Type = getTypeForPath(ctx, cmd, commit+"^", srcPath)
-				if change.Path.Before.Type != Missing {
-					// If it was a type change then
-					change.Path.Before.Name = srcPath
-					change.Path.Before.Type = getTypeForPath(ctx, cmd, commit+"^", srcPath)
-				}
-			case FileDeleted, FileRenamed, FileModified, FileTypeChanged:
-				change.Path.Before.Name = srcPath
-				change.Path.Before.Type = getTypeForPath(ctx, cmd, commit+"^", srcPath)
-				change.Path.Before.SymlinkTarget = resolveSymlinkTarget(ctx, cmd, commit+"^", srcPath, change.Path.Before.Type)
-			}
+		// An added path can exist in base as a different type, like a directory.
+		if (status != FileAdded && status != FileCopied) || getTypeForPath(ctx, cmd, base, srcPath) != Missing {
+			change.Path.Before.Name = srcPath
 		}
-
-		change.Commits = append(change.Commits, commit)
-
 		changes = append(changes, change)
 	}
 
-	slog.LogAttrs(context.Background(), slog.LevelDebug, "Parsed git log", slog.Int("changes", len(changes)))
+	slog.LogAttrs(context.Background(), slog.LevelDebug, "Parsed git diff", slog.Int("changes", len(changes)))
 
 	for _, change := range changes {
 		slog.LogAttrs(
 			context.Background(), slog.LevelDebug,
 			"File change",
-			slog.Any("commits", change.Commits),
 			slog.String("status", string(change.Status)),
 			slog.String("before", change.Path.Before.Name),
 			slog.String("after", change.Path.After.Name),
 		)
 
 		if change.Path.Before.Name != "" {
-			change.Path.Before.Type = getTypeForPath(ctx, cmd, change.Commits[0]+"^", change.Path.Before.Name)
-			change.Path.Before.SymlinkTarget = resolveSymlinkTarget(ctx, cmd, change.Commits[0]+"^", change.Path.Before.Name, change.Path.Before.Type)
-			change.Body.Before = getContentAtCommit(ctx, cmd, change.Commits[0]+"^", change.Path.Before.EffectivePath())
+			change.Path.Before.Type = getTypeForPath(ctx, cmd, base, change.Path.Before.Name)
+			change.Path.Before.SymlinkTarget = resolveSymlinkTarget(ctx, cmd, base, change.Path.Before.Name, change.Path.Before.Type)
+			change.Body.Before = getContentAtCommit(ctx, cmd, base, change.Path.Before.EffectivePath())
 		}
 
-		// The after state must be read from HEAD, not from the last commit that
-		// touched the file, because a merge commit can restore the file after
-		// the last commit visible to git log.
 		if change.Path.After.Name != "" {
-			change.Path.After.Type = getTypeForPath(ctx, cmd, HeadRef, change.Path.After.Name)
-			change.Path.After.SymlinkTarget = resolveSymlinkTarget(ctx, cmd, HeadRef, change.Path.After.Name, change.Path.After.Type)
-			change.Body.After = getContentAtCommit(ctx, cmd, HeadRef, change.Path.After.EffectivePath())
+			change.Path.After.Type = getTypeForPath(ctx, cmd, head, change.Path.After.Name)
+			change.Path.After.SymlinkTarget = resolveSymlinkTarget(ctx, cmd, head, change.Path.After.Name, change.Path.After.Type)
+			change.Body.After = getContentAtCommit(ctx, cmd, head, change.Path.After.EffectivePath())
 		}
 
 		slog.LogAttrs(
 			context.Background(), slog.LevelDebug,
 			"Updated file change",
-			slog.Any("commits", change.Commits),
 			slog.String("before.path", change.Path.Before.Name),
 			slog.String("before.target", change.Path.Before.SymlinkTarget),
 			slog.Any("before.type", change.Path.Before.Type),
@@ -351,7 +317,7 @@ func Changes(ctx context.Context, cmd CommandRunner, baseBranch string, filter P
 			slog.LogAttrs(context.Background(), slog.LevelDebug, "Path was turned into a symlink", slog.String("path", change.Path.After.Name))
 			change.Body.Lines = MakeLineRangeFromTo(1, CountLines(change.Body.After), LinesAfter)
 		case change.Path.Before.Type != Missing && change.Path.After.Type != Missing && change.Path.After.Type != Symlink:
-			change.Body.Lines, err = getModifiedLines(ctx, cmd, change.Commits, change.Path.Before.EffectivePath(), change.Path.After.EffectivePath())
+			change.Body.Lines, err = getModifiedLines(ctx, cmd, base, head, change.Path.Before.EffectivePath(), change.Path.After.EffectivePath())
 			if err != nil {
 				return nil, fmt.Errorf("failed to run git diff for %s: %w", change.Path.After.EffectivePath(), err)
 			}
@@ -385,30 +351,14 @@ func Changes(ctx context.Context, cmd CommandRunner, baseBranch string, filter P
 	return changes, nil
 }
 
-func changesWithout(changes []*FileChange, fpath string) []*FileChange {
-	return slices.DeleteFunc(changes, func(e *FileChange) bool {
-		return e.Path.After.Name == fpath
-	})
-}
-
-func getChangeByPath(changes []*FileChange, fpath string) *FileChange {
-	for _, c := range changes {
-		if c.Path.After.Name == fpath {
-			return c
-		}
-	}
-	return nil
-}
-
-func getModifiedLines(ctx context.Context, cmd CommandRunner, commits []string, beforePath, afterPath string) (LineNumbers, error) {
+func getModifiedLines(ctx context.Context, cmd CommandRunner, base, head, beforePath, afterPath string) (LineNumbers, error) {
 	slog.LogAttrs(
 		context.Background(), slog.LevelDebug, "Getting list of modified lines",
-		slog.Any("commits", commits),
 		slog.String("beforePath", beforePath),
 		slog.String("afterPath", afterPath),
 	)
 
-	output, err := cmd(ctx, "diff", "-M", commits[0]+"^.."+HeadRef, "--", beforePath, afterPath)
+	output, err := cmd(ctx, "diff-tree", "-p", "-M", base, head, "--", beforePath, afterPath)
 	if err != nil {
 		return nil, fmt.Errorf("git diff for %s: %w", afterPath, err)
 	}
@@ -417,7 +367,6 @@ func getModifiedLines(ctx context.Context, cmd CommandRunner, commits []string, 
 
 	slog.LogAttrs(
 		context.Background(), slog.LevelDebug, "List of modified lines",
-		slog.Any("commits", commits),
 		slog.String("beforePath", beforePath),
 		slog.String("afterPath", afterPath),
 		slog.Any("lines", lineNumbers),
@@ -485,8 +434,8 @@ func parseDiff(diff []byte, targetPath string) LineNumbers {
 			inHunk = false
 		case !inHunk && strings.HasPrefix(line, "+++ "):
 			// +++ b/path or +++ /dev/null
-			p := strings.TrimPrefix(line, "+++ b/")
-			inTargetBlock = p == targetPath
+			p := unquotePath(strings.TrimPrefix(line, "+++ "))
+			inTargetBlock = strings.TrimPrefix(p, "b/") == targetPath
 		case !inTargetBlock:
 			continue
 		case strings.HasPrefix(line, "@@"):
@@ -546,6 +495,14 @@ func parseDiff(diff []byte, targetPath string) LineNumbers {
 	return lineNumbers
 }
 
+// unquotePath decodes a path that git printed as a C-style quoted string.
+func unquotePath(p string) string {
+	if strings.HasPrefix(p, `"`) {
+		p, _ = strconv.Unquote(p)
+	}
+	return p
+}
+
 func getTypeForPath(ctx context.Context, cmd CommandRunner, commit, fpath string) PathType {
 	args := []string{"ls-tree", commit, fpath}
 	out, err := cmd(ctx, args...)
@@ -567,7 +524,7 @@ func getTypeForPath(ctx context.Context, cmd CommandRunner, commit, fpath string
 		if len(parts) != 2 {
 			continue
 		}
-		objpath := parts[1]
+		objpath := unquotePath(parts[1])
 		slog.LogAttrs(
 			context.Background(), slog.LevelDebug, "ls-tree line",
 			slog.String("mode", objmode),
