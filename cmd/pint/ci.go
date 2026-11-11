@@ -83,7 +83,7 @@ func actionCI(ctx context.Context, c *cli.Command) error {
 	if c.String(baseBranchFlag) != "" {
 		targetBranch = c.String(baseBranchFlag)
 	}
-	gitInfo, err := git.Describe(ctx, git.RunGit)
+	gitInfo, err := git.Describe(ctx, git.RunGit, targetBranch)
 	if err != nil {
 		return fmt.Errorf("failed to get git info: %w", err)
 	}

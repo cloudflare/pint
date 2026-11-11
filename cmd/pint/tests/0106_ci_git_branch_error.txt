@@ -9,5 +9,5 @@ env GIT_DISCOVERY_ACROSS_FILESYSTEM=1
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=DEBUG msg="Running git command" args=["rev-parse","--verify","HEAD"]
+level=DEBUG msg="Running git command" args=["rev-list","--parents","-n","1","HEAD"]
 level=ERROR msg="Execution completed with error(s)" err="failed to get git info: fatal: not a git repository (or any of the parent directories): .git\n"

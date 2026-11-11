@@ -64,21 +64,53 @@ func TestDescribe(t *testing.T) {
 			},
 		},
 		{
-			// Both commands succeed with empty output.
-			name: "both commands succeed with empty output",
+			name: "empty output",
 			mock: func(_ context.Context, _ ...string) ([]byte, error) {
 				return []byte(""), nil
 			},
+			err: "no commit found for HEAD",
+		},
+		{
+			// HEAD merges the branch (c2) into main (c1), so c2 is the branch head.
+			name: "merge into base branch",
+			mock: func(_ context.Context, args ...string) ([]byte, error) {
+				switch strings.Join(args, " ") {
+				case "rev-list --parents -n 1 HEAD":
+					return []byte("m1 c1 c2\n"), nil
+				case "merge-base --is-ancestor c1 main":
+					return nil, nil
+				case "rev-parse --abbrev-ref HEAD":
+					return []byte("HEAD\n"), nil
+				}
+				return nil, errors.New("unexpected command")
+			},
 			expected: git.Info{
-				HeadCommit:    "",
-				CurrentBranch: "",
+				HeadCommit:    "c2",
+				CurrentBranch: "HEAD",
+			},
+		},
+		{
+			// HEAD merges main (c2) into the branch (c1), so HEAD is the branch head.
+			name: "merge from base branch",
+			mock: func(_ context.Context, args ...string) ([]byte, error) {
+				switch strings.Join(args, " ") {
+				case "rev-list --parents -n 1 HEAD":
+					return []byte("m1 c1 c2\n"), nil
+				case "rev-parse --abbrev-ref HEAD":
+					return []byte("feature\n"), nil
+				}
+				return nil, errors.New("unexpected command")
+			},
+			expected: git.Info{
+				HeadCommit:    "m1",
+				CurrentBranch: "feature",
 			},
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			info, err := git.Describe(t.Context(), tc.mock)
+			info, err := git.Describe(t.Context(), tc.mock, "main")
 			if tc.err != "" {
 				require.EqualError(t, err, tc.err)
 			} else {
