@@ -9,6 +9,10 @@
   modifiers stable, so they no longer require
   `--enable-feature=promql-extended-range-selectors`.
 
+### Fixed
+
+- Improved `pint ci` detection of git changes.
+
 ## v0.89.4
 
 ### Fixed
