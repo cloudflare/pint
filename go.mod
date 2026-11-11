@@ -17,7 +17,7 @@ require (
 	github.com/rogpeppe/go-internal v1.16.0
 	github.com/stretchr/testify v1.12.1
 	github.com/urfave/cli/v3 v3.14.0
-	github.com/zclconf/go-cty v1.19.0
+	github.com/zclconf/go-cty v1.20.0
 	gitlab.com/gitlab-org/api/client-go/v3 v3.43.0
 	go.nhat.io/httpmock v0.12.1
 	go.uber.org/ratelimit v0.3.1
