@@ -14,19 +14,21 @@
   problem:
     reporter: promql/aggregate
     summary: required label is being removed via aggregation
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`job` label is required and should be preserved when aggregating all rules.'
-          firstcolumn: 19
-          lastcolumn: 21
-          kind: 0
-        - message: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
-          firstcolumn: 19
-          lastcolumn: 21
-          kind: 1
+    - message: '`job` label is required and should be preserved when aggregating all
+        rules.'
+      firstcolumn: 19
+      lastcolumn: 21
+      kind: 0
+    - message: Query is using aggregation with `without(job)`, all labels included
+        inside `without(...)` will be removed from the results.
+      firstcolumn: 19
+      lastcolumn: 21
+      kind: 1
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -45,19 +47,21 @@
   problem:
     reporter: promql/aggregate
     summary: required label is being removed via aggregation
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`job` label is required and should be preserved when aggregating all rules.'
-          firstcolumn: 11
-          lastcolumn: 12
-          kind: 0
-        - message: Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
-          firstcolumn: 11
-          lastcolumn: 12
-          kind: 1
+    - message: '`job` label is required and should be preserved when aggregating all
+        rules.'
+      firstcolumn: 11
+      lastcolumn: 12
+      kind: 0
+    - message: Query is using aggregation with `by(instance)`, only labels included
+        inside `by(...)` will be present on the results.
+      firstcolumn: 11
+      lastcolumn: 12
+      kind: 1
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -76,19 +80,21 @@
   problem:
     reporter: promql/aggregate
     summary: required label is being removed via aggregation
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`job` label is required and should be preserved when aggregating all rules.'
-          firstcolumn: 13
-          lastcolumn: 15
-          kind: 0
-        - message: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
-          firstcolumn: 13
-          lastcolumn: 15
-          kind: 1
+    - message: '`job` label is required and should be preserved when aggregating all
+        rules.'
+      firstcolumn: 13
+      lastcolumn: 15
+      kind: 0
+    - message: Query is using aggregation with `without(job)`, all labels included
+        inside `without(...)` will be removed from the results.
+      firstcolumn: 13
+      lastcolumn: 15
+      kind: 1
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -107,19 +113,21 @@
   problem:
     reporter: promql/aggregate
     summary: required label is being removed via aggregation
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`job` label is required and should be preserved when aggregating all rules.'
-          firstcolumn: 5
-          lastcolumn: 6
-          kind: 0
-        - message: Query is using aggregation with `by(type)`, only labels included inside `by(...)` will be present on the results.
-          firstcolumn: 5
-          lastcolumn: 6
-          kind: 1
+    - message: '`job` label is required and should be preserved when aggregating all
+        rules.'
+      firstcolumn: 5
+      lastcolumn: 6
+      kind: 0
+    - message: Query is using aggregation with `by(type)`, only labels included inside
+        `by(...)` will be present on the results.
+      firstcolumn: 5
+      lastcolumn: 6
+      kind: 1
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -170,19 +178,21 @@
   problem:
     reporter: promql/aggregate
     summary: required label is being removed via aggregation
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`job` label is required and should be preserved when aggregating all rules.'
-          firstcolumn: 61
-          lastcolumn: 63
-          kind: 0
-        - message: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
-          firstcolumn: 61
-          lastcolumn: 63
-          kind: 1
+    - message: '`job` label is required and should be preserved when aggregating all
+        rules.'
+      firstcolumn: 61
+      lastcolumn: 63
+      kind: 0
+    - message: Query is using aggregation with `without(job)`, all labels included
+        inside `without(...)` will be removed from the results.
+      firstcolumn: 61
+      lastcolumn: 63
+      kind: 1
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -203,19 +213,21 @@
   problem:
     reporter: promql/aggregate
     summary: required label is being removed via aggregation
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`job` label is required and should be preserved when aggregating all rules.'
-          firstcolumn: 48
-          lastcolumn: 49
-          kind: 0
-        - message: Query is using aggregation with `by(type)`, only labels included inside `by(...)` will be present on the results.
-          firstcolumn: 48
-          lastcolumn: 49
-          kind: 1
+    - message: '`job` label is required and should be preserved when aggregating all
+        rules.'
+      firstcolumn: 48
+      lastcolumn: 49
+      kind: 0
+    - message: Query is using aggregation with `by(type)`, only labels included inside
+        `by(...)` will be present on the results.
+      firstcolumn: 48
+      lastcolumn: 49
+      kind: 1
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -249,17 +261,19 @@
     summary: required label is being removed via aggregation
     details: 'Rule comment: some text'
     diagnostics:
-        - message: '`job` label is required and should be preserved when aggregating all rules.'
-          firstcolumn: 28
-          lastcolumn: 30
-          kind: 0
-        - message: Query is using aggregation with `without(instance, job)`, all labels included inside `without(...)` will be removed from the results.
-          firstcolumn: 28
-          lastcolumn: 30
-          kind: 1
+    - message: '`job` label is required and should be preserved when aggregating all
+        rules.'
+      firstcolumn: 28
+      lastcolumn: 30
+      kind: 0
+    - message: Query is using aggregation with `without(instance, job)`, all labels
+        included inside `without(...)` will be removed from the results.
+      firstcolumn: 28
+      lastcolumn: 30
+      kind: 1
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -278,19 +292,21 @@
   problem:
     reporter: promql/aggregate
     summary: required label is being removed via aggregation
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`job` label is required and should be preserved when aggregating all rules.'
-          firstcolumn: 10
-          lastcolumn: 11
-          kind: 0
-        - message: Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
-          firstcolumn: 10
-          lastcolumn: 11
-          kind: 1
+    - message: '`job` label is required and should be preserved when aggregating all
+        rules.'
+      firstcolumn: 10
+      lastcolumn: 11
+      kind: 0
+    - message: Query is using aggregation with `by(instance)`, only labels included
+        inside `by(...)` will be present on the results.
+      firstcolumn: 10
+      lastcolumn: 11
+      kind: 1
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -308,19 +324,20 @@
   problem:
     reporter: promql/aggregate
     summary: required label is being removed via aggregation
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`job` label is required and should be preserved when aggregating all rules.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
-        - message: Query is using aggregation that removes all labels.
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 1
+    - message: '`job` label is required and should be preserved when aggregating all
+        rules.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
+    - message: Query is using aggregation that removes all labels.
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 1
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -338,19 +355,20 @@
   problem:
     reporter: promql/aggregate
     summary: required label is being removed via aggregation
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`job` label is required and should be preserved when aggregating all rules.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
-        - message: Query is using aggregation that removes all labels.
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 1
+    - message: '`job` label is required and should be preserved when aggregating all
+        rules.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
+    - message: Query is using aggregation that removes all labels.
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 1
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -377,19 +395,21 @@
   problem:
     reporter: promql/aggregate
     summary: required label is being removed via aggregation
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`job` label is required and should be preserved when aggregating all rules.'
-          firstcolumn: 28
-          lastcolumn: 30
-          kind: 0
-        - message: Query is using aggregation with `without(instance, job)`, all labels included inside `without(...)` will be removed from the results.
-          firstcolumn: 28
-          lastcolumn: 30
-          kind: 1
+    - message: '`job` label is required and should be preserved when aggregating all
+        rules.'
+      firstcolumn: 28
+      lastcolumn: 30
+      kind: 0
+    - message: Query is using aggregation with `without(instance, job)`, all labels
+        included inside `without(...)` will be removed from the results.
+      firstcolumn: 28
+      lastcolumn: 30
+      kind: 1
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -408,19 +428,21 @@
   problem:
     reporter: promql/aggregate
     summary: required label is being removed via aggregation
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`job` label is required and should be preserved when aggregating all rules.'
-          firstcolumn: 10
-          lastcolumn: 11
-          kind: 0
-        - message: Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
-          firstcolumn: 10
-          lastcolumn: 11
-          kind: 1
+    - message: '`job` label is required and should be preserved when aggregating all
+        rules.'
+      firstcolumn: 10
+      lastcolumn: 11
+      kind: 0
+    - message: Query is using aggregation with `by(instance)`, only labels included
+        inside `by(...)` will be present on the results.
+      firstcolumn: 10
+      lastcolumn: 11
+      kind: 1
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -437,15 +459,15 @@
   problem:
     reporter: promql/aggregate
     summary: label must be removed in aggregations
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`job` label should be removed when aggregating all rules.'
-          firstcolumn: 10
-          lastcolumn: 16
-          kind: 0
+    - message: '`job` label should be removed when aggregating all rules.'
+      firstcolumn: 10
+      lastcolumn: 16
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -462,15 +484,15 @@
   problem:
     reporter: promql/aggregate
     summary: label must be removed in aggregations
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`job` label should be removed when aggregating all rules.'
-          firstcolumn: 13
-          lastcolumn: 15
-          kind: 0
+    - message: '`job` label should be removed when aggregating all rules.'
+      firstcolumn: 13
+      lastcolumn: 15
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -507,15 +529,15 @@
   problem:
     reporter: promql/aggregate
     summary: label must be removed in aggregations
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`job` label should be removed when aggregating all rules.'
-          firstcolumn: 10
-          lastcolumn: 18
-          kind: 0
+    - message: '`job` label should be removed when aggregating all rules.'
+      firstcolumn: 10
+      lastcolumn: 18
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -552,19 +574,21 @@
   problem:
     reporter: promql/aggregate
     summary: required label is being removed via aggregation
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`job` label is required and should be preserved when aggregating all rules.'
-          firstcolumn: 36
-          lastcolumn: 38
-          kind: 0
-        - message: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
-          firstcolumn: 36
-          lastcolumn: 38
-          kind: 1
+    - message: '`job` label is required and should be preserved when aggregating all
+        rules.'
+      firstcolumn: 36
+      lastcolumn: 38
+      kind: 0
+    - message: Query is using aggregation with `without(job)`, all labels included
+        inside `without(...)` will be removed from the results.
+      firstcolumn: 36
+      lastcolumn: 38
+      kind: 1
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -586,19 +610,21 @@
   problem:
     reporter: promql/aggregate
     summary: required label is being removed via aggregation
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`job` label is required and should be preserved when aggregating all rules.'
-          firstcolumn: 40
-          lastcolumn: 42
-          kind: 0
-        - message: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
-          firstcolumn: 40
-          lastcolumn: 42
-          kind: 1
+    - message: '`job` label is required and should be preserved when aggregating all
+        rules.'
+      firstcolumn: 40
+      lastcolumn: 42
+      kind: 0
+    - message: Query is using aggregation with `without(job)`, all labels included
+        inside `without(...)` will be removed from the results.
+      firstcolumn: 40
+      lastcolumn: 42
+      kind: 1
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -617,19 +643,21 @@
   problem:
     reporter: promql/aggregate
     summary: required label is being removed via aggregation
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`job` label is required and should be preserved when aggregating all rules.'
-          firstcolumn: 14
-          lastcolumn: 15
-          kind: 0
-        - message: Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
-          firstcolumn: 14
-          lastcolumn: 15
-          kind: 1
+    - message: '`job` label is required and should be preserved when aggregating all
+        rules.'
+      firstcolumn: 14
+      lastcolumn: 15
+      kind: 0
+    - message: Query is using aggregation with `by(instance)`, only labels included
+        inside `by(...)` will be present on the results.
+      firstcolumn: 14
+      lastcolumn: 15
+      kind: 1
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -646,15 +674,15 @@
   problem:
     reporter: promql/aggregate
     summary: label must be removed in aggregations
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`instance` label should be removed when aggregating all rules.'
-          firstcolumn: 17
-          lastcolumn: 24
-          kind: 0
+    - message: '`instance` label should be removed when aggregating all rules.'
+      firstcolumn: 17
+      lastcolumn: 24
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -690,19 +718,21 @@
   problem:
     reporter: promql/aggregate
     summary: required label is being removed via aggregation
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`job` label is required and should be preserved when aggregating all rules.'
-          firstcolumn: 22
-          lastcolumn: 24
-          kind: 0
-        - message: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
-          firstcolumn: 22
-          lastcolumn: 24
-          kind: 1
+    - message: '`job` label is required and should be preserved when aggregating all
+        rules.'
+      firstcolumn: 22
+      lastcolumn: 24
+      kind: 0
+    - message: Query is using aggregation with `without(job)`, all labels included
+        inside `without(...)` will be removed from the results.
+      firstcolumn: 22
+      lastcolumn: 24
+      kind: 1
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -721,19 +751,21 @@
   problem:
     reporter: promql/aggregate
     summary: required label is being removed via aggregation
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`job` label is required and should be preserved when aggregating all rules.'
-          firstcolumn: 14
-          lastcolumn: 15
-          kind: 0
-        - message: Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
-          firstcolumn: 14
-          lastcolumn: 15
-          kind: 1
+    - message: '`job` label is required and should be preserved when aggregating all
+        rules.'
+      firstcolumn: 14
+      lastcolumn: 15
+      kind: 0
+    - message: Query is using aggregation with `by(instance)`, only labels included
+        inside `by(...)` will be present on the results.
+      firstcolumn: 14
+      lastcolumn: 15
+      kind: 1
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -753,19 +785,21 @@
   problem:
     reporter: promql/aggregate
     summary: required label is being removed via aggregation
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`job` label is required and should be preserved when aggregating all rules.'
-          firstcolumn: 18
-          lastcolumn: 20
-          kind: 0
-        - message: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
-          firstcolumn: 18
-          lastcolumn: 20
-          kind: 1
+    - message: '`job` label is required and should be preserved when aggregating all
+        rules.'
+      firstcolumn: 18
+      lastcolumn: 20
+      kind: 0
+    - message: Query is using aggregation with `without(job)`, all labels included
+        inside `without(...)` will be removed from the results.
+      firstcolumn: 18
+      lastcolumn: 20
+      kind: 1
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -786,19 +820,21 @@
   problem:
     reporter: promql/aggregate
     summary: required label is being removed via aggregation
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`job` label is required and should be preserved when aggregating all rules.'
-          firstcolumn: 22
-          lastcolumn: 24
-          kind: 0
-        - message: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
-          firstcolumn: 22
-          lastcolumn: 24
-          kind: 1
+    - message: '`job` label is required and should be preserved when aggregating all
+        rules.'
+      firstcolumn: 22
+      lastcolumn: 24
+      kind: 0
+    - message: Query is using aggregation with `without(job)`, all labels included
+        inside `without(...)` will be removed from the results.
+      firstcolumn: 22
+      lastcolumn: 24
+      kind: 1
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -815,15 +851,15 @@
   problem:
     reporter: promql/aggregate
     summary: label must be removed in aggregations
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`instance` label should be removed when aggregating all rules.'
-          firstcolumn: 14
-          lastcolumn: 20
-          kind: 0
+    - message: '`instance` label should be removed when aggregating all rules.'
+      firstcolumn: 14
+      lastcolumn: 20
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 

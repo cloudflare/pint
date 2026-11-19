@@ -4,11 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"regexp"
-	"strconv"
 	"strings"
 
-	"go.yaml.in/yaml/v3"
+	"go.yaml.in/yaml/v4"
 
 	"github.com/prometheus/common/model"
 
@@ -65,7 +63,6 @@ type Parser struct {
 
 func (p Parser) Parse(src io.Reader) (f File) {
 	cr := newContentReader(src)
-	dec := yaml.NewDecoder(cr)
 
 	defer func() {
 		f.Diagnostics = cr.diagnostics
@@ -75,11 +72,14 @@ func (p Parser) Parse(src io.Reader) (f File) {
 
 	f.IsRelaxed = !p.opts.IsStrict
 
+	// NewLoader only fails on invalid options and none are passed.
+	loader, _ := yaml.NewLoader(cr)
+
 	var index int
 	var g []Group
 	for {
 		var doc yaml.Node
-		decodeErr := dec.Decode(&doc)
+		decodeErr := loader.Load(&doc)
 		if errors.Is(decodeErr, io.EOF) {
 			break
 		}
@@ -156,7 +156,7 @@ func (p *Parser) parseNode(node, parent *yaml.Node, group *Group, offsetLine, of
 			//     rules: ...
 			// Then we need to get the offset of `groups` inside the FILE, not inside the YAML node value.
 			// Right now we read the line where it's in the file and count leading spaces.
-			if err := yaml.Unmarshal([]byte(node.Value), &n); err == nil {
+			if err := yaml.Load([]byte(node.Value), &n, yaml.WithSingleDocument()); err == nil {
 				groups = append(
 					groups,
 					p.parseNode(
@@ -656,24 +656,44 @@ func rangeFromYamlMaps(m []yamlMap) (lr diags.LineRange) {
 	return lr
 }
 
-var (
-	yamlErrRe          = regexp.MustCompile("^yaml: line (.+): (.+)")
-	yamlUnmarshalErrRe = regexp.MustCompile("^yaml: unmarshal errors:\n  line (.+): (.+)")
-)
-
+// tryDecodingYamlError converts a yaml.Loader error into a ParseError.
+// Every error returned by yaml.Loader.Load is a *yaml.LoadError.
 func tryDecodingYamlError(err error) ParseError {
-	for _, re := range []*regexp.Regexp{yamlErrRe, yamlUnmarshalErrRe} {
-		parts := re.FindStringSubmatch(err.Error())
-		if len(parts) > 2 {
-			if line, err2 := strconv.Atoi(parts[1]); line > 0 && err2 == nil {
-				return ParseError{
-					Line: line,
-					Err:  errors.New(parts[2]),
-				}
-			}
-		}
+	le, _ := errors.AsType[*yaml.LoadError](err)
+	pe := ParseError{
+		Err:     errors.New("invalid syntax"),
+		Details: "",
+		Diagnostics: []diags.Diagnostic{
+			markDiagnostic(le.Message, le.Mark, diags.Issue),
+		},
+		Line: max(le.Mark.Line, 1),
 	}
-	return ParseError{Line: 1, Err: err}
+	if le.ContextMsg != "" && le.ContextMark.Line > 0 {
+		pe.Diagnostics = append(
+			pe.Diagnostics,
+			markDiagnostic(le.ContextMsg, le.ContextMark, diags.Context),
+		)
+	}
+	return pe
+}
+
+// markDiagnostic points at a single character in the file.
+// FirstColumn and LastColumn are indexes into Pos, not file columns.
+func markDiagnostic(msg string, mark yaml.Mark, kind diags.Kind) diags.Diagnostic {
+	return diags.Diagnostic{
+		Message: msg,
+		Pos: diags.PositionRanges{
+			{
+				Line:        max(mark.Line, 1),
+				FirstColumn: max(mark.Column, 1),
+				LastColumn:  max(mark.Column, 1),
+			},
+		},
+		Expr:        nil,
+		FirstColumn: 1,
+		LastColumn:  1,
+		Kind:        kind,
+	}
 }
 
 func countLeadingSpace(line string) (i int) {

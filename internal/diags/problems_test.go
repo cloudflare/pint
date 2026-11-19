@@ -197,6 +197,37 @@ expr: |
 			},
 		},
 		{
+			name:  "diagnostic past the end of a line",
+			input: "expr: foo",
+			diags: []Diagnostic{
+				{
+					Message:     "unexpected end",
+					Pos:         PositionRanges{{Line: 1, FirstColumn: 10, LastColumn: 10}},
+					FirstColumn: 1,
+					LastColumn:  1,
+				},
+			},
+		},
+		{
+			name:  "diagnostic on an empty line shows the line above",
+			input: "groups: [\n",
+			diags: []Diagnostic{
+				{
+					Message:     "did not find expected node content",
+					Pos:         PositionRanges{{Line: 2, FirstColumn: 1, LastColumn: 1}},
+					FirstColumn: 1,
+					LastColumn:  1,
+				},
+				{
+					Message:     "while parsing a flow node",
+					Pos:         PositionRanges{{Line: 2, FirstColumn: 1, LastColumn: 1}},
+					FirstColumn: 1,
+					LastColumn:  1,
+					Kind:        Context,
+				},
+			},
+		},
+		{
 			name: "non-overlapping subexpression is replaced with ellipsis",
 			input: `
 expr: sum by (instance) (rate(http_requests_total{job="api",status=~"5.."}[5m])) / sum by (instance) (rate(up{job="api"}[5m])) > 0.01`,

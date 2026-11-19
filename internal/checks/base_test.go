@@ -26,7 +26,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/require"
-	"go.yaml.in/yaml/v3"
+	"go.yaml.in/yaml/v4"
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/diags"
@@ -236,7 +236,7 @@ func runTests(t *testing.T, testCases []checkTest) {
 					})
 				}
 
-				d, err := yaml.Marshal(snapshots)
+				d, err := yaml.Dump(snapshots)
 				var snapshot string
 				if tc.snapshot != nil {
 					snapshot = tc.snapshot(string(d))

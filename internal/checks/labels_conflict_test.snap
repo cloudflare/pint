@@ -14,15 +14,18 @@
   problem:
     reporter: labels/conflict
     summary: conflicting labels
-    details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus runtime configuration.'
+    details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus
+      runtime configuration.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com external_labels already has foo="bob" label set, please choose a different name for this label to avoid any conflicts.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com external_labels
+        already has foo="bob" label set, please choose a different name for this label
+        to avoid any conflicts.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 1
     anchor: 0
 
@@ -44,15 +47,18 @@
   problem:
     reporter: labels/conflict
     summary: conflicting labels
-    details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus runtime configuration.'
+    details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus
+      runtime configuration.'
     diagnostics:
-        - message: This label is redundant. `prom` Prometheus server at https://simple.example.com external_labels already has foo="bar" label set and it will be automatically added to all alerts, there's no need to set it manually.
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: This label is redundant. `prom` Prometheus server at https://simple.example.com
+        external_labels already has foo="bar" label set and it will be automatically
+        added to all alerts, there's no need to set it manually.
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 1
     anchor: 0
 
@@ -73,15 +79,18 @@
   problem:
     reporter: labels/conflict
     summary: conflicting labels
-    details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus runtime configuration.'
+    details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus
+      runtime configuration.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com external_labels already has foo="bob" label set, please choose a different name for this label to avoid any conflicts.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com external_labels
+        already has foo="bob" label set, please choose a different name for this label
+        to avoid any conflicts.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 1
     anchor: 0
 
@@ -102,15 +111,16 @@
   problem:
     reporter: labels/conflict
     summary: unable to run checks
-    details: ""
+    details: ''
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 error: `connection refused`.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: 'Couldn''t run some online checks due to `prom` Prometheus server at
+        http://127.0.0.1:1111 error: `connection refused`.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 4
+      first: 1
+      last: 4
     severity: 1
     anchor: 0
 

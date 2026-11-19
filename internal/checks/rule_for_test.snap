@@ -31,15 +31,16 @@
   problem:
     reporter: rule/for
     summary: duration required
-    details: ""
+    details: ''
     diagnostics:
-        - message: This alert rule must have a `for` field with a minimum duration of 5m.
-          firstcolumn: 1
-          lastcolumn: 2
-          kind: 0
+    - message: This alert rule must have a `for` field with a minimum duration of
+        5m.
+      firstcolumn: 1
+      lastcolumn: 2
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -59,13 +60,14 @@
     summary: duration too long
     details: 'Rule comment: some text'
     diagnostics:
-        - message: This alert rule must have a `for` field with a maximum duration of 2m.
-          firstcolumn: 1
-          lastcolumn: 2
-          kind: 0
+    - message: This alert rule must have a `for` field with a maximum duration of
+        2m.
+      firstcolumn: 1
+      lastcolumn: 2
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -90,15 +92,16 @@
   problem:
     reporter: rule/for
     summary: duration required
-    details: ""
+    details: ''
     diagnostics:
-        - message: This alert rule must have a `keep_firing_for` field with a minimum duration of 5m.
-          firstcolumn: 1
-          lastcolumn: 2
-          kind: 0
+    - message: This alert rule must have a `keep_firing_for` field with a minimum
+        duration of 5m.
+      firstcolumn: 1
+      lastcolumn: 2
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -118,15 +121,16 @@
   problem:
     reporter: rule/for
     summary: duration too long
-    details: ""
+    details: ''
     diagnostics:
-        - message: This alert rule must have a `keep_firing_for` field with a maximum duration of 10m.
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: This alert rule must have a `keep_firing_for` field with a maximum
+        duration of 10m.
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -148,15 +152,16 @@
   problem:
     reporter: rule/for
     summary: duration required
-    details: ""
+    details: ''
     diagnostics:
-        - message: This alert rule must have a `for` field with a minimum duration of 5m.
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: This alert rule must have a `for` field with a minimum duration of
+        5m.
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 1
+      first: 1
+      last: 1
     severity: 1
     anchor: 0
 

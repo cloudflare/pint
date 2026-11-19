@@ -2,89 +2,89 @@
 [TestGetChecksForRule/absent_with_required_labels - 1]
 title: absent with required labels
 config: |-
-    {
-      "ci": {
-        "baseBranch": "master",
-        "maxCommits": 20
-      },
-      "parser": {},
-      "repository": {},
-      "checks": {
-        "enabled": [
-          "alerts/absent",
-          "alerts/annotation",
-          "alerts/comparison",
-          "alerts/count",
-          "alerts/external_labels",
-          "alerts/for",
-          "alerts/template",
-          "labels/conflict",
-          "promql/aggregate",
-          "promql/counter",
-          "promql/features",
-          "promql/fragile",
-          "group/interval",
-          "promql/impossible",
-          "promql/nan",
-          "promql/offset",
-          "promql/range_query",
-          "promql/rate",
-          "promql/regexp",
-          "promql/selector",
-          "promql/series",
-          "promql/syntax",
-          "promql/vector_matching",
-          "query/cost",
-          "rule/dependency",
-          "rule/duplicate",
-          "rule/for",
-          "rule/label",
-          "rule/link",
-          "rule/name",
-          "rule/reject",
-          "rule/report"
-        ]
-      },
-      "owners": {},
-      "rules": [
-        {
-          "call": [
-            {
-              "key": "absent",
-              "selector": [
-                {
-                  "key": ".+_total",
-                  "comment": "You must filter by job and namespace.",
-                  "severity": "bug",
-                  "requiredLabels": [
-                    "job",
-                    "namespace"
-                  ]
-                }
-              ]
-            }
-          ]
-        }
+  {
+    "ci": {
+      "baseBranch": "master",
+      "maxCommits": 20
+    },
+    "parser": {},
+    "repository": {},
+    "checks": {
+      "enabled": [
+        "alerts/absent",
+        "alerts/annotation",
+        "alerts/comparison",
+        "alerts/count",
+        "alerts/external_labels",
+        "alerts/for",
+        "alerts/template",
+        "labels/conflict",
+        "promql/aggregate",
+        "promql/counter",
+        "promql/features",
+        "promql/fragile",
+        "group/interval",
+        "promql/impossible",
+        "promql/nan",
+        "promql/offset",
+        "promql/range_query",
+        "promql/rate",
+        "promql/regexp",
+        "promql/selector",
+        "promql/series",
+        "promql/syntax",
+        "promql/vector_matching",
+        "query/cost",
+        "rule/dependency",
+        "rule/duplicate",
+        "rule/for",
+        "rule/label",
+        "rule/link",
+        "rule/name",
+        "rule/reject",
+        "rule/report"
       ]
-    }
+    },
+    "owners": {},
+    "rules": [
+      {
+        "call": [
+          {
+            "key": "absent",
+            "selector": [
+              {
+                "key": ".+_total",
+                "comment": "You must filter by job and namespace.",
+                "severity": "bug",
+                "requiredLabels": [
+                  "job",
+                  "namespace"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
 entry:
-    path:
-        name: rules.yml
-        symlinktarget: rules.yml
-    filecomments: []
-    rulecomments: []
+  path:
+    name: rules.yml
+    symlinktarget: rules.yml
+  filecomments: []
+  rulecomments: []
 checks:
-    - promql/syntax
-    - alerts/for
-    - alerts/comparison
-    - alerts/template
-    - promql/fragile
-    - promql/regexp
-    - rule/dependency
-    - promql/impossible
-    - promql/nan
-    - group/interval
-    - promql/selector(absent:^.+_total$:job)
-    - promql/selector(absent:^.+_total$:namespace)
+- promql/syntax
+- alerts/for
+- alerts/comparison
+- alerts/template
+- promql/fragile
+- promql/regexp
+- rule/dependency
+- promql/impossible
+- promql/nan
+- group/interval
+- promql/selector(absent:^.+_total$:job)
+- promql/selector(absent:^.+_total$:namespace)
 
 ---

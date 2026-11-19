@@ -9,14 +9,17 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/require"
-	"go.yaml.in/yaml/v3"
+	"go.yaml.in/yaml/v4"
 )
 
 func parseYaml(input string) (key, val *yaml.Node) {
-	dec := yaml.NewDecoder(strings.NewReader(input))
+	loader, err := yaml.NewLoader(strings.NewReader(input))
+	if err != nil {
+		return nil, nil
+	}
 	for {
 		var doc yaml.Node
-		err := dec.Decode(&doc)
+		err := loader.Load(&doc)
 		if errors.Is(err, io.EOF) {
 			break
 		}

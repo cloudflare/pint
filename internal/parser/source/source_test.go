@@ -11,7 +11,7 @@ import (
 
 	"github.com/gkampitakis/go-snaps/snaps"
 	"github.com/stretchr/testify/require"
-	"go.yaml.in/yaml/v3"
+	"go.yaml.in/yaml/v4"
 
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/parser/source"
@@ -523,7 +523,7 @@ func TestLabelsSource(t *testing.T) {
 				Expr:   expr,
 				Output: output,
 			}
-			d, err := yaml.Marshal(snap)
+			d, err := yaml.Dump(snap)
 			require.NoError(t, err, "failed to YAML encode snapshots")
 			snaps.WithConfig(snaps.Dir("."), snaps.Filename(file)).MatchSnapshot(t, string(d))
 		})
@@ -1035,7 +1035,7 @@ func TestLabelsSourceWithFeatures(t *testing.T) {
 				Expr:   tc.expr,
 				Output: output,
 			}
-			d, err := yaml.Marshal(snap)
+			d, err := yaml.Dump(snap)
 			require.NoError(t, err, "failed to YAML encode snapshots")
 			snaps.WithConfig(snaps.Dir("."), snaps.Filename(file)).MatchSnapshot(t, string(d))
 		})

@@ -17,21 +17,24 @@
     reporter: promql/vector_matching
     summary: impossible binary operation
     details: |-
-        Trying to match two different time series together will only work if both have the exact same set of labels.
-        You can match time series with different labels by using special keywords and follow the rules set by PromQL.
-        [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
+      Trying to match two different time series together will only work if both have the exact same set of labels.
+      You can match time series with different labels by using special keywords and follow the rules set by PromQL.
+      [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
-        - message: 'The left hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[instance, job]`, which don''t match the right hand side labels: `[dev, instance, job]`. This query will never return any results.'
-          firstcolumn: 1
-          lastcolumn: 44
-          kind: 0
-        - message: 'The right hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[dev, instance, job]`.'
-          firstcolumn: 48
-          lastcolumn: 90
-          kind: 1
+    - message: 'The left hand side of the query on `prom` Prometheus server at https://simple.example.com
+        returns labels: `[instance, job]`, which don''t match the right hand side
+        labels: `[dev, instance, job]`. This query will never return any results.'
+      firstcolumn: 1
+      lastcolumn: 44
+      kind: 0
+    - message: 'The right hand side of the query on `prom` Prometheus server at https://simple.example.com
+        returns labels: `[dev, instance, job]`.'
+      firstcolumn: 48
+      lastcolumn: 90
+      kind: 1
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -55,15 +58,16 @@
   problem:
     reporter: promql/vector_matching
     summary: unable to run checks
-    details: ""
+    details: ''
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 error: `connection refused`.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: 'Couldn''t run some online checks due to `prom` Prometheus server at
+        http://127.0.0.1:1111 error: `connection refused`.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 1
     anchor: 0
 
@@ -82,15 +86,16 @@
   problem:
     reporter: promql/vector_matching
     summary: unable to run checks
-    details: ""
+    details: ''
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 error: `connection refused`.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: 'Couldn''t run some online checks due to `prom` Prometheus server at
+        http://127.0.0.1:1111 error: `connection refused`.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 2
     anchor: 0
 
@@ -109,15 +114,16 @@
   problem:
     reporter: promql/vector_matching
     summary: unable to run checks
-    details: ""
+    details: ''
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: 'Couldn''t run some online checks due to `prom` Prometheus server at
+        http://127.0.0.1:XXXXX error: `server_error: internal error`.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 2
     anchor: 0
 
@@ -136,15 +142,16 @@
   problem:
     reporter: promql/vector_matching
     summary: unable to run checks
-    details: ""
+    details: ''
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: 'Couldn''t run some online checks due to `prom` Prometheus server at
+        http://127.0.0.1:XXXXX error: `server_error: internal error`.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 2
     anchor: 0
 
@@ -169,21 +176,24 @@
     reporter: promql/vector_matching
     summary: impossible binary operation
     details: |-
-        Trying to match two different time series together will only work if both have the exact same set of labels.
-        You can match time series with different labels by using special keywords and follow the rules set by PromQL.
-        [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
+      Trying to match two different time series together will only work if both have the exact same set of labels.
+      You can match time series with different labels by using special keywords and follow the rules set by PromQL.
+      [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
-        - message: 'The left hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[instance, job]`.'
-          firstcolumn: 1
-          lastcolumn: 17
-          kind: 1
-        - message: 'The right hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[dev, instance, job]`, which don''t match the left hand side labels: `[instance, job]`. This query will never return any results.'
-          firstcolumn: 54
-          lastcolumn: 56
-          kind: 0
+    - message: 'The left hand side of the query on `prom` Prometheus server at https://simple.example.com
+        returns labels: `[instance, job]`.'
+      firstcolumn: 1
+      lastcolumn: 17
+      kind: 1
+    - message: 'The right hand side of the query on `prom` Prometheus server at https://simple.example.com
+        returns labels: `[dev, instance, job]`, which don''t match the left hand side
+        labels: `[instance, job]`. This query will never return any results.'
+      firstcolumn: 54
+      lastcolumn: 56
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -227,21 +237,24 @@
     reporter: promql/vector_matching
     summary: impossible binary operation
     details: |-
-        Trying to match two different time series together will only work if both have the exact same set of labels.
-        You can match time series with different labels by using special keywords and follow the rules set by PromQL.
-        [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
+      Trying to match two different time series together will only work if both have the exact same set of labels.
+      You can match time series with different labels by using special keywords and follow the rules set by PromQL.
+      [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
-        - message: 'The left hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[instance, job]`, which don''t match the right hand side labels: `[app_name]`. This query will never return any results.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
-        - message: 'The right hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[app_name]`.'
-          firstcolumn: 21
-          lastcolumn: 32
-          kind: 1
+    - message: 'The left hand side of the query on `prom` Prometheus server at https://simple.example.com
+        returns labels: `[instance, job]`, which don''t match the right hand side
+        labels: `[app_name]`. This query will never return any results.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
+    - message: 'The right hand side of the query on `prom` Prometheus server at https://simple.example.com
+        returns labels: `[app_name]`.'
+      firstcolumn: 21
+      lastcolumn: 32
+      kind: 1
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -280,21 +293,24 @@
     reporter: promql/vector_matching
     summary: impossible binary operation
     details: |-
-        Trying to match two different time series together will only work if both have the exact same set of labels.
-        You can match time series with different labels by using special keywords and follow the rules set by PromQL.
-        [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
+      Trying to match two different time series together will only work if both have the exact same set of labels.
+      You can match time series with different labels by using special keywords and follow the rules set by PromQL.
+      [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
-        - message: 'The left hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[instance, job, notfound]`, which don''t match the right hand side labels: `[instance, job]`. This query will never return any results.'
-          firstcolumn: 1
-          lastcolumn: 64
-          kind: 0
-        - message: 'The right hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[instance, job]`.'
-          firstcolumn: 68
-          lastcolumn: 70
-          kind: 1
+    - message: 'The left hand side of the query on `prom` Prometheus server at https://simple.example.com
+        returns labels: `[instance, job, notfound]`, which don''t match the right
+        hand side labels: `[instance, job]`. This query will never return any results.'
+      firstcolumn: 1
+      lastcolumn: 64
+      kind: 0
+    - message: 'The right hand side of the query on `prom` Prometheus server at https://simple.example.com
+        returns labels: `[instance, job]`.'
+      firstcolumn: 68
+      lastcolumn: 70
+      kind: 1
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -302,7 +318,16 @@
 
 [TestVectorMatchingCheck/max()_by(a)_and_on(a)_foo - 1]
 - description: max() by(a) and on(a) foo
-  content: "\n- record: foo\n  expr: |\n    max by (cluster, env) (\n      increase(error_total{}[10m])\n    ) > 0\n    and on (cluster)\n    cluster_metadata{cluster=\"foo\", environment=\"prod\"} > 0\n  "
+  content: |-
+
+    - record: foo
+      expr: |
+        max by (cluster, env) (
+          increase(error_total{}[10m])
+        ) > 0
+        and on (cluster)
+        cluster_metadata{cluster="foo", environment="prod"} > 0
+      
   output: |
     4 |     max by (cluster, env) (
     5 |       increase(error_total{}[10m])
@@ -318,17 +343,19 @@
     reporter: promql/vector_matching
     summary: impossible binary operation
     details: |-
-        Trying to match two different time series together will only work if both have the exact same set of labels.
-        You can match time series with different labels by using special keywords and follow the rules set by PromQL.
-        [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
+      Trying to match two different time series together will only work if both have the exact same set of labels.
+      You can match time series with different labels by using special keywords and follow the rules set by PromQL.
+      [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
-        - message: Using `on(cluster)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned by this query](https://simple.example.com/query?g0.expr=max+by+%28cluster%2C+env%29+%28increase%28error_total%5B10m%5D%29%29&&g0.tab=table) don't have the `cluster` label.
-          firstcolumn: 66
-          lastcolumn: 77
-          kind: 0
+    - message: Using `on(cluster)` won't produce any results on `prom` Prometheus
+        server at https://simple.example.com because [series returned by this query](https://simple.example.com/query?g0.expr=max+by+%28cluster%2C+env%29+%28increase%28error_total%5B10m%5D%29%29&&g0.tab=table)
+        don't have the `cluster` label.
+      firstcolumn: 66
+      lastcolumn: 77
+      kind: 0
     lines:
-        first: 4
-        last: 8
+      first: 4
+      last: 8
     severity: 2
     anchor: 0
 
@@ -350,17 +377,19 @@
     reporter: promql/vector_matching
     summary: impossible binary operation
     details: |-
-        Trying to match two different time series together will only work if both have the exact same set of labels.
-        You can match time series with different labels by using special keywords and follow the rules set by PromQL.
-        [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
+      Trying to match two different time series together will only work if both have the exact same set of labels.
+      You can match time series with different labels by using special keywords and follow the rules set by PromQL.
+      [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
-        - message: Using `on(app_name)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned by this query](https://simple.example.com/query?g0.expr=%28memory_bytes+%2F+ignoring+%28job%29+memory_limit%29&&g0.tab=table) don't have the `app_name` label.
-          firstcolumn: 53
-          lastcolumn: 64
-          kind: 0
+    - message: Using `on(app_name)` won't produce any results on `prom` Prometheus
+        server at https://simple.example.com because [series returned by this query](https://simple.example.com/query?g0.expr=%28memory_bytes+%2F+ignoring+%28job%29+memory_limit%29&&g0.tab=table)
+        don't have the `app_name` label.
+      firstcolumn: 53
+      lastcolumn: 64
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -384,21 +413,24 @@
     reporter: promql/vector_matching
     summary: impossible binary operation
     details: |-
-        Trying to match two different time series together will only work if both have the exact same set of labels.
-        You can match time series with different labels by using special keywords and follow the rules set by PromQL.
-        [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
+      Trying to match two different time series together will only work if both have the exact same set of labels.
+      You can match time series with different labels by using special keywords and follow the rules set by PromQL.
+      [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
-        - message: 'The left hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[instance, job, notfound]`, which don''t match the right hand side labels: `[instance, job]`. This query will never return any results.'
-          firstcolumn: 1
-          lastcolumn: 17
-          kind: 0
-        - message: 'The right hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[instance, job]`.'
-          firstcolumn: 21
-          lastcolumn: 23
-          kind: 1
+    - message: 'The left hand side of the query on `prom` Prometheus server at https://simple.example.com
+        returns labels: `[instance, job, notfound]`, which don''t match the right
+        hand side labels: `[instance, job]`. This query will never return any results.'
+      firstcolumn: 1
+      lastcolumn: 17
+      kind: 0
+    - message: 'The right hand side of the query on `prom` Prometheus server at https://simple.example.com
+        returns labels: `[instance, job]`.'
+      firstcolumn: 21
+      lastcolumn: 23
+      kind: 1
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -455,17 +487,20 @@
     reporter: promql/vector_matching
     summary: impossible binary operation
     details: |-
-        Trying to match two different time series together will only work if both have the exact same set of labels.
-        You can match time series with different labels by using special keywords and follow the rules set by PromQL.
-        [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
+      Trying to match two different time series together will only work if both have the exact same set of labels.
+      You can match time series with different labels by using special keywords and follow the rules set by PromQL.
+      [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
-        - message: Using `on(notfound)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned from both sides of the query](https://simple.example.com/query?g0.expr=foo+%2F+on+%28notfound%29+bar&&g0.tab=table) don't have the `notfound` label.
-          firstcolumn: 7
-          lastcolumn: 18
-          kind: 0
+    - message: Using `on(notfound)` won't produce any results on `prom` Prometheus
+        server at https://simple.example.com because [series returned from both sides
+        of the query](https://simple.example.com/query?g0.expr=foo+%2F+on+%28notfound%29+bar&&g0.tab=table)
+        don't have the `notfound` label.
+      firstcolumn: 7
+      lastcolumn: 18
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -487,17 +522,19 @@
     reporter: promql/vector_matching
     summary: impossible binary operation
     details: |-
-        Trying to match two different time series together will only work if both have the exact same set of labels.
-        You can match time series with different labels by using special keywords and follow the rules set by PromQL.
-        [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
+      Trying to match two different time series together will only work if both have the exact same set of labels.
+      You can match time series with different labels by using special keywords and follow the rules set by PromQL.
+      [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
-        - message: Using `on(notfound)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned by this query](https://simple.example.com/query?g0.expr=foo&&g0.tab=table) don't have the `notfound` label.
-          firstcolumn: 7
-          lastcolumn: 18
-          kind: 0
+    - message: Using `on(notfound)` won't produce any results on `prom` Prometheus
+        server at https://simple.example.com because [series returned by this query](https://simple.example.com/query?g0.expr=foo&&g0.tab=table)
+        don't have the `notfound` label.
+      firstcolumn: 7
+      lastcolumn: 18
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -519,17 +556,19 @@
     reporter: promql/vector_matching
     summary: impossible binary operation
     details: |-
-        Trying to match two different time series together will only work if both have the exact same set of labels.
-        You can match time series with different labels by using special keywords and follow the rules set by PromQL.
-        [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
+      Trying to match two different time series together will only work if both have the exact same set of labels.
+      You can match time series with different labels by using special keywords and follow the rules set by PromQL.
+      [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
-        - message: Using `on(notfound)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned by this query](https://simple.example.com/query?g0.expr=bar&&g0.tab=table) don't have the `notfound` label.
-          firstcolumn: 21
-          lastcolumn: 32
-          kind: 0
+    - message: Using `on(notfound)` won't produce any results on `prom` Prometheus
+        server at https://simple.example.com because [series returned by this query](https://simple.example.com/query?g0.expr=bar&&g0.tab=table)
+        don't have the `notfound` label.
+      firstcolumn: 21
+      lastcolumn: 32
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -589,21 +628,24 @@
     reporter: promql/vector_matching
     summary: impossible binary operation
     details: |-
-        Trying to match two different time series together will only work if both have the exact same set of labels.
-        You can match time series with different labels by using special keywords and follow the rules set by PromQL.
-        [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
+      Trying to match two different time series together will only work if both have the exact same set of labels.
+      You can match time series with different labels by using special keywords and follow the rules set by PromQL.
+      [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
-        - message: 'The left hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[instance, job, notfound]`, which don''t match the right hand side labels: `[instance, job]`. This query will never return any results.'
-          firstcolumn: 1
-          lastcolumn: 46
-          kind: 0
-        - message: 'The right hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[instance, job]`.'
-          firstcolumn: 50
-          lastcolumn: 52
-          kind: 1
+    - message: 'The left hand side of the query on `prom` Prometheus server at https://simple.example.com
+        returns labels: `[instance, job, notfound]`, which don''t match the right
+        hand side labels: `[instance, job]`. This query will never return any results.'
+      firstcolumn: 1
+      lastcolumn: 46
+      kind: 0
+    - message: 'The right hand side of the query on `prom` Prometheus server at https://simple.example.com
+        returns labels: `[instance, job]`.'
+      firstcolumn: 50
+      lastcolumn: 52
+      kind: 1
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -627,21 +669,24 @@
     reporter: promql/vector_matching
     summary: impossible binary operation
     details: |-
-        Trying to match two different time series together will only work if both have the exact same set of labels.
-        You can match time series with different labels by using special keywords and follow the rules set by PromQL.
-        [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
+      Trying to match two different time series together will only work if both have the exact same set of labels.
+      You can match time series with different labels by using special keywords and follow the rules set by PromQL.
+      [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
-        - message: 'The left hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[instance, job, notfound]`, which don''t match the right hand side labels: `[instance, job]`. This query will never return any results.'
-          firstcolumn: 1
-          lastcolumn: 18
-          kind: 0
-        - message: 'The right hand side of the query on `prom` Prometheus server at https://simple.example.com returns labels: `[instance, job]`.'
-          firstcolumn: 22
-          lastcolumn: 24
-          kind: 1
+    - message: 'The left hand side of the query on `prom` Prometheus server at https://simple.example.com
+        returns labels: `[instance, job, notfound]`, which don''t match the right
+        hand side labels: `[instance, job]`. This query will never return any results.'
+      firstcolumn: 1
+      lastcolumn: 18
+      kind: 0
+    - message: 'The right hand side of the query on `prom` Prometheus server at https://simple.example.com
+        returns labels: `[instance, job]`.'
+      firstcolumn: 22
+      lastcolumn: 24
+      kind: 1
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -671,17 +716,18 @@
     reporter: promql/vector_matching
     summary: impossible binary operation
     details: |-
-        Trying to match two different time series together will only work if both have the exact same set of labels.
-        You can match time series with different labels by using special keywords and follow the rules set by PromQL.
-        [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
+      Trying to match two different time series together will only work if both have the exact same set of labels.
+      You can match time series with different labels by using special keywords and follow the rules set by PromQL.
+      [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
-        - message: The left hand side uses `{job="a"}` while the right hand side uses `{job="b"}`, this will never match.
-          firstcolumn: 1
-          lastcolumn: 25
-          kind: 0
+    - message: The left hand side uses `{job="a"}` while the right hand side uses
+        `{job="b"}`, this will never match.
+      firstcolumn: 1
+      lastcolumn: 25
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 

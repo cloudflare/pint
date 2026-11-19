@@ -12,15 +12,16 @@
   problem:
     reporter: promql/rate
     summary: unable to run checks
-    details: ""
+    details: ''
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: 'Couldn''t run some online checks due to `prom` Prometheus server at
+        http://127.0.0.1:XXXXX error: `server_error: internal error`.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 2
     anchor: 0
 
@@ -44,15 +45,16 @@
   problem:
     reporter: promql/rate
     summary: unable to run checks
-    details: ""
+    details: ''
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 error: `connection refused`.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: 'Couldn''t run some online checks due to `prom` Prometheus server at
+        http://127.0.0.1:1111 error: `connection refused`.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 2
     anchor: 0
 
@@ -72,22 +74,23 @@
     reporter: promql/rate
     summary: duration too small
     details: |-
-        Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate), [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) and [increase](https://prometheus.io/docs/prometheus/latest/querying/functions/#increase) functions comes with a few requirements:
+      Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate), [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) and [increase](https://prometheus.io/docs/prometheus/latest/querying/functions/#increase) functions comes with a few requirements:
 
-        - The metric you calculate (i)rate or increase from must be a counter or a native histogram.
-        - The time window of the (i)rate or increase function must have at least 2 samples.
+      - The metric you calculate (i)rate or increase from must be a counter or a native histogram.
+      - The time window of the (i)rate or increase function must have at least 2 samples.
 
-        The type of your metric is defined by the application that exports that metric.
-        The number of samples depends on how often your application is being scraped by Prometheus.
-        Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
+      The type of your metric is defined by the application that exports that metric.
+      The number of samples depends on how often your application is being scraped by Prometheus.
+      Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
     diagnostics:
-        - message: Duration for `deriv()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
-          firstcolumn: 1
-          lastcolumn: 14
-          kind: 0
+    - message: Duration for `deriv()` must be at least 2 x scrape_interval, `prom`
+        Prometheus server at https://simple.example.com is using `1m` scrape_interval.
+      firstcolumn: 1
+      lastcolumn: 14
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -127,22 +130,23 @@
     reporter: promql/rate
     summary: counter based function called on a non-counter
     details: |-
-        Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate), [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) and [increase](https://prometheus.io/docs/prometheus/latest/querying/functions/#increase) functions comes with a few requirements:
+      Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate), [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) and [increase](https://prometheus.io/docs/prometheus/latest/querying/functions/#increase) functions comes with a few requirements:
 
-        - The metric you calculate (i)rate or increase from must be a counter or a native histogram.
-        - The time window of the (i)rate or increase function must have at least 2 samples.
+      - The metric you calculate (i)rate or increase from must be a counter or a native histogram.
+      - The time window of the (i)rate or increase function must have at least 2 samples.
 
-        The type of your metric is defined by the application that exports that metric.
-        The number of samples depends on how often your application is being scraped by Prometheus.
-        Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
+      The type of your metric is defined by the application that exports that metric.
+      The number of samples depends on how often your application is being scraped by Prometheus.
+      Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
     diagnostics:
-        - message: '`increase()` should only be used with counters but `foo` is a gauge according to metrics metadata from `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 1
-          lastcolumn: 17
-          kind: 0
+    - message: '`increase()` should only be used with counters but `foo` is a gauge
+        according to metrics metadata from `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 1
+      lastcolumn: 17
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -162,22 +166,23 @@
     reporter: promql/rate
     summary: duration too small
     details: |-
-        Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate), [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) and [increase](https://prometheus.io/docs/prometheus/latest/querying/functions/#increase) functions comes with a few requirements:
+      Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate), [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) and [increase](https://prometheus.io/docs/prometheus/latest/querying/functions/#increase) functions comes with a few requirements:
 
-        - The metric you calculate (i)rate or increase from must be a counter or a native histogram.
-        - The time window of the (i)rate or increase function must have at least 2 samples.
+      - The metric you calculate (i)rate or increase from must be a counter or a native histogram.
+      - The time window of the (i)rate or increase function must have at least 2 samples.
 
-        The type of your metric is defined by the application that exports that metric.
-        The number of samples depends on how often your application is being scraped by Prometheus.
-        Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
+      The type of your metric is defined by the application that exports that metric.
+      The number of samples depends on how often your application is being scraped by Prometheus.
+      Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
     diagnostics:
-        - message: Duration for `increase()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
-          firstcolumn: 1
-          lastcolumn: 17
-          kind: 0
+    - message: Duration for `increase()` must be at least 2 x scrape_interval, `prom`
+        Prometheus server at https://simple.example.com is using `1m` scrape_interval.
+      firstcolumn: 1
+      lastcolumn: 17
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -192,20 +197,23 @@
     1 | - record: foo
                   ^^^
                   Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX
-                  error: `failed to decode config data in http://127.0.0.1:XXXXX response: yaml: line 2:
-                  could not find expected ':'`.
+                  error: `failed to decode config data in http://127.0.0.1:XXXXX response: yaml: while
+                  scanning a simple key: could not find expected ':' at line 3`.
   problem:
     reporter: promql/rate
     summary: unable to run checks
-    details: ""
+    details: ''
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `failed to decode config data in http://127.0.0.1:XXXXX response: yaml: line 2: could not find expected '':''`.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: 'Couldn''t run some online checks due to `prom` Prometheus server at
+        http://127.0.0.1:XXXXX error: `failed to decode config data in http://127.0.0.1:XXXXX
+        response: yaml: while scanning a simple key: could not find expected '':''
+        at line 3`.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 2
     anchor: 0
 
@@ -224,15 +232,16 @@
   problem:
     reporter: promql/rate
     summary: unable to run checks
-    details: ""
+    details: ''
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `bad_data: bad input data`.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: 'Couldn''t run some online checks due to `prom` Prometheus server at
+        http://127.0.0.1:XXXXX error: `bad_data: bad input data`.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 2
     anchor: 0
 
@@ -252,22 +261,23 @@
     reporter: promql/rate
     summary: duration too small
     details: |-
-        Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate), [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) and [increase](https://prometheus.io/docs/prometheus/latest/querying/functions/#increase) functions comes with a few requirements:
+      Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate), [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) and [increase](https://prometheus.io/docs/prometheus/latest/querying/functions/#increase) functions comes with a few requirements:
 
-        - The metric you calculate (i)rate or increase from must be a counter or a native histogram.
-        - The time window of the (i)rate or increase function must have at least 2 samples.
+      - The metric you calculate (i)rate or increase from must be a counter or a native histogram.
+      - The time window of the (i)rate or increase function must have at least 2 samples.
 
-        The type of your metric is defined by the application that exports that metric.
-        The number of samples depends on how often your application is being scraped by Prometheus.
-        Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
+      The type of your metric is defined by the application that exports that metric.
+      The number of samples depends on how often your application is being scraped by Prometheus.
+      Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
     diagnostics:
-        - message: Duration for `irate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
-          firstcolumn: 1
-          lastcolumn: 14
-          kind: 0
+    - message: Duration for `irate()` must be at least 2 x scrape_interval, `prom`
+        Prometheus server at https://simple.example.com is using `1m` scrape_interval.
+      firstcolumn: 1
+      lastcolumn: 14
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -327,22 +337,23 @@
     reporter: promql/rate
     summary: duration too small
     details: |-
-        Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate), [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) and [increase](https://prometheus.io/docs/prometheus/latest/querying/functions/#increase) functions comes with a few requirements:
+      Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate), [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) and [increase](https://prometheus.io/docs/prometheus/latest/querying/functions/#increase) functions comes with a few requirements:
 
-        - The metric you calculate (i)rate or increase from must be a counter or a native histogram.
-        - The time window of the (i)rate or increase function must have at least 2 samples.
+      - The metric you calculate (i)rate or increase from must be a counter or a native histogram.
+      - The time window of the (i)rate or increase function must have at least 2 samples.
 
-        The type of your metric is defined by the application that exports that metric.
-        The number of samples depends on how often your application is being scraped by Prometheus.
-        Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
+      The type of your metric is defined by the application that exports that metric.
+      The number of samples depends on how often your application is being scraped by Prometheus.
+      Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
     diagnostics:
-        - message: Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
-          firstcolumn: 1
-          lastcolumn: 24
-          kind: 0
+    - message: Duration for `rate()` must be at least 2 x scrape_interval, `prom`
+        Prometheus server at https://simple.example.com is using `1m` scrape_interval.
+      firstcolumn: 1
+      lastcolumn: 24
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 - description: metadata error
@@ -357,15 +368,16 @@
   problem:
     reporter: promql/rate
     summary: unable to run checks
-    details: ""
+    details: ''
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: 'Couldn''t run some online checks due to `prom` Prometheus server at
+        http://127.0.0.1:XXXXX error: `server_error: internal error`.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 2
     anchor: 0
 
@@ -385,22 +397,23 @@
     reporter: promql/rate
     summary: duration too small
     details: |-
-        Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate), [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) and [increase](https://prometheus.io/docs/prometheus/latest/querying/functions/#increase) functions comes with a few requirements:
+      Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate), [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) and [increase](https://prometheus.io/docs/prometheus/latest/querying/functions/#increase) functions comes with a few requirements:
 
-        - The metric you calculate (i)rate or increase from must be a counter or a native histogram.
-        - The time window of the (i)rate or increase function must have at least 2 samples.
+      - The metric you calculate (i)rate or increase from must be a counter or a native histogram.
+      - The time window of the (i)rate or increase function must have at least 2 samples.
 
-        The type of your metric is defined by the application that exports that metric.
-        The number of samples depends on how often your application is being scraped by Prometheus.
-        Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
+      The type of your metric is defined by the application that exports that metric.
+      The number of samples depends on how often your application is being scraped by Prometheus.
+      Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
     diagnostics:
-        - message: Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
-          firstcolumn: 1
-          lastcolumn: 24
-          kind: 0
+    - message: Duration for `rate()` must be at least 2 x scrape_interval, `prom`
+        Prometheus server at https://simple.example.com is using `1m` scrape_interval.
+      firstcolumn: 1
+      lastcolumn: 24
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -421,22 +434,23 @@
     reporter: promql/rate
     summary: duration too small
     details: |-
-        Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate), [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) and [increase](https://prometheus.io/docs/prometheus/latest/querying/functions/#increase) functions comes with a few requirements:
+      Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate), [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) and [increase](https://prometheus.io/docs/prometheus/latest/querying/functions/#increase) functions comes with a few requirements:
 
-        - The metric you calculate (i)rate or increase from must be a counter or a native histogram.
-        - The time window of the (i)rate or increase function must have at least 2 samples.
+      - The metric you calculate (i)rate or increase from must be a counter or a native histogram.
+      - The time window of the (i)rate or increase function must have at least 2 samples.
 
-        The type of your metric is defined by the application that exports that metric.
-        The number of samples depends on how often your application is being scraped by Prometheus.
-        Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
+      The type of your metric is defined by the application that exports that metric.
+      The number of samples depends on how often your application is being scraped by Prometheus.
+      Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
     diagnostics:
-        - message: Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
-          firstcolumn: 26
-          lastcolumn: 38
-          kind: 0
+    - message: Duration for `rate()` must be at least 2 x scrape_interval, `prom`
+        Prometheus server at https://simple.example.com is using `1m` scrape_interval.
+      firstcolumn: 26
+      lastcolumn: 38
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -457,22 +471,23 @@
     reporter: promql/rate
     summary: counter based function called on a non-counter
     details: |-
-        Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate), [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) and [increase](https://prometheus.io/docs/prometheus/latest/querying/functions/#increase) functions comes with a few requirements:
+      Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate), [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) and [increase](https://prometheus.io/docs/prometheus/latest/querying/functions/#increase) functions comes with a few requirements:
 
-        - The metric you calculate (i)rate or increase from must be a counter or a native histogram.
-        - The time window of the (i)rate or increase function must have at least 2 samples.
+      - The metric you calculate (i)rate or increase from must be a counter or a native histogram.
+      - The time window of the (i)rate or increase function must have at least 2 samples.
 
-        The type of your metric is defined by the application that exports that metric.
-        The number of samples depends on how often your application is being scraped by Prometheus.
-        Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
+      The type of your metric is defined by the application that exports that metric.
+      The number of samples depends on how often your application is being scraped by Prometheus.
+      Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
     diagnostics:
-        - message: '`rate()` should only be used with counters but `bar_g` is a gauge according to metrics metadata from `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 19
-          lastcolumn: 33
-          kind: 0
+    - message: '`rate()` should only be used with counters but `bar_g` is a gauge
+        according to metrics metadata from `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 19
+      lastcolumn: 33
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -492,22 +507,23 @@
     reporter: promql/rate
     summary: counter based function called on a non-counter
     details: |-
-        Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate), [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) and [increase](https://prometheus.io/docs/prometheus/latest/querying/functions/#increase) functions comes with a few requirements:
+      Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate), [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) and [increase](https://prometheus.io/docs/prometheus/latest/querying/functions/#increase) functions comes with a few requirements:
 
-        - The metric you calculate (i)rate or increase from must be a counter or a native histogram.
-        - The time window of the (i)rate or increase function must have at least 2 samples.
+      - The metric you calculate (i)rate or increase from must be a counter or a native histogram.
+      - The time window of the (i)rate or increase function must have at least 2 samples.
 
-        The type of your metric is defined by the application that exports that metric.
-        The number of samples depends on how often your application is being scraped by Prometheus.
-        Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
+      The type of your metric is defined by the application that exports that metric.
+      The number of samples depends on how often your application is being scraped by Prometheus.
+      Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
     diagnostics:
-        - message: '`rate()` should only be used with counters but `foo` is a gauge according to metrics metadata from `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 1
-          lastcolumn: 13
-          kind: 0
+    - message: '`rate()` should only be used with counters but `foo` is a gauge according
+        to metrics metadata from `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 1
+      lastcolumn: 13
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -527,22 +543,23 @@
     reporter: promql/rate
     summary: duration too small
     details: |-
-        Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate), [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) and [increase](https://prometheus.io/docs/prometheus/latest/querying/functions/#increase) functions comes with a few requirements:
+      Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate), [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) and [increase](https://prometheus.io/docs/prometheus/latest/querying/functions/#increase) functions comes with a few requirements:
 
-        - The metric you calculate (i)rate or increase from must be a counter or a native histogram.
-        - The time window of the (i)rate or increase function must have at least 2 samples.
+      - The metric you calculate (i)rate or increase from must be a counter or a native histogram.
+      - The time window of the (i)rate or increase function must have at least 2 samples.
 
-        The type of your metric is defined by the application that exports that metric.
-        The number of samples depends on how often your application is being scraped by Prometheus.
-        Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
+      The type of your metric is defined by the application that exports that metric.
+      The number of samples depends on how often your application is being scraped by Prometheus.
+      Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
     diagnostics:
-        - message: Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
-          firstcolumn: 1
-          lastcolumn: 24
-          kind: 0
+    - message: Duration for `rate()` must be at least 2 x scrape_interval, `prom`
+        Prometheus server at https://simple.example.com is using `1m` scrape_interval.
+      firstcolumn: 1
+      lastcolumn: 24
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 - description: rate(gauge) < 2x scrape interval
@@ -558,22 +575,23 @@
     reporter: promql/rate
     summary: counter based function called on a non-counter
     details: |-
-        Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate), [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) and [increase](https://prometheus.io/docs/prometheus/latest/querying/functions/#increase) functions comes with a few requirements:
+      Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate), [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) and [increase](https://prometheus.io/docs/prometheus/latest/querying/functions/#increase) functions comes with a few requirements:
 
-        - The metric you calculate (i)rate or increase from must be a counter or a native histogram.
-        - The time window of the (i)rate or increase function must have at least 2 samples.
+      - The metric you calculate (i)rate or increase from must be a counter or a native histogram.
+      - The time window of the (i)rate or increase function must have at least 2 samples.
 
-        The type of your metric is defined by the application that exports that metric.
-        The number of samples depends on how often your application is being scraped by Prometheus.
-        Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
+      The type of your metric is defined by the application that exports that metric.
+      The number of samples depends on how often your application is being scraped by Prometheus.
+      Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
     diagnostics:
-        - message: '`rate()` should only be used with counters but `foo` is a gauge according to metrics metadata from `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 1
-          lastcolumn: 24
-          kind: 0
+    - message: '`rate()` should only be used with counters but `foo` is a gauge according
+        to metrics metadata from `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 1
+      lastcolumn: 24
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -608,22 +626,23 @@
     reporter: promql/rate
     summary: duration too small
     details: |-
-        Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate), [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) and [increase](https://prometheus.io/docs/prometheus/latest/querying/functions/#increase) functions comes with a few requirements:
+      Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate), [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) and [increase](https://prometheus.io/docs/prometheus/latest/querying/functions/#increase) functions comes with a few requirements:
 
-        - The metric you calculate (i)rate or increase from must be a counter or a native histogram.
-        - The time window of the (i)rate or increase function must have at least 2 samples.
+      - The metric you calculate (i)rate or increase from must be a counter or a native histogram.
+      - The time window of the (i)rate or increase function must have at least 2 samples.
 
-        The type of your metric is defined by the application that exports that metric.
-        The number of samples depends on how often your application is being scraped by Prometheus.
-        Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
+      The type of your metric is defined by the application that exports that metric.
+      The number of samples depends on how often your application is being scraped by Prometheus.
+      Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
     diagnostics:
-        - message: Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
-          firstcolumn: 1
-          lastcolumn: 13
-          kind: 0
+    - message: Duration for `rate()` must be at least 2 x scrape_interval, `prom`
+        Prometheus server at https://simple.example.com is using `1m` scrape_interval.
+      firstcolumn: 1
+      lastcolumn: 13
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -657,15 +676,19 @@
   problem:
     reporter: promql/rate
     summary: chained rate call
-    details: You can only calculate `rate()` directly from a counter metric. Calling `rate()` on `sum()` results will return bogus results because `sum()` will hide information on when each counter resets. You must first calculate `rate()` before calling any aggregation function. Always `sum(rate(counter))`, never `rate(sum(counter))`
+    details: You can only calculate `rate()` directly from a counter metric. Calling
+      `rate()` on `sum()` results will return bogus results because `sum()` will hide
+      information on when each counter resets. You must first calculate `rate()` before
+      calling any aggregation function. Always `sum(rate(counter))`, never `rate(sum(counter))`
     diagnostics:
-        - message: '`rate(sum(counter))` chain detected, `rate(my:sum[5m])` is called here on results of `sum(foo)`.'
-          firstcolumn: 5
-          lastcolumn: 7
-          kind: 0
+    - message: '`rate(sum(counter))` chain detected, `rate(my:sum[5m])` is called
+        here on results of `sum(foo)`.'
+      firstcolumn: 5
+      lastcolumn: 7
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -694,15 +717,16 @@
   problem:
     reporter: promql/rate
     summary: unable to run checks
-    details: ""
+    details: ''
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.'
-          firstcolumn: 1
-          lastcolumn: 8
-          kind: 0
+    - message: 'Couldn''t run some online checks due to `prom` Prometheus server at
+        http://127.0.0.1:XXXXX error: `server_error: internal error`.'
+      firstcolumn: 1
+      lastcolumn: 8
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 2
     anchor: 0
 
@@ -732,22 +756,23 @@
     reporter: promql/rate
     summary: duration too small
     details: |-
-        Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate), [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) and [increase](https://prometheus.io/docs/prometheus/latest/querying/functions/#increase) functions comes with a few requirements:
+      Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate), [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) and [increase](https://prometheus.io/docs/prometheus/latest/querying/functions/#increase) functions comes with a few requirements:
 
-        - The metric you calculate (i)rate or increase from must be a counter or a native histogram.
-        - The time window of the (i)rate or increase function must have at least 2 samples.
+      - The metric you calculate (i)rate or increase from must be a counter or a native histogram.
+      - The time window of the (i)rate or increase function must have at least 2 samples.
 
-        The type of your metric is defined by the application that exports that metric.
-        The number of samples depends on how often your application is being scraped by Prometheus.
-        Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
+      The type of your metric is defined by the application that exports that metric.
+      The number of samples depends on how often your application is being scraped by Prometheus.
+      Each scrape produces a sample, so if your application is scraped every minute then the minimal time window you can use is two minutes.
     diagnostics:
-        - message: Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
-          firstcolumn: 11
-          lastcolumn: 23
-          kind: 0
+    - message: Duration for `rate()` must be at least 2 x scrape_interval, `prom`
+        Prometheus server at https://simple.example.com is using `1m` scrape_interval.
+      firstcolumn: 11
+      lastcolumn: 23
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -760,7 +785,7 @@
 
 [TestRateCheck/sum(rate(sum))_/_sum(rate(sum)) - 1]
 - description: sum(rate(sum)) / sum(rate(sum))
-  content: |4
+  content: |
 
     - alert: Plexi_Worker_High_Signing_Latency
       expr: |
@@ -772,7 +797,7 @@
           rate(global:response_time_count{namespace!~"test[.].+"}[15m])
         ) by (environment, namespace)
         > 3000
-  output: |4
+  output: |2
      4 |     sum(
      5 |       rate(global:response_time_sum{namespace!~"test[.].+"}[15m])
              ^^^^^^^^^^^^^^^^^^^^^^^
@@ -786,15 +811,19 @@
   problem:
     reporter: promql/rate
     summary: chained rate call
-    details: You can only calculate `rate()` directly from a counter metric. Calling `rate()` on `sum()` results will return bogus results because `sum()` will hide information on when each counter resets. You must first calculate `rate()` before calling any aggregation function. Always `sum(rate(counter))`, never `rate(sum(counter))`
+    details: You can only calculate `rate()` directly from a counter metric. Calling
+      `rate()` on `sum()` results will return bogus results because `sum()` will hide
+      information on when each counter resets. You must first calculate `rate()` before
+      calling any aggregation function. Always `sum(rate(counter))`, never `rate(sum(counter))`
     diagnostics:
-        - message: '`rate(sum(counter))` chain detected, `rate(global:response_time_sum{namespace!~"test[.].+"}[15m])` is called here on results of `sum(response_time_sum:rate2m)`.'
-          firstcolumn: 5
-          lastcolumn: 28
-          kind: 0
+    - message: '`rate(sum(counter))` chain detected, `rate(global:response_time_sum{namespace!~"test[.].+"}[15m])`
+        is called here on results of `sum(response_time_sum:rate2m)`.'
+      firstcolumn: 5
+      lastcolumn: 28
+      kind: 0
     lines:
-        first: 4
-        last: 11
+      first: 4
+      last: 11
     severity: 1
     anchor: 0
 

@@ -5,12 +5,15 @@ cmp stderr stderr.txt
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
-level=WARN msg="Failed to parse file content" err="did not find expected '-' indicator" path=rules/1.yaml line=6
+level=WARN msg="Failed to parse file content" err="invalid syntax" path=rules/1.yaml line=7
 level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
-Fatal: did not find expected '-' indicator (yaml/parse)
-  ---> rules/1.yaml:6
- 6 | 
-     ^^^ did not find expected '-' indicator
+Fatal: invalid syntax (yaml/parse)
+  ---> rules/1.yaml:7
+1 | - alert: Good
+    ^ while parsing a block collection
+  | [...]
+7 | alert: Bad
+    ^ did not find expected '-' indicator
 
 level=INFO msg="Problems found" Fatal=1
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"

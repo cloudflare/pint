@@ -11,15 +11,15 @@
   problem:
     reporter: alerts/for
     summary: redundant field with default value
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`0h` is the default value of `for`, this line is unnecessary.'
-          firstcolumn: 1
-          lastcolumn: 2
-          kind: 0
+    - message: '`0h` is the default value of `for`, this line is unnecessary.'
+      firstcolumn: 1
+      lastcolumn: 2
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 0
     anchor: 0
 
@@ -37,15 +37,15 @@
   problem:
     reporter: alerts/for
     summary: redundant field with default value
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`0h` is the default value of `keep_firing_for`, this line is unnecessary.'
-          firstcolumn: 1
-          lastcolumn: 2
-          kind: 0
+    - message: '`0h` is the default value of `keep_firing_for`, this line is unnecessary.'
+      firstcolumn: 1
+      lastcolumn: 2
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 0
     anchor: 0
 
@@ -75,13 +75,13 @@
     summary: invalid duration
     details: Supported time durations are documented [here](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-durations).
     diagnostics:
-        - message: 'not a valid duration string: "abc"'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: 'not a valid duration string: "abc"'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 2
     anchor: 0
 
@@ -101,13 +101,13 @@
     summary: invalid duration
     details: Supported time durations are documented [here](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-durations).
     diagnostics:
-        - message: 'not a valid duration string: "abc"'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: 'not a valid duration string: "abc"'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 2
     anchor: 0
 
@@ -127,13 +127,13 @@
     summary: invalid duration
     details: Supported time durations are documented [here](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-durations).
     diagnostics:
-        - message: 'not a valid duration string: "-5m"'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: 'not a valid duration string: "-5m"'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 2
     anchor: 0
 
@@ -153,13 +153,13 @@
     summary: invalid duration
     details: Supported time durations are documented [here](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-durations).
     diagnostics:
-        - message: 'not a valid duration string: "-5m"'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: 'not a valid duration string: "-5m"'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 2
     anchor: 0
 

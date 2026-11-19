@@ -6,7 +6,7 @@
 
 [TestGroupIntervalCheck/interval_above_5m_and_keep_firing_for_too_short - 1]
 - description: interval above 5m and keep_firing_for too short
-  content: |4
+  content: |
 
     - name: test
       interval: 10m
@@ -21,15 +21,16 @@
   problem:
     reporter: group/interval
     summary: interval too long
-    details: ""
+    details: ''
     diagnostics:
-        - message: Using group interval > 5m will cause gaps in recording rule results and flapping alerts.
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: Using group interval > 5m will cause gaps in recording rule results
+        and flapping alerts.
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 1
     anchor: 0
 
@@ -47,7 +48,7 @@
 
 [TestGroupIntervalCheck/interval_above_5m_on_alerting_rule - 1]
 - description: interval above 5m on alerting rule
-  content: |4
+  content: |
 
     - name: test
       interval: 9m
@@ -61,15 +62,16 @@
   problem:
     reporter: group/interval
     summary: interval too long
-    details: ""
+    details: ''
     diagnostics:
-        - message: Using group interval > 5m will cause gaps in recording rule results and flapping alerts.
-          firstcolumn: 1
-          lastcolumn: 2
-          kind: 0
+    - message: Using group interval > 5m will cause gaps in recording rule results
+        and flapping alerts.
+      firstcolumn: 1
+      lastcolumn: 2
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 1
     anchor: 0
 
@@ -77,7 +79,7 @@
 
 [TestGroupIntervalCheck/interval_above_5m_on_recording_rule - 1]
 - description: interval above 5m on recording rule
-  content: |4
+  content: |
 
     - name: test
       interval: 9m
@@ -91,15 +93,16 @@
   problem:
     reporter: group/interval
     summary: interval too long
-    details: ""
+    details: ''
     diagnostics:
-        - message: Using group interval > 5m will cause gaps in recording rule results and flapping alerts.
-          firstcolumn: 1
-          lastcolumn: 2
-          kind: 0
+    - message: Using group interval > 5m will cause gaps in recording rule results
+        and flapping alerts.
+      firstcolumn: 1
+      lastcolumn: 2
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 1
     anchor: 0
 
@@ -107,7 +110,7 @@
 
 [TestGroupIntervalCheck/interval_above_5m_on_recording_rule_ignores_keep_firing_for - 1]
 - description: interval above 5m on recording rule ignores keep_firing_for
-  content: |4
+  content: |
 
     - name: test
       interval: 10m
@@ -121,15 +124,16 @@
   problem:
     reporter: group/interval
     summary: interval too long
-    details: ""
+    details: ''
     diagnostics:
-        - message: Using group interval > 5m will cause gaps in recording rule results and flapping alerts.
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: Using group interval > 5m will cause gaps in recording rule results
+        and flapping alerts.
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 1
     anchor: 0
 

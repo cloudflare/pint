@@ -25,7 +25,7 @@ import (
 	"time"
 
 	"github.com/rogpeppe/go-internal/testscript"
-	"go.yaml.in/yaml/v3"
+	"go.yaml.in/yaml/v4"
 )
 
 type snapshotRecorder struct {
@@ -403,13 +403,13 @@ func sanitizePayload(payload []byte) []byte {
 	payload = commitIDRe.ReplaceAll(payload, []byte(`"commit_id":"<COMMIT ID>"`))
 
 	var node yaml.Node
-	if err := yaml.Unmarshal(payload, &node); err != nil {
+	if err := yaml.Load(payload, &node); err != nil {
 		return payload
 	}
 	// Without this we'd emit flow style ({...}) instead of block style (| ...).
 	forceBlockStyle(&node)
 
-	output, err := yaml.Marshal(&node)
+	output, err := yaml.Dump(&node)
 	if err != nil {
 		return payload
 	}

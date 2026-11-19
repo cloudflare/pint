@@ -21,7 +21,7 @@ require (
 	gitlab.com/gitlab-org/api/client-go/v3 v3.48.0
 	go.nhat.io/httpmock v0.12.1
 	go.uber.org/ratelimit v0.3.1
-	go.yaml.in/yaml/v3 v3.0.6
+	go.yaml.in/yaml/v4 v4.0.0
 	golang.org/x/oauth2 v0.38.0
 	golang.org/x/time v0.16.0
 )
@@ -71,6 +71,7 @@ require (
 	go.opentelemetry.io/otel/metric v1.47.0 // indirect
 	go.opentelemetry.io/otel/trace v1.47.0 // indirect
 	go.uber.org/atomic v1.12.0 // indirect
+	go.yaml.in/yaml/v3 v3.0.6 // indirect
 	golang.org/x/mod v0.41.0 // indirect
 	golang.org/x/sync v0.24.0 // indirect
 	golang.org/x/sys v0.49.0 // indirect

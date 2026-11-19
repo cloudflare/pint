@@ -2,110 +2,110 @@
 [TestGetChecksForRule/multiple_checks_and_disable_comment - 1]
 title: multiple checks and disable comment
 config: |-
-    {
-      "ci": {
-        "baseBranch": "master",
-        "maxCommits": 20
-      },
-      "parser": {},
-      "repository": {},
-      "checks": {
-        "enabled": [
-          "alerts/absent",
-          "alerts/annotation",
-          "alerts/comparison",
-          "alerts/count",
-          "alerts/external_labels",
-          "alerts/for",
-          "alerts/template",
-          "labels/conflict",
-          "promql/aggregate",
-          "promql/counter",
-          "promql/features",
-          "promql/fragile",
-          "group/interval",
-          "promql/impossible",
-          "promql/nan",
-          "promql/offset",
-          "promql/range_query",
-          "promql/rate",
-          "promql/regexp",
-          "promql/selector",
-          "promql/series",
-          "promql/syntax",
-          "promql/vector_matching",
-          "query/cost",
-          "rule/dependency",
-          "rule/duplicate",
-          "rule/for",
-          "rule/label",
-          "rule/link",
-          "rule/name",
-          "rule/reject",
-          "rule/report"
-        ]
-      },
-      "owners": {},
-      "rules": [
-        {
-          "aggregate": [
-            {
-              "name": ".+",
-              "severity": "bug",
-              "keep": [
-                "job"
-              ]
-            },
-            {
-              "name": ".+",
-              "comment": "this is rule comment",
-              "severity": "bug",
-              "strip": [
-                "instance",
-                "rack"
-              ]
-            }
-          ]
-        }
+  {
+    "ci": {
+      "baseBranch": "master",
+      "maxCommits": 20
+    },
+    "parser": {},
+    "repository": {},
+    "checks": {
+      "enabled": [
+        "alerts/absent",
+        "alerts/annotation",
+        "alerts/comparison",
+        "alerts/count",
+        "alerts/external_labels",
+        "alerts/for",
+        "alerts/template",
+        "labels/conflict",
+        "promql/aggregate",
+        "promql/counter",
+        "promql/features",
+        "promql/fragile",
+        "group/interval",
+        "promql/impossible",
+        "promql/nan",
+        "promql/offset",
+        "promql/range_query",
+        "promql/rate",
+        "promql/regexp",
+        "promql/selector",
+        "promql/series",
+        "promql/syntax",
+        "promql/vector_matching",
+        "query/cost",
+        "rule/dependency",
+        "rule/duplicate",
+        "rule/for",
+        "rule/label",
+        "rule/link",
+        "rule/name",
+        "rule/reject",
+        "rule/report"
       ]
-    }
+    },
+    "owners": {},
+    "rules": [
+      {
+        "aggregate": [
+          {
+            "name": ".+",
+            "severity": "bug",
+            "keep": [
+              "job"
+            ]
+          },
+          {
+            "name": ".+",
+            "comment": "this is rule comment",
+            "severity": "bug",
+            "strip": [
+              "instance",
+              "rack"
+            ]
+          }
+        ]
+      }
+    ]
+  }
 entry:
-    path:
-        name: rules.yml
-        symlinktarget: rules.yml
-    filecomments: []
-    rulecomments:
-        - value:
-            match: promql/aggregate(instance:false)
-            position:
-                pos:
-                    - line: 3
-                      firstcolumn: 3
-                      lastcolumn: 49
-                offset: 15
-          type: 10
-          offset: 0
-        - value:
-            match: promql/impossible
-            position:
-                pos:
-                    - line: 4
-                      firstcolumn: 3
-                      lastcolumn: 34
-                offset: 15
-          type: 10
-          offset: 0
+  path:
+    name: rules.yml
+    symlinktarget: rules.yml
+  filecomments: []
+  rulecomments:
+  - value:
+      match: promql/aggregate(instance:false)
+      position:
+        pos:
+        - line: 3
+          firstcolumn: 3
+          lastcolumn: 49
+        offset: 15
+    type: 10
+    offset: 0
+  - value:
+      match: promql/impossible
+      position:
+        pos:
+        - line: 4
+          firstcolumn: 3
+          lastcolumn: 34
+        offset: 15
+    type: 10
+    offset: 0
 checks:
-    - promql/syntax
-    - alerts/for
-    - alerts/comparison
-    - alerts/template
-    - promql/fragile
-    - promql/regexp
-    - rule/dependency
-    - promql/nan
-    - group/interval
-    - promql/aggregate(job:true)
-    - promql/aggregate(rack:false)
+- promql/syntax
+- alerts/for
+- alerts/comparison
+- alerts/template
+- promql/fragile
+- promql/regexp
+- rule/dependency
+- promql/nan
+- group/interval
+- promql/aggregate(job:true)
+- promql/aggregate(rack:false)
 
 ---

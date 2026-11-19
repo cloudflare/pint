@@ -11,7 +11,7 @@
 
 [TestSelector/label_missing - 1]
 - description: label missing
-  content: |4
+  content: |
 
     - alert: foo
       expr: errors > 0
@@ -23,13 +23,14 @@
     summary: required matcher missing
     details: 'Rule comment: comment'
     diagnostics:
-        - message: This vector selector must specify `job` label. Please add a `{job="..."} matcher.
-          firstcolumn: 1
-          lastcolumn: 6
-          kind: 0
+    - message: This vector selector must specify `job` label. Please add a `{job="..."}
+        matcher.
+      firstcolumn: 1
+      lastcolumn: 6
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 1
     anchor: 0
 
@@ -37,7 +38,7 @@
 
 [TestSelector/label_missing_/___name__ - 1]
 - description: label missing / __name__
-  content: |4
+  content: |
 
     - alert: foo
       expr: |
@@ -51,13 +52,14 @@
     summary: required matcher missing
     details: 'Rule comment: comment'
     diagnostics:
-        - message: This vector selector must specify `job` label. Please add a `{job="..."} matcher.
-          firstcolumn: 1
-          lastcolumn: 19
-          kind: 0
+    - message: This vector selector must specify `job` label. Please add a `{job="..."}
+        matcher.
+      firstcolumn: 1
+      lastcolumn: 19
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 1
     anchor: 0
 
@@ -65,7 +67,7 @@
 
 [TestSelector/label_missing_/___name___regexp - 1]
 - description: label missing / __name__ regexp
-  content: |4
+  content: |
 
     - alert: foo
       expr: |
@@ -79,13 +81,14 @@
     summary: required matcher missing
     details: 'Rule comment: comment'
     diagnostics:
-        - message: This vector selector must specify `job` label. Please add a `{job="..."} matcher.
-          firstcolumn: 1
-          lastcolumn: 20
-          kind: 0
+    - message: This vector selector must specify `job` label. Please add a `{job="..."}
+        matcher.
+      firstcolumn: 1
+      lastcolumn: 20
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 1
     anchor: 0
 
@@ -93,7 +96,7 @@
 
 [TestSelector/label_missing_/_matchers - 1]
 - description: label missing / matchers
-  content: |4
+  content: |
 
     - alert: foo
       expr: errors{cluster="dev", instance="foo"} > 0
@@ -106,13 +109,14 @@
     summary: required matcher missing
     details: 'Rule comment: comment'
     diagnostics:
-        - message: This vector selector must specify `job` label. Please add a `{job="..."} matcher.
-          firstcolumn: 1
-          lastcolumn: 37
-          kind: 0
+    - message: This vector selector must specify `job` label. Please add a `{job="..."}
+        matcher.
+      firstcolumn: 1
+      lastcolumn: 37
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 1
     anchor: 0
 
@@ -130,7 +134,7 @@
 
 [TestSelector/label_missing_inside_call - 1]
 - description: label missing inside call
-  content: |4
+  content: |
 
     - alert: foo
       expr: absent(errors{xjob="foo"})
@@ -144,13 +148,14 @@
     summary: required matcher missing
     details: 'Rule comment: comment'
     diagnostics:
-        - message: Vector selectors inside the `absent()` function must specify `job` label. Please add a `{job="..."} matcher.
-          firstcolumn: 8
-          lastcolumn: 25
-          kind: 0
+    - message: Vector selectors inside the `absent()` function must specify `job`
+        label. Please add a `{job="..."} matcher.
+      firstcolumn: 8
+      lastcolumn: 25
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 1
     anchor: 0
 

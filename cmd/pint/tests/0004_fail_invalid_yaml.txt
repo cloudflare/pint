@@ -5,12 +5,15 @@ cmp stderr stderr.txt
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
-level=WARN msg="Failed to parse file content" err="did not find expected key" path=rules/bad.yaml line=4
+level=WARN msg="Failed to parse file content" err="invalid syntax" path=rules/bad.yaml line=5
 level=INFO msg="Checking Prometheus rules" entries=2 workers=10 online=true
-Fatal: did not find expected key (yaml/parse)
-  ---> rules/bad.yaml:4
- 4 | 
-     ^^^ did not find expected key
+Fatal: invalid syntax (yaml/parse)
+  ---> rules/bad.yaml:5
+1 | xxx:
+    ^ while parsing a block mapping
+  | [...]
+5 | - xx
+    ^ did not find expected key
 
 Fatal: PromQL syntax error (promql/syntax)
   ---> rules/ok.yml:5 -> `sum:missing`

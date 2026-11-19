@@ -170,7 +170,7 @@ func TestGlobPathFinder(t *testing.T) {
 						SymlinkTarget: "bar.yml",
 					},
 					PathError: parser.ParseError{
-						Err:  errors.New("mapping values are not allowed in this context"),
+						Err:  errors.New("invalid syntax"),
 						Line: 2,
 					},
 					Owner: "bob",
