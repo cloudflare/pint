@@ -1,7 +1,7 @@
 
 [TestTemplateCheck/$value_|_first - 1]
 - description: $value | first
-  content: |4
+  content: |
 
     - alert: Foo
       expr: rate(errors[2m])
@@ -28,7 +28,7 @@
     severity: 3
     anchor: 0
 - description: $value | first
-  content: |4
+  content: |
 
     - alert: Foo
       expr: rate(errors[2m])
@@ -63,7 +63,7 @@
 
 [TestTemplateCheck/__name___is_stripped - 1]
 - description: __name__ is stripped
-  content: |4
+  content: |
 
     - alert: Foo
       expr: sum(foo) > 0
@@ -96,7 +96,7 @@
     severity: 2
     anchor: 0
 - description: __name__ is stripped
-  content: |4
+  content: |
 
     - alert: Foo
       expr: sum(foo) > 0
@@ -133,7 +133,7 @@
 
 [TestTemplateCheck/__name___is_stripped_in_foo+foo - 1]
 - description: __name__ is stripped in foo+foo
-  content: |4
+  content: |
 
     - alert: Foo
       expr: foo + on(__name__, job) foo > 0
@@ -175,7 +175,7 @@
 
 [TestTemplateCheck/absent()_*_on()_group_left()_bar - 1]
 - description: absent() * on() group_left() bar
-  content: |4
+  content: |
 
     - alert: Foo
       expr: absent(foo{job="xxx"}) * on() group_left() bar
@@ -220,7 +220,7 @@
     severity: 2
     anchor: 0
 - description: absent() * on() group_left() bar
-  content: |4
+  content: |
 
     - alert: Foo
       expr: absent(foo{job="xxx"}) * on() group_left() bar
@@ -416,7 +416,7 @@
 
 [TestTemplateCheck/annotation_label_missing_from_metrics_(absent())_/_multiple - 1]
 - description: annotation label missing from metrics (absent()) / multiple
-  content: |4
+  content: |
 
     - alert: Foo Is Missing
       expr: absent(foo) or absent(bar)
@@ -465,7 +465,7 @@
 
 [TestTemplateCheck/annotation_label_missing_from_metrics_(absent(sum)) - 1]
 - description: annotation label missing from metrics (absent(sum))
-  content: |4
+  content: |
 
     - alert: Foo Is Missing
       expr: absent(sum(foo) by(job))
@@ -510,7 +510,7 @@
     severity: 2
     anchor: 0
 - description: annotation label missing from metrics (absent(sum))
-  content: |4
+  content: |
 
     - alert: Foo Is Missing
       expr: absent(sum(foo) by(job))
@@ -559,7 +559,7 @@
 
 [TestTemplateCheck/annotation_label_missing_from_metrics_(absent({job=~})) - 1]
 - description: annotation label missing from metrics (absent({job=~}))
-  content: |4
+  content: |
 
     - alert: Foo Is Missing
       expr: absent({job=~".+"})
@@ -608,7 +608,7 @@
 
 [TestTemplateCheck/annotation_label_missing_from_metrics_(absent,_and) - 1]
 - description: annotation label missing from metrics (absent, and)
-  content: |4
+  content: |
 
     - alert: Foo Is Missing
       expr: absent(foo{job="bar"}) AND on(job) foo
@@ -656,7 +656,7 @@
     severity: 2
     anchor: 0
 - description: annotation label missing from metrics (absent, and)
-  content: |4
+  content: |
 
     - alert: Foo Is Missing
       expr: absent(foo{job="bar"}) AND on(job) foo
@@ -704,7 +704,7 @@
     severity: 2
     anchor: 0
 - description: annotation label missing from metrics (absent, and)
-  content: |4
+  content: |
 
     - alert: Foo Is Missing
       expr: absent(foo{job="bar"}) AND on(job) foo
@@ -752,7 +752,7 @@
     severity: 2
     anchor: 0
 - description: annotation label missing from metrics (absent, and)
-  content: |4
+  content: |
 
     - alert: Foo Is Missing
       expr: absent(foo{job="bar"}) AND on(job) foo
@@ -875,7 +875,7 @@
 
 [TestTemplateCheck/annotation_label_missing_from_metrics_(group_left) - 1]
 - description: annotation label missing from metrics (group_left)
-  content: |4
+  content: |
 
     - alert: Foo Is Down
       expr: count(build_info) by (instance, version) != ignoring(package) group_left(foo) count(package_installed) by (instance, version, package)
@@ -1027,7 +1027,7 @@
 
 [TestTemplateCheck/annotation_label_present_on_metrics_(absent(sum)) - 1]
 - description: annotation label present on metrics (absent(sum))
-  content: |4
+  content: |
 
     - alert: Foo Is Missing
       expr: absent(sum(foo) by(job, instance))
@@ -1072,7 +1072,7 @@
     severity: 2
     anchor: 0
 - description: annotation label present on metrics (absent(sum))
-  content: |4
+  content: |
 
     - alert: Foo Is Missing
       expr: absent(sum(foo) by(job, instance))
@@ -1131,7 +1131,7 @@
 
 [TestTemplateCheck/bar_*_ignoring(job)_foo - 1]
 - description: bar * ignoring(job) foo
-  content: |4
+  content: |
 
     - alert: Foo
       expr: bar * ignoring(job) foo
@@ -1170,7 +1170,7 @@
 
 [TestTemplateCheck/bar_*_on()_group_right()_absent() - 1]
 - description: bar * on() group_right() absent()
-  content: |4
+  content: |
 
     - alert: Foo
       expr: bar * on() group_right() absent(foo{job="xxx"})
@@ -1219,7 +1219,7 @@
     severity: 2
     anchor: 0
 - description: bar * on() group_right() absent()
-  content: |4
+  content: |
 
     - alert: Foo
       expr: bar * on() group_right() absent(foo{job="xxx"})
@@ -1282,7 +1282,7 @@
 
 [TestTemplateCheck/error_on_third_line_of_multi-line_template - 1]
 - description: error on third line of multi-line template
-  content: |4
+  content: |
 
     - alert: Foo
       expr: up == 0
@@ -1545,7 +1545,7 @@
 
 [TestTemplateCheck/humanize_still_needed_for_printf_on_another_value - 1]
 - description: humanize still needed for printf on another value
-  content: |4
+  content: |
 
     - alert: Foo
       expr: rate(errors_total[5m]) > 0
@@ -1778,7 +1778,7 @@
 
 [TestTemplateCheck/metric_or_(metric_or_vector) - 1]
 - description: metric or (metric or vector)
-  content: |4
+  content: |
 
     - alert: Foo
       expr: |
@@ -1818,7 +1818,7 @@
 
 [TestTemplateCheck/multiple_aggregations - 1]
 - description: multiple aggregations
-  content: |4
+  content: |2
 
       - alert: High_CPU_Imbalance_On_Many_Colos
         expr: |
@@ -1830,7 +1830,7 @@
         for: 10m
         annotations:
           summary: "Errors in {{ $labels.colo_name }}"
-  output: |4
+  output: |2
      4 |       count by (region) (
                      ^^^^^^^^^^^
                      Query is using aggregation with `by(region)`, only labels included inside `by(...)` will
@@ -1870,7 +1870,7 @@
 
 [TestTemplateCheck/multiple_or_/_missing_group_left() - 1]
 - description: multiple or / missing group_left()
-  content: |4
+  content: |
 
     - alert: Foo
       expr: >
@@ -1890,7 +1890,7 @@
         < 5 > 0
       annotations:
         dashboard: 'Prefix is {{ $labels.prefix }}'
-  output: |4
+  output: |2
      4 |     avg without(router, colo_id, instance) (...)
        |     [...]
      9 |     < 8 > 0
@@ -1936,7 +1936,7 @@
 
 [TestTemplateCheck/no_humanize_on_irate() - 1]
 - description: no humanize on irate()
-  content: |4
+  content: |
 
     - alert: Foo
       expr: irate(errors[2m]) > 0
@@ -1972,7 +1972,7 @@
 
 [TestTemplateCheck/no_humanize_on_irate()#01 - 1]
 - description: no humanize on irate()
-  content: |4
+  content: |
 
     - alert: Foo
       expr: deriv(errors[2m]) > 0
@@ -2008,7 +2008,7 @@
 
 [TestTemplateCheck/no_humanize_on_rate() - 1]
 - description: no humanize on rate()
-  content: |4
+  content: |
 
     - alert: Foo
       expr: rate(errors[2m]) > 0
@@ -2044,7 +2044,7 @@
 
 [TestTemplateCheck/no_humanize_on_rate()_/_alias - 1]
 - description: no humanize on rate() / alias
-  content: |4
+  content: |
 
     - alert: Foo
       expr: rate(errors[2m]) > 0
@@ -2106,7 +2106,7 @@
 
 [TestTemplateCheck/rate()_with_$value_but_invalid_template_syntax - 1]
 - description: rate() with $value but invalid template syntax
-  content: |4
+  content: |
 
     - alert: Foo
       expr: rate(errors[2m]) > 0
@@ -2154,7 +2154,7 @@
 
 [TestTemplateCheck/template_piped_query_with_syntax_error - 1]
 - description: template piped query with syntax error
-  content: |4
+  content: |
 
     - alert: Foo
       expr: up == 0
@@ -2205,7 +2205,7 @@
 
 [TestTemplateCheck/template_query_reads_missing_label_twice - 1]
 - description: template query reads missing label twice
-  content: |4
+  content: |
 
     - alert: Foo
       expr: up == 0
@@ -2245,7 +2245,7 @@
 
 [TestTemplateCheck/template_query_reads_missing_label_via_first_in_pipe - 1]
 - description: template query reads missing label via first in pipe
-  content: |4
+  content: |
 
     - alert: Foo
       expr: up == 0
@@ -2280,7 +2280,7 @@
 
 [TestTemplateCheck/template_query_reads_two_missing_labels - 1]
 - description: template query reads two missing labels
-  content: |4
+  content: |
 
     - alert: Foo
       expr: up == 0
@@ -2315,7 +2315,7 @@
     severity: 2
     anchor: 0
 - description: template query reads two missing labels
-  content: |4
+  content: |
 
     - alert: Foo
       expr: up == 0
@@ -2355,7 +2355,7 @@
 
 [TestTemplateCheck/template_query_removes_instance - 1]
 - description: template query removes instance
-  content: |4
+  content: |
 
     - alert: Foo
       expr: up == 0
@@ -2400,7 +2400,7 @@
 
 [TestTemplateCheck/template_query_with_bogus_function - 1]
 - description: template query with bogus function
-  content: |4
+  content: |
 
     - alert: Foo
       expr: up == 0
@@ -2436,7 +2436,7 @@
 
 [TestTemplateCheck/template_query_with_bogus_query_in_if - 1]
 - description: template query with bogus query in if
-  content: |4
+  content: |
 
     - alert: Foo
       expr: up == 0
@@ -2471,7 +2471,7 @@
 
 [TestTemplateCheck/template_query_with_bogus_range - 1]
 - description: template query with bogus range
-  content: |4
+  content: |
 
     - alert: Foo
       expr: up == 0
@@ -2511,7 +2511,7 @@
 
 [TestTemplateCheck/template_query_with_on()_removes_unlisted_labels - 1]
 - description: template query with on() removes unlisted labels
-  content: |4
+  content: |
 
     - alert: Foo
       expr: up == 0
@@ -2557,7 +2557,7 @@
 
 [TestTemplateCheck/template_query_with_syntax_error - 1]
 - description: template query with syntax error
-  content: |4
+  content: |
 
     - alert: Foo
       expr: up == 0
@@ -2618,7 +2618,7 @@
 
 [TestTemplateCheck/template_query_with_vector(0)_removes_labels - 1]
 - description: template query with vector(0) removes labels
-  content: |4
+  content: |
 
     - alert: Foo
       expr: up == 0
@@ -2657,7 +2657,7 @@
 
 [TestTemplateCheck/template_range_query_removes_instance - 1]
 - description: template range query removes instance
-  content: |4
+  content: |
 
     - alert: Foo
       expr: up == 0

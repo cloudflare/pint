@@ -192,14 +192,14 @@
     1 | - record: foo
                   ^^^
                   Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX
-                  error: `failed to decode config data in http://127.0.0.1:XXXXX response: yaml: line 2:
-                  could not find expected ':'`.
+                  error: `failed to decode config data in http://127.0.0.1:XXXXX response: yaml: while
+                  scanning a simple key: could not find expected ':' at line 3`.
   problem:
     reporter: promql/rate
     summary: unable to run checks
     details: ""
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `failed to decode config data in http://127.0.0.1:XXXXX response: yaml: line 2: could not find expected '':''`.'
+        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `failed to decode config data in http://127.0.0.1:XXXXX response: yaml: while scanning a simple key: could not find expected '':'' at line 3`.'
           firstcolumn: 1
           lastcolumn: 3
           kind: 0
@@ -760,7 +760,7 @@
 
 [TestRateCheck/sum(rate(sum))_/_sum(rate(sum)) - 1]
 - description: sum(rate(sum)) / sum(rate(sum))
-  content: |4
+  content: |
 
     - alert: Plexi_Worker_High_Signing_Latency
       expr: |
@@ -772,7 +772,7 @@
           rate(global:response_time_count{namespace!~"test[.].+"}[15m])
         ) by (environment, namespace)
         > 3000
-  output: |4
+  output: |2
      4 |     sum(
      5 |       rate(global:response_time_sum{namespace!~"test[.].+"}[15m])
              ^^^^^^^^^^^^^^^^^^^^^^^

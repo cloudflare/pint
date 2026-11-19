@@ -1,0 +1,112 @@
+! exec pint --no-color lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=INFO msg="Finding all rules to check" paths=["rules"]
+level=WARN msg="Failed to parse file content" err="invalid syntax" path=rules/02_scanner_error_without_context.yml line=5
+level=WARN msg="Failed to parse file content" err="invalid syntax" path=rules/03_scanner_error_with_context_on_same_line.yml line=6
+level=WARN msg="Failed to parse file content" err="invalid syntax" path=rules/04_scanner_error_with_context_on_earlier_line.yml line=5
+level=WARN msg="Failed to parse file content" err="invalid syntax" path=rules/05_scanner_error_with_context_at_error_position.yml line=5
+level=WARN msg="Failed to parse file content" err="invalid syntax" path=rules/06_parser_error_without_context.yml line=2
+level=WARN msg="Failed to parse file content" err="invalid syntax" path=rules/07_parser_error_with_context.yml line=3
+level=WARN msg="Failed to parse file content" err="invalid syntax" path=rules/08_parser_error_with_mark_after_last_line.yml line=2
+level=WARN msg="Failed to parse file content" err="invalid syntax" path=rules/09_composer_error.yml line=5
+level=INFO msg="Checking Prometheus rules" entries=8 workers=10 online=true
+Fatal: invalid syntax (yaml/parse)
+  ---> rules/02_scanner_error_without_context.yml:5
+5 |     expr: - sum(up)
+              ^ block sequence entries are not allowed in this context
+
+Fatal: invalid syntax (yaml/parse)
+  ---> rules/03_scanner_error_with_context_on_same_line.yml:6
+5 |     expr: 'sum(up)
+              ^ while scanning a quoted scalar
+6 | 
+    ^ found unexpected end of stream
+
+Fatal: invalid syntax (yaml/parse)
+  ---> rules/04_scanner_error_with_context_on_earlier_line.yml:5
+4 |   - record: foo
+                ^ while scanning a plain scalar
+5 | 	  expr: sum(up)
+    ^ found a tab character that violates indentation
+
+Fatal: invalid syntax (yaml/parse)
+  ---> rules/05_scanner_error_with_context_at_error_position.yml:5
+5 |     expr: @sum(up)
+              ^ found character that cannot start any token
+                while scanning for the next token
+
+Fatal: invalid syntax (yaml/parse)
+  ---> rules/06_parser_error_without_context.yml:2
+2 | %YAML 1.1
+    ^ found duplicate %YAML directive
+
+Fatal: invalid syntax (yaml/parse)
+  ---> rules/07_parser_error_with_context.yml:3
+1 | - record: foo
+    ^ while parsing a block collection
+  | [...]
+3 | foo: bar
+    ^ did not find expected '-' indicator
+
+Fatal: invalid syntax (yaml/parse)
+  ---> rules/08_parser_error_with_mark_after_last_line.yml:2
+1 | groups: [
+2 | 
+    ^ did not find expected node content
+      while parsing a flow node
+
+Fatal: invalid syntax (yaml/parse)
+  ---> rules/09_composer_error.yml:5
+5 |     expr: *bar
+              ^ unknown anchor 'bar' referenced
+
+level=INFO msg="Problems found" Fatal=8
+level=ERROR msg="Execution completed with error(s)" err="found 8 problem(s) with severity Bug or higher"
+-- rules/02_scanner_error_without_context.yml --
+groups:
+- name: foo
+  rules:
+  - record: foo
+    expr: - sum(up)
+-- rules/03_scanner_error_with_context_on_same_line.yml --
+groups:
+- name: foo
+  rules:
+  - record: foo
+    expr: 'sum(up)
+-- rules/04_scanner_error_with_context_on_earlier_line.yml --
+groups:
+- name: foo
+  rules:
+  - record: foo
+	  expr: sum(up)
+-- rules/05_scanner_error_with_context_at_error_position.yml --
+groups:
+- name: foo
+  rules:
+  - record: foo
+    expr: @sum(up)
+-- rules/06_parser_error_without_context.yml --
+%YAML 1.1
+%YAML 1.1
+---
+groups:
+- name: foo
+  rules:
+  - record: foo
+    expr: sum(up)
+-- rules/07_parser_error_with_context.yml --
+- record: foo
+  expr: sum(up)
+foo: bar
+-- rules/08_parser_error_with_mark_after_last_line.yml --
+groups: [
+-- rules/09_composer_error.yml --
+groups:
+- name: foo
+  rules:
+  - record: foo
+    expr: *bar

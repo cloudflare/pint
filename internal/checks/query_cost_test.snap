@@ -114,7 +114,7 @@
 
 [TestCostCheck/7_results#01 - 1]
 - description: 7 results
-  content: |4
+  content: |
 
     - record: foo
       expr: 'sum({__name__="foo"})'

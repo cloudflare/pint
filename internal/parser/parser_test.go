@@ -6,6 +6,7 @@ import (
 	"errors"
 	"os"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -89,8 +90,19 @@ func TestParse(t *testing.T) {
 			output: parser.File{
 				IsRelaxed: true,
 				Error: parser.ParseError{
-					Err:  errors.New("yaml: incomplete UTF-8 octet sequence"),
+					Err:  errors.New("invalid syntax"),
 					Line: 1,
+					Diagnostics: []diags.Diagnostic{
+						{
+							Message: "incomplete UTF-8 octet sequence",
+							Pos: diags.PositionRanges{
+								{Line: 1, FirstColumn: 1, LastColumn: 1},
+							},
+							FirstColumn: 1,
+							LastColumn:  1,
+							Kind:        diags.Issue,
+						},
+					},
 				},
 			},
 		},
@@ -239,8 +251,19 @@ func TestParse(t *testing.T) {
 			output: parser.File{
 				IsRelaxed: true,
 				Error: parser.ParseError{
-					Err:  errors.New("yaml: block sequence entries are not allowed in this context"),
+					Err:  errors.New("invalid syntax"),
 					Line: 1,
+					Diagnostics: []diags.Diagnostic{
+						{
+							Message: "block sequence entries are not allowed in this context",
+							Pos: diags.PositionRanges{
+								{Line: 1, FirstColumn: 11, LastColumn: 11},
+							},
+							FirstColumn: 1,
+							LastColumn:  1,
+							Kind:        diags.Issue,
+						},
+					},
 				},
 			},
 		},
@@ -249,8 +272,19 @@ func TestParse(t *testing.T) {
 			output: parser.File{
 				IsRelaxed: true,
 				Error: parser.ParseError{
-					Err:  errors.New("yaml: mapping values are not allowed in this context"),
+					Err:  errors.New("invalid syntax"),
 					Line: 1,
+					Diagnostics: []diags.Diagnostic{
+						{
+							Message: "mapping values are not allowed in this context",
+							Pos: diags.PositionRanges{
+								{Line: 1, FirstColumn: 20, LastColumn: 20},
+							},
+							FirstColumn: 1,
+							LastColumn:  1,
+							Kind:        diags.Issue,
+						},
+					},
 				},
 			},
 		},
@@ -259,8 +293,28 @@ func TestParse(t *testing.T) {
 			output: parser.File{
 				IsRelaxed: true,
 				Error: parser.ParseError{
-					Err:  errors.New("found a tab character that violates indentation"),
+					Err:  errors.New("invalid syntax"),
 					Line: 2,
+					Diagnostics: []diags.Diagnostic{
+						{
+							Message: "found a tab character that violates indentation",
+							Pos: diags.PositionRanges{
+								{Line: 2, FirstColumn: 1, LastColumn: 1},
+							},
+							FirstColumn: 1,
+							LastColumn:  1,
+							Kind:        diags.Issue,
+						},
+						{
+							Message: "while scanning a plain scalar",
+							Pos: diags.PositionRanges{
+								{Line: 1, FirstColumn: 3, LastColumn: 3},
+							},
+							FirstColumn: 1,
+							LastColumn:  1,
+							Kind:        diags.Context,
+						},
+					},
 				},
 			},
 		},
@@ -1969,6 +2023,20 @@ data:
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 7, Last: 8},
+								Comments: []comments.Comment{
+									{
+										Type: comments.DisableType,
+										Value: comments.Disable{
+											Match: "up",
+											Position: comments.Position{
+												Offset: 15,
+												Pos: diags.PositionRanges{
+													{Line: 11, FirstColumn: 3, LastColumn: 19},
+												},
+											},
+										},
+									},
+								},
 								RecordingRule: &parser.RecordingRule{
 									Record: parser.YamlNode{
 										Value: "foo",
@@ -2886,8 +2954,19 @@ data:
 			output: parser.File{
 				IsRelaxed: true,
 				Error: parser.ParseError{
-					Err:  errors.New("yaml: invalid Unicode character"),
+					Err:  errors.New("invalid syntax"),
 					Line: 1,
+					Diagnostics: []diags.Diagnostic{
+						{
+							Message: "invalid Unicode character (value: 57343)",
+							Pos: diags.PositionRanges{
+								{Line: 1, FirstColumn: 1, LastColumn: 1},
+							},
+							FirstColumn: 1,
+							LastColumn:  1,
+							Kind:        diags.Issue,
+						},
+					},
 				},
 			},
 		},
@@ -3375,8 +3454,28 @@ data:
 			output: parser.File{
 				IsRelaxed: true,
 				Error: parser.ParseError{
-					Err:  errors.New("did not find expected tag URI"),
+					Err:  errors.New("invalid syntax"),
 					Line: 4,
+					Diagnostics: []diags.Diagnostic{
+						{
+							Message: "did not find expected tag URI",
+							Pos: diags.PositionRanges{
+								{Line: 4, FirstColumn: 13, LastColumn: 13},
+							},
+							FirstColumn: 1,
+							LastColumn:  1,
+							Kind:        diags.Issue,
+						},
+						{
+							Message: "while parsing a tag",
+							Pos: diags.PositionRanges{
+								{Line: 4, FirstColumn: 11, LastColumn: 11},
+							},
+							FirstColumn: 1,
+							LastColumn:  1,
+							Kind:        diags.Context,
+						},
+					},
 				},
 			},
 		},
@@ -3892,8 +3991,28 @@ groups:
 			strict: true,
 			output: parser.File{
 				Error: parser.ParseError{
-					Err:  errors.New("found a tab character that violates indentation"),
-					Line: 6,
+					Err:  errors.New("invalid syntax"),
+					Line: 7,
+					Diagnostics: []diags.Diagnostic{
+						{
+							Message: "found a tab character that violates indentation",
+							Pos: diags.PositionRanges{
+								{Line: 7, FirstColumn: 1, LastColumn: 1},
+							},
+							FirstColumn: 1,
+							LastColumn:  1,
+							Kind:        diags.Issue,
+						},
+						{
+							Message: "while scanning a plain scalar",
+							Pos: diags.PositionRanges{
+								{Line: 6, FirstColumn: 17, LastColumn: 17},
+							},
+							FirstColumn: 1,
+							LastColumn:  1,
+							Kind:        diags.Context,
+						},
+					},
 				},
 			},
 		},
@@ -3965,6 +4084,8 @@ groups:
 				Error: parser.ParseError{
 					Line: 8,
 					Err:  errors.New("multi-document YAML files are not allowed"),
+					Details: `This is a multi-document YAML file. Prometheus will only parse the first document and silently ignore the rest.
+To allow for multi-document YAML files set parser->relaxed option in pint config file.`,
 				},
 			},
 		},
@@ -4004,6 +4125,8 @@ groups:
 				Error: parser.ParseError{
 					Line: 4,
 					Err:  errors.New("multi-document YAML files are not allowed"),
+					Details: `This is a multi-document YAML file. Prometheus will only parse the first document and silently ignore the rest.
+To allow for multi-document YAML files set parser->relaxed option in pint config file.`,
 				},
 			},
 		},
@@ -4130,6 +4253,17 @@ groups:
 				Error: parser.ParseError{
 					Err:  errors.New("duplicated group name"),
 					Line: 7,
+					Diagnostics: []diags.Diagnostic{
+						{
+							Message: "duplicated group name",
+							Pos: diags.PositionRanges{
+								{Line: 7, FirstColumn: 10, LastColumn: 14},
+							},
+							FirstColumn: 1,
+							LastColumn:  5,
+							Kind:        diags.Issue,
+						},
+					},
 				},
 			},
 		},
@@ -4395,6 +4529,17 @@ groups:
 				Error: parser.ParseError{
 					Err:  errors.New("duplicated group name"),
 					Line: 5,
+					Diagnostics: []diags.Diagnostic{
+						{
+							Message: "duplicated group name",
+							Pos: diags.PositionRanges{
+								{Line: 5, FirstColumn: 9, LastColumn: 11},
+							},
+							FirstColumn: 1,
+							LastColumn:  3,
+							Kind:        diags.Issue,
+						},
+					},
 				},
 			},
 		},
@@ -4824,6 +4969,8 @@ groups:
 				Error: parser.ParseError{
 					Line: 8,
 					Err:  errors.New("multi-document YAML files are not allowed"),
+					Details: `This is a multi-document YAML file. Prometheus will only parse the first document and silently ignore the rest.
+To allow for multi-document YAML files set parser->relaxed option in pint config file.`,
 				},
 				Groups: []parser.Group{
 					{
@@ -5321,8 +5468,19 @@ groups:
 			strict: true,
 			output: parser.File{
 				Error: parser.ParseError{
-					Err:  errors.New("did not find expected alphabetic or numeric character"),
+					Err:  errors.New("invalid syntax"),
 					Line: 7,
+					Diagnostics: []diags.Diagnostic{
+						{
+							Message: "unknown anchor '*timeout' referenced",
+							Pos: diags.PositionRanges{
+								{Line: 7, FirstColumn: 22, LastColumn: 22},
+							},
+							FirstColumn: 1,
+							LastColumn:  1,
+							Kind:        diags.Issue,
+						},
+					},
 				},
 			},
 		},
@@ -7530,6 +7688,60 @@ data:
 				},
 			},
 		},
+		{
+			// The YAML error context starts at the same position as the error.
+			input: []byte("a: @x\n"),
+			output: parser.File{
+				IsRelaxed: true,
+				Error: parser.ParseError{
+					Err:  errors.New("invalid syntax"),
+					Line: 1,
+					Diagnostics: []diags.Diagnostic{
+						{
+							Message: "found character that cannot start any token",
+							Pos: diags.PositionRanges{
+								{Line: 1, FirstColumn: 4, LastColumn: 4},
+							},
+							FirstColumn: 1,
+							LastColumn:  1,
+							Kind:        diags.Issue,
+						},
+						{
+							Message: "while scanning for the next token",
+							Pos: diags.PositionRanges{
+								{Line: 1, FirstColumn: 4, LastColumn: 4},
+							},
+							FirstColumn: 1,
+							LastColumn:  1,
+							Kind:        diags.Context,
+						},
+					},
+				},
+			},
+		},
+		{
+			// The YAML error has a context message but no context position,
+			// so only the error itself is reported.
+			input: []byte(strings.Repeat("- ", 10001) + "a\n"),
+			output: parser.File{
+				IsRelaxed: true,
+				Error: parser.ParseError{
+					Err:  errors.New("invalid syntax"),
+					Line: 1,
+					Diagnostics: []diags.Diagnostic{
+						{
+							Message: "exceeded max depth of 10000",
+							Pos: diags.PositionRanges{
+								{Line: 1, FirstColumn: 20001, LastColumn: 20001},
+							},
+							FirstColumn: 1,
+							LastColumn:  1,
+							Kind:        diags.Issue,
+						},
+					},
+				},
+			},
+		},
 	}
 
 	alwaysEqual := cmp.Comparer(func(_, _ any) bool { return true })
@@ -7547,7 +7759,8 @@ data:
 	sameErrorText := cmp.FilterValues(func(x, y any) bool {
 		_, xe := x.(error)
 		_, ye := y.(error)
-		return xe && ye
+		_, xp := x.(parser.ParseError)
+		return xe && ye && !xp
 	}, cmpErrorText)
 
 	for i, tc := range testCases {

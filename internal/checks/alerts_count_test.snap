@@ -435,7 +435,7 @@
 
 [TestAlertsCountCheck/{__name__=}_/_three_ranges_/_3_alerts - 1]
 - description: '{__name__=} / three ranges / 3 alerts'
-  content: |4
+  content: |
 
     - alert: foo
       expr: '{__name__="up", job="foo"} == 0'
@@ -463,7 +463,7 @@
 
 [TestAlertsCountCheck/{__name__=~}_/_three_ranges_/_3_alerts - 1]
 - description: '{__name__=~} / three ranges / 3 alerts'
-  content: |4
+  content: |
 
     - alert: foo
       expr: '{__name__=~"(up|foo)", job="foo"} == 0'

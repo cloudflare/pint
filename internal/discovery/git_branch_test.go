@@ -1432,8 +1432,8 @@ groups:
 						},
 					},
 					PathError: parser.ParseError{
-						Line: 11,
-						Err:  errors.New("could not find expected ':'"),
+						Line: 12,
+						Err:  errors.New("invalid syntax"),
 					},
 				},
 			},
@@ -1683,8 +1683,8 @@ groups:
 						},
 					},
 					PathError: parser.ParseError{
-						Err:  errors.New("could not find expected ':'"),
-						Line: 6,
+						Err:  errors.New("invalid syntax"),
+						Line: 7,
 					},
 				},
 			},

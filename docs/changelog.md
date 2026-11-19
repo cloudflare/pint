@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.91.0
+
+### Changed
+
+- `go-yaml` was upgraded to v4 and this version gives us more information
+  in YAML parsing errors.
+
 ## v0.90.0
 
 ### Added

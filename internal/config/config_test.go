@@ -11,7 +11,7 @@ import (
 	"github.com/gkampitakis/go-snaps/snaps"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/require"
-	"go.yaml.in/yaml/v3"
+	"go.yaml.in/yaml/v4"
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/comments"
@@ -1872,7 +1872,7 @@ rule {
 			if tc.entry.File != nil {
 				fileComments = tc.entry.File.Comments
 			}
-			d, err := yaml.Marshal(Snapshot{
+			d, err := yaml.Dump(Snapshot{
 				Title:  tc.title,
 				Config: cfg.String(),
 				Entry: SnapEntry{
@@ -1881,7 +1881,7 @@ rule {
 					RuleComments: tc.entry.Rule.Comments,
 				},
 				Checks: checkNames,
-			})
+			}, yaml.WithV3Defaults(), yaml.WithLineWidth(-1))
 			require.NoError(t, err)
 			snaps.WithConfig(snaps.Filename(fmt.Sprintf("%03d", i+1))).MatchSnapshot(t, string(d))
 		})

@@ -302,7 +302,16 @@
 
 [TestVectorMatchingCheck/max()_by(a)_and_on(a)_foo - 1]
 - description: max() by(a) and on(a) foo
-  content: "\n- record: foo\n  expr: |\n    max by (cluster, env) (\n      increase(error_total{}[10m])\n    ) > 0\n    and on (cluster)\n    cluster_metadata{cluster=\"foo\", environment=\"prod\"} > 0\n  "
+  content: |-
+
+    - record: foo
+      expr: |
+        max by (cluster, env) (
+          increase(error_total{}[10m])
+        ) > 0
+        and on (cluster)
+        cluster_metadata{cluster="foo", environment="prod"} > 0
+      
   output: |
     4 |     max by (cluster, env) (
     5 |       increase(error_total{}[10m])

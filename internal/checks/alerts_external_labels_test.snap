@@ -6,7 +6,7 @@
 
 [TestAlertsExternalLabelsCountCheck/bad_request - 1]
 - description: bad request
-  content: |4
+  content: |
 
     - alert: Foo Is Down
       expr: up{job="foo"} == 0
@@ -46,7 +46,7 @@
 
 [TestAlertsExternalLabelsCountCheck/connection_refused_/_upstream_not_required_/_warning - 1]
 - description: connection refused / upstream not required / warning
-  content: |4
+  content: |
 
     - alert: Foo Is Down
       expr: up{job="foo"} == 0
@@ -101,7 +101,7 @@
 
 [TestAlertsExternalLabelsCountCheck/no_cluster_label - 1]
 - description: no cluster label
-  content: |4
+  content: |
 
     - alert: Foo Is Down
       expr: up{job="foo"} == 0
@@ -132,7 +132,7 @@
     severity: 2
     anchor: 0
 - description: no cluster label
-  content: |4
+  content: |
 
     - alert: Foo Is Down
       expr: up{job="foo"} == 0
@@ -164,7 +164,7 @@
     severity: 2
     anchor: 0
 - description: no cluster label
-  content: |4
+  content: |
 
     - alert: Foo Is Down
       expr: up{job="foo"} == 0
@@ -200,7 +200,7 @@
 
 [TestAlertsExternalLabelsCountCheck/no_cluster_label_/_relaxed_/_group_labels_set - 1]
 - description: no cluster label / relaxed / group labels set
-  content: |4
+  content: |
 
     groups:
     - name: mygroup
@@ -234,7 +234,7 @@
 
 [TestAlertsExternalLabelsCountCheck/no_cluster_label_/_strict_/_group_labels_set - 1]
 - description: no cluster label / strict / group labels set
-  content: |4
+  content: |
 
     groups:
     - name: mygroup

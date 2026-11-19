@@ -166,7 +166,7 @@ line3: baz
              ^ err1
   | [...]
 3 | line3: baz
-               err3
+             ^ err3
 
 ---
 
@@ -353,5 +353,24 @@ expr: |2-
  7 |                                 /
    | [...]
 11 |                                 )
+
+---
+
+[TestInjectDiagnostics/diagnostic_past_the_end_of_a_line - 1]
+expr: foo
+
+1 | expr: foo
+             ^ unexpected end
+
+---
+
+[TestInjectDiagnostics/diagnostic_on_an_empty_line_shows_the_line_above - 1]
+groups: [
+
+
+1 | groups: [
+2 | 
+    ^ did not find expected node content
+      while parsing a flow node
 
 ---

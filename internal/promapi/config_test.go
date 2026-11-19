@@ -2,6 +2,7 @@ package promapi_test
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -18,10 +19,12 @@ import (
 
 func TestConfig(t *testing.T) {
 	type testCaseT struct {
-		ctx         func(t *testing.T) context.Context
-		mock        httpmock.Mocker
-		errCheck    func(t *testing.T, err error)
-		name        string
+		ctx      func(t *testing.T) context.Context
+		mock     httpmock.Mocker
+		errCheck func(t *testing.T, err error)
+		name     string
+		// err is the expected error message, %s is replaced with the server URI.
+		err         string
 		cfg         promapi.PrometheusConfig
 		timeout     time.Duration
 		useFailover bool
@@ -118,6 +121,78 @@ func TestConfig(t *testing.T) {
 				s.ExpectGet(promapi.APIPathConfig).
 					ReturnHeader("Content-Type", "application/json").
 					Return(`{"status":"success","data":{"yaml":"invalid yaml"}}`).
+					UnlimitedTimes()
+			}),
+		},
+		{
+			name:    "empty YAML",
+			timeout: time.Second,
+			err:     "failed to decode config data in %s response: yaml: no documents in stream",
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(promapi.APIPathConfig).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"yaml":""}}`).
+					UnlimitedTimes()
+			}),
+		},
+		{
+			name:    "multi-document YAML",
+			timeout: time.Second,
+			err:     "failed to decode config data in %s response: yaml: expected single document, found multiple",
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(promapi.APIPathConfig).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"yaml":"global: {}\n---\nglobal: {}\n"}}`).
+					UnlimitedTimes()
+			}),
+		},
+		{
+			name:    "YAML syntax error",
+			timeout: time.Second,
+			err: "failed to decode config data in %s response: " +
+				"yaml: while parsing a flow node: did not find expected node content at line 3",
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(promapi.APIPathConfig).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"yaml":"global:\n  scrape_interval: [\n"}}`).
+					UnlimitedTimes()
+			}),
+		},
+		{
+			// YAML reader errors have no line number.
+			name:    "YAML with a control character",
+			timeout: time.Second,
+			err: "failed to decode config data in %s response: " +
+				"yaml: control characters are not allowed (value: 1)",
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(promapi.APIPathConfig).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"yaml":"global: \u0001\n"}}`).
+					UnlimitedTimes()
+			}),
+		},
+		{
+			name:    "YAML value with wrong type",
+			timeout: time.Second,
+			err: "failed to decode config data in %s response: " +
+				"yaml: cannot construct !!str `foo` into time.Duration at line 2",
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(promapi.APIPathConfig).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"yaml":"global:\n  scrape_interval: foo\n"}}`).
+					UnlimitedTimes()
+			}),
+		},
+		{
+			name:    "YAML with multiple values with wrong type",
+			timeout: time.Second,
+			err: "failed to decode config data in %s response: " +
+				"yaml: cannot construct !!str `foo` into time.Duration at line 2\n" +
+				"yaml: cannot construct !!str `bar` into time.Duration at line 3",
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(promapi.APIPathConfig).
+					ReturnHeader("Content-Type", "application/json").
+					Return(`{"status":"success","data":{"yaml":"global:\n  scrape_interval: foo\n  scrape_timeout: bar\n"}}`).
 					UnlimitedTimes()
 			}),
 		},
@@ -220,9 +295,12 @@ func TestConfig(t *testing.T) {
 				cfg, err = prom.Config(t.Context(), time.Minute)
 			}
 
-			if tc.errCheck != nil {
+			switch {
+			case tc.err != "":
+				require.EqualError(t, err, fmt.Sprintf(tc.err, srv.URL()))
+			case tc.errCheck != nil:
 				tc.errCheck(t, err)
-			} else {
+			default:
 				require.NoError(t, err)
 				require.Equal(t, tc.cfg, cfg.Config)
 			}

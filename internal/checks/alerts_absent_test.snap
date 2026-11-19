@@ -278,14 +278,14 @@
     1 | - alert: foo
                  ^^^
                  Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX
-                 error: `failed to decode config data in http://127.0.0.1:XXXXX response: yaml: line 2:
-                 could not find expected ':'`.
+                 error: `failed to decode config data in http://127.0.0.1:XXXXX response: yaml: while
+                 scanning a simple key: could not find expected ':' at line 3`.
   problem:
     reporter: alerts/absent
     summary: unable to run checks
     details: ""
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `failed to decode config data in http://127.0.0.1:XXXXX response: yaml: line 2: could not find expected '':''`.'
+        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `failed to decode config data in http://127.0.0.1:XXXXX response: yaml: while scanning a simple key: could not find expected '':'' at line 3`.'
           firstcolumn: 1
           lastcolumn: 3
           kind: 0

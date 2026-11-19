@@ -9,10 +9,11 @@ import (
 	"log/slog"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
-	"go.yaml.in/yaml/v3"
+	"go.yaml.in/yaml/v4"
 )
 
 const (
@@ -144,8 +145,8 @@ func parseConfig(r io.Reader) (cfg PrometheusConfig, err error) {
 		}
 	}
 
-	if err = yaml.Unmarshal([]byte(data.Data.YAML), &cfg); err != nil {
-		return cfg, err
+	if err = yaml.Load([]byte(data.Data.YAML), &cfg); err != nil {
+		return cfg, yamlErrorMessage(err)
 	}
 
 	if cfg.Global.ScrapeInterval == 0 {
@@ -159,4 +160,31 @@ func parseConfig(r io.Reader) (cfg PrometheusConfig, err error) {
 	}
 
 	return cfg, nil
+}
+
+// yamlErrorMessage formats yaml load errors without their stage and column
+// details, which make the error too long to show in a report.
+// Every error returned by yaml.Load is a *yaml.LoadErrors or a *yaml.LoadError.
+func yamlErrorMessage(err error) error {
+	loadErrs := []*yaml.LoadError{}
+	if loadErrors, ok := errors.AsType[*yaml.LoadErrors](err); ok {
+		loadErrs = loadErrors.Errors
+	} else {
+		loadErr, _ := errors.AsType[*yaml.LoadError](err)
+		loadErrs = append(loadErrs, loadErr)
+	}
+
+	msgs := make([]error, 0, len(loadErrs))
+	for _, le := range loadErrs {
+		// Some go-yaml messages already start with this prefix.
+		msg := strings.TrimPrefix(le.Message, "yaml: ")
+		if le.ContextMsg != "" {
+			msg = le.ContextMsg + ": " + msg
+		}
+		if le.Mark.Line > 0 {
+			msg += fmt.Sprintf(" at line %d", le.Mark.Line)
+		}
+		msgs = append(msgs, errors.New("yaml: "+msg))
+	}
+	return errors.Join(msgs...)
 }

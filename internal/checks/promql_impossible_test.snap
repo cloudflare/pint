@@ -1,7 +1,7 @@
 
 [TestImpossibleCheck/#00 - 1]
 - description: ""
-  content: |4
+  content: |2
 
       - alert: Device_IO_Errors
         expr: >-
@@ -58,7 +58,7 @@
 
 [TestImpossibleCheck/0_>_0 - 1]
 - description: 0 > 0
-  content: |4
+  content: |
 
     - alert: Foo
       expr: 0 > bool 0
@@ -86,7 +86,7 @@
 
 [TestImpossibleCheck/__name___is_stripped - 1]
 - description: __name__ is stripped
-  content: |4
+  content: |
 
     - record: count:sum:foo
       expr: |
@@ -115,7 +115,7 @@
     severity: 1
     anchor: 0
 - description: __name__ is stripped
-  content: |4
+  content: |
 
     - record: count:sum:foo
       expr: |
@@ -160,7 +160,7 @@
 
 [TestImpossibleCheck/complex_query_with_or_vector() - 1]
 - description: complex query with or vector()
-  content: |4
+  content: |
 
     - alert: Foo
       expr: |
@@ -176,7 +176,7 @@
           (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
       annotations:
         summary: High rejectsion rate in {{ $labels.colo_name }}
-  output: |4
+  output: |2
      4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
      5 |       (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
                                                           ^^^^^^^^^
@@ -207,7 +207,7 @@
     severity: 1
     anchor: 0
 - description: complex query with or vector()
-  content: |4
+  content: |
 
     - alert: Foo
       expr: |
@@ -223,7 +223,7 @@
           (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
       annotations:
         summary: High rejectsion rate in {{ $labels.colo_name }}
-  output: |4
+  output: |2
      4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
      5 |       (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
      6 |     > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
@@ -256,7 +256,7 @@
     severity: 1
     anchor: 0
 - description: complex query with or vector()
-  content: |4
+  content: |
 
     - alert: Foo
       expr: |
@@ -272,7 +272,7 @@
           (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
       annotations:
         summary: High rejectsion rate in {{ $labels.colo_name }}
-  output: |4
+  output: |2
      4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
      5 |       (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
      6 |     > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
@@ -304,7 +304,7 @@
     severity: 1
     anchor: 0
 - description: complex query with or vector()
-  content: |4
+  content: |
 
     - alert: Foo
       expr: |
@@ -320,7 +320,7 @@
           (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
       annotations:
         summary: High rejectsion rate in {{ $labels.colo_name }}
-  output: |4
+  output: |2
      4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
      5 |       (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
      6 |     > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
@@ -353,7 +353,7 @@
     severity: 1
     anchor: 0
 - description: complex query with or vector()
-  content: |4
+  content: |
 
     - alert: Foo
       expr: |
@@ -369,7 +369,7 @@
           (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
       annotations:
         summary: High rejectsion rate in {{ $labels.colo_name }}
-  output: |4
+  output: |2
      4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
        |     [...]
      9 |     # inside the query
@@ -395,7 +395,7 @@
     severity: 1
     anchor: 0
 - description: complex query with or vector()
-  content: |4
+  content: |
 
     - alert: Foo
       expr: |
@@ -411,7 +411,7 @@
           (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
       annotations:
         summary: High rejectsion rate in {{ $labels.colo_name }}
-  output: |4
+  output: |2
      4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
        |     [...]
      9 |     # inside the query
@@ -438,7 +438,7 @@
     severity: 1
     anchor: 0
 - description: complex query with or vector()
-  content: |4
+  content: |
 
     - alert: Foo
       expr: |
@@ -454,7 +454,7 @@
           (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
       annotations:
         summary: High rejectsion rate in {{ $labels.colo_name }}
-  output: |4
+  output: |2
      4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
        |     [...]
     11 |       (colo_job:foo_total:rate2m or vector(0)) > 80
@@ -478,7 +478,7 @@
     severity: 1
     anchor: 0
 - description: complex query with or vector()
-  content: |4
+  content: |
 
     - alert: Foo
       expr: |
@@ -494,7 +494,7 @@
           (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
       annotations:
         summary: High rejectsion rate in {{ $labels.colo_name }}
-  output: |4
+  output: |2
      4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
        |     [...]
     11 |       (colo_job:foo_total:rate2m or vector(0)) > 80
@@ -520,7 +520,7 @@
     severity: 1
     anchor: 0
 - description: complex query with or vector()
-  content: |4
+  content: |
 
     - alert: Foo
       expr: |
@@ -536,7 +536,7 @@
           (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
       annotations:
         summary: High rejectsion rate in {{ $labels.colo_name }}
-  output: |4
+  output: |2
      4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
                                               ^^^^^^^^^
                                               `vector(0) / vector(1) > 5 * vector(0) / vector(1)` always
@@ -561,7 +561,7 @@
     severity: 1
     anchor: 0
 - description: complex query with or vector()
-  content: |4
+  content: |
 
     - alert: Foo
       expr: |
@@ -577,7 +577,7 @@
           (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
       annotations:
         summary: High rejectsion rate in {{ $labels.colo_name }}
-  output: |4
+  output: |2
      4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
                                                              ^^^^^^^^^
           You can't use `colo_name` because this label is not possible
@@ -607,7 +607,7 @@
     severity: 1
     anchor: 0
 - description: complex query with or vector()
-  content: |4
+  content: |
 
     - alert: Foo
       expr: |
@@ -623,7 +623,7 @@
           (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
       annotations:
         summary: High rejectsion rate in {{ $labels.colo_name }}
-  output: |4
+  output: |2
      4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
                                               ^^^^^^
                                               Calling `vector()` will return a vector value with no labels.
@@ -656,7 +656,7 @@
     severity: 1
     anchor: 0
 - description: complex query with or vector()
-  content: |4
+  content: |
 
     - alert: Foo
       expr: |
@@ -672,7 +672,7 @@
           (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
       annotations:
         summary: High rejectsion rate in {{ $labels.colo_name }}
-  output: |4
+  output: |2
      4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
      5 |       (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
                                                           ^^^^^^^^^
@@ -703,7 +703,7 @@
     severity: 1
     anchor: 0
 - description: complex query with or vector()
-  content: |4
+  content: |
 
     - alert: Foo
       expr: |
@@ -719,7 +719,7 @@
           (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
       annotations:
         summary: High rejectsion rate in {{ $labels.colo_name }}
-  output: |4
+  output: |2
      4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
      5 |       (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
      6 |     > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
@@ -752,7 +752,7 @@
     severity: 1
     anchor: 0
 - description: complex query with or vector()
-  content: |4
+  content: |
 
     - alert: Foo
       expr: |
@@ -768,7 +768,7 @@
           (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
       annotations:
         summary: High rejectsion rate in {{ $labels.colo_name }}
-  output: |4
+  output: |2
      4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
      5 |       (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
      6 |     > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
@@ -800,7 +800,7 @@
     severity: 1
     anchor: 0
 - description: complex query with or vector()
-  content: |4
+  content: |
 
     - alert: Foo
       expr: |
@@ -816,7 +816,7 @@
           (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
       annotations:
         summary: High rejectsion rate in {{ $labels.colo_name }}
-  output: |4
+  output: |2
      4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
      5 |       (avg(rate(foo_total[6h]) or vector(1)) by (colo_name)))
      6 |     > 5 * (avg(rate(foo_rejections[6h] offset 1d) or vector(0)) by (colo_name) /
@@ -849,7 +849,7 @@
     severity: 1
     anchor: 0
 - description: complex query with or vector()
-  content: |4
+  content: |
 
     - alert: Foo
       expr: |
@@ -865,7 +865,7 @@
           (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
       annotations:
         summary: High rejectsion rate in {{ $labels.colo_name }}
-  output: |4
+  output: |2
      4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
        |     [...]
      9 |     # inside the query
@@ -891,7 +891,7 @@
     severity: 1
     anchor: 0
 - description: complex query with or vector()
-  content: |4
+  content: |
 
     - alert: Foo
       expr: |
@@ -907,7 +907,7 @@
           (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
       annotations:
         summary: High rejectsion rate in {{ $labels.colo_name }}
-  output: |4
+  output: |2
      4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
        |     [...]
      9 |     # inside the query
@@ -934,7 +934,7 @@
     severity: 1
     anchor: 0
 - description: complex query with or vector()
-  content: |4
+  content: |
 
     - alert: Foo
       expr: |
@@ -950,7 +950,7 @@
           (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
       annotations:
         summary: High rejectsion rate in {{ $labels.colo_name }}
-  output: |4
+  output: |2
      4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
        |     [...]
     11 |       (colo_job:foo_total:rate2m or vector(0)) > 80
@@ -974,7 +974,7 @@
     severity: 1
     anchor: 0
 - description: complex query with or vector()
-  content: |4
+  content: |
 
     - alert: Foo
       expr: |
@@ -990,7 +990,7 @@
           (colo_job:foo_total:rate2m offset 1d or vector(0)) > 80
       annotations:
         summary: High rejectsion rate in {{ $labels.colo_name }}
-  output: |4
+  output: |2
      4 |     (avg(rate(foo_rejections[6h]) or vector(0)) by (colo_name) /
        |     [...]
     11 |       (colo_job:foo_total:rate2m or vector(0)) > 80
@@ -1025,7 +1025,7 @@
 
 [TestImpossibleCheck/foo{job=bar}_unless_sum(foo) - 1]
 - description: foo{job=bar} unless sum(foo)
-  content: |4
+  content: |
 
     - alert: Foo
       expr: foo{job="bar"} unless sum(foo)
@@ -1054,7 +1054,7 @@
 
 [TestImpossibleCheck/foo{job=bar}_unless_vector(0) - 1]
 - description: foo{job=bar} unless vector(0)
-  content: |4
+  content: |
 
     - alert: Foo
       expr: foo{job="bar"} unless vector(0)
@@ -1088,7 +1088,7 @@
 
 [TestImpossibleCheck/group_left_inside_without - 1]
 - description: group_left inside without
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -1127,7 +1127,7 @@
     severity: 1
     anchor: 0
 - description: group_left inside without
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -1176,7 +1176,7 @@
 
 [TestImpossibleCheck/group_left_inside_without_but_used_for_inner_join_but_not_fully - 1]
 - description: group_left inside without but used for inner join but not fully
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -1193,7 +1193,7 @@
             colo_metadata{colo_status="v"}
           )
         )
-  output: |4
+  output: |2
      4 |     group without(animal) (
        |     [...]
      8 |         colo_metadata{colo_status="v"}
@@ -1240,7 +1240,7 @@
 
 [TestImpossibleCheck/group_left_labels_not_used_in_outer_join - 1]
 - description: group_left labels not used in outer join
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -1251,7 +1251,7 @@
           * on(instance) group_left (sliver)
           sliver_metadata{node_status="v"}
         )
-  output: |4
+  output: |2
      4 |     up{node_status="v", job="node_exporter"}
      5 |     * on(instance) metal_services_enabled
      6 |     * on(instance) (
@@ -1288,7 +1288,7 @@
 
 [TestImpossibleCheck/group_left_labels_not_used_in_outer_join_with_another_group_left - 1]
 - description: group_left labels not used in outer join with another group_left
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -1299,7 +1299,7 @@
           * on(instance) group_left (sliver)
           sliver_metadata{node_status="v"}
         )
-  output: |4
+  output: |2
      4 |     up{node_status="v", job="node_exporter"}
      5 |     * on(instance) group_left metal_services_enabled
      6 |     * on(instance, colo_name) (
@@ -1336,7 +1336,7 @@
 
 [TestImpossibleCheck/group_left_labels_not_used_in_outer_join_with_another_group_right - 1]
 - description: group_left labels not used in outer join with another group_right
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -1347,7 +1347,7 @@
           * on(instance) group_left (sliver)
           sliver_metadata{node_status="v"}
         )
-  output: |4
+  output: |2
      4 |     up{node_status="v", job="node_exporter"}
      5 |     * on(instance) group_right metal_services_enabled
      6 |     * on(instance, colo_name) (
@@ -1389,7 +1389,7 @@
 
 [TestImpossibleCheck/group_left_not_included_in_by - 1]
 - description: group_left not included in by
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -1428,7 +1428,7 @@
     severity: 1
     anchor: 0
 - description: group_left not included in by
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -1467,7 +1467,7 @@
     severity: 1
     anchor: 0
 - description: group_left not included in by
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -1506,7 +1506,7 @@
     severity: 1
     anchor: 0
 - description: group_left not included in by
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -1549,7 +1549,7 @@
 
 [TestImpossibleCheck/group_left_on_a_label_already_guaranteed_on_the_left - 1]
 - description: group_left on a label already guaranteed on the left
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -1586,7 +1586,7 @@
 
 [TestImpossibleCheck/group_left_with_empty_by - 1]
 - description: group_left with empty by
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -1625,7 +1625,7 @@
     severity: 1
     anchor: 0
 - description: group_left with empty by
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -1664,7 +1664,7 @@
     severity: 1
     anchor: 0
 - description: group_left with empty by
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -1704,7 +1704,7 @@
     severity: 1
     anchor: 0
 - description: group_left with empty by
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -1743,7 +1743,7 @@
     severity: 1
     anchor: 0
 - description: group_left with empty by
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -1786,7 +1786,7 @@
 
 [TestImpossibleCheck/group_right_labels_not_used_in_outer_join - 1]
 - description: group_right labels not used in outer join
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -1797,7 +1797,7 @@
           * on(instance) group_right (sliver)
           metal_services_enabled
         )
-  output: |4
+  output: |2
      4 |     up{node_status="v", job="node_exporter"}
      5 |     * on(instance) metal_services_enabled
      6 |     * on(instance) (
@@ -1849,7 +1849,7 @@
 
 [TestImpossibleCheck/impossible_/_ignoring_group_right_side_message - 1]
 - description: impossible / ignoring group_right side message
-  content: |4
+  content: |
 
     - record: foo
       expr: sum(bar) / ignoring(instance) group_right(cluster) foo{job="bar"}
@@ -1873,7 +1873,7 @@
     severity: 1
     anchor: 0
 - description: impossible / ignoring group_right side message
-  content: |4
+  content: |
 
     - record: foo
       expr: sum(bar) / ignoring(instance) group_right(cluster) foo{job="bar"}
@@ -1906,7 +1906,7 @@
 
 [TestImpossibleCheck/impossible_/_on - 1]
 - description: impossible / on
-  content: |4
+  content: |
 
     - record: foo
       expr: foo / on(instance) sum(bar)
@@ -1935,7 +1935,7 @@
 
 [TestImpossibleCheck/impossible_/_on_group_left_ - 1]
 - description: 'impossible / on group_left '
-  content: |4
+  content: |
 
     - record: foo
       expr: foo / on(instance) group_left(cluster) sum(bar)
@@ -1960,7 +1960,7 @@
     severity: 1
     anchor: 0
 - description: 'impossible / on group_left '
-  content: |4
+  content: |
 
     - record: foo
       expr: foo / on(instance) group_left(cluster) sum(bar)
@@ -1994,7 +1994,7 @@
 
 [TestImpossibleCheck/impossible_/_on_group_right - 1]
 - description: impossible / on group_right
-  content: |4
+  content: |
 
     - record: foo
       expr: sum(bar) / on(instance) group_right(cluster) foo
@@ -2018,7 +2018,7 @@
     severity: 1
     anchor: 0
 - description: impossible / on group_right
-  content: |4
+  content: |
 
     - record: foo
       expr: sum(bar) / on(instance) group_right(cluster) foo
@@ -2051,7 +2051,7 @@
 
 [TestImpossibleCheck/impossible_group_by - 1]
 - description: impossible group_by
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -2068,7 +2068,7 @@
               )
           unless on (colo_name) (colostat_disabled_pops == 1)
         )
-  output: |4
+  output: |2
      4 |     group by (colo_name, instance, tier, animal, brand, sliver, pop_name) (
      5 |       up{node_status="v", job="node_exporter"}
      6 |       and on (instance) (metal_services_enabled == 999)
@@ -2102,7 +2102,7 @@
     severity: 1
     anchor: 0
 - description: impossible group_by
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -2119,7 +2119,7 @@
               )
           unless on (colo_name) (colostat_disabled_pops == 1)
         )
-  output: |4
+  output: |2
      4 |     group by (colo_name, instance, tier, animal, brand, sliver, pop_name) (
      5 |       up{node_status="v", job="node_exporter"}
      6 |       and on (instance) (metal_services_enabled == 999)
@@ -2154,7 +2154,7 @@
     severity: 1
     anchor: 0
 - description: impossible group_by
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -2171,7 +2171,7 @@
               )
           unless on (colo_name) (colostat_disabled_pops == 1)
         )
-  output: |4
+  output: |2
      4 |     group by (colo_name, instance, tier, animal, brand, sliver, pop_name) (
      5 |       up{node_status="v", job="node_exporter"}
      6 |       and on (instance) (metal_services_enabled == 999)
@@ -2207,7 +2207,7 @@
     severity: 1
     anchor: 0
 - description: impossible group_by
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -2224,7 +2224,7 @@
               )
           unless on (colo_name) (colostat_disabled_pops == 1)
         )
-  output: |4
+  output: |2
      4 |     group by (colo_name, instance, tier, animal, brand, sliver, pop_name) (
      5 |       up{node_status="v", job="node_exporter"}
      6 |       and on (instance) (metal_services_enabled == 999)
@@ -2259,7 +2259,7 @@
     severity: 1
     anchor: 0
 - description: impossible group_by
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -2276,7 +2276,7 @@
               )
           unless on (colo_name) (colostat_disabled_pops == 1)
         )
-  output: |4
+  output: |2
      4 |     group by (colo_name, instance, tier, animal, brand, sliver, pop_name) (
      5 |       up{node_status="v", job="node_exporter"}
      6 |       and on (instance) (metal_services_enabled == 999)
@@ -2316,7 +2316,7 @@
 
 [TestImpossibleCheck/impossible_group_by_* - 1]
 - description: impossible group_by *
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -2351,7 +2351,7 @@
     severity: 1
     anchor: 0
 - description: impossible group_by *
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -2386,7 +2386,7 @@
     severity: 1
     anchor: 0
 - description: impossible group_by *
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -2421,7 +2421,7 @@
     severity: 1
     anchor: 0
 - description: impossible group_by *
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -2458,7 +2458,7 @@
     severity: 1
     anchor: 0
 - description: impossible group_by *
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -2499,7 +2499,7 @@
 
 [TestImpossibleCheck/impossible_group_left_and - 1]
 - description: impossible group_left and
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -2539,7 +2539,7 @@
 
 [TestImpossibleCheck/impossible_match_due_to_orphaned_group_left - 1]
 - description: impossible match due to orphaned group_left
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -2577,7 +2577,7 @@
     severity: 1
     anchor: 0
 - description: impossible match due to orphaned group_left
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -2616,7 +2616,7 @@
     severity: 1
     anchor: 0
 - description: impossible match due to orphaned group_left
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -2658,7 +2658,7 @@
 
 [TestImpossibleCheck/impossible_sum_*_on_sum - 1]
 - description: impossible sum * on sum
-  content: |4
+  content: |
 
     - record: foo
       expr: sum(bar) * on(cluster) sum(foo)
@@ -2689,7 +2689,7 @@
 
 [TestImpossibleCheck/impossible_sum_by_sum_by_group_left - 1]
 - description: impossible sum by sum by group_left
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -2729,7 +2729,7 @@
 
 [TestImpossibleCheck/join_on_impossible_label - 1]
 - description: join on impossible label
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -2763,7 +2763,7 @@
     severity: 1
     anchor: 0
 - description: join on impossible label
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -2803,7 +2803,7 @@
 
 [TestImpossibleCheck/join_on_possible_but_redundant_label - 1]
 - description: join on possible but redundant label
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -2851,7 +2851,7 @@
 
 [TestImpossibleCheck/joined_label_ignored_via_ignoring() - 1]
 - description: joined label ignored via ignoring()
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -2909,7 +2909,7 @@
 
 [TestImpossibleCheck/or_vector()_labels_are_missing - 1]
 - description: or vector() labels are missing
-  content: |4
+  content: |
 
     - alert: Foo
       expr: |
@@ -2948,7 +2948,7 @@
     severity: 1
     anchor: 0
 - description: or vector() labels are missing
-  content: |4
+  content: |
 
     - alert: Foo
       expr: |
@@ -2984,7 +2984,7 @@
     severity: 1
     anchor: 0
 - description: or vector() labels are missing
-  content: |4
+  content: |
 
     - alert: Foo
       expr: |
@@ -3023,7 +3023,7 @@
     severity: 1
     anchor: 0
 - description: or vector() labels are missing
-  content: |4
+  content: |
 
     - alert: Foo
       expr: |
@@ -3066,7 +3066,7 @@
 
 [TestImpossibleCheck/orphaned_group_left_labels - 1]
 - description: orphaned group_left labels
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -3104,7 +3104,7 @@
     severity: 1
     anchor: 0
 - description: orphaned group_left labels
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -3142,7 +3142,7 @@
     severity: 1
     anchor: 0
 - description: orphaned group_left labels
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -3181,7 +3181,7 @@
     severity: 1
     anchor: 0
 - description: orphaned group_left labels
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -3220,7 +3220,7 @@
     severity: 1
     anchor: 0
 - description: orphaned group_left labels
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -3262,7 +3262,7 @@
 
 [TestImpossibleCheck/orphaned_group_right_labels_(all) - 1]
 - description: orphaned group_right labels (all)
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -3297,7 +3297,7 @@
     severity: 1
     anchor: 0
 - description: orphaned group_right labels (all)
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -3332,7 +3332,7 @@
     severity: 1
     anchor: 0
 - description: orphaned group_right labels (all)
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -3367,7 +3367,7 @@
     severity: 1
     anchor: 0
 - description: orphaned group_right labels (all)
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -3402,7 +3402,7 @@
     severity: 1
     anchor: 0
 - description: orphaned group_right labels (all)
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -3441,7 +3441,7 @@
 
 [TestImpossibleCheck/orphaned_group_right_labels_(except_animal) - 1]
 - description: orphaned group_right labels (except animal)
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -3476,7 +3476,7 @@
     severity: 1
     anchor: 0
 - description: orphaned group_right labels (except animal)
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -3511,7 +3511,7 @@
     severity: 1
     anchor: 0
 - description: orphaned group_right labels (except animal)
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -3546,7 +3546,7 @@
     severity: 1
     anchor: 0
 - description: orphaned group_right labels (except animal)
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -3584,7 +3584,7 @@
     severity: 1
     anchor: 0
 - description: orphaned group_right labels (except animal)
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -3626,7 +3626,7 @@
 
 [TestImpossibleCheck/orphaned_group_right_labels_(except_sliver) - 1]
 - description: orphaned group_right labels (except sliver)
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -3659,7 +3659,7 @@
     severity: 1
     anchor: 0
 - description: orphaned group_right labels (except sliver)
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -3692,7 +3692,7 @@
     severity: 1
     anchor: 0
 - description: orphaned group_right labels (except sliver)
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -3725,7 +3725,7 @@
     severity: 1
     anchor: 0
 - description: orphaned group_right labels (except sliver)
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -3772,7 +3772,7 @@
 
 [TestImpossibleCheck/sum(foo_or_vector(0))_>_0 - 1]
 - description: sum(foo or vector(0)) > 0
-  content: |4
+  content: |
 
     - alert: Foo
       expr: sum(foo or vector(0)) > 0
@@ -3805,7 +3805,7 @@
 
 [TestImpossibleCheck/unused_&_impossible_group_right_labels - 1]
 - description: unused & impossible group_right labels
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -3844,7 +3844,7 @@
     severity: 1
     anchor: 0
 - description: unused & impossible group_right labels
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -3886,7 +3886,7 @@
 
 [TestImpossibleCheck/unused_group_right_labels - 1]
 - description: unused group_right labels
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -3929,7 +3929,7 @@
 
 [TestImpossibleCheck/unused_joined_label - 1]
 - description: unused joined label
-  content: |4
+  content: |
 
     - record: foo
       expr: |
@@ -3967,7 +3967,7 @@
 
 [TestImpossibleCheck/vector(0)_>_0 - 1]
 - description: vector(0) > 0
-  content: |4
+  content: |
 
     - alert: Foo
       expr: ((( group(vector(0)) ))) > 0

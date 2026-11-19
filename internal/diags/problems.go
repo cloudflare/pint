@@ -169,7 +169,16 @@ func InjectDiagnostics(content string, d []Diagnostic, color output.Color) strin
 	diags := make([]Diagnostic, len(d))
 	copy(diags, d)
 
+	contentLines := strings.Split(content, "\n")
+
 	lines := lineCoverage(diags)
+	// If the line with diagnostics is empty then show the previous line as well.
+	for _, l := range lines {
+		if l > 1 && l <= len(contentLines) && contentLines[l-1] == "" && !slices.Contains(lines, l-1) {
+			lines = append(lines, l-1)
+		}
+	}
+	slices.Sort(lines)
 
 	// Sort diagnostics by FirstColumn descending so that rightmost carets
 	// are printed first — this ensures inner carets don't overwrite outer ones.
@@ -199,10 +208,9 @@ func InjectDiagnostics(content string, d []Diagnostic, color output.Color) strin
 	// underline characters. Subsequent ones skip the caret line but still print
 	// their message aligned with the first diagnostic's underline.
 	disablePoints := make([]bool, len(diags))
-	for i, a := range diags {
+	for i := range diags {
 		for j := range i {
-			b := diags[j]
-			if a.FirstColumn == b.FirstColumn && a.LastColumn == b.LastColumn {
+			if slices.Equal(diagPositions[i], diagPositions[j]) {
 				disablePoints[i] = true
 			}
 		}
@@ -210,8 +218,6 @@ func InjectDiagnostics(content string, d []Diagnostic, color output.Color) strin
 
 	digits := countDigits(lastLine)
 	nrFmt := fmt.Sprintf("%%%dd", digits)
-
-	contentLines := strings.Split(content, "\n")
 
 	// Minimum leading-space indent across all visible lines.
 	// gapIndent aligns gap markers, minIndent controls stripping
@@ -298,13 +304,8 @@ func InjectDiagnostics(content string, d []Diagnostic, color output.Color) strin
 			}
 		}
 
-		// Translate displayed column indices back to original columns
-		// so caret positions still line up after stripping.
-		colShift := lineStrip
-		for columnIndex, r := range line {
-			buf.WriteRune(r)
-
-			origCol := columnIndex + 1 + colShift
+		// markColumn adds the caret line character for a column of this line.
+		markColumn := func(col int) {
 			for i, ok := range needsNextLine {
 				if !ok {
 					continue
@@ -313,18 +314,42 @@ func InjectDiagnostics(content string, d []Diagnostic, color output.Color) strin
 					if pos.Line != lineIndex+1 {
 						continue
 					}
-					before := pos.FirstColumn > origCol
-					inside := pos.FirstColumn <= origCol && pos.LastColumn >= origCol
 					switch {
-					case before:
+					case pos.FirstColumn > col:
 						nextLine[i].WriteRune(' ')
-					case inside && disablePoints[i]:
+					case pos.LastColumn < col:
+					case disablePoints[i]:
 						nextLine[i].WriteRune(' ')
-					case inside && !disablePoints[i]:
+					default:
 						nextLine[i].WriteRune('^')
 					}
 				}
 			}
+		}
+
+		// Translate displayed column indices back to original columns
+		// so caret positions still line up after stripping.
+		colShift := lineStrip
+		for columnIndex, r := range line {
+			buf.WriteRune(r)
+			markColumn(columnIndex + 1 + colShift)
+		}
+
+		// Point at columns past the end of the line, like the end of input.
+		lineEnd := len(line) + colShift
+		lastColumn := lineEnd
+		for i, ok := range needsNextLine {
+			if !ok {
+				continue
+			}
+			for _, pos := range diagPositions[i] {
+				if pos.Line == lineIndex+1 {
+					lastColumn = max(lastColumn, pos.LastColumn)
+				}
+			}
+		}
+		for col := lineEnd + 1; col <= lastColumn; col++ {
+			markColumn(col)
 		}
 		buf.WriteRune('\n')
 

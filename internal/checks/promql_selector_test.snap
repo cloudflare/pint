@@ -11,7 +11,7 @@
 
 [TestSelector/label_missing - 1]
 - description: label missing
-  content: |4
+  content: |
 
     - alert: foo
       expr: errors > 0
@@ -37,7 +37,7 @@
 
 [TestSelector/label_missing_/___name__ - 1]
 - description: label missing / __name__
-  content: |4
+  content: |
 
     - alert: foo
       expr: |
@@ -65,7 +65,7 @@
 
 [TestSelector/label_missing_/___name___regexp - 1]
 - description: label missing / __name__ regexp
-  content: |4
+  content: |
 
     - alert: foo
       expr: |
@@ -93,7 +93,7 @@
 
 [TestSelector/label_missing_/_matchers - 1]
 - description: label missing / matchers
-  content: |4
+  content: |
 
     - alert: foo
       expr: errors{cluster="dev", instance="foo"} > 0
@@ -130,7 +130,7 @@
 
 [TestSelector/label_missing_inside_call - 1]
 - description: label missing inside call
-  content: |4
+  content: |
 
     - alert: foo
       expr: absent(errors{xjob="foo"})
