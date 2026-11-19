@@ -25,15 +25,16 @@
   problem:
     reporter: alerts/external_labels
     summary: unable to run checks
-    details: ""
+    details: ''
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `bad_data: bad input data`.'
-          firstcolumn: 1
-          lastcolumn: 11
-          kind: 0
+    - message: 'Couldn''t run some online checks due to `prom` Prometheus server at
+        http://127.0.0.1:XXXXX error: `bad_data: bad input data`.'
+      firstcolumn: 1
+      lastcolumn: 11
+      kind: 0
     lines:
-        first: 2
-        last: 10
+      first: 2
+      last: 10
     severity: 2
     anchor: 0
 
@@ -65,15 +66,16 @@
   problem:
     reporter: alerts/external_labels
     summary: unable to run checks
-    details: ""
+    details: ''
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 error: `connection refused`.'
-          firstcolumn: 1
-          lastcolumn: 11
-          kind: 0
+    - message: 'Couldn''t run some online checks due to `prom` Prometheus server at
+        http://127.0.0.1:1111 error: `connection refused`.'
+      firstcolumn: 1
+      lastcolumn: 11
+      kind: 0
     lines:
-        first: 2
-        last: 10
+      first: 2
+      last: 10
     severity: 1
     anchor: 0
 
@@ -120,15 +122,18 @@
   problem:
     reporter: alerts/external_labels
     summary: invalid label
-    details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus runtime configuration.'
+    details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus
+      runtime configuration.'
     diagnostics:
-        - message: The template is using `cluster` external label but `prom` Prometheus server at https://simple.example.com doesn't have this label configured in global:external_labels.
-          firstcolumn: 1
-          lastcolumn: 61
-          kind: 0
+    - message: The template is using `cluster` external label but `prom` Prometheus
+        server at https://simple.example.com doesn't have this label configured in
+        global:external_labels.
+      firstcolumn: 1
+      lastcolumn: 61
+      kind: 0
     lines:
-        first: 9
-        last: 9
+      first: 9
+      last: 9
     severity: 2
     anchor: 0
 - description: no cluster label
@@ -152,15 +157,18 @@
   problem:
     reporter: alerts/external_labels
     summary: invalid label
-    details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus runtime configuration.'
+    details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus
+      runtime configuration.'
     diagnostics:
-        - message: The template is using `cluster` external label but `prom` Prometheus server at https://simple.example.com doesn't have this label configured in global:external_labels.
-          firstcolumn: 1
-          lastcolumn: 29
-          kind: 0
+    - message: The template is using `cluster` external label but `prom` Prometheus
+        server at https://simple.example.com doesn't have this label configured in
+        global:external_labels.
+      firstcolumn: 1
+      lastcolumn: 29
+      kind: 0
     lines:
-        first: 10
-        last: 10
+      first: 10
+      last: 10
     severity: 2
     anchor: 0
 - description: no cluster label
@@ -184,15 +192,18 @@
   problem:
     reporter: alerts/external_labels
     summary: invalid label
-    details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus runtime configuration.'
+    details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus
+      runtime configuration.'
     diagnostics:
-        - message: The template is using `cluster` external label but `prom` Prometheus server at https://simple.example.com doesn't have this label configured in global:external_labels.
-          firstcolumn: 1
-          lastcolumn: 45
-          kind: 0
+    - message: The template is using `cluster` external label but `prom` Prometheus
+        server at https://simple.example.com doesn't have this label configured in
+        global:external_labels.
+      firstcolumn: 1
+      lastcolumn: 45
+      kind: 0
     lines:
-        first: 6
-        last: 6
+      first: 6
+      last: 6
     severity: 2
     anchor: 0
 
@@ -218,15 +229,18 @@
   problem:
     reporter: alerts/external_labels
     summary: invalid label
-    details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus runtime configuration.'
+    details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus
+      runtime configuration.'
     diagnostics:
-        - message: The template is using `cluster` external label but `prom` Prometheus server at https://simple.example.com doesn't have this label configured in global:external_labels.
-          firstcolumn: 1
-          lastcolumn: 29
-          kind: 0
+    - message: The template is using `cluster` external label but `prom` Prometheus
+        server at https://simple.example.com doesn't have this label configured in
+        global:external_labels.
+      firstcolumn: 1
+      lastcolumn: 29
+      kind: 0
     lines:
-        first: 5
-        last: 5
+      first: 5
+      last: 5
     severity: 2
     anchor: 0
 
@@ -252,15 +266,18 @@
   problem:
     reporter: alerts/external_labels
     summary: invalid label
-    details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus runtime configuration.'
+    details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus
+      runtime configuration.'
     diagnostics:
-        - message: The template is using `cluster` external label but `prom` Prometheus server at https://simple.example.com doesn't have this label configured in global:external_labels.
-          firstcolumn: 1
-          lastcolumn: 29
-          kind: 0
+    - message: The template is using `cluster` external label but `prom` Prometheus
+        server at https://simple.example.com doesn't have this label configured in
+        global:external_labels.
+      firstcolumn: 1
+      lastcolumn: 29
+      kind: 0
     lines:
-        first: 5
-        last: 5
+      first: 5
+      last: 5
     severity: 2
     anchor: 0
 

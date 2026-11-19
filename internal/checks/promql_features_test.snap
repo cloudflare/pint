@@ -13,16 +13,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`end` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 7
-          lastcolumn: 11
-          kind: 0
+    - message: '`end` requires `--enable-feature=promql-experimental-functions` to
+        be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 7
+      lastcolumn: 11
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -47,16 +48,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`start` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 7
-          lastcolumn: 13
-          kind: 0
+    - message: '`start` requires `--enable-feature=promql-experimental-functions`
+        to be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 7
+      lastcolumn: 13
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -90,15 +92,16 @@
   problem:
     reporter: promql/features
     summary: unable to run checks
-    details: ""
+    details: ''
     diagnostics:
-        - message: 'Couldn''t run some online checks due to "prom" error: `failed to parse Prometheus version "not-a-version": expected major.minor.patch format`.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: 'Couldn''t run some online checks due to "prom" error: `failed to parse
+        Prometheus version "not-a-version": expected major.minor.patch format`.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 1
     anchor: 0
 
@@ -119,16 +122,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`mad_over_time` was added in Prometheus 2.49.0 and requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 1
-          lastcolumn: 13
-          kind: 0
+    - message: '`mad_over_time` was added in Prometheus 2.49.0 and requires `--enable-feature=promql-experimental-functions`
+        to be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 1
+      lastcolumn: 13
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -152,20 +156,22 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`mad_over_time` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 1
-          lastcolumn: 13
-          kind: 0
-        - message: '`mad_over_time` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 26
-          lastcolumn: 38
-          kind: 0
+    - message: '`mad_over_time` requires `--enable-feature=promql-experimental-functions`
+        to be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 1
+      lastcolumn: 13
+      kind: 0
+    - message: '`mad_over_time` requires `--enable-feature=promql-experimental-functions`
+        to be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 26
+      lastcolumn: 38
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -185,16 +191,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`duration_expr` requires Prometheus 3.4.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.'
-          firstcolumn: 10
-          lastcolumn: 14
-          kind: 0
+    - message: '`duration_expr` requires Prometheus 3.4.0 or later but `prom` Prometheus
+        server at https://simple.example.com is running 2.0.0.'
+      firstcolumn: 10
+      lastcolumn: 14
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -214,16 +221,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`duration_expr` requires `--enable-feature=promql-duration-expr` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 10
-          lastcolumn: 14
-          kind: 0
+    - message: '`duration_expr` requires `--enable-feature=promql-duration-expr` to
+        be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 10
+      lastcolumn: 14
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -253,16 +261,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`end` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 8
-          lastcolumn: 10
-          kind: 0
+    - message: '`end` requires `--enable-feature=promql-experimental-functions` to
+        be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 8
+      lastcolumn: 10
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 - description: end() missing feature flag
@@ -278,16 +287,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`start` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 16
-          lastcolumn: 20
-          kind: 0
+    - message: '`start` requires `--enable-feature=promql-experimental-functions`
+        to be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 16
+      lastcolumn: 20
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -312,16 +322,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`mad_over_time` requires Prometheus 2.49.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.'
-          firstcolumn: 1
-          lastcolumn: 13
-          kind: 0
+    - message: '`mad_over_time` requires Prometheus 2.49.0 or later but `prom` Prometheus
+        server at https://simple.example.com is running 2.0.0.'
+      firstcolumn: 1
+      lastcolumn: 13
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -351,16 +362,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`mad_over_time` requires Prometheus 2.49.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.'
-          firstcolumn: 1
-          lastcolumn: 13
-          kind: 0
+    - message: '`mad_over_time` requires Prometheus 2.49.0 or later but `prom` Prometheus
+        server at https://simple.example.com is running 2.0.0.'
+      firstcolumn: 1
+      lastcolumn: 13
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -380,16 +392,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`fill` requires Prometheus 3.10.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.'
-          firstcolumn: 7
-          lastcolumn: 10
-          kind: 0
+    - message: '`fill` requires Prometheus 3.10.0 or later but `prom` Prometheus server
+        at https://simple.example.com is running 2.0.0.'
+      firstcolumn: 7
+      lastcolumn: 10
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -409,16 +422,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`first_over_time` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 1
-          lastcolumn: 15
-          kind: 0
+    - message: '`first_over_time` requires `--enable-feature=promql-experimental-functions`
+        to be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 1
+      lastcolumn: 15
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -447,15 +461,16 @@
   problem:
     reporter: promql/features
     summary: unable to run checks
-    details: ""
+    details: ''
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: 'Couldn''t run some online checks due to `prom` Prometheus server at
+        http://127.0.0.1:XXXXX error: `server_error: internal error`.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 2
     anchor: 0
 
@@ -490,16 +505,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`integral` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 1
-          lastcolumn: 8
-          kind: 0
+    - message: '`integral` requires `--enable-feature=promql-experimental-functions`
+        to be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 1
+      lastcolumn: 8
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -519,16 +535,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`integral` requires Prometheus 3.16.0 or later but `prom` Prometheus server at https://simple.example.com is running 3.15.0.'
-          firstcolumn: 1
-          lastcolumn: 8
-          kind: 0
+    - message: '`integral` requires Prometheus 3.16.0 or later but `prom` Prometheus
+        server at https://simple.example.com is running 3.15.0.'
+      firstcolumn: 1
+      lastcolumn: 8
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -553,16 +570,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`max_of` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 1
-          lastcolumn: 6
-          kind: 0
+    - message: '`max_of` requires `--enable-feature=promql-experimental-functions`
+        to be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 1
+      lastcolumn: 6
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -582,16 +600,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`max_of` requires Prometheus 3.13.0 or later but `prom` Prometheus server at https://simple.example.com is running 3.12.0.'
-          firstcolumn: 1
-          lastcolumn: 6
-          kind: 0
+    - message: '`max_of` requires Prometheus 3.13.0 or later but `prom` Prometheus
+        server at https://simple.example.com is running 3.12.0.'
+      firstcolumn: 1
+      lastcolumn: 6
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -616,16 +635,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`min_of` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 1
-          lastcolumn: 6
-          kind: 0
+    - message: '`min_of` requires `--enable-feature=promql-experimental-functions`
+        to be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 1
+      lastcolumn: 6
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -645,16 +665,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`min_of` requires Prometheus 3.13.0 or later but `prom` Prometheus server at https://simple.example.com is running 3.12.0.'
-          firstcolumn: 1
-          lastcolumn: 6
-          kind: 0
+    - message: '`min_of` requires Prometheus 3.13.0 or later but `prom` Prometheus
+        server at https://simple.example.com is running 3.12.0.'
+      firstcolumn: 1
+      lastcolumn: 6
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -680,16 +701,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`fill` requires Prometheus 3.10.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.'
-          firstcolumn: 46
-          lastcolumn: 49
-          kind: 0
+    - message: '`fill` requires Prometheus 3.10.0 or later but `prom` Prometheus server
+        at https://simple.example.com is running 2.0.0.'
+      firstcolumn: 46
+      lastcolumn: 49
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 - description: multiple features missing
@@ -705,16 +727,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`duration_expr` requires Prometheus 3.4.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.'
-          firstcolumn: 19
-          lastcolumn: 23
-          kind: 0
+    - message: '`duration_expr` requires Prometheus 3.4.0 or later but `prom` Prometheus
+        server at https://simple.example.com is running 2.0.0.'
+      firstcolumn: 19
+      lastcolumn: 23
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 - description: multiple features missing
@@ -730,16 +753,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`mad_over_time` requires Prometheus 2.49.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.'
-          firstcolumn: 1
-          lastcolumn: 13
-          kind: 0
+    - message: '`mad_over_time` requires Prometheus 2.49.0 or later but `prom` Prometheus
+        server at https://simple.example.com is running 2.0.0.'
+      firstcolumn: 1
+      lastcolumn: 13
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 - description: multiple features missing
@@ -755,16 +779,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`smoothed` requires Prometheus 3.7.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.'
-          firstcolumn: 15
-          lastcolumn: 17
-          kind: 0
+    - message: '`smoothed` requires Prometheus 3.7.0 or later but `prom` Prometheus
+        server at https://simple.example.com is running 2.0.0.'
+      firstcolumn: 15
+      lastcolumn: 17
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -789,16 +814,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`mad_over_time` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 1
-          lastcolumn: 13
-          kind: 0
+    - message: '`mad_over_time` requires `--enable-feature=promql-experimental-functions`
+        to be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 1
+      lastcolumn: 13
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -823,16 +849,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`duration_expr` requires `--enable-feature=promql-duration-expr` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 16
-          lastcolumn: 22
-          kind: 0
+    - message: '`duration_expr` requires `--enable-feature=promql-duration-expr` to
+        be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 16
+      lastcolumn: 22
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 - description: range() missing feature flag
@@ -848,16 +875,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`range` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 16
-          lastcolumn: 22
-          kind: 0
+    - message: '`range` requires `--enable-feature=promql-experimental-functions`
+        to be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 16
+      lastcolumn: 22
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -882,16 +910,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`range` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 16
-          lastcolumn: 22
-          kind: 0
+    - message: '`range` requires `--enable-feature=promql-experimental-functions`
+        to be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 16
+      lastcolumn: 22
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -911,16 +940,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`duration_expr` requires `--enable-feature=promql-duration-expr` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 16
-          lastcolumn: 22
-          kind: 0
+    - message: '`duration_expr` requires `--enable-feature=promql-duration-expr` to
+        be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 16
+      lastcolumn: 22
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -940,16 +970,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`smoothed` requires Prometheus 3.7.0 or later but `prom` Prometheus server at https://simple.example.com is running 2.0.0.'
-          firstcolumn: 6
-          lastcolumn: 8
-          kind: 0
+    - message: '`smoothed` requires Prometheus 3.7.0 or later but `prom` Prometheus
+        server at https://simple.example.com is running 2.0.0.'
+      firstcolumn: 6
+      lastcolumn: 8
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -974,16 +1005,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`end` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 16
-          lastcolumn: 18
-          kind: 0
+    - message: '`end` requires `--enable-feature=promql-experimental-functions` to
+        be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 16
+      lastcolumn: 18
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 - description: start() in and binop
@@ -999,16 +1031,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`start` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 24
-          lastcolumn: 28
-          kind: 0
+    - message: '`start` requires `--enable-feature=promql-experimental-functions`
+        to be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 24
+      lastcolumn: 28
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -1029,16 +1062,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`end` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 35
-          lastcolumn: 37
-          kind: 0
+    - message: '`end` requires `--enable-feature=promql-experimental-functions` to
+        be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 35
+      lastcolumn: 37
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 - description: start() in group_left binop
@@ -1056,16 +1090,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`start` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 43
-          lastcolumn: 47
-          kind: 0
+    - message: '`start` requires `--enable-feature=promql-experimental-functions`
+        to be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 43
+      lastcolumn: 47
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -1085,16 +1120,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`end` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 8
-          lastcolumn: 10
-          kind: 0
+    - message: '`end` requires `--enable-feature=promql-experimental-functions` to
+        be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 8
+      lastcolumn: 10
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 - description: start() in group_right binop
@@ -1110,16 +1146,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`start` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 16
-          lastcolumn: 20
-          kind: 0
+    - message: '`start` requires `--enable-feature=promql-experimental-functions`
+        to be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 16
+      lastcolumn: 20
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -1139,16 +1176,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`end` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 22
-          lastcolumn: 24
-          kind: 0
+    - message: '`end` requires `--enable-feature=promql-experimental-functions` to
+        be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 22
+      lastcolumn: 24
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 - description: start() in one-to-one binop
@@ -1165,16 +1203,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`start` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 30
-          lastcolumn: 34
-          kind: 0
+    - message: '`start` requires `--enable-feature=promql-experimental-functions`
+        to be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 30
+      lastcolumn: 34
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -1194,16 +1233,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`end` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 15
-          lastcolumn: 17
-          kind: 0
+    - message: '`end` requires `--enable-feature=promql-experimental-functions` to
+        be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 15
+      lastcolumn: 17
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 - description: start() in or binop
@@ -1219,16 +1259,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`start` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 23
-          lastcolumn: 27
-          kind: 0
+    - message: '`start` requires `--enable-feature=promql-experimental-functions`
+        to be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 23
+      lastcolumn: 27
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -1248,16 +1289,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`end` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 8
-          lastcolumn: 10
-          kind: 0
+    - message: '`end` requires `--enable-feature=promql-experimental-functions` to
+        be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 8
+      lastcolumn: 10
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 - description: start() in scalar-vector binop
@@ -1273,16 +1315,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`start` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 16
-          lastcolumn: 20
-          kind: 0
+    - message: '`start` requires `--enable-feature=promql-experimental-functions`
+        to be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 16
+      lastcolumn: 20
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -1302,16 +1345,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`end` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 19
-          lastcolumn: 21
-          kind: 0
+    - message: '`end` requires `--enable-feature=promql-experimental-functions` to
+        be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 19
+      lastcolumn: 21
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 - description: start() in unless binop
@@ -1328,16 +1372,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`start` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 27
-          lastcolumn: 31
-          kind: 0
+    - message: '`start` requires `--enable-feature=promql-experimental-functions`
+        to be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 27
+      lastcolumn: 31
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -1357,16 +1402,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`end` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 8
-          lastcolumn: 10
-          kind: 0
+    - message: '`end` requires `--enable-feature=promql-experimental-functions` to
+        be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 8
+      lastcolumn: 10
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 - description: start() missing feature flag
@@ -1382,16 +1428,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`start` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 16
-          lastcolumn: 20
-          kind: 0
+    - message: '`start` requires `--enable-feature=promql-experimental-functions`
+        to be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 16
+      lastcolumn: 20
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -1411,16 +1458,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`end` requires Prometheus 3.12.0 or later but `prom` Prometheus server at https://simple.example.com is running 3.11.0.'
-          firstcolumn: 8
-          lastcolumn: 10
-          kind: 0
+    - message: '`end` requires Prometheus 3.12.0 or later but `prom` Prometheus server
+        at https://simple.example.com is running 3.11.0.'
+      firstcolumn: 8
+      lastcolumn: 10
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 - description: start() version too old with flag
@@ -1436,16 +1484,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`start` requires Prometheus 3.12.0 or later but `prom` Prometheus server at https://simple.example.com is running 3.11.0.'
-          firstcolumn: 16
-          lastcolumn: 20
-          kind: 0
+    - message: '`start` requires Prometheus 3.12.0 or later but `prom` Prometheus
+        server at https://simple.example.com is running 3.11.0.'
+      firstcolumn: 16
+      lastcolumn: 20
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -1465,16 +1514,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`end` requires Prometheus 3.12.0 or later but `prom` Prometheus server at https://simple.example.com is running 3.11.0.'
-          firstcolumn: 8
-          lastcolumn: 10
-          kind: 0
+    - message: '`end` requires Prometheus 3.12.0 or later but `prom` Prometheus server
+        at https://simple.example.com is running 3.11.0.'
+      firstcolumn: 8
+      lastcolumn: 10
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 - description: start() version too old without flag
@@ -1490,16 +1540,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`start` requires Prometheus 3.12.0 or later but `prom` Prometheus server at https://simple.example.com is running 3.11.0.'
-          firstcolumn: 16
-          lastcolumn: 20
-          kind: 0
+    - message: '`start` requires Prometheus 3.12.0 or later but `prom` Prometheus
+        server at https://simple.example.com is running 3.11.0.'
+      firstcolumn: 16
+      lastcolumn: 20
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -1524,16 +1575,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`start_timestamp` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 1
-          lastcolumn: 15
-          kind: 0
+    - message: '`start_timestamp` requires `--enable-feature=promql-experimental-functions`
+        to be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 1
+      lastcolumn: 15
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -1553,16 +1605,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`start_timestamp` requires Prometheus 3.14.0 or later but `prom` Prometheus server at https://simple.example.com is running 3.13.0.'
-          firstcolumn: 1
-          lastcolumn: 15
-          kind: 0
+    - message: '`start_timestamp` requires Prometheus 3.14.0 or later but `prom` Prometheus
+        server at https://simple.example.com is running 3.13.0.'
+      firstcolumn: 1
+      lastcolumn: 15
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -1587,16 +1640,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`duration_expr` requires `--enable-feature=promql-duration-expr` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 16
-          lastcolumn: 25
-          kind: 0
+    - message: '`duration_expr` requires `--enable-feature=promql-duration-expr` to
+        be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 16
+      lastcolumn: 25
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 - description: step() missing feature flag
@@ -1612,16 +1666,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`step` requires `--enable-feature=promql-experimental-functions` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 16
-          lastcolumn: 21
-          kind: 0
+    - message: '`step` requires `--enable-feature=promql-experimental-functions` to
+        be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 16
+      lastcolumn: 21
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -1646,16 +1701,17 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`unquoted_utf8_names` requires `--enable-feature=promql-unquoted-utf8-names` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 14
-          lastcolumn: 25
-          kind: 0
+    - message: '`unquoted_utf8_names` requires `--enable-feature=promql-unquoted-utf8-names`
+        to be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 14
+      lastcolumn: 25
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -1679,20 +1735,22 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`unquoted_utf8_names` requires `--enable-feature=promql-unquoted-utf8-names` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 10
-          lastcolumn: 17
-          kind: 0
-        - message: '`unquoted_utf8_names` requires `--enable-feature=promql-unquoted-utf8-names` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 31
-          lastcolumn: 42
-          kind: 0
+    - message: '`unquoted_utf8_names` requires `--enable-feature=promql-unquoted-utf8-names`
+        to be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 10
+      lastcolumn: 17
+      kind: 0
+    - message: '`unquoted_utf8_names` requires `--enable-feature=promql-unquoted-utf8-names`
+        to be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 31
+      lastcolumn: 42
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -1716,20 +1774,22 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`unquoted_utf8_names` requires `--enable-feature=promql-unquoted-utf8-names` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 1
-          lastcolumn: 28
-          kind: 0
-        - message: '`unquoted_utf8_names` requires `--enable-feature=promql-unquoted-utf8-names` to be set on `prom` Prometheus server at https://simple.example.com.'
-          firstcolumn: 30
-          lastcolumn: 41
-          kind: 0
+    - message: '`unquoted_utf8_names` requires `--enable-feature=promql-unquoted-utf8-names`
+        to be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 1
+      lastcolumn: 28
+      kind: 0
+    - message: '`unquoted_utf8_names` requires `--enable-feature=promql-unquoted-utf8-names`
+        to be set on `prom` Prometheus server at https://simple.example.com.'
+      firstcolumn: 30
+      lastcolumn: 41
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -1753,20 +1813,22 @@
     reporter: promql/features
     summary: required feature flag not enabled
     details: |-
-        This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
-        [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
+      This query uses PromQL features that require feature flags to be enabled on the Prometheus server via `--enable-feature=...` flag.
+      [Click here](https://prometheus.io/docs/prometheus/latest/feature_flags/) to see Prometheus feature flags documentation.
     diagnostics:
-        - message: '`unquoted_utf8_names` requires Prometheus 3.16.0 or later but `prom` Prometheus server at https://simple.example.com is running 3.15.0.'
-          firstcolumn: 1
-          lastcolumn: 28
-          kind: 0
-        - message: '`unquoted_utf8_names` requires Prometheus 3.16.0 or later but `prom` Prometheus server at https://simple.example.com is running 3.15.0.'
-          firstcolumn: 30
-          lastcolumn: 41
-          kind: 0
+    - message: '`unquoted_utf8_names` requires Prometheus 3.16.0 or later but `prom`
+        Prometheus server at https://simple.example.com is running 3.15.0.'
+      firstcolumn: 1
+      lastcolumn: 28
+      kind: 0
+    - message: '`unquoted_utf8_names` requires Prometheus 3.16.0 or later but `prom`
+        Prometheus server at https://simple.example.com is running 3.15.0.'
+      firstcolumn: 30
+      lastcolumn: 41
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 

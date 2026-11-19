@@ -409,7 +409,7 @@ func sanitizePayload(payload []byte) []byte {
 	// Without this we'd emit flow style ({...}) instead of block style (| ...).
 	forceBlockStyle(&node)
 
-	output, err := yaml.Dump(&node, yaml.WithV3Defaults(), yaml.WithLineWidth(-1))
+	output, err := yaml.Dump(&node)
 	if err != nil {
 		return payload
 	}

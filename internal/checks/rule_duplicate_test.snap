@@ -13,15 +13,17 @@
   problem:
     reporter: rule/duplicate
     summary: duplicated alerting rule
-    details: ""
+    details: ''
     diagnostics:
-        - message: This rule uses a different query but it can select the same time series as the `foo` alert at `fake.yml:2`, which means both rules will create identical alerts that might be deduplicated, with no way to distinguish between them.
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: This rule uses a different query but it can select the same time series
+        as the `foo` alert at `fake.yml:2`, which means both rules will create identical
+        alerts that might be deduplicated, with no way to distinguish between them.
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 1
     anchor: 0
 
@@ -41,15 +43,17 @@
   problem:
     reporter: rule/duplicate
     summary: duplicated alerting rule
-    details: ""
+    details: ''
     diagnostics:
-        - message: This rule uses a different query but it can select the same time series as the `foo` alert at `fake.yml:2`, which means both rules will create identical alerts that might be deduplicated, with no way to distinguish between them.
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: This rule uses a different query but it can select the same time series
+        as the `foo` alert at `fake.yml:2`, which means both rules will create identical
+        alerts that might be deduplicated, with no way to distinguish between them.
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 1
     anchor: 0
 
@@ -89,15 +93,17 @@
   problem:
     reporter: rule/duplicate
     summary: duplicated alerting rule
-    details: ""
+    details: ''
     diagnostics:
-        - message: This rule uses a different query but it can select the same time series as the `foo` alert at `fake.yml:2`, which means both rules will create identical alerts that might be deduplicated, with no way to distinguish between them.
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: This rule uses a different query but it can select the same time series
+        as the `foo` alert at `fake.yml:2`, which means both rules will create identical
+        alerts that might be deduplicated, with no way to distinguish between them.
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 1
     anchor: 0
 
@@ -115,15 +121,15 @@
   problem:
     reporter: rule/duplicate
     summary: duplicated alerting rule
-    details: ""
+    details: ''
     diagnostics:
-        - message: Duplicated rule, identical rule found in the `foo` alert at `fake.yml:2`.
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: Duplicated rule, identical rule found in the `foo` alert at `fake.yml:2`.
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 3
+      first: 1
+      last: 3
     severity: 2
     anchor: 0
 
@@ -140,15 +146,15 @@
   problem:
     reporter: rule/duplicate
     summary: duplicated alerting rule
-    details: ""
+    details: ''
     diagnostics:
-        - message: Duplicated rule, identical rule found in the `foo` alert at `fake.yml:2`.
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: Duplicated rule, identical rule found in the `foo` alert at `fake.yml:2`.
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 2
     anchor: 0
 
@@ -168,15 +174,17 @@
   problem:
     reporter: rule/duplicate
     summary: duplicated alerting rule
-    details: ""
+    details: ''
     diagnostics:
-        - message: This rule uses a different query but it can select the same time series as the `foo` alert at `fake.yml:2`, which means both rules will create identical alerts that might be deduplicated, with no way to distinguish between them.
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: This rule uses a different query but it can select the same time series
+        as the `foo` alert at `fake.yml:2`, which means both rules will create identical
+        alerts that might be deduplicated, with no way to distinguish between them.
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 1
     anchor: 0
 
@@ -213,15 +221,15 @@
   problem:
     reporter: rule/duplicate
     summary: duplicated alerting rule
-    details: ""
+    details: ''
     diagnostics:
-        - message: Duplicated rule, identical rule found in the `foo` alert at `fake.yml:2`.
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: Duplicated rule, identical rule found in the `foo` alert at `fake.yml:2`.
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 2
     anchor: 0
 
@@ -240,15 +248,15 @@
   problem:
     reporter: rule/duplicate
     summary: duplicated alerting rule
-    details: ""
+    details: ''
     diagnostics:
-        - message: Duplicated rule, identical rule found in the `foo` alert at `fake.yml:2`.
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: Duplicated rule, identical rule found in the `foo` alert at `fake.yml:2`.
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 4
+      first: 1
+      last: 4
     severity: 2
     anchor: 0
 
@@ -315,15 +323,15 @@
   problem:
     reporter: rule/duplicate
     summary: duplicated recording rule
-    details: ""
+    details: ''
     diagnostics:
-        - message: Duplicated rule, identical rule found at fake.yml:6.
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: Duplicated rule, identical rule found at fake.yml:6.
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 2
     anchor: 0
 
@@ -348,15 +356,17 @@
   problem:
     reporter: rule/duplicate
     summary: duplicated alerting rule
-    details: ""
+    details: ''
     diagnostics:
-        - message: This rule uses a different query but it can select the same time series as the `foo` alert at `fake.yml:2`, which means both rules will create identical alerts that might be deduplicated, with no way to distinguish between them.
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: This rule uses a different query but it can select the same time series
+        as the `foo` alert at `fake.yml:2`, which means both rules will create identical
+        alerts that might be deduplicated, with no way to distinguish between them.
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 1
     anchor: 0
 
@@ -381,15 +391,17 @@
   problem:
     reporter: rule/duplicate
     summary: duplicated alerting rule
-    details: ""
+    details: ''
     diagnostics:
-        - message: This rule uses a different query but it can select the same time series as the `foo` alert at `fake.yml:2`, which means both rules will create identical alerts that might be deduplicated, with no way to distinguish between them.
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: This rule uses a different query but it can select the same time series
+        as the `foo` alert at `fake.yml:2`, which means both rules will create identical
+        alerts that might be deduplicated, with no way to distinguish between them.
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 1
     anchor: 0
 
@@ -409,15 +421,17 @@
   problem:
     reporter: rule/duplicate
     summary: duplicated alerting rule
-    details: ""
+    details: ''
     diagnostics:
-        - message: This rule uses a different query but it can select the same time series as the `foo` alert at `fake.yml:2`, which means both rules will create identical alerts that might be deduplicated, with no way to distinguish between them.
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: This rule uses a different query but it can select the same time series
+        as the `foo` alert at `fake.yml:2`, which means both rules will create identical
+        alerts that might be deduplicated, with no way to distinguish between them.
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 1
     anchor: 0
 
@@ -442,15 +456,17 @@
   problem:
     reporter: rule/duplicate
     summary: duplicated alerting rule
-    details: ""
+    details: ''
     diagnostics:
-        - message: This rule uses a different query but it can select the same time series as the `foo` alert at `fake.yml:2`, which means both rules will create identical alerts that might be deduplicated, with no way to distinguish between them.
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: This rule uses a different query but it can select the same time series
+        as the `foo` alert at `fake.yml:2`, which means both rules will create identical
+        alerts that might be deduplicated, with no way to distinguish between them.
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 1
     anchor: 0
 
@@ -472,15 +488,15 @@
   problem:
     reporter: rule/duplicate
     summary: duplicated recording rule
-    details: ""
+    details: ''
     diagnostics:
-        - message: Duplicated rule, identical rule found at fake.yml:6.
-          firstcolumn: 1
-          lastcolumn: 10
-          kind: 0
+    - message: Duplicated rule, identical rule found at fake.yml:6.
+      firstcolumn: 1
+      lastcolumn: 10
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 2
     anchor: 0
 
@@ -497,15 +513,15 @@
   problem:
     reporter: rule/duplicate
     summary: duplicated alerting rule
-    details: ""
+    details: ''
     diagnostics:
-        - message: Duplicated rule, identical rule found in the `foo` alert at `fake.yml:1`.
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: Duplicated rule, identical rule found in the `foo` alert at `fake.yml:1`.
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 2
     anchor: 0
 
@@ -535,15 +551,17 @@
   problem:
     reporter: rule/duplicate
     summary: duplicated alerting rule
-    details: ""
+    details: ''
     diagnostics:
-        - message: This rule uses a different query but it can select the same time series as the `foo` alert at `fake.yml:2`, which means both rules will create identical alerts that might be deduplicated, with no way to distinguish between them.
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: This rule uses a different query but it can select the same time series
+        as the `foo` alert at `fake.yml:2`, which means both rules will create identical
+        alerts that might be deduplicated, with no way to distinguish between them.
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 1
     anchor: 0
 

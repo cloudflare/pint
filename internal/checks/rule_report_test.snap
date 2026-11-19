@@ -10,15 +10,15 @@
   problem:
     reporter: rule/report
     summary: problem reported by config rule
-    details: ""
+    details: ''
     diagnostics:
-        - message: problem reported
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: problem reported
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 0
     anchor: 0
 
@@ -37,15 +37,15 @@
   problem:
     reporter: rule/report
     summary: problem reported by config rule
-    details: ""
+    details: ''
     diagnostics:
-        - message: problem reported
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: problem reported
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 4
+      first: 1
+      last: 4
     severity: 1
     anchor: 0
 

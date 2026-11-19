@@ -15,13 +15,14 @@
     summary: alert count estimate
     details: To get a preview of the alerts that would fire please [click here](https://simple.example.com/graph?g0.expr=up%7Bjob%3D%22foo%22%7D+%3D%3D+0&g0.tab=0&g0.range_input=1d).
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com would trigger 1 alert(s) in the last 1d.'
-          firstcolumn: 1
-          lastcolumn: 18
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com would trigger
+        1 alert(s) in the last 1d.'
+      firstcolumn: 1
+      lastcolumn: 18
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 0
     anchor: 0
 
@@ -43,13 +44,14 @@
     summary: alert count estimate
     details: To get a preview of the alerts that would fire please [click here](https://simple.example.com/graph?g0.expr=up%7Bjob%3D%22foo%22%7D+%3D%3D+0&g0.tab=0&g0.range_input=1d).
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com would trigger 0 alert(s) in the last 1d.'
-          firstcolumn: 1
-          lastcolumn: 18
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com would trigger
+        0 alert(s) in the last 1d.'
+      firstcolumn: 1
+      lastcolumn: 18
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 0
     anchor: 0
 
@@ -68,15 +70,16 @@
   problem:
     reporter: alerts/count
     summary: unable to run checks
-    details: ""
+    details: ''
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `bad_data: bad input data`.'
-          firstcolumn: 1
-          lastcolumn: 11
-          kind: 0
+    - message: 'Couldn''t run some online checks due to `prom` Prometheus server at
+        http://127.0.0.1:XXXXX error: `bad_data: bad input data`.'
+      firstcolumn: 1
+      lastcolumn: 11
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 2
     anchor: 0
 
@@ -95,15 +98,16 @@
   problem:
     reporter: alerts/count
     summary: unable to run checks
-    details: ""
+    details: ''
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 error: `connection refused`.'
-          firstcolumn: 1
-          lastcolumn: 11
-          kind: 0
+    - message: 'Couldn''t run some online checks due to `prom` Prometheus server at
+        http://127.0.0.1:1111 error: `connection refused`.'
+      firstcolumn: 1
+      lastcolumn: 11
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 1
     anchor: 0
 
@@ -124,13 +128,14 @@
     summary: alert count estimate
     details: To get a preview of the alerts that would fire please [click here](https://simple.example.com/graph?g0.expr=up%7Bjob%3D%22foo%22%7D+%3D%3D+0&g0.tab=0&g0.range_input=1d).
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com would trigger 0 alert(s) in the last 1d.'
-          firstcolumn: 1
-          lastcolumn: 18
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com would trigger
+        0 alert(s) in the last 1d.'
+      firstcolumn: 1
+      lastcolumn: 18
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 0
     anchor: 0
 
@@ -153,13 +158,14 @@
     summary: alert count estimate
     details: To get a preview of the alerts that would fire please [click here](https://simple.example.com/graph?g0.expr=up%7Bjob%3D%22foo%22%7D+%3D%3D+0&g0.tab=0&g0.range_input=1d).
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com would trigger 2 alert(s) in the last 1d.'
-          firstcolumn: 1
-          lastcolumn: 18
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com would trigger
+        2 alert(s) in the last 1d.'
+      firstcolumn: 1
+      lastcolumn: 18
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 0
     anchor: 0
 
@@ -181,13 +187,14 @@
     summary: alert count estimate
     details: To get a preview of the alerts that would fire please [click here](https://simple.example.com/graph?g0.expr=up%7Bjob%3D%22foo%22%7D+%3D%3D+0&g0.tab=0&g0.range_input=1d).
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com would trigger 2 alert(s) in the last 1d.'
-          firstcolumn: 1
-          lastcolumn: 18
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com would trigger
+        2 alert(s) in the last 1d.'
+      firstcolumn: 1
+      lastcolumn: 18
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 0
     anchor: 0
 
@@ -210,13 +217,14 @@
     summary: alert count estimate
     details: To get a preview of the alerts that would fire please [click here](https://simple.example.com/graph?g0.expr=up%7Bjob%3D%22foo%22%7D+%3D%3D+0&g0.tab=0&g0.range_input=1d).
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com would trigger 2 alert(s) in the last 1d.'
-          firstcolumn: 1
-          lastcolumn: 18
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com would trigger
+        2 alert(s) in the last 1d.'
+      firstcolumn: 1
+      lastcolumn: 18
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 0
     anchor: 0
 
@@ -248,13 +256,14 @@
     summary: alert count estimate
     details: To get a preview of the alerts that would fire please [click here](https://simple.example.com/graph?g0.expr=up%7Bjob%3D%22foo%22%7D+%3D%3D+0&g0.tab=0&g0.range_input=1d).
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com would trigger 6 alert(s) in the last 1d.'
-          firstcolumn: 1
-          lastcolumn: 18
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com would trigger
+        6 alert(s) in the last 1d.'
+      firstcolumn: 1
+      lastcolumn: 18
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 0
     anchor: 0
 
@@ -276,13 +285,14 @@
     summary: alert count estimate
     details: To get a preview of the alerts that would fire please [click here](https://simple.example.com/graph?g0.expr=up%7Bjob%3D%22foo%22%7D+%3D%3D+0&g0.tab=0&g0.range_input=1d).
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com would trigger 3 alert(s) in the last 1d.'
-          firstcolumn: 1
-          lastcolumn: 18
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com would trigger
+        3 alert(s) in the last 1d.'
+      firstcolumn: 1
+      lastcolumn: 18
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 0
     anchor: 0
 
@@ -304,13 +314,14 @@
     summary: alert count estimate
     details: To get a preview of the alerts that would fire please [click here](https://simple.example.com/graph?g0.expr=up%7Bjob%3D%22foo%22%7D+%3D%3D+0&g0.tab=0&g0.range_input=1d).
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com would trigger 2 alert(s) in the last 1d.'
-          firstcolumn: 1
-          lastcolumn: 18
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com would trigger
+        2 alert(s) in the last 1d.'
+      firstcolumn: 1
+      lastcolumn: 18
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 0
     anchor: 0
 
@@ -331,16 +342,17 @@
     reporter: alerts/count
     summary: alert count estimate
     details: |-
-        To get a preview of the alerts that would fire please [click here](https://simple.example.com/graph?g0.expr=up%7Bjob%3D%22foo%22%7D+%3D%3D+0&g0.tab=0&g0.range_input=1d).
-        Rule comment: rule comment
+      To get a preview of the alerts that would fire please [click here](https://simple.example.com/graph?g0.expr=up%7Bjob%3D%22foo%22%7D+%3D%3D+0&g0.tab=0&g0.range_input=1d).
+      Rule comment: rule comment
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com would trigger 2 alert(s) in the last 1d.'
-          firstcolumn: 1
-          lastcolumn: 18
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com would trigger
+        2 alert(s) in the last 1d.'
+      firstcolumn: 1
+      lastcolumn: 18
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 0
     anchor: 0
 
@@ -362,13 +374,14 @@
     summary: alert count estimate
     details: To get a preview of the alerts that would fire please [click here](https://simple.example.com/graph?g0.expr=up%7Bjob%3D%22foo%22%7D+%3D%3D+0&g0.tab=0&g0.range_input=1d).
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com would trigger 2 alert(s) in the last 1d.'
-          firstcolumn: 1
-          lastcolumn: 18
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com would trigger
+        2 alert(s) in the last 1d.'
+      firstcolumn: 1
+      lastcolumn: 18
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 2
     anchor: 0
 
@@ -394,13 +407,14 @@
     summary: alert count estimate
     details: To get a preview of the alerts that would fire please [click here](https://simple.example.com/graph?g0.expr=up%7Bjob%3D%22foo%22%7D+%3D%3D+0&g0.tab=0&g0.range_input=1d).
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com would trigger 7 alert(s) in the last 1d.'
-          firstcolumn: 1
-          lastcolumn: 18
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com would trigger
+        7 alert(s) in the last 1d.'
+      firstcolumn: 1
+      lastcolumn: 18
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 0
     anchor: 0
 
@@ -421,13 +435,14 @@
     summary: alert count estimate
     details: To get a preview of the alerts that would fire please [click here](https://simple.example.com/graph?g0.expr=up%7Bjob%3D%22foo%22%7D+%3D%3D+0&g0.tab=0&g0.range_input=1d).
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com would trigger 3 alert(s) in the last 1d.'
-          firstcolumn: 1
-          lastcolumn: 18
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com would trigger
+        3 alert(s) in the last 1d.'
+      firstcolumn: 1
+      lastcolumn: 18
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 0
     anchor: 0
 
@@ -449,13 +464,14 @@
     summary: alert count estimate
     details: To get a preview of the alerts that would fire please [click here](https://simple.example.com/graph?g0.expr=%7B__name__%3D%22up%22%2C+job%3D%22foo%22%7D+%3D%3D+0&g0.tab=0&g0.range_input=1d).
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com would trigger 3 alert(s) in the last 1d.'
-          firstcolumn: 1
-          lastcolumn: 31
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com would trigger
+        3 alert(s) in the last 1d.'
+      firstcolumn: 1
+      lastcolumn: 31
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 0
     anchor: 0
 
@@ -477,13 +493,14 @@
     summary: alert count estimate
     details: To get a preview of the alerts that would fire please [click here](https://simple.example.com/graph?g0.expr=%7B__name__%3D~%22%28up%7Cfoo%29%22%2C+job%3D%22foo%22%7D+%3D%3D+0&g0.tab=0&g0.range_input=1d).
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com would trigger 3 alert(s) in the last 1d.'
-          firstcolumn: 1
-          lastcolumn: 38
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com would trigger
+        3 alert(s) in the last 1d.'
+      firstcolumn: 1
+      lastcolumn: 38
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 0
     anchor: 0
 

@@ -12,15 +12,16 @@
   problem:
     reporter: promql/series
     summary: unable to run checks
-    details: ""
+    details: ''
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: 'Couldn''t run some online checks due to `prom` Prometheus server at
+        http://127.0.0.1:XXXXX error: `server_error: internal error`.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 2
     anchor: 0
 
@@ -44,15 +45,16 @@
   problem:
     reporter: promql/series
     summary: unable to run checks
-    details: ""
+    details: ''
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: 'Couldn''t run some online checks due to `prom` Prometheus server at
+        http://127.0.0.1:XXXXX error: `server_error: internal error`.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 2
     anchor: 0
 
@@ -71,15 +73,17 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for the `notfound` metric in the last 1w.'
-          firstcolumn: 5
-          lastcolumn: 12
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com didn''t have
+        any series for the `notfound` metric in the last 1w.'
+      firstcolumn: 5
+      lastcolumn: 12
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -98,15 +102,17 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for the `notfound` metric in the last 3d.'
-          firstcolumn: 5
-          lastcolumn: 12
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com didn''t have
+        any series for the `notfound` metric in the last 3d.'
+      firstcolumn: 5
+      lastcolumn: 12
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -126,15 +132,18 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for the `notfound` metric in the last 1w. Metric name `notfound` matches `promql/series` check ignore regexp `^not.+$`.'
-          firstcolumn: 5
-          lastcolumn: 12
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com didn''t have
+        any series for the `notfound` metric in the last 1w. Metric name `notfound`
+        matches `promql/series` check ignore regexp `^not.+$`.'
+      firstcolumn: 5
+      lastcolumn: 12
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -155,18 +164,20 @@
     reporter: promql/series
     summary: query on nonexistent series
     details: |
-        This usually means that you're deploying a set of rules where one is using the metric produced by another rule.
-        To avoid false positives pint won't run series checks here but that doesn't guarantee that there are no problems here.
-        To fully validate your changes it's best to first deploy the rules that generate the time series needed by other rules.
-        [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#your-query-is-using-recording-rules) for more details.
+      This usually means that you're deploying a set of rules where one is using the metric produced by another rule.
+      To avoid false positives pint won't run series checks here but that doesn't guarantee that there are no problems here.
+      To fully validate your changes it's best to first deploy the rules that generate the time series needed by other rules.
+      [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#your-query-is-using-recording-rules) for more details.
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for the `foo:bar` metric in the last 1w but found a recording rule that generates it, skipping further checks.'
-          firstcolumn: 5
-          lastcolumn: 22
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com didn''t have
+        any series for the `foo:bar` metric in the last 1w but found a recording rule
+        that generates it, skipping further checks.'
+      firstcolumn: 5
+      lastcolumn: 22
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 0
     anchor: 0
 
@@ -187,18 +198,20 @@
     reporter: promql/series
     summary: query on nonexistent series
     details: |
-        This usually means that you're deploying a set of rules where one is using the metric produced by another rule.
-        To avoid false positives pint won't run series checks here but that doesn't guarantee that there are no problems here.
-        To fully validate your changes it's best to first deploy the rules that generate the time series needed by other rules.
-        [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#your-query-is-using-recording-rules) for more details.
+      This usually means that you're deploying a set of rules where one is using the metric produced by another rule.
+      To avoid false positives pint won't run series checks here but that doesn't guarantee that there are no problems here.
+      To fully validate your changes it's best to first deploy the rules that generate the time series needed by other rules.
+      [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#your-query-is-using-recording-rules) for more details.
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for the `foo:bar` metric in the last 1w but found a recording rule that generates it, skipping further checks.'
-          firstcolumn: 5
-          lastcolumn: 22
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com didn''t have
+        any series for the `foo:bar` metric in the last 1w but found a recording rule
+        that generates it, skipping further checks.'
+      firstcolumn: 5
+      lastcolumn: 22
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 0
     anchor: 0
 
@@ -219,18 +232,20 @@
     reporter: promql/series
     summary: query on nonexistent series
     details: |
-        This usually means that you're deploying a set of rules where one is using the metric produced by another rule.
-        To avoid false positives pint won't run series checks here but that doesn't guarantee that there are no problems here.
-        To fully validate your changes it's best to first deploy the rules that generate the time series needed by other rules.
-        [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#your-query-is-using-recording-rules) for more details.
+      This usually means that you're deploying a set of rules where one is using the metric produced by another rule.
+      To avoid false positives pint won't run series checks here but that doesn't guarantee that there are no problems here.
+      To fully validate your changes it's best to first deploy the rules that generate the time series needed by other rules.
+      [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#your-query-is-using-recording-rules) for more details.
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for the `foo:bar` metric in the last 1w but found a recording rule that generates it, skipping further checks.'
-          firstcolumn: 5
-          lastcolumn: 22
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com didn''t have
+        any series for the `foo:bar` metric in the last 1w but found a recording rule
+        that generates it, skipping further checks.'
+      firstcolumn: 5
+      lastcolumn: 22
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 0
     anchor: 0
 
@@ -249,15 +264,17 @@
   problem:
     reporter: promql/series
     summary: unknown alert referenced
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`ALERTS{alertname="myalert"}` metric is generated by alerts but didn''t find any rule named `myalert`.'
-          firstcolumn: 7
-          lastcolumn: 33
-          kind: 0
+    - message: '`ALERTS{alertname="myalert"}` metric is generated by alerts but didn''t
+        find any rule named `myalert`.'
+      firstcolumn: 7
+      lastcolumn: 33
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -281,15 +298,17 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com has the `found` metric but there are no series with the `job` label in the last 1w.'
-          firstcolumn: 5
-          lastcolumn: 20
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com has the `found`
+        metric but there are no series with the `job` label in the last 1w.'
+      firstcolumn: 5
+      lastcolumn: 20
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -308,15 +327,17 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com has the `found` metric but there are no series with the `notfound` label in the last 1w.'
-          firstcolumn: 5
-          lastcolumn: 36
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com has the `found`
+        metric but there are no series with the `notfound` label in the last 1w.'
+      firstcolumn: 5
+      lastcolumn: 36
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -335,15 +356,16 @@
   problem:
     reporter: promql/series
     summary: unable to run checks
-    details: ""
+    details: ''
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: 'Couldn''t run some online checks due to `prom` Prometheus server at
+        http://127.0.0.1:XXXXX error: `server_error: internal error`.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 2
     anchor: 0
 
@@ -362,15 +384,18 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: The `found` metric is only sometimes present on `prom` Prometheus server at https://simple.example.com with an average life span of 5m in the last 1w.
-          firstcolumn: 5
-          lastcolumn: 35
-          kind: 0
+    - message: The `found` metric is only sometimes present on `prom` Prometheus server
+        at https://simple.example.com with an average life span of 5m in the last
+        1w.
+      firstcolumn: 5
+      lastcolumn: 35
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -389,15 +414,18 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: The `found` metric is only sometimes present on `prom` Prometheus server at https://simple.example.com with an average life span of 1d5m in the last 1w.
-          firstcolumn: 5
-          lastcolumn: 35
-          kind: 0
+    - message: The `found` metric is only sometimes present on `prom` Prometheus server
+        at https://simple.example.com with an average life span of 1d5m in the last
+        1w.
+      firstcolumn: 5
+      lastcolumn: 35
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -416,15 +444,18 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: The `found` metric is only sometimes present on `prom` Prometheus server at https://simple.example.com with an average life span of 1d5m in the last 1w.
-          firstcolumn: 5
-          lastcolumn: 35
-          kind: 0
+    - message: The `found` metric is only sometimes present on `prom` Prometheus server
+        at https://simple.example.com with an average life span of 1d5m in the last
+        1w.
+      firstcolumn: 5
+      lastcolumn: 35
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -445,15 +476,17 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com doesn''t currently have the `found` metric, it was last present 4d ago.'
-          firstcolumn: 5
-          lastcolumn: 36
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com doesn''t currently
+        have the `found` metric, it was last present 4d ago.'
+      firstcolumn: 5
+      lastcolumn: 36
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 2
     anchor: 0
 
@@ -474,16 +507,17 @@
     reporter: promql/series
     summary: invalid comment
     details: |-
-        You have a comment that tells pint how long a metric can be missing before it warns you about it but this comment is not formatted correctly.
-        [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#min-age) to see supported syntax.
+      You have a comment that tells pint how long a metric can be missing before it warns you about it but this comment is not formatted correctly.
+      [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#min-age) to see supported syntax.
     diagnostics:
-        - message: 'failed to parse pint comment as duration: not a valid duration string: "foo"'
-          firstcolumn: 17
-          lastcolumn: 48
-          kind: 0
+    - message: 'failed to parse pint comment as duration: not a valid duration string:
+        "foo"'
+      firstcolumn: 17
+      lastcolumn: 48
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 1
     anchor: 0
 - description: '#4 metric was present but disappeared / min-age / invalid value'
@@ -500,15 +534,17 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com doesn''t currently have the `found` metric, it was last present 4d ago.'
-          firstcolumn: 5
-          lastcolumn: 36
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com doesn''t currently
+        have the `found` metric, it was last present 4d ago.'
+      firstcolumn: 5
+      lastcolumn: 36
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 2
     anchor: 0
 
@@ -534,15 +570,17 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com doesn''t currently have the `found` metric, it was last present 4d ago.'
-          firstcolumn: 5
-          lastcolumn: 36
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com doesn''t currently
+        have the `found` metric, it was last present 4d ago.'
+      firstcolumn: 5
+      lastcolumn: 36
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 2
     anchor: 0
 - description: '#4 metric was present but disappeared / min-age / mismatch'
@@ -560,16 +598,17 @@
     reporter: promql/series
     summary: invalid comment
     details: |-
-        One of the `# pint rule/set promql/series` comments used in this rule doesn't have any effect. Make sure that the comment targets series and labels that are used in the rule query and are not already ignored.
-        [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#ignorelabel-value) for docs about comment syntax.
+      One of the `# pint rule/set promql/series` comments used in this rule doesn't have any effect. Make sure that the comment targets series and labels that are used in the rule query and are not already ignored.
+      [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#ignorelabel-value) for docs about comment syntax.
     diagnostics:
-        - message: pint rule/set comment `promql/series(bar) min-age 5d` doesn't match any label matcher in this query
-          firstcolumn: 17
-          lastcolumn: 45
-          kind: 0
+    - message: pint rule/set comment `promql/series(bar) min-age 5d` doesn't match
+        any label matcher in this query
+      firstcolumn: 17
+      lastcolumn: 45
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 1
     anchor: 0
 
@@ -603,15 +642,17 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com doesn''t currently have the `found` metric, it was last present 4d ago.'
-          firstcolumn: 5
-          lastcolumn: 36
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com doesn''t currently
+        have the `found` metric, it was last present 4d ago.'
+      firstcolumn: 5
+      lastcolumn: 36
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -631,15 +672,18 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com doesn''t currently have the `found` metric, it was last present 4d ago. Metric name `found` matches `promql/series` check ignore regexp `^found$`.'
-          firstcolumn: 5
-          lastcolumn: 36
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com doesn''t currently
+        have the `found` metric, it was last present 4d ago. Metric name `found` matches
+        `promql/series` check ignore regexp `^found$`.'
+      firstcolumn: 5
+      lastcolumn: 36
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -659,15 +703,18 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com has the `sometimes` metric with the `churn` label but there are no series matching `{churn="notfound"}` in the last 1w.'
-          firstcolumn: 15
-          lastcolumn: 30
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com has the `sometimes`
+        metric with the `churn` label but there are no series matching `{churn="notfound"}`
+        in the last 1w.'
+      firstcolumn: 15
+      lastcolumn: 30
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -693,15 +740,18 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com has the `foo` metric with the `error` label but there are no series matching `{error="notfound"}` in the last 1w.'
-          firstcolumn: 9
-          lastcolumn: 24
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com has the `foo`
+        metric with the `error` label but there are no series matching `{error="notfound"}`
+        in the last 1w.'
+      firstcolumn: 9
+      lastcolumn: 24
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 2
     anchor: 0
 - description: '#5 ignored label value / selector mismatch'
@@ -719,16 +769,17 @@
     reporter: promql/series
     summary: invalid comment
     details: |-
-        One of the `# pint rule/set promql/series` comments used in this rule doesn't have any effect. Make sure that the comment targets series and labels that are used in the rule query and are not already ignored.
-        [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#ignorelabel-value) for docs about comment syntax.
+      One of the `# pint rule/set promql/series` comments used in this rule doesn't have any effect. Make sure that the comment targets series and labels that are used in the rule query and are not already ignored.
+      [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#ignorelabel-value) for docs about comment syntax.
     diagnostics:
-        - message: pint rule/set comment `promql/series(foo{job="bob"}) ignore/label-value error` doesn't match any label matcher in this query
-          firstcolumn: 17
-          lastcolumn: 70
-          kind: 0
+    - message: pint rule/set comment `promql/series(foo{job="bob"}) ignore/label-value
+        error` doesn't match any label matcher in this query
+      firstcolumn: 17
+      lastcolumn: 70
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 1
     anchor: 0
 
@@ -758,15 +809,18 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com has the `foo` metric with the `error` label but there are no series matching `{error="notfound"}` in the last 1w.'
-          firstcolumn: 9
-          lastcolumn: 24
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com has the `foo`
+        metric with the `error` label but there are no series matching `{error="notfound"}`
+        in the last 1w.'
+      firstcolumn: 9
+      lastcolumn: 24
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 2
     anchor: 0
 
@@ -790,15 +844,16 @@
   problem:
     reporter: promql/series
     summary: unable to run checks
-    details: ""
+    details: ''
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: 'Couldn''t run some online checks due to `prom` Prometheus server at
+        http://127.0.0.1:XXXXX error: `server_error: internal error`.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 2
     anchor: 0
 
@@ -819,15 +874,19 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com has the `found` metric with the `notfound` label but there are no series matching `{notfound="notfound"}` in the last 1w. Metric name `found` matches `promql/series` check ignore regexp `^found$`.'
-          firstcolumn: 11
-          lastcolumn: 29
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com has the `found`
+        metric with the `notfound` label but there are no series matching `{notfound="notfound"}`
+        in the last 1w. Metric name `found` matches `promql/series` check ignore regexp
+        `^found$`.'
+      firstcolumn: 11
+      lastcolumn: 29
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -847,15 +906,18 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com has the `found` metric with the `notfound` label but there are no series matching `{notfound="notfound"}` in the last 1w.'
-          firstcolumn: 11
-          lastcolumn: 29
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com has the `found`
+        metric with the `notfound` label but there are no series matching `{notfound="notfound"}`
+        in the last 1w.'
+      firstcolumn: 11
+      lastcolumn: 29
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -875,15 +937,18 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com has the `found` metric but doesn''t currently have series matching `{removed="xxx"}`, such series were last present 5d16h ago.'
-          firstcolumn: 24
-          lastcolumn: 36
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com has the `found`
+        metric but doesn''t currently have series matching `{removed="xxx"}`, such
+        series were last present 5d16h ago.'
+      firstcolumn: 24
+      lastcolumn: 36
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -904,16 +969,17 @@
     reporter: promql/series
     summary: invalid comment
     details: |-
-        You have a comment that tells pint how long a metric can be missing before it warns you about it but this comment is not formatted correctly.
-        [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#min-age) to see supported syntax.
+      You have a comment that tells pint how long a metric can be missing before it warns you about it but this comment is not formatted correctly.
+      [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#min-age) to see supported syntax.
     diagnostics:
-        - message: 'failed to parse pint comment as duration: unknown unit "e" in duration "1e"'
-          firstcolumn: 17
-          lastcolumn: 47
-          kind: 0
+    - message: 'failed to parse pint comment as duration: unknown unit "e" in duration
+        "1e"'
+      firstcolumn: 17
+      lastcolumn: 47
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 - description: '#6 metric was always present but label disappeared / invalid min-age'
@@ -931,15 +997,18 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com has the `found` metric but doesn''t currently have series matching `{removed="xxx"}`, such series were last present 5d16h ago.'
-          firstcolumn: 24
-          lastcolumn: 36
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com has the `found`
+        metric but doesn''t currently have series matching `{removed="xxx"}`, such
+        series were last present 5d16h ago.'
+      firstcolumn: 24
+      lastcolumn: 36
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 2
     anchor: 0
 
@@ -965,16 +1034,18 @@
     reporter: promql/series
     summary: query on nonexistent series
     details: |-
-        [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.
-        If this metric is expected to exist only under certain conditions, you might want to add a `# pint disable promql/series(...)` comment to avoid pint reports when it's missing. [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) for docs about disable comment syntax.
+      [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.
+      If this metric is expected to exist only under certain conditions, you might want to add a `# pint disable promql/series(...)` comment to avoid pint reports when it's missing. [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) for docs about disable comment syntax.
     diagnostics:
-        - message: The `found` metric with label `{sometimes="xxx"}` is only sometimes present on `prom` Prometheus server at https://simple.example.com with an average life span of 18h45m.
-          firstcolumn: 11
-          lastcolumn: 25
-          kind: 0
+    - message: The `found` metric with label `{sometimes="xxx"}` is only sometimes
+        present on `prom` Prometheus server at https://simple.example.com with an
+        average life span of 18h45m.
+      firstcolumn: 11
+      lastcolumn: 25
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -993,15 +1064,18 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: The `sometimes` metric is only sometimes present on `prom` Prometheus server at https://simple.example.com with an average life span of 35m in the last 1w.
-          firstcolumn: 5
-          lastcolumn: 25
-          kind: 0
+    - message: The `sometimes` metric is only sometimes present on `prom` Prometheus
+        server at https://simple.example.com with an average life span of 35m in the
+        last 1w.
+      firstcolumn: 5
+      lastcolumn: 25
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -1042,15 +1116,18 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com has the `{__name__=~"(foo|bar)_panics_total"}` metric with the `job` label but there are no series matching `{job="myjob"}` in the last 1w.'
-          firstcolumn: 43
-          lastcolumn: 53
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com has the `{__name__=~"(foo|bar)_panics_total"}`
+        metric with the `job` label but there are no series matching `{job="myjob"}`
+        in the last 1w.'
+      firstcolumn: 43
+      lastcolumn: 53
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -1069,15 +1146,18 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for the `{__name__=~"(foo|bar)_panics_total"}` metric in the last 1w.'
-          firstcolumn: 6
-          lastcolumn: 54
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com didn''t have
+        any series for the `{__name__=~"(foo|bar)_panics_total"}` metric in the last
+        1w.'
+      firstcolumn: 6
+      lastcolumn: 54
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -1103,18 +1183,20 @@
     reporter: promql/series
     summary: query on nonexistent series
     details: |
-        This usually means that you're deploying a set of rules where one is using the metric produced by another rule.
-        To avoid false positives pint won't run series checks here but that doesn't guarantee that there are no problems here.
-        To fully validate your changes it's best to first deploy the rules that generate the time series needed by other rules.
-        [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#your-query-is-using-recording-rules) for more details.
+      This usually means that you're deploying a set of rules where one is using the metric produced by another rule.
+      To avoid false positives pint won't run series checks here but that doesn't guarantee that there are no problems here.
+      To fully validate your changes it's best to first deploy the rules that generate the time series needed by other rules.
+      [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#your-query-is-using-recording-rules) for more details.
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for the `foo:count` metric in the last 1w but found a recording rule that generates it, skipping further checks.'
-          firstcolumn: 5
-          lastcolumn: 13
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com didn''t have
+        any series for the `foo:count` metric in the last 1w but found a recording
+        rule that generates it, skipping further checks.'
+      firstcolumn: 5
+      lastcolumn: 13
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 0
     anchor: 0
 - description: alert rule using 2 recording rules
@@ -1131,18 +1213,20 @@
     reporter: promql/series
     summary: query on nonexistent series
     details: |
-        This usually means that you're deploying a set of rules where one is using the metric produced by another rule.
-        To avoid false positives pint won't run series checks here but that doesn't guarantee that there are no problems here.
-        To fully validate your changes it's best to first deploy the rules that generate the time series needed by other rules.
-        [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#your-query-is-using-recording-rules) for more details.
+      This usually means that you're deploying a set of rules where one is using the metric produced by another rule.
+      To avoid false positives pint won't run series checks here but that doesn't guarantee that there are no problems here.
+      To fully validate your changes it's best to first deploy the rules that generate the time series needed by other rules.
+      [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#your-query-is-using-recording-rules) for more details.
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for the `foo:sum` metric in the last 1w but found a recording rule that generates it, skipping further checks.'
-          firstcolumn: 22
-          lastcolumn: 28
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com didn''t have
+        any series for the `foo:sum` metric in the last 1w but found a recording rule
+        that generates it, skipping further checks.'
+      firstcolumn: 22
+      lastcolumn: 28
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 0
     anchor: 0
 
@@ -1161,15 +1245,16 @@
   problem:
     reporter: promql/series
     summary: unable to run checks
-    details: ""
+    details: ''
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `bad_data: bad input data`.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: 'Couldn''t run some online checks due to `prom` Prometheus server at
+        http://127.0.0.1:XXXXX error: `bad_data: bad input data`.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 2
     anchor: 0
 
@@ -1188,15 +1273,16 @@
   problem:
     reporter: promql/series
     summary: unable to run checks
-    details: ""
+    details: ''
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.127.127.127:9999 error: `connection refused`.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: 'Couldn''t run some online checks due to `prom` Prometheus server at
+        http://127.127.127.127:9999 error: `connection refused`.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 1
     anchor: 0
 
@@ -1220,15 +1306,17 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for the `notfound` metric in the last 1w.'
-          firstcolumn: 32
-          lastcolumn: 39
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com didn''t have
+        any series for the `notfound` metric in the last 1w.'
+      firstcolumn: 32
+      lastcolumn: 39
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -1255,16 +1343,17 @@
     reporter: promql/series
     summary: invalid comment
     details: |-
-        One of the `# pint disable promql/series` comments used in this rule doesn't have any effect and won't disable anything. Make sure that the comment targets series that are used in the rule query and are not already ignored.
-        [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax.
+      One of the `# pint disable promql/series` comments used in this rule doesn't have any effect and won't disable anything. Make sure that the comment targets series that are used in the rule query and are not already ignored.
+      [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax.
     diagnostics:
-        - message: pint disable comment `promql/series(foo)` doesn't match any selector in this query
-          firstcolumn: 16
-          lastcolumn: 33
-          kind: 0
+    - message: pint disable comment `promql/series(foo)` doesn't match any selector
+        in this query
+      firstcolumn: 16
+      lastcolumn: 33
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 1
     anchor: 0
 
@@ -1312,16 +1401,17 @@
     reporter: promql/series
     summary: invalid comment
     details: |-
-        One of the `# pint disable promql/series` comments used in this rule doesn't have any effect and won't disable anything. Make sure that the comment targets series that are used in the rule query and are not already ignored.
-        [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax.
+      One of the `# pint disable promql/series` comments used in this rule doesn't have any effect and won't disable anything. Make sure that the comment targets series that are used in the rule query and are not already ignored.
+      [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax.
     diagnostics:
-        - message: pint disable comment `promql/series(metric1)` has no effect because the selector is not being checked due to a fallback `vector(0)`
-          firstcolumn: 16
-          lastcolumn: 37
-          kind: 0
+    - message: pint disable comment `promql/series(metric1)` has no effect because
+        the selector is not being checked due to a fallback `vector(0)`
+      firstcolumn: 16
+      lastcolumn: 37
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 1
     anchor: 0
 - description: disable comment with vector() fallback
@@ -1345,16 +1435,17 @@
     reporter: promql/series
     summary: invalid comment
     details: |-
-        One of the `# pint disable promql/series` comments used in this rule doesn't have any effect and won't disable anything. Make sure that the comment targets series that are used in the rule query and are not already ignored.
-        [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax.
+      One of the `# pint disable promql/series` comments used in this rule doesn't have any effect and won't disable anything. Make sure that the comment targets series that are used in the rule query and are not already ignored.
+      [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax.
     diagnostics:
-        - message: pint disable comment `promql/series(metric2)` has no effect because the selector is not being checked due to a fallback `vector(0)`
-          firstcolumn: 16
-          lastcolumn: 37
-          kind: 0
+    - message: pint disable comment `promql/series(metric2)` has no effect because
+        the selector is not being checked due to a fallback `vector(0)`
+      firstcolumn: 16
+      lastcolumn: 37
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 1
     anchor: 0
 - description: disable comment with vector() fallback
@@ -1378,16 +1469,17 @@
     reporter: promql/series
     summary: invalid comment
     details: |-
-        One of the `# pint disable promql/series` comments used in this rule doesn't have any effect and won't disable anything. Make sure that the comment targets series that are used in the rule query and are not already ignored.
-        [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax.
+      One of the `# pint disable promql/series` comments used in this rule doesn't have any effect and won't disable anything. Make sure that the comment targets series that are used in the rule query and are not already ignored.
+      [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax.
     diagnostics:
-        - message: pint disable comment `promql/series(metric3)` has no effect because the selector is not being checked due to a fallback `vector(0)`
-          firstcolumn: 16
-          lastcolumn: 37
-          kind: 0
+    - message: pint disable comment `promql/series(metric3)` has no effect because
+        the selector is not being checked due to a fallback `vector(0)`
+      firstcolumn: 16
+      lastcolumn: 37
+      kind: 0
     lines:
-        first: 5
-        last: 5
+      first: 5
+      last: 5
     severity: 1
     anchor: 0
 
@@ -1412,15 +1504,17 @@
   problem:
     reporter: promql/series
     summary: unable to run checks
-    details: ""
+    details: ''
     diagnostics:
-        - message: 'Couldn''t run some online checks on `prom` Prometheus server at http://127.0.0.1:XXXXX because some queries are too expensive: `execution: expanding series: context deadline exceeded`.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: 'Couldn''t run some online checks on `prom` Prometheus server at http://127.0.0.1:XXXXX
+        because some queries are too expensive: `execution: expanding series: context
+        deadline exceeded`.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 1
     anchor: 0
 
@@ -1460,15 +1554,17 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for the `foo` metric in the last 1w.'
-          firstcolumn: 5
-          lastcolumn: 7
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com didn''t have
+        any series for the `foo` metric in the last 1w.'
+      firstcolumn: 5
+      lastcolumn: 7
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 2
     anchor: 0
 
@@ -1489,29 +1585,30 @@
     reporter: promql/series
     summary: query on nonexistent series
     details: |
-        `foo` was found on other prometheus servers:
+      `foo` was found on other prometheus servers:
 
-        - [prom0](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
-        - [prom1](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
-        - [prom2](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
-        - [prom3](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
-        - [prom4](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
-        - [prom5](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
-        - [prom6](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
-        - [prom7](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
-        - [prom8](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
-        - [prom9](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
-        - and 20 other server(s).
+      - [prom0](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
+      - [prom1](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
+      - [prom2](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
+      - [prom3](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
+      - [prom4](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
+      - [prom5](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
+      - [prom6](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
+      - [prom7](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
+      - [prom8](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
+      - [prom9](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
+      - and 20 other server(s).
 
-        You might be trying to deploy this rule to the wrong Prometheus server instance.
+      You might be trying to deploy this rule to the wrong Prometheus server instance.
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for the `foo` metric in the last 1w.'
-          firstcolumn: 5
-          lastcolumn: 7
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com didn''t have
+        any series for the `foo` metric in the last 1w.'
+      firstcolumn: 5
+      lastcolumn: 7
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 2
     anchor: 0
 
@@ -1537,29 +1634,30 @@
     reporter: promql/series
     summary: query on nonexistent series
     details: |
-        `foo` was found on other prometheus servers:
+      `foo` was found on other prometheus servers:
 
-        - [prom0](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
-        - [prom1](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
-        - [prom2](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
-        - [prom3](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
-        - [prom4](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
-        - [prom5](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
-        - [prom6](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
-        - [prom7](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
-        - [prom8](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
-        - [prom9](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
-        - and 20 other server(s).
+      - [prom0](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
+      - [prom1](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
+      - [prom2](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
+      - [prom3](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
+      - [prom4](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
+      - [prom5](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
+      - [prom6](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
+      - [prom7](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
+      - [prom8](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
+      - [prom9](http://127.0.0.1:XXXXX/other/graph?g0.expr=foo)
+      - and 20 other server(s).
 
-        You might be trying to deploy this rule to the wrong Prometheus server instance.
+      You might be trying to deploy this rule to the wrong Prometheus server instance.
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for the `foo` metric in the last 1w.'
-          firstcolumn: 5
-          lastcolumn: 7
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com didn''t have
+        any series for the `foo` metric in the last 1w.'
+      firstcolumn: 5
+      lastcolumn: 7
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 2
     anchor: 0
 
@@ -1610,15 +1708,17 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for the `bob` metric in the last 1w.'
-          firstcolumn: 61
-          lastcolumn: 63
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com didn''t have
+        any series for the `bob` metric in the last 1w.'
+      firstcolumn: 61
+      lastcolumn: 63
+      kind: 0
     lines:
-        first: 4
-        last: 12
+      first: 4
+      last: 12
     severity: 2
     anchor: 0
 - description: metric with fallback / 4
@@ -1650,15 +1750,17 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for the `bar` metric in the last 1w.'
-          firstcolumn: 78
-          lastcolumn: 80
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com didn''t have
+        any series for the `bar` metric in the last 1w.'
+      firstcolumn: 78
+      lastcolumn: 80
+      kind: 0
     lines:
-        first: 4
-        last: 12
+      first: 4
+      last: 12
     severity: 2
     anchor: 0
 - description: metric with fallback / 4
@@ -1688,15 +1790,17 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for the `notfound` metric in the last 1w.'
-          firstcolumn: 91
-          lastcolumn: 98
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com didn''t have
+        any series for the `notfound` metric in the last 1w.'
+      firstcolumn: 91
+      lastcolumn: 98
+      kind: 0
     lines:
-        first: 4
-        last: 12
+      first: 4
+      last: 12
     severity: 2
     anchor: 0
 
@@ -1731,15 +1835,17 @@
   problem:
     reporter: promql/series
     summary: unable to run checks
-    details: ""
+    details: ''
     diagnostics:
-        - message: 'Couldn''t run some online checks on `prom` Prometheus server at http://127.0.0.1:XXXXX because some queries are too expensive: `execution: query processing would load too many samples into memory in query execution`.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: 'Couldn''t run some online checks on `prom` Prometheus server at http://127.0.0.1:XXXXX
+        because some queries are too expensive: `execution: query processing would
+        load too many samples into memory in query execution`.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 1
     anchor: 0
 
@@ -1758,15 +1864,17 @@
   problem:
     reporter: promql/series
     summary: unknown alert referenced
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`ALERTS{alertname="myalert"}` metric is generated by alerts but didn''t find any rule named `myalert`.'
-          firstcolumn: 7
-          lastcolumn: 33
-          kind: 0
+    - message: '`ALERTS{alertname="myalert"}` metric is generated by alerts but didn''t
+        find any rule named `myalert`.'
+      firstcolumn: 7
+      lastcolumn: 33
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -1785,15 +1893,17 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for the `foo:bar` metric in the last 1w.'
-          firstcolumn: 5
-          lastcolumn: 22
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com didn''t have
+        any series for the `foo:bar` metric in the last 1w.'
+      firstcolumn: 5
+      lastcolumn: 22
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -1812,15 +1922,18 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com has the `found` metric with the `job` label but there are no series matching `{job="notfound"}` in the last 1w.'
-          firstcolumn: 7
-          lastcolumn: 20
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com has the `found`
+        metric with the `job` label but there are no series matching `{job="notfound"}`
+        in the last 1w.'
+      firstcolumn: 7
+      lastcolumn: 20
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -1841,15 +1954,17 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for the `notfound` metric in the last 1w.'
-          firstcolumn: 7
-          lastcolumn: 26
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com didn''t have
+        any series for the `notfound` metric in the last 1w.'
+      firstcolumn: 7
+      lastcolumn: 26
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 2
     anchor: 0
 - description: series missing, disable comment with labels, invalid selector
@@ -1867,16 +1982,17 @@
     reporter: promql/series
     summary: invalid comment
     details: |-
-        One of the `# pint disable promql/series` comments used in this rule doesn't have any effect and won't disable anything. Make sure that the comment targets series that are used in the rule query and are not already ignored.
-        [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax.
+      One of the `# pint disable promql/series` comments used in this rule doesn't have any effect and won't disable anything. Make sure that the comment targets series that are used in the rule query and are not already ignored.
+      [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax.
     diagnostics:
-        - message: pint disable comment `promql/series(notfound{job=foo})` doesn't match any selector in this query
-          firstcolumn: 16
-          lastcolumn: 47
-          kind: 0
+    - message: pint disable comment `promql/series(notfound{job=foo})` doesn't match
+        any selector in this query
+      firstcolumn: 16
+      lastcolumn: 47
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -1897,15 +2013,17 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for the `notfound` metric in the last 1w.'
-          firstcolumn: 7
-          lastcolumn: 26
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com didn''t have
+        any series for the `notfound` metric in the last 1w.'
+      firstcolumn: 7
+      lastcolumn: 26
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 2
     anchor: 0
 - description: series missing, disable comment with labels, regexp selector
@@ -1923,16 +2041,17 @@
     reporter: promql/series
     summary: invalid comment
     details: |-
-        One of the `# pint disable promql/series` comments used in this rule doesn't have any effect and won't disable anything. Make sure that the comment targets series that are used in the rule query and are not already ignored.
-        [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax.
+      One of the `# pint disable promql/series` comments used in this rule doesn't have any effect and won't disable anything. Make sure that the comment targets series that are used in the rule query and are not already ignored.
+      [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax.
     diagnostics:
-        - message: pint disable comment `promql/series({job="foo"})` doesn't match any selector in this query
-          firstcolumn: 16
-          lastcolumn: 41
-          kind: 0
+    - message: pint disable comment `promql/series({job="foo"})` doesn't match any
+        selector in this query
+      firstcolumn: 16
+      lastcolumn: 41
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -1953,15 +2072,17 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for the `notfound` metric in the last 1w.'
-          firstcolumn: 7
-          lastcolumn: 14
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com didn''t have
+        any series for the `notfound` metric in the last 1w.'
+      firstcolumn: 7
+      lastcolumn: 14
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 2
     anchor: 0
 - description: series missing, disabled comment for labels
@@ -1979,16 +2100,17 @@
     reporter: promql/series
     summary: invalid comment
     details: |-
-        One of the `# pint disable promql/series` comments used in this rule doesn't have any effect and won't disable anything. Make sure that the comment targets series that are used in the rule query and are not already ignored.
-        [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax.
+      One of the `# pint disable promql/series` comments used in this rule doesn't have any effect and won't disable anything. Make sure that the comment targets series that are used in the rule query and are not already ignored.
+      [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax.
     diagnostics:
-        - message: pint disable comment `promql/series(notfound{job="foo"})` doesn't match any selector in this query
-          firstcolumn: 16
-          lastcolumn: 49
-          kind: 0
+    - message: pint disable comment `promql/series(notfound{job="foo"})` doesn't match
+        any selector in this query
+      firstcolumn: 16
+      lastcolumn: 49
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -2007,15 +2129,17 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for the `notfound` metric in the last 1w.'
-          firstcolumn: 7
-          lastcolumn: 14
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com didn''t have
+        any series for the `notfound` metric in the last 1w.'
+      firstcolumn: 7
+      lastcolumn: 14
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -2034,15 +2158,17 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for the `notfound` metric in the last 1w.'
-          firstcolumn: 1
-          lastcolumn: 24
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com didn''t have
+        any series for the `notfound` metric in the last 1w.'
+      firstcolumn: 1
+      lastcolumn: 24
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -2108,15 +2234,17 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for the `notfound` metric in the last 1w.'
-          firstcolumn: 7
-          lastcolumn: 25
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com didn''t have
+        any series for the `notfound` metric in the last 1w.'
+      firstcolumn: 7
+      lastcolumn: 25
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 2
     anchor: 0
 - description: series missing, selector snoozed / bad snooze selector
@@ -2134,16 +2262,17 @@
     reporter: promql/series
     summary: invalid comment
     details: |-
-        One of the `# pint disable promql/series` comments used in this rule doesn't have any effect and won't disable anything. Make sure that the comment targets series that are used in the rule query and are not already ignored.
-        [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax.
+      One of the `# pint disable promql/series` comments used in this rule doesn't have any effect and won't disable anything. Make sure that the comment targets series that are used in the rule query and are not already ignored.
+      [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax.
     diagnostics:
-        - message: pint snooze comment `promql/series(notfound{job=foo})` doesn't match any selector in this query
-          firstcolumn: 26
-          lastcolumn: 57
-          kind: 0
+    - message: pint snooze comment `promql/series(notfound{job=foo})` doesn't match
+        any selector in this query
+      firstcolumn: 26
+      lastcolumn: 57
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -2164,15 +2293,17 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for the `notfound` metric in the last 1w.'
-          firstcolumn: 7
-          lastcolumn: 25
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com didn''t have
+        any series for the `notfound` metric in the last 1w.'
+      firstcolumn: 7
+      lastcolumn: 25
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 2
     anchor: 0
 
@@ -2193,15 +2324,17 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for the `notfound` metric in the last 1w.'
-          firstcolumn: 7
-          lastcolumn: 25
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com didn''t have
+        any series for the `notfound` metric in the last 1w.'
+      firstcolumn: 7
+      lastcolumn: 25
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 2
     anchor: 0
 - description: series missing, selector snoozed / snooze mismatch
@@ -2219,16 +2352,17 @@
     reporter: promql/series
     summary: invalid comment
     details: |-
-        One of the `# pint disable promql/series` comments used in this rule doesn't have any effect and won't disable anything. Make sure that the comment targets series that are used in the rule query and are not already ignored.
-        [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax.
+      One of the `# pint disable promql/series` comments used in this rule doesn't have any effect and won't disable anything. Make sure that the comment targets series that are used in the rule query and are not already ignored.
+      [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax.
     diagnostics:
-        - message: pint snooze comment `promql/series(notfound{job="bob"})` doesn't match any selector in this query
-          firstcolumn: 26
-          lastcolumn: 59
-          kind: 0
+    - message: pint snooze comment `promql/series(notfound{job="bob"})` doesn't match
+        any selector in this query
+      firstcolumn: 26
+      lastcolumn: 59
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -2258,15 +2392,17 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for the `notfound` metric in the last 1w.'
-          firstcolumn: 1
-          lastcolumn: 32
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com didn''t have
+        any series for the `notfound` metric in the last 1w.'
+      firstcolumn: 1
+      lastcolumn: 32
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 2
     anchor: 0
 
@@ -2300,15 +2436,17 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for the `notfound` metric in the last 1w.'
-          firstcolumn: 1
-          lastcolumn: 8
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com didn''t have
+        any series for the `notfound` metric in the last 1w.'
+      firstcolumn: 1
+      lastcolumn: 8
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -2328,23 +2466,24 @@
     reporter: promql/series
     summary: query on nonexistent series
     details: |
-        `notfound` was found on other prometheus servers:
+      `notfound` was found on other prometheus servers:
 
-        - [prom0](http://127.0.0.1:XXXXX/other/graph?g0.expr=notfound)
-        - [prom1](http://127.0.0.1:XXXXX/other/graph?g0.expr=notfound)
-        - [prom2](http://127.0.0.1:XXXXX/other/graph?g0.expr=notfound)
-        - [prom3](http://127.0.0.1:XXXXX/other/graph?g0.expr=notfound)
-        - [prom4](http://127.0.0.1:XXXXX/other/graph?g0.expr=notfound)
+      - [prom0](http://127.0.0.1:XXXXX/other/graph?g0.expr=notfound)
+      - [prom1](http://127.0.0.1:XXXXX/other/graph?g0.expr=notfound)
+      - [prom2](http://127.0.0.1:XXXXX/other/graph?g0.expr=notfound)
+      - [prom3](http://127.0.0.1:XXXXX/other/graph?g0.expr=notfound)
+      - [prom4](http://127.0.0.1:XXXXX/other/graph?g0.expr=notfound)
 
-        You might be trying to deploy this rule to the wrong Prometheus server instance.
+      You might be trying to deploy this rule to the wrong Prometheus server instance.
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for the `notfound` metric in the last 1w.'
-          firstcolumn: 1
-          lastcolumn: 8
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com didn''t have
+        any series for the `notfound` metric in the last 1w.'
+      firstcolumn: 1
+      lastcolumn: 8
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -2364,29 +2503,30 @@
     reporter: promql/series
     summary: query on nonexistent series
     details: |
-        `notfound` was found on other prometheus servers:
+      `notfound` was found on other prometheus servers:
 
-        - [prom0](http://127.0.0.1:XXXXX/other/graph?g0.expr=notfound)
-        - [prom1](http://127.0.0.1:XXXXX/other/graph?g0.expr=notfound)
-        - [prom2](http://127.0.0.1:XXXXX/other/graph?g0.expr=notfound)
-        - [prom3](http://127.0.0.1:XXXXX/other/graph?g0.expr=notfound)
-        - [prom4](http://127.0.0.1:XXXXX/other/graph?g0.expr=notfound)
-        - [prom5](http://127.0.0.1:XXXXX/other/graph?g0.expr=notfound)
-        - [prom6](http://127.0.0.1:XXXXX/other/graph?g0.expr=notfound)
-        - [prom7](http://127.0.0.1:XXXXX/other/graph?g0.expr=notfound)
-        - [prom8](http://127.0.0.1:XXXXX/other/graph?g0.expr=notfound)
-        - [prom9](http://127.0.0.1:XXXXX/other/graph?g0.expr=notfound)
-        - and 5 other server(s).
+      - [prom0](http://127.0.0.1:XXXXX/other/graph?g0.expr=notfound)
+      - [prom1](http://127.0.0.1:XXXXX/other/graph?g0.expr=notfound)
+      - [prom2](http://127.0.0.1:XXXXX/other/graph?g0.expr=notfound)
+      - [prom3](http://127.0.0.1:XXXXX/other/graph?g0.expr=notfound)
+      - [prom4](http://127.0.0.1:XXXXX/other/graph?g0.expr=notfound)
+      - [prom5](http://127.0.0.1:XXXXX/other/graph?g0.expr=notfound)
+      - [prom6](http://127.0.0.1:XXXXX/other/graph?g0.expr=notfound)
+      - [prom7](http://127.0.0.1:XXXXX/other/graph?g0.expr=notfound)
+      - [prom8](http://127.0.0.1:XXXXX/other/graph?g0.expr=notfound)
+      - [prom9](http://127.0.0.1:XXXXX/other/graph?g0.expr=notfound)
+      - and 5 other server(s).
 
-        You might be trying to deploy this rule to the wrong Prometheus server instance.
+      You might be trying to deploy this rule to the wrong Prometheus server instance.
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for the `notfound` metric in the last 1w.'
-          firstcolumn: 1
-          lastcolumn: 8
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com didn''t have
+        any series for the `notfound` metric in the last 1w.'
+      firstcolumn: 1
+      lastcolumn: 8
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -2406,22 +2546,23 @@
     reporter: promql/series
     summary: query on nonexistent series
     details: |
-        `notfound` was found on other prometheus servers:
+      `notfound` was found on other prometheus servers:
 
-        - [prom0](http://127.0.0.1:XXXXX/other/0/graph?g0.expr=notfound)
-        - [prom1](http://127.0.0.1:XXXXX/other/1/graph?g0.expr=notfound)
+      - [prom0](http://127.0.0.1:XXXXX/other/0/graph?g0.expr=notfound)
+      - [prom1](http://127.0.0.1:XXXXX/other/1/graph?g0.expr=notfound)
 
-        pint tried to check 15 server(s) but stopped after checking 3 server(s) due to reaching time limit (50ms).
+      pint tried to check 15 server(s) but stopped after checking 3 server(s) due to reaching time limit (50ms).
 
-        You might be trying to deploy this rule to the wrong Prometheus server instance.
+      You might be trying to deploy this rule to the wrong Prometheus server instance.
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for the `notfound` metric in the last 1w.'
-          firstcolumn: 1
-          lastcolumn: 8
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com didn''t have
+        any series for the `notfound` metric in the last 1w.'
+      firstcolumn: 1
+      lastcolumn: 8
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -2441,30 +2582,31 @@
     reporter: promql/series
     summary: query on nonexistent series
     details: |
-        `notfound` was found on other prometheus servers:
+      `notfound` was found on other prometheus servers:
 
-        - [prom0](http://127.0.0.1:XXXXX/other/0/graph?g0.expr=notfound)
-        - [prom1](http://127.0.0.1:XXXXX/other/1/graph?g0.expr=notfound)
-        - [prom2](http://127.0.0.1:XXXXX/other/2/graph?g0.expr=notfound)
-        - [prom3](http://127.0.0.1:XXXXX/other/3/graph?g0.expr=notfound)
-        - [prom4](http://127.0.0.1:XXXXX/other/4/graph?g0.expr=notfound)
-        - [prom5](http://127.0.0.1:XXXXX/other/5/graph?g0.expr=notfound)
-        - [prom6](http://127.0.0.1:XXXXX/other/6/graph?g0.expr=notfound)
-        - [prom7](http://127.0.0.1:XXXXX/other/7/graph?g0.expr=notfound)
-        - [prom8](http://127.0.0.1:XXXXX/other/8/graph?g0.expr=notfound)
-        - [prom9](http://127.0.0.1:XXXXX/other/9/graph?g0.expr=notfound)
+      - [prom0](http://127.0.0.1:XXXXX/other/0/graph?g0.expr=notfound)
+      - [prom1](http://127.0.0.1:XXXXX/other/1/graph?g0.expr=notfound)
+      - [prom2](http://127.0.0.1:XXXXX/other/2/graph?g0.expr=notfound)
+      - [prom3](http://127.0.0.1:XXXXX/other/3/graph?g0.expr=notfound)
+      - [prom4](http://127.0.0.1:XXXXX/other/4/graph?g0.expr=notfound)
+      - [prom5](http://127.0.0.1:XXXXX/other/5/graph?g0.expr=notfound)
+      - [prom6](http://127.0.0.1:XXXXX/other/6/graph?g0.expr=notfound)
+      - [prom7](http://127.0.0.1:XXXXX/other/7/graph?g0.expr=notfound)
+      - [prom8](http://127.0.0.1:XXXXX/other/8/graph?g0.expr=notfound)
+      - [prom9](http://127.0.0.1:XXXXX/other/9/graph?g0.expr=notfound)
 
-        pint tried to check 15 server(s) but stopped after checking 11 server(s) due to reaching time limit (100ms).
+      pint tried to check 15 server(s) but stopped after checking 11 server(s) due to reaching time limit (100ms).
 
-        You might be trying to deploy this rule to the wrong Prometheus server instance.
+      You might be trying to deploy this rule to the wrong Prometheus server instance.
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for the `notfound` metric in the last 1w.'
-          firstcolumn: 1
-          lastcolumn: 8
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com didn''t have
+        any series for the `notfound` metric in the last 1w.'
+      firstcolumn: 1
+      lastcolumn: 8
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -2483,15 +2625,17 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for the `notfound` metric in the last 1w.'
-          firstcolumn: 5
-          lastcolumn: 12
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com didn''t have
+        any series for the `notfound` metric in the last 1w.'
+      firstcolumn: 5
+      lastcolumn: 12
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -2510,15 +2654,17 @@
   problem:
     reporter: promql/series
     summary: query on nonexistent series
-    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems)
+      to see a list of common problems that might cause this.'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for the `notfound` metric in the last 1w.'
-          firstcolumn: 7
-          lastcolumn: 14
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com didn''t have
+        any series for the `notfound` metric in the last 1w.'
+      firstcolumn: 7
+      lastcolumn: 14
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -2537,15 +2683,16 @@
   problem:
     reporter: promql/series
     summary: unable to run checks
-    details: ""
+    details: ''
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `client_error: 404 Not Found`.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: 'Couldn''t run some online checks due to `prom` Prometheus server at
+        http://127.0.0.1:XXXXX error: `client_error: 404 Not Found`.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 2
     anchor: 0
 
@@ -2564,15 +2711,16 @@
   problem:
     reporter: promql/series
     summary: unable to run checks
-    details: ""
+    details: ''
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `client_error: 404 Not Found`.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: 'Couldn''t run some online checks due to `prom` Prometheus server at
+        http://127.0.0.1:XXXXX error: `client_error: 404 Not Found`.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 2
     anchor: 0
 
@@ -2595,16 +2743,17 @@
     reporter: promql/series
     summary: invalid comment
     details: |-
-        One of the `# pint rule/set promql/series` comments used in this rule doesn't have any effect. Make sure that the comment targets series and labels that are used in the rule query and are not already ignored.
-        [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#ignorelabel-value) for docs about comment syntax.
+      One of the `# pint rule/set promql/series` comments used in this rule doesn't have any effect. Make sure that the comment targets series and labels that are used in the rule query and are not already ignored.
+      [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#ignorelabel-value) for docs about comment syntax.
     diagnostics:
-        - message: pint rule/set comment `promql/series(mymetric) ignore/label-value type` doesn't match any label matcher in this query
-          firstcolumn: 17
-          lastcolumn: 63
-          kind: 0
+    - message: pint rule/set comment `promql/series(mymetric) ignore/label-value type`
+        doesn't match any label matcher in this query
+      firstcolumn: 17
+      lastcolumn: 63
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 1
     anchor: 0
 
@@ -2627,16 +2776,17 @@
     reporter: promql/series
     summary: invalid comment
     details: |-
-        One of the `# pint rule/set promql/series` comments used in this rule doesn't have any effect. Make sure that the comment targets series and labels that are used in the rule query and are not already ignored.
-        [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#ignorelabel-value) for docs about comment syntax.
+      One of the `# pint rule/set promql/series` comments used in this rule doesn't have any effect. Make sure that the comment targets series and labels that are used in the rule query and are not already ignored.
+      [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#ignorelabel-value) for docs about comment syntax.
     diagnostics:
-        - message: pint rule/set comment `promql/series(mymetric) ignore/label-value type` doesn't match any label matcher in this query
-          firstcolumn: 17
-          lastcolumn: 63
-          kind: 0
+    - message: pint rule/set comment `promql/series(mymetric) ignore/label-value type`
+        doesn't match any label matcher in this query
+      firstcolumn: 17
+      lastcolumn: 63
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 1
     anchor: 0
 

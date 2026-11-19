@@ -1881,7 +1881,7 @@ rule {
 					RuleComments: tc.entry.Rule.Comments,
 				},
 				Checks: checkNames,
-			}, yaml.WithV3Defaults(), yaml.WithLineWidth(-1))
+			})
 			require.NoError(t, err)
 			snaps.WithConfig(snaps.Filename(fmt.Sprintf("%03d", i+1))).MatchSnapshot(t, string(d))
 		})

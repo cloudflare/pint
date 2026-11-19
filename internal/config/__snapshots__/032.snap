@@ -2,83 +2,83 @@
 [TestGetChecksForRule/for_match_/_passing#01 - 1]
 title: for match / passing
 config: |-
-    {
-      "ci": {
-        "baseBranch": "master",
-        "maxCommits": 20
-      },
-      "parser": {},
-      "repository": {},
-      "checks": {
-        "enabled": [
-          "alerts/absent",
-          "alerts/annotation",
-          "alerts/comparison",
-          "alerts/count",
-          "alerts/external_labels",
-          "alerts/for",
-          "alerts/template",
-          "labels/conflict",
-          "promql/aggregate",
-          "promql/counter",
-          "promql/features",
-          "promql/fragile",
-          "group/interval",
-          "promql/impossible",
-          "promql/nan",
-          "promql/offset",
-          "promql/range_query",
-          "promql/rate",
-          "promql/regexp",
-          "promql/selector",
-          "promql/series",
-          "promql/syntax",
-          "promql/vector_matching",
-          "query/cost",
-          "rule/dependency",
-          "rule/duplicate",
-          "rule/for",
-          "rule/label",
-          "rule/link",
-          "rule/name",
-          "rule/reject",
-          "rule/report"
-        ]
-      },
-      "owners": {},
-      "rules": [
-        {
-          "match": [
-            {
-              "keep_firing_for": "\u003e 15m"
-            }
-          ],
-          "annotation": [
-            {
-              "key": "summary",
-              "required": true
-            }
-          ]
-        }
+  {
+    "ci": {
+      "baseBranch": "master",
+      "maxCommits": 20
+    },
+    "parser": {},
+    "repository": {},
+    "checks": {
+      "enabled": [
+        "alerts/absent",
+        "alerts/annotation",
+        "alerts/comparison",
+        "alerts/count",
+        "alerts/external_labels",
+        "alerts/for",
+        "alerts/template",
+        "labels/conflict",
+        "promql/aggregate",
+        "promql/counter",
+        "promql/features",
+        "promql/fragile",
+        "group/interval",
+        "promql/impossible",
+        "promql/nan",
+        "promql/offset",
+        "promql/range_query",
+        "promql/rate",
+        "promql/regexp",
+        "promql/selector",
+        "promql/series",
+        "promql/syntax",
+        "promql/vector_matching",
+        "query/cost",
+        "rule/dependency",
+        "rule/duplicate",
+        "rule/for",
+        "rule/label",
+        "rule/link",
+        "rule/name",
+        "rule/reject",
+        "rule/report"
       ]
-    }
+    },
+    "owners": {},
+    "rules": [
+      {
+        "match": [
+          {
+            "keep_firing_for": "\u003e 15m"
+          }
+        ],
+        "annotation": [
+          {
+            "key": "summary",
+            "required": true
+          }
+        ]
+      }
+    ]
+  }
 entry:
-    path:
-        name: rules.yml
-        symlinktarget: rules.yml
-    filecomments: []
-    rulecomments: []
+  path:
+    name: rules.yml
+    symlinktarget: rules.yml
+  filecomments: []
+  rulecomments: []
 checks:
-    - promql/syntax
-    - alerts/for
-    - alerts/comparison
-    - alerts/template
-    - promql/fragile
-    - promql/regexp
-    - rule/dependency
-    - promql/impossible
-    - promql/nan
-    - group/interval
-    - alerts/annotation(summary:true)
+- promql/syntax
+- alerts/for
+- alerts/comparison
+- alerts/template
+- promql/fragile
+- promql/regexp
+- rule/dependency
+- promql/impossible
+- promql/nan
+- group/interval
+- alerts/annotation(summary:true)
 
 ---

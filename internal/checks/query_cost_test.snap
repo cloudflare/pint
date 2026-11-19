@@ -12,15 +12,16 @@
   problem:
     reporter: query/cost
     summary: query cost estimate
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com returned 1 result(s) with 4.0KiB estimated memory usage.'
-          firstcolumn: 1
-          lastcolumn: 8
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com returned 1
+        result(s) with 4.0KiB estimated memory usage.'
+      firstcolumn: 1
+      lastcolumn: 8
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 0
     anchor: 0
 
@@ -46,13 +47,14 @@
     summary: query is too expensive
     details: 'Rule comment: Rule comment'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com returned 6 result(s), maximum allowed series is 5.'
-          firstcolumn: 1
-          lastcolumn: 8
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com returned 6
+        result(s), maximum allowed series is 5.'
+      firstcolumn: 1
+      lastcolumn: 8
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -71,15 +73,16 @@
   problem:
     reporter: query/cost
     summary: query cost estimate
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com returned 7 result(s) with 7.0MiB estimated memory usage.'
-          firstcolumn: 1
-          lastcolumn: 8
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com returned 7
+        result(s) with 7.0MiB estimated memory usage.'
+      firstcolumn: 1
+      lastcolumn: 8
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 0
     anchor: 0
 
@@ -98,15 +101,16 @@
   problem:
     reporter: query/cost
     summary: query cost estimate
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com returned 7 result(s) with 707B estimated memory usage.'
-          firstcolumn: 1
-          lastcolumn: 8
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com returned 7
+        result(s) with 707B estimated memory usage.'
+      firstcolumn: 1
+      lastcolumn: 8
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 0
     anchor: 0
 
@@ -126,15 +130,16 @@
   problem:
     reporter: query/cost
     summary: query cost estimate
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com returned 7 result(s) with 707B estimated memory usage.'
-          firstcolumn: 1
-          lastcolumn: 21
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com returned 7
+        result(s) with 707B estimated memory usage.'
+      firstcolumn: 1
+      lastcolumn: 21
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 0
     anchor: 0
 
@@ -153,15 +158,16 @@
   problem:
     reporter: query/cost
     summary: query is too expensive
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com returned 7 result(s) with 7.0KiB estimated memory usage, maximum allowed series is 1.'
-          firstcolumn: 1
-          lastcolumn: 8
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com returned 7
+        result(s) with 7.0KiB estimated memory usage, maximum allowed series is 1.'
+      firstcolumn: 1
+      lastcolumn: 8
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -182,13 +188,14 @@
     summary: query is too expensive
     details: 'Rule comment: rule comment'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com returned 7 result(s), maximum allowed series is 5.'
-          firstcolumn: 1
-          lastcolumn: 8
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com returned 7
+        result(s), maximum allowed series is 5.'
+      firstcolumn: 1
+      lastcolumn: 8
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 0
     anchor: 0
 
@@ -207,15 +214,16 @@
   problem:
     reporter: query/cost
     summary: unable to run checks
-    details: ""
+    details: ''
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `bad_data: bad input data`.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: 'Couldn''t run some online checks due to `prom` Prometheus server at
+        http://127.0.0.1:XXXXX error: `bad_data: bad input data`.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 2
     anchor: 0
 
@@ -239,15 +247,16 @@
   problem:
     reporter: query/cost
     summary: unable to run checks
-    details: ""
+    details: ''
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 error: `connection refused`.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: 'Couldn''t run some online checks due to `prom` Prometheus server at
+        http://127.0.0.1:1111 error: `connection refused`.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 1
     anchor: 0
 
@@ -286,15 +295,16 @@
   problem:
     reporter: query/cost
     summary: unable to run checks
-    details: ""
+    details: ''
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `connection timeout`.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: 'Couldn''t run some online checks due to `prom` Prometheus server at
+        http://127.0.0.1:XXXXX error: `connection timeout`.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 2
     anchor: 0
 
@@ -313,15 +323,17 @@
   problem:
     reporter: query/cost
     summary: query is too expensive
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com queried 200 samples in total when executing this query, which is more than the configured limit of 100.'
-          firstcolumn: 1
-          lastcolumn: 8
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com queried 200
+        samples in total when executing this query, which is more than the configured
+        limit of 100.'
+      firstcolumn: 1
+      lastcolumn: 8
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -342,13 +354,14 @@
     summary: query is too expensive
     details: 'Rule comment: some text'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com took 5s100ms when executing this query, which is more than the configured limit of 5s.'
-          firstcolumn: 1
-          lastcolumn: 8
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com took 5s100ms
+        when executing this query, which is more than the configured limit of 5s.'
+      firstcolumn: 1
+      lastcolumn: 8
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 0
     anchor: 0
 
@@ -369,13 +382,15 @@
     summary: query is too expensive
     details: 'Rule comment: some text'
     diagnostics:
-        - message: '`prom` Prometheus server at https://simple.example.com queried 20 peak samples when executing this query, which is more than the configured limit of 10.'
-          firstcolumn: 1
-          lastcolumn: 8
-          kind: 0
+    - message: '`prom` Prometheus server at https://simple.example.com queried 20
+        peak samples when executing this query, which is more than the configured
+        limit of 10.'
+      firstcolumn: 1
+      lastcolumn: 8
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 0
     anchor: 0
 
@@ -394,31 +409,31 @@
     reporter: query/cost
     summary: query could use a recording rule
     details: |
-        There is a recording rule that already stores the result of this query, use it here to speed up this query.
+      There is a recording rule that already stores the result of this query, use it here to speed up this query.
 
-        ```yaml
-        - record: colo:foo
-          expr: sum(rate(foo_total[5m])) without(instance)
-        ```
+      ```yaml
+      - record: colo:foo
+        expr: sum(rate(foo_total[5m])) without(instance)
+      ```
 
-        Using `colo:foo` rule would speed up this query:
+      Using `colo:foo` rule would speed up this query:
 
-        - Total queried samples would be 10 instead of 100 (-90.00%)
-        - Peak queried samples would be 9 instead of 50 (-82.00%)
-        - Query evaluation time would be 0 (no change)
+      - Total queried samples would be 10 instead of 100 (-90.00%)
+      - Peak queried samples would be 9 instead of 50 (-82.00%)
+      - Query evaluation time would be 0 (no change)
 
-        To get results for both original and suggested query click below:
+      To get results for both original and suggested query click below:
 
-        - [Original query](https://simple.example.com/graph?g0.expr=sum%28rate%28foo_total%5B5m%5D%29%29+without%28instance%29+%3E+10&g0.tab=table)
-        - [Suggested query](https://simple.example.com/graph?g0.expr=colo%3Afoo+%3E+10&g0.tab=table)
+      - [Original query](https://simple.example.com/graph?g0.expr=sum%28rate%28foo_total%5B5m%5D%29%29+without%28instance%29+%3E+10&g0.tab=table)
+      - [Suggested query](https://simple.example.com/graph?g0.expr=colo%3Afoo+%3E+10&g0.tab=table)
     diagnostics:
-        - message: Use `colo:foo` here instead to speed up the query.
-          firstcolumn: 1
-          lastcolumn: 42
-          kind: 0
+    - message: Use `colo:foo` here instead to speed up the query.
+      firstcolumn: 1
+      lastcolumn: 42
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 0
     anchor: 0
 
@@ -453,31 +468,32 @@
     reporter: query/cost
     summary: query could use a recording rule
     details: |
-        There is a recording rule that already stores the result of this query, use it here to speed up this query.
+      There is a recording rule that already stores the result of this query, use it here to speed up this query.
 
-        ```yaml
-        - record: instance_job:fl2_hmd_request_phase_latency_count:rate5m
-          expr: histogram_count(rate(fl2_request_phase_duration_seconds[5m]))
-        ```
+      ```yaml
+      - record: instance_job:fl2_hmd_request_phase_latency_count:rate5m
+        expr: histogram_count(rate(fl2_request_phase_duration_seconds[5m]))
+      ```
 
-        Using `instance_job:fl2_hmd_request_phase_latency_count:rate5m` rule would speed up this query:
+      Using `instance_job:fl2_hmd_request_phase_latency_count:rate5m` rule would speed up this query:
 
-        - Total queried samples would be 30 instead of 50 (-40.00%)
-        - Peak queried samples would be 30 instead of 50 (-40.00%)
-        - Query evaluation time would be 11s instead of 10s (+10.00%)
+      - Total queried samples would be 30 instead of 50 (-40.00%)
+      - Peak queried samples would be 30 instead of 50 (-40.00%)
+      - Query evaluation time would be 11s instead of 10s (+10.00%)
 
-        To get results for both original and suggested query click below:
+      To get results for both original and suggested query click below:
 
-        - [Original query](https://simple.example.com/graph?g0.expr=sum+without+%28le%29+%28histogram_fraction%280%2C+0.03%2C+rate%28fl2_request_phase_duration_seconds%5B5m%5D%29%29+%2A+histogram_count%28rate%28fl2_request_phase_duration_seconds%5B5m%5D%29%29%29&g0.tab=table)
-        - [Suggested query](https://simple.example.com/graph?g0.expr=sum+without+%28le%29+%28histogram_fraction%280%2C+0.03%2C+rate%28fl2_request_phase_duration_seconds%5B5m%5D%29%29+%2A+instance_job%3Afl2_hmd_request_phase_latency_count%3Arate5m%29&g0.tab=table)
+      - [Original query](https://simple.example.com/graph?g0.expr=sum+without+%28le%29+%28histogram_fraction%280%2C+0.03%2C+rate%28fl2_request_phase_duration_seconds%5B5m%5D%29%29+%2A+histogram_count%28rate%28fl2_request_phase_duration_seconds%5B5m%5D%29%29%29&g0.tab=table)
+      - [Suggested query](https://simple.example.com/graph?g0.expr=sum+without+%28le%29+%28histogram_fraction%280%2C+0.03%2C+rate%28fl2_request_phase_duration_seconds%5B5m%5D%29%29+%2A+instance_job%3Afl2_hmd_request_phase_latency_count%3Arate5m%29&g0.tab=table)
     diagnostics:
-        - message: Use `instance_job:fl2_hmd_request_phase_latency_count:rate5m` here instead to speed up the query.
-          firstcolumn: 95
-          lastcolumn: 155
-          kind: 0
+    - message: Use `instance_job:fl2_hmd_request_phase_latency_count:rate5m` here
+        instead to speed up the query.
+      firstcolumn: 95
+      lastcolumn: 155
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 0
     anchor: 0
 
@@ -501,31 +517,31 @@
     reporter: query/cost
     summary: query could use a recording rule
     details: |
-        There is a recording rule that stores result of a query that might work the same, you can try to use it here to speed up this query.
+      There is a recording rule that stores result of a query that might work the same, you can try to use it here to speed up this query.
 
-        ```yaml
-        - record: foo:rate5m
-          expr: sum by(job) (rate(foo_total{job="bar"}[5m]))
-        ```
+      ```yaml
+      - record: foo:rate5m
+        expr: sum by(job) (rate(foo_total{job="bar"}[5m]))
+      ```
 
-        Using `foo:rate5m` rule would speed up this query:
+      Using `foo:rate5m` rule would speed up this query:
 
-        - Total queried samples would be 10 instead of 100 (-90.00%)
-        - Peak queried samples would be 9 instead of 50 (-82.00%)
-        - Query evaluation time would be 0 (no change)
+      - Total queried samples would be 10 instead of 100 (-90.00%)
+      - Peak queried samples would be 9 instead of 50 (-82.00%)
+      - Query evaluation time would be 0 (no change)
 
-        To get results for both original and suggested query click below:
+      To get results for both original and suggested query click below:
 
-        - [Original query](https://simple.example.com/graph?g0.expr=sum+by%28job%29+%28irate%28foo_total%7Bjob%3D%22bar%22%7D%5B5m%5D%29%29+%3E+10&g0.tab=table)
-        - [Suggested query](https://simple.example.com/graph?g0.expr=foo%3Arate5m%7Bjob%3D%22bar%22%7D+%3E+10&g0.tab=table)
+      - [Original query](https://simple.example.com/graph?g0.expr=sum+by%28job%29+%28irate%28foo_total%7Bjob%3D%22bar%22%7D%5B5m%5D%29%29+%3E+10&g0.tab=table)
+      - [Suggested query](https://simple.example.com/graph?g0.expr=foo%3Arate5m%7Bjob%3D%22bar%22%7D+%3E+10&g0.tab=table)
     diagnostics:
-        - message: Use `foo:rate5m` here instead to speed up the query.
-          firstcolumn: 1
-          lastcolumn: 45
-          kind: 0
+    - message: Use `foo:rate5m` here instead to speed up the query.
+      firstcolumn: 1
+      lastcolumn: 45
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 0
     anchor: 0
 
@@ -544,31 +560,31 @@
     reporter: query/cost
     summary: query could use a recording rule
     details: |
-        There is a recording rule that stores result of a query that might work the same, you can try to use it here to speed up this query.
+      There is a recording rule that stores result of a query that might work the same, you can try to use it here to speed up this query.
 
-        ```yaml
-        - record: foo:rate5m
-          expr: sum by(job, env) (rate(foo_total{job="bar", env="prod"}[5m]))
-        ```
+      ```yaml
+      - record: foo:rate5m
+        expr: sum by(job, env) (rate(foo_total{job="bar", env="prod"}[5m]))
+      ```
 
-        Using `foo:rate5m` rule would speed up this query:
+      Using `foo:rate5m` rule would speed up this query:
 
-        - Total queried samples would be 10 instead of 100 (-90.00%)
-        - Peak queried samples would be 9 instead of 50 (-82.00%)
-        - Query evaluation time would be 0 (no change)
+      - Total queried samples would be 10 instead of 100 (-90.00%)
+      - Peak queried samples would be 9 instead of 50 (-82.00%)
+      - Query evaluation time would be 0 (no change)
 
-        To get results for both original and suggested query click below:
+      To get results for both original and suggested query click below:
 
-        - [Original query](https://simple.example.com/graph?g0.expr=sum+by%28job%2C+env%29+%28irate%28foo_total%7Bjob%3D%22bar%22%2C+env%3D%22prod%22%7D%5B5m%5D%29%29+%3E+10&g0.tab=table)
-        - [Suggested query](https://simple.example.com/graph?g0.expr=foo%3Arate5m%7Bjob%3D%22bar%22%2C+env%3D%22prod%22%7D+%3E+10&g0.tab=table)
+      - [Original query](https://simple.example.com/graph?g0.expr=sum+by%28job%2C+env%29+%28irate%28foo_total%7Bjob%3D%22bar%22%2C+env%3D%22prod%22%7D%5B5m%5D%29%29+%3E+10&g0.tab=table)
+      - [Suggested query](https://simple.example.com/graph?g0.expr=foo%3Arate5m%7Bjob%3D%22bar%22%2C+env%3D%22prod%22%7D+%3E+10&g0.tab=table)
     diagnostics:
-        - message: Use `foo:rate5m` here instead to speed up the query.
-          firstcolumn: 1
-          lastcolumn: 62
-          kind: 0
+    - message: Use `foo:rate5m` here instead to speed up the query.
+      firstcolumn: 1
+      lastcolumn: 62
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 0
     anchor: 0
 
@@ -621,31 +637,31 @@
     reporter: query/cost
     summary: query could use a recording rule
     details: |
-        There is a recording rule that stores result of a query that might work the same, you can try to use it here to speed up this query.
+      There is a recording rule that stores result of a query that might work the same, you can try to use it here to speed up this query.
 
-        ```yaml
-        - record: foo:rate5m
-          expr: sum(rate(foo_total[5m]))
-        ```
+      ```yaml
+      - record: foo:rate5m
+        expr: sum(rate(foo_total[5m]))
+      ```
 
-        Using `foo:rate5m` rule would speed up this query:
+      Using `foo:rate5m` rule would speed up this query:
 
-        - Total queried samples would be 10 instead of 100 (-90.00%)
-        - Peak queried samples would be 9 instead of 50 (-82.00%)
-        - Query evaluation time would be 0 (no change)
+      - Total queried samples would be 10 instead of 100 (-90.00%)
+      - Peak queried samples would be 9 instead of 50 (-82.00%)
+      - Query evaluation time would be 0 (no change)
 
-        To get results for both original and suggested query click below:
+      To get results for both original and suggested query click below:
 
-        - [Original query](https://simple.example.com/graph?g0.expr=sum%28irate%28foo_total%5B5m%5D%29%29+%3E+10&g0.tab=table)
-        - [Suggested query](https://simple.example.com/graph?g0.expr=foo%3Arate5m+%3E+10&g0.tab=table)
+      - [Original query](https://simple.example.com/graph?g0.expr=sum%28irate%28foo_total%5B5m%5D%29%29+%3E+10&g0.tab=table)
+      - [Suggested query](https://simple.example.com/graph?g0.expr=foo%3Arate5m+%3E+10&g0.tab=table)
     diagnostics:
-        - message: Use `foo:rate5m` here instead to speed up the query.
-          firstcolumn: 1
-          lastcolumn: 25
-          kind: 0
+    - message: Use `foo:rate5m` here instead to speed up the query.
+      firstcolumn: 1
+      lastcolumn: 25
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 0
     anchor: 0
 
@@ -663,31 +679,31 @@
     reporter: query/cost
     summary: query could use a recording rule
     details: |
-        There is a recording rule that stores result of a query that might work the same, you can try to use it here to speed up this query.
+      There is a recording rule that stores result of a query that might work the same, you can try to use it here to speed up this query.
 
-        ```yaml
-        - record: foo:rate5m
-          expr: sum by(instance) (rate(foo_total[5m]))
-        ```
+      ```yaml
+      - record: foo:rate5m
+        expr: sum by(instance) (rate(foo_total[5m]))
+      ```
 
-        Using `foo:rate5m` rule would speed up this query:
+      Using `foo:rate5m` rule would speed up this query:
 
-        - Total queried samples would be 10 instead of 100 (-90.00%)
-        - Peak queried samples would be 9 instead of 50 (-82.00%)
-        - Query evaluation time would be 0 (no change)
+      - Total queried samples would be 10 instead of 100 (-90.00%)
+      - Peak queried samples would be 9 instead of 50 (-82.00%)
+      - Query evaluation time would be 0 (no change)
 
-        To get results for both original and suggested query click below:
+      To get results for both original and suggested query click below:
 
-        - [Original query](https://simple.example.com/graph?g0.expr=sum+by%28instance%29+%28irate%28foo_total%5B5m%5D%29%29+%3E+10&g0.tab=table)
-        - [Suggested query](https://simple.example.com/graph?g0.expr=foo%3Arate5m+%3E+10&g0.tab=table)
+      - [Original query](https://simple.example.com/graph?g0.expr=sum+by%28instance%29+%28irate%28foo_total%5B5m%5D%29%29+%3E+10&g0.tab=table)
+      - [Suggested query](https://simple.example.com/graph?g0.expr=foo%3Arate5m+%3E+10&g0.tab=table)
     diagnostics:
-        - message: Use `foo:rate5m` here instead to speed up the query.
-          firstcolumn: 1
-          lastcolumn: 39
-          kind: 0
+    - message: Use `foo:rate5m` here instead to speed up the query.
+      firstcolumn: 1
+      lastcolumn: 39
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 0
     anchor: 0
 
@@ -726,31 +742,31 @@
     reporter: query/cost
     summary: query could use a recording rule
     details: |
-        There is a recording rule that stores result of a query that might work the same, you can try to use it here to speed up this query.
+      There is a recording rule that stores result of a query that might work the same, you can try to use it here to speed up this query.
 
-        ```yaml
-        - record: colo:node_cpu:rate2m
-          expr: rate(node_cpu_seconds_total[2m])
-        ```
+      ```yaml
+      - record: colo:node_cpu:rate2m
+        expr: rate(node_cpu_seconds_total[2m])
+      ```
 
-        Using `colo:node_cpu:rate2m` rule would speed up this query:
+      Using `colo:node_cpu:rate2m` rule would speed up this query:
 
-        - Total queried samples would be 10 instead of 99 (-89.90%)
-        - Peak queried samples would be 10 instead of 19 (-47.37%)
-        - Query evaluation time would be 10s instead of 1m300ms (-83.42%)
+      - Total queried samples would be 10 instead of 99 (-89.90%)
+      - Peak queried samples would be 10 instead of 19 (-47.37%)
+      - Query evaluation time would be 10s instead of 1m300ms (-83.42%)
 
-        To get results for both original and suggested query click below:
+      To get results for both original and suggested query click below:
 
-        - [Original query](https://simple.example.com/graph?g0.expr=server_role%7Brole%3D%22foo%22%7D%0Aand+on%28instance%29%0Asum+by+%28instance%29+%28irate%28node_cpu_seconds_total%5B5m%5D%29%29+%3E+20%0A&g0.tab=table)
-        - [Suggested query](https://simple.example.com/graph?g0.expr=server_role%7Brole%3D%22foo%22%7D%0Aand+on%28instance%29%0Asum+by+%28instance%29+%28colo%3Anode_cpu%3Arate2m%29+%3E+20%0A&g0.tab=table)
+      - [Original query](https://simple.example.com/graph?g0.expr=server_role%7Brole%3D%22foo%22%7D%0Aand+on%28instance%29%0Asum+by+%28instance%29+%28irate%28node_cpu_seconds_total%5B5m%5D%29%29+%3E+20%0A&g0.tab=table)
+      - [Suggested query](https://simple.example.com/graph?g0.expr=server_role%7Brole%3D%22foo%22%7D%0Aand+on%28instance%29%0Asum+by+%28instance%29+%28colo%3Anode_cpu%3Arate2m%29+%3E+20%0A&g0.tab=table)
     diagnostics:
-        - message: Use `colo:node_cpu:rate2m` here instead to speed up the query.
-          firstcolumn: 61
-          lastcolumn: 93
-          kind: 0
+    - message: Use `colo:node_cpu:rate2m` here instead to speed up the query.
+      firstcolumn: 61
+      lastcolumn: 93
+      kind: 0
     lines:
-        first: 3
-        last: 5
+      first: 3
+      last: 5
     severity: 0
     anchor: 0
 
@@ -778,31 +794,31 @@
     reporter: query/cost
     summary: query could use a recording rule
     details: |
-        There is a recording rule that already stores the result of this query, use it here to speed up this query.
+      There is a recording rule that already stores the result of this query, use it here to speed up this query.
 
-        ```yaml
-        - record: foo:rate5m
-          expr: rate(foo_total[5m])
-        ```
+      ```yaml
+      - record: foo:rate5m
+        expr: rate(foo_total[5m])
+      ```
 
-        Using `foo:rate5m` rule would speed up this query:
+      Using `foo:rate5m` rule would speed up this query:
 
-        - Total queried samples would be 10 instead of 100 (-90.00%)
-        - Peak queried samples would be 50 (no change)
-        - Query evaluation time would be 30s300ms (no change)
+      - Total queried samples would be 10 instead of 100 (-90.00%)
+      - Peak queried samples would be 50 (no change)
+      - Query evaluation time would be 30s300ms (no change)
 
-        To get results for both original and suggested query click below:
+      To get results for both original and suggested query click below:
 
-        - [Original query](https://simple.example.com/graph?g0.expr=sum%28rate%28foo_total%5B5m%5D%29%29+without%28instance%29+%3E+10&g0.tab=table)
-        - [Suggested query](https://simple.example.com/graph?g0.expr=sum%28foo%3Arate5m%29+without%28instance%29+%3E+10&g0.tab=table)
+      - [Original query](https://simple.example.com/graph?g0.expr=sum%28rate%28foo_total%5B5m%5D%29%29+without%28instance%29+%3E+10&g0.tab=table)
+      - [Suggested query](https://simple.example.com/graph?g0.expr=sum%28foo%3Arate5m%29+without%28instance%29+%3E+10&g0.tab=table)
     diagnostics:
-        - message: Use `foo:rate5m` here instead to speed up the query.
-          firstcolumn: 5
-          lastcolumn: 23
-          kind: 0
+    - message: Use `foo:rate5m` here instead to speed up the query.
+      firstcolumn: 5
+      lastcolumn: 23
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 0
     anchor: 0
 

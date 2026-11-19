@@ -18,15 +18,17 @@
   problem:
     reporter: promql/range_query
     summary: query beyond configured retention
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`foo[20d]` selector is trying to query Prometheus for 20d worth of metrics, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.'
-          firstcolumn: 6
-          lastcolumn: 13
-          kind: 0
+    - message: '`foo[20d]` selector is trying to query Prometheus for 20d worth of
+        metrics, but `prom` Prometheus server at https://simple.example.com is configured
+        to only keep 15d of metrics history.'
+      firstcolumn: 6
+      lastcolumn: 13
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -45,15 +47,16 @@
   problem:
     reporter: promql/range_query
     summary: unable to run checks
-    details: ""
+    details: ''
     diagnostics:
-        - message: 'Cannot parse --storage.tsdb.retention.time="abc" flag value: not a valid duration string: "abc"'
-          firstcolumn: 1
-          lastcolumn: 14
-          kind: 0
+    - message: 'Cannot parse --storage.tsdb.retention.time="abc" flag value: not a
+        valid duration string: "abc"'
+      firstcolumn: 1
+      lastcolumn: 14
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -72,15 +75,16 @@
   problem:
     reporter: promql/range_query
     summary: unable to run checks
-    details: ""
+    details: ''
     diagnostics:
-        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX error: `server_error: internal error`.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: 'Couldn''t run some online checks due to `prom` Prometheus server at
+        http://127.0.0.1:XXXXX error: `server_error: internal error`.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 2
     anchor: 0
 
@@ -105,15 +109,17 @@
   problem:
     reporter: promql/range_query
     summary: query beyond configured retention
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`foo[11d1h]` selector is trying to query Prometheus for 11d1h worth of metrics, but `prom` Prometheus server at https://simple.example.com is configured to only keep 11d of metrics history.'
-          firstcolumn: 6
-          lastcolumn: 15
-          kind: 0
+    - message: '`foo[11d1h]` selector is trying to query Prometheus for 11d1h worth
+        of metrics, but `prom` Prometheus server at https://simple.example.com is
+        configured to only keep 11d of metrics history.'
+      firstcolumn: 6
+      lastcolumn: 15
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -143,15 +149,17 @@
   problem:
     reporter: promql/range_query
     summary: query beyond configured retention
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`foo[20d]` selector is trying to query Prometheus for 20d worth of metrics, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.'
-          firstcolumn: 6
-          lastcolumn: 13
-          kind: 0
+    - message: '`foo[20d]` selector is trying to query Prometheus for 20d worth of
+        metrics, but `prom` Prometheus server at https://simple.example.com is configured
+        to only keep 15d of metrics history.'
+      firstcolumn: 6
+      lastcolumn: 13
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -182,13 +190,14 @@
     summary: query beyond configured retention
     details: 'Rule comment: some text'
     diagnostics:
-        - message: '`foo[5h]` selector is trying to query Prometheus for 5h worth of metrics, but 4h is the maximum allowed range query.'
-          firstcolumn: 6
-          lastcolumn: 12
-          kind: 0
+    - message: '`foo[5h]` selector is trying to query Prometheus for 5h worth of metrics,
+        but 4h is the maximum allowed range query.'
+      firstcolumn: 6
+      lastcolumn: 12
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -209,13 +218,14 @@
     summary: query beyond configured retention
     details: 'Rule comment: some text'
     diagnostics:
-        - message: '`foo[5h]` selector is trying to query Prometheus for 5h worth of metrics, but 4h is the maximum allowed range query.'
-          firstcolumn: 12
-          lastcolumn: 18
-          kind: 0
+    - message: '`foo[5h]` selector is trying to query Prometheus for 5h worth of metrics,
+        but 4h is the maximum allowed range query.'
+      firstcolumn: 12
+      lastcolumn: 18
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -236,13 +246,14 @@
     summary: query beyond configured retention
     details: 'Rule comment: some text'
     diagnostics:
-        - message: '`foo[6h]` selector is trying to query Prometheus for 6h worth of metrics, but 4h is the maximum allowed range query.'
-          firstcolumn: 32
-          lastcolumn: 38
-          kind: 0
+    - message: '`foo[6h]` selector is trying to query Prometheus for 6h worth of metrics,
+        but 4h is the maximum allowed range query.'
+      firstcolumn: 32
+      lastcolumn: 38
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 
@@ -263,13 +274,14 @@
     summary: query beyond configured retention
     details: 'Rule comment: some text'
     diagnostics:
-        - message: '`foo[6h]` selector is trying to query Prometheus for 6h worth of metrics, but 4h is the maximum allowed range query.'
-          firstcolumn: 6
-          lastcolumn: 12
-          kind: 0
+    - message: '`foo[6h]` selector is trying to query Prometheus for 6h worth of metrics,
+        but 4h is the maximum allowed range query.'
+      firstcolumn: 6
+      lastcolumn: 12
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 - description: limit / both sides of binary expression exceed limit
@@ -286,13 +298,14 @@
     summary: query beyond configured retention
     details: 'Rule comment: some text'
     diagnostics:
-        - message: '`bar[7h]` selector is trying to query Prometheus for 7h worth of metrics, but 4h is the maximum allowed range query.'
-          firstcolumn: 22
-          lastcolumn: 28
-          kind: 0
+    - message: '`bar[7h]` selector is trying to query Prometheus for 7h worth of metrics,
+        but 4h is the maximum allowed range query.'
+      firstcolumn: 22
+      lastcolumn: 28
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 2
     anchor: 0
 

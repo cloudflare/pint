@@ -1,6 +1,6 @@
 
 [TestImpossibleCheck/#00 - 1]
-- description: ""
+- description: ''
   content: |2
 
       - alert: Device_IO_Errors
@@ -37,20 +37,20 @@
   problem:
     reporter: promql/impossible
     summary: dead code in query
-    details: ""
+    details: ''
     diagnostics:
-        - message: |-
-            The right hand side will never be matched because it doesn't have the `device` label from `on(...)`. The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if the provided query doesn't match any time series.
-            You will only get any results back if the metric selector you pass doesn't match anything.
-            Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
-            This means that the only labels you can get back from absent call are the ones you pass to it.
-            If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
-          firstcolumn: 287
-          lastcolumn: 292
-          kind: 0
+    - message: |-
+        The right hand side will never be matched because it doesn't have the `device` label from `on(...)`. The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if the provided query doesn't match any time series.
+        You will only get any results back if the metric selector you pass doesn't match anything.
+        Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+        This means that the only labels you can get back from absent call are the ones you pass to it.
+        If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+      firstcolumn: 287
+      lastcolumn: 292
+      kind: 0
     lines:
-        first: 4
-        last: 9
+      first: 4
+      last: 9
     severity: 1
     anchor: 0
 
@@ -70,15 +70,16 @@
   problem:
     reporter: promql/impossible
     summary: dead code in query
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`0 > 0` always evaluates to `0 > 0` and uses the `bool` modifier which means it will always return 0'
-          firstcolumn: 1
-          lastcolumn: 1
-          kind: 0
+    - message: '`0 > 0` always evaluates to `0 > 0` and uses the `bool` modifier which
+        means it will always return 0'
+      firstcolumn: 1
+      lastcolumn: 1
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 1
     anchor: 0
 
@@ -99,19 +100,19 @@
   problem:
     reporter: promql/impossible
     summary: impossible label
-    details: ""
+    details: ''
     diagnostics:
-        - message: You can't use `__name__` because this label is not possible here.
-          firstcolumn: 60
-          lastcolumn: 67
-          kind: 0
-        - message: Aggregation removes metric name.
-          firstcolumn: 39
-          lastcolumn: 54
-          kind: 1
+    - message: You can't use `__name__` because this label is not possible here.
+      firstcolumn: 60
+      lastcolumn: 67
+      kind: 0
+    - message: Aggregation removes metric name.
+      firstcolumn: 39
+      lastcolumn: 54
+      kind: 1
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 1
     anchor: 0
 - description: __name__ is stripped
@@ -129,15 +130,16 @@
   problem:
     reporter: promql/impossible
     summary: dead code in query
-    details: ""
+    details: ''
     diagnostics:
-        - message: The right hand side will never be matched because it doesn't have the `__name__` label from `on(...)`. Aggregation removes metric name.
-          firstcolumn: 39
-          lastcolumn: 54
-          kind: 0
+    - message: The right hand side will never be matched because it doesn't have the
+        `__name__` label from `on(...)`. Aggregation removes metric name.
+      firstcolumn: 39
+      lastcolumn: 54
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 1
     anchor: 0
 
@@ -191,19 +193,19 @@
   problem:
     reporter: promql/impossible
     summary: impossible label
-    details: ""
+    details: ''
     diagnostics:
-        - message: You can't use `colo_name` because this label is not possible here.
-          firstcolumn: 107
-          lastcolumn: 115
-          kind: 0
-        - message: Calling `vector()` will return a vector value with no labels.
-          firstcolumn: 92
-          lastcolumn: 97
-          kind: 1
+    - message: You can't use `colo_name` because this label is not possible here.
+      firstcolumn: 107
+      lastcolumn: 115
+      kind: 0
+    - message: Calling `vector()` will return a vector value with no labels.
+      firstcolumn: 92
+      lastcolumn: 97
+      kind: 1
     lines:
-        first: 4
-        last: 13
+      first: 4
+      last: 13
     severity: 1
     anchor: 0
 - description: complex query with or vector()
@@ -240,19 +242,19 @@
   problem:
     reporter: promql/impossible
     summary: impossible label
-    details: ""
+    details: ''
     diagnostics:
-        - message: You can't use `colo_name` because this label is not possible here.
-          firstcolumn: 251
-          lastcolumn: 259
-          kind: 0
-        - message: Calling `vector()` will return a vector value with no labels.
-          firstcolumn: 236
-          lastcolumn: 241
-          kind: 1
+    - message: You can't use `colo_name` because this label is not possible here.
+      firstcolumn: 251
+      lastcolumn: 259
+      kind: 0
+    - message: Calling `vector()` will return a vector value with no labels.
+      firstcolumn: 236
+      lastcolumn: 241
+      kind: 1
     lines:
-        first: 4
-        last: 13
+      first: 4
+      last: 13
     severity: 1
     anchor: 0
 - description: complex query with or vector()
@@ -288,19 +290,19 @@
   problem:
     reporter: promql/impossible
     summary: impossible label
-    details: ""
+    details: ''
     diagnostics:
-        - message: You can't use `colo_name` because this label is not possible here.
-          firstcolumn: 184
-          lastcolumn: 192
-          kind: 0
-        - message: Calling `vector()` will return a vector value with no labels.
-          firstcolumn: 169
-          lastcolumn: 174
-          kind: 1
+    - message: You can't use `colo_name` because this label is not possible here.
+      firstcolumn: 184
+      lastcolumn: 192
+      kind: 0
+    - message: Calling `vector()` will return a vector value with no labels.
+      firstcolumn: 169
+      lastcolumn: 174
+      kind: 1
     lines:
-        first: 4
-        last: 13
+      first: 4
+      last: 13
     severity: 1
     anchor: 0
 - description: complex query with or vector()
@@ -337,19 +339,19 @@
   problem:
     reporter: promql/impossible
     summary: impossible label
-    details: ""
+    details: ''
     diagnostics:
-        - message: You can't use `colo_name` because this label is not possible here.
-          firstcolumn: 251
-          lastcolumn: 259
-          kind: 0
-        - message: Calling `vector()` will return a vector value with no labels.
-          firstcolumn: 236
-          lastcolumn: 241
-          kind: 1
+    - message: You can't use `colo_name` because this label is not possible here.
+      firstcolumn: 251
+      lastcolumn: 259
+      kind: 0
+    - message: Calling `vector()` will return a vector value with no labels.
+      firstcolumn: 236
+      lastcolumn: 241
+      kind: 1
     lines:
-        first: 4
-        last: 13
+      first: 4
+      last: 13
     severity: 1
     anchor: 0
 - description: complex query with or vector()
@@ -383,15 +385,16 @@
   problem:
     reporter: promql/impossible
     summary: dead code in query
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`vector(0) > 80` always evaluates to `0 > 80` which is not possible, so it will never return anything.'
-          firstcolumn: 354
-          lastcolumn: 362
-          kind: 0
+    - message: '`vector(0) > 80` always evaluates to `0 > 80` which is not possible,
+        so it will never return anything.'
+      firstcolumn: 354
+      lastcolumn: 362
+      kind: 0
     lines:
-        first: 4
-        last: 13
+      first: 4
+      last: 13
     severity: 1
     anchor: 0
 - description: complex query with or vector()
@@ -426,15 +429,17 @@
   problem:
     reporter: promql/impossible
     summary: dead code in query
-    details: ""
+    details: ''
     diagnostics:
-        - message: The right hand side will never be matched because it doesn't have the `colo_name` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
-          firstcolumn: 354
-          lastcolumn: 359
-          kind: 0
+    - message: The right hand side will never be matched because it doesn't have the
+        `colo_name` label from `on(...)`. Calling `vector()` will return a vector
+        value with no labels.
+      firstcolumn: 354
+      lastcolumn: 359
+      kind: 0
     lines:
-        first: 4
-        last: 13
+      first: 4
+      last: 13
     severity: 1
     anchor: 0
 - description: complex query with or vector()
@@ -466,15 +471,16 @@
   problem:
     reporter: promql/impossible
     summary: dead code in query
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`vector(0) > 80` always evaluates to `0 > 80` which is not possible, so it will never return anything.'
-          firstcolumn: 431
-          lastcolumn: 439
-          kind: 0
+    - message: '`vector(0) > 80` always evaluates to `0 > 80` which is not possible,
+        so it will never return anything.'
+      firstcolumn: 431
+      lastcolumn: 439
+      kind: 0
     lines:
-        first: 4
-        last: 13
+      first: 4
+      last: 13
     severity: 1
     anchor: 0
 - description: complex query with or vector()
@@ -508,15 +514,17 @@
   problem:
     reporter: promql/impossible
     summary: dead code in query
-    details: ""
+    details: ''
     diagnostics:
-        - message: The right hand side will never be matched because it doesn't have the `colo_name` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
-          firstcolumn: 431
-          lastcolumn: 436
-          kind: 0
+    - message: The right hand side will never be matched because it doesn't have the
+        `colo_name` label from `on(...)`. Calling `vector()` will return a vector
+        value with no labels.
+      firstcolumn: 431
+      lastcolumn: 436
+      kind: 0
     lines:
-        first: 4
-        last: 13
+      first: 4
+      last: 13
     severity: 1
     anchor: 0
 - description: complex query with or vector()
@@ -549,15 +557,16 @@
   problem:
     reporter: promql/impossible
     summary: dead code in query
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`vector(0) / vector(1) > 5 * vector(0) / vector(1)` always evaluates to `0 > 0` which is not possible, so it will never return anything.'
-          firstcolumn: 34
-          lastcolumn: 42
-          kind: 0
+    - message: '`vector(0) / vector(1) > 5 * vector(0) / vector(1)` always evaluates
+        to `0 > 0` which is not possible, so it will never return anything.'
+      firstcolumn: 34
+      lastcolumn: 42
+      kind: 0
     lines:
-        first: 4
-        last: 13
+      first: 4
+      last: 13
     severity: 1
     anchor: 0
 - description: complex query with or vector()
@@ -591,19 +600,19 @@
   problem:
     reporter: promql/impossible
     summary: impossible label
-    details: ""
+    details: ''
     diagnostics:
-        - message: You can't use `colo_name` because this label is not possible here.
-          firstcolumn: 49
-          lastcolumn: 57
-          kind: 0
-        - message: Calling `vector()` will return a vector value with no labels.
-          firstcolumn: 34
-          lastcolumn: 39
-          kind: 1
+    - message: You can't use `colo_name` because this label is not possible here.
+      firstcolumn: 49
+      lastcolumn: 57
+      kind: 0
+    - message: Calling `vector()` will return a vector value with no labels.
+      firstcolumn: 34
+      lastcolumn: 39
+      kind: 1
     lines:
-        first: 4
-        last: 13
+      first: 4
+      last: 13
     severity: 1
     anchor: 0
 - description: complex query with or vector()
@@ -640,19 +649,19 @@
   problem:
     reporter: promql/impossible
     summary: impossible label
-    details: ""
+    details: ''
     diagnostics:
-        - message: You can't use `colo_name` because this label is not possible here.
-          firstcolumn: 311
-          lastcolumn: 319
-          kind: 0
-        - message: Calling `vector()` will return a vector value with no labels.
-          firstcolumn: 34
-          lastcolumn: 39
-          kind: 1
+    - message: You can't use `colo_name` because this label is not possible here.
+      firstcolumn: 311
+      lastcolumn: 319
+      kind: 0
+    - message: Calling `vector()` will return a vector value with no labels.
+      firstcolumn: 34
+      lastcolumn: 39
+      kind: 1
     lines:
-        first: 4
-        last: 13
+      first: 4
+      last: 13
     severity: 1
     anchor: 0
 - description: complex query with or vector()
@@ -687,19 +696,19 @@
   problem:
     reporter: promql/impossible
     summary: impossible label
-    details: ""
+    details: ''
     diagnostics:
-        - message: You can't use `colo_name` because this label is not possible here.
-          firstcolumn: 107
-          lastcolumn: 115
-          kind: 0
-        - message: Calling `vector()` will return a vector value with no labels.
-          firstcolumn: 92
-          lastcolumn: 97
-          kind: 1
+    - message: You can't use `colo_name` because this label is not possible here.
+      firstcolumn: 107
+      lastcolumn: 115
+      kind: 0
+    - message: Calling `vector()` will return a vector value with no labels.
+      firstcolumn: 92
+      lastcolumn: 97
+      kind: 1
     lines:
-        first: 4
-        last: 13
+      first: 4
+      last: 13
     severity: 1
     anchor: 0
 - description: complex query with or vector()
@@ -736,19 +745,19 @@
   problem:
     reporter: promql/impossible
     summary: impossible label
-    details: ""
+    details: ''
     diagnostics:
-        - message: You can't use `colo_name` because this label is not possible here.
-          firstcolumn: 251
-          lastcolumn: 259
-          kind: 0
-        - message: Calling `vector()` will return a vector value with no labels.
-          firstcolumn: 236
-          lastcolumn: 241
-          kind: 1
+    - message: You can't use `colo_name` because this label is not possible here.
+      firstcolumn: 251
+      lastcolumn: 259
+      kind: 0
+    - message: Calling `vector()` will return a vector value with no labels.
+      firstcolumn: 236
+      lastcolumn: 241
+      kind: 1
     lines:
-        first: 4
-        last: 13
+      first: 4
+      last: 13
     severity: 1
     anchor: 0
 - description: complex query with or vector()
@@ -784,19 +793,19 @@
   problem:
     reporter: promql/impossible
     summary: impossible label
-    details: ""
+    details: ''
     diagnostics:
-        - message: You can't use `colo_name` because this label is not possible here.
-          firstcolumn: 184
-          lastcolumn: 192
-          kind: 0
-        - message: Calling `vector()` will return a vector value with no labels.
-          firstcolumn: 169
-          lastcolumn: 174
-          kind: 1
+    - message: You can't use `colo_name` because this label is not possible here.
+      firstcolumn: 184
+      lastcolumn: 192
+      kind: 0
+    - message: Calling `vector()` will return a vector value with no labels.
+      firstcolumn: 169
+      lastcolumn: 174
+      kind: 1
     lines:
-        first: 4
-        last: 13
+      first: 4
+      last: 13
     severity: 1
     anchor: 0
 - description: complex query with or vector()
@@ -833,19 +842,19 @@
   problem:
     reporter: promql/impossible
     summary: impossible label
-    details: ""
+    details: ''
     diagnostics:
-        - message: You can't use `colo_name` because this label is not possible here.
-          firstcolumn: 251
-          lastcolumn: 259
-          kind: 0
-        - message: Calling `vector()` will return a vector value with no labels.
-          firstcolumn: 236
-          lastcolumn: 241
-          kind: 1
+    - message: You can't use `colo_name` because this label is not possible here.
+      firstcolumn: 251
+      lastcolumn: 259
+      kind: 0
+    - message: Calling `vector()` will return a vector value with no labels.
+      firstcolumn: 236
+      lastcolumn: 241
+      kind: 1
     lines:
-        first: 4
-        last: 13
+      first: 4
+      last: 13
     severity: 1
     anchor: 0
 - description: complex query with or vector()
@@ -879,15 +888,16 @@
   problem:
     reporter: promql/impossible
     summary: dead code in query
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`vector(0) > 80` always evaluates to `0 > 80` which is not possible, so it will never return anything.'
-          firstcolumn: 354
-          lastcolumn: 362
-          kind: 0
+    - message: '`vector(0) > 80` always evaluates to `0 > 80` which is not possible,
+        so it will never return anything.'
+      firstcolumn: 354
+      lastcolumn: 362
+      kind: 0
     lines:
-        first: 4
-        last: 13
+      first: 4
+      last: 13
     severity: 1
     anchor: 0
 - description: complex query with or vector()
@@ -922,15 +932,17 @@
   problem:
     reporter: promql/impossible
     summary: dead code in query
-    details: ""
+    details: ''
     diagnostics:
-        - message: The right hand side will never be matched because it doesn't have the `colo_name` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
-          firstcolumn: 354
-          lastcolumn: 359
-          kind: 0
+    - message: The right hand side will never be matched because it doesn't have the
+        `colo_name` label from `on(...)`. Calling `vector()` will return a vector
+        value with no labels.
+      firstcolumn: 354
+      lastcolumn: 359
+      kind: 0
     lines:
-        first: 4
-        last: 13
+      first: 4
+      last: 13
     severity: 1
     anchor: 0
 - description: complex query with or vector()
@@ -962,15 +974,16 @@
   problem:
     reporter: promql/impossible
     summary: dead code in query
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`vector(0) > 80` always evaluates to `0 > 80` which is not possible, so it will never return anything.'
-          firstcolumn: 431
-          lastcolumn: 439
-          kind: 0
+    - message: '`vector(0) > 80` always evaluates to `0 > 80` which is not possible,
+        so it will never return anything.'
+      firstcolumn: 431
+      lastcolumn: 439
+      kind: 0
     lines:
-        first: 4
-        last: 13
+      first: 4
+      last: 13
     severity: 1
     anchor: 0
 - description: complex query with or vector()
@@ -1004,15 +1017,17 @@
   problem:
     reporter: promql/impossible
     summary: dead code in query
-    details: ""
+    details: ''
     diagnostics:
-        - message: The right hand side will never be matched because it doesn't have the `colo_name` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
-          firstcolumn: 431
-          lastcolumn: 436
-          kind: 0
+    - message: The right hand side will never be matched because it doesn't have the
+        `colo_name` label from `on(...)`. Calling `vector()` will return a vector
+        value with no labels.
+      firstcolumn: 431
+      lastcolumn: 436
+      kind: 0
     lines:
-        first: 4
-        last: 13
+      first: 4
+      last: 13
     severity: 1
     anchor: 0
 
@@ -1038,15 +1053,17 @@
   problem:
     reporter: promql/impossible
     summary: dead code in query
-    details: ""
+    details: ''
     diagnostics:
-        - message: The right hand side will never be matched because it doesn't have the `job` label while the left hand side will. Query is using aggregation that removes all labels.
-          firstcolumn: 23
-          lastcolumn: 25
-          kind: 0
+    - message: The right hand side will never be matched because it doesn't have the
+        `job` label while the left hand side will. Query is using aggregation that
+        removes all labels.
+      firstcolumn: 23
+      lastcolumn: 25
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 1
     anchor: 0
 
@@ -1067,15 +1084,17 @@
   problem:
     reporter: promql/impossible
     summary: dead code in query
-    details: ""
+    details: ''
     diagnostics:
-        - message: The right hand side will never be matched because it doesn't have the `job` label while the left hand side will. Calling `vector()` will return a vector value with no labels.
-          firstcolumn: 23
-          lastcolumn: 28
-          kind: 0
+    - message: The right hand side will never be matched because it doesn't have the
+        `job` label while the left hand side will. Calling `vector()` will return
+        a vector value with no labels.
+      firstcolumn: 23
+      lastcolumn: 28
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 1
     anchor: 0
 
@@ -1111,19 +1130,21 @@
   problem:
     reporter: promql/impossible
     summary: unused label
-    details: ""
+    details: ''
     diagnostics:
-        - message: Previously joined label `animal` is being removed from the results.
-          firstcolumn: 15
-          lastcolumn: 20
-          kind: 0
-        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
-          firstcolumn: 111
-          lastcolumn: 116
-          kind: 1
+    - message: Previously joined label `animal` is being removed from the results.
+      firstcolumn: 15
+      lastcolumn: 20
+      kind: 0
+    - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels
+        included inside `group_left(...)` will be joined to the results on the other
+        side of the query.
+      firstcolumn: 111
+      lastcolumn: 116
+      kind: 1
     lines:
-        first: 4
-        last: 8
+      first: 4
+      last: 8
     severity: 1
     anchor: 0
 - description: group_left inside without
@@ -1151,19 +1172,21 @@
   problem:
     reporter: promql/impossible
     summary: unused label
-    details: ""
+    details: ''
     diagnostics:
-        - message: Previously joined label `brand` is being removed from the results.
-          firstcolumn: 23
-          lastcolumn: 27
-          kind: 0
-        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
-          firstcolumn: 119
-          lastcolumn: 123
-          kind: 1
+    - message: Previously joined label `brand` is being removed from the results.
+      firstcolumn: 23
+      lastcolumn: 27
+      kind: 0
+    - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels
+        included inside `group_left(...)` will be joined to the results on the other
+        side of the query.
+      firstcolumn: 119
+      lastcolumn: 123
+      kind: 1
     lines:
-        first: 4
-        last: 8
+      first: 4
+      last: 8
     severity: 1
     anchor: 0
 
@@ -1215,19 +1238,21 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `brand` from being added to the results.
-          firstcolumn: 155
-          lastcolumn: 155
-          kind: 0
-        - message: Query is using `group_left(animal, brand)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
-          firstcolumn: 267
-          lastcolumn: 271
-          kind: 1
+    - message: This binary operation prevents previously joined label `brand` from
+        being added to the results.
+      firstcolumn: 155
+      lastcolumn: 155
+      kind: 0
+    - message: Query is using `group_left(animal, brand)`, all labels included inside
+        `group_left(...)` will be joined to the results on the other side of the query.
+      firstcolumn: 267
+      lastcolumn: 271
+      kind: 1
     lines:
-        first: 4
-        last: 16
+      first: 4
+      last: 16
     severity: 1
     anchor: 0
 
@@ -1268,19 +1293,21 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `sliver` from being added to the results.
-          firstcolumn: 80
-          lastcolumn: 80
-          kind: 0
-        - message: Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
-          firstcolumn: 151
-          lastcolumn: 156
-          kind: 1
+    - message: This binary operation prevents previously joined label `sliver` from
+        being added to the results.
+      firstcolumn: 80
+      lastcolumn: 80
+      kind: 0
+    - message: Query is using `group_left(sliver)`, all labels included inside `group_left(...)`
+        will be joined to the results on the other side of the query.
+      firstcolumn: 151
+      lastcolumn: 156
+      kind: 1
     lines:
-        first: 4
-        last: 10
+      first: 4
+      last: 10
     severity: 1
     anchor: 0
 
@@ -1316,19 +1343,21 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `sliver` from being added to the results.
-          firstcolumn: 91
-          lastcolumn: 91
-          kind: 0
-        - message: Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
-          firstcolumn: 173
-          lastcolumn: 178
-          kind: 1
+    - message: This binary operation prevents previously joined label `sliver` from
+        being added to the results.
+      firstcolumn: 91
+      lastcolumn: 91
+      kind: 0
+    - message: Query is using `group_left(sliver)`, all labels included inside `group_left(...)`
+        will be joined to the results on the other side of the query.
+      firstcolumn: 173
+      lastcolumn: 178
+      kind: 1
     lines:
-        first: 4
-        last: 10
+      first: 4
+      last: 10
     severity: 1
     anchor: 0
 
@@ -1364,19 +1393,21 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `sliver` from being added to the results.
-          firstcolumn: 92
-          lastcolumn: 92
-          kind: 0
-        - message: Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
-          firstcolumn: 174
-          lastcolumn: 179
-          kind: 1
+    - message: This binary operation prevents previously joined label `sliver` from
+        being added to the results.
+      firstcolumn: 92
+      lastcolumn: 92
+      kind: 0
+    - message: Query is using `group_left(sliver)`, all labels included inside `group_left(...)`
+        will be joined to the results on the other side of the query.
+      firstcolumn: 174
+      lastcolumn: 179
+      kind: 1
     lines:
-        first: 4
-        last: 10
+      first: 4
+      last: 10
     severity: 1
     anchor: 0
 
@@ -1412,19 +1443,21 @@
   problem:
     reporter: promql/impossible
     summary: unused label
-    details: ""
+    details: ''
     diagnostics:
-        - message: Previously joined label `tier` is being removed from the results.
-          firstcolumn: 7
-          lastcolumn: 15
-          kind: 0
-        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
-          firstcolumn: 92
-          lastcolumn: 95
-          kind: 1
+    - message: Previously joined label `tier` is being removed from the results.
+      firstcolumn: 7
+      lastcolumn: 15
+      kind: 0
+    - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels
+        included inside `group_left(...)` will be joined to the results on the other
+        side of the query.
+      firstcolumn: 92
+      lastcolumn: 95
+      kind: 1
     lines:
-        first: 4
-        last: 8
+      first: 4
+      last: 8
     severity: 1
     anchor: 0
 - description: group_left not included in by
@@ -1451,19 +1484,21 @@
   problem:
     reporter: promql/impossible
     summary: unused label
-    details: ""
+    details: ''
     diagnostics:
-        - message: Previously joined label `animal` is being removed from the results.
-          firstcolumn: 7
-          lastcolumn: 15
-          kind: 0
-        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
-          firstcolumn: 98
-          lastcolumn: 103
-          kind: 1
+    - message: Previously joined label `animal` is being removed from the results.
+      firstcolumn: 7
+      lastcolumn: 15
+      kind: 0
+    - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels
+        included inside `group_left(...)` will be joined to the results on the other
+        side of the query.
+      firstcolumn: 98
+      lastcolumn: 103
+      kind: 1
     lines:
-        first: 4
-        last: 8
+      first: 4
+      last: 8
     severity: 1
     anchor: 0
 - description: group_left not included in by
@@ -1490,19 +1525,21 @@
   problem:
     reporter: promql/impossible
     summary: unused label
-    details: ""
+    details: ''
     diagnostics:
-        - message: Previously joined label `pop_name` is being removed from the results.
-          firstcolumn: 7
-          lastcolumn: 15
-          kind: 0
-        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
-          firstcolumn: 113
-          lastcolumn: 120
-          kind: 1
+    - message: Previously joined label `pop_name` is being removed from the results.
+      firstcolumn: 7
+      lastcolumn: 15
+      kind: 0
+    - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels
+        included inside `group_left(...)` will be joined to the results on the other
+        side of the query.
+      firstcolumn: 113
+      lastcolumn: 120
+      kind: 1
     lines:
-        first: 4
-        last: 8
+      first: 4
+      last: 8
     severity: 1
     anchor: 0
 - description: group_left not included in by
@@ -1529,19 +1566,20 @@
   problem:
     reporter: promql/impossible
     summary: unused label
-    details: ""
+    details: ''
     diagnostics:
-        - message: Previously joined label `sliver` is being removed from the results.
-          firstcolumn: 7
-          lastcolumn: 15
-          kind: 0
-        - message: Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
-          firstcolumn: 184
-          lastcolumn: 189
-          kind: 1
+    - message: Previously joined label `sliver` is being removed from the results.
+      firstcolumn: 7
+      lastcolumn: 15
+      kind: 0
+    - message: Query is using `group_left(sliver)`, all labels included inside `group_left(...)`
+        will be joined to the results on the other side of the query.
+      firstcolumn: 184
+      lastcolumn: 189
+      kind: 1
     lines:
-        first: 4
-        last: 8
+      first: 4
+      last: 8
     severity: 1
     anchor: 0
 
@@ -1566,19 +1604,20 @@
   problem:
     reporter: promql/impossible
     summary: redundant label
-    details: ""
+    details: ''
     diagnostics:
-        - message: Query is trying to join the `node_status` label that is already present on the other side of the query.
-          firstcolumn: 68
-          lastcolumn: 78
-          kind: 0
-        - message: Query will only return series where these labels are present.
-          firstcolumn: 1
-          lastcolumn: 40
-          kind: 1
+    - message: Query is trying to join the `node_status` label that is already present
+        on the other side of the query.
+      firstcolumn: 68
+      lastcolumn: 78
+      kind: 0
+    - message: Query will only return series where these labels are present.
+      firstcolumn: 1
+      lastcolumn: 40
+      kind: 1
     lines:
-        first: 4
-        last: 5
+      first: 4
+      last: 5
     severity: 1
     anchor: 0
 
@@ -1609,19 +1648,21 @@
   problem:
     reporter: promql/impossible
     summary: unused label
-    details: ""
+    details: ''
     diagnostics:
-        - message: Previously joined label `tier` is being removed from the results.
-          firstcolumn: 1
-          lastcolumn: 5
-          kind: 0
-        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
-          firstcolumn: 82
-          lastcolumn: 85
-          kind: 1
+    - message: Previously joined label `tier` is being removed from the results.
+      firstcolumn: 1
+      lastcolumn: 5
+      kind: 0
+    - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels
+        included inside `group_left(...)` will be joined to the results on the other
+        side of the query.
+      firstcolumn: 82
+      lastcolumn: 85
+      kind: 1
     lines:
-        first: 4
-        last: 8
+      first: 4
+      last: 8
     severity: 1
     anchor: 0
 - description: group_left with empty by
@@ -1648,19 +1689,21 @@
   problem:
     reporter: promql/impossible
     summary: unused label
-    details: ""
+    details: ''
     diagnostics:
-        - message: Previously joined label `animal` is being removed from the results.
-          firstcolumn: 1
-          lastcolumn: 5
-          kind: 0
-        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
-          firstcolumn: 88
-          lastcolumn: 93
-          kind: 1
+    - message: Previously joined label `animal` is being removed from the results.
+      firstcolumn: 1
+      lastcolumn: 5
+      kind: 0
+    - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels
+        included inside `group_left(...)` will be joined to the results on the other
+        side of the query.
+      firstcolumn: 88
+      lastcolumn: 93
+      kind: 1
     lines:
-        first: 4
-        last: 8
+      first: 4
+      last: 8
     severity: 1
     anchor: 0
 - description: group_left with empty by
@@ -1688,19 +1731,21 @@
   problem:
     reporter: promql/impossible
     summary: unused label
-    details: ""
+    details: ''
     diagnostics:
-        - message: Previously joined label `brand` is being removed from the results.
-          firstcolumn: 1
-          lastcolumn: 5
-          kind: 0
-        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
-          firstcolumn: 96
-          lastcolumn: 100
-          kind: 1
+    - message: Previously joined label `brand` is being removed from the results.
+      firstcolumn: 1
+      lastcolumn: 5
+      kind: 0
+    - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels
+        included inside `group_left(...)` will be joined to the results on the other
+        side of the query.
+      firstcolumn: 96
+      lastcolumn: 100
+      kind: 1
     lines:
-        first: 4
-        last: 8
+      first: 4
+      last: 8
     severity: 1
     anchor: 0
 - description: group_left with empty by
@@ -1727,19 +1772,21 @@
   problem:
     reporter: promql/impossible
     summary: unused label
-    details: ""
+    details: ''
     diagnostics:
-        - message: Previously joined label `pop_name` is being removed from the results.
-          firstcolumn: 1
-          lastcolumn: 5
-          kind: 0
-        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
-          firstcolumn: 103
-          lastcolumn: 110
-          kind: 1
+    - message: Previously joined label `pop_name` is being removed from the results.
+      firstcolumn: 1
+      lastcolumn: 5
+      kind: 0
+    - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels
+        included inside `group_left(...)` will be joined to the results on the other
+        side of the query.
+      firstcolumn: 103
+      lastcolumn: 110
+      kind: 1
     lines:
-        first: 4
-        last: 8
+      first: 4
+      last: 8
     severity: 1
     anchor: 0
 - description: group_left with empty by
@@ -1766,19 +1813,20 @@
   problem:
     reporter: promql/impossible
     summary: unused label
-    details: ""
+    details: ''
     diagnostics:
-        - message: Previously joined label `sliver` is being removed from the results.
-          firstcolumn: 1
-          lastcolumn: 5
-          kind: 0
-        - message: Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
-          firstcolumn: 174
-          lastcolumn: 179
-          kind: 1
+    - message: Previously joined label `sliver` is being removed from the results.
+      firstcolumn: 1
+      lastcolumn: 5
+      kind: 0
+    - message: Query is using `group_left(sliver)`, all labels included inside `group_left(...)`
+        will be joined to the results on the other side of the query.
+      firstcolumn: 174
+      lastcolumn: 179
+      kind: 1
     lines:
-        first: 4
-        last: 8
+      first: 4
+      last: 8
     severity: 1
     anchor: 0
 
@@ -1814,19 +1862,21 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `sliver` from being added to the results.
-          firstcolumn: 80
-          lastcolumn: 80
-          kind: 0
-        - message: Query is using `group_right(sliver)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
-          firstcolumn: 162
-          lastcolumn: 167
-          kind: 1
+    - message: This binary operation prevents previously joined label `sliver` from
+        being added to the results.
+      firstcolumn: 80
+      lastcolumn: 80
+      kind: 0
+    - message: Query is using `group_right(sliver)`, all labels included inside `group_right(...)`
+        will be joined to the results on the other side of the query.
+      firstcolumn: 162
+      lastcolumn: 167
+      kind: 1
     lines:
-        first: 4
-        last: 10
+      first: 4
+      last: 10
     severity: 1
     anchor: 0
 
@@ -1861,15 +1911,17 @@
   problem:
     reporter: promql/impossible
     summary: dead code in query
-    details: ""
+    details: ''
     diagnostics:
-        - message: The left hand side will never be matched because it doesn't have the `job` label while the right hand side will. Query is using aggregation that removes all labels.
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: The left hand side will never be matched because it doesn't have the
+        `job` label while the right hand side will. Query is using aggregation that
+        removes all labels.
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 1
     anchor: 0
 - description: impossible / ignoring group_right side message
@@ -1886,19 +1938,19 @@
   problem:
     reporter: promql/impossible
     summary: impossible label
-    details: ""
+    details: ''
     diagnostics:
-        - message: You can't use `cluster` because this label is not possible here.
-          firstcolumn: 43
-          lastcolumn: 49
-          kind: 0
-        - message: Query is using aggregation that removes all labels.
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 1
+    - message: You can't use `cluster` because this label is not possible here.
+      firstcolumn: 43
+      lastcolumn: 49
+      kind: 0
+    - message: Query is using aggregation that removes all labels.
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 1
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 1
     anchor: 0
 
@@ -1919,15 +1971,17 @@
   problem:
     reporter: promql/impossible
     summary: dead code in query
-    details: ""
+    details: ''
     diagnostics:
-        - message: The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
-          firstcolumn: 20
-          lastcolumn: 22
-          kind: 0
+    - message: The right hand side will never be matched because it doesn't have the
+        `instance` label from `on(...)`. Query is using aggregation that removes all
+        labels.
+      firstcolumn: 20
+      lastcolumn: 22
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 1
     anchor: 0
 
@@ -1948,15 +2002,17 @@
   problem:
     reporter: promql/impossible
     summary: dead code in query
-    details: ""
+    details: ''
     diagnostics:
-        - message: The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
-          firstcolumn: 40
-          lastcolumn: 42
-          kind: 0
+    - message: The right hand side will never be matched because it doesn't have the
+        `instance` label from `on(...)`. Query is using aggregation that removes all
+        labels.
+      firstcolumn: 40
+      lastcolumn: 42
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 1
     anchor: 0
 - description: 'impossible / on group_left '
@@ -1974,19 +2030,19 @@
   problem:
     reporter: promql/impossible
     summary: impossible label
-    details: ""
+    details: ''
     diagnostics:
-        - message: You can't use `cluster` because this label is not possible here.
-          firstcolumn: 31
-          lastcolumn: 37
-          kind: 0
-        - message: Query is using aggregation that removes all labels.
-          firstcolumn: 40
-          lastcolumn: 42
-          kind: 1
+    - message: You can't use `cluster` because this label is not possible here.
+      firstcolumn: 31
+      lastcolumn: 37
+      kind: 0
+    - message: Query is using aggregation that removes all labels.
+      firstcolumn: 40
+      lastcolumn: 42
+      kind: 1
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 1
     anchor: 0
 
@@ -2006,15 +2062,17 @@
   problem:
     reporter: promql/impossible
     summary: dead code in query
-    details: ""
+    details: ''
     diagnostics:
-        - message: The left hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: The left hand side will never be matched because it doesn't have the
+        `instance` label from `on(...)`. Query is using aggregation that removes all
+        labels.
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 1
     anchor: 0
 - description: impossible / on group_right
@@ -2031,19 +2089,19 @@
   problem:
     reporter: promql/impossible
     summary: impossible label
-    details: ""
+    details: ''
     diagnostics:
-        - message: You can't use `cluster` because this label is not possible here.
-          firstcolumn: 37
-          lastcolumn: 43
-          kind: 0
-        - message: Query is using aggregation that removes all labels.
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 1
+    - message: You can't use `cluster` because this label is not possible here.
+      firstcolumn: 37
+      lastcolumn: 43
+      kind: 0
+    - message: Query is using aggregation that removes all labels.
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 1
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 1
     anchor: 0
 
@@ -2086,19 +2144,22 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `tier` from being added to the results.
-          firstcolumn: 118
-          lastcolumn: 120
-          kind: 0
-        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
-          firstcolumn: 198
-          lastcolumn: 201
-          kind: 1
+    - message: This binary operation prevents previously joined label `tier` from
+        being added to the results.
+      firstcolumn: 118
+      lastcolumn: 120
+      kind: 0
+    - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels
+        included inside `group_left(...)` will be joined to the results on the other
+        side of the query.
+      firstcolumn: 198
+      lastcolumn: 201
+      kind: 1
     lines:
-        first: 4
-        last: 16
+      first: 4
+      last: 16
     severity: 1
     anchor: 0
 - description: impossible group_by
@@ -2138,19 +2199,22 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `animal` from being added to the results.
-          firstcolumn: 118
-          lastcolumn: 120
-          kind: 0
-        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
-          firstcolumn: 204
-          lastcolumn: 209
-          kind: 1
+    - message: This binary operation prevents previously joined label `animal` from
+        being added to the results.
+      firstcolumn: 118
+      lastcolumn: 120
+      kind: 0
+    - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels
+        included inside `group_left(...)` will be joined to the results on the other
+        side of the query.
+      firstcolumn: 204
+      lastcolumn: 209
+      kind: 1
     lines:
-        first: 4
-        last: 16
+      first: 4
+      last: 16
     severity: 1
     anchor: 0
 - description: impossible group_by
@@ -2191,19 +2255,22 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `brand` from being added to the results.
-          firstcolumn: 118
-          lastcolumn: 120
-          kind: 0
-        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
-          firstcolumn: 212
-          lastcolumn: 216
-          kind: 1
+    - message: This binary operation prevents previously joined label `brand` from
+        being added to the results.
+      firstcolumn: 118
+      lastcolumn: 120
+      kind: 0
+    - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels
+        included inside `group_left(...)` will be joined to the results on the other
+        side of the query.
+      firstcolumn: 212
+      lastcolumn: 216
+      kind: 1
     lines:
-        first: 4
-        last: 16
+      first: 4
+      last: 16
     severity: 1
     anchor: 0
 - description: impossible group_by
@@ -2243,19 +2310,22 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `pop_name` from being added to the results.
-          firstcolumn: 118
-          lastcolumn: 120
-          kind: 0
-        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
-          firstcolumn: 219
-          lastcolumn: 226
-          kind: 1
+    - message: This binary operation prevents previously joined label `pop_name` from
+        being added to the results.
+      firstcolumn: 118
+      lastcolumn: 120
+      kind: 0
+    - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels
+        included inside `group_left(...)` will be joined to the results on the other
+        side of the query.
+      firstcolumn: 219
+      lastcolumn: 226
+      kind: 1
     lines:
-        first: 4
-        last: 16
+      first: 4
+      last: 16
     severity: 1
     anchor: 0
 - description: impossible group_by
@@ -2296,19 +2366,21 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `sliver` from being added to the results.
-          firstcolumn: 118
-          lastcolumn: 120
-          kind: 0
-        - message: Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
-          firstcolumn: 290
-          lastcolumn: 295
-          kind: 1
+    - message: This binary operation prevents previously joined label `sliver` from
+        being added to the results.
+      firstcolumn: 118
+      lastcolumn: 120
+      kind: 0
+    - message: Query is using `group_left(sliver)`, all labels included inside `group_left(...)`
+        will be joined to the results on the other side of the query.
+      firstcolumn: 290
+      lastcolumn: 295
+      kind: 1
     lines:
-        first: 4
-        last: 16
+      first: 4
+      last: 16
     severity: 1
     anchor: 0
 
@@ -2335,19 +2407,20 @@
   problem:
     reporter: promql/impossible
     summary: impossible label
-    details: ""
+    details: ''
     diagnostics:
-        - message: You can't use `env` because this label is not possible here.
-          firstcolumn: 11
-          lastcolumn: 13
-          kind: 0
-        - message: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
-          firstcolumn: 87
-          lastcolumn: 99
-          kind: 1
+    - message: You can't use `env` because this label is not possible here.
+      firstcolumn: 11
+      lastcolumn: 13
+      kind: 0
+    - message: Query is using one-to-one vector matching with `on(instance)`, only
+        labels included inside `on(...)` will be present on the results.
+      firstcolumn: 87
+      lastcolumn: 99
+      kind: 1
     lines:
-        first: 4
-        last: 6
+      first: 4
+      last: 6
     severity: 1
     anchor: 0
 - description: impossible group_by *
@@ -2370,19 +2443,20 @@
   problem:
     reporter: promql/impossible
     summary: impossible label
-    details: ""
+    details: ''
     diagnostics:
-        - message: You can't use `cluster` because this label is not possible here.
-          firstcolumn: 16
-          lastcolumn: 22
-          kind: 0
-        - message: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
-          firstcolumn: 87
-          lastcolumn: 99
-          kind: 1
+    - message: You can't use `cluster` because this label is not possible here.
+      firstcolumn: 16
+      lastcolumn: 22
+      kind: 0
+    - message: Query is using one-to-one vector matching with `on(instance)`, only
+        labels included inside `on(...)` will be present on the results.
+      firstcolumn: 87
+      lastcolumn: 99
+      kind: 1
     lines:
-        first: 4
-        last: 6
+      first: 4
+      last: 6
     severity: 1
     anchor: 0
 - description: impossible group_by *
@@ -2405,19 +2479,20 @@
   problem:
     reporter: promql/impossible
     summary: impossible label
-    details: ""
+    details: ''
     diagnostics:
-        - message: You can't use `status` because this label is not possible here.
-          firstcolumn: 25
-          lastcolumn: 30
-          kind: 0
-        - message: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
-          firstcolumn: 87
-          lastcolumn: 99
-          kind: 1
+    - message: You can't use `status` because this label is not possible here.
+      firstcolumn: 25
+      lastcolumn: 30
+      kind: 0
+    - message: Query is using one-to-one vector matching with `on(instance)`, only
+        labels included inside `on(...)` will be present on the results.
+      firstcolumn: 87
+      lastcolumn: 99
+      kind: 1
     lines:
-        first: 4
-        last: 6
+      first: 4
+      last: 6
     severity: 1
     anchor: 0
 - description: impossible group_by *
@@ -2442,19 +2517,20 @@
   problem:
     reporter: promql/impossible
     summary: impossible label
-    details: ""
+    details: ''
     diagnostics:
-        - message: You can't use `dc` because this label is not possible here.
-          firstcolumn: 43
-          lastcolumn: 44
-          kind: 0
-        - message: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
-          firstcolumn: 87
-          lastcolumn: 99
-          kind: 1
+    - message: You can't use `dc` because this label is not possible here.
+      firstcolumn: 43
+      lastcolumn: 44
+      kind: 0
+    - message: Query is using one-to-one vector matching with `on(instance)`, only
+        labels included inside `on(...)` will be present on the results.
+      firstcolumn: 87
+      lastcolumn: 99
+      kind: 1
     lines:
-        first: 4
-        last: 6
+      first: 4
+      last: 6
     severity: 1
     anchor: 0
 - description: impossible group_by *
@@ -2479,19 +2555,20 @@
   problem:
     reporter: promql/impossible
     summary: impossible label
-    details: ""
+    details: ''
     diagnostics:
-        - message: You can't use `port` because this label is not possible here.
-          firstcolumn: 47
-          lastcolumn: 50
-          kind: 0
-        - message: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
-          firstcolumn: 87
-          lastcolumn: 99
-          kind: 1
+    - message: You can't use `port` because this label is not possible here.
+      firstcolumn: 47
+      lastcolumn: 50
+      kind: 0
+    - message: Query is using one-to-one vector matching with `on(instance)`, only
+        labels included inside `on(...)` will be present on the results.
+      firstcolumn: 87
+      lastcolumn: 99
+      kind: 1
     lines:
-        first: 4
-        last: 6
+      first: 4
+      last: 6
     severity: 1
     anchor: 0
 
@@ -2519,19 +2596,21 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `sliver` from being added to the results.
-          firstcolumn: 42
-          lastcolumn: 44
-          kind: 0
-        - message: Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
-          firstcolumn: 120
-          lastcolumn: 125
-          kind: 1
+    - message: This binary operation prevents previously joined label `sliver` from
+        being added to the results.
+      firstcolumn: 42
+      lastcolumn: 44
+      kind: 0
+    - message: Query is using `group_left(sliver)`, all labels included inside `group_left(...)`
+        will be joined to the results on the other side of the query.
+      firstcolumn: 120
+      lastcolumn: 125
+      kind: 1
     lines:
-        first: 4
-        last: 6
+      first: 4
+      last: 6
     severity: 1
     anchor: 0
 
@@ -2561,19 +2640,22 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `tier` from being added to the results.
-          firstcolumn: 42
-          lastcolumn: 44
-          kind: 0
-        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
-          firstcolumn: 135
-          lastcolumn: 138
-          kind: 1
+    - message: This binary operation prevents previously joined label `tier` from
+        being added to the results.
+      firstcolumn: 42
+      lastcolumn: 44
+      kind: 0
+    - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels
+        included inside `group_left(...)` will be joined to the results on the other
+        side of the query.
+      firstcolumn: 135
+      lastcolumn: 138
+      kind: 1
     lines:
-        first: 4
-        last: 7
+      first: 4
+      last: 7
     severity: 1
     anchor: 0
 - description: impossible match due to orphaned group_left
@@ -2600,19 +2682,22 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `pop_name` from being added to the results.
-          firstcolumn: 42
-          lastcolumn: 44
-          kind: 0
-        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
-          firstcolumn: 156
-          lastcolumn: 163
-          kind: 1
+    - message: This binary operation prevents previously joined label `pop_name` from
+        being added to the results.
+      firstcolumn: 42
+      lastcolumn: 44
+      kind: 0
+    - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels
+        included inside `group_left(...)` will be joined to the results on the other
+        side of the query.
+      firstcolumn: 156
+      lastcolumn: 163
+      kind: 1
     lines:
-        first: 4
-        last: 7
+      first: 4
+      last: 7
     severity: 1
     anchor: 0
 - description: impossible match due to orphaned group_left
@@ -2638,19 +2723,21 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `sliver` from being added to the results.
-          firstcolumn: 42
-          lastcolumn: 44
-          kind: 0
-        - message: Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
-          firstcolumn: 225
-          lastcolumn: 230
-          kind: 1
+    - message: This binary operation prevents previously joined label `sliver` from
+        being added to the results.
+      firstcolumn: 42
+      lastcolumn: 44
+      kind: 0
+    - message: Query is using `group_left(sliver)`, all labels included inside `group_left(...)`
+        will be joined to the results on the other side of the query.
+      firstcolumn: 225
+      lastcolumn: 230
+      kind: 1
     lines:
-        first: 4
-        last: 7
+      first: 4
+      last: 7
     severity: 1
     anchor: 0
 
@@ -2669,19 +2756,19 @@
   problem:
     reporter: promql/impossible
     summary: impossible label
-    details: ""
+    details: ''
     diagnostics:
-        - message: You can't use `cluster` because this label is not possible here.
-          firstcolumn: 15
-          lastcolumn: 21
-          kind: 0
-        - message: Query is using aggregation that removes all labels.
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 1
+    - message: You can't use `cluster` because this label is not possible here.
+      firstcolumn: 15
+      lastcolumn: 21
+      kind: 0
+    - message: Query is using aggregation that removes all labels.
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 1
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 1
     anchor: 0
 
@@ -2709,19 +2796,20 @@
   problem:
     reporter: promql/impossible
     summary: impossible label
-    details: ""
+    details: ''
     diagnostics:
-        - message: You can't use `cluster` because this label is not possible here.
-          firstcolumn: 9
-          lastcolumn: 15
-          kind: 0
-        - message: Query is using aggregation with `by(instance, job)`, only labels included inside `by(...)` will be present on the results.
-          firstcolumn: 63
-          lastcolumn: 64
-          kind: 1
+    - message: You can't use `cluster` because this label is not possible here.
+      firstcolumn: 9
+      lastcolumn: 15
+      kind: 0
+    - message: Query is using aggregation with `by(instance, job)`, only labels included
+        inside `by(...)` will be present on the results.
+      firstcolumn: 63
+      lastcolumn: 64
+      kind: 1
     lines:
-        first: 4
-        last: 7
+      first: 4
+      last: 7
     severity: 1
     anchor: 0
 
@@ -2747,19 +2835,20 @@
   problem:
     reporter: promql/impossible
     summary: redundant label
-    details: ""
+    details: ''
     diagnostics:
-        - message: Query is trying to join the `job` label that is already present on the other side of the query.
-          firstcolumn: 63
-          lastcolumn: 65
-          kind: 0
-        - message: Query will only return series where these labels are present.
-          firstcolumn: 18
-          lastcolumn: 42
-          kind: 1
+    - message: Query is trying to join the `job` label that is already present on
+        the other side of the query.
+      firstcolumn: 63
+      lastcolumn: 65
+      kind: 0
+    - message: Query will only return series where these labels are present.
+      firstcolumn: 18
+      lastcolumn: 42
+      kind: 1
     lines:
-        first: 4
-        last: 6
+      first: 4
+      last: 6
     severity: 1
     anchor: 0
 - description: join on impossible label
@@ -2783,19 +2872,20 @@
   problem:
     reporter: promql/impossible
     summary: impossible label
-    details: ""
+    details: ''
     diagnostics:
-        - message: You can't use `job` because this label is not possible here.
-          firstcolumn: 63
-          lastcolumn: 65
-          kind: 0
-        - message: Query uses `{job=""}` selector which will filter out any time series with the `job` label set.
-          firstcolumn: 68
-          lastcolumn: 91
-          kind: 1
+    - message: You can't use `job` because this label is not possible here.
+      firstcolumn: 63
+      lastcolumn: 65
+      kind: 0
+    - message: Query uses `{job=""}` selector which will filter out any time series
+        with the `job` label set.
+      firstcolumn: 68
+      lastcolumn: 91
+      kind: 1
     lines:
-        first: 4
-        last: 6
+      first: 4
+      last: 6
     severity: 1
     anchor: 0
 
@@ -2821,19 +2911,20 @@
   problem:
     reporter: promql/impossible
     summary: redundant label
-    details: ""
+    details: ''
     diagnostics:
-        - message: Query is trying to join the `job` label that is already present on the other side of the query.
-          firstcolumn: 63
-          lastcolumn: 65
-          kind: 0
-        - message: Query will only return series where these labels are present.
-          firstcolumn: 18
-          lastcolumn: 42
-          kind: 1
+    - message: Query is trying to join the `job` label that is already present on
+        the other side of the query.
+      firstcolumn: 63
+      lastcolumn: 65
+      kind: 0
+    - message: Query will only return series where these labels are present.
+      firstcolumn: 18
+      lastcolumn: 42
+      kind: 1
     lines:
-        first: 4
-        last: 6
+      first: 4
+      last: 6
     severity: 1
     anchor: 0
 
@@ -2869,19 +2960,21 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `version` from being added to the results.
-          firstcolumn: 77
-          lastcolumn: 77
-          kind: 0
-        - message: Query is using one-to-one vector matching with `ignoring(version)`, all labels included inside `ignoring(...)` will be removed on the results.
-          firstcolumn: 88
-          lastcolumn: 94
-          kind: 1
+    - message: This binary operation prevents previously joined label `version` from
+        being added to the results.
+      firstcolumn: 77
+      lastcolumn: 77
+      kind: 0
+    - message: Query is using one-to-one vector matching with `ignoring(version)`,
+        all labels included inside `ignoring(...)` will be removed on the results.
+      firstcolumn: 88
+      lastcolumn: 94
+      kind: 1
     lines:
-        first: 4
-        last: 5
+      first: 4
+      last: 5
     severity: 1
     anchor: 0
 
@@ -2932,19 +3025,19 @@
   problem:
     reporter: promql/impossible
     summary: impossible label
-    details: ""
+    details: ''
     diagnostics:
-        - message: You can't use `region` because this label is not possible here.
-          firstcolumn: 213
-          lastcolumn: 218
-          kind: 0
-        - message: Calling `vector()` will return a vector value with no labels.
-          firstcolumn: 199
-          lastcolumn: 204
-          kind: 1
+    - message: You can't use `region` because this label is not possible here.
+      firstcolumn: 213
+      lastcolumn: 218
+      kind: 0
+    - message: Calling `vector()` will return a vector value with no labels.
+      firstcolumn: 199
+      lastcolumn: 204
+      kind: 1
     lines:
-        first: 4
-        last: 8
+      first: 4
+      last: 8
     severity: 1
     anchor: 0
 - description: or vector() labels are missing
@@ -2972,15 +3065,17 @@
   problem:
     reporter: promql/impossible
     summary: dead code in query
-    details: ""
+    details: ''
     diagnostics:
-        - message: The right hand side will never be matched because it doesn't have the `region` label while the left hand side will. Calling `vector()` will return a vector value with no labels.
-          firstcolumn: 199
-          lastcolumn: 204
-          kind: 0
+    - message: The right hand side will never be matched because it doesn't have the
+        `region` label while the left hand side will. Calling `vector()` will return
+        a vector value with no labels.
+      firstcolumn: 199
+      lastcolumn: 204
+      kind: 0
     lines:
-        first: 4
-        last: 8
+      first: 4
+      last: 8
     severity: 1
     anchor: 0
 - description: or vector() labels are missing
@@ -3007,19 +3102,19 @@
   problem:
     reporter: promql/impossible
     summary: impossible label
-    details: ""
+    details: ''
     diagnostics:
-        - message: You can't use `region` because this label is not possible here.
-          firstcolumn: 102
-          lastcolumn: 107
-          kind: 0
-        - message: Calling `vector()` will return a vector value with no labels.
-          firstcolumn: 88
-          lastcolumn: 93
-          kind: 1
+    - message: You can't use `region` because this label is not possible here.
+      firstcolumn: 102
+      lastcolumn: 107
+      kind: 0
+    - message: Calling `vector()` will return a vector value with no labels.
+      firstcolumn: 88
+      lastcolumn: 93
+      kind: 1
     lines:
-        first: 4
-        last: 8
+      first: 4
+      last: 8
     severity: 1
     anchor: 0
 - description: or vector() labels are missing
@@ -3046,19 +3141,19 @@
   problem:
     reporter: promql/impossible
     summary: impossible label
-    details: ""
+    details: ''
     diagnostics:
-        - message: You can't use `region` because this label is not possible here.
-          firstcolumn: 213
-          lastcolumn: 218
-          kind: 0
-        - message: Calling `vector()` will return a vector value with no labels.
-          firstcolumn: 199
-          lastcolumn: 204
-          kind: 1
+    - message: You can't use `region` because this label is not possible here.
+      firstcolumn: 213
+      lastcolumn: 218
+      kind: 0
+    - message: Calling `vector()` will return a vector value with no labels.
+      firstcolumn: 199
+      lastcolumn: 204
+      kind: 1
     lines:
-        first: 4
-        last: 8
+      first: 4
+      last: 8
     severity: 1
     anchor: 0
 
@@ -3088,19 +3183,22 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `tier` from being added to the results.
-          firstcolumn: 42
-          lastcolumn: 44
-          kind: 0
-        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
-          firstcolumn: 120
-          lastcolumn: 123
-          kind: 1
+    - message: This binary operation prevents previously joined label `tier` from
+        being added to the results.
+      firstcolumn: 42
+      lastcolumn: 44
+      kind: 0
+    - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels
+        included inside `group_left(...)` will be joined to the results on the other
+        side of the query.
+      firstcolumn: 120
+      lastcolumn: 123
+      kind: 1
     lines:
-        first: 4
-        last: 7
+      first: 4
+      last: 7
     severity: 1
     anchor: 0
 - description: orphaned group_left labels
@@ -3126,19 +3224,22 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `animal` from being added to the results.
-          firstcolumn: 42
-          lastcolumn: 44
-          kind: 0
-        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
-          firstcolumn: 126
-          lastcolumn: 131
-          kind: 1
+    - message: This binary operation prevents previously joined label `animal` from
+        being added to the results.
+      firstcolumn: 42
+      lastcolumn: 44
+      kind: 0
+    - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels
+        included inside `group_left(...)` will be joined to the results on the other
+        side of the query.
+      firstcolumn: 126
+      lastcolumn: 131
+      kind: 1
     lines:
-        first: 4
-        last: 7
+      first: 4
+      last: 7
     severity: 1
     anchor: 0
 - description: orphaned group_left labels
@@ -3165,19 +3266,22 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `brand` from being added to the results.
-          firstcolumn: 42
-          lastcolumn: 44
-          kind: 0
-        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
-          firstcolumn: 134
-          lastcolumn: 138
-          kind: 1
+    - message: This binary operation prevents previously joined label `brand` from
+        being added to the results.
+      firstcolumn: 42
+      lastcolumn: 44
+      kind: 0
+    - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels
+        included inside `group_left(...)` will be joined to the results on the other
+        side of the query.
+      firstcolumn: 134
+      lastcolumn: 138
+      kind: 1
     lines:
-        first: 4
-        last: 7
+      first: 4
+      last: 7
     severity: 1
     anchor: 0
 - description: orphaned group_left labels
@@ -3204,19 +3308,22 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `pop_name` from being added to the results.
-          firstcolumn: 42
-          lastcolumn: 44
-          kind: 0
-        - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
-          firstcolumn: 141
-          lastcolumn: 148
-          kind: 1
+    - message: This binary operation prevents previously joined label `pop_name` from
+        being added to the results.
+      firstcolumn: 42
+      lastcolumn: 44
+      kind: 0
+    - message: Query is using `group_left(tier, animal, brand, pop_name)`, all labels
+        included inside `group_left(...)` will be joined to the results on the other
+        side of the query.
+      firstcolumn: 141
+      lastcolumn: 148
+      kind: 1
     lines:
-        first: 4
-        last: 7
+      first: 4
+      last: 7
     severity: 1
     anchor: 0
 - description: orphaned group_left labels
@@ -3242,19 +3349,21 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `sliver` from being added to the results.
-          firstcolumn: 42
-          lastcolumn: 44
-          kind: 0
-        - message: Query is using `group_left(sliver)`, all labels included inside `group_left(...)` will be joined to the results on the other side of the query.
-          firstcolumn: 210
-          lastcolumn: 215
-          kind: 1
+    - message: This binary operation prevents previously joined label `sliver` from
+        being added to the results.
+      firstcolumn: 42
+      lastcolumn: 44
+      kind: 0
+    - message: Query is using `group_left(sliver)`, all labels included inside `group_left(...)`
+        will be joined to the results on the other side of the query.
+      firstcolumn: 210
+      lastcolumn: 215
+      kind: 1
     lines:
-        first: 4
-        last: 7
+      first: 4
+      last: 7
     severity: 1
     anchor: 0
 
@@ -3281,19 +3390,20 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `sliver` from being added to the results.
-          firstcolumn: 194
-          lastcolumn: 194
-          kind: 0
-        - message: ""
-          firstcolumn: 194
-          lastcolumn: 194
-          kind: 1
+    - message: This binary operation prevents previously joined label `sliver` from
+        being added to the results.
+      firstcolumn: 194
+      lastcolumn: 194
+      kind: 0
+    - message: ''
+      firstcolumn: 194
+      lastcolumn: 194
+      kind: 1
     lines:
-        first: 4
-        last: 7
+      first: 4
+      last: 7
     severity: 1
     anchor: 0
 - description: orphaned group_right labels (all)
@@ -3316,19 +3426,20 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `tier` from being added to the results.
-          firstcolumn: 125
-          lastcolumn: 125
-          kind: 0
-        - message: ""
-          firstcolumn: 125
-          lastcolumn: 125
-          kind: 1
+    - message: This binary operation prevents previously joined label `tier` from
+        being added to the results.
+      firstcolumn: 125
+      lastcolumn: 125
+      kind: 0
+    - message: ''
+      firstcolumn: 125
+      lastcolumn: 125
+      kind: 1
     lines:
-        first: 4
-        last: 7
+      first: 4
+      last: 7
     severity: 1
     anchor: 0
 - description: orphaned group_right labels (all)
@@ -3351,19 +3462,20 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `animal` from being added to the results.
-          firstcolumn: 125
-          lastcolumn: 125
-          kind: 0
-        - message: ""
-          firstcolumn: 125
-          lastcolumn: 125
-          kind: 1
+    - message: This binary operation prevents previously joined label `animal` from
+        being added to the results.
+      firstcolumn: 125
+      lastcolumn: 125
+      kind: 0
+    - message: ''
+      firstcolumn: 125
+      lastcolumn: 125
+      kind: 1
     lines:
-        first: 4
-        last: 7
+      first: 4
+      last: 7
     severity: 1
     anchor: 0
 - description: orphaned group_right labels (all)
@@ -3386,19 +3498,20 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `brand` from being added to the results.
-          firstcolumn: 125
-          lastcolumn: 125
-          kind: 0
-        - message: ""
-          firstcolumn: 125
-          lastcolumn: 125
-          kind: 1
+    - message: This binary operation prevents previously joined label `brand` from
+        being added to the results.
+      firstcolumn: 125
+      lastcolumn: 125
+      kind: 0
+    - message: ''
+      firstcolumn: 125
+      lastcolumn: 125
+      kind: 1
     lines:
-        first: 4
-        last: 7
+      first: 4
+      last: 7
     severity: 1
     anchor: 0
 - description: orphaned group_right labels (all)
@@ -3421,19 +3534,20 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `pop_name` from being added to the results.
-          firstcolumn: 125
-          lastcolumn: 125
-          kind: 0
-        - message: ""
-          firstcolumn: 125
-          lastcolumn: 125
-          kind: 1
+    - message: This binary operation prevents previously joined label `pop_name` from
+        being added to the results.
+      firstcolumn: 125
+      lastcolumn: 125
+      kind: 0
+    - message: ''
+      firstcolumn: 125
+      lastcolumn: 125
+      kind: 1
     lines:
-        first: 4
-        last: 7
+      first: 4
+      last: 7
     severity: 1
     anchor: 0
 
@@ -3460,19 +3574,20 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `tier` from being added to the results.
-          firstcolumn: 125
-          lastcolumn: 125
-          kind: 0
-        - message: ""
-          firstcolumn: 125
-          lastcolumn: 125
-          kind: 1
+    - message: This binary operation prevents previously joined label `tier` from
+        being added to the results.
+      firstcolumn: 125
+      lastcolumn: 125
+      kind: 0
+    - message: ''
+      firstcolumn: 125
+      lastcolumn: 125
+      kind: 1
     lines:
-        first: 4
-        last: 7
+      first: 4
+      last: 7
     severity: 1
     anchor: 0
 - description: orphaned group_right labels (except animal)
@@ -3495,19 +3610,20 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `brand` from being added to the results.
-          firstcolumn: 125
-          lastcolumn: 125
-          kind: 0
-        - message: ""
-          firstcolumn: 125
-          lastcolumn: 125
-          kind: 1
+    - message: This binary operation prevents previously joined label `brand` from
+        being added to the results.
+      firstcolumn: 125
+      lastcolumn: 125
+      kind: 0
+    - message: ''
+      firstcolumn: 125
+      lastcolumn: 125
+      kind: 1
     lines:
-        first: 4
-        last: 7
+      first: 4
+      last: 7
     severity: 1
     anchor: 0
 - description: orphaned group_right labels (except animal)
@@ -3530,19 +3646,20 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `pop_name` from being added to the results.
-          firstcolumn: 125
-          lastcolumn: 125
-          kind: 0
-        - message: ""
-          firstcolumn: 125
-          lastcolumn: 125
-          kind: 1
+    - message: This binary operation prevents previously joined label `pop_name` from
+        being added to the results.
+      firstcolumn: 125
+      lastcolumn: 125
+      kind: 0
+    - message: ''
+      firstcolumn: 125
+      lastcolumn: 125
+      kind: 1
     lines:
-        first: 4
-        last: 7
+      first: 4
+      last: 7
     severity: 1
     anchor: 0
 - description: orphaned group_right labels (except animal)
@@ -3568,19 +3685,21 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `sliver` from being added to the results.
-          firstcolumn: 202
-          lastcolumn: 202
-          kind: 0
-        - message: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
-          firstcolumn: 1
-          lastcolumn: 257
-          kind: 1
+    - message: This binary operation prevents previously joined label `sliver` from
+        being added to the results.
+      firstcolumn: 202
+      lastcolumn: 202
+      kind: 0
+    - message: Query is using one-to-one vector matching with `on(instance)`, only
+        labels included inside `on(...)` will be present on the results.
+      firstcolumn: 1
+      lastcolumn: 257
+      kind: 1
     lines:
-        first: 4
-        last: 7
+      first: 4
+      last: 7
     severity: 1
     anchor: 0
 - description: orphaned group_right labels (except animal)
@@ -3606,19 +3725,21 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `animal` from being added to the results.
-          firstcolumn: 202
-          lastcolumn: 202
-          kind: 0
-        - message: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
-          firstcolumn: 1
-          lastcolumn: 257
-          kind: 1
+    - message: This binary operation prevents previously joined label `animal` from
+        being added to the results.
+      firstcolumn: 202
+      lastcolumn: 202
+      kind: 0
+    - message: Query is using one-to-one vector matching with `on(instance)`, only
+        labels included inside `on(...)` will be present on the results.
+      firstcolumn: 1
+      lastcolumn: 257
+      kind: 1
     lines:
-        first: 4
-        last: 7
+      first: 4
+      last: 7
     severity: 1
     anchor: 0
 
@@ -3643,19 +3764,20 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `tier` from being added to the results.
-          firstcolumn: 91
-          lastcolumn: 91
-          kind: 0
-        - message: ""
-          firstcolumn: 91
-          lastcolumn: 91
-          kind: 1
+    - message: This binary operation prevents previously joined label `tier` from
+        being added to the results.
+      firstcolumn: 91
+      lastcolumn: 91
+      kind: 0
+    - message: ''
+      firstcolumn: 91
+      lastcolumn: 91
+      kind: 1
     lines:
-        first: 4
-        last: 6
+      first: 4
+      last: 6
     severity: 1
     anchor: 0
 - description: orphaned group_right labels (except sliver)
@@ -3676,19 +3798,20 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `animal` from being added to the results.
-          firstcolumn: 91
-          lastcolumn: 91
-          kind: 0
-        - message: ""
-          firstcolumn: 91
-          lastcolumn: 91
-          kind: 1
+    - message: This binary operation prevents previously joined label `animal` from
+        being added to the results.
+      firstcolumn: 91
+      lastcolumn: 91
+      kind: 0
+    - message: ''
+      firstcolumn: 91
+      lastcolumn: 91
+      kind: 1
     lines:
-        first: 4
-        last: 6
+      first: 4
+      last: 6
     severity: 1
     anchor: 0
 - description: orphaned group_right labels (except sliver)
@@ -3709,19 +3832,20 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `brand` from being added to the results.
-          firstcolumn: 91
-          lastcolumn: 91
-          kind: 0
-        - message: ""
-          firstcolumn: 91
-          lastcolumn: 91
-          kind: 1
+    - message: This binary operation prevents previously joined label `brand` from
+        being added to the results.
+      firstcolumn: 91
+      lastcolumn: 91
+      kind: 0
+    - message: ''
+      firstcolumn: 91
+      lastcolumn: 91
+      kind: 1
     lines:
-        first: 4
-        last: 6
+      first: 4
+      last: 6
     severity: 1
     anchor: 0
 - description: orphaned group_right labels (except sliver)
@@ -3742,19 +3866,20 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `pop_name` from being added to the results.
-          firstcolumn: 91
-          lastcolumn: 91
-          kind: 0
-        - message: ""
-          firstcolumn: 91
-          lastcolumn: 91
-          kind: 1
+    - message: This binary operation prevents previously joined label `pop_name` from
+        being added to the results.
+      firstcolumn: 91
+      lastcolumn: 91
+      kind: 0
+    - message: ''
+      firstcolumn: 91
+      lastcolumn: 91
+      kind: 1
     lines:
-        first: 4
-        last: 6
+      first: 4
+      last: 6
     severity: 1
     anchor: 0
 
@@ -3784,15 +3909,16 @@
   problem:
     reporter: promql/impossible
     summary: dead code in query
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`vector(0) > 0` always evaluates to `0 > 0` which is not possible, so it will never return anything.'
-          firstcolumn: 12
-          lastcolumn: 20
-          kind: 0
+    - message: '`vector(0) > 0` always evaluates to `0 > 0` which is not possible,
+        so it will never return anything.'
+      firstcolumn: 12
+      lastcolumn: 20
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 1
     anchor: 0
 
@@ -3828,19 +3954,20 @@
   problem:
     reporter: promql/impossible
     summary: unused label
-    details: ""
+    details: ''
     diagnostics:
-        - message: Previously joined label `sliver` is being removed from the results.
-          firstcolumn: 81
-          lastcolumn: 91
-          kind: 0
-        - message: Query is using `group_right(sliver)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
-          firstcolumn: 144
-          lastcolumn: 149
-          kind: 1
+    - message: Previously joined label `sliver` is being removed from the results.
+      firstcolumn: 81
+      lastcolumn: 91
+      kind: 0
+    - message: Query is using `group_right(sliver)`, all labels included inside `group_right(...)`
+        will be joined to the results on the other side of the query.
+      firstcolumn: 144
+      lastcolumn: 149
+      kind: 1
     lines:
-        first: 4
-        last: 8
+      first: 4
+      last: 8
     severity: 1
     anchor: 0
 - description: unused & impossible group_right labels
@@ -3866,19 +3993,20 @@
   problem:
     reporter: promql/impossible
     summary: impossible label
-    details: ""
+    details: ''
     diagnostics:
-        - message: You can't use `colo_name` because this label is not possible here.
-          firstcolumn: 21
-          lastcolumn: 29
-          kind: 0
-        - message: Query is using aggregation with `by(animal)`, only labels included inside `by(...)` will be present on the results.
-          firstcolumn: 81
-          lastcolumn: 82
-          kind: 1
+    - message: You can't use `colo_name` because this label is not possible here.
+      firstcolumn: 21
+      lastcolumn: 29
+      kind: 0
+    - message: Query is using aggregation with `by(animal)`, only labels included
+        inside `by(...)` will be present on the results.
+      firstcolumn: 81
+      lastcolumn: 82
+      kind: 1
     lines:
-        first: 4
-        last: 8
+      first: 4
+      last: 8
     severity: 1
     anchor: 0
 
@@ -3909,19 +4037,20 @@
   problem:
     reporter: promql/impossible
     summary: unused label
-    details: ""
+    details: ''
     diagnostics:
-        - message: Previously joined label `sliver` is being removed from the results.
-          firstcolumn: 81
-          lastcolumn: 102
-          kind: 0
-        - message: Query is using `group_right(sliver)`, all labels included inside `group_right(...)` will be joined to the results on the other side of the query.
-          firstcolumn: 155
-          lastcolumn: 160
-          kind: 1
+    - message: Previously joined label `sliver` is being removed from the results.
+      firstcolumn: 81
+      lastcolumn: 102
+      kind: 0
+    - message: Query is using `group_right(sliver)`, all labels included inside `group_right(...)`
+        will be joined to the results on the other side of the query.
+      firstcolumn: 155
+      lastcolumn: 160
+      kind: 1
     lines:
-        first: 4
-        last: 8
+      first: 4
+      last: 8
     severity: 1
     anchor: 0
 
@@ -3947,19 +4076,21 @@
   problem:
     reporter: promql/impossible
     summary: orphaned label
-    details: ""
+    details: ''
     diagnostics:
-        - message: This binary operation prevents previously joined label `version` from being added to the results.
-          firstcolumn: 77
-          lastcolumn: 77
-          kind: 0
-        - message: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
-          firstcolumn: 1
-          lastcolumn: 131
-          kind: 1
+    - message: This binary operation prevents previously joined label `version` from
+        being added to the results.
+      firstcolumn: 77
+      lastcolumn: 77
+      kind: 0
+    - message: Query is using one-to-one vector matching with `on(instance)`, only
+        labels included inside `on(...)` will be present on the results.
+      firstcolumn: 1
+      lastcolumn: 131
+      kind: 1
     lines:
-        first: 4
-        last: 5
+      first: 4
+      last: 5
     severity: 1
     anchor: 0
 
@@ -3979,15 +4110,16 @@
   problem:
     reporter: promql/impossible
     summary: dead code in query
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`vector(0) > 0` always evaluates to `0 > 0` which is not possible, so it will never return anything.'
-          firstcolumn: 11
-          lastcolumn: 19
-          kind: 0
+    - message: '`vector(0) > 0` always evaluates to `0 > 0` which is not possible,
+        so it will never return anything.'
+      firstcolumn: 11
+      lastcolumn: 19
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 1
     anchor: 0
 

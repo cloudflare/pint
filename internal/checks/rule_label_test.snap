@@ -12,13 +12,13 @@
     summary: required label not set
     details: 'Rule comment: some text'
     diagnostics:
-        - message: '`severity` label is required.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: '`severity` label is required.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 1
     anchor: 0
 
@@ -40,15 +40,15 @@
   problem:
     reporter: rule/label
     summary: required label not set
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`severity` label is required.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: '`severity` label is required.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 2
-        last: 7
+      first: 2
+      last: 7
     severity: 1
     anchor: 0
 
@@ -70,15 +70,15 @@
   problem:
     reporter: rule/label
     summary: required label not set
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`severity` label is required.'
-          firstcolumn: 1
-          lastcolumn: 6
-          kind: 0
+    - message: '`severity` label is required.'
+      firstcolumn: 1
+      lastcolumn: 6
+      kind: 0
     lines:
-        first: 4
-        last: 7
+      first: 4
+      last: 7
     severity: 1
     anchor: 0
 
@@ -97,15 +97,15 @@
   problem:
     reporter: rule/label
     summary: invalid label value
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`severity` label value must match `^critical|info$`.'
-          firstcolumn: 1
-          lastcolumn: 7
-          kind: 0
+    - message: '`severity` label value must match `^critical|info$`.'
+      firstcolumn: 1
+      lastcolumn: 7
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 1
     anchor: 0
 
@@ -128,15 +128,15 @@
   problem:
     reporter: rule/label
     summary: invalid label value
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`severity` label value must match `^critical|info$`.'
-          firstcolumn: 1
-          lastcolumn: 5
-          kind: 0
+    - message: '`severity` label value must match `^critical|info$`.'
+      firstcolumn: 1
+      lastcolumn: 5
+      kind: 0
     lines:
-        first: 5
-        last: 5
+      first: 5
+      last: 5
     severity: 1
     anchor: 0
 
@@ -155,15 +155,15 @@
   problem:
     reporter: rule/label
     summary: invalid label value
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`severity` label value must match `^critical|info$`.'
-          firstcolumn: 1
-          lastcolumn: 7
-          kind: 0
+    - message: '`severity` label value must match `^critical|info$`.'
+      firstcolumn: 1
+      lastcolumn: 7
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 1
     anchor: 0
 
@@ -186,15 +186,15 @@
   problem:
     reporter: rule/label
     summary: invalid label value
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`severity` label value must match `^critical|info$`.'
-          firstcolumn: 1
-          lastcolumn: 5
-          kind: 0
+    - message: '`severity` label value must match `^critical|info$`.'
+      firstcolumn: 1
+      lastcolumn: 5
+      kind: 0
     lines:
-        first: 5
-        last: 5
+      first: 5
+      last: 5
     severity: 1
     anchor: 0
 
@@ -213,15 +213,15 @@
   problem:
     reporter: rule/label
     summary: invalid label value
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`components` label value must match `^api|memcached$`.'
-          firstcolumn: 1
-          lastcolumn: 6
-          kind: 0
+    - message: '`components` label value must match `^api|memcached$`.'
+      firstcolumn: 1
+      lastcolumn: 6
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 2
     anchor: 0
 
@@ -241,24 +241,24 @@
     reporter: rule/label
     summary: invalid label value
     details: |-
-        List of allowed values:
+      List of allowed values:
 
-        - `api`
-        - `memcached`
-        - `storage`
-        - `prometheus`
-        - `kvm`
-        - `mysql`
+      - `api`
+      - `memcached`
+      - `storage`
+      - `prometheus`
+      - `kvm`
+      - `mysql`
 
-        And 3 other value(s).
+      And 3 other value(s).
     diagnostics:
-        - message: '`components` label value is not one of valid values.'
-          firstcolumn: 1
-          lastcolumn: 6
-          kind: 0
+    - message: '`components` label value is not one of valid values.'
+      firstcolumn: 1
+      lastcolumn: 6
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 2
     anchor: 0
 
@@ -277,15 +277,15 @@
   problem:
     reporter: rule/label
     summary: invalid label value
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`severity` label value must match `^critical$`.'
-          firstcolumn: 1
-          lastcolumn: 7
-          kind: 0
+    - message: '`severity` label value must match `^critical$`.'
+      firstcolumn: 1
+      lastcolumn: 7
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 1
     anchor: 0
 
@@ -308,15 +308,15 @@
   problem:
     reporter: rule/label
     summary: invalid label value
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`severity` label value must match `^critical|info$`.'
-          firstcolumn: 1
-          lastcolumn: 5
-          kind: 0
+    - message: '`severity` label value must match `^critical|info$`.'
+      firstcolumn: 1
+      lastcolumn: 5
+      kind: 0
     lines:
-        first: 5
-        last: 5
+      first: 5
+      last: 5
     severity: 1
     anchor: 0
 
@@ -335,15 +335,15 @@
   problem:
     reporter: rule/label
     summary: invalid label value
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`severity` label value must match `^critical$`.'
-          firstcolumn: 1
-          lastcolumn: 7
-          kind: 0
+    - message: '`severity` label value must match `^critical$`.'
+      firstcolumn: 1
+      lastcolumn: 7
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 1
     anchor: 0
 
@@ -366,15 +366,15 @@
   problem:
     reporter: rule/label
     summary: invalid label value
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`severity` label value must match `^critical|info$`.'
-          firstcolumn: 1
-          lastcolumn: 5
-          kind: 0
+    - message: '`severity` label value must match `^critical|info$`.'
+      firstcolumn: 1
+      lastcolumn: 5
+      kind: 0
     lines:
-        first: 5
-        last: 5
+      first: 5
+      last: 5
     severity: 1
     anchor: 0
 
@@ -393,15 +393,15 @@
   problem:
     reporter: rule/label
     summary: invalid label value
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`components` label value must match `^api|memcached$`.'
-          firstcolumn: 1
-          lastcolumn: 6
-          kind: 0
+    - message: '`components` label value must match `^api|memcached$`.'
+      firstcolumn: 1
+      lastcolumn: 6
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 2
     anchor: 0
 
@@ -421,26 +421,26 @@
     reporter: rule/label
     summary: invalid label value
     details: |-
-        List of allowed values:
+      List of allowed values:
 
-        - `api`
-        - `memcached`
-        - `storage`
-        - `prometheus`
-        - `kvm`
-        - `mysql`
-        - `memsql`
-        - `haproxy`
+      - `api`
+      - `memcached`
+      - `storage`
+      - `prometheus`
+      - `kvm`
+      - `mysql`
+      - `memsql`
+      - `haproxy`
 
-        Rule comment: some text
+      Rule comment: some text
     diagnostics:
-        - message: '`components` label value is not one of valid values.'
-          firstcolumn: 1
-          lastcolumn: 6
-          kind: 0
+    - message: '`components` label value is not one of valid values.'
+      firstcolumn: 1
+      lastcolumn: 6
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 1
     anchor: 0
 
@@ -464,15 +464,15 @@
   problem:
     reporter: rule/label
     summary: required label not set
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`severity` label is required.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: '`severity` label is required.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 4
+      first: 1
+      last: 4
     severity: 1
     anchor: 0
 
@@ -497,15 +497,15 @@
   problem:
     reporter: rule/label
     summary: required label not set
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`sev.+` label is required.'
-          firstcolumn: 1
-          lastcolumn: 6
-          kind: 0
+    - message: '`sev.+` label is required.'
+      firstcolumn: 1
+      lastcolumn: 6
+      kind: 0
     lines:
-        first: 3
-        last: 5
+      first: 3
+      last: 5
     severity: 1
     anchor: 0
 
@@ -532,15 +532,15 @@
   problem:
     reporter: rule/label
     summary: required label not set
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`severity` label is required.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: '`severity` label is required.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 1
     anchor: 0
 
@@ -572,15 +572,15 @@
   problem:
     reporter: rule/label
     summary: required label not set
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`severity` label is required.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: '`severity` label is required.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 1
     anchor: 0
 
@@ -610,15 +610,15 @@
   problem:
     reporter: rule/label
     summary: invalid label value
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`for` label value must match `^must wait {{$for}} to fire$`.'
-          firstcolumn: 1
-          lastcolumn: 20
-          kind: 0
+    - message: '`for` label value must match `^must wait {{$for}} to fire$`.'
+      firstcolumn: 1
+      lastcolumn: 20
+      kind: 0
     lines:
-        first: 5
-        last: 5
+      first: 5
+      last: 5
     severity: 1
     anchor: 0
 
@@ -642,15 +642,15 @@
   problem:
     reporter: rule/label
     summary: invalid label value
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`priority` label value must match `^(1|2|3)$`.'
-          firstcolumn: 1
-          lastcolumn: 2
-          kind: 0
+    - message: '`priority` label value must match `^(1|2|3)$`.'
+      firstcolumn: 1
+      lastcolumn: 2
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 1
     anchor: 0
 
@@ -671,13 +671,13 @@
     summary: invalid label value
     details: 'Rule comment: some text'
     diagnostics:
-        - message: '`priority` label value must match `^(1|2|3)$`.'
-          firstcolumn: 1
-          lastcolumn: 2
-          kind: 0
+    - message: '`priority` label value must match `^(1|2|3)$`.'
+      firstcolumn: 1
+      lastcolumn: 2
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 1
     anchor: 0
 

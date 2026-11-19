@@ -10,15 +10,16 @@
   problem:
     reporter: promql/syntax
     summary: PromQL syntax error
-    details: '[Click here](https://prometheus.io/docs/prometheus/latest/querying/basics/) for PromQL documentation.'
+    details: '[Click here](https://prometheus.io/docs/prometheus/latest/querying/basics/)
+      for PromQL documentation.'
     diagnostics:
-        - message: unclosed left parenthesis
-          firstcolumn: 5
-          lastcolumn: 4
-          kind: 0
+    - message: unclosed left parenthesis
+      firstcolumn: 5
+      lastcolumn: 4
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 3
     anchor: 0
 
@@ -35,15 +36,16 @@
   problem:
     reporter: promql/syntax
     summary: PromQL syntax error
-    details: '[Click here](https://prometheus.io/docs/prometheus/latest/querying/basics/) for PromQL documentation.'
+    details: '[Click here](https://prometheus.io/docs/prometheus/latest/querying/basics/)
+      for PromQL documentation.'
     diagnostics:
-        - message: unclosed left parenthesis
-          firstcolumn: 13
-          lastcolumn: 12
-          kind: 0
+    - message: unclosed left parenthesis
+      firstcolumn: 13
+      lastcolumn: 12
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 3
     anchor: 0
 

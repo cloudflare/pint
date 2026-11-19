@@ -21,15 +21,16 @@
   problem:
     reporter: group/interval
     summary: interval too long
-    details: ""
+    details: ''
     diagnostics:
-        - message: Using group interval > 5m will cause gaps in recording rule results and flapping alerts.
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: Using group interval > 5m will cause gaps in recording rule results
+        and flapping alerts.
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 1
     anchor: 0
 
@@ -61,15 +62,16 @@
   problem:
     reporter: group/interval
     summary: interval too long
-    details: ""
+    details: ''
     diagnostics:
-        - message: Using group interval > 5m will cause gaps in recording rule results and flapping alerts.
-          firstcolumn: 1
-          lastcolumn: 2
-          kind: 0
+    - message: Using group interval > 5m will cause gaps in recording rule results
+        and flapping alerts.
+      firstcolumn: 1
+      lastcolumn: 2
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 1
     anchor: 0
 
@@ -91,15 +93,16 @@
   problem:
     reporter: group/interval
     summary: interval too long
-    details: ""
+    details: ''
     diagnostics:
-        - message: Using group interval > 5m will cause gaps in recording rule results and flapping alerts.
-          firstcolumn: 1
-          lastcolumn: 2
-          kind: 0
+    - message: Using group interval > 5m will cause gaps in recording rule results
+        and flapping alerts.
+      firstcolumn: 1
+      lastcolumn: 2
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 1
     anchor: 0
 
@@ -121,15 +124,16 @@
   problem:
     reporter: group/interval
     summary: interval too long
-    details: ""
+    details: ''
     diagnostics:
-        - message: Using group interval > 5m will cause gaps in recording rule results and flapping alerts.
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: Using group interval > 5m will cause gaps in recording rule results
+        and flapping alerts.
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 1
     anchor: 0
 

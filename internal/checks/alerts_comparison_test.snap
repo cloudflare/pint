@@ -13,19 +13,20 @@
     reporter: alerts/comparison
     summary: always firing alert
     details: |-
-        Prometheus alerting rules will trigger an alert for each query that returns *any* result.
-        Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.
-        In most cases this can be achieved by having some condition in the query expression.
-        For example `up == 0` or `rate(error_total[2m]) > 0`.
-        Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
+      Prometheus alerting rules will trigger an alert for each query that returns *any* result.
+      Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.
+      In most cases this can be achieved by having some condition in the query expression.
+      For example `up == 0` or `rate(error_total[2m]) > 0`.
+      Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
     diagnostics:
-        - message: If other parts of this query don't return anything then this part will always return a result and so this alert will fire.
-          firstcolumn: 14
-          lastcolumn: 22
-          kind: 0
+    - message: If other parts of this query don't return anything then this part will
+        always return a result and so this alert will fire.
+      firstcolumn: 14
+      lastcolumn: 22
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -60,19 +61,20 @@
     reporter: alerts/comparison
     summary: always firing alert
     details: |-
-        Prometheus alerting rules will trigger an alert for each query that returns *any* result.
-        Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.
-        In most cases this can be achieved by having some condition in the query expression.
-        For example `up == 0` or `rate(error_total[2m]) > 0`.
-        Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
+      Prometheus alerting rules will trigger an alert for each query that returns *any* result.
+      Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.
+      In most cases this can be achieved by having some condition in the query expression.
+      For example `up == 0` or `rate(error_total[2m]) > 0`.
+      Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
     diagnostics:
-        - message: If other parts of this query don't return anything then this part will always return a result and so this alert will fire.
-          firstcolumn: 14
-          lastcolumn: 22
-          kind: 0
+    - message: If other parts of this query don't return anything then this part will
+        always return a result and so this alert will fire.
+      firstcolumn: 14
+      lastcolumn: 22
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -117,19 +119,20 @@
     reporter: alerts/comparison
     summary: always firing alert
     details: |-
-        Prometheus alerting rules will trigger an alert for each query that returns *any* result.
-        Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.
-        In most cases this can be achieved by having some condition in the query expression.
-        For example `up == 0` or `rate(error_total[2m]) > 0`.
-        Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
+      Prometheus alerting rules will trigger an alert for each query that returns *any* result.
+      Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.
+      In most cases this can be achieved by having some condition in the query expression.
+      For example `up == 0` or `rate(error_total[2m]) > 0`.
+      Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
     diagnostics:
-        - message: Results of this query are using the `bool` modifier, which means it will always return a result and the alert will always fire.
-          firstcolumn: 6
-          lastcolumn: 20
-          kind: 0
+    - message: Results of this query are using the `bool` modifier, which means it
+        will always return a result and the alert will always fire.
+      firstcolumn: 6
+      lastcolumn: 20
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -154,19 +157,20 @@
     reporter: alerts/comparison
     summary: always firing alert
     details: |-
-        Prometheus alerting rules will trigger an alert for each query that returns *any* result.
-        Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.
-        In most cases this can be achieved by having some condition in the query expression.
-        For example `up == 0` or `rate(error_total[2m]) > 0`.
-        Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
+      Prometheus alerting rules will trigger an alert for each query that returns *any* result.
+      Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.
+      In most cases this can be achieved by having some condition in the query expression.
+      For example `up == 0` or `rate(error_total[2m]) > 0`.
+      Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
     diagnostics:
-        - message: This query doesn't have any condition and so this alert will always fire if it matches anything.
-          firstcolumn: 1
-          lastcolumn: 13
-          kind: 0
+    - message: This query doesn't have any condition and so this alert will always
+        fire if it matches anything.
+      firstcolumn: 1
+      lastcolumn: 13
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -216,19 +220,20 @@
     reporter: alerts/comparison
     summary: always firing alert
     details: |-
-        Prometheus alerting rules will trigger an alert for each query that returns *any* result.
-        Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.
-        In most cases this can be achieved by having some condition in the query expression.
-        For example `up == 0` or `rate(error_total[2m]) > 0`.
-        Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
+      Prometheus alerting rules will trigger an alert for each query that returns *any* result.
+      Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.
+      In most cases this can be achieved by having some condition in the query expression.
+      For example `up == 0` or `rate(error_total[2m]) > 0`.
+      Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
     diagnostics:
-        - message: This query doesn't have any condition and so this alert will always fire if it matches anything.
-          firstcolumn: 24
-          lastcolumn: 61
-          kind: 0
+    - message: This query doesn't have any condition and so this alert will always
+        fire if it matches anything.
+      firstcolumn: 24
+      lastcolumn: 61
+      kind: 0
     lines:
-        first: 3
-        last: 5
+      first: 3
+      last: 5
     severity: 1
     anchor: 0
 
@@ -261,19 +266,20 @@
     reporter: alerts/comparison
     summary: always firing alert
     details: |-
-        Prometheus alerting rules will trigger an alert for each query that returns *any* result.
-        Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.
-        In most cases this can be achieved by having some condition in the query expression.
-        For example `up == 0` or `rate(error_total[2m]) > 0`.
-        Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
+      Prometheus alerting rules will trigger an alert for each query that returns *any* result.
+      Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.
+      In most cases this can be achieved by having some condition in the query expression.
+      For example `up == 0` or `rate(error_total[2m]) > 0`.
+      Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
     diagnostics:
-        - message: This query will always return a result and so this alert will always fire.
-          firstcolumn: 1
-          lastcolumn: 9
-          kind: 0
+    - message: This query will always return a result and so this alert will always
+        fire.
+      firstcolumn: 1
+      lastcolumn: 9
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -293,19 +299,20 @@
     reporter: alerts/comparison
     summary: always firing alert
     details: |-
-        Prometheus alerting rules will trigger an alert for each query that returns *any* result.
-        Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.
-        In most cases this can be achieved by having some condition in the query expression.
-        For example `up == 0` or `rate(error_total[2m]) > 0`.
-        Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
+      Prometheus alerting rules will trigger an alert for each query that returns *any* result.
+      Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.
+      In most cases this can be achieved by having some condition in the query expression.
+      For example `up == 0` or `rate(error_total[2m]) > 0`.
+      Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
     diagnostics:
-        - message: If other parts of this query don't return anything then this part will always return a result and so this alert will fire.
-          firstcolumn: 14
-          lastcolumn: 22
-          kind: 0
+    - message: If other parts of this query don't return anything then this part will
+        always return a result and so this alert will fire.
+      firstcolumn: 14
+      lastcolumn: 22
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 

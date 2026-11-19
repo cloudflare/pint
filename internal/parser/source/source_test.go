@@ -523,7 +523,7 @@ func TestLabelsSource(t *testing.T) {
 				Expr:   expr,
 				Output: output,
 			}
-			d, err := yaml.Dump(snap, yaml.WithV3Defaults(), yaml.WithLineWidth(-1))
+			d, err := yaml.Dump(snap)
 			require.NoError(t, err, "failed to YAML encode snapshots")
 			snaps.WithConfig(snaps.Dir("."), snaps.Filename(file)).MatchSnapshot(t, string(d))
 		})
@@ -1035,7 +1035,7 @@ func TestLabelsSourceWithFeatures(t *testing.T) {
 				Expr:   tc.expr,
 				Output: output,
 			}
-			d, err := yaml.Dump(snap, yaml.WithV3Defaults(), yaml.WithLineWidth(-1))
+			d, err := yaml.Dump(snap)
 			require.NoError(t, err, "failed to YAML encode snapshots")
 			snaps.WithConfig(snaps.Dir("."), snaps.Filename(file)).MatchSnapshot(t, string(d))
 		})

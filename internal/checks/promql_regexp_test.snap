@@ -33,15 +33,18 @@
   problem:
     reporter: promql/regexp
     summary: smelly regexp selector
-    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors)
+      for details on how vector selectors work.
     diagnostics:
-        - message: '`{cluster=~".*dev.*"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels'
-          firstcolumn: 5
-          lastcolumn: 22
-          kind: 0
+    - message: '`{cluster=~".*dev.*"}` looks like a smelly selector that tries to
+        extract substrings from the value, please consider breaking down the value
+        of this label into multiple smaller labels'
+      firstcolumn: 5
+      lastcolumn: 22
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -64,15 +67,17 @@
   problem:
     reporter: promql/regexp
     summary: redundant regexp
-    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors)
+      for details on how vector selectors work.
     diagnostics:
-        - message: Unnecessary regexp match on static string `job=~"bar"`, use `job="bar"` instead.
-          firstcolumn: 5
-          lastcolumn: 14
-          kind: 0
+    - message: Unnecessary regexp match on static string `job=~"bar"`, use `job="bar"`
+        instead.
+      firstcolumn: 5
+      lastcolumn: 14
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -90,15 +95,17 @@
   problem:
     reporter: promql/regexp
     summary: redundant regexp
-    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors)
+      for details on how vector selectors work.
     diagnostics:
-        - message: Unnecessary regexp match on static string `job=~"bar"`, use `job="bar"` instead.
-          firstcolumn: 5
-          lastcolumn: 14
-          kind: 0
+    - message: Unnecessary regexp match on static string `job=~"bar"`, use `job="bar"`
+        instead.
+      firstcolumn: 5
+      lastcolumn: 14
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 - description: duplicated unnecessary regexp
@@ -113,15 +120,17 @@
   problem:
     reporter: promql/regexp
     summary: redundant regexp
-    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors)
+      for details on how vector selectors work.
     diagnostics:
-        - message: Unnecessary regexp match on static string `job=~"bar"`, use `job="bar"` instead.
-          firstcolumn: 23
-          lastcolumn: 32
-          kind: 0
+    - message: Unnecessary regexp match on static string `job=~"bar"`, use `job="bar"`
+        instead.
+      firstcolumn: 23
+      lastcolumn: 32
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -149,15 +158,17 @@
   problem:
     reporter: promql/regexp
     summary: redundant regexp
-    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors)
+      for details on how vector selectors work.
     diagnostics:
-        - message: Unnecessary regexp match on static string `job=~"(?:)"`, use `job=""` instead.
-          firstcolumn: 5
-          lastcolumn: 15
-          kind: 0
+    - message: Unnecessary regexp match on static string `job=~"(?:)"`, use `job=""`
+        instead.
+      firstcolumn: 5
+      lastcolumn: 15
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -174,15 +185,16 @@
   problem:
     reporter: promql/regexp
     summary: redundant regexp
-    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors)
+      for details on how vector selectors work.
     diagnostics:
-        - message: Unnecessary regexp match on static string `job=~""`, use `job=""` instead.
-          firstcolumn: 5
-          lastcolumn: 11
-          kind: 0
+    - message: Unnecessary regexp match on static string `job=~""`, use `job=""` instead.
+      firstcolumn: 5
+      lastcolumn: 11
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -212,15 +224,18 @@
   problem:
     reporter: promql/regexp
     summary: smelly regexp selector
-    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors)
+      for details on how vector selectors work.
     diagnostics:
-        - message: '`{name=~"etcd-backup-.*.timer"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels'
-          firstcolumn: 5
-          lastcolumn: 32
-          kind: 0
+    - message: '`{name=~"etcd-backup-.*.timer"}` looks like a smelly selector that
+        tries to extract substrings from the value, please consider breaking down
+        the value of this label into multiple smaller labels'
+      firstcolumn: 5
+      lastcolumn: 32
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -238,15 +253,17 @@
   problem:
     reporter: promql/regexp
     summary: redundant regexp
-    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors)
+      for details on how vector selectors work.
     diagnostics:
-        - message: Unnecessary regexp match on static string `job=~"bar"`, use `job="bar"` instead.
-          firstcolumn: 5
-          lastcolumn: 14
-          kind: 0
+    - message: Unnecessary regexp match on static string `job=~"bar"`, use `job="bar"`
+        instead.
+      firstcolumn: 5
+      lastcolumn: 14
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -271,15 +288,18 @@
   problem:
     reporter: promql/regexp
     summary: smelly regexp selector
-    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors)
+      for details on how vector selectors work.
     diagnostics:
-        - message: '`{cluster!~".*staging.*"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels'
-          firstcolumn: 5
-          lastcolumn: 26
-          kind: 0
+    - message: '`{cluster!~".*staging.*"}` looks like a smelly selector that tries
+        to extract substrings from the value, please consider breaking down the value
+        of this label into multiple smaller labels'
+      firstcolumn: 5
+      lastcolumn: 26
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -329,15 +349,18 @@
   problem:
     reporter: promql/regexp
     summary: smelly regexp selector
-    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors)
+      for details on how vector selectors work.
     diagnostics:
-        - message: '`{job=~"service_.*_prod"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels'
-          firstcolumn: 5
-          lastcolumn: 26
-          kind: 0
+    - message: '`{job=~"service_.*_prod"}` looks like a smelly selector that tries
+        to extract substrings from the value, please consider breaking down the value
+        of this label into multiple smaller labels'
+      firstcolumn: 5
+      lastcolumn: 26
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -357,15 +380,18 @@
   problem:
     reporter: promql/regexp
     summary: smelly regexp selector
-    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors)
+      for details on how vector selectors work.
     diagnostics:
-        - message: '`{job=~"service_.*_prod"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels'
-          firstcolumn: 5
-          lastcolumn: 26
-          kind: 0
+    - message: '`{job=~"service_.*_prod"}` looks like a smelly selector that tries
+        to extract substrings from the value, please consider breaking down the value
+        of this label into multiple smaller labels'
+      firstcolumn: 5
+      lastcolumn: 26
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -390,15 +416,18 @@
   problem:
     reporter: promql/regexp
     summary: smelly regexp selector
-    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors)
+      for details on how vector selectors work.
     diagnostics:
-        - message: '`{job=~"service_.*_prod"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels'
-          firstcolumn: 5
-          lastcolumn: 26
-          kind: 0
+    - message: '`{job=~"service_.*_prod"}` looks like a smelly selector that tries
+        to extract substrings from the value, please consider breaking down the value
+        of this label into multiple smaller labels'
+      firstcolumn: 5
+      lastcolumn: 26
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -427,15 +456,17 @@
   problem:
     reporter: promql/regexp
     summary: unnecessary negative wildcard regexp
-    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors)
+      for details on how vector selectors work.
     diagnostics:
-        - message: Use `foo{job=""}` if you want to match on all time series for `foo` without the `job` label.
-          firstcolumn: 5
-          lastcolumn: 13
-          kind: 0
+    - message: Use `foo{job=""}` if you want to match on all time series for `foo`
+        without the `job` label.
+      firstcolumn: 5
+      lastcolumn: 13
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -453,15 +484,17 @@
   problem:
     reporter: promql/regexp
     summary: redundant regexp
-    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors)
+      for details on how vector selectors work.
     diagnostics:
-        - message: Unnecessary regexp match on static string `job!~"bar"`, use `job!="bar"` instead.
-          firstcolumn: 5
-          lastcolumn: 14
-          kind: 0
+    - message: Unnecessary regexp match on static string `job!~"bar"`, use `job!="bar"`
+        instead.
+      firstcolumn: 5
+      lastcolumn: 14
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -480,15 +513,17 @@
   problem:
     reporter: promql/regexp
     summary: unnecessary negative wildcard regexp
-    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors)
+      for details on how vector selectors work.
     diagnostics:
-        - message: Use `foo{job=""}` if you want to match on all time series for `foo` without the `job` label.
-          firstcolumn: 5
-          lastcolumn: 13
-          kind: 0
+    - message: Use `foo{job=""}` if you want to match on all time series for `foo`
+        without the `job` label.
+      firstcolumn: 5
+      lastcolumn: 13
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -506,15 +541,17 @@
   problem:
     reporter: promql/regexp
     summary: redundant regexp
-    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors)
+      for details on how vector selectors work.
     diagnostics:
-        - message: Unnecessary regexp match on static string `job=~"bar"`, use `job="bar"` instead.
-          firstcolumn: 5
-          lastcolumn: 14
-          kind: 0
+    - message: Unnecessary regexp match on static string `job=~"bar"`, use `job="bar"`
+        instead.
+      firstcolumn: 5
+      lastcolumn: 14
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -533,15 +570,18 @@
   problem:
     reporter: promql/regexp
     summary: redundant regexp anchors
-    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors)
+      for details on how vector selectors work.
     diagnostics:
-        - message: Prometheus regexp matchers are automatically fully anchored so a match for `job=~"^.+$"` will result in `job=~"^^.+$$"`, remove regexp anchors `^` and/or `$`.
-          firstcolumn: 5
-          lastcolumn: 15
-          kind: 0
+    - message: Prometheus regexp matchers are automatically fully anchored so a match
+        for `job=~"^.+$"` will result in `job=~"^^.+$$"`, remove regexp anchors `^`
+        and/or `$`.
+      firstcolumn: 5
+      lastcolumn: 15
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -561,15 +601,18 @@
   problem:
     reporter: promql/regexp
     summary: redundant regexp anchors
-    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors)
+      for details on how vector selectors work.
     diagnostics:
-        - message: Prometheus regexp matchers are automatically fully anchored so a match for `job=~"(foo|^.+)$"` will result in `job=~"^(foo|^.+)$$"`, remove regexp anchors `^` and/or `$`.
-          firstcolumn: 5
-          lastcolumn: 21
-          kind: 0
+    - message: Prometheus regexp matchers are automatically fully anchored so a match
+        for `job=~"(foo|^.+)$"` will result in `job=~"^(foo|^.+)$$"`, remove regexp
+        anchors `^` and/or `$`.
+      firstcolumn: 5
+      lastcolumn: 21
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -587,15 +630,17 @@
   problem:
     reporter: promql/regexp
     summary: redundant regexp
-    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors)
+      for details on how vector selectors work.
     diagnostics:
-        - message: Unnecessary regexp match on static string `job=~"foo\"bar"`, use `job="foo\"bar"` instead.
-          firstcolumn: 1
-          lastcolumn: 20
-          kind: 0
+    - message: Unnecessary regexp match on static string `job=~"foo\"bar"`, use `job="foo\"bar"`
+        instead.
+      firstcolumn: 1
+      lastcolumn: 20
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -612,15 +657,16 @@
   problem:
     reporter: promql/regexp
     summary: unnecessary wildcard regexp
-    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors)
+      for details on how vector selectors work.
     diagnostics:
-        - message: Use `foo` if you want to match on all `job` values.
-          firstcolumn: 5
-          lastcolumn: 13
-          kind: 0
+    - message: Use `foo` if you want to match on all `job` values.
+      firstcolumn: 5
+      lastcolumn: 13
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -637,15 +683,16 @@
   problem:
     reporter: promql/regexp
     summary: unnecessary wildcard regexp
-    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors)
+      for details on how vector selectors work.
     diagnostics:
-        - message: Use `foo{instance="bob"}` if you want to match on all `job` values.
-          firstcolumn: 5
-          lastcolumn: 13
-          kind: 0
+    - message: Use `foo{instance="bob"}` if you want to match on all `job` values.
+      firstcolumn: 5
+      lastcolumn: 13
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 - description: unnecessary wildcard regexp / many filters
@@ -659,15 +706,16 @@
   problem:
     reporter: promql/regexp
     summary: unnecessary wildcard regexp
-    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors)
+      for details on how vector selectors work.
     diagnostics:
-        - message: Use `foo{instance="bob"}` if you want to match on all `cluster` values.
-          firstcolumn: 16
-          lastcolumn: 28
-          kind: 0
+    - message: Use `foo{instance="bob"}` if you want to match on all `cluster` values.
+      firstcolumn: 16
+      lastcolumn: 28
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 
@@ -685,15 +733,16 @@
   problem:
     reporter: promql/regexp
     summary: unnecessary wildcard regexp
-    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors)
+      for details on how vector selectors work.
     diagnostics:
-        - message: Use `{instance="bob"}` if you want to match on all `job` values.
-          firstcolumn: 2
-          lastcolumn: 10
-          kind: 0
+    - message: Use `{instance="bob"}` if you want to match on all `job` values.
+      firstcolumn: 2
+      lastcolumn: 10
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 1
     anchor: 0
 - description: unnecessary wildcard regexp / many filters / no name
@@ -707,15 +756,16 @@
   problem:
     reporter: promql/regexp
     summary: unnecessary wildcard regexp
-    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors)
+      for details on how vector selectors work.
     diagnostics:
-        - message: Use `{instance="bob"}` if you want to match on all `cluster` values.
-          firstcolumn: 13
-          lastcolumn: 25
-          kind: 0
+    - message: Use `{instance="bob"}` if you want to match on all `cluster` values.
+      firstcolumn: 13
+      lastcolumn: 25
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 1
     anchor: 0
 
@@ -733,15 +783,17 @@
   problem:
     reporter: promql/regexp
     summary: unnecessary wildcard regexp
-    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors)
+      for details on how vector selectors work.
     diagnostics:
-        - message: Use `{__name__=~"foo|bar", instance="bob"}` if you want to match on all `job` values.
-          firstcolumn: 2
-          lastcolumn: 10
-          kind: 0
+    - message: Use `{__name__=~"foo|bar", instance="bob"}` if you want to match on
+        all `job` values.
+      firstcolumn: 2
+      lastcolumn: 10
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 1
     anchor: 0
 - description: unnecessary wildcard regexp / many filters / regexp name
@@ -757,15 +809,17 @@
   problem:
     reporter: promql/regexp
     summary: unnecessary wildcard regexp
-    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors)
+      for details on how vector selectors work.
     diagnostics:
-        - message: Use `{__name__=~"foo|bar", instance="bob"}` if you want to match on all `cluster` values.
-          firstcolumn: 34
-          lastcolumn: 46
-          kind: 0
+    - message: Use `{__name__=~"foo|bar", instance="bob"}` if you want to match on
+        all `cluster` values.
+      firstcolumn: 34
+      lastcolumn: 46
+      kind: 0
     lines:
-        first: 3
-        last: 3
+      first: 3
+      last: 3
     severity: 1
     anchor: 0
 
@@ -807,15 +861,16 @@
   problem:
     reporter: promql/regexp
     summary: unnecessary wildcard regexp
-    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors)
+      for details on how vector selectors work.
     diagnostics:
-        - message: Use `foo` if you want to match on all `job` values.
-          firstcolumn: 5
-          lastcolumn: 13
-          kind: 0
+    - message: Use `foo` if you want to match on all `job` values.
+      firstcolumn: 5
+      lastcolumn: 13
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 - description: wildcard and static redundant regexp
@@ -830,15 +885,17 @@
   problem:
     reporter: promql/regexp
     summary: redundant regexp
-    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors)
+      for details on how vector selectors work.
     diagnostics:
-        - message: Unnecessary regexp match on static string `cluster=~"prod"`, use `cluster="prod"` instead.
-          firstcolumn: 16
-          lastcolumn: 30
-          kind: 0
+    - message: Unnecessary regexp match on static string `cluster=~"prod"`, use `cluster="prod"`
+        instead.
+      firstcolumn: 16
+      lastcolumn: 30
+      kind: 0
     lines:
-        first: 2
-        last: 2
+      first: 2
+      last: 2
     severity: 1
     anchor: 0
 

@@ -41,13 +41,14 @@
     summary: link check failed
     details: 'Rule comment: some text'
     diagnostics:
-        - message: 'GET request for http://127.0.0.1:XXXXX/dashboard returned invalid status code: `400 Bad Request`.'
-          firstcolumn: 1
-          lastcolumn: 32
-          kind: 0
+    - message: 'GET request for http://127.0.0.1:XXXXX/dashboard returned invalid
+        status code: `400 Bad Request`.'
+      firstcolumn: 1
+      lastcolumn: 32
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 2
     anchor: 0
 
@@ -79,13 +80,14 @@
     summary: link check failed
     details: 'Rule comment: some text'
     diagnostics:
-        - message: 'GET request for http: returned an error: Get "http:": http: no Host in request URL.'
-          firstcolumn: 1
-          lastcolumn: 7
-          kind: 0
+    - message: 'GET request for http: returned an error: Get "http:": http: no Host
+        in request URL.'
+      firstcolumn: 1
+      lastcolumn: 7
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 2
     anchor: 0
 
@@ -112,15 +114,16 @@
   problem:
     reporter: rule/link
     summary: link check failed
-    details: ""
+    details: ''
     diagnostics:
-        - message: 'GET request for http://127.0.0.1:XXXXX/dashboard returned invalid status code: `400 Bad Request`.'
-          firstcolumn: 1
-          lastcolumn: 32
-          kind: 0
+    - message: 'GET request for http://127.0.0.1:XXXXX/dashboard returned invalid
+        status code: `400 Bad Request`.'
+      firstcolumn: 1
+      lastcolumn: 32
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 1
     anchor: 0
 - description: multiple links, 400
@@ -138,15 +141,16 @@
   problem:
     reporter: rule/link
     summary: link check failed
-    details: ""
+    details: ''
     diagnostics:
-        - message: 'GET request for http://127.0.0.1:XXXXX/graph returned invalid status code: `400 Bad Request`.'
-          firstcolumn: 1
-          lastcolumn: 28
-          kind: 0
+    - message: 'GET request for http://127.0.0.1:XXXXX/graph returned invalid status
+        code: `400 Bad Request`.'
+      firstcolumn: 1
+      lastcolumn: 28
+      kind: 0
     lines:
-        first: 5
-        last: 5
+      first: 5
+      last: 5
     severity: 1
     anchor: 0
 

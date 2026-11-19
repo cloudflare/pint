@@ -236,7 +236,7 @@ func runTests(t *testing.T, testCases []checkTest) {
 					})
 				}
 
-				d, err := yaml.Dump(snapshots, yaml.WithV3Defaults(), yaml.WithLineWidth(-1))
+				d, err := yaml.Dump(snapshots)
 				var snapshot string
 				if tc.snapshot != nil {
 					snapshot = tc.snapshot(string(d))

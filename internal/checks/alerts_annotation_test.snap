@@ -10,15 +10,15 @@
   problem:
     reporter: alerts/annotation
     summary: required annotation not set
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`severity` annotation is required.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: '`severity` annotation is required.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 1
     anchor: 0
 
@@ -40,15 +40,15 @@
   problem:
     reporter: alerts/annotation
     summary: required annotation not set
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`severity` annotation is required.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: '`severity` annotation is required.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 2
-        last: 7
+      first: 2
+      last: 7
     severity: 2
     anchor: 0
 
@@ -74,13 +74,13 @@
     summary: invalid annotation value
     details: 'Rule comment: rule comment'
     diagnostics:
-        - message: '`components` annotation value must match `^api|memcached$`.'
-          firstcolumn: 1
-          lastcolumn: 6
-          kind: 0
+    - message: '`components` annotation value must match `^api|memcached$`.'
+      firstcolumn: 1
+      lastcolumn: 6
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 2
     anchor: 0
 
@@ -100,25 +100,25 @@
     reporter: alerts/annotation
     summary: invalid annotation value
     details: |-
-        List of allowed values:
+      List of allowed values:
 
-        - `api`
-        - `memcached`
-        - `storage`
-        - `prometheus`
-        - `kvm`
-        - `mysql`
+      - `api`
+      - `memcached`
+      - `storage`
+      - `prometheus`
+      - `kvm`
+      - `mysql`
 
-        And 3 other value(s).
-        Rule comment: rule comment
+      And 3 other value(s).
+      Rule comment: rule comment
     diagnostics:
-        - message: '`components` annotation value is not one of valid values.'
-          firstcolumn: 1
-          lastcolumn: 6
-          kind: 0
+    - message: '`components` annotation value is not one of valid values.'
+      firstcolumn: 1
+      lastcolumn: 6
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 2
     anchor: 0
 
@@ -142,15 +142,15 @@
   problem:
     reporter: alerts/annotation
     summary: required annotation not set
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`severity` annotation is required.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: '`severity` annotation is required.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 4
+      first: 1
+      last: 4
     severity: 1
     anchor: 0
 
@@ -172,15 +172,15 @@
   problem:
     reporter: alerts/annotation
     summary: required annotation not set
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`severity` annotation is required.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: '`severity` annotation is required.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 1
-        last: 2
+      first: 1
+      last: 2
     severity: 1
     anchor: 0
 
@@ -205,15 +205,15 @@
   problem:
     reporter: alerts/annotation
     summary: invalid annotation value
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`for` annotation value must match `^{{ $for }}$`.'
-          firstcolumn: 1
-          lastcolumn: 2
-          kind: 0
+    - message: '`for` annotation value must match `^{{ $for }}$`.'
+      firstcolumn: 1
+      lastcolumn: 2
+      kind: 0
     lines:
-        first: 5
-        last: 5
+      first: 5
+      last: 5
     severity: 2
     anchor: 0
 
@@ -252,15 +252,15 @@
   problem:
     reporter: alerts/annotation
     summary: invalid annotation value
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`annotation_.*` annotation value must match `^critical$`.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: '`annotation_.*` annotation value must match `^critical$`.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 1
     anchor: 0
 
@@ -279,15 +279,15 @@
   problem:
     reporter: alerts/annotation
     summary: invalid annotation value
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`annotation_.*` annotation value must match `^critical$`.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: '`annotation_.*` annotation value must match `^critical$`.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 1
     anchor: 0
 
@@ -306,15 +306,15 @@
   problem:
     reporter: alerts/annotation
     summary: invalid annotation value
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`severity` annotation value must match `^critical$`.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: '`severity` annotation value must match `^critical$`.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 1
     anchor: 0
 
@@ -333,15 +333,15 @@
   problem:
     reporter: alerts/annotation
     summary: invalid annotation value
-    details: ""
+    details: ''
     diagnostics:
-        - message: '`severity` annotation value must match `^critical$`.'
-          firstcolumn: 1
-          lastcolumn: 3
-          kind: 0
+    - message: '`severity` annotation value must match `^critical$`.'
+      firstcolumn: 1
+      lastcolumn: 3
+      kind: 0
     lines:
-        first: 4
-        last: 4
+      first: 4
+      last: 4
     severity: 1
     anchor: 0
 

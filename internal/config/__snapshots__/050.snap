@@ -2,108 +2,108 @@
 [TestGetChecksForRule/state_match - 1]
 title: state match
 config: |-
-    {
-      "ci": {
-        "baseBranch": "master",
-        "maxCommits": 20
-      },
-      "parser": {},
-      "repository": {},
-      "checks": {
-        "enabled": [
-          "alerts/absent",
-          "alerts/annotation",
-          "alerts/comparison",
-          "alerts/count",
-          "alerts/external_labels",
-          "alerts/for",
-          "alerts/template",
-          "labels/conflict",
-          "promql/aggregate",
-          "promql/counter",
-          "promql/features",
-          "promql/fragile",
-          "group/interval",
-          "promql/impossible",
-          "promql/nan",
-          "promql/offset",
-          "promql/range_query",
-          "promql/rate",
-          "promql/regexp",
-          "promql/selector",
-          "promql/series",
-          "promql/syntax",
-          "promql/vector_matching",
-          "query/cost",
-          "rule/dependency",
-          "rule/duplicate",
-          "rule/for",
-          "rule/label",
-          "rule/link",
-          "rule/name",
-          "rule/reject",
-          "rule/report"
+  {
+    "ci": {
+      "baseBranch": "master",
+      "maxCommits": 20
+    },
+    "parser": {},
+    "repository": {},
+    "checks": {
+      "enabled": [
+        "alerts/absent",
+        "alerts/annotation",
+        "alerts/comparison",
+        "alerts/count",
+        "alerts/external_labels",
+        "alerts/for",
+        "alerts/template",
+        "labels/conflict",
+        "promql/aggregate",
+        "promql/counter",
+        "promql/features",
+        "promql/fragile",
+        "group/interval",
+        "promql/impossible",
+        "promql/nan",
+        "promql/offset",
+        "promql/range_query",
+        "promql/rate",
+        "promql/regexp",
+        "promql/selector",
+        "promql/series",
+        "promql/syntax",
+        "promql/vector_matching",
+        "query/cost",
+        "rule/dependency",
+        "rule/duplicate",
+        "rule/for",
+        "rule/label",
+        "rule/link",
+        "rule/name",
+        "rule/reject",
+        "rule/report"
+      ]
+    },
+    "owners": {},
+    "rules": [
+      {
+        "match": [
+          {
+            "state": [
+              "renamed"
+            ]
+          }
+        ],
+        "aggregate": [
+          {
+            "name": ".+",
+            "severity": "bug",
+            "keep": [
+              "job"
+            ]
+          }
         ]
       },
-      "owners": {},
-      "rules": [
-        {
-          "match": [
-            {
-              "state": [
-                "renamed"
-              ]
-            }
-          ],
-          "aggregate": [
-            {
-              "name": ".+",
-              "severity": "bug",
-              "keep": [
-                "job"
-              ]
-            }
-          ]
-        },
-        {
-          "ignore": [
-            {
-              "state": [
-                "modified"
-              ]
-            }
-          ],
-          "aggregate": [
-            {
-              "name": ".+",
-              "severity": "bug",
-              "strip": [
-                "instance",
-                "rack"
-              ]
-            }
-          ]
-        }
-      ]
-    }
+      {
+        "ignore": [
+          {
+            "state": [
+              "modified"
+            ]
+          }
+        ],
+        "aggregate": [
+          {
+            "name": ".+",
+            "severity": "bug",
+            "strip": [
+              "instance",
+              "rack"
+            ]
+          }
+        ]
+      }
+    ]
+  }
 entry:
-    path:
-        name: rules.yml
-        symlinktarget: rules.yml
-    filecomments: []
-    rulecomments: []
+  path:
+    name: rules.yml
+    symlinktarget: rules.yml
+  filecomments: []
+  rulecomments: []
 checks:
-    - promql/syntax
-    - alerts/for
-    - alerts/comparison
-    - alerts/template
-    - promql/fragile
-    - promql/regexp
-    - promql/impossible
-    - promql/nan
-    - group/interval
-    - promql/aggregate(job:true)
-    - promql/aggregate(instance:false)
-    - promql/aggregate(rack:false)
+- promql/syntax
+- alerts/for
+- alerts/comparison
+- alerts/template
+- promql/fragile
+- promql/regexp
+- promql/impossible
+- promql/nan
+- group/interval
+- promql/aggregate(job:true)
+- promql/aggregate(instance:false)
+- promql/aggregate(rack:false)
 
 ---
