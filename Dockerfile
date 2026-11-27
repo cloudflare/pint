@@ -4,7 +4,7 @@ WORKDIR /src
 RUN apk add make git
 RUN make
 
-FROM debian:stable-20261104@sha256:3f0347f4b50e7a54a91d1beaf6ce6fa5aec392347da6a9184b5bfe4e1b814538
+FROM debian:stable-20261123@sha256:a32b8984739287d78c4783b0825bdaaad187d157b16a98e0c0c5e5f2675d81fa
 RUN apt-get update --yes && \
     apt-get install --no-install-recommends --yes git ca-certificates && \
     rm -rf /var/lib/apt/lists/*
